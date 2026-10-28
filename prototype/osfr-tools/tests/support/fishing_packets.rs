@@ -1,6 +1,7 @@
 //! Shared request builders and the fish-definition fixture for the fishing tests
-//! (`fishing_entry`, `fishing_service`, `fisherman_entry_chain` and
-//! `fishing_guide_drawable`). Test-only; production never includes this file.
+//! (`fishing_entry`, `fishing_service`, `fisherman_entry_chain`,
+//! `fishing_guide_drawable` and `quest_any_of_objectives`). Test-only; production
+//! never includes this file.
 //!
 //! 138 request shapes come from the client writers `00b6a380|400|460|4d0`; the
 //! family-39 envelope from the base constructor `008a4420` (family, subtype, then
@@ -34,10 +35,31 @@ pub fn fish_item_ids() -> BTreeSet<i32> {
         .collect()
 }
 
-/// (T790) One minimal `inventory.json` with no state rows and no definitions, so
-/// `add_fish_definitions` can add the fish a paid catch stores. The three spans match the
-/// fixture shape `fishing_service` already uses: coins, items, equipment.
-fn write_empty_inventory(directory: &Path) {
+/// (T790) One item definition row for a fishing fixture `inventory.json`: the given id
+/// in the shape the `fishing_service` fixture already used (slot 3, class 1).
+pub fn definition_row(id: i32) -> Value {
+    let bytes = [id.to_le_bytes(), 8i32.to_le_bytes()].concat();
+    json!({
+        "id": id,
+        "slot": 3,
+        "class_id": 1,
+        "default_tint": 5,
+        "max_stack": 10,
+        "model": "fixture.adr",
+        "texture": "fixture",
+        "tint_alias": "fixture",
+        "effect": 0,
+        "wield_type": 0,
+        "serialized_hex": bytes.iter().map(|byte| format!("{byte:02x}")).collect::<String>(),
+        "sha256": format!("{:x}", Sha256::digest(&bytes)),
+    })
+}
+
+/// (T790) Write the minimal `inventory.json` the fishing fixtures share: no state rows,
+/// one unlocked profile that allows item slot 3, and `definitions`. Creates `directory`,
+/// so a caller can point it at its own temp dir. Shared by `fishing_service` and the
+/// any_of suite.
+pub fn write_inventory(directory: &Path, player_guid: u64, definitions: &[Value]) {
     let coins = 0u32.to_le_bytes();
     let empty = 0i32.to_le_bytes();
     let span = |kind: &str, offset: usize, profile_id: usize, bytes: &[u8]| {
@@ -51,7 +73,7 @@ fn write_empty_inventory(directory: &Path) {
     };
     let content = json!({
         "schema_version": 1,
-        "player_guid": 1,
+        "player_guid": player_guid,
         "default_state": {
             "coins": 0,
             "items": [],
@@ -64,8 +86,9 @@ fn write_empty_inventory(directory: &Path) {
             span("items", 17, 0, &empty),
             span("equipment", 21, 1, &empty)
         ],
-        "definitions": []
+        "definitions": definitions
     });
+    fs::create_dir_all(directory).unwrap();
     fs::write(
         directory.join("inventory.json"),
         serde_json::to_vec(&content).unwrap(),
@@ -73,13 +96,10 @@ fn write_empty_inventory(directory: &Path) {
     .unwrap();
 }
 
-/// (T790) A scratch directory's inventory holding every fish the shipped spot file can
-/// grant, and the reward ledger a fishing round uses. One unlocked profile; the bag
-/// capacity is a test value because `route` recomputes the fishing cap from the live
-/// inventory.
-pub fn fish_inventory_rewards(directory: &Path) -> RewardState {
-    write_empty_inventory(directory);
-    add_fish_definitions(directory);
+/// (T790) Load that inventory and the one unlocked profile into a reward ledger. The
+/// bag capacity is a test value because `route` recomputes the fishing cap from the
+/// live inventory.
+pub fn reward_state(directory: &Path, capacity: usize) -> RewardState {
     let inventory = Inventory::load(directory, None).unwrap();
     let profiles = ProfileState {
         version: 1,
@@ -87,7 +107,15 @@ pub fn fish_inventory_rewards(directory: &Path) -> RewardState {
         unlocked: BTreeSet::from([1]),
         experience: BTreeMap::new(),
     };
-    RewardState::new(inventory, profiles, 4)
+    RewardState::new(inventory, profiles, capacity)
+}
+
+/// (T790) A scratch directory's inventory holding every fish the shipped spot file can
+/// grant, and the reward ledger a fishing round uses.
+pub fn fish_inventory_rewards(directory: &Path, capacity: usize) -> RewardState {
+    write_inventory(directory, 1, &[]);
+    add_fish_definitions(directory);
+    reward_state(directory, capacity)
 }
 
 /// Widen a fixture `inventory.json` with a stub definition for every fish item the real
@@ -106,22 +134,7 @@ pub fn add_fish_definitions(directory: &Path) {
         if known.contains(&id) {
             continue;
         }
-        let bytes = [id.to_le_bytes(), 8i32.to_le_bytes()].concat();
-        let hex: String = bytes.iter().map(|byte| format!("{byte:02x}")).collect();
-        definitions.push(json!({
-            "id": id,
-            "slot": 3,
-            "class_id": 1,
-            "default_tint": 5,
-            "max_stack": 10,
-            "model": "fixture.adr",
-            "texture": "fixture",
-            "tint_alias": "fixture",
-            "effect": 0,
-            "wield_type": 0,
-            "serialized_hex": hex,
-            "sha256": format!("{:x}", Sha256::digest(&bytes))
-        }));
+        definitions.push(definition_row(id));
     }
     fs::write(&path, serde_json::to_vec(&inventory).unwrap()).unwrap();
 }

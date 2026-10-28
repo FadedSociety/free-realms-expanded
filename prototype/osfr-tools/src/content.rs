@@ -4,7 +4,7 @@
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use serde_json::Value;
 use std::{
-    collections::{BTreeMap, BTreeSet, HashSet},
+    collections::{BTreeMap, HashSet},
     fmt, fs,
     path::{Path, PathBuf},
 };
@@ -281,14 +281,16 @@ pub(crate) fn validate_any_of(
     {
         return Err("any_of goal alternatives must all be one family");
     }
-    let mut seen = BTreeSet::new();
+    // At most eight ids, so a linear scan beats a set allocation.
+    let mut seen = Vec::new();
     for alternative in alternatives {
         let id = alternative
             .target_id()
             .ok_or("any_of goal alternative target must be positive")?;
-        if !seen.insert(id) {
+        if seen.contains(&id) {
             return Err("any_of goal must not repeat an alternative target");
         }
+        seen.push(id);
     }
     Ok(())
 }

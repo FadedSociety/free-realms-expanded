@@ -1244,6 +1244,45 @@ class Checker:
                 else:
                     seen[v] = i
 
+    # (R) T790: the leaf kinds and positive target bounds `content::validate_any_of`
+    # accepts. An `any_of` alternative is a target id only; the goal's `count` is the
+    # shared total the ordinary objective count rule bounds.
+    ANY_OF_LEAVES = {
+        "talk_to_npc": ("npc_id", 0xffffffffffffffff),
+        "collect_item": ("item_id", 0x7fffffff),
+        "gather_resource": ("resource_id", 0xffffffff),
+    }
+
+    def check_any_of(self, field, alternatives, error):
+        """The shape both Rust loaders enforce: 2..=8 same-family alternatives with
+        positive unique targets."""
+        if not isinstance(alternatives, list) or not (2 <= len(alternatives) <= 8):
+            error(field + ".alternatives", alternatives, "any_of requires 2..=8 alternatives")
+            return
+        families, targets = set(), []
+        for index, alternative in enumerate(alternatives):
+            leaf_field = f"{field}.alternatives[{index}]"
+            leaf = self.ANY_OF_LEAVES.get(
+                alternative.get("kind") if isinstance(alternative, dict) else None)
+            if leaf is None:
+                error(leaf_field, alternative,
+                      "any_of alternative must be talk_to_npc, collect_item or gather_resource")
+                continue
+            key, maximum = leaf
+            target = alternative.get(key)
+            families.add(alternative["kind"])
+            if not (type(target) is int and 1 <= target <= maximum):
+                error(leaf_field + "." + key, target,
+                      "any_of alternative target must be a positive id")
+            elif target in targets:
+                error(leaf_field + "." + key, target,
+                      "any_of alternatives must not repeat a target")
+            else:
+                targets.append(target)
+        if len(families) > 1:
+            error(field + ".alternatives", alternatives,
+                  "any_of alternatives must all be one family")
+
     # -- cross-file -----------------------------------------------------------
     def check_quest(self, rel, path, quest):
         # (R) Catalogue publication policy. Incomplete definitions remain editable.
@@ -1325,6 +1364,7 @@ class Checker:
             "interact_actor": ("actor_guid", None), "complete_dungeon": ("encounter_id", None),
             "client_reported": ("client_id", None), "job_level": ("profile_id", None),
             "use_ability": ("ability_id", "count"), "use_item": ("item_id", "count"),
+            "any_of": (None, "count"),
         }
         seen = set()
         for index, goal in enumerate(goals):
@@ -1339,24 +1379,27 @@ class Checker:
                 error(field + ".id", goal_id, "objective id must be unique and positive u32")
             if type(goal_id) is int:
                 seen.add(goal_id)
-            target = goal.get(key)
-            valid_target = identity(target)
-            if key == "zone_id":
-                valid_target = type(target) is int and 0 <= target <= 0xffffffff
-            elif key == "npc_id":
-                valid_target = type(target) is int and 1 <= target <= 0xffffffffffffffff
-            elif key == "actor_guid":
-                valid_target = type(target) is int and 1 <= target <= 0xffffffffffffffff
-            elif key in ("item_id", "definition_id", "client_id"):
-                valid_target = type(target) is int and 1 <= target <= 0x7fffffff
-            elif key == "node_type":
-                valid_target = (isinstance(target, str) and 1 <= len(target) <= 64
-                                and not any(ord(c) < 32 for c in target))
-            elif key == "profile_id":
-                valid_target = (type(target) is int and 1 <= target <= 0x7fffffff
-                                and target in self.job_profiles)
-            if not valid_target:
-                error(field + "." + key, target, "invalid quest objective target")
+            if goal["kind"] == "any_of":
+                self.check_any_of(field, goal.get("alternatives"), error)
+            else:
+                target = goal.get(key)
+                valid_target = identity(target)
+                if key == "zone_id":
+                    valid_target = type(target) is int and 0 <= target <= 0xffffffff
+                elif key == "npc_id":
+                    valid_target = type(target) is int and 1 <= target <= 0xffffffffffffffff
+                elif key == "actor_guid":
+                    valid_target = type(target) is int and 1 <= target <= 0xffffffffffffffff
+                elif key in ("item_id", "definition_id", "client_id"):
+                    valid_target = type(target) is int and 1 <= target <= 0x7fffffff
+                elif key == "node_type":
+                    valid_target = (isinstance(target, str) and 1 <= len(target) <= 64
+                                    and not any(ord(c) < 32 for c in target))
+                elif key == "profile_id":
+                    valid_target = (type(target) is int and 1 <= target <= 0x7fffffff
+                                    and target in self.job_profiles)
+                if not valid_target:
+                    error(field + "." + key, target, "invalid quest objective target")
             if count and not positive(goal.get(count)):
                 error(field + "." + count, goal.get(count), "objective count must be 1..1000000")
             if goal["kind"] == "collect_node" and not (

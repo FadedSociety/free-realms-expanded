@@ -1,13 +1,10 @@
 use osfr_tools::{
     fishing::{Error, FishRun, Handle, Phase, ServerPacket, Sub, Vec4},
     fishing_service::{Change, FishingService},
-    inventory::Inventory,
-    profiles::ProfileState,
     quest_engine::QuestEvent,
     rewards::RewardState,
 };
-use serde_json::{Value, json};
-use sha2::{Digest, Sha256};
+use serde_json::Value;
 use std::{
     collections::{BTreeMap, BTreeSet},
     fs,
@@ -37,58 +34,12 @@ impl InventoryFixture {
             std::process::id(),
             FIXTURE_ID.fetch_add(1, Ordering::Relaxed)
         ));
-        fs::create_dir_all(&path).unwrap();
-        let coins = 0u32.to_le_bytes();
-        let empty = 0i32.to_le_bytes();
-        let definition_bytes = [100i32.to_le_bytes(), 8i32.to_le_bytes()].concat();
-        let definition = json!({
-            "id": 100,
-            "slot": 3,
-            "class_id": 1,
-            "default_tint": 5,
-            "max_stack": 10,
-            "model": "fixture.adr",
-            "texture": "fixture",
-            "tint_alias": "fixture",
-            "effect": 0,
-            "wield_type": 0,
-            "serialized_hex": hex(&definition_bytes),
-            "sha256": digest(&definition_bytes)
-        });
-        let content = json!({
-            "schema_version": 1,
-            "player_guid": PLAYER,
-            "default_state": {
-                "coins": 0,
-                "items": [],
-                "equipment": [],
-                "next_instance_id": null
-            },
-            "profiles": [{"id": 1, "allowed_classes": [1], "slots": [3]}],
-            "spans": [
-                span("coins", 13, 0, &coins),
-                span("items", 17, 0, &empty),
-                span("equipment", 21, 1, &empty)
-            ],
-            "definitions": [definition]
-        });
-        fs::write(
-            path.join("inventory.json"),
-            serde_json::to_vec(&content).unwrap(),
-        )
-        .unwrap();
+        fishing_packets::write_inventory(&path, PLAYER, &[fishing_packets::definition_row(100)]);
         Self(path)
     }
 
     fn reward_state(&self) -> RewardState {
-        let inventory = Inventory::load(&self.0, None).unwrap();
-        let profiles = ProfileState {
-            version: 1,
-            active: 1,
-            unlocked: BTreeSet::from([1]),
-            experience: BTreeMap::new(),
-        };
-        RewardState::new(inventory, profiles, 4)
+        fishing_packets::reward_state(&self.0, 4)
     }
 }
 
@@ -97,24 +48,6 @@ impl Drop for InventoryFixture {
         let _ = fs::remove_file(self.0.join("inventory.json"));
         let _ = fs::remove_dir(&self.0);
     }
-}
-
-fn span(kind: &str, offset: usize, profile_id: usize, bytes: &[u8]) -> Value {
-    json!({
-        "kind": kind,
-        "offset": offset,
-        "length": bytes.len(),
-        "profile_id": profile_id,
-        "sha256": digest(bytes)
-    })
-}
-
-fn digest(bytes: &[u8]) -> String {
-    format!("{:x}", Sha256::digest(bytes))
-}
-
-fn hex(bytes: &[u8]) -> String {
-    bytes.iter().map(|byte| format!("{byte:02x}")).collect()
 }
 
 fn register_request() -> Vec<u8> {

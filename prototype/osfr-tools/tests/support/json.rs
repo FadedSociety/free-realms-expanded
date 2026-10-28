@@ -9,6 +9,7 @@ use serde_json::Value;
 use std::{fs, path::Path};
 
 /// The JSON document at `path`, panicking with the path on a read or parse error.
+#[allow(dead_code)] // Some suites include this reader only to write.
 pub fn read(path: &Path) -> Value {
     serde_json::from_slice(
         &fs::read(path).unwrap_or_else(|error| panic!("{}: {error}", path.display())),

@@ -14,8 +14,12 @@
 
 #[path = "support/fishing_packets.rs"]
 mod fishing_packets;
+#[path = "support/json.rs"]
+mod json;
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
+#[path = "support/scratch.rs"]
+mod scratch;
 
 use fishing_packets::{cast_at, lifecycle, reel, register};
 use npc_quest_chain::content_dir;
@@ -30,13 +34,9 @@ use osfr_tools::{
     quest_markers::{QuestMarker, marker_for},
     rewards::{RewardDisplay, RewardGrant},
 };
+use scratch::Scratch;
 use serde_json::{Value, json};
-use std::{
-    collections::BTreeMap,
-    fs,
-    path::{Path, PathBuf},
-    sync::atomic::{AtomicU64, Ordering},
-};
+use std::{collections::BTreeMap, fs, path::Path};
 
 const QUEST: u32 = 9_900_001;
 const GIVER: u64 = 9_000_000_189;
@@ -61,44 +61,11 @@ const ACTOR: Handle = Handle {
 };
 const FISH_T0: u64 = 1_000_000;
 
-static NEXT: AtomicU64 = AtomicU64::new(0);
-
-struct Scratch(PathBuf);
-
-impl Scratch {
-    fn new(tag: &str) -> Self {
-        let root = Path::new(env!("CARGO_TARGET_TMPDIR")).join(format!(
-            "t790-{tag}-{}-{}",
-            std::process::id(),
-            NEXT.fetch_add(1, Ordering::Relaxed)
-        ));
-        let _ = fs::remove_dir_all(&root);
-        fs::create_dir_all(root.join("quests")).unwrap();
-        fs::create_dir_all(root.join("npcs")).unwrap();
-        Self(root)
-    }
-
-    fn path(&self) -> &Path {
-        &self.0
-    }
-}
-
-impl Drop for Scratch {
-    fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.0);
-    }
-}
-
 fn source() -> Value {
     json!([{
         "kind": "reconstructed",
         "evidence": "(R) T790 synthetic any_of objective fixture"
     }])
-}
-
-fn write_json(path: &Path, value: &Value) {
-    fs::write(path, serde_json::to_vec_pretty(value).unwrap())
-        .unwrap_or_else(|error| panic!("{}: {error}", path.display()));
 }
 
 fn any_of(id: u32, count: u32, alternatives: Value) -> Value {
@@ -129,7 +96,7 @@ fn talk_goal(id: u32, npc_id: u64) -> Value {
 
 fn split_tree(objectives: Value) -> Scratch {
     let scratch = Scratch::new("split");
-    write_json(
+    json::write_pretty(
         &scratch.path().join("quests/t790.json"),
         &json!({
             "schema_version": 1,
@@ -144,11 +111,11 @@ fn split_tree(objectives: Value) -> Scratch {
             }],
         }),
     );
-    write_json(
+    json::write_pretty(
         &scratch.path().join("npcs/bindings.json"),
         &json!({"schema_version": 1, "records": []}),
     );
-    write_json(
+    json::write_pretty(
         &scratch.path().join("jobs.json"),
         &json!({
             "schema_version": 1,
@@ -237,11 +204,11 @@ fn flat_tree(objectives: Value, item_ids: &[i32]) -> Scratch {
             })
         })
         .collect();
-    write_json(
+    json::write_pretty(
         &scratch.path().join("items.json"),
         &json!({"schema_version": 1, "records": records}),
     );
-    write_json(
+    json::write_pretty(
         &scratch.path().join("quests.json"),
         &json!({
             "schema_version": 1,
@@ -355,6 +322,73 @@ fn too_many_alternatives_is_rejected_at_load() {
         ContentDb::load(flat.path()).is_err(),
         "the flat loader accepted nine any_of alternatives"
     );
+}
+
+#[test]
+fn one_alternative_is_rejected_at_load() {
+    let pair = json!([collect(ITEM_A), collect(ITEM_B)]);
+    let split_control = split_tree(json!([any_of(1, 1, pair.clone())]));
+    assert!(
+        split_load(&split_control).is_ok(),
+        "two split alternatives are the bound and must load"
+    );
+    let split = split_tree(json!([any_of(1, 1, json!([collect(ITEM_A)]))]));
+    assert!(
+        split_load(&split).is_err(),
+        "the split loader accepted a one-alternative any_of"
+    );
+
+    let flat_control = flat_tree(json!([any_of(1, 1, pair)]), &[ITEM_A, ITEM_B]);
+    assert!(
+        ContentDb::load(flat_control.path()).is_ok(),
+        "two flat alternatives are the bound and must load"
+    );
+    let flat = flat_tree(
+        json!([any_of(1, 1, json!([collect(ITEM_A)]))]),
+        &[ITEM_A, ITEM_B],
+    );
+    assert!(
+        ContentDb::load(flat.path()).is_err(),
+        "the flat loader accepted a one-alternative any_of"
+    );
+}
+
+/// The count bound of `content::validate_any_of` on both loaders: the goal's single
+/// shared total is `1..=quest_engine::MAX_COUNT` (1_000_000; the constant is
+/// crate-private, so this test carries its value).
+#[test]
+fn count_bounds_are_rejected_at_load() {
+    let alternatives = json!([collect(ITEM_A), collect(ITEM_B)]);
+    for count in [1, 1_000_000] {
+        let split = split_tree(json!([any_of(1, count, alternatives.clone())]));
+        assert!(
+            split_load(&split).is_ok(),
+            "the split loader refused count {count}"
+        );
+        let flat = flat_tree(
+            json!([any_of(1, count, alternatives.clone())]),
+            &[ITEM_A, ITEM_B],
+        );
+        assert!(
+            ContentDb::load(flat.path()).is_ok(),
+            "the flat loader refused count {count}"
+        );
+    }
+    for count in [0, 1_000_001] {
+        let split = split_tree(json!([any_of(1, count, alternatives.clone())]));
+        assert!(
+            split_load(&split).is_err(),
+            "the split loader accepted any_of count {count}"
+        );
+        let flat = flat_tree(
+            json!([any_of(1, count, alternatives.clone())]),
+            &[ITEM_A, ITEM_B],
+        );
+        assert!(
+            ContentDb::load(flat.path()).is_err(),
+            "the flat loader accepted any_of count {count}"
+        );
+    }
 }
 
 #[test]
@@ -633,7 +667,13 @@ fn fish_variant_catch_credits_any_of() {
     activate(&mut engine);
 
     let inventory_dir = Scratch::new("fish-inventory");
-    let mut rewards = fishing_packets::fish_inventory_rewards(inventory_dir.path());
+    // One bag slot per loop attempt: a full bag releases the catch without a
+    // `CollectItem` event, which would make this a test of bag capacity.
+    let mut rewards = fishing_packets::fish_inventory_rewards(inventory_dir.path(), 500);
+    assert!(
+        rewards.bag_capacity >= 500,
+        "the loop casts up to 500 times; a smaller bag releases a catch and starves it"
+    );
     let spots = FishingSpots::load(&content_dir())
         .unwrap()
         .expect("the shipped fishing spots load");

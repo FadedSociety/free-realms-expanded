@@ -9,13 +9,15 @@
 
 #[path = "../common/item_catalogue.rs"]
 mod item_catalogue;
+#[path = "json.rs"]
+mod json;
+#[path = "scratch.rs"]
+mod scratch;
+
+pub use scratch::Scratch;
 
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
-use std::{
-    fs,
-    path::{Path, PathBuf},
-};
 
 pub const FIXTURE_DEFECT: u32 = 9_100_002;
 pub const FIXTURE_QUEST: u32 = 9_100_001;
@@ -64,28 +66,6 @@ pub enum Defect {
         position: [f64; 3],
         radius: f64,
     },
-}
-
-pub struct Scratch(PathBuf);
-
-impl Scratch {
-    fn new(name: &str) -> Self {
-        let dir = Path::new(env!("CARGO_TARGET_TMPDIR")).join(format!("t314-{name}"));
-        let _ = fs::remove_dir_all(&dir);
-        fs::create_dir_all(dir.join("quests")).expect("fixture quests dir");
-        fs::create_dir_all(dir.join("npcs")).expect("fixture npcs dir");
-        Self(dir)
-    }
-
-    pub fn path(&self) -> &Path {
-        &self.0
-    }
-}
-
-impl Drop for Scratch {
-    fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.0);
-    }
 }
 
 fn fixture_source() -> Value {
@@ -397,14 +377,6 @@ fn fixture_npc(npc_id: u64, name: &str, name_string_id: u32, model_id: u32, x: f
     })
 }
 
-fn write_json(path: &Path, value: &Value) {
-    fs::write(
-        path,
-        serde_json::to_vec_pretty(value).expect("fixture JSON"),
-    )
-    .unwrap_or_else(|error| panic!("{}: {error}", path.display()));
-}
-
 pub fn fixture(name: &str, defect: Defect) -> Scratch {
     let scratch = Scratch::new(name);
     let root = scratch.path();
@@ -519,13 +491,13 @@ pub fn fixture(name: &str, defect: Defect) -> Scratch {
             "source": fixture_source(),
         }],
     });
-    write_json(
+    json::write_pretty(
         &root.join("zones.json"),
         &json!({"schema_version": 1, "records": [{"id": 1, "name": "Fixture Zone"}]}),
     );
-    write_json(&root.join("npc_spawns_extra.json"), &json!({"records": []}));
-    write_json(&root.join("jobs.json"), &jobs);
-    write_json(&root.join("inventory.json"), &fixture_inventory());
+    json::write_pretty(&root.join("npc_spawns_extra.json"), &json!({"records": []}));
+    json::write_pretty(&root.join("jobs.json"), &jobs);
+    json::write_pretty(&root.join("inventory.json"), &fixture_inventory());
     item_catalogue::write(
         root,
         &[
@@ -535,16 +507,16 @@ pub fn fixture(name: &str, defect: Defect) -> Scratch {
             item_catalogue::sized_row(FIXTURE_ANY_OF_ITEM as u32, 8),
         ],
     );
-    write_json(&root.join("recipes.json"), &fixture_recipe_book());
-    write_json(&root.join("field_battles.json"), &fixture_field_battles());
-    write_json(&root.join("quest_nodes.json"), &fixture_quest_nodes());
-    write_json(&root.join("job_abilities.json"), &fixture_job_abilities());
-    write_json(&root.join("enemies.json"), &fixture_enemies());
-    write_json(
+    json::write_pretty(&root.join("recipes.json"), &fixture_recipe_book());
+    json::write_pretty(&root.join("field_battles.json"), &fixture_field_battles());
+    json::write_pretty(&root.join("quest_nodes.json"), &fixture_quest_nodes());
+    json::write_pretty(&root.join("job_abilities.json"), &fixture_job_abilities());
+    json::write_pretty(&root.join("enemies.json"), &fixture_enemies());
+    json::write_pretty(
         &root.join("quests/fixture.json"),
         &json!({"schema_version": 1, "records": quests}),
     );
-    write_json(
+    json::write_pretty(
         &root.join("npcs/fixture.json"),
         &json!({"schema_version": 1, "records": [
             fixture_npc(FIXTURE_GIVER, "Fixture giver", 700_002, 101, 10.0),
