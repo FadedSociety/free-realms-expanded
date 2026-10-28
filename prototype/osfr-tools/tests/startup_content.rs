@@ -61,9 +61,11 @@ fn scrub_self(data: &mut SelfData) {
     for row in &mut data.post_quest_records.keyed_strings {
         row.value_bytes.clear();
     }
-    // (R) None of the sample character's progress: its second quest list (101 records), known
-    // recipes, pet rows and active effect. Gameplay writes none of these at login.
+    // (R) None of the sample character's progress: its second quest list (101 records) and the
+    // achievement-points dword after it (client `00940e60`), known recipes, pet rows and active
+    // effect. Gameplay writes none of these at login.
     data.quest_records.second.clear();
+    data.quest_records.second_tail = [0; 4];
     data.post_quest_records.recipes.clear();
     data.post_quest_records.variable_records.clear();
     data.effects.clear();
@@ -186,7 +188,7 @@ fn content_startup_is_the_same_as_a_reference_run_with_that_snapshot() {
 }
 
 #[test]
-fn startup_content_has_no_capture_server_text_or_names() {
+fn startup_content_has_no_capture_server_text() {
     let directory = content().join("startup");
     for file in ["self_data.json", "snapshot.json"] {
         let text = fs::read_to_string(directory.join(file))
@@ -293,6 +295,10 @@ fn self_data_content_is_typed_json_that_round_trips() {
     // pets or effects, no collected flag.
     assert!(data.inventory.items.is_empty() && data.quest_records.first.is_empty());
     assert!(data.quest_records.second.is_empty() && data.effects.is_empty());
+    assert_eq!(
+        data.quest_records.second_tail, [0; 4],
+        "achievement points start at 0"
+    );
     let post = &data.post_quest_records;
     assert!(post.recipes.is_empty() && post.variable_records.is_empty());
     assert!(

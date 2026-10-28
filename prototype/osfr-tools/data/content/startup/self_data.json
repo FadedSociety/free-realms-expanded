@@ -18240,7 +18240,7 @@
     "first": [],
     "first_tail": "00000000ffffffff000a0000001e000000",
     "second": [],
-    "second_tail": "03020000"
+    "second_tail": "00000000"
   },
   "quests": {
     "version": 1,

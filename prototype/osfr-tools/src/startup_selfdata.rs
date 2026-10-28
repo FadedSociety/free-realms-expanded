@@ -257,7 +257,8 @@ pub struct QuestRecords {
     #[serde(with = "hex")]
     pub first_tail: [u8; 17],
     pub second: Vec<QuestSecondRecord>,
-    /// (R) Fixed four-byte tail after the second list.
+    /// The dword after the second list: the reader `00940e60` stores it at receiver+0x1100, which
+    /// the inspect path exposes as the achievement-points value (GetValue 29). Not a constant.
     #[serde(with = "hex")]
     pub second_tail: [u8; 4],
 }
