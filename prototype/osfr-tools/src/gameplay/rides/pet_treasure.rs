@@ -22,7 +22,7 @@ impl Gameplay {
         // cannot click (housing keeps the pets gate open but closes the start gate) wastes the find
         // and the cooldown. `activity_busy` is exactly what `pet_treasure_26_8` refuses with.
         let busy = self.activity_busy();
-        let ground = terrain_height(self.terrain.clone(), character.zone_id);
+        let (ground, _) = terrain_height(self.terrain.clone(), character.zone_id);
         let wire = self.pets.treasure_tick(
             busy,
             character.position,

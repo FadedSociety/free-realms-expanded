@@ -54172,6 +54172,7 @@
     "warp_climb_m": 6.0,
     "click_max_m": 40.0,
     "min_click_m": 8.0,
+    "min_click_step_m": 10.0,
     "step_up_m": 1.0,
     "step_down_m": 3.0,
     "sample_m": 0.5,

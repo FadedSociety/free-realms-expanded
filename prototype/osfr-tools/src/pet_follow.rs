@@ -39,14 +39,16 @@ pub struct FollowConfig {
     pub warp_far_m: f32,
     pub warp_far_ms: u64,
     pub warp_climb_m: f32,
-    /// F833 (R): how far a follow click may land from its owner (and how far its height may
-    /// differ) before it is refused. The client's own sender `00b5fcf0` reports only a target
-    /// 8-40 m from the point it tracks, so 40 m admits every real click; reachability itself is
-    /// checked by `walkable` (T490).
+    /// F833 (R): how far a follow click may land from its owner before it is refused. The
+    /// client's own sender `00b5fcf0` reports only a target 8-40 m from the point it tracks, so
+    /// 40 m admits every real click; reachability itself is checked by `walkable` (T490).
     pub click_max_m: f32,
     /// T490: the client's own minimum click distance from the owner (`DAT_0176b1b0` = 8.0 m in
     /// `00b5fcf0`); a nearer click answers 0.
     pub min_click_m: f32,
+    /// T490: the client's own minimum displacement between two sent clicks (`DAT_01b5d878` =
+    /// 10.0 m in `00b5fcf0`, gate A); a click nearer the last accepted one answers 0.
+    pub min_click_step_m: f32,
     /// T490: the most the ground may rise between two walk samples (1 m, as OSFR PR #152
     /// steps up; the value is (R)).
     pub step_up_m: f32,
@@ -98,6 +100,9 @@ impl FollowConfig {
             && self.min_click_m.is_finite()
             && 0.5 <= self.min_click_m
             && self.min_click_m < self.click_max_m
+            && self.min_click_step_m.is_finite()
+            && 1.0 <= self.min_click_step_m
+            && self.min_click_step_m <= self.click_max_m
             && self.step_up_m.is_finite()
             && (0.1..=10.0).contains(&self.step_up_m)
             && self.step_down_m.is_finite()
@@ -114,22 +119,35 @@ impl FollowConfig {
     }
 
     /// F833/T490 (R): a follow click is admitted only in the client's own 8-40 m band from the
-    /// owner, in both the ground plane and height, so a forged coordinate cannot park the pet on
-    /// the far side of the world. The client's own sender `00b5fcf0` rejects what this refuses.
-    pub fn admits_click(&self, owner: [f32; 3], target: [f32; 3]) -> bool {
-        let distance = dist(owner, target);
+    /// owner, so a forged coordinate cannot park the pet on the far side of the world. The
+    /// client's sender `00b5fcf0` measures the 4D distance between two engine vectors; the
+    /// server reads only the owner's three position components, so the owner's fourth is 0 and
+    /// the click's fourth is part of the distance (`00b5fcf0` writes all four). The client's own
+    /// sender rejects what this refuses.
+    pub fn admits_click(&self, owner: [f32; 3], target: [f32; 4]) -> bool {
+        let distance = dist4([owner[0], owner[1], owner[2], 0.0], target);
         (self.min_click_m..=self.click_max_m).contains(&distance)
-            && (target[1] - owner[1]).abs() <= self.click_max_m
+    }
+
+    /// T490: the client's gate A: a click is taken only once it is `min_click_step_m` from the
+    /// click the client sent last (`00b5fcf0`). The server's nearest stand-in for the client's
+    /// cache is the last click it accepted (R: a click the client computed but did not send
+    /// updates the client's cache and not this one, so the server can be the stricter side).
+    pub fn advances_click(&self, last: [f32; 4], target: [f32; 4]) -> bool {
+        dist4(last, target) >= self.min_click_step_m
     }
 }
 
 /// T490: whether the ground along the straight (x, z) path from `from` to `to` is walkable.
 ///
-/// The path is sampled every `sample_m`; each sample must exist, be finite, and differ from the
-/// previous one by at most `step_up` up and `step_down` down. Unknown ground (`None`) is never
-/// walkable, so a zone without a height grid refuses every path. Heights come only from
-/// `ground`, so a client-supplied y can never decide the check. Cost is the number of samples
-/// (`length / sample_m`), bounded by `MAX_WALK_SAMPLES` and by the caller's `click_max_m`.
+/// The path is sampled at fixed `sample_m` intervals and again at the endpoint (review F850:
+/// dividing a short step into equal parts put its only inner sample wherever the step happened
+/// to end, which missed a cliff between the samples); each sample must exist, be finite, and
+/// differ from the previous one by at most `step_up` up and `step_down` down. Unknown ground
+/// (`None`) is never walkable, so a zone without a height grid refuses every path. Heights come
+/// only from `ground`, so a client-supplied y can never decide the check. Cost is the number of
+/// samples (`length / sample_m`), bounded by `MAX_WALK_SAMPLES` and by the caller's
+/// `click_max_m`.
 pub fn walkable(
     ground: impl Fn(f32, f32) -> Option<f32>,
     from: [f32; 3],
@@ -155,12 +173,12 @@ pub fn walkable(
     if samples > MAX_WALK_SAMPLES as f32 {
         return false;
     }
-    let samples = samples as usize;
     let Some(mut previous) = ground(from[0], from[2]).filter(|y| y.is_finite()) else {
         return false;
     };
-    for sample in 1..=samples {
-        let t = sample as f32 / samples as f32;
+    let mut distance = sample_m;
+    while distance < length {
+        let t = distance / length;
         let Some(y) = ground(from[0] + dx * t, from[2] + dz * t).filter(|y| y.is_finite()) else {
             return false;
         };
@@ -168,8 +186,12 @@ pub fn walkable(
             return false;
         }
         previous = y;
+        distance += sample_m;
     }
-    true
+    let Some(y) = ground(to[0], to[2]).filter(|y| y.is_finite()) else {
+        return false;
+    };
+    y - previous <= step_up && previous - y <= step_down
 }
 
 /// The owner as the server last accepted it: position and the time of that update.
@@ -302,13 +324,16 @@ pub fn go_to(pet: PetPose, target: [f32; 3], owner: [f32; 3]) -> PetPose {
 }
 
 /// Advance the pet one owner update or tick. `paused` is the 53/24 pet-window mode (not 0):
-/// the pet stops and faces its owner. A non-finite owner pose or ground value skips the step
-/// and keeps the last pose.
+/// the pet stops and faces its owner. `gridded` is whether the zone has a height grid at all:
+/// with one, unknown ground is a hole and refuses the step; without one the step keeps T455's
+/// owner-height rule. A non-finite owner pose or ground value skips the step and keeps the last
+/// pose.
 pub fn step(
     config: &FollowConfig,
     owner: OwnerPose,
     pet: PetPose,
     ground: impl Fn(f32, f32) -> Option<f32>,
+    gridded: bool,
     paused: bool,
 ) -> (PetPose, Option<Move>) {
     if !owner.position.iter().all(|v| v.is_finite()) {
@@ -376,7 +401,9 @@ pub fn step(
             return (p, None);
         } else {
             let pace = config.min_speed;
-            return match advance(config, &mut p, owner, &ground, go.target, pace, now, dt) {
+            return match advance(
+                config, &mut p, owner, &ground, gridded, go.target, pace, now, dt,
+            ) {
                 Advance::Bad => (pet, None),
                 Advance::Blocked => (p, None),
                 Advance::Warp => warp(config, p, owner, &ground),
@@ -429,7 +456,9 @@ pub fn step(
         speed = boosted.min(speed * config.max_speed_multiplier);
     }
 
-    match advance(config, &mut p, owner, &ground, target, speed, now, dt) {
+    match advance(
+        config, &mut p, owner, &ground, gridded, target, speed, now, dt,
+    ) {
         Advance::Bad => (pet, None),
         Advance::Blocked => (p, None),
         Advance::Warp => warp(config, p, owner, &ground),
@@ -470,6 +499,7 @@ fn advance(
     p: &mut PetPose,
     owner: OwnerPose,
     ground: &impl Fn(f32, f32) -> Option<f32>,
+    gridded: bool,
     target: [f32; 3],
     speed: f32,
     now: u64,
@@ -497,18 +527,28 @@ fn advance(
             return Advance::Warp;
         }
         Some(y) => y,
-        // A zone without a terrain grid keeps the owner's height (R); the walk check below is
-        // skipped only when neither end of the step has ground.
+        // A zone without a terrain grid keeps the owner's height (R).
         None => owner.position[1],
     };
-    let checked = stepped.is_some_and(|y| y.is_finite())
+    // T490 (review F850): check the ground at least one `sample_m` ahead along the next step's
+    // direction (or up to the target), not only as far as this tick moves. A 20 Hz follow step
+    // is 0.1-0.6 m and a heightfield smears a cliff across one cell, so a step-sized check would
+    // creep down it one interpolated cell at a time.
+    let (check_x, check_z) = heading.map_or((x, z), |d| {
+        let look = reach.max(config.sample_m).min(remaining);
+        (from[0] + d[0] * look, from[2] + d[1] * look)
+    });
+    // A gridded zone always checks: both ends unknown there mean a hole (or outside the grid),
+    // which `walkable` refuses. Only a zone with no grid at all keeps the owner-height fallback.
+    let checked = gridded
+        || stepped.is_some_and(|y| y.is_finite())
         || ground(from[0], from[2]).is_some_and(|y| y.is_finite());
     if checked
         && (x != from[0] || z != from[2])
         && !walkable(
             ground,
             from,
-            [x, y, z],
+            [check_x, y, check_z],
             config.step_up_m,
             config.step_down_m,
             config.sample_m,
@@ -627,6 +667,12 @@ fn sub(b: [f32; 3], a: [f32; 3]) -> [f32; 2] {
 fn dist(a: [f32; 3], b: [f32; 3]) -> f32 {
     let d = sub(b, a);
     (d[0] * d[0] + d[1] * d[1]).sqrt()
+}
+
+/// The client's own click distance: four components, like `00b5fcf0` measures them.
+fn dist4(a: [f32; 4], b: [f32; 4]) -> f32 {
+    ((a[0] - b[0]).powi(2) + (a[1] - b[1]).powi(2) + (a[2] - b[2]).powi(2) + (a[3] - b[3]).powi(2))
+        .sqrt()
 }
 
 fn unit(v: [f32; 2]) -> Option<[f32; 2]> {

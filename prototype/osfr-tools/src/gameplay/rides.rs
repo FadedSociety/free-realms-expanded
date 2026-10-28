@@ -11,12 +11,17 @@ mod pet_treasure;
 #[path = "../bin/osfr_gateway/pet_wire.rs"]
 mod pet_wire;
 
-/// The terrain height under (x, z) in `zone`: the pet's follow step and its chest stand on it.
+/// The terrain height under (x, z) in `zone`, and whether that zone has a height grid at all:
+/// with one, unknown ground is a hole and refuses a pet's step; without one the step keeps
+/// T455's owner-height rule.
 fn terrain_height(
     terrain: Option<std::sync::Arc<crate::terrain::Terrain>>,
     zone: u32,
-) -> impl Fn(f32, f32) -> Option<f32> {
-    move |x, z| terrain.as_ref()?.height_at(zone, x, z)
+) -> (impl Fn(f32, f32) -> Option<f32>, bool) {
+    let gridded = terrain
+        .as_ref()
+        .is_some_and(|terrain| terrain.grid(zone).is_some());
+    (move |x, z| terrain.as_ref()?.height_at(zone, x, z), gridded)
 }
 
 impl Gameplay {
@@ -307,7 +312,7 @@ impl Gameplay {
         let minigame_active = self.blocks(|gates| gates.pets);
         let busy = crate::pets::PetBusy { minigame_active };
         // T490: the 53/26 walk check samples the character's zone heightfield (none without a grid).
-        let ground = terrain_height(self.terrain.clone(), character.zone_id);
+        let (ground, _) = terrain_height(self.terrain.clone(), character.zone_id);
         let pets = &mut self.pets;
         let inventory = &mut self.inventory;
         // Pet need clocks are whole seconds and care timers (T485) milliseconds; the pet service
@@ -453,10 +458,10 @@ impl Gameplay {
         if self.pets.active_pet_id().is_none() && !self.resummon_pet(character, now_ms, out) {
             return;
         }
-        let ground = terrain_height(self.terrain.clone(), character.zone_id);
-        let wire = self
-            .pets
-            .follow_owner(character.guid, character.position, ground, now_ms);
+        let (ground, gridded) = terrain_height(self.terrain.clone(), character.zone_id);
+        let wire =
+            self.pets
+                .follow_owner(character.guid, character.position, ground, gridded, now_ms);
         out.replies.extend(wire.private);
         out.nearby.extend(wire.shared);
     }

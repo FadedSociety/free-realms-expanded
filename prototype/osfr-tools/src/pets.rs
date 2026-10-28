@@ -1225,15 +1225,27 @@ pub struct PetWire {
     pub accepted_trick: Option<u32>,
 }
 
+/// T490: a 53/26 click the server accepted, kept so the client's own interval and minimum
+/// displacement gates (which compare against the click the client sent last) can be applied.
+/// Session only: never saved and never part of the roster.
+#[derive(Clone, Copy)]
+struct Click {
+    /// The four floats as the client sent them: the click vector `00b5fcf0` transmits.
+    position: [f32; 4],
+    /// The session clock (ms) when the click was accepted.
+    at_ms: u64,
+}
+
 #[derive(Clone, Copy)]
 struct ActivePet {
     pet_id: u32,
     owner_guid: u64,
     actor_guid: u64,
     position: [f32; 3],
-    /// T490: when the last 53/26 click was accepted (ms), for the client's 200 ms minimum
-    /// interval. Session only, like the pose.
-    last_click_ms: Option<u64>,
+    /// T490: the last 53/26 click this session accepted, for the client's own 200 ms interval
+    /// and 10 m minimum displacement between sends (`00b5fcf0` gates A and D). Session only,
+    /// like the pose.
+    last_click: Option<Click>,
     in_water: bool,
     /// T455: session-only follow pose; never saved, never part of the roster.
     pose: crate::pet_follow::PetPose,
@@ -1686,7 +1698,7 @@ impl PetService {
             owner_guid,
             actor_guid,
             position: pose.position,
-            last_click_ms: None,
+            last_click: None,
             in_water: false,
             pose,
             feeding: None,
@@ -2125,11 +2137,14 @@ impl PetService {
 
     /// T455: move the summoned pet after its owner (an accepted owner update or a world tick).
     /// The 125 frames go to the owner (`private`) and to viewers (`shared`). Never marks a save.
+    /// T490: `gridded` is whether the zone has a height grid, so a hole refuses a step there and
+    /// a gridless zone keeps the owner-height rule.
     pub fn follow_owner(
         &mut self,
         owner_guid: u64,
         owner_position: [f32; 3],
         ground: impl Fn(f32, f32) -> Option<f32>,
+        gridded: bool,
         now_ms: u64,
     ) -> PetWire {
         let mut wire = PetWire::default();
@@ -2144,8 +2159,14 @@ impl PetService {
             position: owner_position,
             at_ms: now_ms,
         };
-        let (pose, step) =
-            crate::pet_follow::step(follow, owner, active.pose, ground, self.ui_mode != 0);
+        let (pose, step) = crate::pet_follow::step(
+            follow,
+            owner,
+            active.pose,
+            ground,
+            gridded,
+            self.ui_mode != 0,
+        );
         active.pose = pose;
         active.position = pose.position;
         if let Some(step) = step {
@@ -2504,11 +2525,11 @@ impl PetService {
     /// T490: the routed 53/26 tile click. On yes the pet walks to `target` on the following
     /// updates and ticks; on no it answers flag 0 and changes nothing. A target is refused when
     /// it is outside the client's own click band from the owner (8 m to 40 m; `00b5fcf0`), was
-    /// sent inside `min_click_interval_ms` of the last accepted click (200 ms, the same sender),
-    /// is farther from the pet than one click path (`click_max_m`, which also bounds the walk
-    /// check's cost), or is not walkable from the pet (unknown ground included, so a zone
-    /// without a grid answers 0 (R)). Without an active pet there is no actor to name and
-    /// nothing is sent.
+    /// sent inside `min_click_interval_ms` of the last accepted click (200 ms, the same sender)
+    /// or nearer than `min_click_step_m` to it (10 m, the sender's gate A), is farther from the
+    /// pet than one click path (`click_max_m`, which also bounds the walk check's cost), or is
+    /// not walkable from the pet (unknown ground included, so a zone without a grid answers 0
+    /// (R)). Without an active pet there is no actor to name and nothing is sent.
     pub fn follow_location(
         &mut self,
         target: [f32; 4],
@@ -2516,26 +2537,33 @@ impl PetService {
         ground: impl Fn(f32, f32) -> Option<f32>,
         now_ms: u64,
     ) -> PetWire {
-        let reply = |active: &ActivePet, can_go: bool| PetWire {
-            private: vec![pet_can_go_packet(active.actor_guid, can_go)],
+        let reply = |can_go: bool| PetWire {
+            private: vec![pet_can_go_packet(target, can_go)],
             ..PetWire::default()
         };
         let Some(active) = self.active.as_mut() else {
             return PetWire::default();
         };
         let Some(follow) = self.content.follow.as_ref() else {
-            return reply(active, false);
+            return reply(false);
         };
         let spot = [target[0], target[1], target[2]];
         let (px, pz) = (spot[0] - active.position[0], spot[2] - active.position[2]);
         let from_pet = (px * px + pz * pz).sqrt();
         let too_soon = active
-            .last_click_ms
-            .is_some_and(|last| now_ms.saturating_sub(last) < follow.min_click_interval_ms);
+            .last_click
+            .is_some_and(|last| now_ms.saturating_sub(last.at_ms) < follow.min_click_interval_ms);
+        let too_near = active
+            .last_click
+            .is_some_and(|last| !follow.advances_click(last.position, target));
         // The cheap refusals run before the heightfield walk: a refused click costs one reply
         // and no sampling.
-        if too_soon || !follow.admits_click(owner_position, spot) || from_pet > follow.click_max_m {
-            return reply(active, false);
+        if too_soon
+            || too_near
+            || !follow.admits_click(owner_position, target)
+            || from_pet > follow.click_max_m
+        {
+            return reply(false);
         }
         if !crate::pet_follow::walkable(
             &ground,
@@ -2545,13 +2573,16 @@ impl PetService {
             follow.step_down_m,
             follow.sample_m,
         ) {
-            return reply(active, false);
+            return reply(false);
         }
-        active.last_click_ms = Some(now_ms);
+        active.last_click = Some(Click {
+            position: target,
+            at_ms: now_ms,
+        });
         // The pet walks from where it is; the clicked y never becomes its height (the walk step
         // reads the heightfield), so a client-supplied y cannot move the pet.
         active.pose = crate::pet_follow::go_to(active.pose, spot, owner_position);
-        reply(active, true)
+        reply(true)
     }
 
     pub fn set_in_water(&mut self, in_water: bool) -> io::Result<()> {
@@ -3267,11 +3298,16 @@ fn pet_favorite_packet(pet_id: u32, slot: u32, trick_id: u32) -> Vec<u8> {
     bytes
 }
 
-/// T490: 53/26 PetCanGoLocation reply (reader `00b578d0`: `sub_B55280` base header,
-/// `sub_8E2410` reads the u64 actor, the byte at +32 is the can-go flag at client +0x12f9).
-fn pet_can_go_packet(actor_guid: u64, can_go: bool) -> Vec<u8> {
+/// T490: 53/26 PetCanGoLocation reply (reader `00b578d0`: `sub_B55280` base header, then
+/// `sub_8E2410` reads four dwords into +16..+31 and the byte at +32 becomes the can-go flag at
+/// client +0x12f9; a short body sets the stream's error flag and the client ignores the reply).
+/// The client's sender fills the same 16 bytes with the click's four floats (`00b5fcf0`), so the
+/// reply echoes them; the client's handler reads only the flag.
+fn pet_can_go_packet(position: [f32; 4], can_go: bool) -> Vec<u8> {
     let mut bytes = pet_header(26);
-    bytes.extend(actor_guid.to_le_bytes());
+    for value in position {
+        bytes.extend(value.to_le_bytes());
+    }
     bytes.push(u8::from(can_go));
     bytes
 }

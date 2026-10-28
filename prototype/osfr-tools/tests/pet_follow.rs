@@ -46,6 +46,7 @@ fn walk(
             pet,
             ground,
             false,
+            false,
         );
         pet = next;
         frames.extend(frame);
@@ -71,6 +72,7 @@ fn hold(
             },
             pet,
             flat,
+            false,
             false,
         );
         pet = next;
@@ -159,6 +161,7 @@ fn a_teleport_warps_the_pet_beside_the_owner_once() {
         pet,
         flat,
         false,
+        false,
     );
     assert_eq!(frame.map(|f| f.kind), Some(MoveKind::Warp));
     assert!(dist(pet.position, jumped) <= cfg.side_m + 0.1);
@@ -170,6 +173,7 @@ fn a_teleport_warps_the_pet_beside_the_owner_once() {
         },
         pet,
         flat,
+        false,
         false,
     );
     assert_ne!(next.map(|f| f.kind), Some(MoveKind::Warp), "one warp only");
@@ -197,6 +201,7 @@ fn an_open_pet_window_stops_the_pet_until_it_closes() {
         },
         pet,
         flat,
+        false,
         true,
     );
     assert_eq!(frame.map(|f| f.kind), Some(MoveKind::Stop));
@@ -208,6 +213,7 @@ fn an_open_pet_window_stops_the_pet_until_it_closes() {
         },
         paused,
         flat,
+        false,
         true,
     );
     assert_eq!(again, None, "one stop frame while paused");
@@ -230,6 +236,7 @@ fn a_bad_ground_or_owner_value_skips_the_step() {
         pet,
         nan_ground,
         false,
+        false,
     );
     assert_eq!((kept, frame), (pet, None));
     let (kept, frame) = step(
@@ -240,6 +247,7 @@ fn a_bad_ground_or_owner_value_skips_the_step() {
         },
         pet,
         flat,
+        false,
         false,
     );
     assert_eq!((kept, frame), (pet, None));
@@ -256,7 +264,7 @@ fn follow_frames_use_the_enemy_movement_layout() {
         .unwrap();
     let mut frames = Vec::new();
     for t in 1..=20u64 {
-        let wire = service.follow_owner(33, [0.0, 0.0, t as f32 * 0.5], flat, t * 100);
+        let wire = service.follow_owner(33, [0.0, 0.0, t as f32 * 0.5], flat, false, t * 100);
         assert!(!wire.changed, "following never marks a save");
         assert_eq!(
             wire.private, wire.shared,
@@ -271,15 +279,16 @@ fn follow_frames_use_the_enemy_movement_layout() {
     assert_eq!(frame[2..10], 44u64.to_le_bytes(), "the summoned actor");
     assert!(
         service
-            .follow_owner(99, [0.0, 0.0, 30.0], flat, 5_000)
+            .follow_owner(99, [0.0, 0.0, 30.0], flat, false, 5_000)
             .shared
             .is_empty(),
         "only its own owner"
     );
 }
 
-/// F833: a follow click is bounded around the owner (the client's own sender `00b5fcf0` reports
-/// only targets 8-40 m away), so a forged coordinate cannot park the pet.
+/// F833/T490: a follow click is bounded around the owner (the client's own sender `00b5fcf0`
+/// measures a 4D distance in [8, 40] m), so a forged coordinate cannot park the pet. T490/F850
+/// also enforces the sender's gate A, the 10 m minimum displacement between clicks.
 #[test]
 fn a_follow_click_is_bounded_around_the_owner() {
     let cfg = config();
@@ -292,18 +301,30 @@ fn a_follow_click_is_bounded_around_the_owner() {
         "before the first owner update the spawn stands in for the owner"
     );
     assert!(
-        cfg.admits_click(owner, [owner[0] + cfg.click_max_m, owner[1], owner[2]]),
+        cfg.admits_click(owner, [owner[0] + cfg.click_max_m, owner[1], owner[2], 0.0]),
         "the boundary itself is admitted"
     );
     assert!(!cfg.admits_click(
         owner,
-        [owner[0] + cfg.click_max_m + 0.5, owner[1], owner[2]]
+        [owner[0] + cfg.click_max_m + 0.5, owner[1], owner[2], 0.0]
     ));
     assert!(!cfg.admits_click(
         owner,
-        [owner[0], owner[1] + cfg.click_max_m + 0.5, owner[2]]
+        [owner[0], owner[1] + cfg.click_max_m + 0.5, owner[2], 0.0]
     ));
-    assert!(!cfg.admits_click(owner, [1e38, 1e38, 1e38]));
+    assert!(
+        !cfg.admits_click(owner, [owner[0] + 30.0, owner[1] + 30.0, owner[2], 0.0]),
+        "the client's 4D distance is 42 m even though each axis is inside 40"
+    );
+    assert!(!cfg.admits_click(owner, [1e38, 1e38, 1e38, 0.0]));
+    assert!(
+        cfg.advances_click([10.0, 0.0, 0.0, 0.0], [20.0, 0.0, 0.0, 0.0]),
+        "10 m is the client's own minimum displacement"
+    );
+    assert!(
+        !cfg.advances_click([10.0, 0.0, 0.0, 0.0], [15.0, 0.0, 0.0, 5.0]),
+        "a 5 m step and a 5 m fourth component is 7 m, under the 10 m minimum"
+    );
     let (stepped, _) = step(
         &cfg,
         OwnerPose {
@@ -312,6 +333,7 @@ fn a_follow_click_is_bounded_around_the_owner() {
         },
         pet,
         flat,
+        false,
         false,
     );
     assert_eq!(stepped.owner_position(), owner, "after an owner update");

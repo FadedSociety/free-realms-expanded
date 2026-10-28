@@ -26,7 +26,7 @@ use osfr_tools::{
     terrain::Terrain,
 };
 use pet_inventory::InventoryFixture;
-use pet_wire::{can_go, summon};
+use pet_wire::{can_go, can_go_reply, read_can_go_reply, summon};
 use std::{fs, sync::Arc};
 
 /// The shipped `follow` block.
@@ -38,14 +38,6 @@ fn grid_ground(
     grid: &osfr_tools::terrain::HeightGrid,
 ) -> impl Fn(f32, f32) -> Option<f32> + Copy + '_ {
     |x, z| grid.height_at(x, z)
-}
-
-/// The 53/26 reply the client reader `00b578d0` parses: u64 actor guid, then the can-go flag.
-fn answer(actor_guid: u64, can_go: bool) -> Vec<u8> {
-    let mut bytes = vec![53, 0, 26];
-    bytes.extend(actor_guid.to_le_bytes());
-    bytes.push(u8::from(can_go));
-    bytes
 }
 
 /// A flat 40 x 40 m field with a 2 m ledge at x = 0: the walk from -5 to 5 rises 2 m between
@@ -113,6 +105,22 @@ fn a_gentle_slope_is_allowed() {
     ));
 }
 
+/// T490/F850: a step shorter than `sample_m` was folded into equal parts, so its only inner
+/// sample sat at half the step and missed the cliff; at a 20 Hz tick a 12 m/s pet steps 0.6 m.
+#[test]
+fn a_short_step_still_samples_the_whole_path() {
+    let grid = four_metre_cliff();
+    let ground = grid_ground(&grid);
+    assert!(
+        !walkable(ground, [0.0, 4.0, 0.0], [-0.6, 0.0, 0.0], 1.0, 3.0, 0.5),
+        "the 0.5 m sample lands on the low side of the 4 m cliff"
+    );
+    assert!(
+        walkable(ground, [0.0, 4.0, 0.0], [-0.2, 3.2, 0.0], 1.0, 3.0, 0.5),
+        "a 0.2 m step down the interpolated cell is under the step-down limit"
+    );
+}
+
 #[test]
 fn unknown_ground_is_not_walkable() {
     let hole = |x: f32, _: f32| (x < 2.0).then_some(0.0);
@@ -158,6 +166,7 @@ fn a_following_pet_refuses_a_cliff_and_warps_after_the_timeout() {
             },
             pet,
             ground,
+            true,
             false,
         );
         pet = next;
@@ -270,7 +279,27 @@ fn a_reachable_click_walks_the_pet_there_and_it_waits() {
         .unwrap()
         .unwrap();
     let actor = PetService::pet_guid(OWNER);
-    assert_eq!(accepted.private, vec![answer(actor, true)]);
+    assert_eq!(
+        accepted.private,
+        vec![can_go_reply([10.0, 5.0, 0.0, 0.0], true)],
+        "the reply echoes the click vector the client reader consumes"
+    );
+    assert_eq!(
+        read_can_go_reply(&accepted.private[0]),
+        Some(([10.0, 5.0, 0.0, 0.0], true)),
+        "the client reader 00b578d0 reads four dwords and then the flag"
+    );
+    assert_eq!(
+        accepted.private[0].len(),
+        20,
+        "3 header bytes, the four-dword payload and the flag"
+    );
+    let short = [vec![53, 0, 26], actor.to_le_bytes().to_vec(), vec![1]].concat();
+    assert_eq!(
+        read_can_go_reply(&short),
+        None,
+        "a body short of the reader's 16 payload bytes cannot set the client's can-go flag"
+    );
     assert_eq!(
         service.document_value(),
         saved,
@@ -283,7 +312,7 @@ fn a_reachable_click_walks_the_pet_there_and_it_waits() {
     let mut walks = 0;
     let mut t = 2_500;
     while t <= 30_000 {
-        let wire = service.follow_owner(OWNER, [0.0; 3], flat, t);
+        let wire = service.follow_owner(OWNER, [0.0; 3], flat, false, t);
         if wire
             .private
             .iter()
@@ -348,7 +377,7 @@ fn an_unreachable_click_is_refused_and_following_continues() {
         .unwrap();
     assert_eq!(
         refused.private,
-        vec![answer(PetService::pet_guid(OWNER), false)]
+        vec![can_go_reply([10.0, 2.0, 0.0, 0.0], false)]
     );
     assert_eq!(
         service.active_follow_state(),
@@ -356,8 +385,8 @@ fn an_unreachable_click_is_refused_and_following_continues() {
         "a refusal stores no destination"
     );
 
-    service.follow_owner(OWNER, [0.0; 3], ground, 3_000);
-    service.follow_owner(OWNER, [0.0, 0.0, 5.0], ground, 3_500);
+    service.follow_owner(OWNER, [0.0; 3], ground, true, 3_000);
+    service.follow_owner(OWNER, [0.0, 0.0, 5.0], ground, true, 3_500);
     let position = service.view(OWNER).expect("the pet is out").position;
     assert!(
         position[2] > 2.0,
@@ -368,11 +397,14 @@ fn an_unreachable_click_is_refused_and_following_continues() {
 #[test]
 fn a_click_outside_the_client_limits_is_refused() {
     let flat = |_: f32, _: f32| Some(0.0);
-    let actor = PetService::pet_guid(OWNER);
     for (target, why) in [
         ([5.0, 0.0, 0.0, 0.0], "inside the client's 8 m minimum"),
         ([50.0, 0.0, 0.0, 0.0], "past the client's 40 m maximum"),
         ([-40.0, 0.0, 0.0, 0.0], "one click path past the pet"),
+        (
+            [30.0, 0.0, 0.0, 30.0],
+            "the client's 4D distance is over 40 m even though x is inside it",
+        ),
     ] {
         let (mut service, mut fixture) = summoned();
         let before = (service.active_follow_state(), service.view(OWNER));
@@ -388,7 +420,7 @@ fn a_click_outside_the_client_limits_is_refused() {
             )
             .unwrap()
             .unwrap();
-        assert_eq!(refused.private, vec![answer(actor, false)], "{why}");
+        assert_eq!(refused.private, vec![can_go_reply(target, false)], "{why}");
         assert_eq!(refused.shared, Vec::<Vec<u8>>::new(), "{why}: no broadcast");
         assert_eq!(
             (service.active_follow_state(), service.view(OWNER)),
@@ -441,7 +473,6 @@ fn a_malformed_click_returns_err_and_changes_nothing() {
 fn a_second_click_inside_the_interval_is_ignored() {
     let flat = |_: f32, _: f32| Some(0.0);
     let (mut service, mut fixture) = summoned();
-    let actor = PetService::pet_guid(OWNER);
     let click = |service: &mut PetService, fixture: &mut InventoryFixture, target, now| {
         service
             .handle_at_ms(
@@ -457,12 +488,15 @@ fn a_second_click_inside_the_interval_is_ignored() {
             .unwrap()
     };
     let first = click(&mut service, &mut fixture, [10.0, 0.0, 0.0, 0.0], 2_000);
-    assert_eq!(first.private, vec![answer(actor, true)]);
+    assert_eq!(
+        first.private,
+        vec![can_go_reply([10.0, 0.0, 0.0, 0.0], true)]
+    );
     let stored = service.active_follow_state();
     let early = click(&mut service, &mut fixture, [20.0, 0.0, 0.0, 0.0], 2_100);
     assert_eq!(
         early.private,
-        vec![answer(actor, false)],
+        vec![can_go_reply([20.0, 0.0, 0.0, 0.0], false)],
         "100 ms is inside the 200 ms interval"
     );
     assert_eq!(
@@ -471,7 +505,54 @@ fn a_second_click_inside_the_interval_is_ignored() {
         "the ignored click changes nothing"
     );
     let later = click(&mut service, &mut fixture, [20.0, 0.0, 0.0, 0.0], 2_200);
-    assert_eq!(later.private, vec![answer(actor, true)]);
+    assert_eq!(
+        later.private,
+        vec![can_go_reply([20.0, 0.0, 0.0, 0.0], true)]
+    );
+}
+
+/// T490/F850: the client's gate A requires 10 m between two sent clicks (`00b5fcf0`), so a
+/// fine-grained click sequence the client would never send is refused; a refusal leaves the
+/// stored click alone, and a click 10 m on is accepted.
+#[test]
+fn a_click_inside_the_client_step_band_is_refused() {
+    let flat = |_: f32, _: f32| Some(0.0);
+    let (mut service, mut fixture) = summoned();
+    let click = |service: &mut PetService, fixture: &mut InventoryFixture, target, now| {
+        service
+            .handle_at_ms(
+                &can_go(target),
+                OWNER,
+                [0.0; 3],
+                &mut fixture.inventory,
+                PetBusy::default(),
+                flat,
+                now,
+            )
+            .unwrap()
+            .unwrap()
+    };
+    let first = click(&mut service, &mut fixture, [10.0, 0.0, 0.0, 0.0], 2_000);
+    assert_eq!(
+        first.private,
+        vec![can_go_reply([10.0, 0.0, 0.0, 0.0], true)]
+    );
+    let stored = (service.active_follow_state(), service.view(OWNER));
+    // 15 m from the owner (inside the 8-40 m band) but only 5 m from the accepted click.
+    let near = click(&mut service, &mut fixture, [15.0, 0.0, 0.0, 0.0], 2_300);
+    assert_eq!(
+        near.private,
+        vec![can_go_reply([15.0, 0.0, 0.0, 0.0], false)],
+        "the client would not have sent a click 5 m from the last one"
+    );
+    assert_eq!(
+        (service.active_follow_state(), service.view(OWNER)),
+        stored,
+        "the refused step changes no destination"
+    );
+    // 10 m from the accepted click: the client's own minimum displacement.
+    let far = click(&mut service, &mut fixture, [20.0, 0.0, 0.0, 0.0], 2_400);
+    assert_eq!(far.private, vec![can_go_reply([20.0, 0.0, 0.0, 0.0], true)]);
 }
 
 /// A zone without a height grid has nothing to walk on: the click answers 0 (R) and changes
@@ -494,7 +575,7 @@ fn a_click_without_a_terrain_grid_answers_zero() {
         .unwrap();
     assert_eq!(
         refused.private,
-        vec![answer(PetService::pet_guid(OWNER), false)]
+        vec![can_go_reply([10.0, 0.0, 0.0, 0.0], false)]
     );
     assert_eq!(
         service.active_follow_state(),
@@ -522,22 +603,28 @@ fn a_click_without_a_pet_sends_nothing() {
     assert!(wire.private.is_empty() && wire.shared.is_empty());
 }
 
-#[test]
-fn a_clicked_spot_is_walked_to_through_the_world_tick() {
+/// A zone-7 world whose terrain is `grid`, with the care suite's dog summoned beside an owner at
+/// `at`. The fixture is returned so its content folder outlives the world that loaded from it.
+fn world_with(
+    grid: osfr_tools::terrain::HeightGrid,
+    at: [f32; 3],
+) -> (
+    npc_quest_chain::Fixture,
+    Gameplay,
+    osfr_tools::character_store::CharacterState,
+) {
     let fixture = npc_quest_chain::Fixture::new();
     let terrain_dir = fixture.path().join("terrain");
     fs::create_dir_all(&terrain_dir).unwrap();
-    let grid = terrain::surface([-50.0, -50.0], [50.0, 50.0], 1.0, |_, _| 0.0);
     fs::write(terrain_dir.join("zone_7.hgt"), grid.to_bytes()).unwrap();
     let mut game = Gameplay::load(fixture.path(), None).unwrap();
     game.set_terrain(Some(Arc::new(Terrain::load(&terrain_dir).unwrap())));
-
     let content = PetContent::bundled().unwrap();
     let mut pets = PetService::new(content.clone()).unwrap();
     let definition = content.definition(1_000_015).unwrap();
     let pet = pets.adopt_vendor_grant(1, &definition, 0).unwrap();
     game.adopt_pets(pets.document_value()).unwrap();
-    let who = character_at_for(CHARACTER, 7, [0.0, 0.0, 0.0]);
+    let who = character_at_for(CHARACTER, 7, at);
     game.initialize_world(&who, 0).unwrap();
     let summoned = game.handle_in_world(&summon(pet), &who, 1_000).unwrap();
     assert!(
@@ -547,13 +634,21 @@ fn a_clicked_spot_is_walked_to_through_the_world_tick() {
             .any(|packet| packet.starts_with(&[53, 0, 9])),
         "the summon activates the pet"
     );
+    (fixture, game, who)
+}
 
-    let actor = PetService::pet_guid(who.guid);
+#[test]
+fn a_clicked_spot_is_walked_to_through_the_world_tick() {
+    let grid = terrain::surface([-50.0, -50.0], [50.0, 50.0], 1.0, |_, _| 0.0);
+    let (_fixture, mut game, who) = world_with(grid, [0.0, 0.0, 0.0]);
+
     let reply = game
         .handle_in_world(&can_go([10.0, 0.0, 0.0, 0.0]), &who, 2_000)
         .unwrap();
     assert!(
-        reply.replies.contains(&answer(actor, true)),
+        reply
+            .replies
+            .contains(&can_go_reply([10.0, 0.0, 0.0, 0.0], true)),
         "the world route answers can-go: {:?}",
         reply.replies
     );
@@ -580,5 +675,90 @@ fn a_clicked_spot_is_walked_to_through_the_world_tick() {
             .any(|packet| packet.starts_with(&[125, 0])),
         "a 125 follows the moved owner: {:?}",
         resumed.replies
+    );
+}
+
+/// T490/F850: the production tick is 20 Hz, so a 2 m/s follow step is 0.1 m and the walk check
+/// must look a `sample_m` ahead. Before the fix the heightfield's one-cell interpolation let the
+/// pet creep down a 4 m cliff 0.8 m per tick.
+#[test]
+fn a_fifty_millisecond_follow_step_does_not_walk_down_a_cliff() {
+    let grid = terrain::surface([-20.0, -20.0], [20.0, 20.0], 0.5, |x, _| {
+        if x < 0.0 { 0.0 } else { 4.0 }
+    });
+    let (_fixture, mut game, mut who) = world_with(grid, [2.0, 4.0, 0.0]);
+    let mut previous = game.pet_view(who.guid).expect("the pet is out").position;
+    let mut last_move = 1_000;
+    let mut landing = None;
+    for step in 1..=240u64 {
+        let t = 1_000 + step * 50;
+        if step < 200 {
+            // The owner walks left at 2 m/s and drops to the low side at x = 0.
+            let x = 2.0 - 0.1 * step as f32;
+            who = character_at_for(CHARACTER, 7, [x, if x < 0.0 { 0.0 } else { 4.0 }, 0.0]);
+        }
+        game.pet_tick(&who, t);
+        let position = game.pet_view(who.guid).expect("the pet is out").position;
+        if position[1] <= 0.1 {
+            landing = Some((t, position));
+            break;
+        }
+        assert!(
+            position[1] >= 3.9,
+            "{t} ms: the pet descended the cliff part way: {position:?}"
+        );
+        assert!(
+            position[0] >= -0.001,
+            "{t} ms: the pet crossed the cliff edge: {position:?}"
+        );
+        if (position[0] - previous[0]).abs() >= 1e-4 || (position[2] - previous[2]).abs() >= 1e-4 {
+            last_move = t;
+        }
+        previous = position;
+    }
+    let (at, landed) = landing.expect("a blocked pet warps after warp_far_ms");
+    assert!(
+        at.saturating_sub(last_move) >= follow().warp_far_ms,
+        "the warp waits warp_far_ms after the last step: {last_move} -> {at}"
+    );
+    assert!(
+        landed[0] < 0.0,
+        "the warp lands on the low side: {landed:?}"
+    );
+}
+
+/// T490/F850: a zone with a height grid has a hole where the grid has no ground, and that is not
+/// walkable. Before the fix, a step whose two ends were both unknown kept T455's owner-height
+/// rule, so a pet standing beside an owner outside the grid walked after them at their height.
+#[test]
+fn a_pet_over_a_hole_in_a_gridded_zone_does_not_walk() {
+    // A grid that covers only the middle of the zone: the owner and pet stand outside it.
+    let grid = terrain::surface([-2.0, -2.0], [2.0, 2.0], 1.0, |_, _| 0.0);
+    let (_fixture, mut game, who) = world_with(grid, [20.0, 0.0, 20.0]);
+    let spawn = game.pet_view(who.guid).expect("the pet is out").position;
+    assert_eq!(spawn, [22.0, 0.0, 20.0], "the pet spawns beside its owner");
+    for t in (1_050..5_000).step_by(50) {
+        game.pet_tick(&who, t);
+        assert_eq!(
+            game.pet_view(who.guid).expect("the pet is out").position,
+            spawn,
+            "{t} ms: unknown ground under both ends of the step is not walkable"
+        );
+    }
+    // After warp_far_ms of refused steps the pet goes to its owner instead.
+    let warped = (5_000..8_000)
+        .step_by(50)
+        .find(|&t| {
+            game.pet_tick(&who, t).is_some_and(|out| {
+                out.replies
+                    .iter()
+                    .any(|packet| packet.starts_with(&[125, 0]))
+            })
+        })
+        .expect("a blocked pet warps after warp_far_ms");
+    assert_eq!(
+        game.pet_view(who.guid).expect("the pet is out").position,
+        spawn,
+        "{warped} ms: the warp lands beside the owner"
     );
 }

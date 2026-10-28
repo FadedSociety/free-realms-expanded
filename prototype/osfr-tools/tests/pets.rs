@@ -15,6 +15,10 @@ static SEQUENCE: AtomicU64 = AtomicU64::new(0);
 mod pet_inventory;
 use pet_inventory::InventoryFixture;
 
+#[path = "../src/bin/osfr_gateway/pet_wire.rs"]
+mod pet_wire;
+use pet_wire::can_go_reply;
+
 fn definition() -> PetDefinition {
     PetDefinition {
         species_id: 652,
@@ -124,10 +128,11 @@ fn follow_and_equipment_state_validate_owned_items_and_slots() {
         .unwrap();
     let followed =
         service.follow_location([10.0, 0.0, 0.0, 0.0], [0.0; 3], |_, _| Some(0.0), 1_000);
-    let mut can_go = vec![53, 0, 26];
-    can_go.extend(44u64.to_le_bytes());
-    can_go.push(1);
-    assert_eq!(followed.private, vec![can_go], "the owned actor can go");
+    assert_eq!(
+        followed.private,
+        vec![can_go_reply([10.0, 0.0, 0.0, 0.0], true)],
+        "the owned actor can go"
+    );
     assert!(followed.shared.is_empty(), "the reply is owner-only");
     service.set_in_water(true).unwrap();
     assert_eq!(

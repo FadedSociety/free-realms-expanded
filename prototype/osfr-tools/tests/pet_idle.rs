@@ -25,7 +25,7 @@ use osfr_tools::{
     world_events::piece_052::ANIM_ID_STAND,
 };
 use pet_inventory::InventoryFixture;
-use pet_wire::{perform_trick, summon, water};
+use pet_wire::{can_go_reply, perform_trick, summon, water};
 use serde_json::{Value, json};
 
 /// 1,000 s after adoption: the same base the other pet suites use.
@@ -168,7 +168,7 @@ impl Session {
     fn tick(&mut self, at: u64) -> Seen {
         let mut wire = self
             .service
-            .follow_owner(OWNER, self.owner, |_, _| None, at);
+            .follow_owner(OWNER, self.owner, |_, _| None, false, at);
         let care = self.service.care_tick(&mut self.fixture.inventory, at);
         assert!(!care.changed, "idle life saves nothing");
         wire.private.extend(care.private);
@@ -591,13 +591,6 @@ fn a_follow_click_wakes_a_lying_pet_and_pauses_its_idle_life() {
     );
     // A refused click changes nothing: the pet stays where it lies, still settled and with no
     // destination stored. The 53/26 reply (flag 0) is the only thing sent.
-    let actor = session.actor;
-    let can_go = |flag: bool| {
-        let mut packet = vec![53, 0, 26];
-        packet.extend(actor.to_le_bytes());
-        packet.push(u8::from(flag));
-        packet
-    };
     let before = session.service.view(OWNER).unwrap();
     for target in [
         [f32::NAN, 0.0, 0.0, 0.0],
@@ -609,7 +602,11 @@ fn a_follow_click_wakes_a_lying_pet_and_pauses_its_idle_life() {
             session
                 .service
                 .follow_location(target, session.owner, |_, _| Some(0.0), lying.at + 1);
-        assert_eq!(refused.private, vec![can_go(false)], "{target:?}");
+        assert_eq!(
+            refused.private,
+            vec![can_go_reply(target, false)],
+            "{target:?}"
+        );
         assert_eq!(session.service.view(OWNER).unwrap(), before, "{target:?}");
     }
     let still = session.tick(lying.at + TICK);
@@ -631,7 +628,10 @@ fn a_follow_click_wakes_a_lying_pet_and_pauses_its_idle_life() {
         |_, _| Some(0.0),
         lying.at + TICK,
     );
-    assert_eq!(accepted.private, vec![can_go(true)]);
+    assert_eq!(
+        accepted.private,
+        vec![can_go_reply([20.0, 0.0, 0.0, 0.0], true)]
+    );
     let up = session.tick(lying.at + 2 * TICK);
     assert_stand_up(&up);
     assert_eq!(session.service.view(OWNER).unwrap().base_animation, None);

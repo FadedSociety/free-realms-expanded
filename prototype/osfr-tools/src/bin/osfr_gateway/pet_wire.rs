@@ -7,7 +7,7 @@
 //! T485: the care panel's utility (53/16), feed (53/19) and water (53/28) bodies.
 //! T488: groom (53/18) and the tactile stroke report (53/22).
 //! T489: perform trick (53/7), gesture result (53/8) and favourite trick (53/14).
-//! T490: the tile-click can-go location (53/26).
+//! T490: the tile-click can-go location (53/26) and its reply.
 #![allow(dead_code)] // each includer uses a subset
 
 /// Client `SendPetSummon` (`00b5a650`): `53 00 | 4 | u32 pet id | action 1`.
@@ -98,4 +98,32 @@ pub fn can_go(position: [f32; 4]) -> Vec<u8> {
     }
     bytes.push(0);
     bytes
+}
+
+/// T490: the server's 53/26 reply (reader `00b578d0`: `sub_B55280` header, then `sub_8E2410`
+/// reads four dwords into +16..+31, then the flag byte at +32). The client's handler
+/// (`00b5ce60` case 26) reads only the flag; the four dwords echo the click vector the client's
+/// own ctor fills them with (`00b5fcf0`).
+pub fn can_go_reply(position: [f32; 4], can_go: bool) -> Vec<u8> {
+    let mut bytes = vec![53, 0, 26];
+    for value in position {
+        bytes.extend(value.to_le_bytes());
+    }
+    bytes.push(u8::from(can_go));
+    bytes
+}
+
+/// T490: read a 53/26 reply the way the client reader `00b578d0` does: four dwords and then the
+/// flag. `None` when the body is shorter than that, which is what makes the client's read hit
+/// the stream bounds error (`sub_8E2410` + `sub_B58300`) and leaves its can-go flag unset.
+pub fn read_can_go_reply(packet: &[u8]) -> Option<([f32; 4], bool)> {
+    if !packet.starts_with(&[53, 0, 26]) || packet.len() < 20 {
+        return None;
+    }
+    let mut position = [0.0f32; 4];
+    for (index, slot) in position.iter_mut().enumerate() {
+        let at = 3 + index * 4;
+        *slot = f32::from_le_bytes(packet[at..at + 4].try_into().ok()?);
+    }
+    Some((position, packet[19] != 0))
 }
