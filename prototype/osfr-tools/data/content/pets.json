@@ -54410,12 +54410,13 @@
     "speed_bonus": 3.0,
     "duration_ms": 10000,
     "refresh_ms": 4000,
-    "tag_id": 1800000000,
+    "tag_id": 2100000000,
     "icon_id": 3851,
     "name_id": 116881,
+    "composite_effect_id": 15216,
     "source": {
       "kind": "reconstructed",
-      "evidence": "T532 (R): mood 25, +3 units/s, 10 s duration and 4 s refresh are server policy; name_id 116881 is the client locale row 'Pet Happiness Speed Buff' (Global.Text.116881 -> locale hash 1121068295); icon 3851 is Resources/Images/Images.txt row 3851 icon_status_sprint_32.dds, and icon 0 draws no row in GroupHandler:AddAbilityEffect. tag_id is server-assigned above the consumable effect ids. 57918 is NOT an effect definition: ClientItemDefinitions row 57918 is the Yeti Mask item, so it is not used. 15216 is ActorCompositeEffectDefinitions row PFX_beam_white_feet_speed-run_loop, the visible foot beam; it is not sent because this rule has no 35/41 world-effect path."
+      "evidence": "T532 (R): mood 25, +3 units/s, 10 s duration and 4 s refresh are server policy; name_id 116881 is the client locale row 'Pet Happiness Speed Buff' (Global.Text.116881 -> locale hash 1121068295); icon 3851 is Resources/Images/Images.txt row 3851 icon_status_sprint_32.dds, and icon 0 draws no row in GroupHandler:AddAbilityEffect. tag_id is server-assigned above the consumable buff ids (1.0e9..1.5e9) and the world-tag range (1.5e9..2.0e9, `consumable_effects::WORLD_TAG_BASE`), so a row can never alias either. 57918 is NOT an effect definition: ClientItemDefinitions row 57918 is the Yeti Mask item, so it is not used. T830: composite_effect_id 15216 is ActorCompositeEffectDefinitions.xml row PFX_beam_white_feet_speed-run_loop (PARTICLE 20111), the client's own run-speed foot beam, played on the owner by 35/41 and removed by 35/42."
     }
   }
 }

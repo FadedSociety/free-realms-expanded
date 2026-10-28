@@ -1230,6 +1230,10 @@ mod tests {
         let still = super::super::tests::l039_login_pose::step(owner, parked);
         rig.scene.dispatch(&rig.options, &still, 100_100).unwrap();
         let pet = rig.scene.world.pets.get(&owner).cloned().unwrap();
+        // T830: the Labrador is now the active pet and owns its own actor id, so the AddNpc the
+        // late viewer is sent names that pet, not the first one.
+        let mut add_npc = vec![35, 0, 2, 0];
+        add_npc.extend(pet.actor_guid.to_le_bytes());
         let looped = pet
             .base_animation
             .expect("the pet lies down on the world tick");

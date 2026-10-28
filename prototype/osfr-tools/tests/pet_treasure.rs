@@ -158,7 +158,7 @@ impl Dig {
             service,
             fixture,
             pet,
-            actor: PetService::pet_guid(OWNER),
+            actor: PetService::pet_guid(OWNER, pet),
             owner: [0.0; 3],
             wall: WALL,
             busy: false,
@@ -1861,7 +1861,7 @@ fn chest_guids_are_unique_across_finds_owners_and_sessions() {
         let mut dog = Dig::dog(seed);
         let guid = dog.until_chest(120_000).unwrap().chest().unwrap().actor_id;
         assert!(seen.insert(guid), "guid {guid:#x} was minted twice");
-        assert_ne!(guid, PetService::pet_guid(OWNER));
+        assert_ne!(guid, PetService::pet_guid(OWNER, dog.pet));
     }
     // Two finds of one session (the cooldown moved on between them) never share a guid either.
     let mut dog = Dig::dog(77);

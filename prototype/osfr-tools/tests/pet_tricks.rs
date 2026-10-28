@@ -78,9 +78,9 @@ fn owner_animation(trick: u32) -> Vec<u8> {
     animation_packet(OWNER, trick_row(trick).owner_animation_id, false)
 }
 
-fn pet_animation(trick: u32) -> Vec<u8> {
+fn pet_animation(pet: u32, trick: u32) -> Vec<u8> {
     animation_packet(
-        PetService::pet_guid(OWNER),
+        PetService::pet_guid(OWNER, pet),
         trick_row(trick).animation_id,
         false,
     )
@@ -193,8 +193,8 @@ fn a_known_trick_runs_kind_1_lock_owner_animation_pet_animation_then_the_result_
         "before the delay",
     );
     let animated = service.care_tick(&mut fixture.inventory, start + delay);
-    assert_eq!(traffic(&animated.private), vec![pet_animation(TRICK)]);
-    assert_eq!(animated.shared, vec![pet_animation(TRICK)]);
+    assert_eq!(traffic(&animated.private), vec![pet_animation(pet, TRICK)]);
+    assert_eq!(animated.shared, vec![pet_animation(pet, TRICK)]);
     assert_eq!(animated.accepted_trick, None);
     // It plays once, and the trick keeps running until its time is over.
     quiet(
@@ -230,7 +230,7 @@ fn a_late_tick_still_plays_the_animation_before_the_result() {
     let (mut service, mut fixture, pet) = ready();
     send(&mut service, &mut fixture, &perform_trick(TRICK), START);
     let wire = service.care_tick(&mut fixture.inventory, START + 10 * 60_000);
-    let mut expected = vec![pet_animation(TRICK)];
+    let mut expected = vec![pet_animation(pet, TRICK)];
     expected.extend(ending(pet, TRICK));
     assert_eq!(traffic(&wire.private), expected);
 }
@@ -435,7 +435,7 @@ fn a_perform_during_another_trick_is_refused_and_the_first_trick_runs_on() {
     }
     // The first trick is untouched: its animation, then one result at its own time.
     let animated = service.care_tick(&mut fixture.inventory, start + delay);
-    assert_eq!(traffic(&animated.private), vec![pet_animation(TRICK)]);
+    assert_eq!(traffic(&animated.private), vec![pet_animation(pet, TRICK)]);
     let ended = service.care_tick(&mut fixture.inventory, start + delay + run);
     assert_eq!(traffic(&ended.private), ending(pet, TRICK));
     quiet(
@@ -536,10 +536,10 @@ fn a_gesture_report_for_the_running_trick_ends_it_only_once_the_pet_animation_be
         &trick_result(TRICK),
         start + delay + 1,
     );
-    let mut expected = vec![pet_animation(TRICK)];
+    let mut expected = vec![pet_animation(pet, TRICK)];
     expected.extend(ending(pet, TRICK));
     assert_eq!(traffic(&sudden.private), expected);
-    assert_eq!(sudden.shared, vec![pet_animation(TRICK)]);
+    assert_eq!(sudden.shared, vec![pet_animation(pet, TRICK)]);
 }
 
 #[test]
@@ -660,7 +660,7 @@ fn a_dismiss_a_new_summon_water_and_zoning_end_the_trick_with_the_unlocks_and_no
     let failed = send(&mut service, &mut fixture, &summon(pet + 77), start + 100);
     assert!(traffic(&failed.private).is_empty());
     let ended = service.care_tick(&mut fixture.inventory, end);
-    let mut expected = vec![pet_animation(TRICK)];
+    let mut expected = vec![pet_animation(pet, TRICK)];
     expected.extend(ending(pet, TRICK));
     assert_eq!(traffic(&ended.private), expected);
 
@@ -917,7 +917,7 @@ fn a_trick_runs_through_gameplay_for_the_owner_and_the_viewers() {
         trick_row(TRICK).duration_ms as u64,
     );
     let start = START + 1_000;
-    let actor = PetService::pet_guid(who.guid);
+    let actor = PetService::pet_guid(who.guid, pet);
     game.handle_in_world(&summon(pet), &who, start).unwrap();
 
     let refused = game
@@ -958,4 +958,86 @@ fn a_trick_runs_through_gameplay_for_the_owner_and_the_viewers() {
         .unwrap();
     let zoned = game.settle_pets(&who, true, start + 1_000_100).unwrap();
     assert_eq!(traffic(&zoned.replies), unlocks(pet, TRICK));
+}
+
+/// T830: switching pets is an actor *creation* for the client - its pet window, camera and trick
+/// bar bind to the active pet's actor, so a second pet must not reuse the first one's id. The new
+/// pet's trick then plays on the new actor, through the real `Gameplay` route.
+#[test]
+fn a_second_pet_is_a_second_actor_and_performs_its_trick_on_it() {
+    let fixture = Fixture::minimal(CHARACTER);
+    let content = PetContent::bundled().unwrap();
+    let mut definition = content.definition(1_000_015).unwrap();
+    definition.model = content.model(364).unwrap().adr.clone();
+    let mut seeded = PetService::new(content).unwrap();
+    let first = seeded.adopt_vendor_grant(1, &definition, 0).unwrap();
+    let second = seeded.adopt_vendor_grant(2, &definition, 0).unwrap();
+    let (first_actor, second_actor) = (
+        PetService::pet_guid(CHARACTER, first),
+        PetService::pet_guid(CHARACTER, second),
+    );
+    assert_ne!(first_actor, second_actor, "each pet owns its actor");
+
+    let who = CharacterState {
+        guid: CHARACTER,
+        zone_id: 0,
+        position: [-440.0, 0.8, 1292.0],
+        rotation: [1.0, 0.0, 0.0],
+    };
+    let mut game = Gameplay::load(fixture.path(), None).unwrap();
+    game.adopt_pets(seeded.document_value()).unwrap();
+    game.initialize_world(&who, START).unwrap();
+    let start = START + 1_000;
+    game.handle_in_world(&summon(first), &who, start).unwrap();
+    let switched = game
+        .handle_in_world(&summon(second), &who, start + 1_000)
+        .unwrap();
+
+    let created = switched
+        .replies
+        .iter()
+        .find(|packet| packet.starts_with(&[35, 0, 2, 0]))
+        .expect("the old actor is replaced by a new one");
+    assert_eq!(&created[4..12], &second_actor.to_le_bytes());
+    let active = switched
+        .replies
+        .iter()
+        .find(|packet| packet.starts_with(&[53, 0, 9]))
+        .expect("the active pair");
+    assert_eq!(&active[3..7], &second.to_le_bytes());
+    assert_eq!(&active[7..15], &second_actor.to_le_bytes());
+    assert!(
+        switched
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[35, 0, 3, 0, 1, 0])
+                && packet[6..14] == first_actor.to_le_bytes()),
+        "the old pet's actor is removed"
+    );
+
+    let delay = trick_row(TRICK).start_delay_ms as u64;
+    let accepted = game
+        .handle_in_world(&perform_trick(TRICK), &who, start + 2_000)
+        .unwrap();
+    assert_eq!(
+        traffic(&accepted.replies),
+        vec![
+            trick_notify(second, 1, TRICK, name_id(TRICK), 0),
+            notify(second, 5, 0),
+            animation_packet(who.guid, trick_row(TRICK).owner_animation_id, false),
+        ],
+        "the new pet accepts the trick (a refusal would be the two unlocks)"
+    );
+    let animated = game
+        .pet_tick(&who, start + 2_000 + delay)
+        .expect("a pet is out");
+    assert_eq!(
+        traffic(&animated.replies),
+        vec![animation_packet(
+            second_actor,
+            trick_row(TRICK).animation_id,
+            false
+        )],
+        "the trick plays on the new pet's own actor"
+    );
 }

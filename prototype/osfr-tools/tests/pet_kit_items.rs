@@ -336,7 +336,7 @@ fn a_real_bowl_and_real_food_fit_feed_and_play_the_pet_feed_animation() {
     }
     send(&mut service, &mut fixture, &pet_wire::summon(pet), T0);
     let before = service.pet(pet).unwrap().needs.food;
-    let actor = PetService::pet_guid(OWNER);
+    let actor = PetService::pet_guid(OWNER, pet);
 
     let started = send(&mut service, &mut fixture, &pet_wire::feed(pet), T0 + 1_000);
     assert_eq!(notify_kinds(&started.private), vec![1]);
@@ -404,7 +404,7 @@ fn a_non_bowl_in_the_bowl_slot_is_refused_and_changes_nothing() {
     );
     let tick = service.care_tick(&mut fixture.inventory, T0 + 2_000);
     assert!(!tick.changed);
-    assert!(animations(&tick.private, PetService::pet_guid(OWNER)).is_empty());
+    assert!(animations(&tick.private, PetService::pet_guid(OWNER, pet)).is_empty());
     assert_eq!(service.document_value(), roster);
     assert_eq!(fixture.inventory.state(), &inventory);
     assert_eq!(care::count(&fixture, FOOD_INSTANCE), 2);

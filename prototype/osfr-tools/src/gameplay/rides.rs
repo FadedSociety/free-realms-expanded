@@ -75,15 +75,17 @@ impl Gameplay {
         self.pets.happy_speed_bonus().unwrap_or(0.0)
     }
 
-    /// T532: one happy-speed-buff step. The buff-bar row goes to the owner, and the character
-    /// speed stat follows so the client's own motion matches the server's allowance (the stat is
-    /// the live bonus, so a row that just ended restores the on-foot value). A ride's own 38/7
-    /// owns the speed while seated, so the stat waits for the next refresh on foot.
+    /// T532: one happy-speed-buff step. The buff-bar row goes to the owner, the content's composite
+    /// effect to the owner and the viewers, and the character speed stat follows so the client's
+    /// own motion matches the server's allowance (the stat is the live bonus, so a row that just
+    /// ended restores the on-foot value). A ride's own 38/7 owns the speed while seated, so the
+    /// stat waits for the next refresh on foot.
     fn sync_happy_buff(&mut self, character: &CharacterState, now_ms: u64, out: &mut Outcome) {
-        let Some(rows) = self.pets.happy_buff_tick(now_ms) else {
+        let Some(wire) = self.pets.happy_buff_tick(now_ms, character.guid) else {
             return;
         };
-        out.replies.extend(rows);
+        out.replies.extend(wire.private);
+        out.nearby.extend(wire.shared);
         if self.is_mounted() {
             return;
         }
@@ -419,15 +421,15 @@ impl Gameplay {
     /// never an `Err` out of the loaded path or the world tick. Nothing is remembered on almost
     /// every tick, so the memory is checked before the occupation table is asked.
     fn resummon_pet(&mut self, character: &CharacterState, now_ms: u64, out: &mut Outcome) -> bool {
-        if self.pets.remembered_pet_id().is_none() {
+        let Some(pet_id) = self.pets.remembered_pet_id() else {
             return false;
-        }
+        };
         let busy = crate::pets::PetBusy {
             minigame_active: self.blocks(|gates| gates.pets),
         };
         let guid = character.guid;
         match self.pets.resummon(
-            crate::pets::PetService::pet_guid(guid),
+            crate::pets::PetService::pet_guid(guid, pet_id),
             guid,
             character.position,
             busy,

@@ -10,6 +10,12 @@
 //! the character speed stat is family 38 sub 7 stat id 2 `MaxMovementSpeed` (stat-name table
 //! `0x01af2008`, entry `0x01af2010`; entry reader `008e7640`). The rule values are (R):
 //! pets.json `happy_buff` (mood 25, +3 units/s, 10 s, 4 s refresh).
+//!
+//! T830: the tag id rotates on every send because the client's 38/16 insert tells its data source
+//! (`00a19e70`) before it parses the blob (`00a18cc0`), and only a *new* tag id tells it again;
+//! the row it replaces is removed in the same batch. The visible effect is the content's composite
+//! effect (35/41: family-35 dispatcher case 41 at `0x00933779`, reader `008d7ad0`), attached to the
+//! owner and removed with 35/42.
 
 #[path = "common/gateway_packets.rs"]
 mod gateway_packets;
@@ -30,7 +36,10 @@ use osfr_tools::{
 };
 use pet_inventory::InventoryFixture;
 use pet_wire::{dismiss, summon};
-use piece_056::{EffectTagPayload, decode_add_effect_tag, decode_remove_effect_tag};
+use piece_056::{
+    CompositeEffect, EffectTagPayload, decode_add_composite_effect, decode_add_effect_tag,
+    decode_remove_composite_effect, decode_remove_effect_tag,
+};
 use serde_json::{Value, json};
 use std::path::PathBuf;
 
@@ -48,6 +57,8 @@ const BONUS: f32 = 3.0;
 const NAME_ID: i32 = 116881;
 /// `Resources/Images/Images.txt` row 3851 `icon_status_sprint_32.dds`, the status speed icon.
 const ICON: i32 = 3851;
+/// `Resources/ActorCompositeEffectDefinitions.xml` row `PFX_beam_white_feet_speed-run_loop`.
+const COMPOSITE: i32 = 15216;
 
 fn reference() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -104,6 +115,22 @@ fn removes(packets: &[Vec<u8>]) -> Vec<i32> {
         .collect()
 }
 
+/// The 35/41 composite-effect rows in one outcome (T830: the visible speed effect).
+fn composite_adds(packets: &[Vec<u8>]) -> Vec<CompositeEffect> {
+    packets
+        .iter()
+        .filter_map(|packet| decode_add_composite_effect(body(packet)).ok())
+        .collect()
+}
+
+/// The 35/42 removals in one outcome, as `(guid, tag id)`.
+fn composite_removes(packets: &[Vec<u8>]) -> Vec<(u64, i32)> {
+    packets
+        .iter()
+        .filter_map(|packet| decode_remove_composite_effect(body(packet)).ok())
+        .collect()
+}
+
 /// Every 38/7 stat id 2 (`MaxMovementSpeed`) value in one outcome, reader-faithful: u16 38, u16
 /// 7, u64 target, i32 count, then per entry i32 id, i32 kind (0 int, 1 float) and the value.
 fn speeds(packets: &[Vec<u8>]) -> Vec<f32> {
@@ -149,7 +176,11 @@ fn a_happy_summoned_pet_sends_the_buff_row_and_the_boosted_speed_stat() {
     let mut game = game(roster(false, 100.0));
     let out = game.handle_in_world(&summon(1), &who(), NOW).unwrap();
     let sent = rows(&out.replies);
-    assert_eq!(sent.len(), 1, "one buff-bar row per tag id");
+    assert_eq!(
+        sent.len(),
+        2,
+        "the client only re-reads the row on a *new* tag id, so the start sends one step ahead"
+    );
     let (tag, row) = &sent[0];
     assert_eq!(row.name_id(), NAME_ID, "the recovered locale row");
     assert_eq!(row.icon_id(), ICON, "the client image table row");
@@ -157,6 +188,27 @@ fn a_happy_summoned_pet_sends_the_buff_row_and_the_boosted_speed_stat() {
     assert!(
         *tag > 1_500_000_000,
         "above the consumable and world tag ranges, so it can never alias one"
+    );
+    assert_eq!(sent[1].0, tag + 1, "the second row is the next id");
+    assert_eq!(
+        removes(&out.replies),
+        vec![*tag],
+        "the first row is dropped in the same batch: one icon, never two"
+    );
+    assert_eq!(
+        composite_adds(&out.replies),
+        vec![CompositeEffect {
+            guid: OWNER,
+            tag_id: *tag,
+            composite_effect_id: COMPOSITE,
+            source_guid: OWNER,
+        }],
+        "the client's own speed foot beam, attached to the owner"
+    );
+    assert_eq!(
+        composite_adds(&out.nearby),
+        composite_adds(&out.replies),
+        "viewers see the same effect"
     );
     assert_eq!(
         speeds(&out.replies),
@@ -168,17 +220,29 @@ fn a_happy_summoned_pet_sends_the_buff_row_and_the_boosted_speed_stat() {
     assert!(rows(&quiet.replies).is_empty() && speeds(&quiet.replies).is_empty());
 }
 
+/// The protected T532 name: a refresh still replaced the one row it holds. T830 only changed which
+/// id the replacement carries (a fresh one) and that the row it replaces is removed in the batch.
 #[test]
 fn a_refresh_replaces_the_one_row_and_never_stacks() {
     let mut game = game(roster(false, 100.0));
     let out = game.handle_in_world(&summon(1), &who(), NOW).unwrap();
-    let tag = rows(&out.replies)[0].0;
+    let shown = rows(&out.replies)[1].0;
     let refreshed = game.pet_tick(&who(), NOW + 4_000).unwrap();
     let rows = rows(&refreshed.replies);
-    assert_eq!(rows.len(), 1, "a refresh re-sends the one row");
+    assert_eq!(rows.len(), 1, "a refresh sends the one current row");
     assert_eq!(
-        rows[0].0, tag,
-        "the tag id never changes, so nothing stacks"
+        rows[0].0,
+        shown + 1,
+        "a fresh tag id, so the client re-reads"
+    );
+    assert_eq!(
+        removes(&refreshed.replies),
+        vec![shown],
+        "the row it replaces goes in the same batch"
+    );
+    assert!(
+        composite_adds(&refreshed.replies).is_empty(),
+        "the effect keeps looping; it is not restarted every refresh"
     );
     assert_eq!(speeds(&refreshed.replies), vec![ON_FOOT + BONUS]);
 }
@@ -219,6 +283,12 @@ fn a_mood_drop_below_the_threshold_ends_the_buff() {
     // Summoned needs decay 0.04/s: 3,800 s takes the mood far below 25.
     let ended = game.pet_tick(&who(), NOW + 3_800_000).unwrap();
     assert_eq!(removes(&ended.replies).len(), 1, "38/17");
+    assert_eq!(
+        composite_removes(&ended.replies),
+        composite_removes(&ended.nearby),
+        "the effect is removed with the row, for the owner and the viewers"
+    );
+    assert_eq!(composite_removes(&ended.replies).len(), 1, "35/42");
     assert_eq!(speeds(&ended.replies), vec![ON_FOOT], "speed restored");
     let quiet = game.pet_tick(&who(), NOW + 3_801_000).unwrap();
     assert!(rows(&quiet.replies).is_empty());
@@ -234,6 +304,11 @@ fn dismissal_ends_the_buff_at_once_and_the_tick_stops() {
         .handle_in_world(&dismiss(1), &who(), NOW + 1_000)
         .unwrap();
     assert_eq!(removes(&out.replies).len(), 1);
+    assert_eq!(
+        composite_removes(&out.replies).len(),
+        1,
+        "a dismiss takes the effect with it"
+    );
     assert_eq!(speeds(&out.replies), vec![ON_FOOT]);
     assert!(
         game.pet_tick(&who(), NOW + 2_000).is_none(),
@@ -255,7 +330,7 @@ fn zoning_ends_the_buff_with_the_pet() {
     let back = game
         .pet_tick(&who(), NOW + 2_000)
         .expect("the remembered pet comes back");
-    assert_eq!(rows(&back.replies).len(), 1);
+    assert_eq!(rows(&back.replies).len(), 2, "a fresh start step");
     assert_eq!(speeds(&back.replies), vec![ON_FOOT + BONUS]);
 }
 
@@ -278,6 +353,11 @@ fn a_refused_pet_request_leaves_the_buff_and_the_pet_alone() {
     assert!(rows(&refused.replies).is_empty());
     assert!(removes(&refused.replies).is_empty());
     assert!(speeds(&refused.replies).is_empty());
+    assert!(
+        composite_adds(&refused.replies).is_empty()
+            && composite_removes(&refused.replies).is_empty(),
+        "T830: a refusal starts and ends no effect"
+    );
     assert_eq!(game.state(), state, "a refusal changes no live state");
     assert_eq!(game.pets_document(), pets, "a refusal changes no roster");
     assert_eq!(game.pet_view(OWNER).unwrap().pet_id, 1, "the pet stays out");
@@ -301,13 +381,15 @@ fn a_reconnect_starts_without_the_buff() {
         NOW,
     )
     .unwrap();
-    assert!(pets.happy_buff_tick(NOW).is_some(), "the row is sent");
+    assert!(
+        pets.happy_buff_tick(NOW, OWNER).is_some(),
+        "the row is sent"
+    );
     assert_eq!(pets.happy_speed_bonus(), Some(BONUS));
     pets.reset_session();
     assert_eq!(pets.happy_speed_bonus(), None, "session-only state");
-    assert_eq!(
-        pets.happy_buff_tick(NOW + 1),
-        None,
+    assert!(
+        pets.happy_buff_tick(NOW + 1, OWNER).is_none(),
         "a fresh session sends nothing"
     );
 }
@@ -349,9 +431,10 @@ fn the_gateway_accepts_a_move_only_the_buff_admits() {
     let buffed = gateway.handle_at(&wrap(&summon(1)), NOW).expect("summon");
     assert_eq!(
         rows(&buffed.replies).len(),
-        1,
+        2,
         "the buff row reached the client"
     );
+    assert_eq!(composite_adds(&buffed.replies).len(), 1, "and its effect");
     assert_eq!(speeds(&buffed.replies), vec![ON_FOOT + BONUS]);
 
     // Anchor the movement clock with a no-op report, then the far move 100 ms later.
@@ -371,6 +454,10 @@ fn without_the_buff_the_same_move_is_rejected() {
     let mut gateway = session(roster(true, 100.0));
     let vanity = gateway.handle_at(&wrap(&summon(1)), NOW).expect("summon");
     assert!(rows(&vanity.replies).is_empty());
+    assert!(
+        composite_adds(&vanity.replies).is_empty(),
+        "a vanity pet plays no effect"
+    );
     gateway
         .handle_at(&wrap(&move_to(OWNER, who().position)), NOW + 10)
         .expect("anchor");

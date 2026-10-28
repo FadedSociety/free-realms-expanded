@@ -333,7 +333,7 @@ fn a_reachable_click_walks_the_pet_there_and_it_waits() {
         )
         .unwrap()
         .unwrap();
-    let actor = PetService::pet_guid(OWNER);
+    let actor = PetService::pet_guid(OWNER, service.active_pet_id().unwrap());
     assert_eq!(
         accepted.private,
         vec![can_go_reply([10.0, 5.0, 0.0, 0.0], true)],

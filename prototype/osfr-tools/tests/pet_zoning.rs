@@ -160,7 +160,7 @@ fn dismiss() -> Vec<u8> {
 }
 
 fn actor() -> u64 {
-    PetService::pet_guid(GUID)
+    PetService::pet_guid(GUID, PET)
 }
 
 /// One kart race and its exit through the world's loaded signal.

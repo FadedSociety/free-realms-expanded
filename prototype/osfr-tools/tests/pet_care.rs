@@ -204,7 +204,7 @@ fn feeding_without_a_bowl_only_unlocks_and_spends_nothing() {
         "a refused feed shows the viewers nothing"
     );
     assert!(
-        animations(&wire.private, PetService::pet_guid(OWNER)).is_empty(),
+        animations(&wire.private, PetService::pet_guid(OWNER, pet)).is_empty(),
         "and plays no eat animation"
     );
     for at in [T0 + 2_000, T0 + 8_000] {
@@ -219,7 +219,7 @@ fn feeding_without_a_bowl_only_unlocks_and_spends_nothing() {
 fn a_feed_plays_the_eat_animation_for_the_owner_and_the_viewers() {
     assert_eq!(pets_json()["care"]["feed_animation"], EAT);
     let (mut service, mut fixture, pet) = ready_to_feed();
-    let actor = PetService::pet_guid(OWNER);
+    let actor = PetService::pet_guid(OWNER, pet);
     let eat = osfr_tools::world_events::piece_052::animation_packet(actor, EAT, false);
     let started = send(&mut service, &mut fixture, &feed(pet), T0 + 1_000);
     assert_eq!(started.private, vec![notify(pet, 1, 0)], "the begin only");
@@ -272,7 +272,7 @@ fn a_feed_announces_the_meal_once_and_a_food_that_left_the_bag_says_nothing() {
     assert!(!applied.changed, "nothing was eaten");
     assert_eq!(applied.notice, None, "nothing was eaten, nothing is said");
     assert!(
-        animations(&applied.private, PetService::pet_guid(OWNER)).is_empty(),
+        animations(&applied.private, PetService::pet_guid(OWNER, pet)).is_empty(),
         "no eat animation either"
     );
     let ended = service.care_tick(&mut fixture.inventory, T0 + 7_000);

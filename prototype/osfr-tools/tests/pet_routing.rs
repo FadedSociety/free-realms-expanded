@@ -103,7 +103,7 @@ fn name_response(packets: &[Vec<u8>], actor: u64, accepted: bool) -> bool {
 fn an_owned_pet_summons_one_server_actor_and_the_serializer_dismiss_removes_it() {
     let mut service = service();
     let pet_id = owned_pet(&mut service);
-    let actor = PetService::pet_guid(OWNER);
+    let actor = PetService::pet_guid(OWNER, pet_id);
     assert_ne!(actor, OWNER);
     assert_eq!(
         PetRequest::decode(&summon(pet_id)).unwrap(),
@@ -222,7 +222,7 @@ fn a_bundled_pet_actor_carries_its_models_txt_id_and_texture_alias() {
 
     let packet = service.view(OWNER).unwrap().spawn_packet().unwrap();
     let npc = startup_world::parse_add_npc(&packet).unwrap();
-    assert_eq!(npc.actor_id, PetService::pet_guid(OWNER));
+    assert_eq!(npc.actor_id, PetService::pet_guid(OWNER, pet_id));
     assert_eq!(npc.model_id, 1756);
     assert_eq!(npc.texture_alias, "goldtips");
     assert_eq!(npc.npc_name, "Char");
@@ -387,7 +387,7 @@ fn an_owned_adoption_item_can_create_and_summon_a_roster_pet() {
     assert_eq!(pets.len(), 1);
     assert_eq!(pets[0].id, 1);
     assert_eq!(active, 1);
-    assert_eq!(actor, PetService::pet_guid(OWNER));
+    assert_eq!(actor, PetService::pet_guid(OWNER, 1));
     assert_eq!(service.active_pet_id(), Some(1));
     assert!(service.pet(1).is_some());
     let after = inventory
@@ -489,7 +489,7 @@ fn a_selected_name_updates_only_the_active_pet_and_refusals_change_nothing() {
     assert!(accepted.changed);
     assert!(name_response(
         &accepted.private,
-        PetService::pet_guid(OWNER),
+        PetService::pet_guid(OWNER, pet_id),
         true
     ));
     assert!(has(&accepted.private, 53, 5));
@@ -509,7 +509,7 @@ fn a_selected_name_updates_only_the_active_pet_and_refusals_change_nothing() {
     assert!(!rejected.changed);
     assert!(name_response(
         &rejected.private,
-        PetService::pet_guid(OWNER),
+        PetService::pet_guid(OWNER, pet_id),
         false
     ));
     assert_eq!(service.roster_snapshot(), before);
@@ -722,7 +722,12 @@ fn switching_pets_removes_the_old_actor_then_creates_and_activates_the_new_one()
     let mut service = service();
     let first = service.adopt_vendor_grant(1, &definition(), 0).unwrap();
     let second = service.adopt_vendor_grant(2, &definition(), 0).unwrap();
-    let actor = PetService::pet_guid(OWNER);
+    let old_actor = PetService::pet_guid(OWNER, first);
+    let actor = PetService::pet_guid(OWNER, second);
+    assert_ne!(
+        old_actor, actor,
+        "T830: each pet owns its actor, so a switch is a creation for the client"
+    );
     service
         .handle(&summon(first), OWNER, [0.0; 3], PetBusy::default(), NOW)
         .unwrap()
@@ -742,7 +747,7 @@ fn switching_pets_removes_the_old_actor_then_creates_and_activates_the_new_one()
     assert_eq!(switched.private[..2], switched.shared[..]);
     let removal = &switched.private[0];
     assert!(removal.starts_with(&[35, 0, 3, 0, 1, 0]));
-    assert_eq!(&removal[6..14], &actor.to_le_bytes());
+    assert_eq!(&removal[6..14], &old_actor.to_le_bytes());
     let created = &switched.private[1];
     assert!(created.starts_with(&[35, 0, 2, 0]));
     assert_eq!(&created[4..12], &actor.to_le_bytes());

@@ -164,7 +164,7 @@ impl Session {
             service,
             fixture,
             pet,
-            actor: PetService::pet_guid(OWNER),
+            actor: PetService::pet_guid(OWNER, pet),
             owner: [0.0; 3],
         }
     }
@@ -1077,7 +1077,7 @@ fn a_pet_idles_and_shows_bubbles_through_gameplay_for_the_owner_and_the_viewers(
     game.adopt_pets(service.document_value()).unwrap();
     game.initialize_world(&who, START).unwrap();
     game.handle_in_world(&summon(pet), &who, START).unwrap();
-    let actor = PetService::pet_guid(who.guid);
+    let actor = PetService::pet_guid(who.guid, pet);
     let (idle, bathroom, _) = rows(364);
 
     // Walking: no animation, even for ten minutes. (A hungry pet's bubble needs no stillness.)

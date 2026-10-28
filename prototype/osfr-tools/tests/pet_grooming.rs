@@ -180,7 +180,7 @@ fn strokes_raise_groom_and_a_full_bar_ends_the_session_with_status_dry_off_and_k
     // T812: a new pet is not already near full, so a groom is real scrubbing, not a few strokes.
     assert!(at - start >= 10_000, "{} ms", at - start);
     let dry_off = animation_packet(
-        PetService::pet_guid(OWNER),
+        PetService::pet_guid(OWNER, pet),
         number("dry_off_animation") as i32,
         false,
     );

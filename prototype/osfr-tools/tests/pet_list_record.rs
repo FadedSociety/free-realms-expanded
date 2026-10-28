@@ -22,7 +22,7 @@ struct Record {
     sex_04: bool,
     icon_08: u32,
     members_30: bool,
-    tricks_34: Vec<[u32; 9]>,
+    tricks_34: Vec<[u32; 10]>,
     classes_e4: Vec<[u32; 3]>,
     name: String,
     name_text_1c: u32,
@@ -61,12 +61,13 @@ impl Reader<'_> {
         let members_30 = self.u8() != 0;
         let tricks_34 = (0..self.u32())
             .map(|_| {
-                let mut row = [0; 9];
+                // Key, the eight u32 of `008ce1a0`, then the known byte (index 9).
+                let mut row = [0; 10];
                 row[0] = self.u32(); // list key
-                for field in &mut row[1..] {
+                for field in &mut row[1..9] {
                     *field = self.u32(); // 008ce1a0: eight u32
                 }
-                let _known = self.u8();
+                row[9] = u32::from(self.u8() != 0);
                 row
             })
             .collect();
@@ -213,12 +214,13 @@ fn a_dog_lists_tricks_11_to_17_with_names_and_its_item_classes() {
     let content = pets_json();
     let model = row(&content, "models", "model_id", 364);
     let mut service = PetService::new(PetContent::bundled().unwrap()).unwrap();
-    let definition = PetContent::bundled()
+    // The item's own definition, so a new pet knows exactly its model's tricks (the production
+    // route `definition_for_item` takes).
+    let dog = PetContent::bundled()
         .unwrap()
-        .definition(1_000_015)
+        .definition_for_item(23_917)
         .unwrap();
-    let mut dog = definition.clone();
-    dog.model = model["adr"].as_str().unwrap().into();
+    assert_eq!(dog.model, model["adr"].as_str().unwrap());
     let id = service.adopt_vendor_grant(1, &dog, 0).unwrap();
     let records = list(&service.list_packet());
     let record = records.iter().find(|r| r.id == id).unwrap();
@@ -231,6 +233,23 @@ fn a_dog_lists_tricks_11_to_17_with_names_and_its_item_classes() {
             .iter()
             .all(|t| names.contains(&u64::from(t[3])))
     );
+    // T830: a new pet knows its model row's tricks and nothing else, in the client data's order.
+    // `known` (index 9) is the unlock the client's trick bar draws from; the last u32 (index 8) is
+    // the sort key its data source orders the rows by.
+    let model_tricks = model["tricks"].as_array().unwrap();
+    assert_eq!(record.tricks_34.len(), model_tricks.len());
+    for (at, trick) in record.tricks_34.iter().enumerate() {
+        let loaded = &model_tricks[at];
+        assert_eq!(trick[0], loaded["id"].as_u64().unwrap() as u32, "key");
+        assert_eq!(trick[1], trick[0], "the element id repeats the key");
+        assert_eq!(
+            trick[9],
+            u32::from(loaded["known"].as_bool().unwrap()),
+            "trick {} known",
+            trick[1]
+        );
+        assert_eq!(trick[8], at as u32 + 1, "the client's row order");
+    }
     assert_eq!(
         record.classes_e4.len(),
         model["item_classes"].as_array().unwrap().len()

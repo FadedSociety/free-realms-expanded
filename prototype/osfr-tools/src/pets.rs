@@ -5,7 +5,12 @@
 //! because no original pet datagram was recovered.
 
 use crate::{
-    abilities::{build_effect_tag, effect_packets::encode_remove_effect_tag},
+    abilities::{
+        build_effect_tag,
+        effect_packets::{
+            encode_add_composite_effect, encode_remove_composite_effect, encode_remove_effect_tag,
+        },
+    },
     inventory::{Inventory, InventoryState},
     startup_world, world,
     world_events::piece_052,
@@ -154,8 +159,9 @@ impl CareTiming {
 
 /// T532: the happy-pet speed buff. Every value is server policy (R) except `name_id`, the
 /// client locale row (116881 "Pet Happiness Speed Buff", hash of `Global.Text.116881`);
-/// `tag_id` is server-assigned and `icon_id` is a client `Resources/Images/Images.txt` image.
-/// The client draws no buff row for icon 0, and one row per `tag_id`, so a refresh replaces it.
+/// `tag_id` is server-assigned, `icon_id` is a client `Resources/Images/Images.txt` image and
+/// `composite_effect_id` a client `Resources/ActorCompositeEffectDefinitions.xml` row.
+/// The client draws no buff row for icon 0 and keys one buff icon per `tag_id`.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
 struct HappyBuff {
@@ -167,12 +173,16 @@ struct HappyBuff {
     duration_ms: u64,
     /// How often the row is re-sent while the rule holds; under `duration_ms`.
     refresh_ms: u64,
-    /// The row's instance id; above the consumable effect ids so it can never alias one.
+    /// The row's first instance id; above the consumable effect ids so it can never alias one.
+    /// Each send rotates to the next id (see `happy_buff_tick`).
     tag_id: i32,
     /// The client image the buff bar draws; zero draws no row at all.
     icon_id: i32,
     /// The client locale row the buff bar shows as the row's name.
     name_id: i32,
+    /// T830: the client composite effect that plays on the owner while the buff runs (35/41,
+    /// removed by 35/42): `15216` is `PFX_beam_white_feet_speed-run_loop`. Zero plays nothing.
+    composite_effect_id: i32,
     source: SourceTag,
 }
 
@@ -184,11 +194,24 @@ impl HappyBuff {
             && (0.1..=10.0).contains(&self.speed_bonus)
             && (1_000..=600_000).contains(&self.duration_ms)
             && (100..self.duration_ms).contains(&self.refresh_ms)
-            // `consumable_effects` owns 1.0e9..1.5e9 and job/power-up rows use definition ids.
-            && self.tag_id > 1_500_000_000
+            // `consumable_effects` owns the buff tags 1.0e9..1.5e9 and the world tags
+            // 1.5e9..2.0e9; job/power-up rows use definition ids.
+            && self.tag_id > 2_000_000_000
             && self.icon_id != 0
             && self.name_id != 0
+            && self.composite_effect_id >= 0
     }
+}
+
+/// One buff-bar row for this step's tag id.
+fn happy_row(config: &HappyBuff, tag_id: i32) -> Vec<u8> {
+    build_effect_tag(tag_id, config.duration_ms, config.icon_id, config.name_id)
+}
+
+/// T830: the next row id, wrapping back to the content's first id. The client keys one buff icon
+/// per id, so a fresh id is what makes it re-read the row (see `PetService::happy_buff_tick`).
+fn next_happy_tag(config: &HappyBuff, tag_id: i32) -> i32 {
+    tag_id.checked_add(1).unwrap_or(config.tag_id)
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
@@ -1282,6 +1305,9 @@ impl ActivePet {
 struct HappyBuffLive {
     /// When the next row refresh is due (ms). The row itself already carries its duration.
     refresh_at_ms: u64,
+    /// T830: the tag id of the buff-bar row the client holds. Every send uses a fresh id and
+    /// removes this one, because the client only tells its buff bar about a *new* tag id.
+    tag_id: i32,
 }
 
 /// T485: a feed between its 53/20 begin and end.
@@ -1423,9 +1449,13 @@ impl PetService {
             .and_then(|id| self.content.item(id))
     }
 
-    /// (R) One active pet per owner; the actor id never comes from the client.
-    pub fn pet_guid(owner_guid: u64) -> u64 {
-        owner_guid ^ PET_GUID_TAG
+    /// (R) The id never comes from the client. The pet id is part of it: every pet owns its own
+    /// actor, so summoning another pet is an actor creation for the client rather than a
+    /// remove-and-add of an id it still holds (T830: its camera, pet window and trick bar bind to
+    /// the actor, and a switch left them on the old pet). The same pet keeps its id, so a
+    /// dismiss, a zone change or a reconnect re-summons the actor the client already knows.
+    pub fn pet_guid(owner_guid: u64, pet_id: u32) -> u64 {
+        owner_guid ^ PET_GUID_TAG ^ (u64::from(pet_id) << 32)
     }
 
     pub fn view(&self, owner_guid: u64) -> Option<PetPresence> {
@@ -1822,7 +1852,6 @@ impl PetService {
         &mut self,
         definition_id: u32,
         tint: u32,
-        actor_guid: u64,
         owner_guid: u64,
         owner_position: [f32; 3],
         inventory: &mut Inventory,
@@ -1842,7 +1871,7 @@ impl PetService {
             self.adopt_with_replies(inventory, instance_id, &definition, now)?;
         let transition = self.summon(
             new_pet_id,
-            actor_guid,
+            Self::pet_guid(owner_guid, new_pet_id),
             owner_guid,
             owner_position,
             busy,
@@ -1864,7 +1893,6 @@ impl PetService {
         let Some(request) = PetRequest::decode(inner)? else {
             return Ok(None);
         };
-        let actor_guid = Self::pet_guid(owner_guid);
         let mut next = self.clone();
         let summoning = matches!(request, PetRequest::Summon { .. });
         // T485: replacing or dismissing the active pet ends its feed (nothing more is consumed).
@@ -1875,6 +1903,7 @@ impl PetService {
         let applied = match request {
             PetRequest::Summon { pet_id } => {
                 next.rebase_clock(now);
+                let actor_guid = Self::pet_guid(owner_guid, pet_id);
                 next.summon(pet_id, actor_guid, owner_guid, owner_position, busy, now)
             }
             PetRequest::Dismiss => {
@@ -2071,14 +2100,12 @@ impl PetService {
             _ => return self.handle(inner, owner_guid, owner_position, busy, now),
         };
 
-        let actor_guid = Self::pet_guid(owner_guid);
         let mut next = self.clone();
         next.rebase_clock(now);
         let mut next_inventory = inventory.clone();
         let applied = next.summon_by_item_owned(
             definition_id,
             tint,
-            actor_guid,
             owner_guid,
             owner_position,
             &mut next_inventory,
@@ -2475,13 +2502,20 @@ impl PetService {
         )
     }
 
-    /// T532: one happy-speed-buff step. The rule (R): the summoned pet is not vanity and its
-    /// decayed mood is at least `happy_mood`; while it holds, one buff-bar row (38/16, reader
-    /// `008d8870`) is refreshed every `refresh_ms`, and when it stops the row is removed (38/17).
-    /// Returns the rows it sent, so the caller re-sends its speed stat then and reads the new value
-    /// from [`Self::happy_speed_bonus`]. Session-only: nothing here marks a save. `None` when
-    /// nothing is due, so an idle tick allocates nothing.
-    pub fn happy_buff_tick(&mut self, now_ms: u64) -> Option<Vec<Vec<u8>>> {
+    /// T532/T830: one happy-speed-buff step. The rule (R): the summoned pet is not vanity and its
+    /// decayed mood is at least `happy_mood`. While it holds, one buff-bar row (38/16, reader
+    /// `008d8870`) and the content's composite effect on the owner (35/41) are kept up, and when it
+    /// stops both are removed (38/17 and 35/42). Returns the packets split into the owner's rows
+    /// and the composite effect (owner and viewers), so the caller re-sends its speed stat then and
+    /// reads the new value from [`Self::happy_speed_bonus`]. Session-only: nothing here marks a
+    /// save. `None` when nothing is due, so an idle tick allocates nothing.
+    ///
+    /// The row's tag id rotates on every send. The client's 38/16 insert tells its effect-tag data
+    /// source (`00a19e70` -> the virtual at `+0x10`) *before* it parses the blob into the record
+    /// (`00a18cc0`), and only a new tag id notifies it again, so a same-id refresh never reaches
+    /// `GroupHandler:BuffsUpdated`. With the rotation every step is a new id, and the row it
+    /// replaces is removed in the same batch: exactly one icon, always from a parsed row.
+    pub fn happy_buff_tick(&mut self, now_ms: u64, owner_guid: u64) -> Option<PetWire> {
         // Without a pet the rule cannot hold, and without a live buff there is nothing to end, so
         // the ordinary tick is these two checks: no content borrow, no allocation.
         if self.active.is_none() && self.happy.is_none() {
@@ -2491,24 +2525,54 @@ impl PetService {
         let content = Arc::clone(&self.content);
         let config = content.happy_buff.as_ref()?;
         if !self.happy_rule_holds(config, now_ms) {
-            return self
-                .happy
-                .take()
-                .map(|_| vec![encode_remove_effect_tag(config.tag_id)]);
+            let live = self.happy.take()?;
+            let mut wire = PetWire {
+                private: vec![encode_remove_effect_tag(live.tag_id)],
+                ..PetWire::default()
+            };
+            if config.composite_effect_id != 0 {
+                let remove = encode_remove_composite_effect(owner_guid, config.tag_id);
+                wire.private.push(remove.clone());
+                wire.shared.push(remove);
+            }
+            return Some(wire);
         }
         if self.happy.is_some_and(|live| now_ms < live.refresh_at_ms) {
             return None;
         }
-        // One row per tag id, so a refresh replaces the client's row and never stacks.
+        let refresh_at_ms = now_ms.saturating_add(config.refresh_ms);
+        let previous = self.happy.map(|live| live.tag_id);
+        let tag = previous.map_or(config.tag_id, |id| next_happy_tag(config, id));
+        let mut wire = PetWire {
+            private: vec![happy_row(config, tag)],
+            ..PetWire::default()
+        };
+        let mut shown = tag;
+        if let Some(previous) = previous {
+            // The row it replaces goes in the same batch, so the bar never shows two icons.
+            wire.private.push(encode_remove_effect_tag(previous));
+        } else {
+            // One step ahead (see above): the second row makes the data source read the first one
+            // once it is parsed, then the first row is dropped again in the same batch.
+            shown = next_happy_tag(config, tag);
+            wire.private.push(happy_row(config, shown));
+            wire.private.push(encode_remove_effect_tag(tag));
+            if config.composite_effect_id != 0 {
+                let add = encode_add_composite_effect(
+                    owner_guid,
+                    config.tag_id,
+                    config.composite_effect_id,
+                    owner_guid,
+                );
+                wire.private.push(add.clone());
+                wire.shared.push(add);
+            }
+        }
         self.happy = Some(HappyBuffLive {
-            refresh_at_ms: now_ms.saturating_add(config.refresh_ms),
+            refresh_at_ms,
+            tag_id: shown,
         });
-        Some(vec![build_effect_tag(
-            config.tag_id,
-            config.duration_ms,
-            config.icon_id,
-            config.name_id,
-        )])
+        Some(wire)
     }
 
     /// T532 (R): the summoned pet is not vanity and its decayed mood is at least `happy_mood`.

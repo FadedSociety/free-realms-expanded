@@ -600,7 +600,7 @@ fn a_saved_pet_is_summoned_seen_by_two_players_and_dismissed() {
 
     let ga = rig.accounts[0].guid;
     let gb = rig.accounts[1].guid;
-    let actor = PetService::pet_guid(ga);
+    let actor = PetService::pet_guid(ga, pet_id);
     let mut a = rig.connect(0, "petA");
     let mut b = rig.connect(1, "petB");
     a.pump(Duration::from_millis(500)).unwrap();
@@ -615,7 +615,7 @@ fn a_saved_pet_is_summoned_seen_by_two_players_and_dismissed() {
     assert!(
         a.wait_for(Duration::from_secs(1), |m| is_pet_actor(
             m,
-            PetService::pet_guid(gb)
+            PetService::pet_guid(gb, pet_id)
         ))
         .is_err(),
         "an unowned pet appeared"

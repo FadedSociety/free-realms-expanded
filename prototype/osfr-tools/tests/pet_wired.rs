@@ -154,7 +154,7 @@ fn removal_packet(packets: &[Vec<u8>], actor: u64) -> bool {
 fn an_owned_saved_pet_is_listed_summoned_seen_nearby_and_dismissed() {
     let save = Save::new();
     let mut game = game(&save.path);
-    let actor = PetService::pet_guid(who().guid);
+    let actor = PetService::pet_guid(who().guid, 1);
 
     let loaded = game.initialize_world(&who(), NOW).unwrap();
     assert!(has(&loaded.replies, 53, 5), "pet roster at world entry");
@@ -217,7 +217,7 @@ fn foreign_pet_and_unowned_item_requests_leave_gameplay_unchanged() {
 fn zoning_dismisses_without_persisting_the_actor_and_reload_keeps_roster() {
     let save = Save::new();
     let mut game = game(&save.path);
-    let actor = PetService::pet_guid(who().guid);
+    let actor = PetService::pet_guid(who().guid, 1);
     game.handle_in_world(&summon(1), &who(), NOW).unwrap();
     assert!(game.pet_view(1).is_some());
     let ended = game.settle_pets(&who(), true, NOW + 1).unwrap();
@@ -271,7 +271,7 @@ fn the_gateway_exposes_the_saved_pet_roster_and_clears_the_actor_on_zoning() {
     let summoned = gateway.handle_at(&wrap(&summon(1)), NOW + 3).unwrap();
     assert!(summoned.nearby.iter().any(|packet| actor_packet(
         std::slice::from_ref(packet),
-        PetService::pet_guid(who().guid)
+        PetService::pet_guid(who().guid, 1)
     )));
     assert!(gateway.pet_view().is_some());
     let ended = gateway.settle_pets(true, NOW + 4).unwrap();
@@ -297,7 +297,7 @@ fn pet_moves(packets: &[Vec<u8>], actor: u64) -> usize {
 fn a_walking_owner_moves_the_summoned_pet_for_viewers_without_a_save() {
     let save = Save::new();
     let mut game = game(&save.path);
-    let actor = PetService::pet_guid(who().guid);
+    let actor = PetService::pet_guid(who().guid, 1);
     game.handle_in_world(&summon(1), &who(), NOW).unwrap();
     let mut owner = who();
     let (mut to_viewers, mut to_owner) = (0, 0);
@@ -355,7 +355,7 @@ fn a_walking_owner_moves_the_summoned_pet_for_viewers_without_a_save() {
 fn a_walking_pet_keeps_its_gait_between_the_owners_reports() {
     let save = Save::new();
     let mut game = game(&save.path);
-    let actor = PetService::pet_guid(who().guid);
+    let actor = PetService::pet_guid(who().guid, 1);
     game.handle_in_world(&summon(1), &who(), NOW).unwrap();
     let stand = animation_packet(
         actor,
@@ -401,7 +401,7 @@ fn no_pet_means_no_tick_and_a_dismissed_pet_sends_no_moves() {
     let save = Save::new();
     let mut game = game(&save.path);
     assert!(game.pet_tick(&who(), NOW).is_none());
-    let actor = PetService::pet_guid(who().guid);
+    let actor = PetService::pet_guid(who().guid, 1);
     game.handle_in_world(&summon(1), &who(), NOW).unwrap();
     game.handle_in_world(&[53, 0, 4, 0, 0, 0, 0, 0], &who(), NOW + 1)
         .unwrap();
@@ -625,7 +625,7 @@ fn a_feed_apply_sets_both_save_flags_and_survives_a_whole_document_reload() {
 /// a zone change ends it through `settle_pets` (kind 4).
 #[test]
 fn a_groom_ends_through_the_gameplay_fanout_tick_and_zoning_with_kind_4() {
-    let actor = PetService::pet_guid(who().guid);
+    let actor = PetService::pet_guid(who().guid, 1);
     let dry_off = dry_off(actor);
 
     // Full bar: brisk strokes fill the bar through the request path (200 is well over the shipped
