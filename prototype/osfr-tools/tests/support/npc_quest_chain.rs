@@ -39,6 +39,7 @@ use osfr_tools::{
     inventory::InventoryItem,
     npc_interaction::{decode_dialogue_26_3, decode_quest_offer_49_1},
     quest_engine::{QuestProgress, QuestStatus},
+    startup_world::{NpcSpawn, parse_add_npc},
 };
 use serde_json::Value;
 use std::{
@@ -460,6 +461,17 @@ pub fn character_at_for(guid: u64, zone_id: u32, position: [f32; 3]) -> Characte
 
 pub fn character_at(zone_id: u32, position: [f32; 3]) -> CharacterState {
     character_at_for(CHARACTER, zone_id, position)
+}
+
+/// The actors the production visibility batch (`Gameplay::update_npc_visibility`) newly draws
+/// for a session standing at `character`, decoded with the client 35/2 reader. The client keeps
+/// an actor it was already sent, so a later call returns only what came into view since.
+pub fn visible_npcs(game: &mut Gameplay, character: &CharacterState) -> Vec<NpcSpawn> {
+    game.update_npc_visibility(character)
+        .expect("the visibility batch builds")
+        .iter()
+        .filter_map(|packet| parse_add_npc(packet).ok())
+        .collect()
 }
 
 /// Fill the bag to the production capacity floor (exactly [`BAG_SLOTS`] stacks), so

@@ -3,7 +3,7 @@
 
 use osfr_tools::{
     collection_catalogue::CollectionCatalogueContent,
-    harvest_nodes::{GatheringNodes, HarvestNodesContent},
+    harvest_nodes::{GatheringNodes, HarvestNodesContent, NodePresentation},
 };
 use std::{
     collections::{BTreeSet, HashMap},
@@ -22,6 +22,14 @@ fn content_dir() -> PathBuf {
 
 fn data_file(name: &str) -> PathBuf {
     content_dir().join(name)
+}
+
+/// What a type at the captured template's 1.0 scale and no alias draws.
+fn template_presentation() -> NodePresentation {
+    NodePresentation {
+        scale: Some(1.0),
+        ..NodePresentation::default()
+    }
 }
 
 fn load() -> HarvestNodesContent {
@@ -257,10 +265,26 @@ fn legacy_mushroom_and_mining_files_still_load_with_the_new_fields_defaulted() {
             mining.pools.len(),
             mining.spawns.len()
         ),
-        (1, 1, 5)
+        (2, 2, 22)
     );
-    assert_eq!(mining.node_types[0].model_id, 259);
-    assert!(mining.node_types[0].drop_table.is_empty());
+    let copper = mining
+        .node_types
+        .iter()
+        .find(|row| row.key == "copper-vein")
+        .expect("the reconstructed copper-vein type");
+    assert_eq!(copper.model_id, 259);
+    assert!(copper.drop_table.is_empty());
+    // T547: the client's own Snowhill vein type beside it.
+    let vein = mining
+        .node_types
+        .iter()
+        .find(|row| row.key == "snowhill-copper-vein")
+        .expect("the T547 vein type");
+    assert_eq!((vein.name.as_str(), vein.model_id), ("Copper Vein", 4019));
+    assert_eq!(vein.scale, 0.5);
+    assert_eq!(vein.texture_alias.as_deref(), Some("Copper"));
+    assert_eq!(vein.cursor_id, 20);
+    assert!(vein.drop_table.is_empty());
     assert!(mining.pools.iter().all(|pool| pool.drop_table.is_empty()));
 }
 
@@ -294,15 +318,54 @@ fn the_gathering_loader_reads_collection_nodes() {
     );
     // T524 review: the full AddNpc presentation is the collection kind's; a mining or quest
     // actor keeps the captured template fields, and the Chef mushrooms only gain their sparkle.
-    for file in ["mining_nodes.json", "quest_nodes.json"] {
-        let dir = TempDir::new();
-        fs::copy(data_file(file), dir.0.join(file)).unwrap();
-        let nodes = GatheringNodes::load(&dir.0).unwrap().expect("a node file");
+    // T547: every type sends its own scale (1.0 is the template's); the Snowhill vein type adds
+    // its 0.5 scale and recolour alias.
+    let dir = TempDir::new();
+    fs::copy(
+        data_file("quest_nodes.json"),
+        dir.0.join("quest_nodes.json"),
+    )
+    .unwrap();
+    let nodes = GatheringNodes::load(&dir.0)
+        .unwrap()
+        .expect("the quest node file");
+    assert!(
+        nodes
+            .actors()
+            .all(|actor| actor.presentation == template_presentation()),
+        "quest actors must keep the captured AddNpc template fields"
+    );
+    let dir = TempDir::new();
+    fs::copy(
+        data_file("mining_nodes.json"),
+        dir.0.join("mining_nodes.json"),
+    )
+    .unwrap();
+    let nodes = GatheringNodes::load(&dir.0)
+        .unwrap()
+        .expect("the mining node file");
+    for actor in nodes.actors() {
+        let presentation = &actor.presentation;
         assert!(
-            nodes.actors().all(|actor| actor.presentation
-                == osfr_tools::harvest_nodes::NodePresentation::default()),
-            "{file} actors must keep the captured AddNpc template fields"
+            presentation.composite_effect_id.is_none()
+                && presentation.interact_range.is_none()
+                && presentation.sub_text_name_id.is_none()
+                && presentation.extra_composite_effect_id.is_none(),
+            "a mining actor changed an AddNpc field T524 pinned"
         );
+        if actor.model_id == 4019 {
+            assert_eq!(
+                (presentation.scale, presentation.texture_alias.as_deref()),
+                (Some(0.5), Some("Copper")),
+                "the vein type's own scale and texture"
+            );
+        } else {
+            assert_eq!(
+                presentation,
+                &template_presentation(),
+                "the old copper type keeps the captured template fields"
+            );
+        }
     }
     let dir = TempDir::new();
     fs::copy(

@@ -1167,12 +1167,13 @@ fn node_content_is_bounded_and_unique() {
     let actors: Vec<_> = nodes.actors().collect();
     // 12 + 2 mushroom nodes (pool maxima), 4 copper veins, 5 quest-only tin-ore pickups
     // (T503, `quest_nodes.json`), 21 T539 quest pickups (5 hammers, 5 chisels, 3 rocks,
-    // 8 homework pages) and 166 placed collection nodes (T524, the 34 pool maxima).
-    assert_eq!(actors.len(), 210);
+    // 8 homework pages), 166 placed collection nodes (T524, the 34 pool maxima) and the
+    // 8 Snowhill copper veins T547 places from the 17 recovered rows.
+    assert_eq!(actors.len(), 218);
     let mut ids: Vec<_> = actors.iter().map(|a| a.guid).collect();
     ids.sort();
     ids.dedup();
-    assert_eq!(ids.len(), 210);
+    assert_eq!(ids.len(), 218);
     assert!(
         actors
             .iter()

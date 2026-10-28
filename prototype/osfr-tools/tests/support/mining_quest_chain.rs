@@ -12,13 +12,13 @@
 #![allow(dead_code)]
 
 use crate::npc_quest_chain::{
-    CHARACTER, Fixture as ChainFixture, character_at_for, content_dir, has_family, npc_interact,
-    release_end_screen, send, talk,
+    CHARACTER, Fixture as ChainFixture, character_at_for, has_family, npc_interact,
+    release_end_screen, send, shipped_nodes, talk,
 };
 use osfr_tools::{
     character_store::CharacterState,
     gameplay::{Gameplay, GameplayState, Outcome},
-    harvest_nodes::GatheringNodes,
+    harvest_nodes::NodeActor,
     inventory::{InventoryItem, InventoryState, MAX_ITEMS},
     mining::{self, Type8BoardSpec, Type8Goal, Type8Kind, Type8Output},
     profiles::ProfileState,
@@ -191,6 +191,11 @@ impl Fixture {
         self.game_with_state(state)
     }
 
+    /// The production save envelope bytes, not a `GameplayState` proxy.
+    pub fn saved_bytes(&self, game: &Gameplay, character: &CharacterState) -> Vec<u8> {
+        self.0.saved_bytes(game, character)
+    }
+
     /// The production save envelope, not a `GameplayState` proxy. Delegates to the
     /// canonical fixture helper, including its serialized-state round-trip check.
     pub fn save_and_reload(&self, game: &Gameplay, character: &CharacterState) -> Gameplay {
@@ -245,17 +250,28 @@ pub fn open_end_screen(
     release_end_screen(game, character, quest_id, target, end_text, now + 2)
 }
 
-pub fn copper_nodes() -> Vec<(u64, [f32; 3])> {
-    let nodes = GatheringNodes::load(&content_dir())
-        .expect("node content loads")
-        .expect("node content exists");
+/// The reconstructed generic ore pile (`snowhill-copper` pool), the model the Miner chapters'
+/// "live copper vein" tests use. T547's recovered Snowhill veins are model 4019.
+pub const LEGACY_COPPER_MODEL: u32 = 259;
+
+/// The placed node actors of `model`, in guid order (the loader's content-spawn order).
+pub fn nodes_of_model(model: u32) -> Vec<NodeActor> {
+    let nodes = shipped_nodes();
     let mut found: Vec<_> = nodes
         .actors()
-        .filter(|actor| actor.name == "Copper Vein")
-        .map(|actor| (actor.guid, actor.position))
+        .filter(|actor| actor.model_id == model)
+        .cloned()
         .collect();
-    found.sort_by_key(|(guid, _)| *guid);
+    found.sort_by_key(|actor| actor.guid);
     found
+}
+
+/// The legacy `snowhill-copper` pool's placed nodes, which the Miner chapter tests click.
+pub fn copper_nodes() -> Vec<(u64, [f32; 3])> {
+    nodes_of_model(LEGACY_COPPER_MODEL)
+        .iter()
+        .map(|actor| (actor.guid, actor.position))
+        .collect()
 }
 
 pub fn copper_ore(game: &Gameplay) -> u32 {

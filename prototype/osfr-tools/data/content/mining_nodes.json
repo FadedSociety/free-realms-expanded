@@ -17,6 +17,29 @@
       "cursor_id": 0,
       "placement_y_offset": 0.0,
       "source_tag": "reconstructed_R"
+    },
+    {
+      "key": "snowhill-copper-vein",
+      "name": "Copper Vein",
+      "model_id": 4019,
+      "scale": 0.5,
+      "composite_effect_id": 0,
+      "interact_range": 12,
+      "cursor_id": 20,
+      "placement_y_offset": 0.0,
+      "texture_alias": "Copper",
+      "drop_table": [],
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "name": "Global.Text.7228 = client locale hash 3010554754 'Copper Vein'; Sanctuary NameId 7228",
+        "model_id": "client Resources/Models.txt 4019 = sg_mining_node_snowhillcopper_01.adr; Sanctuary-main-20261019 src/Resources/Npcs.json ModelId 4019",
+        "scale": "Sanctuary-main-20261019 src/Resources/Npcs.json Scale 0.5 on all 17 copper templates",
+        "texture_alias": "Sanctuary-main-20261019 src/Resources/Npcs.json TextureAlias 'Copper'",
+        "cursor_id": "client Resources/Cursors.txt 20 = cursor_interaction_mining.cur; Sanctuary-main-20261019 src/Resources/Npcs.json CursorId 20. Loaded only: the AddNpc crosswalk (reader 00921a10) has no cursor field, so it is not sent.",
+        "interact_range": "(R) 12, same as the existing copper-vein type; the server-side node reach",
+        "placement_y_offset": "0.0: the recovered spawn heights already sit on the terrain",
+        "drop_table": "empty like copper-vein: the Mining18 board (mining.json) pays Copper Ore 2739"
+      }
     }
   ],
   "pools": [
@@ -27,6 +50,19 @@
       "max_active_nodes": 4,
       "respawn_seconds": 60,
       "source_tag": "reconstructed_R"
+    },
+    {
+      "key": "snowhill-copper-world",
+      "zone_definition_id": 13,
+      "node_type": "snowhill-copper-vein",
+      "max_active_nodes": 8,
+      "respawn_seconds": 60,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "placement": "17 spawnNpcWithGuid rows of copper model 4019 in Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua (Snowhill, zone 13)",
+        "max_active_nodes": "(R) 8 of the 17 recovered veins active at a time; no recovered cap",
+        "respawn_seconds": "(R) 60, same as the existing snowhill-copper pool; no recovered timer"
+      }
     }
   ],
   "spawns": [
@@ -89,6 +125,261 @@
       ],
       "heading": 0.0,
       "source_tag": "reconstructed_R"
+    },
+    {
+      "id": 33585,
+      "pool_key": "snowhill-copper-world",
+      "zone_definition_id": 13,
+      "position": [
+        -1.23958,
+        24.43309,
+        358.05753
+      ],
+      "heading": 0.637000001,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:3807 spawnNpcWithGuid(33585, 100000033585, -1.23958, 24.43309, 358.05753, 0.637000001); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33585 (ModelId 4019, NameId 7228, Scale 0.5, TextureAlias Copper, CursorId 20)"
+      }
+    },
+    {
+      "id": 33587,
+      "pool_key": "snowhill-copper-world",
+      "zone_definition_id": 13,
+      "position": [
+        0.91229,
+        27.72464,
+        220.64369
+      ],
+      "heading": -2.30637004,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:3809 spawnNpcWithGuid(33587, 100000033587, 0.91229, 27.72464, 220.64369, -2.30637004); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33587 (ModelId 4019, NameId 7228, Scale 0.5, TextureAlias Copper, CursorId 20)"
+      }
+    },
+    {
+      "id": 33608,
+      "pool_key": "snowhill-copper-world",
+      "zone_definition_id": 13,
+      "position": [
+        71.09579,
+        25.92073,
+        268.4464
+      ],
+      "heading": 0.646399951,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:3829 spawnNpcWithGuid(33608, 100000033608, 71.09579, 25.92073, 268.4464, 0.646399951); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33608 (ModelId 4019, NameId 7228, Scale 0.5, TextureAlias Copper, CursorId 20)"
+      }
+    },
+    {
+      "id": 33616,
+      "pool_key": "snowhill-copper-world",
+      "zone_definition_id": 13,
+      "position": [
+        45.50775,
+        33.71435,
+        384.9801
+      ],
+      "heading": -2.68951009,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:3837 spawnNpcWithGuid(33616, 100000033616, 45.50775, 33.71435, 384.9801, -2.68951009); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33616 (ModelId 4019, NameId 7228, Scale 0.5, TextureAlias Copper, CursorId 20)"
+      }
+    },
+    {
+      "id": 33629,
+      "pool_key": "snowhill-copper-world",
+      "zone_definition_id": 13,
+      "position": [
+        239.47092,
+        21.9696,
+        315.95697
+      ],
+      "heading": 1.09623001,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:3848 spawnNpcWithGuid(33629, 100000033629, 239.47092, 21.9696, 315.95697, 1.09623001); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33629 (ModelId 4019, NameId 7228, Scale 0.5, TextureAlias Copper, CursorId 20)"
+      }
+    },
+    {
+      "id": 33738,
+      "pool_key": "snowhill-copper-world",
+      "zone_definition_id": 13,
+      "position": [
+        140.1587,
+        32.44574,
+        484.80045
+      ],
+      "heading": -0.18494,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:3947 spawnNpcWithGuid(33738, 100000033738, 140.1587, 32.44574, 484.80045, -0.18494); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33738 (ModelId 4019, NameId 7228, Scale 0.5, TextureAlias Copper, CursorId 20)"
+      }
+    },
+    {
+      "id": 33771,
+      "pool_key": "snowhill-copper-world",
+      "zone_definition_id": 13,
+      "position": [
+        327.43762,
+        31.00128,
+        336.0417
+      ],
+      "heading": -3.12245011,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:3966 spawnNpcWithGuid(33771, 100000033771, 327.43762, 31.00128, 336.0417, -3.12245011); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33771 (ModelId 4019, NameId 7228, Scale 0.5, TextureAlias Copper, CursorId 20)"
+      }
+    },
+    {
+      "id": 33820,
+      "pool_key": "snowhill-copper-world",
+      "zone_definition_id": 13,
+      "position": [
+        -25.6173,
+        16.30147,
+        376.61868
+      ],
+      "heading": 2.58143996,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:3984 spawnNpcWithGuid(33820, 100000033820, -25.6173, 16.30147, 376.61868, 2.58143996); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33820 (ModelId 4019, NameId 7228, Scale 0.5, TextureAlias Copper, CursorId 20)"
+      }
+    },
+    {
+      "id": 33821,
+      "pool_key": "snowhill-copper-world",
+      "zone_definition_id": 13,
+      "position": [
+        -3.83224,
+        102.55815,
+        450.79395
+      ],
+      "heading": -3.08600998,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:3985 spawnNpcWithGuid(33821, 100000033821, -3.83224, 102.55815, 450.79395, -3.08600998); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33821 (ModelId 4019, NameId 7228, Scale 0.5, TextureAlias Copper, CursorId 20)"
+      }
+    },
+    {
+      "id": 33860,
+      "pool_key": "snowhill-copper-world",
+      "zone_definition_id": 13,
+      "position": [
+        -43.35672,
+        13.26019,
+        215.16418
+      ],
+      "heading": -2.58488008,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:4019 spawnNpcWithGuid(33860, 100000033860, -43.35672, 13.26019, 215.16418, -2.58488008); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33860 (ModelId 4019, NameId 7228, Scale 0.5, TextureAlias Copper, CursorId 20)"
+      }
+    },
+    {
+      "id": 33939,
+      "pool_key": "snowhill-copper-world",
+      "zone_definition_id": 13,
+      "position": [
+        -82.25269,
+        13.34621,
+        190.32819
+      ],
+      "heading": 0.268119993,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:4097 spawnNpcWithGuid(33939, 100000033939, -82.25269, 13.34621, 190.32819, 0.268119993); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33939 (ModelId 4019, NameId 7228, Scale 0.5, TextureAlias Copper, CursorId 20)"
+      }
+    },
+    {
+      "id": 33940,
+      "pool_key": "snowhill-copper-world",
+      "zone_definition_id": 13,
+      "position": [
+        -90.93334,
+        11.43187,
+        195.16814
+      ],
+      "heading": 2.71262002,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:4098 spawnNpcWithGuid(33940, 100000033940, -90.93334, 11.43187, 195.16814, 2.71262002); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33940 (ModelId 4019, NameId 7228, Scale 0.5, TextureAlias Copper, CursorId 20)"
+      }
+    },
+    {
+      "id": 33999,
+      "pool_key": "snowhill-copper-world",
+      "zone_definition_id": 13,
+      "position": [
+        -103.48452,
+        19.22692,
+        139.26068
+      ],
+      "heading": -0.885840011,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:4157 spawnNpcWithGuid(33999, 100000033999, -103.48452, 19.22692, 139.26068, -0.885840011); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33999 (ModelId 4019, NameId 7228, Scale 0.5, TextureAlias Copper, CursorId 20)"
+      }
+    },
+    {
+      "id": 34010,
+      "pool_key": "snowhill-copper-world",
+      "zone_definition_id": 13,
+      "position": [
+        -210.25104,
+        -1.18471,
+        156.08772
+      ],
+      "heading": 2.68027995,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:4166 spawnNpcWithGuid(34010, 100000034010, -210.25104, -1.18471, 156.08772, 2.68027995); Sanctuary-main-20261019 src/Resources/Npcs.json Id=34010 (ModelId 4019, NameId 7228, Scale 0.5, TextureAlias Copper, CursorId 20)"
+      }
+    },
+    {
+      "id": 34012,
+      "pool_key": "snowhill-copper-world",
+      "zone_definition_id": 13,
+      "position": [
+        -154.00388,
+        11.54511,
+        104.64955
+      ],
+      "heading": 2.70569996,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:4168 spawnNpcWithGuid(34012, 100000034012, -154.00388, 11.54511, 104.64955, 2.70569996); Sanctuary-main-20261019 src/Resources/Npcs.json Id=34012 (ModelId 4019, NameId 7228, Scale 0.5, TextureAlias Copper, CursorId 20)"
+      }
+    },
+    {
+      "id": 36116,
+      "pool_key": "snowhill-copper-world",
+      "zone_definition_id": 13,
+      "position": [
+        -219.52002,
+        -13.97675,
+        307.1193
+      ],
+      "heading": -2.17419004,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:4179 spawnNpcWithGuid(36116, 100000036116, -219.52002, -13.97675, 307.1193, -2.17419004); Sanctuary-main-20261019 src/Resources/Npcs.json Id=36116 (ModelId 4019, NameId 7228, Scale 0.5, TextureAlias Copper, CursorId 20)"
+      }
+    },
+    {
+      "id": 36303,
+      "pool_key": "snowhill-copper-world",
+      "zone_definition_id": 13,
+      "position": [
+        -5.44792,
+        11.29212,
+        241.60905
+      ],
+      "heading": -0.630230023,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:4266 spawnNpcWithGuid(36303, 100000036303, -5.44792, 11.29212, 241.60905, -0.630230023); Sanctuary-main-20261019 src/Resources/Npcs.json Id=36303 (ModelId 4019, NameId 7228, Scale 0.5, TextureAlias Copper, CursorId 20)"
+      }
     }
   ]
 }

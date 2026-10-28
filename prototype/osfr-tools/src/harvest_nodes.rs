@@ -13,7 +13,9 @@
 //! parent module owns the grant and the ledger tick (`gameplay/collection_pickup.rs`). Only the
 //! collection kind sends the type's full AddNpc presentation (effect, integer range, rare
 //! subtitle, extra-effect companion); the Chef mushrooms only gain their sparkle, and mining
-//! and quest actors keep the captured template fields.
+//! and quest actors keep the captured template fields. Every kind draws its type's `scale` and
+//! optional `texture_alias` (T547). Node actors send no heading: static actors keep the
+//! template facing, so a spawn row's `heading` is loaded content only.
 
 use crate::{
     harvesting::CHEF_PROFILE_ID,
@@ -32,6 +34,11 @@ use std::{
 };
 
 const MAX_FILE_BYTES: u64 = 1 << 20;
+/// AddNpc prefixes each appearance string with its byte length; the other actor kinds cap their
+/// alias at the same 120 bytes.
+const MAX_TEXTURE_ALIAS: usize = 120;
+/// The largest model scale a node type may ask for.
+const MAX_NODE_SCALE: f32 = 100.0;
 /// Node actor guids: "NOD", the node file's tag byte, then the content spawn id. The tag is
 /// OR-ed into a zero byte, so every tag needs its own value; see `NODE_FILES`. Clear of NPC,
 /// placement and pickup ids.
@@ -113,13 +120,22 @@ pub struct HarvestNodeType {
     pub key: String,
     pub name: String,
     pub model_id: u32,
+    /// AddNpc `scale`: the model scale this type is drawn at (every pre-T547 type is 1.0, the
+    /// captured template's value).
     pub scale: f32,
+    /// Sanctuary's recolour alias (`TextureAlias`, e.g. "Copper"), drawn as AddNpc
+    /// `texture_alias` (35/2 reader `00921a10`). Absent or empty keeps the model's own
+    /// textures; at most [`MAX_TEXTURE_ALIAS`] bytes.
+    #[serde(default)]
+    pub texture_alias: Option<String>,
     pub composite_effect_id: u32,
     /// Sanctuary adds these on top of the main effect (sparkling water). T524 draws the one
     /// extra effect as a tag-4 invisible companion, for collection nodes only.
     #[serde(default)]
     pub extra_composite_effect_ids: Vec<u32>,
     pub interact_range: u32,
+    /// The client cursor row (`Resources/Cursors.txt` 20 = `cursor_interaction_mining.cur`).
+    /// Loaded only: the AddNpc crosswalk has no cursor field, so nothing is sent from it.
     pub cursor_id: u32,
     pub placement_y_offset: f32,
     /// Sanctuary's rare-node subtitle locale row; absent on common types and Legacy nodes.
@@ -167,6 +183,7 @@ pub struct HarvestNodeSpawn {
     pub pool_key: String,
     pub zone_definition_id: u32,
     pub position: [f32; 3],
+    /// Recovered facing, kept as content. Not drawn: see the module doc.
     pub heading: f32,
     #[serde(default)]
     pub source_tag: Option<String>,
@@ -237,10 +254,10 @@ impl NodeActor {
 }
 
 /// T524: the AddNpc presentation fields a node kind adds to the captured static-actor
-/// template. A `None` field keeps the template's captured value, so mining and quest actors
-/// stay byte-identical to the pre-T524 captures. Only collection nodes send the full set; the
-/// Chef mushrooms override the sparkle alone (the brief's "only the mushroom types start
-/// sparkling").
+/// template. A `None` field keeps the template's captured value. Only collection nodes send
+/// the effect, range, subtitle and companion; the Chef mushrooms override the sparkle alone
+/// (the brief's "only the mushroom types start sparkling"). `scale` and `texture_alias` (T547)
+/// are set for every kind from its type.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct NodePresentation {
     /// AddNpc `composite_effect_id` (after `vertical_offset`): the node type's sparkle.
@@ -254,6 +271,12 @@ pub struct NodePresentation {
     pub sub_text_name_id: Option<i32>,
     /// The type's one extra effect (water), drawn by a tag-4 invisible cube companion.
     pub extra_composite_effect_id: Option<u32>,
+    /// AddNpc `scale` (after the chat-bubble size): the type's model scale. `None` only on
+    /// companion actors, which keep the template.
+    pub scale: Option<f32>,
+    /// AddNpc `texture_alias` (after `disposition`): the type's recolour alias, when it
+    /// declares one.
+    pub texture_alias: Option<String>,
 }
 
 pub enum NodeChange {
@@ -659,6 +682,23 @@ fn add_sites(
         {
             return Err(bad("node range or respawn out of bounds"));
         }
+        // T547: a model scale or alias the client cannot draw is refused at load, not sent.
+        if !node_type.scale.is_finite()
+            || node_type.scale <= 0.0
+            || node_type.scale > MAX_NODE_SCALE
+        {
+            return Err(bad("node scale out of bounds"));
+        }
+        let texture_alias = node_type
+            .texture_alias
+            .clone()
+            .filter(|alias| !alias.is_empty());
+        if texture_alias
+            .as_ref()
+            .is_some_and(|alias| alias.len() > MAX_TEXTURE_ALIAS)
+        {
+            return Err(bad("node texture alias out of bounds"));
+        }
         let kind = match source {
             NodeSource::Gather(gather) => SiteKind::Gather(gather),
             NodeSource::Pickup => SiteKind::Pickup(pool.node_type.clone()),
@@ -681,13 +721,15 @@ fn add_sites(
         };
         // T524: collection nodes send the type's effect, AddNpc range, rare subtitle and one
         // extra-effect companion; the Chef mushrooms override the sparkle alone; mining and
-        // quest actors keep the pre-T524 captured template fields.
-        let presentation = match source {
+        // quest actors keep the pre-T524 captured template fields. T547 adds every type's own
+        // scale and recolour.
+        let mut presentation = match source {
             NodeSource::Collect => NodePresentation {
                 composite_effect_id: Some(node_type.composite_effect_id),
                 interact_range: Some(node_type.interact_range),
                 sub_text_name_id: node_type.sub_text_name_id,
                 extra_composite_effect_id: node_type.extra_composite_effect_ids.first().copied(),
+                ..NodePresentation::default()
             },
             NodeSource::Gather(Gather::Harvesting) => NodePresentation {
                 composite_effect_id: Some(node_type.composite_effect_id),
@@ -695,6 +737,8 @@ fn add_sites(
             },
             NodeSource::Gather(Gather::Mining) | NodeSource::Pickup => NodePresentation::default(),
         };
+        presentation.scale = Some(node_type.scale);
+        presentation.texture_alias = texture_alias;
         let rows: Vec<_> = content
             .spawns
             .iter()
@@ -775,6 +819,14 @@ fn node_spawn(node: &NodeActor, interactable: bool) -> NpcSpawn {
     if let Some(sub_text) = node.presentation.sub_text_name_id {
         spawn.sub_text_name_string_id = sub_text;
     }
+    // T547: the vein's model scale and recolour. Reader `00921a10` reads `scale` as the float
+    // after the chat-bubble size and `texture_alias` as the first string after `disposition`.
+    if let Some(scale) = node.presentation.scale {
+        spawn.scale = scale;
+    }
+    if let Some(alias) = &node.presentation.texture_alias {
+        spawn.texture_alias.clone_from(alias);
+    }
     spawn.is_interactable = u8::from(interactable);
     spawn
 }
@@ -795,6 +847,7 @@ fn companion_actor(node: &NodeActor) -> Option<NodeActor> {
             interact_range: Some(0),
             sub_text_name_id: Some(-1),
             extra_composite_effect_id: None,
+            ..NodePresentation::default()
         },
     })
 }

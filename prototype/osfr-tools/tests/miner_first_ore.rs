@@ -63,17 +63,11 @@ use npc_quest_chain::{
     finish_quest, has_family, npc_interact, npc_select, objective_activated,
     objective_activated_packet, objective_complete, offer, pending_offer, pending_turnin,
     profile_xp, quest_end_reply, quest_reply, quest_status, read_json, saved, select_job, send,
-    talk,
+    talk, visible_npcs,
 };
 use osfr_tools::{
-    character_store::CharacterState,
-    game_store,
-    gameplay::Gameplay,
-    inventory::MAX_ITEMS,
-    mining,
-    profiles::ProfileState,
-    quest_engine::QuestStatus,
-    startup_world::{NpcSpawn, parse_add_npc},
+    character_store::CharacterState, gameplay::Gameplay, inventory::MAX_ITEMS, mining,
+    profiles::ProfileState, quest_engine::QuestStatus, startup_world::NpcSpawn,
 };
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
@@ -199,38 +193,22 @@ fn assert_inert(
     now: u64,
     label: &str,
 ) {
-    let before = save_envelope(fixture, game, character);
+    let before = fixture.saved_bytes(game, character);
     assert_packet_changes_nothing(game, character, packet, now, label);
     assert_eq!(
-        save_envelope(fixture, game, character),
+        fixture.saved_bytes(game, character),
         before,
         "{label} changed the save"
     );
 }
 
-/// The real `game_store` save bytes, so a refusal is also proven inert at the persistence
-/// boundary. The envelope is deterministic: it carries no timestamp.
-fn save_envelope(fixture: &Fixture, game: &Gameplay, character: &CharacterState) -> Vec<u8> {
-    let path = fixture.path().join("refusal-save.json");
-    let snapshot = game_store::Snapshot {
-        character: character.clone(),
-        gameplay: Some(game.state()),
-        pets: None,
-    };
-    game_store::save(&path, &snapshot).expect("the save envelope writes");
-    std::fs::read(&path).expect("the save envelope reads")
-}
-
-/// The production per-session visibility batch, decoded with the client 35/2 reader, for one
-/// session standing at `at`. Each nearby session builds its own batch through
-/// `Gameplay::update_npc_visibility`.
+/// One actor from the production per-session visibility batch for a session standing at `at`.
+/// Each nearby session builds its own batch.
 fn drawn_npc(fixture: &Fixture, character_id: u64, at: [f32; 3], actor_id: u64) -> NpcSpawn {
     let mut game = fixture.game_as(character_id, MINER, &[ADVENTURER, MINER]);
     let character = character_at_for(character_id, 0, at);
-    game.update_npc_visibility(&character)
-        .expect("visibility batch builds")
-        .iter()
-        .filter_map(|packet| parse_add_npc(packet).ok())
+    visible_npcs(&mut game, &character)
+        .into_iter()
         .find(|npc| npc.actor_id == actor_id)
         .unwrap_or_else(|| panic!("actor {actor_id} is drawn for every nearby session"))
 }
@@ -1367,14 +1345,14 @@ fn refusals_wrong_target_and_replay_change_nothing() {
     // Out-of-range 26/8 is an `Err` at the session boundary and changes nothing.
     let far = character_at([10_000.0, 0.0, 10_000.0]);
     let before = saved(&game);
-    let before_save = save_envelope(&fixture, &game, &character);
+    let before_save = fixture.saved_bytes(&game, &character);
     assert!(
         game.handle_in_world(&npc_interact(TRIXI), &far, now + 200)
             .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "an out-of-range 26/8 is refused"
     );
     assert_eq!(saved(&game), before);
-    assert_eq!(save_envelope(&fixture, &game, &character), before_save);
+    assert_eq!(fixture.saved_bytes(&game, &character), before_save);
 
     // A replayed accept while the quest is already active is inert.
     assert_packet_changes_nothing(
@@ -1396,7 +1374,7 @@ fn refusals_wrong_target_and_replay_change_nothing() {
         now + 400,
     );
     let before = saved(&game);
-    let before_save = save_envelope(&fixture, &game, &character);
+    let before_save = fixture.saved_bytes(&game, &character);
     assert_packet_changes_nothing(
         &mut game,
         &at_trixi,
@@ -1410,11 +1388,11 @@ fn refusals_wrong_target_and_replay_change_nothing() {
         "the wrong quest consumed the held end screen"
     );
     assert_eq!(saved(&game), before);
-    assert_eq!(save_envelope(&fixture, &game, &character), before_save);
+    assert_eq!(fixture.saved_bytes(&game, &character), before_save);
 
     finish_quest(&mut game, &at_trixi, ALL_I_GOT, MINER, 5, 15, now + 600);
     let finished = saved(&game);
-    let finished_save = save_envelope(&fixture, &game, &character);
+    let finished_save = fixture.saved_bytes(&game, &character);
     assert_packet_changes_nothing(
         &mut game,
         &at_trixi,
@@ -1430,7 +1408,7 @@ fn refusals_wrong_target_and_replay_change_nothing() {
         "a replayed 49/2 after completion",
     );
     assert_eq!(saved(&game), finished);
-    assert_eq!(save_envelope(&fixture, &game, &character), finished_save);
+    assert_eq!(fixture.saved_bytes(&game, &character), finished_save);
 }
 
 /// T334: the accepted state, the Trixi step counter and the held end screen live in the
@@ -1722,7 +1700,7 @@ fn a_near_cap_coin_balance_refuses_the_turn_in_without_paying_xp_or_item() {
     let xp_before = profile_xp(&game, MINER);
     let items_before = item_ledger(&game);
     let before = saved(&game);
-    let before_save = save_envelope(&fixture, &game, &character);
+    let before_save = fixture.saved_bytes(&game, &character);
 
     // T382: the refusal is a per-player denial, not a session-ending error or a panic.
     let refused = game
@@ -1747,7 +1725,7 @@ fn a_near_cap_coin_balance_refuses_the_turn_in_without_paying_xp_or_item() {
     );
     assert_eq!(quest_status(&game, ALL_I_GOT), QuestStatus::Active);
     assert_eq!(saved(&game), before);
-    assert_eq!(save_envelope(&fixture, &game, &character), before_save);
+    assert_eq!(fixture.saved_bytes(&game, &character), before_save);
 
     // Spending the overflow lets the same held end screen pay once.
     let mut state = game.state();
@@ -1990,13 +1968,13 @@ fn a_non_miner_wrong_npc_or_forged_request_changes_nothing() {
     assert_no_offer(&mut game, &character, THERIN, &mut later, "Therin");
     let [x, y, z] = smitty_position();
     let outside = character_at([x + 42.0, y, z]);
-    let before = save_envelope(&fixture, &game, &character);
+    let before = fixture.saved_bytes(&game, &character);
     assert!(
         game.handle_in_world(&npc_interact(SMITTY), &outside, later + 10)
             .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "a 26/8 30 m outside the interaction radius is refused"
     );
-    assert_eq!(save_envelope(&fixture, &game, &character), before);
+    assert_eq!(fixture.saved_bytes(&game, &character), before);
     assert_eq!(counts(&game, RUSH_ORDER), [0, 0, 0]);
 
     // After the Smitty step, a turn-in before the copper ore holds no end screen.
