@@ -12,9 +12,10 @@
 //! Resolved objective kinds: `talk_to_npc`, `interact_actor`, `reach_poi`,
 //! `defeat`, `collect_item`, `equip_item`, `craft_recipe`, `complete_dungeon`,
 //! `finish_minigame`, `gather_resource`, `collect_node`, `job_level`,
-//! `perform_pet_trick`, `use_ability` and `use_item`. The item, recipe, dungeon,
-//! minigame, gather, quest-pickup, pet-trick, ability, enemy and single-use
-//! consumable kinds additionally resolve their target ids in the id sets owned by
+//! `perform_pet_trick`, `use_ability`, `use_item` and `any_of`. An `any_of` has
+//! no target of its own: every alternative is graded as its leaf kind (T790).
+//! The item, recipe, dungeon, minigame, gather, quest-pickup, pet-trick, ability,
+//! enemy and single-use consumable kinds additionally resolve their target ids in the id sets owned by
 //! `tests/support/quest_target_sets.rs`, which names the owning loader and every
 //! `FinishMinigame` emitter. A
 //! `collect_node` node type must have at least one placed spawn in
@@ -70,7 +71,7 @@ use osfr_tools::{
 use quest_catalogue_fixture::{
     Defect, FIXTURE_ABILITY, FIXTURE_BATTLE, FIXTURE_DEFECT, FIXTURE_ENEMY,
     FIXTURE_GATHER_RESOURCE, FIXTURE_ITEM, FIXTURE_MINIGAME, FIXTURE_NODE_TYPE, FIXTURE_PET_TRICK,
-    FIXTURE_QUEST, FIXTURE_RECIPE, FIXTURE_USE_ITEM, Scratch, fixture,
+    FIXTURE_QUEST, FIXTURE_RECIPE, FIXTURE_TARGET, FIXTURE_USE_ITEM, Scratch, fixture,
 };
 use quest_records::{RawQuest, as_u32, read_quests, sorted_json_paths};
 use quest_target_sets::{MinigameFact, Targets};
@@ -233,7 +234,7 @@ impl Catalogue {
     /// Objective kinds whose target this gate resolves. Everything else is only
     /// bounded by the split loader; the target test prints the gap.
     fn unchecked_objective_kinds(&self) -> BTreeSet<&str> {
-        const CHECKED: [&str; 15] = [
+        const CHECKED: [&str; 16] = [
             "talk_to_npc",
             "interact_actor",
             "reach_poi",
@@ -249,6 +250,7 @@ impl Catalogue {
             "perform_pet_trick",
             "use_ability",
             "use_item",
+            "any_of",
         ];
         self.enabled()
             .flat_map(|quest| quest.objectives.iter())
@@ -288,7 +290,8 @@ impl Catalogue {
     /// Every reachable enabled objective target this gate knows how to resolve:
     /// talk and interact actors are in the production draw set; `reach_poi` ids
     /// are positive; kill and item ids/counts are positive; and every target
-    /// kind with a shipped id table resolves in it. Visit geometry bounds are
+    /// kind with a shipped id table resolves in it. `any_of` alternatives are
+    /// graded as their leaf kind (T790). Visit geometry bounds are
     /// enforced by `from_split_content` and deliberately not repeated here.
     /// Unreachable enabled records are skipped, as the reachability rule says.
     fn target_violations(&self) -> Vec<String> {
@@ -297,177 +300,203 @@ impl Catalogue {
             for (index, goal) in quest.objectives.iter().enumerate() {
                 let objective = goal["id"].as_u64().unwrap_or(0);
                 let owner = format!("quest {} objective {objective} (#{index})", quest.id);
-                match goal["kind"].as_str().unwrap_or_default() {
-                    "talk_to_npc" => {
-                        self.target_violation(&mut violations, &owner, goal["npc_id"].as_u64());
-                    }
-                    "interact_actor" => {
-                        self.target_violation(&mut violations, &owner, goal["actor_guid"].as_u64());
-                    }
-                    "reach_poi" => {
-                        if goal["poi_id"].as_u64().unwrap_or(0) == 0 {
-                            violations.push(format!("{owner}: reach_poi target is not positive"));
-                        }
-                    }
-                    "defeat" => {
-                        if goal["model_id"].as_u64().unwrap_or(0) == 0
-                            || !(1..=MAX_OBJECTIVE_COUNT)
-                                .contains(&goal["count"].as_u64().unwrap_or(0))
-                        {
-                            violations
-                                .push(format!("{owner}: defeat target and count must be positive"));
-                        }
-                    }
-                    "collect_item" => {
-                        let item = goal["item_id"]
-                            .as_i64()
-                            .and_then(|id| i32::try_from(id).ok())
-                            .unwrap_or(0);
-                        if item <= 0
-                            || !(1..=MAX_OBJECTIVE_COUNT)
-                                .contains(&goal["quantity"].as_u64().unwrap_or(0))
-                        {
-                            violations.push(format!(
-                                "{owner}: collect_item target and quantity must be positive"
-                            ));
-                        }
-                        if item > 0 && !self.targets.items.contains(&item) {
-                            violations.push(format!(
-                                "{owner} (collect_item): item {item} is not defined by the shipped item catalogue"
-                            ));
-                        }
-                    }
-                    "equip_item" => {
-                        let item = goal["definition_id"]
-                            .as_i64()
-                            .and_then(|id| i32::try_from(id).ok())
-                            .unwrap_or(0);
-                        if !self.targets.items.contains(&item) {
-                            violations.push(format!(
-                                "{owner} (equip_item): item {item} is not defined by the shipped item catalogue"
-                            ));
-                        }
-                    }
-                    "craft_recipe" => {
-                        let recipe = as_u32(&goal["recipe_id"]).unwrap_or(0);
-                        if !self.targets.recipes.contains(&recipe) {
-                            violations.push(format!(
-                                "{owner} (craft_recipe): recipe {recipe} is not defined by the shipped recipe book"
-                            ));
-                        }
-                    }
-                    "complete_dungeon" => {
-                        let encounter = as_u32(&goal["encounter_id"]).unwrap_or(0);
-                        if !self.targets.dungeons.contains(&encounter) {
-                            violations.push(format!(
-                                "{owner} (complete_dungeon): encounter {encounter} is not a shipped field battle or dungeon id"
-                            ));
-                        }
-                    }
-                    "finish_minigame" => {
-                        let minigame = as_u32(&goal["minigame_id"]).unwrap_or(0);
-                        if !self.targets.minigames.contains(&minigame) {
-                            violations.push(format!(
-                                "{owner} (finish_minigame): minigame {minigame} is not a shipped minigame id"
-                            ));
-                        }
-                        // T787: an enabled `require` must name only facts the id's own
-                        // producer reports. A bound on a fact it cannot report is a quest
-                        // no result can ever credit.
-                        if let Some(require) = goal.get("require") {
-                            for (field, fact) in [
-                                ("min_score", MinigameFact::Score),
-                                ("max_elapsed_seconds", MinigameFact::Elapsed),
-                                ("max_placement", MinigameFact::Placement),
-                                ("no_knockout", MinigameFact::Knockout),
-                            ] {
-                                let demanded = if field == "no_knockout" {
-                                    require[field].as_bool() == Some(true)
-                                } else {
-                                    require.get(field).is_some_and(|value| !value.is_null())
-                                };
-                                if demanded && !self.targets.reports(minigame, fact) {
-                                    violations.push(format!(
-                                        "{owner} (finish_minigame): {field} needs a fact the producer for minigame {minigame} does not report"
-                                    ));
-                                }
-                            }
-                        }
-                    }
-                    "gather_resource" => {
-                        let resource = as_u32(&goal["resource_id"]).unwrap_or(0);
-                        if !self.targets.gather.contains(&resource) {
-                            violations.push(format!(
-                                "{owner} (gather_resource): resource {resource} is not a shipped mining/harvesting output or local gather drop"
-                            ));
-                        }
-                    }
-                    "collect_node" => {
-                        let node_type = goal["node_type"].as_str().unwrap_or_default();
-                        if node_type.is_empty() || !self.targets.nodes.contains(node_type) {
-                            violations.push(format!(
-                                "{owner} (collect_node): node type {node_type:?} has no placed spawn in quest_nodes.json"
-                            ));
-                        }
-                    }
-                    "job_level" => {
-                        let profile = as_u32(&goal["profile_id"]).unwrap_or(0);
-                        if !self.targets.profiles.contains(&profile) {
-                            violations.push(format!(
-                                "{owner} (job_level): profile {profile} is not declared by the loaded profile content"
-                            ));
-                        }
-                    }
-                    "perform_pet_trick" => {
-                        let trick = as_u32(&goal["trick_id"]).unwrap_or(0);
-                        if !self.targets.pet_tricks.contains(&trick) {
-                            violations.push(format!(
-                                "{owner} (perform_pet_trick): trick {trick} is not a pets.json trick id"
-                            ));
-                        }
-                    }
-                    "use_ability" => {
-                        let ability = as_u32(&goal["ability_id"]).unwrap_or(0);
-                        if !self.targets.abilities.contains(&ability) {
-                            violations.push(format!(
-                                "{owner} (use_ability): ability {ability} is not a job_abilities.json definition id"
-                            ));
-                        }
-                        // An absent target is legal: a self cast, or a goal that counts the
-                        // ability on any enemy. Present, it must name a shipped definition.
-                        if let Some(target) = goal.get("target_actor_kind_id") {
-                            let target = as_u32(target).unwrap_or(0);
-                            if !self.targets.enemy_kinds.contains(&target) {
-                                violations.push(format!(
-                                    "{owner} (use_ability): target {target} is not an enemies.json definition id"
-                                ));
-                            }
-                        }
-                    }
-                    "use_item" => {
-                        let item = goal["item_id"]
-                            .as_i64()
-                            .and_then(|id| i32::try_from(id).ok())
-                            .unwrap_or(0);
-                        if item <= 0 {
-                            violations.push(format!("{owner}: use_item target must be positive"));
-                        } else if !self.targets.items.contains(&item) {
-                            violations.push(format!(
-                                "{owner} (use_item): item {item} is not defined by the shipped item catalogue"
-                            ));
-                        } else if !self.targets.consumables.contains(&item) {
-                            // The item bar spends only a single-use effect row; a catalogue item
-                            // without one can never produce the event the step waits for.
-                            violations.push(format!(
-                                "{owner} (use_item): item {item} has no single-use consumable row, so the bar can never spend it"
-                            ));
-                        }
-                    }
-                    _ => {}
-                }
+                self.objective_violations(&mut violations, &owner, goal, false);
             }
         }
         violations
+    }
+
+    /// One goal's target report. An `any_of` leaf has no `quantity` of its own (the
+    /// goal's `count` is the total), so only its id is graded.
+    fn objective_violations(
+        &self,
+        violations: &mut Vec<String>,
+        owner: &str,
+        goal: &Value,
+        any_of_leaf: bool,
+    ) {
+        match goal["kind"].as_str().unwrap_or_default() {
+            "talk_to_npc" => {
+                self.target_violation(violations, owner, goal["npc_id"].as_u64());
+            }
+            "interact_actor" => {
+                self.target_violation(violations, owner, goal["actor_guid"].as_u64());
+            }
+            "reach_poi" => {
+                if goal["poi_id"].as_u64().unwrap_or(0) == 0 {
+                    violations.push(format!("{owner}: reach_poi target is not positive"));
+                }
+            }
+            "defeat" => {
+                if goal["model_id"].as_u64().unwrap_or(0) == 0
+                    || !(1..=MAX_OBJECTIVE_COUNT).contains(&goal["count"].as_u64().unwrap_or(0))
+                {
+                    violations.push(format!("{owner}: defeat target and count must be positive"));
+                }
+            }
+            "collect_item" => {
+                let item = goal["item_id"]
+                    .as_i64()
+                    .and_then(|id| i32::try_from(id).ok())
+                    .unwrap_or(0);
+                let quantity_positive = any_of_leaf
+                    || (1..=MAX_OBJECTIVE_COUNT).contains(&goal["quantity"].as_u64().unwrap_or(0));
+                if item <= 0 || !quantity_positive {
+                    violations.push(format!(
+                        "{owner}: collect_item target and quantity must be positive"
+                    ));
+                }
+                if item > 0 && !self.targets.items.contains(&item) {
+                    violations.push(format!(
+                                "{owner} (collect_item): item {item} is not defined by the shipped item catalogue"
+                            ));
+                }
+            }
+            "equip_item" => {
+                let item = goal["definition_id"]
+                    .as_i64()
+                    .and_then(|id| i32::try_from(id).ok())
+                    .unwrap_or(0);
+                if !self.targets.items.contains(&item) {
+                    violations.push(format!(
+                                "{owner} (equip_item): item {item} is not defined by the shipped item catalogue"
+                            ));
+                }
+            }
+            "craft_recipe" => {
+                let recipe = as_u32(&goal["recipe_id"]).unwrap_or(0);
+                if !self.targets.recipes.contains(&recipe) {
+                    violations.push(format!(
+                                "{owner} (craft_recipe): recipe {recipe} is not defined by the shipped recipe book"
+                            ));
+                }
+            }
+            "complete_dungeon" => {
+                let encounter = as_u32(&goal["encounter_id"]).unwrap_or(0);
+                if !self.targets.dungeons.contains(&encounter) {
+                    violations.push(format!(
+                                "{owner} (complete_dungeon): encounter {encounter} is not a shipped field battle or dungeon id"
+                            ));
+                }
+            }
+            "finish_minigame" => {
+                let minigame = as_u32(&goal["minigame_id"]).unwrap_or(0);
+                if !self.targets.minigames.contains(&minigame) {
+                    violations.push(format!(
+                                "{owner} (finish_minigame): minigame {minigame} is not a shipped minigame id"
+                            ));
+                }
+                // T787: an enabled `require` must name only facts the id's own
+                // producer reports. A bound on a fact it cannot report is a quest
+                // no result can ever credit.
+                if let Some(require) = goal.get("require") {
+                    for (field, fact) in [
+                        ("min_score", MinigameFact::Score),
+                        ("max_elapsed_seconds", MinigameFact::Elapsed),
+                        ("max_placement", MinigameFact::Placement),
+                        ("no_knockout", MinigameFact::Knockout),
+                    ] {
+                        let demanded = if field == "no_knockout" {
+                            require[field].as_bool() == Some(true)
+                        } else {
+                            require.get(field).is_some_and(|value| !value.is_null())
+                        };
+                        if demanded && !self.targets.reports(minigame, fact) {
+                            violations.push(format!(
+                                        "{owner} (finish_minigame): {field} needs a fact the producer for minigame {minigame} does not report"
+                                    ));
+                        }
+                    }
+                }
+            }
+            "gather_resource" => {
+                let resource = as_u32(&goal["resource_id"]).unwrap_or(0);
+                if !self.targets.gather.contains(&resource) {
+                    violations.push(format!(
+                                "{owner} (gather_resource): resource {resource} is not a shipped mining/harvesting output or local gather drop"
+                            ));
+                }
+            }
+            "collect_node" => {
+                let node_type = goal["node_type"].as_str().unwrap_or_default();
+                if node_type.is_empty() || !self.targets.nodes.contains(node_type) {
+                    violations.push(format!(
+                                "{owner} (collect_node): node type {node_type:?} has no placed spawn in quest_nodes.json"
+                            ));
+                }
+            }
+            "job_level" => {
+                let profile = as_u32(&goal["profile_id"]).unwrap_or(0);
+                if !self.targets.profiles.contains(&profile) {
+                    violations.push(format!(
+                                "{owner} (job_level): profile {profile} is not declared by the loaded profile content"
+                            ));
+                }
+            }
+            "perform_pet_trick" => {
+                let trick = as_u32(&goal["trick_id"]).unwrap_or(0);
+                if !self.targets.pet_tricks.contains(&trick) {
+                    violations.push(format!(
+                        "{owner} (perform_pet_trick): trick {trick} is not a pets.json trick id"
+                    ));
+                }
+            }
+            "use_ability" => {
+                let ability = as_u32(&goal["ability_id"]).unwrap_or(0);
+                if !self.targets.abilities.contains(&ability) {
+                    violations.push(format!(
+                                "{owner} (use_ability): ability {ability} is not a job_abilities.json definition id"
+                            ));
+                }
+                // An absent target is legal: a self cast, or a goal that counts the
+                // ability on any enemy. Present, it must name a shipped definition.
+                if let Some(target) = goal.get("target_actor_kind_id") {
+                    let target = as_u32(target).unwrap_or(0);
+                    if !self.targets.enemy_kinds.contains(&target) {
+                        violations.push(format!(
+                                    "{owner} (use_ability): target {target} is not an enemies.json definition id"
+                                ));
+                    }
+                }
+            }
+            "use_item" => {
+                let item = goal["item_id"]
+                    .as_i64()
+                    .and_then(|id| i32::try_from(id).ok())
+                    .unwrap_or(0);
+                if item <= 0 {
+                    violations.push(format!("{owner}: use_item target must be positive"));
+                } else if !self.targets.items.contains(&item) {
+                    violations.push(format!(
+                                "{owner} (use_item): item {item} is not defined by the shipped item catalogue"
+                            ));
+                } else if !self.targets.consumables.contains(&item) {
+                    // The item bar spends only a single-use effect row; a catalogue item
+                    // without one can never produce the event the step waits for.
+                    violations.push(format!(
+                                "{owner} (use_item): item {item} has no single-use consumable row, so the bar can never spend it"
+                            ));
+                }
+            }
+            // T790: an any-of has no target of its own; walk every alternative as the leaf
+            // kind it is, so each id resolves in its own shipped set.
+            "any_of" => {
+                for (leaf, alternative) in goal["alternatives"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .enumerate()
+                {
+                    self.objective_violations(
+                        violations,
+                        &format!("{owner} (any_of) alternative {leaf}"),
+                        alternative,
+                        true,
+                    );
+                }
+            }
+            _ => {}
+        }
     }
 
     fn target_violation(&self, violations: &mut Vec<String>, owner: &str, target: Option<u64>) {
@@ -818,6 +847,32 @@ fn patch_fixture_field(scratch: &Scratch, quest: u32, kind: &str, field: &str, v
     .unwrap_or_else(|error| panic!("{}: {error}", path.display()));
 }
 
+/// Replace one alternative of the fixture's `any_of` goal (T790 canaries).
+fn patch_fixture_alternative(scratch: &Scratch, quest: u32, index: usize, value: Value) {
+    let path = scratch.path().join("quests/fixture.json");
+    let mut document = read_json(&path);
+    let record = document["records"]
+        .as_array_mut()
+        .expect("fixture records")
+        .iter_mut()
+        .find(|record| as_u32(&record["id"]) == Some(quest))
+        .unwrap_or_else(|| panic!("the fixture quest {quest} exists"));
+    let goal = record["objectives"]
+        .as_array_mut()
+        .expect("fixture objectives")
+        .iter_mut()
+        .find(|goal| goal["kind"].as_str() == Some("any_of"))
+        .unwrap_or_else(|| panic!("the fixture quest {quest} has an any_of objective"));
+    goal["alternatives"]
+        .as_array_mut()
+        .expect("fixture alternatives")[index] = value;
+    fs::write(
+        &path,
+        serde_json::to_vec_pretty(&document).expect("fixture JSON"),
+    )
+    .unwrap_or_else(|error| panic!("{}: {error}", path.display()));
+}
+
 #[test]
 fn graded_target_kinds_fail_on_a_scratch_tree() {
     // Control: every graded kind has one resolving target in the fixture's own
@@ -1013,6 +1068,71 @@ fn graded_target_kinds_fail_on_a_scratch_tree() {
             && violations[0].contains("collect_node")
             && violations[0].contains("missing-node"),
         "canary H did not report the unknown node type: {violations:?}"
+    );
+
+    // Canary I (T790): one any_of alternative names an item the catalogue does not own.
+    // The clean fixture's two collect alternatives resolve above, so only the patch fails.
+    let any_of_item = fixture("canary-any-of-item", Defect::None);
+    patch_fixture_alternative(
+        &any_of_item,
+        FIXTURE_QUEST,
+        1,
+        json!({"kind": "collect_item", "item_id": 999_999}),
+    );
+    let catalogue = Catalogue::load(any_of_item.path()).expect("the altered any-of quest loads");
+    let violations = catalogue.target_violations();
+    assert_eq!(violations.len(), 1, "{violations:?}");
+    assert!(
+        violations[0].contains(&format!("quest {FIXTURE_QUEST} objective 13 (#11)"))
+            && violations[0].contains("any_of")
+            && violations[0].contains("999999"),
+        "canary I did not name the any_of item alternative: {violations:?}"
+    );
+
+    // Canary J: every talk alternative must resolve in the draw set, not only the first.
+    let any_of_talk = fixture("canary-any-of-talk", Defect::None);
+    patch_fixture_alternative(
+        &any_of_talk,
+        FIXTURE_QUEST,
+        0,
+        json!({"kind": "talk_to_npc", "npc_id": FIXTURE_TARGET}),
+    );
+    patch_fixture_alternative(
+        &any_of_talk,
+        FIXTURE_QUEST,
+        1,
+        json!({"kind": "talk_to_npc", "npc_id": 999_999}),
+    );
+    let catalogue =
+        Catalogue::load(any_of_talk.path()).expect("the altered talk any_of quest loads");
+    let violations = catalogue.target_violations();
+    assert_eq!(violations.len(), 1, "{violations:?}");
+    assert!(
+        violations[0].contains("any_of") && violations[0].contains("999999"),
+        "canary J did not name the missing talk alternative: {violations:?}"
+    );
+
+    // Canary K: every gather alternative must resolve in the gather set.
+    let any_of_gather = fixture("canary-any-of-gather", Defect::None);
+    patch_fixture_alternative(
+        &any_of_gather,
+        FIXTURE_QUEST,
+        0,
+        json!({"kind": "gather_resource", "resource_id": FIXTURE_GATHER_RESOURCE}),
+    );
+    patch_fixture_alternative(
+        &any_of_gather,
+        FIXTURE_QUEST,
+        1,
+        json!({"kind": "gather_resource", "resource_id": 999_999}),
+    );
+    let catalogue =
+        Catalogue::load(any_of_gather.path()).expect("the altered gather any_of quest loads");
+    let violations = catalogue.target_violations();
+    assert_eq!(violations.len(), 1, "{violations:?}");
+    assert!(
+        violations[0].contains("any_of") && violations[0].contains("999999"),
+        "canary K did not name the missing gather alternative: {violations:?}"
     );
 }
 

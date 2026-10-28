@@ -4,7 +4,7 @@
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use serde_json::Value;
 use std::{
-    collections::{BTreeMap, HashSet},
+    collections::{BTreeMap, BTreeSet, HashSet},
     fmt, fs,
     path::{Path, PathBuf},
 };
@@ -216,6 +216,83 @@ impl MinigameRequirement {
     }
 }
 
+/// (R) T790: the family one `any_of` goal counts. A goal's alternatives are all one
+/// family, so the journal, marker and event rules can treat them as one target.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub(crate) enum AnyOfFamily {
+    TalkToNpc,
+    CollectItem,
+    GatherResource,
+}
+
+/// One leaf of a [`ContentGoal::AnyOf`]. The leaf names only the id the event carries;
+/// the goal's single `count` is the shared total. No per-leaf provenance: the goal's
+/// `source` carries it.
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
+pub enum AnyOfTarget {
+    TalkToNpc { npc_id: u64 },
+    CollectItem { item_id: i32 },
+    GatherResource { resource_id: u32 },
+}
+
+impl AnyOfTarget {
+    pub(crate) fn family(&self) -> AnyOfFamily {
+        match self {
+            Self::TalkToNpc { .. } => AnyOfFamily::TalkToNpc,
+            Self::CollectItem { .. } => AnyOfFamily::CollectItem,
+            Self::GatherResource { .. } => AnyOfFamily::GatherResource,
+        }
+    }
+
+    /// The positive id a matching event must carry, across the three families.
+    fn target_id(&self) -> Option<u64> {
+        match self {
+            Self::TalkToNpc { npc_id } => (*npc_id != 0).then_some(*npc_id),
+            Self::CollectItem { item_id } => u64::try_from(*item_id).ok().filter(|id| *id > 0),
+            Self::GatherResource { resource_id } => {
+                (*resource_id != 0).then_some(u64::from(*resource_id))
+            }
+        }
+    }
+}
+
+/// (R) T790: one `any_of` names 2 to 8 alternatives of one family.
+pub(crate) const MIN_ANY_OF_ALTERNATIVES: usize = 2;
+pub(crate) const MAX_ANY_OF_ALTERNATIVES: usize = 8;
+
+/// The authored `any_of` shape: 2..=8 alternatives of one family, each with a positive
+/// id, no repeated target. Both quest loaders call this, so the flat and split paths
+/// refuse the same JSON for the same reason.
+pub(crate) fn validate_any_of(
+    alternatives: &[AnyOfTarget],
+    count: u32,
+) -> Result<(), &'static str> {
+    if !(MIN_ANY_OF_ALTERNATIVES..=MAX_ANY_OF_ALTERNATIVES).contains(&alternatives.len()) {
+        return Err("any_of goal requires 2 to 8 alternatives");
+    }
+    if !(1..=crate::quest_engine::MAX_COUNT).contains(&count) {
+        return Err("any_of goal count must be 1..=MAX_COUNT");
+    }
+    let family = alternatives.first().map(AnyOfTarget::family);
+    if alternatives
+        .iter()
+        .any(|alternative| Some(alternative.family()) != family)
+    {
+        return Err("any_of goal alternatives must all be one family");
+    }
+    let mut seen = BTreeSet::new();
+    for alternative in alternatives {
+        let id = alternative
+            .target_id()
+            .ok_or("any_of goal alternative target must be positive")?;
+        if !seen.insert(id) {
+            return Err("any_of goal must not repeat an alternative target");
+        }
+    }
+    Ok(())
+}
+
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub enum ContentGoal {
@@ -360,6 +437,15 @@ pub enum ContentGoal {
         count: u32,
         source: Vec<SourceTag>,
     },
+    /// (R) T790: one counter that accepts any one of 2..=8 same-family targets. Any
+    /// matching event counts toward the single `count`; an id outside the alternatives
+    /// (or another family) counts nothing. A collect event of quantity 3 counts 3.
+    AnyOf {
+        id: u32,
+        count: u32,
+        alternatives: Vec<AnyOfTarget>,
+        source: Vec<SourceTag>,
+    },
 }
 
 impl ContentGoal {
@@ -382,7 +468,8 @@ impl ContentGoal {
             | Self::InteractActor { id, .. }
             | Self::CompleteDungeon { id, .. }
             | Self::UseAbility { id, .. }
-            | Self::UseItem { id, .. } => *id,
+            | Self::UseItem { id, .. }
+            | Self::AnyOf { id, .. } => *id,
         }
     }
 }
@@ -982,7 +1069,8 @@ fn check_goal_sources(owner: &str, goal: &ContentGoal) -> Result<(), ContentErro
         | ContentGoal::InteractActor { id, source, .. }
         | ContentGoal::CompleteDungeon { id, source, .. }
         | ContentGoal::UseAbility { id, source, .. }
-        | ContentGoal::UseItem { id, source, .. } => (id, source),
+        | ContentGoal::UseItem { id, source, .. }
+        | ContentGoal::AnyOf { id, source, .. } => (id, source),
     };
     check_sources(&format!("{owner} goal {id}"), source)
 }
@@ -1139,6 +1227,39 @@ fn validate_goal(
                          max_placement 1..={MAX_MINIGAME_PLACEMENT}"
                     ),
                 });
+            }
+            Ok(())
+        }
+        // T790: shape first, so a mixed-family or duplicate list is reported as that,
+        // not as a dangling id. Then each leaf resolves like its plain goal kind.
+        ContentGoal::AnyOf {
+            count,
+            alternatives,
+            ..
+        } => {
+            validate_any_of(alternatives, *count).map_err(|detail| {
+                ContentError::InvalidRecord {
+                    record: owner.to_owned(),
+                    detail: detail.to_owned(),
+                }
+            })?;
+            for alternative in alternatives {
+                match alternative {
+                    AnyOfTarget::TalkToNpc { npc_id } => reference(
+                        owner,
+                        "goal.npc_id",
+                        npc_id,
+                        npcs.contains(&npc_id.to_string()),
+                    )?,
+                    AnyOfTarget::CollectItem { item_id } => reference(
+                        owner,
+                        "goal.item_id",
+                        item_id,
+                        items.contains(&item_id.to_string()),
+                    )?,
+                    // The quest engine validates the resource binding, like gather_resource.
+                    AnyOfTarget::GatherResource { .. } => {}
+                }
             }
             Ok(())
         }

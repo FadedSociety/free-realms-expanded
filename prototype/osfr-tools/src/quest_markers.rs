@@ -14,7 +14,7 @@
 //! Both handlers look the guid up in the client's actor table (`00984960`) and skip a guid it
 //! has not spawned, so a caller must send the NPC's spawn first.
 
-use crate::quest_engine::{ObjectiveKind, QuestEngine, QuestStatus};
+use crate::quest_engine::{QuestEngine, QuestStatus};
 use serde::Deserialize;
 use std::{
     fs,
@@ -163,9 +163,7 @@ pub fn marker_for(engine: &QuestEngine, npc_id: u64) -> Option<QuestMarker> {
             return engine.state().pending_turnin != Some(id)
                 && engine.turnin_npc_id(id) == Some(npc_id);
         }
-        open.iter().any(|objective| {
-            matches!(objective.kind, ObjectiveKind::TalkToNpc { npc_id: target } if target == npc_id)
-        })
+        open.iter().any(|objective| objective.kind.talks_to(npc_id))
     };
     let turn_in = engine.pending_turnin_actor() == Some(npc_id)
         || engine

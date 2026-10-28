@@ -368,6 +368,62 @@ pub enum ObjectiveKind {
         client_id: u32,
         trigger: ClientTrigger,
     },
+    /// (R) T790: one counter over 2..=8 leaves of one family (`TalkToNpc`, `CollectItem`
+    /// or `GatherResource`). `event_matches` uses the first matching alternative only, so
+    /// an event counts once even for a repeated leaf; both content loaders reject a
+    /// repeated or mixed-family list, this is defense in depth.
+    AnyOf {
+        alternatives: Vec<ObjectiveKind>,
+    },
+}
+
+impl ObjectiveKind {
+    /// Every NPC a Talk to this objective finishes on. An `any_of` over talk targets
+    /// finishes on any of its leaves; every other kind names none. Cheap and allocation-free
+    /// because the marker path calls it per candidate NPC.
+    pub(crate) fn talk_targets(&self) -> impl Iterator<Item = u64> + '_ {
+        let leaves: &[Self] = match self {
+            Self::AnyOf { alternatives } => alternatives,
+            leaf => std::slice::from_ref(leaf),
+        };
+        leaves.iter().filter_map(|kind| match kind {
+            Self::TalkToNpc { npc_id } => Some(*npc_id),
+            _ => None,
+        })
+    }
+
+    /// Whether a Talk to `npc_id` finishes this objective: its one talk target, or any
+    /// talk alternative of an `any_of`.
+    pub(crate) fn talks_to(&self, npc_id: u64) -> bool {
+        self.talk_targets().any(|target| target == npc_id)
+    }
+}
+
+/// The one family an `any_of` leaf belongs to; `None` for every other kind, including a
+/// nested `any_of` (the content loaders and `valid_objective_kind` both refuse one).
+fn any_of_family(kind: &ObjectiveKind) -> Option<crate::content::AnyOfFamily> {
+    match kind {
+        ObjectiveKind::TalkToNpc { .. } => Some(crate::content::AnyOfFamily::TalkToNpc),
+        ObjectiveKind::CollectItem { .. } => Some(crate::content::AnyOfFamily::CollectItem),
+        ObjectiveKind::GatherResource { .. } => Some(crate::content::AnyOfFamily::GatherResource),
+        _ => None,
+    }
+}
+
+impl From<&crate::content::AnyOfTarget> for ObjectiveKind {
+    fn from(target: &crate::content::AnyOfTarget) -> Self {
+        match target {
+            crate::content::AnyOfTarget::TalkToNpc { npc_id } => {
+                Self::TalkToNpc { npc_id: *npc_id }
+            }
+            crate::content::AnyOfTarget::CollectItem { item_id } => {
+                Self::CollectItem { item_id: *item_id }
+            }
+            crate::content::AnyOfTarget::GatherResource { resource_id } => Self::GatherResource {
+                resource_id: *resource_id,
+            },
+        }
+    }
 }
 
 /// What the client is told to watch for: 45/6 LookAt, 45/10 UIEvent or 45/11 FirstMovement
@@ -1379,10 +1435,7 @@ impl QuestEngine {
                 let talks = definition
                     .objectives
                     .iter()
-                    .filter_map(|goal| match goal.kind {
-                        ObjectiveKind::TalkToNpc { npc_id } => Some(npc_id),
-                        _ => None,
-                    });
+                    .flat_map(|goal| goal.kind.talk_targets());
                 talks.chain([definition.giver_npc_id, definition.turnin_npc_id])
             })
             .collect();
@@ -1623,10 +1676,7 @@ impl QuestEngine {
     ) -> Option<crate::quest_dialogue::TalkDialogue> {
         for quest_id in self.state.quests.keys().copied() {
             for objective in self.current_objectives(quest_id) {
-                if !matches!(
-                    &objective.kind,
-                    ObjectiveKind::TalkToNpc { npc_id: target } if *target == npc_id
-                ) {
+                if !objective.kind.talks_to(npc_id) {
                     continue;
                 }
                 let Some(step) = self.conversations.get(&(quest_id, objective.id)) else {
@@ -2267,10 +2317,8 @@ impl QuestEngine {
                     .iter()
                     .enumerate()
                     .any(|(index, objective)| {
-                        matches!(
-                            &objective.kind,
-                            ObjectiveKind::TalkToNpc { npc_id: target } if *target == npc_id
-                        ) && (!definition.ordered || index + 1 == definition.objectives.len())
+                        objective.kind.talks_to(npc_id)
+                            && (!definition.ordered || index + 1 == definition.objectives.len())
                     })
             });
             if ready
@@ -2701,6 +2749,20 @@ fn definition_from_content(
                     ));
                 }
             }
+            // T790: both content paths share the authored shape rule
+            // (`content::validate_any_of`); an empty source would otherwise slip through
+            // here because only the flat loader checks goal provenance.
+            ContentGoal::AnyOf {
+                count,
+                alternatives,
+                source,
+                ..
+            } => {
+                crate::content::validate_any_of(alternatives, *count).map_err(invalid)?;
+                if source.is_empty() {
+                    return Err(invalid("any_of objective requires provenance"));
+                }
+            }
             _ => {}
         }
     }
@@ -2917,6 +2979,19 @@ fn definition_from_content(
                 kind: ObjectiveKind::JobLevel {
                     profile_id: *profile_id,
                     level: *level,
+                },
+            },
+            ContentGoal::AnyOf {
+                id,
+                count,
+                alternatives,
+                ..
+            } => QuestObjective {
+                id: *id,
+                required: *count,
+                description: format!("Objective {}", id),
+                kind: ObjectiveKind::AnyOf {
+                    alternatives: alternatives.iter().map(ObjectiveKind::from).collect(),
                 },
             },
         })
@@ -3224,6 +3299,19 @@ fn valid_objective_kind(kind: &ObjectiveKind) -> bool {
                 && radius.is_finite()
                 && (0.1..=1000.0).contains(radius)
         }
+        // T790: 2..=8 leaves of one family. A repeated leaf is allowed here because
+        // `event_matches` uses the first match only; the content loaders reject it so an
+        // author never ships one. A nested any_of is never a leaf.
+        ObjectiveKind::AnyOf { alternatives } => {
+            let Some(family) = alternatives.first().and_then(any_of_family) else {
+                return false;
+            };
+            (crate::content::MIN_ANY_OF_ALTERNATIVES..=crate::content::MAX_ANY_OF_ALTERNATIVES)
+                .contains(&alternatives.len())
+                && alternatives.iter().all(|alternative| {
+                    any_of_family(alternative) == Some(family) && valid_objective_kind(alternative)
+                })
+        }
     }
 }
 
@@ -3295,6 +3383,15 @@ fn validate_event(event: &QuestEvent) -> io::Result<()> {
 
 fn event_matches(kind: &ObjectiveKind, event: &QuestEvent) -> u32 {
     match (kind, event) {
+        // T790: the first alternative that matches supplies the count; an event never
+        // counts for more than one alternative, and a quantity is kept whole.
+        (ObjectiveKind::AnyOf { alternatives }, event) => alternatives
+            .iter()
+            .find_map(|alternative| {
+                let count = event_matches(alternative, event);
+                (count > 0).then_some(count)
+            })
+            .unwrap_or(0),
         (ObjectiveKind::TalkToNpc { npc_id: a }, QuestEvent::TalkToNpc { npc_id: b }) if a == b => {
             1
         }

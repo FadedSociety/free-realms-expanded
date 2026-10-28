@@ -9,10 +9,16 @@
 //! encounter close.
 #![allow(dead_code)]
 
-use osfr_tools::fishing::Handle;
+use osfr_tools::{
+    fishing::Handle, inventory::Inventory, profiles::ProfileState, rewards::RewardState,
+};
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
-use std::{collections::BTreeSet, fs, path::Path};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    fs,
+    path::Path,
+};
 
 /// Every fish item id the shipped `fishing_spots.json` binds.
 pub fn fish_item_ids() -> BTreeSet<i32> {
@@ -26,6 +32,62 @@ pub fn fish_item_ids() -> BTreeSet<i32> {
         .map(|id| id.as_i64().unwrap() as i32)
         .filter(|id| *id > 0)
         .collect()
+}
+
+/// (T790) One minimal `inventory.json` with no state rows and no definitions, so
+/// `add_fish_definitions` can add the fish a paid catch stores. The three spans match the
+/// fixture shape `fishing_service` already uses: coins, items, equipment.
+fn write_empty_inventory(directory: &Path) {
+    let coins = 0u32.to_le_bytes();
+    let empty = 0i32.to_le_bytes();
+    let span = |kind: &str, offset: usize, profile_id: usize, bytes: &[u8]| {
+        json!({
+            "kind": kind,
+            "offset": offset,
+            "length": bytes.len(),
+            "profile_id": profile_id,
+            "sha256": format!("{:x}", Sha256::digest(bytes)),
+        })
+    };
+    let content = json!({
+        "schema_version": 1,
+        "player_guid": 1,
+        "default_state": {
+            "coins": 0,
+            "items": [],
+            "equipment": [],
+            "next_instance_id": null
+        },
+        "profiles": [{"id": 1, "allowed_classes": [1], "slots": [3]}],
+        "spans": [
+            span("coins", 13, 0, &coins),
+            span("items", 17, 0, &empty),
+            span("equipment", 21, 1, &empty)
+        ],
+        "definitions": []
+    });
+    fs::write(
+        directory.join("inventory.json"),
+        serde_json::to_vec(&content).unwrap(),
+    )
+    .unwrap();
+}
+
+/// (T790) A scratch directory's inventory holding every fish the shipped spot file can
+/// grant, and the reward ledger a fishing round uses. One unlocked profile; the bag
+/// capacity is a test value because `route` recomputes the fishing cap from the live
+/// inventory.
+pub fn fish_inventory_rewards(directory: &Path) -> RewardState {
+    write_empty_inventory(directory);
+    add_fish_definitions(directory);
+    let inventory = Inventory::load(directory, None).unwrap();
+    let profiles = ProfileState {
+        version: 1,
+        active: 1,
+        unlocked: BTreeSet::from([1]),
+        experience: BTreeMap::new(),
+    };
+    RewardState::new(inventory, profiles, 4)
 }
 
 /// Widen a fixture `inventory.json` with a stub definition for every fish item the real

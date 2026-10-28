@@ -107,6 +107,39 @@ fn talk_and_interact_objectives_point_at_the_npc() {
     );
 }
 
+/// T790: an any-of pins its first alternative, the same rule as the journal text; a
+/// collect any-of has no place to pin.
+#[test]
+fn an_any_of_talk_objective_pins_its_first_alternative() {
+    assert_eq!(
+        locate_kind(ObjectiveKind::AnyOf {
+            alternatives: vec![
+                ObjectiveKind::TalkToNpc { npc_id: NPC },
+                ObjectiveKind::TalkToNpc { npc_id: NPC + 1 },
+            ],
+        }),
+        Some(pin(4, NPC, 0, [-1909.5, -44.4, 462.8]))
+    );
+    assert_eq!(
+        locate_kind(ObjectiveKind::AnyOf {
+            alternatives: vec![
+                ObjectiveKind::CollectItem { item_id: 5 },
+                ObjectiveKind::CollectItem { item_id: 6 },
+            ],
+        }),
+        None
+    );
+    assert_eq!(
+        locate_kind(ObjectiveKind::AnyOf {
+            alternatives: vec![
+                ObjectiveKind::GatherResource { resource_id: 5 },
+                ObjectiveKind::GatherResource { resource_id: 6 },
+            ],
+        }),
+        None
+    );
+}
+
 #[test]
 fn reach_poi_and_visit_position_use_their_own_geometry() {
     assert_eq!(

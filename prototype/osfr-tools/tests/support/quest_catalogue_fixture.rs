@@ -21,6 +21,9 @@ pub const FIXTURE_DEFECT: u32 = 9_100_002;
 pub const FIXTURE_QUEST: u32 = 9_100_001;
 pub const FIXTURE_ITEM: i32 = 9_100_100;
 pub const FIXTURE_RECIPE: u32 = 9_100_101;
+/// T790: a second item definition so the fixture `any_of` has two independent
+/// alternatives, and canary C (which removes `FIXTURE_ITEM`) does not disturb it.
+pub const FIXTURE_ANY_OF_ITEM: i32 = 9_100_106;
 /// The recipe row's `minigame_id`: the game id a craft win sends as 39/18.
 pub const FIXTURE_MINIGAME: u32 = 9_100_102;
 pub const FIXTURE_BATTLE: u32 = 9_100_200;
@@ -41,7 +44,7 @@ pub const FIXTURE_ENEMY: u32 = 9_100_104;
 /// `use_item` step can name an id the bar can actually spend.
 pub const FIXTURE_USE_ITEM: i32 = 11_002;
 const FIXTURE_GIVER: u64 = 9_000_100_001;
-const FIXTURE_TARGET: u64 = 9_000_100_002;
+pub const FIXTURE_TARGET: u64 = 9_000_100_002;
 const FIXTURE_MISSING_GIVER: u64 = 9_000_100_099;
 const FIXTURE_MISSING_PREREQUISITE: u32 = 4_000_100_098;
 const FIXTURE_BLOCKER: u32 = 9_100_003;
@@ -205,6 +208,17 @@ fn fixture_objectives() -> Value {
                 "id": 12,
                 "item_id": FIXTURE_USE_ITEM,
                 "count": 1,
+                "source": fixture_source(),
+            }),
+            // T790: one any-of over two item definitions the fixture catalogue owns.
+            json!({
+                "kind": "any_of",
+                "id": 13,
+                "count": 1,
+                "alternatives": [
+                    {"kind": "collect_item", "item_id": FIXTURE_ANY_OF_ITEM},
+                    {"kind": "collect_item", "item_id": FIXTURE_RECIPE},
+                ],
                 "source": fixture_source(),
             }),
         ]);
@@ -518,6 +532,7 @@ pub fn fixture(name: &str, defect: Defect) -> Scratch {
             item_catalogue::sized_row(FIXTURE_ITEM as u32, 8),
             item_catalogue::sized_row(FIXTURE_RECIPE, 8),
             item_catalogue::sized_row(FIXTURE_USE_ITEM as u32, 8),
+            item_catalogue::sized_row(FIXTURE_ANY_OF_ITEM as u32, 8),
         ],
     );
     write_json(&root.join("recipes.json"), &fixture_recipe_book());

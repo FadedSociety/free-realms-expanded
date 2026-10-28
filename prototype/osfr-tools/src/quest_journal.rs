@@ -296,30 +296,38 @@ pub struct Places<'a> {
 }
 
 /// The pin for one objective, or `None` when the content gives it no single known place
-/// (items, jobs, crafting, minigames, a whole zone). Never a guess (R).
+/// (items, jobs, crafting, minigames, a whole zone). An `any_of` pins its first alternative,
+/// as the journal text does. Never a guess (R).
 pub fn locate(quest_id: u32, objective: &QuestObjective, places: &Places) -> Option<Pin> {
-    let (guid, zone_id, position) = match objective.kind {
+    let (guid, zone_id, position) = match &objective.kind {
         ObjectiveKind::TalkToNpc { npc_id } | ObjectiveKind::InteractNpc { npc_id } => {
-            (npc_id, OPEN_WORLD_ZONE, (places.npc)(npc_id)?)
+            (*npc_id, OPEN_WORLD_ZONE, (places.npc)(*npc_id)?)
         }
         ObjectiveKind::KillActorKind { actor_kind_id } => {
             // A field enemy of the kind wins; a kind that only fights inside a battle
             // points at that battle's marker (R: the lowest battle id that fields it).
             let (guid, position) =
-                (places.enemy)(actor_kind_id).or_else(|| (places.battle_enemy)(actor_kind_id))?;
+                (places.enemy)(*actor_kind_id).or_else(|| (places.battle_enemy)(*actor_kind_id))?;
             (guid, OPEN_WORLD_ZONE, position)
         }
         ObjectiveKind::CompleteDungeon { encounter_id } => {
-            let (guid, position) = (places.battle)(encounter_id)?;
+            let (guid, position) = (places.battle)(*encounter_id)?;
             (guid, OPEN_WORLD_ZONE, position)
         }
         ObjectiveKind::ReachPoi { poi_id } => {
-            let (zone, position) = (places.poi)(poi_id)?;
+            let (zone, position) = (places.poi)(*poi_id)?;
             (0, zone, position)
         }
         ObjectiveKind::VisitPosition {
             zone_id, position, ..
-        } => (0, zone_id, position),
+        } => (0, *zone_id, *position),
+        // T790: an any-of has no place of its own; a talk any-of pins its first
+        // alternative, the same rule as the journal text. Collect and gather alternatives
+        // pin nothing.
+        ObjectiveKind::AnyOf { .. } => {
+            let npc_id = objective.kind.talk_targets().next()?;
+            (npc_id, OPEN_WORLD_ZONE, (places.npc)(npc_id)?)
+        }
         _ => return None,
     };
     position.iter().all(|v| v.is_finite()).then_some(Pin {

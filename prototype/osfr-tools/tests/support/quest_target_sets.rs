@@ -57,6 +57,9 @@
 //!   `enemies::EnemyEngine::load` owns (it exposes no id list). The encounter
 //!   engine reports this definition id on a kill and on an accepted cast, so a
 //!   `use_ability` target must be one of them.
+//! * `any_of` (T790): an alternative has no set of its own; each leaf id resolves
+//!   in the set for its family above (talk in the draw set, collect in `items`,
+//!   gather in `gather`), never in a combined set.
 //! * `consumables`: the single-use rows of `item_bar::Effects` (the loaded
 //!   `consumables.json`, or the built-in potion table when it is absent). A
 //!   `use_item` goal only ever credits when `ItemBar::consume` actually spends
