@@ -1876,3 +1876,127 @@ fn a_copy_of_a_lot_is_read_only_even_for_an_editor() {
         .unwrap();
     assert_eq!(housing(&decorate.replies), [53]);
 }
+
+// T870: the creative decorate catalog through the real session. `housing_settings.json` is the
+// setting; the shipped file turns it on, and the fixtures above (which copy only `houses.json`)
+// stay on the owned flow.
+
+impl Content {
+    /// The generated fixture table plus a `housing_settings.json` with the catalog on or off.
+    fn with_catalog(on: bool) -> Self {
+        let content = Self::with_fixtures();
+        fs::write(
+            content.0.join("housing_settings.json"),
+            format!(r#"{{"schema_version":1,"creative_catalog":{on}}}"#),
+        )
+        .unwrap();
+        content
+    }
+}
+
+/// The selector the 127/43 list gives the catalog row of `item`.
+fn selector_of(list: &FixtureItemList, item: i32) -> u32 {
+    let row = list.items.iter().find(|i| i.item_definition_id == item);
+    u32::try_from(row.expect("the catalog row").fixture_guid).unwrap()
+}
+
+/// Granted, entered, loaded and in edit mode: the lot and the 127/43 list.
+fn decorating_with_list(game: &mut Gameplay) -> (u64, FixtureItemList) {
+    let lot = granted(game);
+    game.handle_in_world(&enter(lot.instance_guid), &character(), 2_000)
+        .unwrap();
+    let loaded = game.initialize_world(&character(), 3_000).unwrap();
+    let list = FixtureItemList::decode(reply(&loaded.replies, 43)).unwrap();
+    game.handle_in_world(&edit(true), &character(), 4_000)
+        .unwrap();
+    (lot.instance_guid, list)
+}
+
+#[test]
+fn a_creative_catalog_places_free_saves_and_picks_up_nothing() {
+    let content = Content::with_catalog(true);
+    let mut game = content.game();
+    let (lot, list) = decorating_with_list(&mut game);
+    let rows = osfr_tools::housing_service::FixtureConfig::load(
+        &PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/housing_fixtures.json"),
+    )
+    .unwrap()
+    .rows;
+    assert_eq!(list.items.len(), rows.len(), "every row, owned or not");
+    let bag = serde_json::to_vec(&game.state().inventory).unwrap();
+    let kit_standing = standing(&game).len();
+
+    // 127/1 then 127/2 from the catalog: the piece stands, the client is told to drop no item,
+    // and the bag is byte-equal.
+    let selector = selector_of(&list, KIT_BLOCK);
+    let asked = game
+        .handle_in_world(&ask(selector), &character(), 5_000)
+        .unwrap();
+    assert_eq!(housing(&asked.replies), [42]);
+    let placed = game
+        .handle_in_world(&place(selector), &character(), 6_000)
+        .unwrap();
+    assert!(placed.changed, "a placement is saved");
+    assert_eq!(housing(&placed.replies), [40, 44]);
+    assert!(backpack(&placed.replies, 4).is_empty(), "no item leaves");
+    let piece = FixtureUpdate::decode(reply(&placed.replies, 40))
+        .unwrap()
+        .instance
+        .guid;
+    assert_eq!(standing(&game).len(), kit_standing + 1);
+    assert_eq!(serde_json::to_vec(&game.state().inventory).unwrap(), bag);
+    // The same selector places another piece: unlimited.
+    let again = game
+        .handle_in_world(&place(selector), &character(), 6_500)
+        .unwrap();
+    assert!(again.changed);
+    assert_eq!(standing(&game).len(), kit_standing + 2);
+
+    // A relog keeps the pieces, and re-entering draws them.
+    let mut relogged = Gameplay::load(&content.0, Some(game.state())).unwrap();
+    assert_eq!(standing(&relogged), standing(&game));
+    relogged
+        .handle_in_world(&enter(lot), &character(), 8_000)
+        .unwrap();
+    let loaded = relogged.initialize_world(&character(), 9_000).unwrap();
+    assert!(
+        updates(&loaded.replies)
+            .iter()
+            .any(|u| u.instance.guid == piece)
+    );
+    relogged
+        .handle_in_world(&edit(true), &character(), 9_500)
+        .unwrap();
+
+    // Picking a creative piece up removes it and sends no inventory update.
+    let picked = relogged
+        .handle_in_world(&pickup(piece), &character(), 10_000)
+        .unwrap();
+    assert!(picked.changed);
+    assert_eq!(housing(&picked.replies), [41, 44]);
+    assert!(backpack(&picked.replies, 2).is_empty(), "nothing returns");
+    assert_eq!(standing(&relogged).len(), kit_standing + 1);
+    assert_eq!(
+        serde_json::to_vec(&relogged.state().inventory).unwrap(),
+        bag
+    );
+}
+
+#[test]
+fn with_the_catalog_off_the_session_lists_only_the_bag_and_refuses_a_selector() {
+    let content = Content::with_catalog(false);
+    let mut game = content.game();
+    let (_, list) = decorating_with_list(&mut game);
+    assert_eq!(list.items.len(), 1, "the starter Chicken only");
+    assert_eq!(list.items[0].item_definition_id, CHICKEN);
+    let selector = osfr_tools::housing_service::creative::selector(KIT_BLOCK).unwrap();
+    refused(&mut game, "a catalog selector, catalog off", &ask(selector));
+    refused(&mut game, "127/2 for it", &place(selector));
+}
+
+#[test]
+fn a_broken_housing_settings_file_fails_the_load_instead_of_reading_as_off() {
+    let content = Content::with_catalog(true);
+    fs::write(content.0.join("housing_settings.json"), "{").unwrap();
+    assert!(Gameplay::load(&content.0, None).is_err());
+}

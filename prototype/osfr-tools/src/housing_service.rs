@@ -65,6 +65,8 @@ use std::{
 #[allow(dead_code)]
 mod wire;
 
+pub mod creative;
+
 /// Base opcode of the whole housing family (`BaseHousingPacket`).
 pub const BASE_OPCODE: u16 = 127;
 /// Byte length of the recovered housing header: base opcode then inner opcode.
@@ -755,11 +757,12 @@ fn kit_refused() -> ServiceError {
 }
 
 fn owned_instance(item: &InventoryItem) -> Option<OwnedInstance> {
-    if item.count == 0 || item.tint < 0 {
+    let instance_id = u32::try_from(item.id).ok()?;
+    if item.count == 0 || item.tint < 0 || creative::is_reserved_id(instance_id) {
         return None;
     }
     Some(OwnedInstance {
-        instance_id: u32::try_from(item.id).ok()?,
+        instance_id,
         definition_id: item.definition_id,
         tint_id: item.tint,
         count: item.count,
@@ -1323,6 +1326,9 @@ pub struct HousingService {
     /// T872: other characters' lots copied in for a visit. Served like any lot (edits stay the
     /// owner's through `can_enter`), never saved, and dropped when the visit ends.
     foreign: BTreeSet<u64>,
+    /// T870: the decorate tray offers every fixture row, unowned and unlimited (`creative`).
+    /// Content, not save state; off until `with_creative_catalog`.
+    creative_catalog: bool,
 }
 
 impl HousingService {
@@ -1337,6 +1343,7 @@ impl HousingService {
             starter_property_id: None,
             starter_kit: None,
             foreign: BTreeSet::new(),
+            creative_catalog: false,
         }
     }
 
@@ -1349,6 +1356,20 @@ impl HousingService {
         let mut service = Self::new(config);
         service.adopt_content(content)?;
         Ok(service)
+    }
+
+    /// T870: switch the creative catalog (`creative::catalog_setting`). It changes only what the
+    /// tray offers and what a selector may name; saved fixtures and the bag are untouched.
+    pub fn with_creative_catalog(mut self, on: bool) -> Self {
+        self.creative_catalog = on;
+        self
+    }
+
+    /// The item a catalog selector names, while the catalog is on.
+    fn catalog_item(&self, selection: u32) -> Option<i32> {
+        self.creative_catalog
+            .then(|| creative::selected_item(selection))
+            .flatten()
     }
 
     /// The starter choices and lot rows of `content`. A kit item without a configuration row
@@ -1522,6 +1543,7 @@ impl HousingService {
             starter_property_id: None,
             starter_kit: None,
             foreign: BTreeSet::new(),
+            creative_catalog: false,
         })
     }
 
@@ -1661,6 +1683,12 @@ impl HousingService {
             return Err(ServiceError::HousingContentInvalid(
                 "zero placement selection id",
             ));
+        }
+        if let Some(item) = self.catalog_item(item_instance_id) {
+            self.config.row_for_item_definition(item)?;
+            self.selections
+                .insert((actor_guid, selection_id), item_instance_id);
+            return Ok(());
         }
         let instance = stock
             .instances()
@@ -2021,35 +2049,49 @@ impl HousingService {
         let house_guid = self.house_of(actor_guid)?;
         self.housing.can_enter(actor_guid, house_guid)?;
         self.require_edit_mode(actor_guid)?;
-        let instance = stock
-            .instances()
-            .into_iter()
-            .find(|instance| instance.instance_id == item_instance_id)
-            .ok_or(ServiceError::UnknownInstance {
-                instance_id: item_instance_id,
-            })?;
-        if instance.count != 1 {
-            return Err(ServiceError::StackedInstanceUnsupported {
-                instance_id: item_instance_id,
-                count: instance.count,
-            });
-        }
-        let row = self
-            .config
-            .row_for_item_definition(instance.definition_id)?;
+        // A catalog selector places a fresh creative piece (tint 0, its own placed id); anything
+        // else is a real instance of the bag.
+        let catalog = self.catalog_item(item_instance_id);
+        let (definition_id, tint_id, instance_id) = match catalog {
+            Some(item) => {
+                let placed = creative::next_placed_id(&self.housing.snapshot_lots())
+                    .ok_or(HousingError::InvalidPlacement)?;
+                (item, 0, placed)
+            }
+            None => {
+                let instance = stock
+                    .instances()
+                    .into_iter()
+                    .find(|instance| instance.instance_id == item_instance_id)
+                    .ok_or(ServiceError::UnknownInstance {
+                        instance_id: item_instance_id,
+                    })?;
+                if instance.count != 1 {
+                    return Err(ServiceError::StackedInstanceUnsupported {
+                        instance_id: item_instance_id,
+                        count: instance.count,
+                    });
+                }
+                (instance.definition_id, instance.tint_id, item_instance_id)
+            }
+        };
+        let row = self.config.row_for_item_definition(definition_id)?;
         let fixture_definition_id = row.fixture_definition_id;
         let lot = self.housing.saved_fixtures(house_guid)?;
-        let housing_transform = housing_transform(&transform, instance.tint_id)?;
+        let housing_transform = housing_transform(&transform, tint_id)?;
 
         // Stage the whole housing side first. A refusal anywhere below leaves the live state and
         // the live inventory untouched, because the staged clone is dropped.
         let mut staged = self.housing.clone();
         let mut ledger = self.derive_ledger(&lot, stock);
+        if catalog.is_some() && !ledger.seed(fixture_definition_id, tint_id, [instance_id]) {
+            return Err(HousingError::InvalidPlacement.into());
+        }
         let outcome = staged.place_fixture(
             actor_guid,
             house_guid,
             fixture_definition_id,
-            item_instance_id,
+            instance_id,
             housing_transform,
             &mut ledger,
         )?;
@@ -2062,8 +2104,11 @@ impl HousingService {
         let actor = self.fixture_actor(&outcome.placed, fixture_definition_id)?;
         // The live inventory stays the single owner of the item: mutate it last, and only after
         // every housing check passed. `Inventory::consume` is internally atomic, so a refusal here
-        // drops the staged lot and leaves both sides exactly as they were.
-        stock.consume(item_instance_id, 1)?;
+        // drops the staged lot and leaves both sides exactly as they were. A creative piece
+        // consumes nothing.
+        if catalog.is_none() {
+            stock.consume(item_instance_id, 1)?;
+        }
         self.housing = staged;
         let saved = self.housing.saved_fixtures(house_guid)?;
         Ok(ServiceOutcome {
@@ -2096,11 +2141,14 @@ impl HousingService {
         // Mirror of placement: the real inventory gets the unit back before the staged lot commits.
         // Housing keys its ledger on the fixture definition, so the item definition the backpack
         // knows is resolved through the same configuration row the placement used.
-        let item_definition_id = self
-            .config
-            .row_for_fixture_definition(proposal.definition_id)?
-            .item_definition_id;
-        stock.return_instance(item_definition_id, proposal.tint_id)?;
+        // A creative piece (T870) was never an item, so nothing comes back.
+        if !creative::is_placed_id(proposal.instance_id) {
+            let item_definition_id = self
+                .config
+                .row_for_fixture_definition(proposal.definition_id)?
+                .item_definition_id;
+            stock.return_instance(item_definition_id, proposal.tint_id)?;
+        }
         self.housing = staged;
         let saved = self.housing.saved_fixtures(house_guid)?;
         Ok(ServiceOutcome {
@@ -2143,10 +2191,12 @@ impl HousingService {
             let StagedChange::Return(proposal) = outcome.staged else {
                 return Err(ServiceError::Housing(HousingError::UnknownFixture));
             };
-            let row = self
-                .config
-                .row_for_fixture_definition(proposal.definition_id)?;
-            returns.push((row.item_definition_id, proposal.tint_id));
+            if !creative::is_placed_id(proposal.instance_id) {
+                let row = self
+                    .config
+                    .row_for_fixture_definition(proposal.definition_id)?;
+                returns.push((row.item_definition_id, proposal.tint_id));
+            }
             removed.push(HousingReply::FixtureRemove(FixtureRemove {
                 fixture_guid: fixture.fixture_guid,
             }));
@@ -2349,6 +2399,9 @@ impl HousingService {
         &self,
         stock: &dyn FurnitureStock,
     ) -> Result<FixtureItemList, ServiceError> {
+        if self.creative_catalog {
+            return Ok(self.catalog_item_list());
+        }
         let mut instances = stock.instances();
         instances.sort_by_key(|instance| instance.instance_id);
         let mut items = Vec::new();
@@ -2357,16 +2410,10 @@ impl HousingService {
             let Ok(row) = self.config.row_for_item_definition(instance.definition_id) else {
                 continue;
             };
-            items.push(FixtureInstanceInfo {
-                fixture_guid: u64::from(instance.instance_id),
-                item_definition_id: row.item_definition_id,
-                coupling: CouplingDisplay {
-                    id: 0,
-                    npc_guids: Vec::new(),
-                    composite_effect: 0,
-                    effect_type: 0,
-                },
-            });
+            items.push(fixture_info(
+                u64::from(instance.instance_id),
+                row.item_definition_id,
+            ));
             definitions
                 .entry(row.fixture_definition_id)
                 .or_insert_with(|| fixture_definition_from_row(row));
@@ -2376,6 +2423,27 @@ impl HousingService {
             definitions: definitions.into_values().collect(),
             words: Vec::new(),
         })
+    }
+
+    /// T870: the 127/43 list of a creative catalog: one record per fixture row (unlimited, so
+    /// none is ever used up), named by its selector. It replaces the owned list, which stays
+    /// reachable through the bag. The table is bounded by `MAX_CONFIG_ROWS`, within the codec's
+    /// `MAX_COUNT`.
+    fn catalog_item_list(&self) -> FixtureItemList {
+        let mut list = FixtureItemList {
+            items: Vec::new(),
+            definitions: Vec::new(),
+            words: Vec::new(),
+        };
+        for row in &self.config.rows {
+            let Some(selector) = creative::selector(row.item_definition_id) else {
+                continue;
+            };
+            list.items
+                .push(fixture_info(u64::from(selector), row.item_definition_id));
+            list.definitions.push(fixture_definition_from_row(row));
+        }
+        list
     }
 
     /// Resolve the 127/1 selector. The decorate bar sends the inventory item guid (module note),
@@ -2402,15 +2470,19 @@ impl HousingService {
             .get(&(actor_guid, selection_id))
             .copied()
             .ok_or(ServiceError::UnresolvedSelection { selection_id })?;
-        let instance = stock
-            .instances()
-            .into_iter()
-            .find(|instance| instance.instance_id == instance_id)
-            .filter(|instance| instance.count == 1)
-            .ok_or(ServiceError::UnknownInstance { instance_id })?;
-        let row = self
-            .config
-            .row_for_item_definition(instance.definition_id)?;
+        let item_definition_id = match self.catalog_item(instance_id) {
+            Some(item) => item,
+            None => {
+                stock
+                    .instances()
+                    .into_iter()
+                    .find(|instance| instance.instance_id == instance_id)
+                    .filter(|instance| instance.count == 1)
+                    .ok_or(ServiceError::UnknownInstance { instance_id })?
+                    .definition_id
+            }
+        };
+        let row = self.config.row_for_item_definition(item_definition_id)?;
         // Client reader 00ac1f50: the model dword, the selection dword, the definition, then the
         // two alias strings and the tint dword. The aliases and tint come from the item row (R for
         // the semantic names; the slot order is the client's).
@@ -2489,16 +2561,7 @@ impl HousingService {
             .row_for_fixture_definition(fixture_definition_id)?;
         Ok(FixtureUpdate {
             instance: Self::fixture_instance(placed),
-            info: FixtureInstanceInfo {
-                fixture_guid: placed.fixture_guid,
-                item_definition_id: row.item_definition_id,
-                coupling: CouplingDisplay {
-                    id: 0,
-                    npc_guids: Vec::new(),
-                    composite_effect: 0,
-                    effect_type: 0,
-                },
-            },
+            info: fixture_info(placed.fixture_guid, row.item_definition_id),
             definition: fixture_definition_from_row(row),
             unknown_guids: Vec::new(),
             words: [0, 0, 0],
@@ -2549,6 +2612,20 @@ impl HousingService {
         }
         .apply(&mut npc);
         Ok(FixtureActor::Spawn(Box::new(npc)))
+    }
+}
+
+/// A 127/40 or 127/43 fixture record with no coupling effect (the capture sends none).
+fn fixture_info(fixture_guid: u64, item_definition_id: i32) -> FixtureInstanceInfo {
+    FixtureInstanceInfo {
+        fixture_guid,
+        item_definition_id,
+        coupling: CouplingDisplay {
+            id: 0,
+            npc_guids: Vec::new(),
+            composite_effect: 0,
+            effect_type: 0,
+        },
     }
 }
 

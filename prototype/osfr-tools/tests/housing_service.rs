@@ -10,6 +10,8 @@
 
 #[path = "support/housing_move.rs"]
 mod housing_move;
+#[path = "support/scratch.rs"]
+mod scratch;
 
 use osfr_tools::{housing, housing_native, housing_service, inventory, zone_transition};
 
@@ -2650,6 +2652,378 @@ fn a_schema_one_document_migrates_placed_by_to_the_owner() {
             HousingService::from_state(FixtureConfig::capture_defaults(), &unknown, &no_items())
                 .unwrap_err(),
             StateError::SchemaVersion { found }
+        );
+    }
+}
+
+// T870: the creative decorate catalog. Capture-default rows keep the cases small; the bundled
+// table checks the real size.
+
+fn creative_lot() -> (HousingService, TestStock) {
+    let mut service = service_with_lot().with_creative_catalog(true);
+    let mut stock = TestStock::new(vec![owned(INSTANCE, BLOCK_ITEM, 1)]);
+    enter(&mut service, &mut stock);
+    (service, stock)
+}
+
+/// 127/1 for the catalog selector of `item`, then 127/2 at `at`.
+fn place_from_catalog(
+    service: &mut HousingService,
+    stock: &mut TestStock,
+    item: i32,
+    at: [f32; 4],
+) -> Result<housing_service::ServiceOutcome, ServiceError> {
+    let selector = housing_service::creative::selector(item).unwrap();
+    service.handle(OWNER, &place_request_frame(selector), stock)?;
+    service.handle(
+        OWNER,
+        &place_frame(selector, &block_transform(at, ZERO_ROTATION, 1.0)),
+        stock,
+    )
+}
+
+fn at(x: f32) -> [f32; 4] {
+    [x, 0.0, 20.0, 1.0]
+}
+
+/// Place the owned block (instance `INSTANCE`) at `x`, spending it.
+fn place_owned_block(service: &mut HousingService, stock: &mut TestStock, x: f32) {
+    service.offer(OWNER, SELECTION, INSTANCE, stock).unwrap();
+    let frame = place_frame(SELECTION, &block_transform(at(x), ZERO_ROTATION, 1.0));
+    service.handle(OWNER, &frame, stock).unwrap();
+}
+
+#[test]
+fn a_creative_catalog_lists_every_fixture_row_unowned() {
+    for config in [FixtureConfig::capture_defaults(), bundled_fixtures()] {
+        let rows = config.rows.clone();
+        let mut service = service_with_config(config).with_creative_catalog(true);
+        // An owned block is not in the list: the catalog replaces it.
+        let mut stock = TestStock::new(vec![owned(INSTANCE, BLOCK_ITEM, 1)]);
+        let entered = service
+            .handle(OWNER, &enter_frame(HOUSE), &mut stock)
+            .unwrap();
+        let list =
+            housing_native::FixtureItemList::decode(&entered.replies[3].encode().unwrap()).unwrap();
+        assert_eq!(list.items.len(), rows.len());
+        assert_eq!(list.definitions.len(), rows.len());
+        for (info, row) in list.items.iter().zip(&rows) {
+            let selector = housing_service::creative::selector(row.item_definition_id).unwrap();
+            assert_eq!(info.fixture_guid, u64::from(selector));
+            assert_eq!(info.item_definition_id, row.item_definition_id);
+        }
+        let ids: BTreeSet<i32> = list.definitions.iter().map(|d| d.id).collect();
+        assert_eq!(ids.len(), rows.len(), "one definition per row");
+        assert_eq!(stock.instances.len(), 1, "listing takes nothing");
+    }
+}
+
+#[test]
+fn a_catalog_placement_costs_nothing_and_places_again() {
+    let (mut service, mut stock) = creative_lot();
+    let before = stock.instances.clone();
+    let first = place_from_catalog(&mut service, &mut stock, BLOCK_ITEM, at(10.0)).unwrap();
+    assert!(first.changed);
+    assert_eq!(
+        opcodes(&first),
+        vec![REPLY_FIXTURE_UPDATE, REPLY_HOUSE_INFO]
+    );
+    // The selector is still bound: the same piece places again, and a different row too.
+    let selector = housing_service::creative::selector(BLOCK_ITEM).unwrap();
+    let frame = place_frame(selector, &block_transform(at(12.0), ZERO_ROTATION, 1.0));
+    service.handle(OWNER, &frame, &mut stock).unwrap();
+    place_from_catalog(&mut service, &mut stock, 14_300, at(14.0)).unwrap();
+
+    let lot = service.lot(HOUSE).unwrap();
+    assert_eq!(lot.count, 3);
+    let ids: BTreeSet<u32> = lot.fixtures.iter().map(|f| f.item_instance_id).collect();
+    assert_eq!(ids.len(), 3, "each piece has its own id");
+    assert!(
+        ids.iter()
+            .all(|&id| housing_service::creative::is_placed_id(id))
+    );
+    assert_eq!(stock.instances, before, "the bag is untouched");
+    let definitions: BTreeSet<i32> = lot
+        .fixtures
+        .iter()
+        .map(|f| f.fixture_definition_id)
+        .collect();
+    assert_eq!(definitions, BTreeSet::from([BLOCK_FIXTURE, 902]));
+    // The 127/42 answer for a catalog selector is the row's own asset.
+    let asked = service
+        .handle(OWNER, &place_request_frame(selector), &mut stock)
+        .unwrap();
+    let asset = housing_native::FixtureAsset::decode(&asked.replies[0].encode().unwrap()).unwrap();
+    assert_eq!(asset.selection_id, selector);
+    assert_eq!(asset.definition.id, BLOCK_FIXTURE);
+}
+
+#[test]
+fn picking_up_a_creative_piece_grants_nothing_even_after_the_catalog_goes_off() {
+    let (mut service, mut stock) = creative_lot();
+    // One owned piece and two creative ones.
+    place_owned_block(&mut service, &mut stock, 10.0);
+    place_from_catalog(&mut service, &mut stock, BLOCK_ITEM, at(12.0)).unwrap();
+    place_from_catalog(&mut service, &mut stock, BLOCK_ITEM, at(14.0)).unwrap();
+    assert!(stock.instances.is_empty(), "the owned block was spent");
+    let lot = service.lot(HOUSE).unwrap();
+    let guid = |creative: bool| {
+        lot.fixtures
+            .iter()
+            .find(|f| housing_service::creative::is_placed_id(f.item_instance_id) == creative)
+            .unwrap()
+            .fixture_guid
+    };
+
+    // A creative pickup removes the piece and returns nothing.
+    let outcome = service
+        .handle(OWNER, &pickup_frame(guid(true)), &mut stock)
+        .unwrap();
+    assert_eq!(
+        opcodes(&outcome),
+        vec![REPLY_FIXTURE_REMOVE, REPLY_HOUSE_INFO]
+    );
+    assert_eq!(service.lot(HOUSE).unwrap().count, 2);
+    assert!(stock.instances.is_empty());
+
+    // The catalog goes off (a restart with the setting changed): the remaining creative piece
+    // still returns nothing, and the owned one still returns its unit.
+    let mut off = HousingService::from_state_with_content(
+        FixtureConfig::capture_defaults(),
+        test_housing_content(),
+        &service.state(),
+        &no_items(),
+    )
+    .unwrap();
+    enter(&mut off, &mut stock);
+    let creative_left = service
+        .lot(HOUSE)
+        .unwrap()
+        .fixtures
+        .into_iter()
+        .find(|f| housing_service::creative::is_placed_id(f.item_instance_id))
+        .unwrap()
+        .fixture_guid;
+    off.handle(OWNER, &pickup_frame(creative_left), &mut stock)
+        .unwrap();
+    assert!(
+        stock.instances.is_empty(),
+        "the creative piece is not an item"
+    );
+    off.handle(OWNER, &pickup_frame(guid(false)), &mut stock)
+        .unwrap();
+    assert_eq!(stock.instances.len(), 1, "the owned piece comes back");
+    assert_eq!(stock.instances[0].definition_id, BLOCK_ITEM);
+}
+
+#[test]
+fn pickup_all_returns_only_the_owned_pieces() {
+    let (mut service, mut stock) = creative_lot();
+    place_owned_block(&mut service, &mut stock, 10.0);
+    place_from_catalog(&mut service, &mut stock, BLOCK_ITEM, at(12.0)).unwrap();
+    place_from_catalog(&mut service, &mut stock, 14_300, at(14.0)).unwrap();
+    assert_eq!(service.lot(HOUSE).unwrap().count, 3);
+
+    service
+        .handle(OWNER, &pickup_all_frame(), &mut stock)
+        .unwrap();
+    assert_eq!(service.lot(HOUSE).unwrap().count, 0);
+    assert_eq!(stock.instances.len(), 1, "one unit, the owned block");
+    assert_eq!(stock.instances[0].definition_id, BLOCK_ITEM);
+}
+
+#[test]
+fn creative_pieces_survive_a_save_and_the_next_one_gets_a_fresh_id() {
+    let content = Content::new(vec![item(INSTANCE as i32, BLOCK_ITEM, 1)], &[BLOCK_ITEM]);
+    let mut inventory = content.inventory();
+    let mut service = service_with_lot().with_creative_catalog(true);
+    enter(&mut service, &mut inventory);
+    let mut stock = TestStock::default();
+    place_from_catalog(&mut service, &mut stock, BLOCK_ITEM, at(10.0)).unwrap();
+    place_from_catalog(&mut service, &mut stock, BLOCK_ITEM, at(12.0)).unwrap();
+    let saved = service.state();
+
+    // The saved document restores against the untouched bag: no creative id is "still owned".
+    let json = serde_json::to_vec(&saved).unwrap();
+    let state: HousingServiceState = serde_json::from_slice(&json).unwrap();
+    let mut restored = HousingService::from_state_with_content(
+        FixtureConfig::capture_defaults(),
+        test_housing_content(),
+        &state,
+        inventory.state(),
+    )
+    .unwrap()
+    .with_creative_catalog(true);
+    assert_eq!(restored.state(), saved);
+    enter(&mut restored, &mut inventory);
+    place_from_catalog(&mut restored, &mut stock, BLOCK_ITEM, at(14.0)).unwrap();
+    let ids: BTreeSet<u32> = restored
+        .lot(HOUSE)
+        .unwrap()
+        .fixtures
+        .iter()
+        .map(|f| f.item_instance_id)
+        .collect();
+    assert_eq!(ids.len(), 3, "a restored lot never reuses a held id");
+    assert_eq!(
+        units(&inventory, BLOCK_ITEM),
+        1,
+        "the real block was never spent"
+    );
+}
+
+#[test]
+fn with_the_catalog_off_a_selector_is_nothing_and_the_owned_flow_stands() {
+    let mut service = service_with_lot();
+    let mut stock = TestStock::new(vec![owned(INSTANCE, BLOCK_ITEM, 1)]);
+    let entered = service
+        .handle(OWNER, &enter_frame(HOUSE), &mut stock)
+        .unwrap();
+    service
+        .handle(OWNER, &edit_frame(true), &mut stock)
+        .unwrap();
+    let list =
+        housing_native::FixtureItemList::decode(&entered.replies[3].encode().unwrap()).unwrap();
+    assert_eq!(list.items.len(), 1, "only the owned block");
+    let state = service.state();
+    let selector = housing_service::creative::selector(BLOCK_ITEM).unwrap();
+    assert_eq!(
+        service
+            .handle(OWNER, &place_request_frame(selector), &mut stock)
+            .unwrap_err(),
+        ServiceError::UnknownInstance {
+            instance_id: selector
+        }
+    );
+    let frame = place_frame(selector, &block_transform(at(10.0), ZERO_ROTATION, 1.0));
+    assert_eq!(
+        service.handle(OWNER, &frame, &mut stock).unwrap_err(),
+        ServiceError::UnresolvedSelection {
+            selection_id: selector
+        }
+    );
+    assert_eq!(service.state(), state);
+    assert_eq!(stock.instances.len(), 1);
+    // The owned item still places and is spent.
+    place(&mut service, &mut stock);
+    assert!(stock.instances.is_empty());
+}
+
+#[test]
+fn creative_refusals_change_nothing() {
+    let (mut service, mut stock) = creative_lot();
+    let state = service.state();
+    let before = stock.instances.clone();
+
+    // A row the table does not have, a position outside the build area, and a placed id (not
+    // a selector: it names nothing).
+    let unknown = housing_service::creative::selector(99_999).unwrap();
+    assert_eq!(
+        service
+            .handle(OWNER, &place_request_frame(unknown), &mut stock)
+            .unwrap_err(),
+        ServiceError::FixtureDefinitionUnknown {
+            definition_id: 99_999
+        }
+    );
+    assert_eq!(
+        place_from_catalog(&mut service, &mut stock, BLOCK_ITEM, at(500.0)).unwrap_err(),
+        ServiceError::Housing(HousingError::OutsideBuildArea)
+    );
+    let placed = housing_service::creative::next_placed_id(&service.state().lots).unwrap();
+    assert_eq!(
+        service
+            .handle(OWNER, &place_request_frame(placed), &mut stock)
+            .unwrap_err(),
+        ServiceError::UnknownInstance {
+            instance_id: placed
+        }
+    );
+    assert_eq!(service.state(), state);
+    assert_eq!(stock.instances, before);
+
+    // A full lot (four fixtures) refuses the fifth.
+    for index in 0..4 {
+        place_from_catalog(
+            &mut service,
+            &mut stock,
+            BLOCK_ITEM,
+            at(10.0 + index as f32),
+        )
+        .unwrap();
+    }
+    let full = service.state();
+    assert_eq!(
+        place_from_catalog(&mut service, &mut stock, BLOCK_ITEM, at(20.0)).unwrap_err(),
+        ServiceError::Housing(HousingError::FixtureLimitReached)
+    );
+    assert_eq!(service.state(), full);
+    assert_eq!(stock.instances, before);
+}
+
+#[test]
+fn creative_ids_never_alias_an_item_the_character_owns() {
+    use housing_service::creative::{
+        SELECTOR_BASE, is_placed_id, is_reserved_id, next_placed_id, selected_item, selector,
+    };
+    // The bands: a selector round-trips, a placed id is not a selector, neither is a real id.
+    assert_eq!(
+        selected_item(selector(BLOCK_ITEM).unwrap()),
+        Some(BLOCK_ITEM)
+    );
+    assert_eq!(selector(0), None);
+    assert_eq!(selector(-5), None);
+    assert_eq!(selected_item(INSTANCE), None);
+    assert_eq!(selected_item(SELECTOR_BASE), None);
+    let first = next_placed_id(&[]).unwrap();
+    assert!(is_placed_id(first) && is_reserved_id(first) && selected_item(first).is_none());
+    assert!(!is_placed_id(INSTANCE) && !is_reserved_id(INSTANCE));
+
+    // A bag row that carries a reserved id (a hand-edited save) is not furniture it owns.
+    let id = i32::try_from(selector(BLOCK_ITEM).unwrap()).unwrap();
+    let content = Content::new(
+        vec![
+            item(INSTANCE as i32, BLOCK_ITEM, 1),
+            item(id, BLOCK_ITEM, 1),
+        ],
+        &[BLOCK_ITEM],
+    );
+    let inventory = content.inventory();
+    let owned_ids: Vec<u32> = FurnitureStock::instances(&inventory)
+        .iter()
+        .map(|instance| instance.instance_id)
+        .collect();
+    assert_eq!(owned_ids, vec![INSTANCE]);
+}
+
+#[test]
+fn the_catalog_setting_reads_housing_settings_json() {
+    let shipped = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    assert!(
+        housing_service::creative::catalog_setting(&shipped).unwrap(),
+        "the shipped content turns the catalog on"
+    );
+    let scratch = scratch::Scratch::new("housing-settings");
+    let write = |text: &str| fs::write(scratch.path().join("housing_settings.json"), text).unwrap();
+    // No file: off, the owned flow of every content package without one.
+    assert!(!housing_service::creative::catalog_setting(scratch.path()).unwrap());
+    write(r#"{"schema_version":1,"creative_catalog":false}"#);
+    assert!(!housing_service::creative::catalog_setting(scratch.path()).unwrap());
+    write(r#"{"schema_version":1,"creative_catalog":true}"#);
+    assert!(housing_service::creative::catalog_setting(scratch.path()).unwrap());
+    // A file that is present but wrong is refused, never read as off.
+    for bad in [
+        "not json",
+        r#"{"schema_version":2,"creative_catalog":true}"#,
+        r#"{"schema_version":1}"#,
+        r#"{"schema_version":1,"creative_catalog":true,"extra":1}"#,
+        &" ".repeat(5000),
+    ] {
+        write(bad);
+        assert_eq!(
+            housing_service::creative::catalog_setting(scratch.path()).unwrap_err(),
+            ServiceError::HousingContentInvalid("invalid housing settings"),
+            "{bad:.40}"
         );
     }
 }

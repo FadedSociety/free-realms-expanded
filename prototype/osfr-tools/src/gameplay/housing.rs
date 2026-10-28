@@ -48,6 +48,8 @@ impl HousingSession {
         } else {
             FixtureConfig::capture_defaults()
         };
+        let creative = crate::housing_service::creative::catalog_setting(directory)
+            .map_err(|e| invalid(format!("{e:?}")))?;
         let service = match saved {
             Some(state) => {
                 HousingService::from_state_with_content(config, content, state, inventory)
@@ -57,7 +59,7 @@ impl HousingSession {
                 .map_err(|e| invalid(format!("{e:?}")))?,
         };
         Ok(Some(Self {
-            service,
+            service: service.with_creative_catalog(creative),
             return_to: None,
             pending: Vec::new(),
             scene: None,
