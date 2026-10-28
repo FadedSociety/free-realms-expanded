@@ -513,7 +513,9 @@ pub const UNKNOWN_TICKET: &str = "unknown_ticket";
 /// T764: one-time card launch tickets (lead security). The game server mints one per launch and
 /// sends it in 39/0x28; the card login (411) must present it, and a character id the 411 carries
 /// must name the owner, before it expires; it works once. (R) The store is per session (one
-/// card character, one live launch), and `now_ms` is the caller's monotonic clock, the same one
+/// card character, one live launch): each mint replaces that character's row and sweeps expired
+/// ones, so it holds at most one ticket. A store shared by many sessions would need its own
+/// bound, like `login_auth::MAX_TOKENS`. `now_ms` is the caller's monotonic clock, the same one
 /// for mint and redeem.
 #[derive(Clone)]
 pub struct LaunchTickets {
@@ -522,10 +524,6 @@ pub struct LaunchTickets {
     issued: BTreeMap<u64, (u64, u64)>,
 }
 
-/// (R) Ceiling on held tickets, expired ones included until the next mint sweeps them. A session
-/// has one card character, so this only bounds a store shared by many, like
-/// `login_auth::MAX_TOKENS`.
-pub const MAX_TICKETS: usize = 64;
 /// (R) Draws before a random source that keeps returning zero or a held ticket is called broken.
 const TICKET_DRAWS: usize = 4;
 
@@ -549,17 +547,25 @@ impl LaunchTickets {
         }
     }
 
-    /// A fresh non-zero random ticket for `character`. It drops expired tickets and replaces any
-    /// the character still holds, so the table stays bounded by live launches. A full table is
-    /// refused, and a broken random source (zero or a repeat on every draw) is refused after four
-    /// draws rather than retried forever.
+    /// A fresh non-zero random ticket for `character`. The draw comes first, so a broken random
+    /// source (zero or a repeat on every draw) refuses the mint and leaves the character's
+    /// previous ticket in place; on success expired tickets and that character's old ticket are
+    /// dropped, so the per-session store keeps one ticket.
     pub fn mint(&mut self, character: u64, now_ms: u64) -> io::Result<u64> {
+        self.mint_with(character, now_ms, random_ticket)
+    }
+
+    /// [`Self::mint`] with the random source passed in, so a test can fail the draw.
+    fn mint_with(
+        &mut self,
+        character: u64,
+        now_ms: u64,
+        next: impl FnMut() -> io::Result<u64>,
+    ) -> io::Result<u64> {
+        // Draw before the sweep: a failed draw must not have already dropped the old ticket.
+        let ticket = draw_ticket(&self.issued, next)?;
         self.issued
             .retain(|_, (owner, expires)| *expires > now_ms && *owner != character);
-        if self.outstanding() >= MAX_TICKETS {
-            return Err(io::Error::other("card launch ticket table is full"));
-        }
-        let ticket = draw_ticket(&self.issued, random_ticket)?;
         let expires = now_ms.saturating_add(self.ttl_ms);
         self.issued.insert(ticket, (character, expires));
         Ok(ticket)
@@ -702,5 +708,22 @@ mod tests {
 
         // A random-source error is the caller's, not a retry.
         assert!(draw_ticket(&held, || Err(io::Error::other("unavailable"))).is_err());
+    }
+
+    #[test]
+    fn a_failed_draw_keeps_the_previous_ticket_redeemable() {
+        let mut tickets = LaunchTickets::new(60_000);
+        let old = tickets.mint_with(7, 0, || Ok(11)).unwrap();
+        // The OS source fails: the old ticket must still be there, so the card login still works.
+        assert!(
+            tickets
+                .mint_with(7, 1, || Err(io::Error::other("unavailable")))
+                .is_err()
+        );
+        assert_eq!(tickets.outstanding(), 1, "a failed mint changes nothing");
+        // A source that only repeats the held ticket is refused the same way.
+        assert!(tickets.mint_with(7, 2, || Ok(old)).is_err());
+        assert_eq!(tickets.outstanding(), 1);
+        assert_eq!(tickets.redeem(&old.to_string(), "", 3), Some(Ok(7)));
     }
 }

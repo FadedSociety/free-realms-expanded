@@ -2,8 +2,7 @@
 //! (lab/content/tcg/analysis/lead-login-decode-2026-10-26.md), not from this crate's encoder,
 //! and the one-time launch tickets the session login is checked against.
 use osfr_tools::card_service::{
-    self, ConnectionServer, LaunchTickets, MAX_FRAME, MAX_TICKETS, Reader, SessionLogin,
-    client_frame, reply,
+    self, ConnectionServer, LaunchTickets, MAX_FRAME, Reader, SessionLogin, client_frame, reply,
 };
 #[path = "support/card_packets.rs"]
 mod card_packets;
@@ -173,9 +172,13 @@ fn a_refused_card_login_changes_nothing_and_the_next_one_still_logs_in() {
 
 #[test]
 fn the_retail_login_without_a_character_id_redeems_by_ticket_alone() {
-    // Native 2026-10-27: the exe passes `--character=<name> --ticket=<n>` and no `--characterID`
-    // (the exe's only argument builders are 0x10D2240, 0x10D2160, 0x10D21D0, 0x10D22B0 and
-    // 0x10D2450; its strings have no `--characterID`), so the 411's CharacterID is empty.
+    // Native 2026-10-27 (re-checked F821): the exe passes `--character=<name> --ticket=<n>` and
+    // no `--characterID`. The card manager `00ad47f0` builds the DLL arguments through
+    // `10D2120` (`--lang=%s`), `10D2140` (`--country=%s`), `10D2240` (`--sessionID=%s`),
+    // `10D2160` (`--username=%s`), `10D21D0` (`--realm=%s`), `10D22B0` (`--character=%s`),
+    // `10D2320` (`--challenge=%s`, called with a null challenge here so it appends nothing) and
+    // `10D2450` (`--ticket=%llu`); the exe's `--`-prefixed strings contain no `--characterID`, so
+    // the 411's CharacterID is empty.
     let mut tickets = LaunchTickets::new(TTL_MS);
     let ticket = tickets.mint(CHARACTER, 0).unwrap().to_string();
     assert_eq!(tickets.redeem(&ticket, "", 1), Some(Ok(CHARACTER)));
@@ -440,25 +443,6 @@ fn a_ping_is_echoed_only_after_login() {
     // A ping the client's reader would not read the same way is an error, never echoed.
     assert!(reply(&[0x20, 0x07, 0x01, 0x22, 0x4D, 0], "h", 1, true, |_| None).is_err());
     assert!(reply(&[0x20, 0x07, 0x01], "h", 1, true, |_| None).is_err());
-}
-
-#[test]
-fn a_full_ticket_table_refuses_and_the_next_mint_sweeps_expired_ones() {
-    let mut tickets = LaunchTickets::new(TTL_MS);
-    for character in 1..=MAX_TICKETS as u64 {
-        tickets.mint(character, 0).unwrap();
-    }
-    assert_eq!(tickets.outstanding(), MAX_TICKETS);
-    let error = tickets.mint(MAX_TICKETS as u64 + 1, 1).unwrap_err();
-    assert_eq!(error.kind(), std::io::ErrorKind::Other);
-    assert_eq!(
-        tickets.outstanding(),
-        MAX_TICKETS,
-        "a refusal changes nothing"
-    );
-    // At the lifetime boundary the sweep makes room again.
-    assert_ne!(tickets.mint(MAX_TICKETS as u64 + 1, TTL_MS).unwrap(), 0);
-    assert_eq!(tickets.outstanding(), 1);
 }
 
 #[test]
