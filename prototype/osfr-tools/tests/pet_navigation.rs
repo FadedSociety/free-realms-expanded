@@ -34,6 +34,13 @@ fn follow() -> FollowConfig {
     serde_json::from_value(pets_json()["follow"].clone()).expect("the shipped follow block")
 }
 
+/// The speed the pet's actor spawns with (`pets.json` `movement_speed`).
+fn pace() -> f32 {
+    pets_json()["movement_speed"]["speed"]
+        .as_f64()
+        .expect("a pet movement speed") as f32
+}
+
 fn grid_ground(
     grid: &osfr_tools::terrain::HeightGrid,
 ) -> impl Fn(f32, f32) -> Option<f32> + Copy + '_ {
@@ -160,6 +167,7 @@ fn a_following_pet_refuses_a_cliff_and_warps_after_the_timeout() {
         }
         let (next, frame) = step(
             &cfg,
+            pace(),
             OwnerPose {
                 position: owner,
                 at_ms: now,

@@ -22,7 +22,7 @@ use osfr_tools::{
     gameplay::Gameplay,
     pets::{PetContent, PetService},
     startup_world::parse_add_npc,
-    world_events::piece_052::ANIM_ID_STAND,
+    world_events::piece_052::{ANIM_ID_RUN, ANIM_ID_STAND, ANIM_ID_WALK},
 };
 use pet_inventory::InventoryFixture;
 use pet_wire::{can_go_reply, perform_trick, summon, water};
@@ -82,6 +82,15 @@ fn plays(packets: &[Vec<u8>], actor: u64) -> Vec<Play> {
         .collect()
 }
 
+/// T827: `plays` without the follow step's locomotion base animations (walk, run, stand).
+fn idle_plays(packets: &[Vec<u8>], actor: u64) -> Vec<Play> {
+    let (walk, run, stand) = osfr_tools::world_events::piece_052::locomotion_animation_ids();
+    plays(packets, actor)
+        .into_iter()
+        .filter(|play| !(play.base && [walk, run, stand].contains(&play.animation)))
+        .collect()
+}
+
 /// Every 35/27 for `actor`: base words, u64 guid, i32 icon, i32 seconds, u8 clear flag (0).
 fn bubbles(packets: &[Vec<u8>], actor: u64) -> Vec<Bubble> {
     packets
@@ -114,9 +123,12 @@ fn visual(packets: &[Vec<u8>]) -> Vec<Vec<u8>> {
 /// What one tick showed.
 struct Seen {
     at: u64,
+    /// The idle life's 35/8 (the care tick), without the gait animations of the follow step.
     plays: Vec<Play>,
+    /// T827: the follow step's own 35/8 (walk, run, stand base animations).
+    gait: Vec<Play>,
     bubbles: Vec<Bubble>,
-    /// The owner's 35/8 and 35/27 packets, as sent.
+    /// The owner's 35/8 and 35/27 packets from the care tick, as sent.
     raw: Vec<Vec<u8>>,
 }
 
@@ -171,7 +183,8 @@ impl Session {
             .follow_owner(OWNER, self.owner, |_, _| None, false, at);
         let care = self.service.care_tick(&mut self.fixture.inventory, at);
         assert!(!care.changed, "idle life saves nothing");
-        wire.private.extend(care.private);
+        let gait = plays(&wire.private, self.actor);
+        wire.private.extend(care.private.iter().cloned());
         wire.shared.extend(care.shared);
         assert_eq!(
             visual(&wire.private),
@@ -180,9 +193,10 @@ impl Session {
         );
         Seen {
             at,
-            plays: plays(&wire.private, self.actor),
-            bubbles: bubbles(&wire.private, self.actor),
-            raw: visual(&wire.private),
+            plays: plays(&care.private, self.actor),
+            gait,
+            bubbles: bubbles(&care.private, self.actor),
+            raw: visual(&care.private),
         }
     }
 
@@ -548,14 +562,26 @@ fn a_pet_lies_down_after_its_delay_fidgets_and_stands_when_the_owner_moves() {
             last = fidget.at;
         }
 
-        // The owner moves: the base animation returns to standing, the exit transition plays, and
-        // no old timer runs on: the next idle animation is a full delay after the pet settles.
+        // The owner moves: the follow step's base walk replaces the rest loop (no standing base
+        // animation over it), the exit transition plays, and no old timer runs on: the next idle
+        // animation is a full delay after the pet settles.
         let moved_at = START + 6 * 60_000 + TICK;
         session.owner = [4.0, 0.0, 0.0];
         let up = session.tick(moved_at);
-        assert_stand_up(&up);
         assert_eq!(
-            up.plays[1].animation, posture.exit.animation_id,
+            up.gait,
+            [Play {
+                animation: ANIM_ID_WALK,
+                base: true
+            }],
+            "seed {seed}"
+        );
+        assert_eq!(
+            up.plays,
+            [Play {
+                animation: posture.exit.animation_id,
+                base: false
+            }],
             "seed {seed}"
         );
         let after_up = session.run(moved_at + TICK, moved_at + 3 * 60_000);
@@ -633,16 +659,31 @@ fn a_follow_click_wakes_a_lying_pet_and_pauses_its_idle_life() {
         vec![can_go_reply([20.0, 0.0, 0.0, 0.0], true)]
     );
     let up = session.tick(lying.at + 2 * TICK);
-    assert_stand_up(&up);
-    assert_eq!(session.service.view(OWNER).unwrap().base_animation, None);
-    // It walks to the clicked spot, so no rest pose resumes while the walk runs.
-    let walked = session.run(lying.at + 3 * TICK, lying.at + 6_000);
-    assert!(
-        walked
-            .iter()
-            .all(|seen| seen.plays.iter().all(|play| !play.base)),
-        "a walking pet does not lie down"
+    // T827: the follow step's walk base replaces the rest loop, so only the exit transition is
+    // left over it.
+    assert_eq!(
+        up.gait.len(),
+        1,
+        "the follow step sends one locomotion base"
     );
+    assert!(up.gait[0].base);
+    assert!(
+        [ANIM_ID_WALK, ANIM_ID_RUN].contains(&up.gait[0].animation),
+        "the follow step's gait replaces the rest loop: {:?}",
+        up.gait
+    );
+    assert_eq!(up.plays.len(), 1, "the exit transition still plays");
+    assert!(!up.plays[0].base);
+    assert_eq!(session.service.view(OWNER).unwrap().base_animation, None);
+    // It walks to the clicked spot, so no idle life (and no rest pose) resumes while it walks.
+    for step in 3..=4u64 {
+        let walking = session.tick(lying.at + TICK * step);
+        assert!(
+            walking.plays.is_empty(),
+            "a walking pet does not idle: {:?}",
+            walking.plays
+        );
+    }
 }
 
 /// F809: a viewer who arrives while the pet lies down is sent the rest loop as a base animation
@@ -1047,12 +1088,12 @@ fn a_pet_idles_and_shows_bubbles_through_gameplay_for_the_owner_and_the_viewers(
         who.position[2] += 1.0;
         let out = game.pet_tick(&who, at).expect("a pet is out");
         assert!(
-            plays(&out.replies, actor).is_empty(),
+            idle_plays(&out.replies, actor).is_empty(),
             "walking: {:?}",
             out.replies
         );
         assert!(
-            plays(&out.nearby, actor).is_empty(),
+            idle_plays(&out.nearby, actor).is_empty(),
             "walking: {:?}",
             out.nearby
         );
@@ -1077,7 +1118,7 @@ fn a_pet_idles_and_shows_bubbles_through_gameplay_for_the_owner_and_the_viewers(
             "only a find may save on an idle tick"
         );
         assert_eq!(visual(&out.replies), visual(&out.nearby));
-        for play in plays(&out.nearby, actor) {
+        for play in idle_plays(&out.nearby, actor) {
             if idle.contains(&play.animation) || bathroom.contains(&play.animation) {
                 assert!(!play.base, "an idle animation is a one-shot");
                 idle_seen = true;

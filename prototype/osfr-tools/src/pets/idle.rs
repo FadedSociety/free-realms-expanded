@@ -351,15 +351,20 @@ impl IdleState {
 
     /// The pet stopped being settled: a pet that lay down gets back on its feet (the base
     /// animation returns to standing, then the exit transition plays); a standing one has nothing
-    /// to undo. No timer runs until it settles again.
-    fn stand_up(&mut self, set: Option<&PetIdleSet>, now_ms: u64) -> Vec<Play> {
+    /// to undo. No timer runs until it settles again. T827: a pet that already walks off has its
+    /// base animation from the follow step, so no standing base animation is sent over it.
+    fn stand_up(&mut self, set: Option<&PetIdleSet>, now_ms: u64, moving: bool) -> Vec<Play> {
         self.animation_at_ms = u64::MAX;
         self.rest_at_ms = u64::MAX;
         self.looped = None;
         let Some(index) = self.rest.take() else {
             return Vec::new();
         };
-        let mut plays = vec![Play::base(ANIM_ID_STAND)];
+        let mut plays = if moving {
+            Vec::new()
+        } else {
+            vec![Play::base(ANIM_ID_STAND)]
+        };
         if let Some(posture) = set.and_then(|set| set.rest_postures.get(index)) {
             self.busy_until_ms = now_ms.saturating_add(u64::from(posture.exit.duration_ms));
             plays.push(Play::once(posture.exit.animation_id));
@@ -414,7 +419,7 @@ impl PetService {
                 plays = state.advance(config, self.idle_set(active.pet_id), now_ms);
             }
         } else if std::mem::take(&mut state.settled) {
-            plays = state.stand_up(self.idle_set(active.pet_id), now_ms);
+            plays = state.stand_up(self.idle_set(active.pet_id), now_ms, active.pose.moving());
         }
         let mut packets: Vec<Vec<u8>> = plays
             .iter()

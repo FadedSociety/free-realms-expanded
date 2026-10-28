@@ -10,6 +10,12 @@
 //! against the heightfield first: a rise over `step_up_m`, a drop over `step_down_m` or
 //! unknown ground refuses the step, and a pet that makes no progress for `warp_far_ms` warps
 //! to its owner.
+//!
+//! T827: the pet trails at its own pace (`pets.json` `movement_speed`, the speed its actor
+//! spawns with; a long gap adds a catch-up boost) rather than the owner's pace, sends a frame
+//! every `send_ms` while it walks, and carries the base animation the client must play: walk,
+//! run while catching up, stand when it arrives. A 125 frame alone moves the actor without a
+//! gait, the way the enemies and patrols pair every move with a 35/8 base animation.
 
 use serde::{Deserialize, Serialize};
 
@@ -17,6 +23,10 @@ use serde::{Deserialize, Serialize};
 const STILL_EPS_M: f32 = 0.05;
 /// The pet has reached its spot (m).
 const ARRIVE_M: f32 = 0.1;
+/// How often the client reports a moving owner (ms): it sets its next send +500 ms (client
+/// `00934a20`; +50 ms in some states). `settle_delay_ms` must outlast it, or the pet would settle
+/// in the gap between two updates of a walking owner.
+const OWNER_UPDATE_MS: u64 = 500;
 /// (R) A safety bound on one walk check. Callers cap a click path with `click_max_m` (40 m at
 /// the shipped values); this only stops a bad caller from sampling a whole world.
 const MAX_WALK_SAMPLES: usize = 4_096;
@@ -26,11 +36,10 @@ const MAX_WALK_SAMPLES: usize = 4_096;
 pub struct FollowConfig {
     pub side_m: f32,
     pub behind_m: f32,
-    pub min_speed: f32,
-    pub max_speed: f32,
     pub catch_up_start_m: f32,
     pub catch_up_gain: f32,
     pub max_speed_multiplier: f32,
+    /// T827: must outlast `OWNER_UPDATE_MS`, or a walking owner would settle between reports.
     pub settle_delay_ms: u64,
     pub settle_radius_m: f32,
     pub settle_min_deg: f32,
@@ -64,6 +73,8 @@ pub struct FollowConfig {
     pub resume_m: f32,
     /// T490: how long the pet waits at a clicked spot after reaching it (R).
     pub go_timeout_ms: u64,
+    /// T827: the walk frame interval; 100 ms at the shipped value makes 0.5 m steps at the pet's
+    /// 5 m/s pace instead of the old one-frame-per-500 ms 5-6 m hop (R).
     pub send_ms: u64,
 }
 
@@ -82,18 +93,13 @@ impl FollowConfig {
         metres
             .iter()
             .all(|m| m.is_finite() && (0.1..=500.0).contains(m))
-            && self.min_speed.is_finite()
-            && self.max_speed.is_finite()
-            && 0.1 <= self.min_speed
-            && self.min_speed <= self.max_speed
-            && self.max_speed <= 50.0
             && self.catch_up_gain.is_finite()
             && (0.0..=10.0).contains(&self.catch_up_gain)
             && (1.0..=5.0).contains(&self.max_speed_multiplier)
             && 0.0 <= self.settle_min_deg
             && self.settle_min_deg < self.settle_max_deg
             && self.settle_max_deg <= 180.0
-            && self.settle_delay_ms <= 60_000
+            && (OWNER_UPDATE_MS + 100..=60_000).contains(&self.settle_delay_ms)
             && (1..=60_000).contains(&self.warp_far_ms)
             && (1.0..=100.0).contains(&self.click_max_m)
             && self.click_max_m <= self.warp_far_m
@@ -201,6 +207,14 @@ pub struct OwnerPose {
     pub at_ms: u64,
 }
 
+/// The base animation the pet's actor plays (35/8 with the base flag).
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum Gait {
+    Stand,
+    Walk,
+    Run,
+}
+
 /// What one step asks the wire to send for the pet actor.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum MoveKind {
@@ -214,6 +228,8 @@ pub struct Move {
     pub kind: MoveKind,
     pub position: [f32; 3],
     pub heading: [f32; 3],
+    /// Set when the base animation changes with this frame; `None` keeps the current one.
+    pub gait: Option<Gait>,
 }
 
 /// T490: a clicked spot the pet walks to and then waits at (session only, like the pose).
@@ -235,7 +251,8 @@ pub struct PetPose {
     pub heading: [f32; 2],
     last_owner: Option<OwnerPose>,
     owner_facing: [f32; 2],
-    owner_speed: f32,
+    /// The base animation the actor is playing; a `Move` carries a new one only on a change.
+    gait: Gait,
     still_since_ms: Option<u64>,
     far_since_ms: Option<u64>,
     last_sent_ms: Option<u64>,
@@ -255,6 +272,11 @@ impl PetPose {
     /// waiting at a clicked spot counts as settled too.
     pub fn settled(&self) -> bool {
         self.settled
+    }
+
+    /// The pet is walking or running to a spot (T827: an idle posture ends with the first step).
+    pub fn moving(&self) -> bool {
+        self.moving
     }
 
     /// The owner's last accepted position, which bounds a follow click; before the first owner
@@ -293,7 +315,7 @@ fn spawn_inner(owner: [f32; 3]) -> PetPose {
         heading: [-1.0, 0.0],
         last_owner: None,
         owner_facing: [0.0, 1.0],
-        owner_speed: 0.0,
+        gait: Gait::Stand,
         still_since_ms: None,
         far_since_ms: None,
         last_sent_ms: None,
@@ -323,13 +345,14 @@ pub fn go_to(pet: PetPose, target: [f32; 3], owner: [f32; 3]) -> PetPose {
     }
 }
 
-/// Advance the pet one owner update or tick. `paused` is the 53/24 pet-window mode (not 0):
-/// the pet stops and faces its owner. `gridded` is whether the zone has a height grid at all:
-/// with one, unknown ground is a hole and refuses the step; without one the step keeps T455's
-/// owner-height rule. A non-finite owner pose or ground value skips the step and keeps the last
-/// pose.
+/// Advance the pet one owner update or tick. `pace` is the pet's walking speed (m/s). `paused`
+/// is the 53/24 pet-window mode (not 0): the pet stops and faces its owner. `gridded` is whether
+/// the zone has a height grid at all: with one, unknown ground is a hole and refuses the step;
+/// without one the step keeps T455's owner-height rule. A non-finite owner pose or ground value
+/// skips the step and keeps the last pose.
 pub fn step(
     config: &FollowConfig,
+    pace: f32,
     owner: OwnerPose,
     pet: PetPose,
     ground: impl Fn(f32, f32) -> Option<f32>,
@@ -352,9 +375,6 @@ pub fn step(
         }
         if moved > STILL_EPS_M {
             p.owner_facing = unit(sub(owner.position, last.position)).unwrap_or(p.owner_facing);
-            if dt > 0.0 {
-                p.owner_speed = moved / dt;
-            }
             p.still_since_ms = None;
         } else if p.still_since_ms.is_none() {
             p.still_since_ms = Some(now);
@@ -382,7 +402,8 @@ pub fn step(
         p.settled = false;
         p.blocked_since_ms = None;
         p.heading = face;
-        return (p, fresh.then(|| frame(MoveKind::Stop, &p)));
+        let stop = fresh.then(|| frame(MoveKind::Stop, &mut p, Gait::Stand));
+        return (p, stop);
     }
     p.paused = false;
 
@@ -400,9 +421,8 @@ pub fn step(
         } else if go.arrived_ms.is_some() {
             return (p, None);
         } else {
-            let pace = config.min_speed;
             return match advance(
-                config, &mut p, owner, &ground, gridded, go.target, pace, now, dt,
+                config, &mut p, owner, &ground, gridded, go.target, pace, false, now, dt,
             ) {
                 Advance::Bad => (pet, None),
                 Advance::Blocked => (p, None),
@@ -416,12 +436,12 @@ pub fn step(
                         p.settled = true;
                         p.moving = false;
                         p.heading = unit(sub(owner.position, p.position)).unwrap_or(p.heading);
-                        let stop = sent(&mut p, now, MoveKind::Stop);
+                        let stop = sent(&mut p, now, MoveKind::Stop, Gait::Stand);
                         return (p, Some(stop));
                     }
                     p.settled = false;
                     p.moving = moving;
-                    let walk = walk_if_due(config, &mut p, now);
+                    let walk = walk_if_due(config, &mut p, now, Gait::Walk);
                     (p, walk)
                 }
             };
@@ -445,7 +465,7 @@ pub fn step(
             scale(right(p.owner_facing), side * config.side_m),
         )
     };
-    let mut speed = p.owner_speed.clamp(config.min_speed, config.max_speed);
+    let mut speed = pace;
     if gap > config.catch_up_start_m {
         p.catching_up = true;
     } else if gap <= config.behind_m + config.side_m {
@@ -457,21 +477,30 @@ pub fn step(
     }
 
     match advance(
-        config, &mut p, owner, &ground, gridded, target, speed, now, dt,
+        config, &mut p, owner, &ground, gridded, target, speed, !settling, now, dt,
     ) {
         Advance::Bad => (pet, None),
         Advance::Blocked => (p, None),
         Advance::Warp => warp(config, p, owner, &ground),
         Advance::Moved { arrived, moving } => {
-            if arrived && settling {
+            // The trailing point is not a destination the client is told about: the owner reports
+            // again within `OWNER_UPDATE_MS`, so reaching it between two reports keeps the gait
+            // and waits. Only a settle (the owner still for `settle_delay_ms`) ends the walk with
+            // one Stop frame, so the pet does not stand up and walk again every update.
+            let at_spot = !moving || (settling && arrived);
+            if at_spot {
+                if !settling {
+                    return (p, None);
+                }
                 p.settled = true;
                 p.moving = false;
                 p.heading = unit(sub(owner.position, p.position)).unwrap_or(p.heading);
-                let stop = sent(&mut p, now, MoveKind::Stop);
+                let stop = sent(&mut p, now, MoveKind::Stop, Gait::Stand);
                 return (p, Some(stop));
             }
-            p.moving = moving;
-            let walk = walk_if_due(config, &mut p, now);
+            p.moving = true;
+            let gait = if p.catching_up { Gait::Run } else { Gait::Walk };
+            let walk = walk_if_due(config, &mut p, now, gait);
             (p, walk)
         }
     }
@@ -493,7 +522,10 @@ enum Advance {
 }
 
 /// One movement toward `target` at `speed` m/s: the single place the ground height, the 6 m
-/// climb limit and the T490 walk check are applied.
+/// climb limit and the T490 walk check are applied. `look_past_target` extends the walk check a
+/// `sample_m` beyond a target the pet is reaching within one step: T827 trails a moving owner at
+/// the pet's own pace, so the pet catches the trailing point every tick and a per-tick target
+/// step would otherwise creep down a cliff the heightfield smears over one cell.
 fn advance(
     config: &FollowConfig,
     p: &mut PetPose,
@@ -502,6 +534,7 @@ fn advance(
     gridded: bool,
     target: [f32; 3],
     speed: f32,
+    look_past_target: bool,
     now: u64,
     dt: f32,
 ) -> Advance {
@@ -509,16 +542,13 @@ fn advance(
     let to_target = sub(target, from);
     let remaining = (to_target[0] * to_target[0] + to_target[1] * to_target[1]).sqrt();
     let reach = speed * dt;
-    let (x, z, arrived, heading) = if remaining <= ARRIVE_M.max(reach) {
-        (target[0], target[2], true, None)
+    let direction =
+        (remaining > 1e-4).then(|| [to_target[0] / remaining, to_target[1] / remaining]);
+    let (x, z, arrived) = if remaining <= ARRIVE_M.max(reach) {
+        (target[0], target[2], true)
     } else {
-        let d = [to_target[0] / remaining, to_target[1] / remaining];
-        (
-            from[0] + d[0] * reach,
-            from[2] + d[1] * reach,
-            false,
-            Some(d),
-        )
+        let d = direction.unwrap_or([0.0, 0.0]);
+        (from[0] + d[0] * reach, from[2] + d[1] * reach, false)
     };
     let stepped = ground(x, z);
     let y = match stepped {
@@ -534,8 +564,15 @@ fn advance(
     // direction (or up to the target), not only as far as this tick moves. A 20 Hz follow step
     // is 0.1-0.6 m and a heightfield smears a cliff across one cell, so a step-sized check would
     // creep down it one interpolated cell at a time.
-    let (check_x, check_z) = heading.map_or((x, z), |d| {
-        let look = reach.max(config.sample_m).min(remaining);
+    let (check_x, check_z) = direction.map_or((x, z), |d| {
+        let look = reach.max(config.sample_m);
+        let look = if look_past_target {
+            // At most one sample beyond the target, so a long owner-update gap cannot make the
+            // check sample outside the zone.
+            look.min(remaining + config.sample_m)
+        } else {
+            look.min(remaining)
+        };
         (from[0] + d[0] * look, from[2] + d[1] * look)
     });
     // A gridded zone always checks: both ends unknown there mean a hole (or outside the grid),
@@ -561,7 +598,7 @@ fn advance(
         return Advance::Blocked;
     }
     p.blocked_since_ms = None;
-    if let Some(heading) = heading {
+    if !arrived && let Some(heading) = direction {
         p.heading = heading;
     }
     p.position = [x, y, z];
@@ -571,11 +608,11 @@ fn advance(
     }
 }
 
-fn walk_if_due(config: &FollowConfig, p: &mut PetPose, now: u64) -> Option<Move> {
+fn walk_if_due(config: &FollowConfig, p: &mut PetPose, now: u64, gait: Gait) -> Option<Move> {
     let due = p
         .last_sent_ms
         .is_none_or(|sent| now.saturating_sub(sent) >= config.send_ms);
-    (p.moving && due).then(|| sent(p, now, MoveKind::Walk))
+    (p.moving && (due || p.gait != gait)).then(|| sent(p, now, MoveKind::Walk, gait))
 }
 
 fn warp(
@@ -601,20 +638,23 @@ fn warp(
     p.go = None;
     p.blocked_since_ms = None;
     let now = owner.at_ms;
-    let warp = sent(&mut p, now, MoveKind::Warp);
+    let warp = sent(&mut p, now, MoveKind::Warp, Gait::Stand);
     (p, Some(warp))
 }
 
-fn sent(p: &mut PetPose, now: u64, kind: MoveKind) -> Move {
+fn sent(p: &mut PetPose, now: u64, kind: MoveKind, gait: Gait) -> Move {
     p.last_sent_ms = Some(now);
-    frame(kind, p)
+    frame(kind, p, gait)
 }
 
-fn frame(kind: MoveKind, p: &PetPose) -> Move {
+fn frame(kind: MoveKind, p: &mut PetPose, gait: Gait) -> Move {
+    let change = (p.gait != gait).then_some(gait);
+    p.gait = gait;
     Move {
         kind,
         position: p.position,
         heading: [p.heading[0], 0.0, p.heading[1]],
+        gait: change,
     }
 }
 

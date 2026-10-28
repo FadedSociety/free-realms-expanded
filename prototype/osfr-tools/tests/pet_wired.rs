@@ -321,9 +321,10 @@ fn a_walking_owner_moves_the_summoned_pet_for_viewers_without_a_save() {
         assert!(!out.changed);
         settled += pet_moves(&out.nearby, actor);
     }
-    // Walk and stop frames share the wire layout; the pure test pins exactly one stop frame.
+    // Walk and stop frames share the wire layout; T827: it walks to the spot at one frame per
+    // `send_ms` (100 ms) and the pure test pins the stop frames.
     assert!(
-        (1..=4).contains(&settled),
+        (4..=9).contains(&settled),
         "{settled} frames while settling"
     );
     for step in 61..=80u64 {
@@ -345,6 +346,44 @@ fn a_walking_owner_moves_the_summoned_pet_for_viewers_without_a_save() {
         view.position,
         owner.position
     );
+}
+
+/// T827: the client reports a walking owner about every 500 ms and the world ticks every 50 ms,
+/// so the pet reaches its trailing point between two reports. Through the real gameplay path it
+/// must keep its walk gait for the whole 20 s (no standing base animation), then stand once.
+#[test]
+fn a_walking_pet_keeps_its_gait_between_the_owners_reports() {
+    let save = Save::new();
+    let mut game = game(&save.path);
+    let actor = PetService::pet_guid(who().guid);
+    game.handle_in_world(&summon(1), &who(), NOW).unwrap();
+    let stand = animation_packet(
+        actor,
+        osfr_tools::world_events::piece_052::ANIM_ID_STAND,
+        true,
+    );
+    let mut owner = who();
+    let (mut stands, mut moves) = (0, 0);
+    for tick in 1..=400u64 {
+        let at = NOW + tick * 50;
+        let out = if tick % 10 == 0 {
+            owner.position[2] += 2.0; // 4 m/s, one report per 500 ms
+            game.on_location(&owner, at).unwrap()
+        } else {
+            game.pet_tick(&owner, at).expect("a pet is out")
+        };
+        stands += out.nearby.iter().filter(|p| **p == stand).count();
+        moves += pet_moves(&out.nearby, actor);
+    }
+    assert!(moves > 100, "the pet trails the owner: {moves} frames");
+    assert_eq!(stands, 0, "the pet never stands while the owner walks");
+    for tick in 401..=500u64 {
+        let out = game
+            .pet_tick(&owner, NOW + tick * 50)
+            .expect("a pet is out");
+        stands += out.nearby.iter().filter(|p| **p == stand).count();
+    }
+    assert_eq!(stands, 1, "one stand once the owner halts");
 }
 
 #[test]

@@ -86,7 +86,8 @@ fn pet_animation(trick: u32) -> Vec<u8> {
     )
 }
 
-/// Every trick packet in `packets`, in order: 53/15, 53/20 and 35/8.
+/// Every trick packet in `packets`, in order: 53/15, 53/20 and 35/8. A trick plays as a once
+/// animation (base flag 0); the follow step's walk and stand gaits (T827) are base animations.
 fn traffic(packets: &[Vec<u8>]) -> Vec<Vec<u8>> {
     let animation = animation_packet(0, 0, false);
     packets
@@ -94,7 +95,7 @@ fn traffic(packets: &[Vec<u8>]) -> Vec<Vec<u8>> {
         .filter(|packet| {
             packet.starts_with(&[53, 0, 15])
                 || packet.starts_with(&[53, 0, 20])
-                || packet.starts_with(&animation[..4])
+                || (packet.starts_with(&animation[..4]) && packet.last() == Some(&0))
         })
         .cloned()
         .collect()

@@ -2161,6 +2161,7 @@ impl PetService {
         };
         let (pose, step) = crate::pet_follow::step(
             follow,
+            self.content.movement_speed.speed,
             owner,
             active.pose,
             ground,
@@ -2170,10 +2171,23 @@ impl PetService {
         active.pose = pose;
         active.position = pose.position;
         if let Some(step) = step {
+            use crate::pet_follow::Gait;
+            use crate::world_events::piece_052::{ANIM_ID_RUN, ANIM_ID_STAND, ANIM_ID_WALK};
             let packet =
                 crate::enemies::movement_packet(active.actor_guid, step.position, step.heading);
             wire.private.push(packet.clone());
             wire.shared.push(packet);
+            // The gait is a base animation: the move alone slides the actor without walking.
+            if let Some(gait) = step.gait {
+                let id = match gait {
+                    Gait::Stand => ANIM_ID_STAND,
+                    Gait::Walk => ANIM_ID_WALK,
+                    Gait::Run => ANIM_ID_RUN,
+                };
+                let packet = crate::enemies::animation_packet(active.actor_guid, id, true);
+                wire.private.push(packet.clone());
+                wire.shared.push(packet);
+            }
         }
         wire
     }

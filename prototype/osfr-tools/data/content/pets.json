@@ -54157,11 +54157,9 @@
   "follow": {
     "side_m": 2.0,
     "behind_m": 2.0,
-    "min_speed": 2.0,
-    "max_speed": 12.0,
     "catch_up_start_m": 10.0,
-    "catch_up_gain": 0.5,
-    "max_speed_multiplier": 2.0,
+    "catch_up_gain": 1.0,
+    "max_speed_multiplier": 4.0,
     "settle_delay_ms": 750,
     "settle_radius_m": 2.3,
     "settle_min_deg": 30.0,
@@ -54179,7 +54177,7 @@
     "min_click_interval_ms": 200,
     "resume_m": 3.0,
     "go_timeout_ms": 10000,
-    "send_ms": 500
+    "send_ms": 100
   },
   "care": {
     "feed_effect_ms": 900,
