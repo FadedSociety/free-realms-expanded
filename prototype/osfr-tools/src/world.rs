@@ -780,6 +780,22 @@ impl NpcVisibility {
         })
     }
 
+    /// (T552) Every non-excluded content actor's runtime GUID, client model and position,
+    /// for the conversation, idle and look-at schedules fixed at gameplay load. Season is
+    /// deliberately not applied here: the schedules are keyed by GUID and each firing is
+    /// gated by [`Self::model_of`], so an actor whose season starts later plays from then on
+    /// (and an out-of-season conversation member only leaves its turns silent).
+    pub fn ambient_actors(&self) -> impl Iterator<Item = (u64, u32, [f32; 3])> + '_ {
+        self.by_zone
+            .values()
+            .flatten()
+            .filter(|npc| !self.excluded.contains(&npc.spawn.actor_id))
+            .filter_map(|npc| {
+                let model_id = u32::try_from(npc.spawn.model_id).ok()?;
+                Some((npc.spawn.actor_id, model_id, npc.position))
+            })
+    }
+
     /// Model and position of a loaded actor, including one hidden from this
     /// viewer (a collected or replaced coin, or a field actor): the authoring
     /// commands need the content row, not this viewer's filtered view (T525).

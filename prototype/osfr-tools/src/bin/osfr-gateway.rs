@@ -3203,6 +3203,7 @@ impl Server {
             .flat_map(|npc| self.world.players.nearby_sessions(zone, npc.position))
             .collect();
         let ambient_from = self.npc_ambient_ms;
+        let ambient_world = (&self.world.players, &self.membership, zone, instance);
         for session in self.sessions.values_mut() {
             let Some((location_instance, ready)) = self
                 .membership
@@ -3225,7 +3226,7 @@ impl Server {
             // every tick. `hold_deaths` marks the first pass of this instance;
             // later resync passes in the same tick must not repeat the window.
             if valid && hold_deaths {
-                ambient::queue_due(session, ambient_from, now_ms);
+                ambient::queue_due(session, ambient_world, ambient_from, now_ms);
             }
             let fields: Vec<_> = candidates
                 .iter()

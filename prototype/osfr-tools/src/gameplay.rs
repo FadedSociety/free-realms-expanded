@@ -930,8 +930,6 @@ impl Gameplay {
         };
         let collections =
             collection_pickup::load(npc_content, &progression_extras, &mut npc_visibility)?;
-        let npc_ambient =
-            crate::npc_ambient::NpcAmbient::load(npc_content)?.map(std::sync::Arc::new);
         // Overworld enemies replace their passive Legacy copies (same GUIDs).
         let mut encounter = encounter;
         if let Some(engine) = encounter.as_mut() {
@@ -968,6 +966,12 @@ impl Gameplay {
                 }
             }
         }
+        let ambient_actors: Vec<_> = npc_visibility
+            .as_ref()
+            .map(|visibility| visibility.ambient_actors().collect())
+            .unwrap_or_default();
+        let npc_ambient = crate::npc_ambient::NpcAmbient::load(npc_content, &ambient_actors)?
+            .map(std::sync::Arc::new);
         let battle_file = npc_content.join("field_battles.json");
         // T022: optional chess rows; an absent file publishes none.
         let chess_path = npc_content.join(crate::chess_service::CONTENT_FILE);

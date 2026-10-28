@@ -3,6 +3,7 @@
 //! reader `0x008d6830`, SetAnimation reader `0x008e5dd0`). Field actors are
 //! excluded from the passive visibility table, so their model row never fires.
 use super::*;
+use osfr_tools::npc_ambient::{AmbientUpdate, NpcAmbient};
 use serde_json::Value;
 
 #[path = "../../../tests/support/json.rs"]
@@ -355,6 +356,325 @@ fn t507_ambient_animations_follow_the_model_table_for_every_viewer() {
     assert!(
         seen.is_empty(),
         "a resync pass must not replay the ambient window: {seen:?}"
+    );
+
+    let _ = fs::remove_dir_all(scratch);
+}
+
+const CHILD_F_MODEL: u64 = 7;
+const CHILD_M_MODEL: u64 = 9;
+const DALMATION_MODEL: u64 = 514;
+
+/// Two placed child models whose ambient rows have conversation and idle
+/// fields, within the 6 m XZ grouping radius.
+fn conversation_pair(document: &Value) -> ((u64, u32, [f32; 3]), (u64, u32, [f32; 3])) {
+    let actors: Vec<_> = document["records"]
+        .as_array()
+        .expect("extra rows")
+        .iter()
+        .filter_map(|row| {
+            let model_id = row["model_id"].as_u64()?;
+            if model_id != CHILD_F_MODEL && model_id != CHILD_M_MODEL {
+                return None;
+            }
+            Some((
+                row["spawn_guid"].as_u64().expect("a spawn GUID"),
+                u32::try_from(model_id).ok()?,
+                serde_json::from_value::<[f32; 3]>(row["position"].clone())
+                    .expect("an XYZ position"),
+            ))
+        })
+        .collect();
+    for first in &actors {
+        for second in &actors {
+            if first.0 == second.0 {
+                continue;
+            }
+            let dx = first.2[0] - second.2[0];
+            let dz = first.2[2] - second.2[2];
+            if dx * dx + dz * dz <= 36.0 {
+                return (*first, *second);
+            }
+        }
+    }
+    panic!("content has a child conversation pair");
+}
+
+/// `(at, update)` for the first window in `[start, start + limit)` that
+/// contains an update the predicate accepts. The real hook calls the same
+/// `due_for_known` with the same known set and window.
+fn find_due(
+    table: &NpcAmbient,
+    known: &BTreeSet<u64>,
+    models: &BTreeMap<u64, u32>,
+    want: impl Fn(&AmbientUpdate) -> bool,
+    start: u64,
+    limit: u64,
+) -> Option<(u64, AmbientUpdate)> {
+    for at in start..start.saturating_add(limit) {
+        let updates = table.due_for_known(known, |guid| models.get(&guid).copied(), at - 1, at);
+        if let Some(update) = updates.into_iter().find(|update| want(update)) {
+            return Some((at, update));
+        }
+    }
+    None
+}
+
+/// Put the session in the player registry at the open-world position, as
+/// `Session::advance` does on world entry and movement.
+fn register_pose(server: &mut Server, key: SessionKey, position: [f32; 3]) {
+    let id = server.sessions[&key].id;
+    server
+        .world
+        .players
+        .update_pose_with_state(
+            id,
+            ZoneInstance {
+                zone_id: 0,
+                instance_id: 0,
+            },
+            position,
+            0.0,
+            0,
+            0,
+        )
+        .expect("the player registry accepts the test pose");
+}
+
+/// Tick the shared field with this viewer's known set pinned, so the ambient
+/// pass sees exactly the actors under test.
+fn tick_window(
+    server: &mut Server,
+    keys: [SessionKey; 2],
+    known: &BTreeSet<u64>,
+    from: u64,
+    to: u64,
+) {
+    for key in keys {
+        server.sessions.get_mut(&key).unwrap().known_npcs = known.clone();
+    }
+    server.npc_ambient_ms = from;
+    server.tick_shared_fields(to);
+}
+
+fn tick_with_known(server: &mut Server, keys: [SessionKey; 2], known: &BTreeSet<u64>, at: u64) {
+    tick_window(server, keys, known, at - 1, at);
+}
+
+fn assert_packets(server: &mut Server, key: SessionKey, at: u64, packets: &[Vec<u8>], why: &str) {
+    let seen = bodies(server, key, at);
+    for packet in packets {
+        assert!(
+            seen.iter().any(|body| body == packet),
+            "{why}: expected {packet:?} in {seen:?}"
+        );
+    }
+}
+
+fn look_at_for(bodies: &[Vec<u8>], guid: u64) -> Vec<u64> {
+    bodies
+        .iter()
+        .filter(|body| body.starts_with(&[35, 0, 17, 0]) && body.len() == 20)
+        .filter_map(|body| {
+            let actor = u64::from_le_bytes(body[4..12].try_into().unwrap());
+            (actor == guid).then(|| u64::from_le_bytes(body[12..20].try_into().unwrap()))
+        })
+        .collect()
+}
+
+#[test]
+fn t552_conversation_turns_and_idle_rows_reach_every_viewer() {
+    if !super::tests::test_support::bin_test_target("t552") {
+        return;
+    }
+    if !super::t020_group_routing::fixtures_present() {
+        eprintln!("skip t552-conversation: the private lab fixtures are absent");
+        return;
+    }
+    let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let extras = json::read(&content.join("npc_spawns_extra.json"));
+    let (first, second) = conversation_pair(&extras);
+    let (mut server, keys, scratch) = super::t020_group_routing::server_rig("t552-conversation");
+    let manifest: Value =
+        serde_json::from_slice(&fs::read(server.options.reference.join("manifest.json")).unwrap())
+            .unwrap();
+    let version = manifest["client_version"].as_str().unwrap().to_owned();
+    load_world_view(&mut server, keys[0], first.2, &version);
+    load_world_view(&mut server, keys[1], second.2, &version);
+
+    let (table, models) = {
+        let game = server.sessions[&keys[0]].gateway.gameplay().unwrap();
+        let table = game.npc_ambient().expect("the ambient table loads").clone();
+        let models = BTreeMap::from([
+            (
+                first.0,
+                game.npc_model(first.0).expect("the first child is visible"),
+            ),
+            (
+                second.0,
+                game.npc_model(second.0)
+                    .expect("the second child is visible"),
+            ),
+        ]);
+        (table, models)
+    };
+    let known: BTreeSet<u64> = [first.0, second.0].into_iter().collect();
+
+    let (first_at, first_update) = find_due(
+        &table,
+        &known,
+        &models,
+        |update| matches!(update, AmbientUpdate::Conversation { .. }),
+        2_000,
+        60_000,
+    )
+    .expect("the child pair has a conversation firing");
+    let AmbientUpdate::Conversation {
+        guid: first_speaker,
+        ..
+    } = &first_update
+    else {
+        unreachable!("the predicate selected a conversation");
+    };
+    let first_speaker = *first_speaker;
+    tick_with_known(&mut server, [keys[0], keys[1]], &known, first_at);
+    let expected = first_update.packets(0);
+    assert_eq!(expected.len(), 1);
+    for key in [keys[0], keys[1]] {
+        assert_packets(
+            &mut server,
+            key,
+            first_at,
+            &expected,
+            "conversation reaches both viewers",
+        );
+    }
+
+    let (second_at, second_update) = find_due(
+        &table,
+        &known,
+        &models,
+        |update| matches!(update, AmbientUpdate::Conversation { .. }),
+        first_at + 1,
+        60_000,
+    )
+    .expect("the child pair speaks again");
+    let AmbientUpdate::Conversation {
+        guid: second_speaker,
+        ..
+    } = &second_update
+    else {
+        unreachable!("the predicate selected a conversation");
+    };
+    assert_ne!(
+        first_speaker, *second_speaker,
+        "a group of two takes turns: {first_speaker} then {second_speaker}"
+    );
+    tick_with_known(&mut server, [keys[0], keys[1]], &known, second_at);
+    for key in [keys[0], keys[1]] {
+        assert_packets(
+            &mut server,
+            key,
+            second_at,
+            &second_update.packets(0),
+            "the second speaker reaches both viewers",
+        );
+    }
+
+    let (idle_at, idle_update) = find_due(
+        &table,
+        &known,
+        &models,
+        |update| matches!(update, AmbientUpdate::Idle { .. }),
+        second_at + 1,
+        60_000,
+    )
+    .expect("a child idle row fires");
+    let idle_packets = idle_update.packets(0);
+    assert_eq!(idle_packets.len(), 2, "35/26 and the base 35/8");
+    tick_with_known(&mut server, [keys[0], keys[1]], &known, idle_at);
+    for key in [keys[0], keys[1]] {
+        assert_packets(
+            &mut server,
+            key,
+            idle_at,
+            &idle_packets,
+            "the idle loop reaches both viewers",
+        );
+    }
+
+    let _ = fs::remove_dir_all(scratch);
+}
+
+#[test]
+fn t552_look_at_target_is_shared_and_clears_out_of_range() {
+    if !super::tests::test_support::bin_test_target("t552") {
+        return;
+    }
+    if !super::t020_group_routing::fixtures_present() {
+        eprintln!("skip t552-look-at: the private lab fixtures are absent");
+        return;
+    }
+    let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let extras = json::read(&content.join("npc_spawns_extra.json"));
+    let (dog, dog_at) = spawn_of_model(&extras, DALMATION_MODEL);
+    let (mut server, keys, scratch) = super::t020_group_routing::server_rig("t552-look-at");
+    let manifest: Value =
+        serde_json::from_slice(&fs::read(server.options.reference.join("manifest.json")).unwrap())
+            .unwrap();
+    let version = manifest["client_version"].as_str().unwrap().to_owned();
+    let near = [dog_at[0] + 1.0, dog_at[1], dog_at[2]];
+    let farther = [dog_at[0] + 2.0, dog_at[1], dog_at[2]];
+    load_world_view(&mut server, keys[0], near, &version);
+    load_world_view(&mut server, keys[1], farther, &version);
+    register_pose(&mut server, keys[0], near);
+    register_pose(&mut server, keys[1], farther);
+    let viewer_guids = [
+        server.sessions[&keys[0]].character_guid,
+        server.sessions[&keys[1]].character_guid,
+    ];
+    let known: BTreeSet<u64> = [dog].into_iter().collect();
+
+    let mut first_at = None;
+    for now in (2_050..=30_000).step_by(50) {
+        tick_window(&mut server, [keys[0], keys[1]], &known, now - 50, now);
+        let first = look_at_for(&bodies(&mut server, keys[0], now), dog);
+        let second = look_at_for(&bodies(&mut server, keys[1], now), dog);
+        if let (Some(&first_target), Some(&second_target)) = (first.last(), second.last()) {
+            assert_eq!(
+                first_target, second_target,
+                "every viewer resolves the same look-at target"
+            );
+            assert_ne!(first_target, 0, "a nearby player is the target");
+            first_at = Some((now, first_target));
+            break;
+        }
+    }
+    let (target_at, target) = first_at.expect("the dog looks at a nearby player");
+    assert_eq!(
+        target, viewer_guids[0],
+        "the nearest ready player is the target"
+    );
+
+    let far = [dog_at[0] + 50.0, dog_at[1], dog_at[2]];
+    register_pose(&mut server, keys[0], far);
+    register_pose(&mut server, keys[1], [far[0] + 1.0, far[1], far[2]]);
+    let mut cleared = false;
+    for now in (target_at + 50..=target_at + 30_000).step_by(50) {
+        tick_window(&mut server, [keys[0], keys[1]], &known, now - 50, now);
+        let first = look_at_for(&bodies(&mut server, keys[0], now), dog);
+        let second = look_at_for(&bodies(&mut server, keys[1], now), dog);
+        if let (Some(&first_target), Some(&second_target)) = (first.last(), second.last()) {
+            assert_eq!(first_target, second_target);
+            if first_target == 0 {
+                cleared = true;
+                break;
+            }
+        }
+    }
+    assert!(
+        cleared,
+        "the dog clears its look-at when no player is in range"
     );
 
     let _ = fs::remove_dir_all(scratch);

@@ -266,6 +266,32 @@ impl PlayerRegistry {
             .filter(move |session| session.zone == zone)
     }
 
+    /// (T552) The nearest session within `radius` m of `position` (3D, like the directed
+    /// view cutoff) that `accept` allows, ties broken by character GUID then session id, so
+    /// every caller resolves the same one. The grid supplies candidates; the result says
+    /// nothing about what any viewer may know (see [`Self::knows_character`]).
+    pub fn nearest_session(
+        &self,
+        zone: ZoneInstance,
+        position: [f32; 3],
+        radius: f32,
+        mut accept: impl FnMut(&PlayerSession) -> bool,
+    ) -> Option<&PlayerSession> {
+        let limit = f64::from(radius).powi(2);
+        self.nearby_sessions(zone, position)
+            .into_iter()
+            .filter_map(|id| self.sessions.get(&id))
+            .filter(|player| accept(player))
+            .map(|player| (distance_squared(position, player.position), player))
+            .filter(|(distance, _)| *distance <= limit)
+            .min_by(|(left, a), (right, b)| {
+                left.total_cmp(right)
+                    .then(a.character_guid.cmp(&b.character_guid))
+                    .then(a.session_id.0.cmp(&b.session_id.0))
+            })
+            .map(|(_, player)| player)
+    }
+
     /// A PC reference is safe only after this viewer's directed AddPc.
     pub fn knows_character(&self, viewer: SessionId, character: u64) -> bool {
         self.character_owners.get(&character).is_some_and(|owner| {

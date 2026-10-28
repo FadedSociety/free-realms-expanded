@@ -263,6 +263,15 @@ fn an_out_of_season_actor_has_no_position_model_or_content_key() {
     assert!(outside.marker_targets(&wanted).next().is_none());
     assert!(outside.teleport_targets(0).is_empty());
     assert_eq!(outside.model_actors().count(), 0);
+    // T552: ambient schedules are keyed by GUID and fixed at load, so the actor is
+    // listed in season or not; each firing is gated by `model_of` above.
+    for visibility in [&inside, &outside] {
+        assert!(
+            visibility
+                .ambient_actors()
+                .any(|actor| actor == (QUIET_GUID, 7, [1.0, 0.0, 1.0]))
+        );
+    }
     let _ = std::fs::remove_dir_all(&dir);
 }
 
