@@ -10,8 +10,11 @@
 //! mapping has a median height error of 0.21 m on a 4 m raster; swapped or
 //! negated axes are tens of metres out.
 //!
-//! (R) Terrain only. Bridges, buildings and rocks are runtime objects with
-//! their own collision, so `height_at` reports the ground under them.
+//! (R) The grid alone is terrain only: bridges, buildings and rocks are runtime
+//! objects with their own collision, so `height_at` reports the ground under them.
+//! T534: `obstacles()` loads the `zone_<id>.obs` files the bake writes beside the
+//! grids, so a mover can refuse a wall and stand on a bridge deck.
+use crate::obstacles::Obstacles;
 use std::{
     collections::HashMap,
     fs,
@@ -178,10 +181,23 @@ impl HeightGrid {
 pub struct Terrain {
     dir: Option<PathBuf>,
     zones: HashMap<u32, HeightGrid>,
+    /// T534: placed-object collision from the same directory; empty until the bake
+    /// writes a zone file, which keeps the heightfield-only behaviour.
+    obstacles: Obstacles,
 }
 
 impl Terrain {
+    /// Load the `.hgt` grids and the `.obs` obstacle files beside them.
     pub fn load(dir: &Path) -> Result<Self, String> {
+        let mut terrain = Self::load_heights(dir)?;
+        terrain.obstacles = Obstacles::load(dir);
+        Ok(terrain)
+    }
+
+    /// Load only the `.hgt` grids. Callers that never query placed-object collision (the
+    /// placement suites' shared lab terrain, for example) skip parsing every `.obs` file;
+    /// `obstacles()` is then empty, which is the heightfield-only behaviour.
+    pub fn load_heights(dir: &Path) -> Result<Self, String> {
         let mut zones = HashMap::new();
         let entries = fs::read_dir(dir).map_err(|e| format!("{}: {e}", dir.display()))?;
         for entry in entries.flatten() {
@@ -194,11 +210,15 @@ impl Terrain {
                 continue;
             };
             let bytes = fs::read(entry.path()).map_err(|e| format!("{name}: {e}"))?;
-            zones.insert(id, HeightGrid::from_bytes(&bytes).map_err(|e| format!("{name}: {e}"))?);
+            zones.insert(
+                id,
+                HeightGrid::from_bytes(&bytes).map_err(|e| format!("{name}: {e}"))?,
+            );
         }
         Ok(Self {
             dir: Some(dir.to_owned()),
             zones,
+            obstacles: Obstacles::default(),
         })
     }
 
@@ -208,6 +228,12 @@ impl Terrain {
 
     pub fn grid(&self, zone: u32) -> Option<&HeightGrid> {
         self.zones.get(&zone)
+    }
+
+    /// T534: the placed-object meshes beside the grids; a zone without a file is
+    /// absent, so callers keep the T490 heightfield-only walk.
+    pub fn obstacles(&self) -> &Obstacles {
+        &self.obstacles
     }
 
     /// The raw `.hgt` file for the Studio map.
@@ -263,6 +289,85 @@ mod tests {
         assert_eq!(HeightGrid::from_bytes(&bytes).unwrap(), grid);
         assert!(HeightGrid::from_bytes(&bytes[..bytes.len() - 1]).is_err());
         assert!(HeightGrid::from_bytes(b"OSFRHGT0").is_err());
+    }
+
+    #[test]
+    fn terrain_loads_obstacles_beside_the_grid() {
+        let dir =
+            std::env::temp_dir().join(format!("osfr-terrain-obstacles-{}", std::process::id()));
+        fs::create_dir_all(&dir).unwrap();
+        fs::write(dir.join("zone_7.hgt"), slope().to_bytes()).unwrap();
+        let deck = crate::obstacles::ZoneObstacles::from_world_triangles(
+            vec![[[0.0, 5.0, 0.0], [4.0, 5.0, 0.0], [0.0, 5.0, 4.0]]],
+            8.0,
+        )
+        .unwrap();
+        fs::write(dir.join("zone_7.obs"), deck.to_bytes()).unwrap();
+        let terrain = Terrain::load(&dir).unwrap();
+        assert!(terrain.obstacles().has(7));
+        assert_eq!(
+            terrain.obstacles().surface_below(7, 0.5, 0.5, 5.0, 3.0),
+            Some(5.0)
+        );
+        assert_eq!(
+            terrain.obstacles().surface_below(8, 0.5, 0.5, 5.0, 3.0),
+            None
+        );
+        fs::remove_dir_all(&dir).unwrap();
+    }
+
+    /// T534 review: a caller that only needs heights (the shared placement suites) skips every
+    /// `.obs` parse, so a multi-zone obstacle bake does not tax each test process. `load` still
+    /// reads them.
+    #[test]
+    fn a_heights_only_load_skips_the_obstacle_files() {
+        let dir = std::env::temp_dir().join(format!("osfr-terrain-heights-{}", std::process::id()));
+        fs::create_dir_all(&dir).unwrap();
+        fs::write(dir.join("zone_7.hgt"), slope().to_bytes()).unwrap();
+        let deck = crate::obstacles::ZoneObstacles::from_world_triangles(
+            vec![[[0.0, 5.0, 0.0], [4.0, 5.0, 0.0], [0.0, 5.0, 4.0]]],
+            8.0,
+        )
+        .unwrap();
+        fs::write(dir.join("zone_7.obs"), deck.to_bytes()).unwrap();
+        let heights = Terrain::load_heights(&dir).unwrap();
+        assert!(heights.height_at(7, 4.0, 4.0).is_some());
+        assert!(
+            !heights.obstacles().has(7),
+            "the height-only load skipped it"
+        );
+        assert_eq!(
+            heights.obstacles().surface_below(7, 0.5, 0.5, 5.0, 3.0),
+            None
+        );
+        let full = Terrain::load(&dir).unwrap();
+        assert!(full.obstacles().has(7), "the ordinary load reads it");
+        fs::remove_dir_all(&dir).unwrap();
+    }
+
+    /// T534 review: an obstacle file without a height grid keeps the zone ungridded, so the
+    /// pet walk's owner-height fallback still applies. The baker writes the grid first and no
+    /// `.obs` for a refused zone, but a hand-placed or stale file must not look like ground.
+    #[test]
+    fn an_obstacle_file_without_a_height_grid_is_not_a_grid() {
+        let dir =
+            std::env::temp_dir().join(format!("osfr-terrain-obs-only-{}", std::process::id()));
+        fs::create_dir_all(&dir).unwrap();
+        let deck = crate::obstacles::ZoneObstacles::from_world_triangles(
+            vec![[[0.0, 5.0, 0.0], [4.0, 5.0, 0.0], [0.0, 5.0, 4.0]]],
+            8.0,
+        )
+        .unwrap();
+        fs::write(dir.join("zone_7.obs"), deck.to_bytes()).unwrap();
+        let terrain = Terrain::load(&dir).unwrap();
+        assert!(terrain.grid(7).is_none(), "there is no height grid");
+        assert!(terrain.obstacles().has(7), "the obstacle file loaded");
+        assert_eq!(terrain.height_at(7, 0.5, 0.5), None);
+        assert_eq!(
+            terrain.obstacles().surface_below(7, 0.5, 0.5, 5.0, 3.0),
+            Some(5.0)
+        );
+        fs::remove_dir_all(&dir).unwrap();
     }
 
     #[test]

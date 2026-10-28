@@ -18,10 +18,28 @@ fn terrain_height(
     terrain: Option<std::sync::Arc<crate::terrain::Terrain>>,
     zone: u32,
 ) -> (impl Fn(f32, f32) -> Option<f32>, bool) {
+    // T534: an obstacle file is not a height grid. The CDTA bake parses only the container
+    // prefix (a partial floor), so a zone with obstacles but no `.hgt` must keep the
+    // owner-height fallback; otherwise every point without an obstacle top would refuse and
+    // the pet would stop following. Obstacle tops are still merged into `ground` through
+    // `pet_follow::floor`.
     let gridded = terrain
         .as_ref()
         .is_some_and(|terrain| terrain.grid(zone).is_some());
     (move |x, z| terrain.as_ref()?.height_at(zone, x, z), gridded)
+}
+
+/// T534: the zone's baked placed-object meshes, when the loader found a file for it. The
+/// caller keeps the terrain `Arc` alive; the returned borrow points into it.
+fn zone_obstacles(
+    terrain: Option<&crate::terrain::Terrain>,
+    zone: u32,
+) -> Option<(&crate::obstacles::Obstacles, u32)> {
+    let terrain = terrain?;
+    terrain
+        .obstacles()
+        .has(zone)
+        .then_some((terrain.obstacles(), zone))
 }
 
 impl Gameplay {
@@ -317,7 +335,10 @@ impl Gameplay {
         let minigame_active = self.blocks(|gates| gates.pets);
         let busy = crate::pets::PetBusy { minigame_active };
         // T490: the 53/26 walk check samples the character's zone heightfield (none without a grid).
-        let (ground, _) = terrain_height(self.terrain.clone(), character.zone_id);
+        // T534: and the zone's baked placed-object meshes, when the bake wrote them.
+        let terrain = self.terrain.clone();
+        let (ground, _) = terrain_height(terrain.clone(), character.zone_id);
+        let obstacles = zone_obstacles(terrain.as_deref(), character.zone_id);
         let pets = &mut self.pets;
         let inventory = &mut self.inventory;
         // Pet need clocks are whole seconds and care timers (T485) milliseconds; the pet service
@@ -329,6 +350,7 @@ impl Gameplay {
             inventory,
             busy,
             ground,
+            obstacles,
             now_ms,
         )?;
         let Some(wire) = wire else {
@@ -466,10 +488,17 @@ impl Gameplay {
         if self.pets.active_pet_id().is_none() && !self.resummon_pet(character, now_ms, out) {
             return;
         }
-        let (ground, gridded) = terrain_height(self.terrain.clone(), character.zone_id);
-        let wire =
-            self.pets
-                .follow_owner(character.guid, character.position, ground, gridded, now_ms);
+        let terrain = self.terrain.clone();
+        let (ground, gridded) = terrain_height(terrain.clone(), character.zone_id);
+        let obstacles = zone_obstacles(terrain.as_deref(), character.zone_id);
+        let wire = self.pets.follow_owner(
+            character.guid,
+            character.position,
+            ground,
+            obstacles,
+            gridded,
+            now_ms,
+        );
         out.replies.extend(wire.private);
         out.nearby.extend(wire.shared);
     }

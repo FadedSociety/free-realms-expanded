@@ -22,11 +22,12 @@
 //!   triangles are byte-equal render triangles of the pinned community
 //!   reader's `sg_npx_cavern_01_room_01_lod0.dme` export.
 //!
-//! RECONSTRUCTED, labelled at the call site: `MAX_SLOPE_DEGREES` and the
-//! "highest walkable surface below the probe" query. They are an analysis
-//! policy for the checker, not recovered game physics, and the absolute
-//! surface orientation is accepted because the real payloads contain both
-//! windings.
+//! RECONSTRUCTED, labelled at the call site: `MAX_SLOPE_DEGREES`, the per-triangle
+//! surface test and the "highest walkable surface below the probe" query. The slope
+//! and triangle policy live once in `osfr_tools::obstacles` and are shared with the
+//! T534 walk query, so the checker and the server never disagree. They are an
+//! analysis policy, not recovered game physics, and the absolute surface orientation
+//! is accepted because the real payloads contain both windings.
 //!
 //! NOT CLAIMED: that the parsed prefix is the complete collision mesh. The
 //! bytes after the prefix (91% of `001632.cdt`) and the zlib-compressed
@@ -39,12 +40,6 @@ pub const CDTA_MAGIC: [u8; 4] = *b"CDTA";
 pub const CDTA_VERSION: u32 = 1;
 /// Fixed prefix size up to and including the vertex count.
 const PREFIX_BYTES: usize = 24;
-
-/// Reconstructed analysis policy: a triangle is treated as walkable surface
-/// when its normal is within this many degrees of vertical, in either
-/// winding. The value is a checker choice; the real client slope limit is
-/// not recovered.
-pub const MAX_SLOPE_DEGREES: f32 = 50.0;
 
 /// Axis-aligned bounds of a vertex set, in the asset's own (actor-local) space.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -229,8 +224,8 @@ pub fn classify_bounds(collision: &Aabb, render: &Aabb, epsilon: f32) -> BoundsR
 }
 
 /// Highest walkable prefix surface at `(x, z)` that is at or below `probe_y`.
-/// Triangles outside the slope policy are ignored; the query is an analysis
-/// helper, not a character controller.
+/// The per-triangle slope and containment test is `osfr_tools::obstacles::triangle_surface`,
+/// the same one the T534 walk query uses; this loop only adds the probe ceiling.
 pub fn horizontal_floor(
     mesh: &CdtaMesh,
     x: f32,
@@ -238,31 +233,10 @@ pub fn horizontal_floor(
     probe_y: f32,
     max_slope_degrees: f32,
 ) -> Option<f32> {
-    let limit = max_slope_degrees.to_radians().cos();
-    let mut best: Option<f32> = None;
-    for [a, b, c] in mesh.triangles() {
-        let (ux, uy, uz) = (b[0] - a[0], b[1] - a[1], b[2] - a[2]);
-        let (vx, vy, vz) = (c[0] - a[0], c[1] - a[1], c[2] - a[2]);
-        let (nx, ny, nz) = (uy * vz - uz * vy, uz * vx - ux * vz, ux * vy - uy * vx);
-        let length = (nx * nx + ny * ny + nz * nz).sqrt();
-        if length <= 1e-12 || (ny / length).abs() < limit {
-            continue;
-        }
-        // Barycentric containment in the XZ projection.
-        let denom = (b[2] - c[2]) * (a[0] - c[0]) + (c[0] - b[0]) * (a[2] - c[2]);
-        if denom.abs() <= 1e-12 {
-            continue;
-        }
-        let l1 = ((b[2] - c[2]) * (x - c[0]) + (c[0] - b[0]) * (z - c[2])) / denom;
-        let l2 = ((c[2] - a[2]) * (x - c[0]) + (a[0] - c[0]) * (z - c[2])) / denom;
-        let l3 = 1.0 - l1 - l2;
-        if l1 < -1e-6 || l2 < -1e-6 || l3 < -1e-6 {
-            continue;
-        }
-        let y = l1 * a[1] + l2 * b[1] + l3 * c[1];
-        if y <= probe_y && best.map_or(true, |current| y > current) {
-            best = Some(y);
-        }
-    }
-    best
+    mesh.triangles()
+        .filter_map(|triangle| {
+            let y = osfr_tools::obstacles::triangle_surface(triangle, x, z, max_slope_degrees)?;
+            (y <= probe_y).then_some(y)
+        })
+        .max_by(f32::total_cmp)
 }

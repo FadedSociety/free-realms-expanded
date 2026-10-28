@@ -155,6 +155,7 @@ pub fn send(
             &mut fixture.inventory,
             PetBusy::default(),
             |_, _| None,
+            None,
             now_ms,
         )
         .unwrap()

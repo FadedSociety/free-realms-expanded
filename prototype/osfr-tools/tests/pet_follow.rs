@@ -36,6 +36,20 @@ fn dist(a: [f32; 3], b: [f32; 3]) -> f32 {
     ((a[0] - b[0]).powi(2) + (a[2] - b[2]).powi(2)).sqrt()
 }
 
+/// T534: a content package cut before `body_height_m` existed still loads, with the shipped
+/// value as its compatibility default and the block still valid.
+#[test]
+fn an_old_follow_block_without_body_height_uses_the_default() {
+    let mut follow = json::pets_json()["follow"].clone();
+    follow
+        .as_object_mut()
+        .expect("a follow object")
+        .remove("body_height_m");
+    let cfg: FollowConfig = serde_json::from_value(follow).expect("an old follow block");
+    assert_eq!(cfg.body_height_m, 1.8);
+    assert!(cfg.valid(), "the default keeps the old block valid");
+}
+
 /// Walk the owner along +z at `speed` m/s for `ms` in 100 ms steps; every frame is returned.
 fn walk(
     sh: &Shipped,
@@ -60,6 +74,7 @@ fn walk(
             },
             pet,
             ground,
+            None,
             false,
             false,
         );
@@ -90,6 +105,7 @@ fn hold(
             },
             pet,
             flat,
+            None,
             false,
             false,
         );
@@ -126,6 +142,7 @@ fn walk_at_client_cadence(
             },
             pet,
             flat,
+            None,
             false,
             false,
         );
@@ -235,6 +252,7 @@ fn a_teleport_warps_the_pet_beside_the_owner_once() {
         },
         pet,
         flat,
+        None,
         false,
         false,
     );
@@ -249,6 +267,7 @@ fn a_teleport_warps_the_pet_beside_the_owner_once() {
         },
         pet,
         flat,
+        None,
         false,
         false,
     );
@@ -355,6 +374,7 @@ fn only_a_jump_beyond_the_leash_teleports() {
             },
             pet,
             flat,
+            None,
             false,
             false,
         );
@@ -391,6 +411,7 @@ fn the_far_leash_teleports_only_after_its_delay() {
             },
             pet,
             flat,
+            None,
             false,
             false,
         );
@@ -442,6 +463,7 @@ fn an_open_pet_window_stops_the_pet_until_it_closes() {
         },
         pet,
         flat,
+        None,
         false,
         true,
     );
@@ -455,6 +477,7 @@ fn an_open_pet_window_stops_the_pet_until_it_closes() {
         },
         paused,
         flat,
+        None,
         false,
         true,
     );
@@ -479,6 +502,7 @@ fn a_bad_ground_or_owner_value_skips_the_step() {
         },
         pet,
         nan_ground,
+        None,
         false,
         false,
     );
@@ -492,6 +516,7 @@ fn a_bad_ground_or_owner_value_skips_the_step() {
         },
         pet,
         flat,
+        None,
         false,
         false,
     );
@@ -517,7 +542,7 @@ fn follow_frames_use_the_enemy_movement_layout() {
         .unwrap();
     let mut frames = Vec::new();
     for t in 1..=20u64 {
-        let wire = service.follow_owner(33, [0.0, 0.0, t as f32 * 0.5], flat, false, t * 100);
+        let wire = service.follow_owner(33, [0.0, 0.0, t as f32 * 0.5], flat, None, false, t * 100);
         assert!(!wire.changed, "following never marks a save");
         assert_eq!(
             wire.private, wire.shared,
@@ -542,7 +567,7 @@ fn follow_frames_use_the_enemy_movement_layout() {
     assert_eq!(frame[2..10], 44u64.to_le_bytes(), "the summoned actor");
     assert!(
         service
-            .follow_owner(99, [0.0, 0.0, 30.0], flat, false, 5_000)
+            .follow_owner(99, [0.0, 0.0, 30.0], flat, None, false, 5_000)
             .shared
             .is_empty(),
         "only its own owner"
@@ -598,6 +623,7 @@ fn a_follow_click_is_bounded_around_the_owner() {
         },
         pet,
         flat,
+        None,
         false,
         false,
     );

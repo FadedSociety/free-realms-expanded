@@ -187,7 +187,7 @@ impl Dig {
         self.at = at;
         let mut wire = self
             .service
-            .follow_owner(OWNER, self.owner, |_, _| None, false, at);
+            .follow_owner(OWNER, self.owner, |_, _| None, None, false, at);
         let care = self.service.care_tick(&mut self.fixture.inventory, at);
         wire.private.extend(care.private);
         wire.shared.extend(care.shared);

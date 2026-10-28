@@ -180,7 +180,7 @@ impl Session {
     fn tick(&mut self, at: u64) -> Seen {
         let mut wire = self
             .service
-            .follow_owner(OWNER, self.owner, |_, _| None, false, at);
+            .follow_owner(OWNER, self.owner, |_, _| None, None, false, at);
         let care = self.service.care_tick(&mut self.fixture.inventory, at);
         assert!(!care.changed, "idle life saves nothing");
         let gait = plays(&wire.private, self.actor);
@@ -624,10 +624,13 @@ fn a_follow_click_wakes_a_lying_pet_and_pauses_its_idle_life() {
         [0.0, 1e38, 0.0, 0.0],
         [100.0, 0.0, 0.0, 0.0],
     ] {
-        let refused =
-            session
-                .service
-                .follow_location(target, session.owner, |_, _| Some(0.0), lying.at + 1);
+        let refused = session.service.follow_location(
+            target,
+            session.owner,
+            |_, _| Some(0.0),
+            None,
+            lying.at + 1,
+        );
         assert_eq!(
             refused.private,
             vec![can_go_reply(target, false)],
@@ -652,6 +655,7 @@ fn a_follow_click_wakes_a_lying_pet_and_pauses_its_idle_life() {
         [20.0, 0.0, 0.0, 0.0],
         session.owner,
         |_, _| Some(0.0),
+        None,
         lying.at + TICK,
     );
     assert_eq!(

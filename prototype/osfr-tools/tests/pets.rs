@@ -134,8 +134,13 @@ fn follow_and_equipment_state_validate_owned_items_and_slots() {
     service
         .summon(pet_id, 44, 33, [0.0; 3], PetBusy::default(), 0, Vec::new())
         .unwrap();
-    let followed =
-        service.follow_location([10.0, 0.0, 0.0, 0.0], [0.0; 3], |_, _| Some(0.0), 1_000);
+    let followed = service.follow_location(
+        [10.0, 0.0, 0.0, 0.0],
+        [0.0; 3],
+        |_, _| Some(0.0),
+        None,
+        1_000,
+    );
     assert_eq!(
         followed.private,
         vec![can_go_reply([10.0, 0.0, 0.0, 0.0], true)],

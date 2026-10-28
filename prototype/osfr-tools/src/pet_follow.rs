@@ -30,6 +30,10 @@ const OWNER_UPDATE_MS: u64 = 500;
 /// (R) A safety bound on one walk check. Callers cap a click path with `click_max_m` (40 m at
 /// the shipped values); this only stops a bad caller from sampling a whole world.
 const MAX_WALK_SAMPLES: usize = 4_096;
+/// T534: a path longer than this many samples (a click check, not a 20 Hz step) probes
+/// the baked surface once per `obstacles::CELL_M` cell instead of once per sample. The
+/// per-tick walk still samples every 0.5 m, so bridge edges stay exact.
+const COARSE_SURFACE_SAMPLES: f32 = 8.0;
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
@@ -73,6 +77,11 @@ pub struct FollowConfig {
     pub step_down_m: f32,
     /// T490: the distance between walk samples (the same reference samples every 0.5 m; (R)).
     pub sample_m: f32,
+    /// T534: the body a walk segment must clear above the ground (m). The client's pets
+    /// are humanoid actors; the value is (R) and tunable, not a compiled rule. A package cut
+    /// before T534 loads with the shipped 1.8 m default.
+    #[serde(default = "default_body_height_m")]
+    pub body_height_m: f32,
     /// T490: the client sends a click at most every 200 ms (`DAT_01b5d874` = 0xC8 against
     /// `timeGetTime` milliseconds, sub_7027F0 / sub_8B0E20); the server answers one sooner 0.
     pub min_click_interval_ms: u64,
@@ -84,6 +93,11 @@ pub struct FollowConfig {
     /// pet); T827 removed the old speed guess, so a frame is the pet's own pace (2.5 m at 5 m/s,
     /// R) instead of the old 5-6 m hop. A gait change may be sent between due frames.
     pub send_ms: u64,
+}
+
+/// T534: the shipped body height, used only by a content package cut before the field.
+fn default_body_height_m() -> f32 {
+    1.8
 }
 
 impl FollowConfig {
@@ -123,6 +137,9 @@ impl FollowConfig {
             && (0.1..=20.0).contains(&self.step_down_m)
             && self.sample_m.is_finite()
             && (0.1..=5.0).contains(&self.sample_m)
+            && self.body_height_m.is_finite()
+            && (0.5..=3.0).contains(&self.body_height_m)
+            && self.body_height_m > self.step_up_m + 0.1
             && self.min_click_interval_ms <= 60_000
             && self.resume_m.is_finite()
             && (0.5..=50.0).contains(&self.resume_m)
@@ -159,22 +176,35 @@ impl FollowConfig {
 /// to end, which missed a cliff between the samples); each sample must exist, be finite, and
 /// differ from the previous one by at most `step_up` up and `step_down` down. Unknown ground
 /// (`None`) is never walkable, so a zone without a height grid refuses every path. Heights come
-/// only from `ground`, so a client-supplied y can never decide the check. Cost is the number of
-/// samples (`length / sample_m`), bounded by `MAX_WALK_SAMPLES` and by the caller's
-/// `click_max_m`.
+/// only from `ground`, so a client-supplied y can never decide the check.
+///
+/// T534: with `obstacles`, the path is refused when one baked placed-object triangle crosses
+/// the body between `ground + step_up` and `ground + body_height`; without one (the default, no
+/// `.obs` file for the zone) nothing changes. Obstacle tops (a bridge deck) are merged into
+/// every sampled height, so a bridge over unknown ground is walkable ground. The whole path is
+/// one swept obstacle query after the cheap height samples, and a click-length path probes the
+/// baked surface once per 8 m cell rather than per sample, so a refused click costs a bounded
+/// handful of buckets (T534 review); a 20 Hz step keeps the exact per-sample surface. `step_up`
+/// is also the obstacle clearance and `body_height` is the follow block's `body_height_m`, so
+/// both are content values.
+#[allow(clippy::too_many_arguments)]
 pub fn walkable(
     ground: impl Fn(f32, f32) -> Option<f32>,
+    obstacles: Option<(&crate::obstacles::Obstacles, u32)>,
     from: [f32; 3],
     to: [f32; 3],
     step_up: f32,
     step_down: f32,
     sample_m: f32,
+    body_height: f32,
 ) -> bool {
     if !from.iter().all(|value| value.is_finite())
         || !to.iter().all(|value| value.is_finite())
         || !step_up.is_finite()
         || !step_down.is_finite()
+        || !sample_m.is_finite()
         || !(sample_m > 0.0)
+        || !body_height.is_finite()
     {
         return false;
     }
@@ -187,13 +217,45 @@ pub fn walkable(
     if samples > MAX_WALK_SAMPLES as f32 {
         return false;
     }
-    let Some(mut previous) = ground(from[0], from[2]).filter(|y| y.is_finite()) else {
+    let coarse = samples > COARSE_SURFACE_SAMPLES;
+    let mut cached: Option<((i32, i32), Option<f32>)> = None;
+    let mut surface = |x: f32, z: f32| -> Option<f32> {
+        let base = ground(x, z);
+        let Some((obstacles, zone)) = obstacles else {
+            return base;
+        };
+        let top = if coarse {
+            let key = (
+                (x / crate::obstacles::CELL_M).floor() as i32,
+                (z / crate::obstacles::CELL_M).floor() as i32,
+            );
+            match cached {
+                Some((cached, top)) if cached == key => top,
+                _ => {
+                    let top = obstacles.surface_below(zone, x, z, from[1], step_down);
+                    cached = Some((key, top));
+                    top
+                }
+            }
+        } else {
+            obstacles.surface_below(zone, x, z, from[1], step_down)
+        };
+        match base {
+            Some(base) if !base.is_finite() => Some(base),
+            Some(base) => Some(top.map_or(base, |top| base.max(top))),
+            None => top,
+        }
+    };
+    let Some(start) = surface(from[0], from[2]).filter(|y| y.is_finite()) else {
         return false;
     };
+    let mut previous = start;
     let mut distance = sample_m;
     while distance < length {
         let t = distance / length;
-        let Some(y) = ground(from[0] + dx * t, from[2] + dz * t).filter(|y| y.is_finite()) else {
+        let x = from[0] + dx * t;
+        let z = from[2] + dz * t;
+        let Some(y) = surface(x, z).filter(|y| y.is_finite()) else {
             return false;
         };
         if y - previous > step_up || previous - y > step_down {
@@ -202,10 +264,24 @@ pub fn walkable(
         previous = y;
         distance += sample_m;
     }
-    let Some(y) = ground(to[0], to[2]).filter(|y| y.is_finite()) else {
+    let Some(end) = surface(to[0], to[2]).filter(|y| y.is_finite()) else {
         return false;
     };
-    y - previous <= step_up && previous - y <= step_down
+    if end - previous > step_up || previous - end > step_down {
+        return false;
+    }
+    let Some((obstacles, zone)) = obstacles else {
+        return true;
+    };
+    // One swept band for the whole path, after the cheap refusals: a cliff or a hole never
+    // pays for a triangle test, and a wall, railing or tabletop anywhere along the path refuses.
+    !obstacles.segment_blocked(
+        zone,
+        [from[0], start, from[2]],
+        [to[0], end, to[2]],
+        step_up,
+        body_height,
+    )
 }
 
 /// The owner as the server last accepted it: position and the time of that update.
@@ -355,15 +431,19 @@ pub fn go_to(pet: PetPose, target: [f32; 3], owner: [f32; 3]) -> PetPose {
 
 /// Advance the pet one owner update or tick. `pace` is the pet's walking speed (m/s). `paused`
 /// is the 53/24 pet-window mode (not 0): the pet stops and faces its owner. `gridded` is whether
-/// the zone has a height grid at all: with one, unknown ground is a hole and refuses the step;
-/// without one the step keeps T455's owner-height rule. A non-finite owner pose or ground value
-/// skips the step and keeps the last pose.
+/// the zone has a *height grid*: with one, unknown ground is a hole and refuses the step; without
+/// one the step keeps T455's owner-height rule. An obstacle-only zone (a `.obs` file but no
+/// `.hgt`, which the baker does not write) is therefore still ungridded, so its missing floor
+/// cannot disable the fallback. T534: `obstacles` supplies the zone's baked placed-object
+/// meshes, whose blocked segments refuse a step and whose horizontal tops (a bridge deck) count
+/// as ground. A non-finite owner pose or ground value skips the step and keeps the last pose.
 pub fn step(
     config: &FollowConfig,
     pace: f32,
     owner: OwnerPose,
     pet: PetPose,
     ground: impl Fn(f32, f32) -> Option<f32>,
+    obstacles: Option<(&crate::obstacles::Obstacles, u32)>,
     gridded: bool,
     paused: bool,
 ) -> (PetPose, Option<Move>) {
@@ -379,7 +459,7 @@ pub fn step(
         let moved = dist(last.position, owner.position);
         if moved > config.warp_owner_jump_m {
             p.last_owner = Some(owner);
-            return warp(config, p, owner, &ground);
+            return warp(config, p, owner, &ground, obstacles);
         }
         if moved > STILL_EPS_M {
             p.owner_facing = unit(sub(owner.position, last.position)).unwrap_or(p.owner_facing);
@@ -396,7 +476,7 @@ pub fn step(
     if gap > config.warp_far_m {
         let since = *p.far_since_ms.get_or_insert(now);
         if now.saturating_sub(since) >= config.warp_far_ms {
-            return warp(config, p, owner, &ground);
+            return warp(config, p, owner, &ground, obstacles);
         }
     } else {
         p.far_since_ms = None;
@@ -430,11 +510,11 @@ pub fn step(
             return (p, None);
         } else {
             return match advance(
-                config, &mut p, owner, &ground, gridded, go.target, pace, false, now, dt,
+                config, &mut p, owner, &ground, obstacles, gridded, go.target, pace, false, now, dt,
             ) {
                 Advance::Bad => (pet, None),
                 Advance::Blocked => (p, None),
-                Advance::Warp => warp(config, p, owner, &ground),
+                Advance::Warp => warp(config, p, owner, &ground, obstacles),
                 Advance::Moved { arrived, moving } => {
                     if arrived {
                         p.go = Some(GoTarget {
@@ -485,11 +565,11 @@ pub fn step(
     }
 
     match advance(
-        config, &mut p, owner, &ground, gridded, target, speed, !settling, now, dt,
+        config, &mut p, owner, &ground, obstacles, gridded, target, speed, !settling, now, dt,
     ) {
         Advance::Bad => (pet, None),
         Advance::Blocked => (p, None),
-        Advance::Warp => warp(config, p, owner, &ground),
+        Advance::Warp => warp(config, p, owner, &ground, obstacles),
         Advance::Moved { arrived, moving } => {
             // The trailing point is not a destination the client is told about: the owner reports
             // again within `OWNER_UPDATE_MS`, so reaching it between two reports keeps the gait
@@ -529,6 +609,33 @@ enum Advance {
     },
 }
 
+/// The ground a mover stands on: the heightfield, unless a baked obstacle top (a
+/// bridge deck) is higher within `step_down`. A zone without obstacles is exactly
+/// `ground`; a non-finite heightfield value stays non-finite so the caller keeps its
+/// bad-ground refusal. `step_down` is the follow block's own limit, so a content tune
+/// moves the surface probe with the walk's drop check.
+pub fn floor(
+    ground: &impl Fn(f32, f32) -> Option<f32>,
+    obstacles: Option<(&crate::obstacles::Obstacles, u32)>,
+    step_down: f32,
+    from_y: f32,
+    x: f32,
+    z: f32,
+) -> Option<f32> {
+    let base = ground(x, z);
+    let Some((obstacles, zone)) = obstacles else {
+        return base;
+    };
+    let Some(top) = obstacles.surface_below(zone, x, z, from_y, step_down) else {
+        return base;
+    };
+    match base {
+        Some(base) if !base.is_finite() => Some(base),
+        Some(base) => Some(base.max(top)),
+        None => Some(top),
+    }
+}
+
 /// One movement toward `target` at `speed` m/s: the single place the ground height, the 6 m
 /// climb limit and the T490 walk check are applied. The check covers both the point this step
 /// lands on and, with `look_past_target`, one `sample_m` beyond a target the pet reaches within
@@ -540,6 +647,7 @@ fn advance(
     p: &mut PetPose,
     owner: OwnerPose,
     ground: &impl Fn(f32, f32) -> Option<f32>,
+    obstacles: Option<(&crate::obstacles::Obstacles, u32)>,
     gridded: bool,
     target: [f32; 3],
     speed: f32,
@@ -559,7 +667,7 @@ fn advance(
         let d = direction.unwrap_or([0.0, 0.0]);
         (from[0] + d[0] * reach, from[2] + d[1] * reach, false)
     };
-    let stepped = ground(x, z);
+    let stepped = floor(ground, obstacles, config.step_down_m, p.position[1], x, z);
     let y = match stepped {
         Some(y) if !y.is_finite() => return Advance::Bad,
         Some(y) if (y - p.position[1]).abs() > config.warp_climb_m && p.last_sent_ms.is_some() => {
@@ -588,18 +696,28 @@ fn advance(
     // which `walkable` refuses. Only a zone with no grid at all keeps the owner-height fallback.
     let checked = gridded
         || stepped.is_some_and(|y| y.is_finite())
-        || ground(from[0], from[2]).is_some_and(|y| y.is_finite());
+        || floor(
+            ground,
+            obstacles,
+            config.step_down_m,
+            p.position[1],
+            from[0],
+            from[2],
+        )
+        .is_some_and(|y| y.is_finite());
     // F858 (review F850): the endpoint of this step is checked as well as the lookahead. The
     // lookahead alone skipped the point the pet actually moves to, so a hole or a dip narrower
     // than `sample_m` at that point (a fine height grid, or a narrow trench) was stepped onto.
     let reachable = |to| {
         walkable(
             ground,
+            obstacles,
             from,
             to,
             config.step_up_m,
             config.step_down_m,
             config.sample_m,
+            config.body_height_m,
         )
     };
     let step_end = [x, y, z];
@@ -637,15 +755,23 @@ fn warp(
     mut p: PetPose,
     owner: OwnerPose,
     ground: &impl Fn(f32, f32) -> Option<f32>,
+    obstacles: Option<(&crate::obstacles::Obstacles, u32)>,
 ) -> (PetPose, Option<Move>) {
     let spot = add(
         owner.position,
         [0.0, 0.0],
         scale(right(p.owner_facing), config.side_m),
     );
-    let y = ground(spot[0], spot[2])
-        .filter(|y| y.is_finite())
-        .unwrap_or(owner.position[1]);
+    let y = floor(
+        ground,
+        obstacles,
+        config.step_down_m,
+        owner.position[1],
+        spot[0],
+        spot[2],
+    )
+    .filter(|y| y.is_finite())
+    .unwrap_or(owner.position[1]);
     p.position = [spot[0], y, spot[2]];
     p.heading = p.owner_facing;
     p.far_since_ms = None;

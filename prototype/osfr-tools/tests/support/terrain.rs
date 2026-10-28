@@ -11,7 +11,9 @@ use std::path::Path;
 
 /// The shipped zone-0/9600 terrain grids every placement suite samples.
 pub fn load() -> Terrain {
-    Terrain::load(&Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../lab/terrain"))
+    // Heights only: these suites never query placed-object collision, so they must not
+    // parse a multi-zone `.obs` bake that the lead keeps beside the shared grids.
+    Terrain::load_heights(&Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../lab/terrain"))
         .expect("the shipped zone-0/9600 terrain grids load")
 }
 

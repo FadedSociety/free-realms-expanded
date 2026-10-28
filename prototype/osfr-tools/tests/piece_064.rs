@@ -34,9 +34,8 @@
 #[allow(dead_code)]
 mod piece_064;
 
-use piece_064::{
-    Aabb, BoundsRelation, CdtaError, CdtaMesh, MAX_SLOPE_DEGREES, classify_bounds, horizontal_floor,
-};
+use osfr_tools::obstacles::MAX_SLOPE_DEGREES;
+use piece_064::{Aabb, BoundsRelation, CdtaError, CdtaMesh, classify_bounds, horizontal_floor};
 
 /// Build a synthetic CDTA container: header, vertices, index block, tail bytes.
 fn synthetic(header: [u32; 3], vertices: &[[f32; 3]], indices: &[u16], tail: &[u8]) -> Vec<u8> {

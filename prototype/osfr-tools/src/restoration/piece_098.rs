@@ -899,6 +899,8 @@ pub struct Actor {
     pub material_file: Option<String>,
     pub model_scale: Option<f32>,
     pub animation_slots: Vec<AnimationSlot>,
+    /// T534: the `.cdt` collision companion named by section type 13.
+    pub collision_file: Option<String>,
     pub section_types: Vec<u8>,
 }
 
@@ -1058,6 +1060,19 @@ pub fn load_actor(bytes: &[u8]) -> Result<Actor, LoadError> {
             }
             9 => {
                 actor.animation_slots.extend(scan_animation_slots(payload)?);
+            }
+            // T534: client parser `sub_7E6C10` (0x007e6c10) dispatches ADR section type 13 to
+            // `sub_7E1F00` (0x007e1f00), which reads inner record type 1 through
+            // `sub_F9FB50` and stores the string at ActorDefinition+0x234. The client's
+            // collision load failure (`sub_786890` 0x00786890, case 5, "Collision data %s for
+            // actor %s") names that asset. In the client corpus the section-13 name of a room
+            // actor is `sg_npx_cavern_01_room_01.cdt`; the `.cdt`-is-collision identity is (R).
+            13 => {
+                actor.collision_file = read_records(payload)
+                    .into_iter()
+                    .find(|(record_type, _)| *record_type == 1)
+                    .map(|(_, record)| payload_string(record))
+                    .filter(|name| name.to_ascii_lowercase().ends_with(".cdt"));
             }
             _ => {}
         }

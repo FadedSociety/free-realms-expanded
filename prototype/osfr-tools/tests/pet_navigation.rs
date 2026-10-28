@@ -41,6 +41,11 @@ fn pace() -> f32 {
         .expect("a pet movement speed") as f32
 }
 
+/// T534: the shipped body height the obstacle band uses (m).
+fn body() -> f32 {
+    follow().body_height_m
+}
+
 fn grid_ground(
     grid: &osfr_tools::terrain::HeightGrid,
 ) -> impl Fn(f32, f32) -> Option<f32> + Copy + '_ {
@@ -75,11 +80,29 @@ fn a_two_metre_rise_is_refused() {
     let grid = two_metre_step();
     let ground = grid_ground(&grid);
     assert!(
-        !walkable(ground, [-5.0, 0.0, 0.0], [5.0, 0.0, 0.0], 1.0, 3.0, 0.5),
+        !walkable(
+            ground,
+            None,
+            [-5.0, 0.0, 0.0],
+            [5.0, 0.0, 0.0],
+            1.0,
+            3.0,
+            0.5,
+            body()
+        ),
         "a 2 m rise is over the 1 m step-up limit"
     );
     assert!(
-        walkable(ground, [-5.0, 0.0, 0.0], [5.0, 0.0, 0.0], 2.5, 3.0, 0.5),
+        walkable(
+            ground,
+            None,
+            [-5.0, 0.0, 0.0],
+            [5.0, 0.0, 0.0],
+            2.5,
+            3.0,
+            0.5,
+            body()
+        ),
         "the same ledge is fine with a 2.5 m step-up limit"
     );
 }
@@ -89,11 +112,29 @@ fn a_ten_metre_cliff_is_refused_going_down() {
     let grid = ten_metre_cliff();
     let ground = grid_ground(&grid);
     assert!(
-        !walkable(ground, [5.0, 10.0, 0.0], [-5.0, 0.0, 0.0], 1.0, 3.0, 0.5),
+        !walkable(
+            ground,
+            None,
+            [5.0, 10.0, 0.0],
+            [-5.0, 0.0, 0.0],
+            1.0,
+            3.0,
+            0.5,
+            body()
+        ),
         "a 10 m drop is over the 3 m step-down limit"
     );
     assert!(
-        walkable(ground, [-5.0, 0.0, 0.0], [5.0, 10.0, 0.0], 10.0, 20.0, 0.5),
+        walkable(
+            ground,
+            None,
+            [-5.0, 0.0, 0.0],
+            [5.0, 10.0, 0.0],
+            10.0,
+            20.0,
+            0.5,
+            body()
+        ),
         "the same cliff passes with wider limits, so the height is what refused it"
     );
 }
@@ -104,11 +145,13 @@ fn a_gentle_slope_is_allowed() {
     let ground = grid_ground(&grid);
     assert!(walkable(
         ground,
+        None,
         [-5.0, 0.0, 0.0],
         [5.0, 2.0, 0.0],
         1.0,
         3.0,
-        0.5
+        0.5,
+        body()
     ));
 }
 
@@ -119,11 +162,29 @@ fn a_short_step_still_samples_the_whole_path() {
     let grid = four_metre_cliff();
     let ground = grid_ground(&grid);
     assert!(
-        !walkable(ground, [0.0, 4.0, 0.0], [-0.6, 0.0, 0.0], 1.0, 3.0, 0.5),
+        !walkable(
+            ground,
+            None,
+            [0.0, 4.0, 0.0],
+            [-0.6, 0.0, 0.0],
+            1.0,
+            3.0,
+            0.5,
+            body()
+        ),
         "the 0.5 m sample lands on the low side of the 4 m cliff"
     );
     assert!(
-        walkable(ground, [0.0, 4.0, 0.0], [-0.2, 3.2, 0.0], 1.0, 3.0, 0.5),
+        walkable(
+            ground,
+            None,
+            [0.0, 4.0, 0.0],
+            [-0.2, 3.2, 0.0],
+            1.0,
+            3.0,
+            0.5,
+            body()
+        ),
         "a 0.2 m step down the interpolated cell is under the step-down limit"
     );
 }
@@ -133,19 +194,50 @@ fn unknown_ground_is_not_walkable() {
     let hole = |x: f32, _: f32| (x < 2.0).then_some(0.0);
     assert!(!walkable(
         hole,
+        None,
         [-5.0, 0.0, 0.0],
         [5.0, 0.0, 0.0],
         1.0,
         3.0,
-        0.5
+        0.5,
+        body()
     ));
     assert!(!walkable(
         |_, _| None,
+        None,
         [-5.0, 0.0, 0.0],
         [5.0, 0.0, 0.0],
         1.0,
         3.0,
-        0.5
+        0.5,
+        body()
+    ));
+}
+
+/// T534: the walk check refuses a non-finite endpoint or body height instead of letting a
+/// forged/overflowed value decide a step.
+#[test]
+fn non_finite_walk_inputs_are_refused() {
+    let flat = |_: f32, _: f32| Some(0.0);
+    assert!(!walkable(
+        flat,
+        None,
+        [f32::NAN, 0.0, 0.0],
+        [1.0, 0.0, 0.0],
+        1.0,
+        3.0,
+        0.5,
+        body()
+    ));
+    assert!(!walkable(
+        flat,
+        None,
+        [0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0],
+        1.0,
+        3.0,
+        0.5,
+        f32::NAN
     ));
 }
 
@@ -173,6 +265,7 @@ fn a_step_endpoint_over_a_hole_is_refused() {
         },
         pet,
         hole,
+        None,
         true,
         false,
     );
@@ -186,6 +279,7 @@ fn a_step_endpoint_over_a_hole_is_refused() {
         },
         still,
         hole,
+        None,
         true,
         false,
     );
@@ -221,6 +315,7 @@ fn a_following_pet_refuses_a_cliff_and_warps_after_the_timeout() {
             },
             pet,
             ground,
+            None,
             true,
             false,
         );
@@ -329,6 +424,7 @@ fn a_reachable_click_walks_the_pet_there_and_it_waits() {
             &mut fixture.inventory,
             PetBusy::default(),
             flat,
+            None,
             2_000,
         )
         .unwrap()
@@ -367,7 +463,7 @@ fn a_reachable_click_walks_the_pet_there_and_it_waits() {
     let mut walks = 0;
     let mut t = 2_500;
     while t <= 30_000 {
-        let wire = service.follow_owner(OWNER, [0.0; 3], flat, false, t);
+        let wire = service.follow_owner(OWNER, [0.0; 3], flat, None, false, t);
         if wire
             .private
             .iter()
@@ -426,6 +522,7 @@ fn an_unreachable_click_is_refused_and_following_continues() {
             &mut fixture.inventory,
             PetBusy::default(),
             ground,
+            None,
             2_000,
         )
         .unwrap()
@@ -440,8 +537,8 @@ fn an_unreachable_click_is_refused_and_following_continues() {
         "a refusal stores no destination"
     );
 
-    service.follow_owner(OWNER, [0.0; 3], ground, true, 3_000);
-    service.follow_owner(OWNER, [0.0, 0.0, 5.0], ground, true, 3_500);
+    service.follow_owner(OWNER, [0.0; 3], ground, None, true, 3_000);
+    service.follow_owner(OWNER, [0.0, 0.0, 5.0], ground, None, true, 3_500);
     let position = service.view(OWNER).expect("the pet is out").position;
     assert!(
         position[2] > 2.0,
@@ -471,6 +568,7 @@ fn a_click_outside_the_client_limits_is_refused() {
                 &mut fixture.inventory,
                 PetBusy::default(),
                 flat,
+                None,
                 2_000,
             )
             .unwrap()
@@ -511,6 +609,7 @@ fn a_malformed_click_returns_err_and_changes_nothing() {
                     &mut fixture.inventory,
                     PetBusy::default(),
                     flat,
+                    None,
                     2_000,
                 )
                 .is_err(),
@@ -537,6 +636,7 @@ fn a_second_click_inside_the_interval_is_ignored() {
                 &mut fixture.inventory,
                 PetBusy::default(),
                 flat,
+                None,
                 now,
             )
             .unwrap()
@@ -582,6 +682,7 @@ fn a_click_inside_the_client_step_band_is_refused() {
                 &mut fixture.inventory,
                 PetBusy::default(),
                 flat,
+                None,
                 now,
             )
             .unwrap()
@@ -624,6 +725,7 @@ fn a_click_without_a_terrain_grid_answers_zero() {
             &mut fixture.inventory,
             PetBusy::default(),
             |_, _| None,
+            None,
             2_000,
         )
         .unwrap()
@@ -651,6 +753,7 @@ fn a_click_without_a_pet_sends_nothing() {
             &mut fixture.inventory,
             PetBusy::default(),
             |_, _| Some(0.0),
+            None,
             1_000,
         )
         .unwrap()
@@ -668,10 +771,30 @@ fn world_with(
     Gameplay,
     osfr_tools::character_store::CharacterState,
 ) {
+    world_with_obstacles(Some(grid), None, at)
+}
+
+/// T534: the same world with a baked `zone_7.obs` beside the height grid, so the tests drive the
+/// real `Terrain::load` path the gateway uses. `grid` is `None` for the obstacle-only case, which
+/// the baker can no longer write but a hand-placed file can present.
+fn world_with_obstacles(
+    grid: Option<osfr_tools::terrain::HeightGrid>,
+    obstacles: Option<&osfr_tools::obstacles::ZoneObstacles>,
+    at: [f32; 3],
+) -> (
+    npc_quest_chain::Fixture,
+    Gameplay,
+    osfr_tools::character_store::CharacterState,
+) {
     let fixture = npc_quest_chain::Fixture::new();
     let terrain_dir = fixture.path().join("terrain");
     fs::create_dir_all(&terrain_dir).unwrap();
-    fs::write(terrain_dir.join("zone_7.hgt"), grid.to_bytes()).unwrap();
+    if let Some(grid) = grid {
+        fs::write(terrain_dir.join("zone_7.hgt"), grid.to_bytes()).unwrap();
+    }
+    if let Some(obstacles) = obstacles {
+        fs::write(terrain_dir.join("zone_7.obs"), obstacles.to_bytes()).unwrap();
+    }
     let mut game = Gameplay::load(fixture.path(), None).unwrap();
     game.set_terrain(Some(Arc::new(Terrain::load(&terrain_dir).unwrap())));
     let content = PetContent::bundled().unwrap();
@@ -874,5 +997,204 @@ fn a_pet_over_a_hole_in_a_gridded_zone_does_not_walk() {
         game.pet_view(who.guid).expect("the pet is out").position,
         spawn,
         "{warped} ms: the warp lands beside the owner"
+    );
+}
+
+/// T534: a 2 m wall at x = 6 spanning z = -20..20, from y = 0 to 2.
+fn wall_mesh() -> osfr_tools::obstacles::ZoneObstacles {
+    osfr_tools::obstacles::ZoneObstacles::from_world_triangles(
+        vec![
+            [[6.0, 0.0, -20.0], [6.0, 2.0, -20.0], [6.0, 2.0, 20.0]],
+            [[6.0, 0.0, -20.0], [6.0, 2.0, 20.0], [6.0, 0.0, 20.0]],
+        ],
+        8.0,
+    )
+    .unwrap()
+}
+
+/// T534: a bridge deck at y = 5 over x -10..30, z -10..10.
+fn deck_mesh() -> osfr_tools::obstacles::ZoneObstacles {
+    osfr_tools::obstacles::ZoneObstacles::from_world_triangles(
+        vec![
+            [[-10.0, 5.0, -10.0], [30.0, 5.0, -10.0], [30.0, 5.0, 10.0]],
+            [[-10.0, 5.0, -10.0], [30.0, 5.0, 10.0], [-10.0, 5.0, 10.0]],
+        ],
+        8.0,
+    )
+    .unwrap()
+}
+
+/// T534: the wall is not walkable, so the real 53/26 route answers 0 at once and stores nothing:
+/// the pet keeps its pose and never crosses x = 6 on the ticks that follow.
+#[test]
+fn a_wall_between_the_pet_and_the_click_refuses_the_step() {
+    let grid = terrain::surface([-50.0, -50.0], [50.0, 50.0], 1.0, |_, _| 0.0);
+    let (_fixture, mut game, who) =
+        world_with_obstacles(Some(grid), Some(&wall_mesh()), [0.0, 0.0, 0.0]);
+    let before = game.pet_view(who.guid).expect("the pet is out").position;
+    let reply = game
+        .handle_in_world(&can_go([12.0, 0.0, 0.0, 0.0]), &who, 2_000)
+        .unwrap();
+    assert!(
+        reply
+            .replies
+            .contains(&can_go_reply([12.0, 0.0, 0.0, 0.0], false)),
+        "the 2 m wall refuses the click: {:?}",
+        reply.replies
+    );
+    assert!(
+        !reply
+            .replies
+            .contains(&can_go_reply([12.0, 0.0, 0.0, 0.0], true)),
+        "no accepted reply is sent"
+    );
+    assert_eq!(
+        game.pet_view(who.guid).expect("the pet is out").position,
+        before,
+        "a refused click changes nothing"
+    );
+    for t in (2_050..4_000).step_by(50) {
+        game.pet_tick(&who, t);
+        let position = game.pet_view(who.guid).expect("the pet is out").position;
+        assert!(
+            position[0] < 6.0,
+            "{t} ms: the pet walked through the wall: {position:?}"
+        );
+    }
+    // The owner walks through the wall to the far side. The follow tick's own walk check must
+    // also refuse the wall, so the pet stays on the near side until the no-progress warp
+    // (`warp_far_ms`, 5 s) lifts it over.
+    let moved = character_at_for(CHARACTER, 7, [12.0, 0.0, 0.0]);
+    for t in (4_050..7_000).step_by(50) {
+        game.pet_tick(&moved, t);
+        let position = game.pet_view(who.guid).expect("the pet is out").position;
+        assert!(
+            position[0] < 6.0,
+            "{t} ms: the pet followed its owner through the wall: {position:?}"
+        );
+    }
+}
+
+/// T534 review: a refusal changes nothing, including the next click. There is no server
+/// attempt clock (the client's 200 ms gate is on accepted clicks only); the CPU bound is the
+/// obstacle query itself: one swept segment with a fixed triangle budget and a surface probe
+/// once per 8 m cell (`obstacles::tests` and `pet_follow::walkable` pin those). A valid click
+/// 100 ms after a wall-refused one is therefore accepted.
+#[test]
+fn a_refused_click_does_not_consume_the_next_click() {
+    let grid = terrain::surface([-50.0, -50.0], [50.0, 50.0], 1.0, |_, _| 0.0);
+    let (_fixture, mut game, who) =
+        world_with_obstacles(Some(grid), Some(&wall_mesh()), [0.0, 0.0, 0.0]);
+    let before = game.pet_view(who.guid).expect("the pet is out").position;
+    let blocked = [12.0, 0.0, 0.0, 0.0];
+    let first = game.handle_in_world(&can_go(blocked), &who, 2_000).unwrap();
+    assert!(
+        first.replies.contains(&can_go_reply(blocked, false)),
+        "the wall refuses the first click"
+    );
+    assert_eq!(
+        game.pet_view(who.guid).expect("the pet is out").position,
+        before,
+        "a refused click changes nothing"
+    );
+    // A valid target 9.7 m from the owner and on the near side of the wall.
+    let valid = [5.5, 0.0, 8.0, 0.0];
+    let immediate = game.handle_in_world(&can_go(valid), &who, 2_100).unwrap();
+    assert!(
+        immediate.replies.contains(&can_go_reply(valid, true)),
+        "the refused click did not spend the next click: {:?}",
+        immediate.replies
+    );
+}
+
+/// T534: a 53/26 click along the deck is accepted through the same surface query and the pet
+/// walks at deck height, not at the heightfield 5 m below.
+#[test]
+fn a_click_along_a_bridge_deck_stays_at_deck_height() {
+    let grid = terrain::surface([-50.0, -50.0], [50.0, 50.0], 1.0, |_, _| 0.0);
+    let (_fixture, mut game, who) =
+        world_with_obstacles(Some(grid), Some(&deck_mesh()), [0.0, 5.0, 0.0]);
+    let target = [10.0, 5.0, 0.0, 0.0];
+    let reply = game.handle_in_world(&can_go(target), &who, 2_000).unwrap();
+    assert!(
+        reply.replies.contains(&can_go_reply(target, true)),
+        "the deck is ground for the click: {:?}",
+        reply.replies
+    );
+    let mut position = game.pet_view(who.guid).expect("the pet is out").position;
+    for t in (2_500..=14_000).step_by(500) {
+        game.pet_tick(&who, t);
+        position = game.pet_view(who.guid).expect("the pet is out").position;
+        assert!(
+            (position[1] - 5.0).abs() < 0.01,
+            "{t} ms: the pet dropped off the deck: {position:?}"
+        );
+        if (position[0] - 10.0).abs() <= 0.2 {
+            break;
+        }
+    }
+    assert!(
+        (position[0] - 10.0).abs() <= 0.2,
+        "the pet reaches the clicked spot on the deck: {position:?}"
+    );
+}
+
+/// T534 review: an obstacle file without a height grid is not a grid. The zone keeps T455's
+/// owner-height rule, so the pet follows instead of refusing every step (the old `gridded`
+/// check made such a zone a floor of nothing, so the pet only warped).
+#[test]
+fn an_obstacle_only_zone_keeps_the_owner_height_fallback() {
+    let (_fixture, mut game, who) = world_with_obstacles(None, Some(&wall_mesh()), [0.0, 0.0, 0.0]);
+    let spawn = game.pet_view(who.guid).expect("the pet is out").position;
+    assert_eq!(spawn, [2.0, 0.0, 0.0], "the pet spawns beside its owner");
+    let moved = character_at_for(CHARACTER, 7, [0.0, 0.0, 10.0]);
+    for t in (1_050..=2_000).step_by(50) {
+        game.pet_tick(&moved, t);
+    }
+    let position = game.pet_view(who.guid).expect("the pet is out").position;
+    assert!(
+        (position[0] - spawn[0]).abs() > 1.0 || (position[2] - spawn[2]).abs() > 1.0,
+        "the pet follows at the owner's height instead of blocking: {position:?}"
+    );
+    assert!(
+        (position[1] - spawn[1]).abs() < 0.01,
+        "the owner-height fallback keeps the pet's height: {position:?}"
+    );
+    // The click path still refuses: with no height grid and no surface under the pet, the
+    // ground is unknown (T490), even though a `.obs` file exists.
+    let target = [5.5, 0.0, 8.0, 0.0];
+    let reply = game.handle_in_world(&can_go(target), &who, 3_000).unwrap();
+    assert!(
+        reply.replies.contains(&can_go_reply(target, false)),
+        "unknown ground refuses the click in an obstacle-only zone: {:?}",
+        reply.replies
+    );
+}
+
+/// T534: the heightfield under the bridge is 5 m down, but the deck is the highest surface within
+/// the step drop, so the following pet walks along it at deck height instead of refusing or
+/// dropping to the ground.
+#[test]
+fn a_bridge_deck_is_ground_for_the_following_pet() {
+    let grid = terrain::surface([-50.0, -50.0], [50.0, 50.0], 1.0, |_, _| 0.0);
+    let (_fixture, mut game, mut who) =
+        world_with_obstacles(Some(grid), Some(&deck_mesh()), [0.0, 5.0, 0.0]);
+    let spawn = game.pet_view(who.guid).expect("the pet is out").position;
+    assert!(
+        (spawn[1] - 5.0).abs() < 0.01,
+        "the pet spawns on the deck: {spawn:?}"
+    );
+    who = character_at_for(CHARACTER, 7, [10.0, 5.0, 0.0]);
+    for t in (1_500..=4_000).step_by(50) {
+        game.pet_tick(&who, t);
+    }
+    let position = game.pet_view(who.guid).expect("the pet is out").position;
+    assert!(
+        (position[1] - 5.0).abs() < 0.01,
+        "the deck is the pet's ground, not the heightfield 5 m below: {position:?}"
+    );
+    assert!(
+        position[0] > 3.0,
+        "the pet follows its owner along the deck: {position:?}"
     );
 }

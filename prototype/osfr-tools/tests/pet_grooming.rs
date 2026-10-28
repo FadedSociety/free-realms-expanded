@@ -288,6 +288,7 @@ fn every_groom_refusal_sends_kind_6_and_changes_nothing() {
                 minigame_active: true,
             },
             |_, _| None,
+            None,
             at,
         )
         .unwrap()
@@ -441,6 +442,7 @@ fn petting_needs_a_free_summoned_pet_and_no_session_and_strokes_need_their_mode(
                 minigame_active: true,
             },
             |_, _| None,
+            None,
             at,
         )
         .unwrap()
@@ -506,6 +508,7 @@ fn a_grooming_mode_report_without_a_session_is_unlocked_with_kind_6() {
                 minigame_active: true,
             },
             |_, _| None,
+            None,
             start + 300,
         )
         .unwrap()

@@ -315,6 +315,9 @@ fn synthetic_adr() -> Vec<u8> {
         bank.extend(speed.to_be_bytes());
     }
     push_section(&mut file, 9, &bank);
+    let mut collision = Vec::new();
+    push_record(&mut collision, 1, b"treeble.cdt\0");
+    push_section(&mut file, 13, &collision);
     file
 }
 
@@ -574,6 +577,11 @@ fn actor_loads_model_skeleton_and_animation_slots() {
     assert_eq!(actor.animation_slots[0].gr2_file, "chatdy_loc_stand.gr2");
     assert_eq!(actor.animation_slots[0].speed, Some(3.0));
     assert!((actor.animation_slots[1].speed.unwrap() - 0.666667).abs() < 1e-5);
+    assert_eq!(
+        actor.collision_file.as_deref(),
+        Some("treeble.cdt"),
+        "T534: section 13 names the collision companion"
+    );
     assert!(actor.section_types.contains(&9));
 }
 

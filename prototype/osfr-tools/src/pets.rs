@@ -2194,6 +2194,7 @@ impl PetService {
             inventory,
             busy,
             |_, _| None,
+            None,
             now.saturating_mul(1_000),
         )
     }
@@ -2210,6 +2211,7 @@ impl PetService {
         inventory: &mut Inventory,
         busy: PetBusy,
         ground: impl Fn(f32, f32) -> Option<f32>,
+        obstacles: Option<(&crate::obstacles::Obstacles, u32)>,
         now_ms: u64,
     ) -> io::Result<Option<PetWire>> {
         let Some(request) = PetRequest::decode(inner)? else {
@@ -2274,6 +2276,7 @@ impl PetService {
                     position,
                     owner_position,
                     ground,
+                    obstacles,
                     now_ms,
                 )));
             }
@@ -2372,6 +2375,7 @@ impl PetService {
         owner_guid: u64,
         owner_position: [f32; 3],
         ground: impl Fn(f32, f32) -> Option<f32>,
+        obstacles: Option<(&crate::obstacles::Obstacles, u32)>,
         gridded: bool,
         now_ms: u64,
     ) -> PetWire {
@@ -2393,6 +2397,7 @@ impl PetService {
             owner,
             active.pose,
             ground,
+            obstacles,
             gridded,
             self.ui_mode != 0,
         );
@@ -2908,16 +2913,20 @@ impl PetService {
     /// T490: the routed 53/26 tile click. On yes the pet walks to `target` on the following
     /// updates and ticks; on no it answers flag 0 and changes nothing. A target is refused when
     /// it is outside the client's own click band from the owner (8 m to 40 m; `00b5fcf0`), was
-    /// sent inside `min_click_interval_ms` of the last accepted click (200 ms, the same sender)
-    /// or nearer than `min_click_step_m` to it (10 m, the sender's gate A), is farther from the
-    /// pet than one click path (`click_max_m`, which also bounds the walk check's cost), or is
-    /// not walkable from the pet (unknown ground included, so a zone without a grid answers 0
-    /// (R)). Without an active pet there is no actor to name and nothing is sent.
+    /// sent inside `min_click_interval_ms` of the last accepted click or nearer than
+    /// `min_click_step_m` to it (10 m, the sender's gate A), is farther from the pet than one
+    /// click path (`click_max_m`, which also bounds the walk check's cost), or is not walkable
+    /// from the pet (unknown heightfield ground included; a baked obstacle top counts as ground,
+    /// and a blocked segment refuses (R)). A refused click changes nothing, including the next
+    /// click: the walk itself is bounded (one swept obstacle query with a triangle budget and a
+    /// once-per-cell surface probe), not throttled by an attempt clock (T534 review). Without
+    /// an active pet there is no actor to name and nothing is sent.
     pub fn follow_location(
         &mut self,
         target: [f32; 4],
         owner_position: [f32; 3],
         ground: impl Fn(f32, f32) -> Option<f32>,
+        obstacles: Option<(&crate::obstacles::Obstacles, u32)>,
         now_ms: u64,
     ) -> PetWire {
         let reply = |can_go: bool| PetWire {
@@ -2948,13 +2957,17 @@ impl PetService {
         {
             return reply(false);
         }
+        // T534: the walk check stands on the same surface the step will use, so a
+        // bridge deck is ground there and its edge is a real drop.
         if !crate::pet_follow::walkable(
             &ground,
+            obstacles,
             active.position,
             spot,
             follow.step_up_m,
             follow.step_down_m,
             follow.sample_m,
+            follow.body_height_m,
         ) {
             return reply(false);
         }
