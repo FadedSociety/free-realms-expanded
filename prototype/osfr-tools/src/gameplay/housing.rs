@@ -7,8 +7,8 @@
 //! family 127 falls through exactly as before.
 use super::*;
 use crate::housing_service::{
-    FixtureConfig, HousingContent, HousingService, HousingServiceState, HousingZoneChange, Request,
-    ServiceOutcome, decode_request,
+    FixtureConfig, HousingContent, HousingReply, HousingService, HousingServiceState,
+    HousingZoneChange, Request, ServiceOutcome, decode_request,
 };
 
 /// Base opcode of the housing family, as the first two bytes of every inner packet.
@@ -23,6 +23,8 @@ pub(super) struct HousingSession {
     pending: Vec<Vec<u8>>,
     /// The lot scene sent on entry: the server's membership registry places the player in it.
     scene: Option<crate::zone_transition::ZoneTransition>,
+    /// T872: the lot entered, own or visited; it keys the shared house instance.
+    house: Option<u64>,
 }
 
 impl HousingSession {
@@ -59,6 +61,7 @@ impl HousingSession {
             return_to: None,
             pending: Vec::new(),
             scene: None,
+            house: None,
         }))
     }
 
@@ -113,6 +116,40 @@ fn encode_replies(outcome: &ServiceOutcome) -> io::Result<Vec<Vec<u8>>> {
     let records = outcome.replies.iter().map(|reply| reply.encode_inner());
     let actors = outcome.actors.iter().map(|actor| actor.encode_inner());
     records.chain(actors).collect()
+}
+
+/// T872: what an owner's lot edit shows the lot's visitors: the fixture records (127/40, 127/41,
+/// 127/51) and the fixtures' actors, with the new snapshot their copies are replaced with. The
+/// owner-only replies (item list, house info, place answers, denials) stay with the owner.
+fn house_broadcast(
+    session: &HousingSession,
+    outcome: &ServiceOutcome,
+) -> io::Result<Option<crate::housing_service::HouseBroadcast>> {
+    let Some(house_guid) = session.house.filter(|_| outcome.changed) else {
+        return Ok(None);
+    };
+    let Ok(lot) = session.service.lot(house_guid) else {
+        return Ok(None);
+    };
+    let records = (outcome.replies.iter())
+        .filter(|reply| {
+            matches!(
+                reply,
+                HousingReply::FixtureUpdate(_)
+                    | HousingReply::FixtureRemove(_)
+                    | HousingReply::PositionUpdate(_)
+            )
+        })
+        .map(HousingReply::encode_inner);
+    let actors = outcome.actors.iter().map(|actor| actor.encode_inner());
+    let packets = records.chain(actors).collect::<io::Result<Vec<_>>>()?;
+    Ok(
+        (!packets.is_empty()).then_some(crate::housing_service::HouseBroadcast {
+            house_guid,
+            lot,
+            packets,
+        }),
+    )
 }
 
 impl Gameplay {
@@ -172,9 +209,14 @@ impl Gameplay {
             Ok(outcome) => outcome,
             Err(error) => {
                 let mut replies = vec![chat::system(&error.denial_message())];
+                let request = decode_request(inner);
                 // Client reader 00ab3030: one length-prefixed reason string.
-                if decode_request(inner).is_ok_and(|request| request.answers_with_denial()) {
+                if request.as_ref().is_ok_and(Request::answers_with_denial) {
                     replies.push(error.denial_reply().encode_inner()?);
+                }
+                // T872: a refused enter (a visit above all) clears the client's enter busy flag.
+                if matches!(request, Ok(Request::Enter { .. })) {
+                    replies.push(crate::housing_service::enter_failed(error.enter_failure()));
                 }
                 return Ok(Some(Outcome {
                     replies,
@@ -188,6 +230,7 @@ impl Gameplay {
         };
         match &outcome.zone_change {
             Some(HousingZoneChange::EnterHouse {
+                house_guid,
                 scene,
                 spawn_position,
                 spawn_rotation,
@@ -195,6 +238,7 @@ impl Gameplay {
             }) => {
                 // Entering from inside a house keeps the original world pose.
                 session.return_to.get_or_insert_with(|| character.clone());
+                session.house = Some(*house_guid);
                 session.pending = encode_replies(&outcome)?;
                 let lot_scene = crate::zone_transition::ZoneTransition {
                     envelope_flag: 1,
@@ -222,11 +266,15 @@ impl Gameplay {
                     .ok_or_else(|| invalid("left a house with no saved world pose"))?;
                 session.pending.clear();
                 session.scene = None;
+                session.house = None;
                 // The fixtures' 35/3s go out before the zone change, so no actor outlives the visit.
                 out.replies = encode_replies(&outcome)?;
                 out.scene_zoning = Some(self.world_zoning(&back)?);
             }
-            None => out.replies = encode_replies(&outcome)?,
+            None => {
+                out.replies = encode_replies(&outcome)?;
+                out.house_broadcast = house_broadcast(&session, &outcome)?;
+            }
         }
         // 38/4 for a placed item, 38/2 for a returned or granted one. `adopt_state` commits the
         // inventory only if it validates, before the session, so a failure here changes nothing.
@@ -256,13 +304,70 @@ impl Gameplay {
         let session = self.housing.as_mut()?;
         session.pending.clear();
         session.scene = None;
+        session.house = None;
         let back = session.return_to.take()?;
         session.service.end_visit(back.guid);
         Some(back)
     }
 
+    /// T872: the lot this character is inside, own or visited; it keys the shared house instance.
+    pub fn visiting_house(&self) -> Option<u64> {
+        self.housing.as_ref().filter(|s| s.in_house())?.house
+    }
+
+    /// T872: this character's own lots (never a visit's copy), for another player's 127/14 or
+    /// 127/19.
+    pub fn own_house_lots(&self) -> Vec<crate::housing::LotSnapshot> {
+        (self.housing.as_ref())
+            .and_then(HousingSession::state)
+            .map(|state| state.lots)
+            .unwrap_or_default()
+    }
+
+    /// T872: serve another character's lot to this visitor (`HousingService::admit_foreign_lot`).
+    /// False when this session has no housing or the copy is refused.
+    pub fn admit_foreign_lot(
+        &mut self,
+        lot: crate::housing::LotSnapshot,
+        visitor: u64,
+        visit_pass: bool,
+    ) -> bool {
+        (self.housing.as_mut()).is_some_and(|s| {
+            s.service
+                .admit_foreign_lot(lot, visitor, visit_pass)
+                .is_ok()
+        })
+    }
+
+    /// T872: an owner's edit reaching a visitor inside that lot: its copy is replaced, and the
+    /// packets come back to send now. While the lot scene is still loading they join the packets
+    /// sent once it has (the client needs 127/28 before any 127/4x). Nothing for anyone else.
+    pub fn visit_update(
+        &mut self,
+        broadcast: &crate::housing_service::HouseBroadcast,
+        visitor: u64,
+    ) -> Vec<Vec<u8>> {
+        let house = broadcast.house_guid;
+        let Some(session) = (self.housing.as_mut())
+            .filter(|s| s.in_house() && s.house == Some(house) && s.service.has_foreign_lot(house))
+        else {
+            return Vec::new();
+        };
+        if (session.service)
+            .admit_foreign_lot(broadcast.lot.clone(), visitor, true)
+            .is_err()
+        {
+            return Vec::new();
+        }
+        if session.pending.is_empty() {
+            return broadcast.packets.clone();
+        }
+        session.pending.extend(broadcast.packets.iter().cloned());
+        Vec::new()
+    }
+
     /// While inside, the lot is the player's scene (like a soccer arena), so the server's
-    /// membership registry registers it and gives the visit its own instance.
+    /// membership registry registers it; a lot's visitors share its instance (T872).
     pub(super) fn house_zone(&self) -> Option<crate::encounter::ZoneTransition> {
         let session = self.housing.as_ref().filter(|s| s.in_house())?;
         scene_zone(session.scene.as_ref()?)

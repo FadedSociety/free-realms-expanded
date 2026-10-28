@@ -15,7 +15,7 @@ use osfr_tools::{
     character_store::CharacterState,
     gameplay::Gameplay,
     gateway::Gateway,
-    housing::{FixtureTransform, SavedFixture},
+    housing::{FixtureTransform, LotPermission, SavedFixture},
     housing_native::{
         FixtureAsset, FixtureItemList, FixtureRemove, FixtureUpdate, HouseInfo, InstanceData,
         InstanceList, PlacementDenied, PlayerHousingInstanceInfo, PositionUpdate, ZoneData,
@@ -438,19 +438,29 @@ fn refused_requests_change_nothing() {
     let mut game = content.game();
     let lot = granted(&mut game);
     let before = game.state();
-    for (what, inner) in [
-        ("an unknown house", enter(lot.instance_guid ^ 0xff)),
-        ("leaving while outside", LEAVE.to_vec()),
-        ("a truncated enter", enter(lot.instance_guid)[..10].to_vec()),
+    // T872: a refused enter also sends the client's 127/46 (here code 1, no such lot), which
+    // clears its enter busy flag; every other refusal is a chat line only.
+    for (what, inner, housing_replies) in [
+        (
+            "an unknown house",
+            enter(lot.instance_guid ^ 0xff),
+            vec![46],
+        ),
+        ("leaving while outside", LEAVE.to_vec(), vec![]),
+        (
+            "a truncated enter",
+            enter(lot.instance_guid)[..10].to_vec(),
+            vec![],
+        ),
     ] {
         let out = game.handle_in_world(&inner, &character(), 5_000);
         if let Ok(out) = out {
             assert!(!out.changed, "{what}");
             assert!(out.scene_zoning.is_none(), "{what}");
-            assert!(
-                out.replies.iter().all(|r| subtype(r).is_none()),
-                "{what}: a chat line only"
-            );
+            assert_eq!(housing(&out.replies), housing_replies, "{what}");
+            if !housing_replies.is_empty() {
+                assert!(out.replies.contains(&enter_failed(1)), "{what}");
+            }
         }
         assert_eq!(game.state(), before, "{what}");
         assert_eq!(game.house_return(), None, "{what}");
@@ -1681,4 +1691,153 @@ fn a_lot_saved_before_the_fix_is_sent_with_positive_guids_and_no_turn() {
     assert!(records.iter().any(|u| u.instance.guid == chicken));
     let relogged = Gameplay::load(&content.0, Some(migrated.state())).unwrap();
     assert_eq!(relogged.state().housing, migrated.state().housing);
+}
+
+// T872 house visits: a visitor is served a copy of the owner's lot (the gateway admits it from the
+// owner's online session); the service decides who gets in, the copy is never saved, and the
+// owner's edits reach a visitor inside through `visit_update`.
+const VISITOR: u64 = 2;
+
+fn visitor() -> CharacterState {
+    CharacterState {
+        guid: VISITOR,
+        ..character()
+    }
+}
+
+fn enter_failed(code: u8) -> Vec<u8> {
+    vec![127, 0, 46, 0, code, 0, 0, 0]
+}
+
+/// A house whose owner is not online (no copy) is refused with 127/46 code 1, a stranger's
+/// copy with code 2 (reader `0x00ab9080` clears the client's enter busy flag), and neither
+/// enters, moves or saves anything.
+#[test]
+fn a_stranger_is_refused_with_127_46_and_nothing_is_kept() {
+    let content = Content::with_houses();
+    let mut owner = content.game();
+    let lot = granted(&mut owner).instance_guid;
+    let mut guest = content.game();
+    let offline = guest
+        .handle_in_world(&enter(lot), &visitor(), 1_000)
+        .unwrap();
+    assert!(
+        offline.replies.contains(&enter_failed(1)),
+        "{:?}",
+        offline.replies
+    );
+    assert!(guest.admit_foreign_lot(owner.own_house_lots()[0].clone(), VISITOR, false));
+    let refused = guest
+        .handle_in_world(&enter(lot), &visitor(), 2_000)
+        .unwrap();
+    assert!(
+        refused.replies.contains(&enter_failed(2)),
+        "{:?}",
+        refused.replies
+    );
+    assert!(refused.scene_zoning.is_none());
+    assert_eq!(guest.visiting_house(), None);
+    assert!(guest.state().housing.is_none(), "a copy is never saved");
+}
+
+/// A friend's copy carries a pass: the friend enters the owner's lot and is served its standing
+/// fixtures, cannot decorate, gets the owner's pickup (the record and the actor's removal, not
+/// the owner's bag or house info), and leaves removing only what still stands. Nothing of the
+/// visit is saved, and the owner's lot is untouched by it.
+#[test]
+fn a_friend_visits_sees_the_owners_edit_and_leaves_without_a_trace() {
+    let content = Content::with_houses();
+    let mut owner = content.game();
+    let lot = granted(&mut owner).instance_guid;
+    owner
+        .handle_in_world(&enter(lot), &character(), 2_000)
+        .unwrap();
+    owner.initialize_world(&character(), 3_000).unwrap();
+    owner
+        .handle_in_world(&edit(true), &character(), 4_000)
+        .unwrap();
+
+    let mut guest = content.game();
+    assert!(guest.admit_foreign_lot(owner.own_house_lots()[0].clone(), VISITOR, true));
+    let entered = guest
+        .handle_in_world(&enter(lot), &visitor(), 5_000)
+        .unwrap();
+    assert!(entered.scene_zoning.is_some(), "{:?}", entered.replies);
+    assert_eq!(
+        guest.visiting_house(),
+        Some(lot),
+        "the lot keys the shared instance"
+    );
+    let loaded = guest.initialize_world(&visitor(), 6_000).unwrap();
+    assert_eq!(updates(&loaded.replies).len(), KIT_BLOCKS);
+    assert_eq!(actors(&loaded.replies).len(), KIT_BLOCKS);
+    let decorate = guest
+        .handle_in_world(&edit(true), &visitor(), 7_000)
+        .unwrap();
+    assert_eq!(
+        housing(&decorate.replies),
+        [53],
+        "a visitor cannot decorate"
+    );
+
+    let block = standing(&owner)[0].fixture_guid;
+    let picked = owner
+        .handle_in_world(&pickup(block), &character(), 8_000)
+        .unwrap();
+    let broadcast = (picked.house_broadcast.clone()).expect("the edit reaches the lot's visitors");
+    assert_eq!(broadcast.house_guid, lot);
+    assert_eq!(broadcast.lot.fixtures.len(), KIT_BLOCKS - 1);
+    let sent = guest.visit_update(&broadcast, VISITOR);
+    assert_eq!(
+        housing(&sent),
+        [41],
+        "the record, not the owner's house info"
+    );
+    assert!(
+        sent.iter().any(|p| p.starts_with(&[35, 0, 3, 0])),
+        "{sent:?}"
+    );
+    assert!(backpack(&sent, 2).is_empty(), "never the owner's bag");
+
+    let left = guest.handle_in_world(&LEAVE, &visitor(), 9_000).unwrap();
+    let removals = left
+        .replies
+        .iter()
+        .filter(|r| r.starts_with(&[35, 0, 3, 0]));
+    assert_eq!(removals.count(), KIT_BLOCKS - 1, "the refreshed copy");
+    assert_eq!(guest.visiting_house(), None);
+    assert!(guest.state().housing.is_none(), "a copy is never saved");
+    let again = guest
+        .handle_in_world(&enter(lot), &visitor(), 10_000)
+        .unwrap();
+    assert!(
+        again.replies.contains(&enter_failed(1)),
+        "leaving drops the copy"
+    );
+    assert_eq!(standing(&owner).len(), KIT_BLOCKS - 1);
+}
+
+/// A copy is read-only whatever the owner granted: an edit would move the visitor's furniture
+/// into a lot that is never saved, so a level-3 entry is capped at visiting.
+#[test]
+fn a_copy_of_a_lot_is_read_only_even_for_an_editor() {
+    let content = Content::with_houses();
+    let mut owner = content.game();
+    let lot = granted(&mut owner).instance_guid;
+    let mut copy = owner.own_house_lots()[0].clone();
+    copy.permissions.push(LotPermission {
+        guid: VISITOR,
+        level: 3,
+    });
+    let mut guest = content.game();
+    assert!(guest.admit_foreign_lot(copy, VISITOR, false));
+    let entered = guest
+        .handle_in_world(&enter(lot), &visitor(), 1_000)
+        .unwrap();
+    assert!(entered.scene_zoning.is_some(), "level 3 still visits");
+    guest.initialize_world(&visitor(), 2_000).unwrap();
+    let decorate = guest
+        .handle_in_world(&edit(true), &visitor(), 3_000)
+        .unwrap();
+    assert_eq!(housing(&decorate.replies), [53]);
 }

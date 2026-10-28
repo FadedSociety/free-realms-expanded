@@ -45,6 +45,8 @@ mod delivery;
 mod encounter_invites;
 #[path = "osfr_gateway/group_arena.rs"]
 mod group_arena;
+#[path = "osfr_gateway/house_visits.rs"]
+mod house_visits;
 use delivery::{
     chat_error_delivery, field_packet, field_packets_for, field_recipient_matches, queue_delivery,
     refresh_public_look, rider_event, trade_deliveries, wrap_application,
@@ -1661,6 +1663,7 @@ impl Session {
         let mut staged_gateway = self.gateway.clone();
         let mut held =
             group_arena::Held::enter(&mut staged_gateway, membership, self.character_guid);
+        house_visits::admit(&mut staged_gateway, sessions, world, message);
         let mut outcome = match staged_gateway.handle_at(message, now_ms) {
             Ok(outcome) => outcome,
             Err(error) => {
@@ -1690,6 +1693,7 @@ impl Session {
         let admin_move = outcome.admin_move.take();
         let world_event = outcome.world_event.take();
         let boombox = outcome.boombox.take();
+        let house_broadcast = outcome.house_broadcast.take();
         let staged = std::mem::take(&mut outcome.moderation);
         // T008: the jump body is built from this request's final pose; fan it out
         // only after the commit, like the notice above.
@@ -1710,6 +1714,7 @@ impl Session {
             if let Some(definition) = boombox {
                 boombox_routing::place(self, sessions, world, now_ms, definition);
             }
+            house_visits::fan_out(sessions, self.character_guid, house_broadcast);
             if let Some(request) = admin_move {
                 admin_move::run(self, options, sessions, world, membership, now_ms, request)?;
             }
@@ -1790,27 +1795,23 @@ impl Session {
                     .map(ZoneInstance::world_instance_id)
                     .transpose()?
                     .or_else(|| (!transfer).then_some(old_instance).flatten());
-                Some(membership.prepare_membership(
+                let [x, y, z] = current.position;
+                let [rx, ry, rz] = current.rotation;
+                let pose = WorldPose {
+                    position: [x, y, z, 1.0],
+                    rotation: [rx, ry, rz, 1.0],
+                };
+                let (guid, zone, loaded) = (
                     self.character_guid,
                     current.zone_id,
-                    target,
-                    WorldPose {
-                        position: [
-                            current.position[0],
-                            current.position[1],
-                            current.position[2],
-                            1.0,
-                        ],
-                        rotation: [
-                            current.rotation[0],
-                            current.rotation[1],
-                            current.rotation[2],
-                            1.0,
-                        ],
-                    },
                     staged_gateway.is_world_loaded(),
-                    now_ms,
-                )?)
+                );
+                // T872: entering a lot joins that house's one instance (owner and visitors).
+                Some(match (target, staged_gateway.visiting_house()) {
+                    (None, Some(house)) => membership
+                        .prepare_house_membership(guid, zone, house, pose, loaded, now_ms)?,
+                    _ => membership.prepare_membership(guid, zone, target, pose, loaded, now_ms)?,
+                })
             } else {
                 None
             };

@@ -1078,9 +1078,16 @@ impl WorldPose {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum InstanceKind {
     Public,
-    Dungeon { dungeon_id: String },
-    Encounter { encounter_id: i32 },
-    House { owner_id: PlayerId },
+    Dungeon {
+        dungeon_id: String,
+    },
+    Encounter {
+        encounter_id: i32,
+    },
+    /// T872: one house lot. Everyone inside the same lot shares it (`prepare_house_membership`).
+    House {
+        house_guid: u64,
+    },
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -1378,6 +1385,31 @@ impl World {
             next_instance_id,
             now_ms,
         })
+    }
+
+    /// T872 house visits: entering a lot joins the instance already keyed by that house in that
+    /// zone, so the owner and their visitors see each other; the first entry stages it. A seeded
+    /// scene keeps its public instance (never re-kinded).
+    pub fn prepare_house_membership(
+        &self,
+        player: PlayerId,
+        zone_id: u32,
+        house_guid: u64,
+        pose: WorldPose,
+        ready: bool,
+        now_ms: u64,
+    ) -> Result<MembershipChange, WorldError> {
+        let kind = InstanceKind::House { house_guid };
+        let existing = (self.instances.values())
+            .find(|row| row.zone_id == zone_id && row.kind == kind)
+            .map(|row| row.id);
+        let mut change = self.prepare_membership(player, zone_id, existing, pose, ready, now_ms)?;
+        if let Some(instance) = (change.instance.as_mut())
+            .filter(|instance| matches!(instance.kind, InstanceKind::Encounter { .. }))
+        {
+            instance.kind = kind;
+        }
+        Ok(change)
     }
 
     /// Infallible install after save; no other writer may run between prepare/install.
@@ -2000,5 +2032,31 @@ mod tests {
             world.instance_id_free(1),
             "the zone may still take its own id for its public instance"
         );
+    }
+
+    /// T872: the owner and a visitor of one lot share its instance; another lot of the same
+    /// scene gets its own.
+    #[test]
+    fn one_house_is_one_instance_and_two_houses_are_two() {
+        let mut world = World::runtime();
+        world.register_runtime_zone(zone(7)).unwrap();
+        let enter = |world: &mut World, player: PlayerId, house: u64| {
+            let change = world
+                .prepare_house_membership(player, 7, house, WorldPose::ORIGIN, false, 0)
+                .unwrap();
+            let id = change.instance_id();
+            world.commit_membership(change);
+            id
+        };
+        let owner = enter(&mut world, 1, 0xA);
+        let visitor = enter(&mut world, 2, 0xA);
+        let other = enter(&mut world, 3, 0xB);
+        assert_eq!(owner, visitor, "one lot, one instance");
+        assert_ne!(owner, other, "another lot is another instance");
+        assert_eq!(
+            world.instances[&owner].kind,
+            InstanceKind::House { house_guid: 0xA }
+        );
+        assert_eq!(world.instances[&owner].members.len(), 2);
     }
 }

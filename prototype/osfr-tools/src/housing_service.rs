@@ -32,8 +32,9 @@
 //! packet loop, no second ledger, no new dependency.
 
 use crate::housing::{
-    FixtureInstance, FixtureItemLedger, FixtureTransform, Housing, HousingError, LotSnapshot,
-    PlacedFixture, PropertyDefinition, PropertyGrant, SavedFixture, StagedChange,
+    FixtureInstance, FixtureItemLedger, FixtureTransform, Housing, HousingError, LotPermission,
+    LotSnapshot, PERMISSION_CAN_VISIT, PlacedFixture, PropertyDefinition, PropertyGrant,
+    SavedFixture, StagedChange,
 };
 use crate::housing_native::{
     CouplingDisplay, Customization, FixtureAsset, FixtureDefinition,
@@ -828,6 +829,54 @@ impl From<HousingError> for ServiceError {
     }
 }
 
+/// 127/46 enter failure (client reader `0x00ab9080`): one u32 that clears the client's enter busy
+/// flag and picks its message; 1 server not found, 2 and 6 permission denied, 3 zone missing.
+pub const REPLY_ENTER_FAILED: u16 = 46;
+
+impl ServiceError {
+    /// T872: the 127/46 code for a refused 127/19. A lot this session cannot see is a house whose
+    /// owner is not online (no copy was admitted); any other refusal is a permission one.
+    pub fn enter_failure(&self) -> u32 {
+        match self {
+            Self::Housing(HousingError::LotNotFound) => 1,
+            Self::HouseSceneUnavailable { .. } => 3,
+            _ => 2,
+        }
+    }
+}
+
+/// The 127/46 packet for `code` (see `ServiceError::enter_failure`).
+pub fn enter_failed(code: u32) -> Vec<u8> {
+    [BASE_OPCODE, REPLY_ENTER_FAILED]
+        .iter()
+        .flat_map(|opcode| opcode.to_le_bytes())
+        .chain(code.to_le_bytes())
+        .collect()
+}
+
+/// T872: an owner's lot edit for the visitors inside: the house, its new snapshot (each visitor's
+/// copy is replaced with it) and the packets they draw it from (fixture records and actors).
+#[derive(Clone, Debug)]
+pub struct HouseBroadcast {
+    pub house_guid: u64,
+    pub lot: LotSnapshot,
+    pub packets: Vec<Vec<u8>>,
+}
+
+impl HouseBroadcast {
+    /// Two edits in one bundle: the later snapshot, and both edits' packets in order.
+    pub fn merge(earlier: Option<Self>, later: Option<Self>) -> Option<Self> {
+        match (earlier, later) {
+            (Some(mut first), Some(second)) if first.house_guid == second.house_guid => {
+                first.packets.extend(second.packets);
+                first.lot = second.lot;
+                Some(first)
+            }
+            (first, second) => second.or(first),
+        }
+    }
+}
+
 impl ServiceError {
     /// A bounded single-line reason for the recovered `127/53` body. Fixed literals only, so the
     /// message always fits the codec's string bound.
@@ -1271,6 +1320,9 @@ pub struct HousingService {
     house_definitions: BTreeMap<i32, HousingLotDefinition>,
     starter_property_id: Option<i32>,
     starter_kit: Option<StarterKit>,
+    /// T872: other characters' lots copied in for a visit. Served like any lot (edits stay the
+    /// owner's through `can_enter`), never saved, and dropped when the visit ends.
+    foreign: BTreeSet<u64>,
 }
 
 impl HousingService {
@@ -1284,6 +1336,7 @@ impl HousingService {
             house_definitions: BTreeMap::new(),
             starter_property_id: None,
             starter_kit: None,
+            foreign: BTreeSet::new(),
         }
     }
 
@@ -1468,6 +1521,7 @@ impl HousingService {
             house_definitions: BTreeMap::new(),
             starter_property_id: None,
             starter_kit: None,
+            foreign: BTreeSet::new(),
         })
     }
 
@@ -1484,10 +1538,64 @@ impl HousingService {
     }
 
     /// The persisted half of this service, for the lead's canonical snapshot.
+    /// The character's own lots; a visit's foreign copies are never saved.
     pub fn state(&self) -> HousingServiceState {
         HousingServiceState {
             schema_version: SERVICE_SCHEMA_VERSION,
-            lots: self.housing.snapshot_lots(),
+            lots: (self.housing.snapshot_lots().into_iter())
+                .filter(|lot| !self.foreign.contains(&lot.lot_guid))
+                .collect(),
+        }
+    }
+
+    /// T872: serve another character's lot to a visitor. The copy is rebuilt with a restore's
+    /// checks and replaces any older copy (the gateway refreshes it after each owner edit). A
+    /// lot of this character's own is never replaced. `visit_pass` adds a level-1 permission for
+    /// the visitor to this copy only (a friend of the owner; reference HouseAccess).
+    pub fn admit_foreign_lot(
+        &mut self,
+        mut lot: LotSnapshot,
+        visitor: u64,
+        visit_pass: bool,
+    ) -> Result<(), ServiceError> {
+        if lot.owner_guid == visitor
+            || (self.housing.saved_fixtures(lot.lot_guid).is_ok()
+                && !self.foreign.contains(&lot.lot_guid))
+        {
+            return Err(HousingError::NotPermitted.into());
+        }
+        // A copy is read-only: an edit would move the visitor's furniture into a lot that is never
+        // saved. The owner's real lot keeps its levels.
+        for permission in &mut lot.permissions {
+            permission.level = permission.level.min(PERMISSION_CAN_VISIT);
+        }
+        if visit_pass {
+            lot.permissions
+                .retain(|permission| permission.guid != visitor);
+            lot.permissions.push(LotPermission {
+                guid: visitor,
+                level: PERMISSION_CAN_VISIT,
+            });
+        }
+        let guid = lot.lot_guid;
+        self.housing.admit_lot(lot)?;
+        self.foreign.insert(guid);
+        Ok(())
+    }
+
+    /// The house a visitor's copy is of, if any: the gateway refreshes only copies it handed out.
+    pub fn has_foreign_lot(&self, house_guid: u64) -> bool {
+        self.foreign.contains(&house_guid)
+    }
+
+    /// Drop every foreign copy except the one being visited (a visit keeps its own lot).
+    fn forget_foreign_lots(&mut self, keep: Option<u64>) {
+        for guid in std::mem::take(&mut self.foreign) {
+            if Some(guid) == keep {
+                self.foreign.insert(guid);
+            } else {
+                self.housing.forget_lot(guid);
+            }
         }
     }
 
@@ -1726,16 +1834,19 @@ impl HousingService {
             ));
             actors.push(self.fixture_actor(&placed, saved.fixture_definition_id)?);
         }
+        let (spawn_position, spawn_rotation) =
+            (definition.spawn_position, definition.spawn_rotation);
         self.entered.insert(actor_guid, house_guid);
         self.edit_mode.insert(actor_guid, false);
         self.selections.retain(|(owner, _), _| *owner != actor_guid);
+        self.forget_foreign_lots(Some(house_guid));
         Ok(ServiceOutcome {
             zone_change: Some(HousingZoneChange::EnterHouse {
                 actor_guid,
                 house_guid,
                 scene,
-                spawn_position: definition.spawn_position,
-                spawn_rotation: definition.spawn_rotation,
+                spawn_position,
+                spawn_rotation,
             }),
             replies,
             actors,
@@ -1839,10 +1950,10 @@ impl HousingService {
         })
     }
 
+    /// Every lot of one owner this service holds, a visit's foreign copies included (127/14 for
+    /// another player lists the copies the gateway admitted).
     fn lots_of(&self, owner_guid: u64) -> Vec<LotSnapshot> {
-        self.state()
-            .lots
-            .into_iter()
+        (self.housing.snapshot_lots().into_iter())
             .filter(|lot| lot.owner_guid == owner_guid)
             .collect()
     }
@@ -1853,6 +1964,7 @@ impl HousingService {
         let house_guid = self.entered.remove(&actor_guid)?;
         self.edit_mode.remove(&actor_guid);
         self.selections.retain(|(owner, _), _| *owner != actor_guid);
+        self.forget_foreign_lots(None);
         Some(house_guid)
     }
 
@@ -1860,14 +1972,15 @@ impl HousingService {
     /// zone the player returns to (T806 review finding 3). The removal timing is reconstructed (R):
     /// a pickup's 35/3 is captured, the leave order is not.
     fn leave(&mut self, actor_guid: u64) -> Result<ServiceOutcome, ServiceError> {
-        let house_guid = self
-            .end_visit(actor_guid)
-            .ok_or(ServiceError::NotInHouse { actor_guid })?;
+        let house_guid =
+            *(self.entered.get(&actor_guid)).ok_or(ServiceError::NotInHouse { actor_guid })?;
+        // Before `end_visit`, which drops a visitor's copy of the lot.
         let actors = self
             .housing
             .saved_fixtures(house_guid)
             .map(|lot| fixture_removals(&lot))
             .unwrap_or_default();
+        self.end_visit(actor_guid);
         Ok(ServiceOutcome {
             zone_change: Some(HousingZoneChange::ReturnToPreviousZone {
                 actor_guid,

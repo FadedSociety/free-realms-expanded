@@ -817,6 +817,41 @@ impl Housing {
         Ok(())
     }
 
+    /// T872: add or replace one lot from a snapshot (a visitor's copy of another character's
+    /// lot), with the same fixture and property checks as a restore. The property row is added
+    /// only when this process has none for it; no grant is recorded, so the copy owns nothing.
+    pub fn admit_lot(&mut self, snapshot: LotSnapshot) -> Result<(), HousingError> {
+        let property = PropertyDefinition {
+            property_id: snapshot.property_id,
+            zone_id: snapshot.zone_id,
+            name_id: snapshot.name_id,
+            max_fixtures: snapshot.max_fixtures,
+            max_landmarks: snapshot.max_landmarks,
+            build_areas: snapshot.build_areas.clone(),
+        };
+        property
+            .validate()
+            .map_err(|_| HousingError::CorruptSnapshot)?;
+        let (guid, lot) = self
+            .rebuild(SnapshotDocument {
+                schema_version: SNAPSHOT_SCHEMA_VERSION,
+                properties: vec![snapshot],
+            })?
+            .pop_first()
+            .ok_or(HousingError::CorruptSnapshot)?;
+        self.properties
+            .entry(property.property_id)
+            .or_insert(property);
+        self.lots.insert(guid, lot);
+        Ok(())
+    }
+
+    /// T872: drop a visitor's copy. Only `admit_lot` copies come through here (the service tracks
+    /// them), never a lot this character owns.
+    pub fn forget_lot(&mut self, house_guid: u64) {
+        self.lots.remove(&house_guid);
+    }
+
     pub fn set_locked(
         &mut self,
         actor_guid: u64,

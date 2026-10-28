@@ -178,7 +178,45 @@ mod tests {
             }),
             world_event: Some(crate::world_events::WorldEventCommand::Start("show".into())),
             boombox: Some(878),
+            house_broadcast: Some(crate::housing_service::HouseBroadcast {
+                house_guid: 12,
+                lot: crate::housing::LotSnapshot {
+                    owner_guid: 1,
+                    property_id: 2,
+                    lot_guid: 12,
+                    zone_id: 3,
+                    name_id: 4,
+                    max_fixtures: 5,
+                    max_landmarks: 6,
+                    count: 0,
+                    build_areas: Vec::new(),
+                    fixtures: Vec::new(),
+                    permissions: Vec::new(),
+                    locked: false,
+                },
+                packets: vec![vec![5]],
+            }),
         }
+    }
+
+    /// T872: two edits of one lot in a bundle reach its visitors as both edits' packets in order
+    /// with the later snapshot; an edit of another lot replaces the earlier one.
+    #[test]
+    fn house_broadcasts_of_one_lot_merge_in_order() {
+        use crate::housing_service::HouseBroadcast;
+        let edit = |house_guid, packet: u8, count| {
+            let mut broadcast = staged_outcome().house_broadcast.unwrap();
+            broadcast.house_guid = house_guid;
+            broadcast.lot.count = count;
+            broadcast.packets = vec![vec![packet]];
+            Some(broadcast)
+        };
+        let merged = HouseBroadcast::merge(edit(12, 1, 1), edit(12, 2, 2)).unwrap();
+        assert_eq!(merged.packets, vec![vec![1], vec![2]]);
+        assert_eq!(merged.lot.count, 2);
+        let other = HouseBroadcast::merge(edit(12, 1, 1), edit(13, 2, 2)).unwrap();
+        assert_eq!((other.house_guid, other.packets), (13, vec![vec![2]]));
+        assert!(HouseBroadcast::merge(edit(12, 1, 1), None).is_some());
     }
 
     #[test]
@@ -213,6 +251,12 @@ mod tests {
             Some(crate::world_events::WorldEventCommand::Start("show".into()))
         );
         assert_eq!(live.boombox, Some(878));
+        assert_eq!(
+            live.house_broadcast
+                .as_ref()
+                .map(|b| (b.house_guid, &b.packets)),
+            Some((12, &vec![vec![5]]))
+        );
         // Nothing staged never wipes the live state.
         live.absorb(Outcome::default());
         assert!(live.dev_command_denied && live.changed);

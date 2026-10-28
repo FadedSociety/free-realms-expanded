@@ -150,6 +150,8 @@ pub struct GatewayOutcome {
     pub world_event: Option<crate::world_events::WorldEventCommand>,
     /// T461: a boombox press the host places once after the commit, like `admin_move`.
     pub boombox: Option<i32>,
+    /// T872: an owner's lot edit the host sends to the lot's visitors after the commit.
+    pub house_broadcast: Option<crate::housing_service::HouseBroadcast>,
     /// L042: role-gated moderation commands; the host runs them after the commit.
     pub moderation: Vec<crate::moderation::Command>,
     /// Inner application payloads that passed the gateway parser, in request order.
@@ -965,6 +967,11 @@ impl Gateway {
         self.loaded
     }
 
+    /// T872: the house lot this character is inside; the membership registry keys its instance.
+    pub fn visiting_house(&self) -> Option<u64> {
+        self.gameplay.as_ref()?.visiting_house()
+    }
+
     pub fn take_pending_transfer(&mut self) -> Option<crate::players::ZoneInstance> {
         self.pending_transfer.take()
     }
@@ -1721,6 +1728,10 @@ impl Gateway {
                         outcome.admin_move = result.admin_move.or(outcome.admin_move.take());
                         outcome.world_event = result.world_event.or(outcome.world_event.take());
                         outcome.boombox = result.boombox.or(outcome.boombox.take());
+                        outcome.house_broadcast = crate::housing_service::HouseBroadcast::merge(
+                            outcome.house_broadcast.take(),
+                            result.house_broadcast,
+                        );
                         outcome.nearby.extend(result.nearby);
                         outcome.dev_command_denials += usize::from(result.dev_command_denied);
                         outcome.applications.push(inner.clone());

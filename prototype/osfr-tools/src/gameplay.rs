@@ -359,6 +359,8 @@ pub struct Outcome {
     pub world_event: Option<crate::world_events::WorldEventCommand>,
     /// T461: the definition of a boombox the host places once after a successful commit.
     pub boombox: Option<i32>,
+    /// T872: an owner's lot edit the host sends to the lot's visitors after the commit.
+    pub house_broadcast: Option<crate::housing_service::HouseBroadcast>,
 }
 
 impl Outcome {
@@ -381,6 +383,7 @@ impl Outcome {
             admin_move,
             world_event,
             boombox,
+            house_broadcast,
         } = other;
         self.dev_command_denied |= dev_command_denied;
         self.shared_field = shared_field.or(self.shared_field.take());
@@ -396,6 +399,10 @@ impl Outcome {
         self.admin_move = admin_move.or(self.admin_move.take());
         self.world_event = world_event.or(self.world_event.take());
         self.boombox = boombox.or(self.boombox.take());
+        self.house_broadcast = crate::housing_service::HouseBroadcast::merge(
+            self.house_broadcast.take(),
+            house_broadcast,
+        );
     }
 }
 

@@ -67,7 +67,7 @@ fn transfer_orders_begin_zoning_before_zone_details_and_npcs() {
     let mut world = World::new(content(), 1_000);
     world.enter_public(10, 7, pose(1.0), 0).unwrap();
     let target = world
-        .create_child_instance(7, 7, InstanceKind::House { owner_id: 10 }, 1)
+        .create_child_instance(7, 7, InstanceKind::House { house_guid: 10 }, 1)
         .unwrap();
 
     let moved = world.enter_instance(10, target, pose(8.0), 2).unwrap();
@@ -156,7 +156,7 @@ fn failed_transfer_keeps_previous_instance_pose_and_membership() {
     world.enter_public(10, 7, pose(12.5), 1).unwrap();
     assert!(world.mark_zone_ready(10, 7).unwrap());
     let target = world
-        .create_child_instance(7, 0, InstanceKind::House { owner_id: 10 }, 2)
+        .create_child_instance(7, 0, InstanceKind::House { house_guid: 10 }, 2)
         .unwrap();
     let invalid = WorldPose {
         position: [f32::NAN, 0.0, 0.0, 1.0],
