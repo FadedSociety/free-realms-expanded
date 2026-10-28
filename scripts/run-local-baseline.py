@@ -166,7 +166,6 @@ endpoint = f"127.0.0.1:{front.getsockname()[1]}"
 # offered whose bytes the client's own pack lacks.
 manifest_bytes = (client / "Assets_manifest.txt").read_bytes()
 asset_delivery = AssetDelivery(lab, manifest_bytes, client)
-manifest_crc = manifest_crc_body(asset_delivery.served_manifest)
 # The card window's own asset set (`tcg/AssetsTcg_manifest.txt`) is answered under /tcg/: its CRC
 # check passes against this run's local copy, and the local TCG pack already holds every file.
 tcg_routes = {}
@@ -174,6 +173,10 @@ if (client / "tcg/AssetsTcg_manifest.txt").is_file():
     tcg_manifest = (client / "tcg/AssetsTcg_manifest.txt").read_bytes()
     tcg_routes = {"/tcg/manifest.crc": manifest_crc_body(tcg_manifest),
                   "/tcg/manifest.txt.z": manifest_wire(tcg_manifest)}
+# Every main manifest route serves the merged body, so the announced CRC and the
+# recorded hash describe the same manifest.
+routes = {**asset_delivery.manifest_routes(), **tcg_routes}
+manifest_crc = routes["/manifest.crc"]
 http_requests = []
 http_counts = Counter()
 asset_proofs = {}
@@ -183,9 +186,7 @@ http_metrics_lock = threading.Lock()
 class AssetsHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = self.path.split("?", 1)[0]
-        body = {"/manifest.crc": manifest_crc,
-                "/Assets_manifest.txt": manifest_bytes,
-                "/manifest.txt.z": asset_delivery.manifest_wire, **tcg_routes}.get(path)
+        body = routes.get(path)
         if body is None:
             try:
                 delivered = asset_delivery.get(self.path)
@@ -265,7 +266,8 @@ result = {"run_directory": str(run), "started_utc": datetime.now(timezone.utc).i
           "server_executable_sha256": hashlib.sha256(Path(server_command[0]).read_bytes()).hexdigest(),
           "client_endpoint": endpoint, "server_port": server_port,
           "asset_url": asset_url, "asset_manifest_crc": manifest_crc.decode("ascii").strip(),
-          "asset_manifest_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
+          "asset_manifest_sha256": hashlib.sha256(asset_delivery.served_manifest).hexdigest(),
+          "asset_manifest_base_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
           "asset_manifest_client_pack_rows": asset_delivery.client_rows,
           "relay_receive_buffer_bytes": back.getsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF),
           "input_automation": False, "configuration_backup": str(before)}

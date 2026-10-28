@@ -11,6 +11,11 @@ The client's own downloaded TCG asset cache (`assets/assetpack000_manifest.txt` 
 its names are served only when the manifest row's CRC matches the pack entry, and the
 served manifest carries the rows so the client can find them. Nothing is invented: a
 name whose bytes the player's own pack does not hold is not offered.
+
+The pack itself is not parsed here: its index is the `catalog.tsv` written by
+`osfr-tools catalog` (the canonical Rust `read_index` in
+`prototype/osfr-tools/src/main.rs`). Each catalog row names the pack file, offset, size
+and CRC; the bytes are read from the client copy and CRC-checked before delivery.
 """
 import csv
 import hashlib
@@ -26,11 +31,13 @@ from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
 MAX_ASSET = 128 * 1024 * 1024
+# (R) One client-pack row's raw size. The launcher responder applies the same bound.
+MAX_PACK_ASSET = 16 * 1024 * 1024
 CACHE_BYTES = 64 * 1024 * 1024
 MAX_PACK_MANIFEST = 8 * 1024 * 1024
-MAX_PACK_BLOCKS = 65536
 PACK_MANIFEST = "assets/assetpack000_manifest.txt"
-PACKS = "assetpack000W_*.pack"
+PACK_PREFIX = "assetpack000w_"
+PACK_SUFFIX = ".pack"
 PACK_PATH_CHARS = frozenset("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_- .()")
 PACK_PART_SUFFIX = ".osfr-part"
 
@@ -79,48 +86,6 @@ class PackSource:
     crc: int
 
 
-def read_pack_index(path: Path):
-    """The supplied packs' directory blocks: BE absolute next-block offset, BE entry count,
-    then length-prefixed name and BE (offset, size, crc32) (osfr-tools `catalog`)."""
-    size = path.stat().st_size
-    entries = {}
-    visited = set()
-    block = 0
-    with path.open("rb") as handle:
-        while True:
-            if block in visited or block + 8 > size or len(visited) >= MAX_PACK_BLOCKS:
-                raise ValueError(f"invalid or cyclic directory block: {path.name}")
-            visited.add(block)
-            handle.seek(block)
-            header = handle.read(8)
-            if len(header) != 8:
-                raise ValueError(f"truncated directory block: {path.name}")
-            next_block, count = struct.unpack(">II", header)
-            if count > (size - block - 8) // 16:
-                raise ValueError(f"invalid entry count: {path.name}")
-            for _ in range(count):
-                raw_length = handle.read(4)
-                if len(raw_length) != 4:
-                    raise ValueError(f"truncated asset name: {path.name}")
-                length = struct.unpack(">I", raw_length)[0]
-                if not 1 <= length <= 4096:
-                    raise ValueError(f"invalid asset name length: {path.name}")
-                name = handle.read(length)
-                fields = handle.read(12)
-                if len(name) != length or len(fields) != 12:
-                    raise ValueError(f"truncated asset entry: {path.name}")
-                text = name.decode("utf-8")
-                if any(ord(char) < 32 or ord(char) == 127 for char in text):
-                    raise ValueError(f"control character in asset name: {path.name}")
-                offset, entry_size, crc = struct.unpack(">III", fields)
-                if offset + entry_size > size or entry_size > MAX_ASSET:
-                    raise ValueError(f"asset extends past end of pack: {path.name}")
-                entries.setdefault(text.lower(), (offset, entry_size, crc))
-            if next_block == 0:
-                return entries
-            block = next_block
-
-
 def manifest_wire(manifest: bytes) -> bytes:
     """`manifest.txt.z`: the same envelope as a compressed asset (native readers 010ebd70/010ebee0)."""
     return struct.pack(">II", 0xA1B2C3D4, len(manifest)) + zlib.compress(manifest, 6)
@@ -152,6 +117,9 @@ class AssetDelivery:
     def __init__(self, lab: Path, manifest: bytes, client: Path | None = None):
         self.manifest = {}
         # R: index both community bare names and local .z names by one asset name.
+        # Only a raw row's length is the bytes' length; a `.z` row's is the compressed
+        # wire length, so only raw rows can be filled from a pack's raw entry.
+        self.raw_names = set()
         for row in csv.reader(manifest.decode("utf-8-sig").splitlines()):
             if len(row) != 3:
                 continue
@@ -159,6 +127,8 @@ class AssetDelivery:
             key = _canonical_name(name)
             if not _asset_name(key):
                 continue
+            if not name.lower().endswith(".z"):
+                self.raw_names.add(key)
             expected = (int(crc), int(length))
             if not 0 <= expected[0] <= 0xFFFFFFFF or not 0 <= expected[1] <= MAX_ASSET:
                 raise ValueError(f"invalid asset manifest values: {name}")
@@ -168,10 +138,18 @@ class AssetDelivery:
 
         self.sources = {}
         self.community_sources = {}
+        # name -> [(pack basename, offset, size, crc)] from the canonical catalog.
+        self.pack_index = {}
         extracted = (lab / "extracted/client-assets").resolve()
         with (extracted / "catalog.tsv").open(encoding="utf-8", newline="") as handle:
             for row in csv.DictReader(handle, delimiter="\t"):
                 name = row["name"].lower()
+                pack = row["pack"].replace("\\", "/").rsplit("/", 1)[-1].lower()
+                if pack.startswith(PACK_PREFIX) and pack.endswith(PACK_SUFFIX):
+                    # The pack itself is this row's source; it is not an extraction.
+                    self.pack_index.setdefault(name, []).append(
+                        (pack, int(row["offset"]), int(row["bytes"]), int(row["crc32"], 16)))
+                    continue
                 expected = self.manifest.get(name)
                 if expected is None or int(row["crc32"], 16) != expected[0]:
                     continue
@@ -241,41 +219,73 @@ class AssetDelivery:
     def _add_client_pack(self, client: Path) -> None:
         """Admit the client's own downloaded TCG pack rows it can actually serve.
 
-        A row is offered only when the pack holds that exact name and both the row's
-        and the pack entry's CRC agree. `.z` rows are announced raw (the pack holds raw
-        bytes), so no compression is invented for them.
+        The announced manifest row is the allowance: an entry selected from the
+        `osfr-tools catalog` rows must agree with that row's CRC and wire length.
+        Every pack is tried, so a row the first pack holds at another CRC still
+        resolves from the pack that holds the announced one. A base-manifest name keeps
+        its row and its own source; only one this lab cannot fill may borrow matching
+        bytes from the pack. `.z` rows are announced raw (the pack holds raw bytes), so
+        no compression is invented for them.
         """
         manifest_path = client / PACK_MANIFEST
-        folder = client / "assets"
-        if not manifest_path.is_file() or not folder.is_dir():
+        folder = (client / "assets").resolve()
+        if not manifest_path.is_file() or not folder.is_dir() or not self.pack_index:
             return
         if manifest_path.stat().st_size > MAX_PACK_MANIFEST:
             raise ValueError("client asset-pack manifest exceeds its size limit")
-        index = {}
-        for pack in sorted(folder.glob(PACKS)):
-            for name, fields in read_pack_index(pack).items():
-                index.setdefault(name, (pack, *fields))
+        # A raw base row keeps its announced form; only a row this lab cannot fill may
+        # use the identical raw bytes from the pack.
+        for key in self.raw_names:
+            if key in self.sources:
+                continue
+            crc, length = self.manifest[key]
+            entry = self._pack_entry(key, crc, length, folder)
+            if entry is not None:
+                self.sources[key] = entry
+                self.client_rows += 1
         with manifest_path.open(encoding="utf-8-sig", newline="") as handle:
             for row in csv.reader(handle):
                 if len(row) != 3:
                     continue
-                name, raw_crc, _raw_length = (part.strip() for part in row)
+                name, raw_crc, raw_length = (part.strip() for part in row)
                 if not raw_crc.isdigit():
                     continue
                 crc = int(raw_crc)
                 key = _canonical_name(name)
-                if crc > 0xFFFFFFFF or not _pack_path(key) or key in self.manifest:
+                if crc > 0xFFFFFFFF or key in self.manifest or key in self.sources:
                     continue
-                entry = index.get(key)
-                if entry is None or entry[3] != crc:
+                raw = not name.lower().endswith(".z")
+                if raw and not raw_length.isdigit():
                     continue
-                pack, offset, size, _entry_crc = entry
-                if size > MAX_ASSET:
+                length = int(raw_length) if raw else None
+                if not _pack_path(key):
                     continue
-                self.manifest[key] = (crc, size)
-                self.sources[key] = PackSource(pack, offset, size, crc)
-                self.extra_rows.append(f"{key},{crc},{size}")
-        self.client_rows = len(self.extra_rows)
+                entry = self._pack_entry(key, crc, length, folder)
+                if entry is None:
+                    continue
+                self.manifest[key] = (crc, entry.size)
+                self.sources[key] = entry
+                self.client_rows += 1
+                self.extra_rows.append(f"{key},{crc},{entry.size}")
+
+    def _pack_entry(self, key: str, crc: int, length, folder: Path):
+        """The first catalog entry for `key` that matches the manifest row's CRC (and,
+        for a raw row, its wire length), reading from a pack inside the client copy."""
+        for pack, offset, size, entry_crc in self.pack_index.get(key, ()):
+            if entry_crc != crc or (length is not None and size != length):
+                continue
+            if not 0 <= size <= MAX_PACK_ASSET:
+                continue
+            path = folder / pack
+            try:
+                if not path.is_file() or not path.resolve().is_relative_to(folder):
+                    continue
+                if offset + size > path.stat().st_size:
+                    continue
+            except OSError:
+                continue
+            return PackSource(path, offset, size, crc)
+        return None
 
     def _merge_manifest(self, manifest: bytes) -> bytes:
         if not self.extra_rows:
@@ -286,9 +296,16 @@ class AssetDelivery:
             merged += separator
         return merged + separator.join(row.encode("ascii") for row in self.extra_rows) + separator
 
+    def manifest_routes(self):
+        """The harness server's manifest replies: every route describes the same merged
+        body, so the announced CRC/length and the SHA never disagree."""
+        return {"/manifest.crc": manifest_crc_body(self.served_manifest),
+                "/Assets_manifest.txt": self.served_manifest,
+                "/manifest.txt.z": self.manifest_wire}
+
     @staticmethod
     def _pack_bytes(source: PackSource) -> bytes:
-        if not 0 <= source.size <= MAX_ASSET or source.offset + source.size > source.path.stat().st_size:
+        if not 0 <= source.size <= MAX_PACK_ASSET or source.offset + source.size > source.path.stat().st_size:
             raise ValueError("client pack entry lies outside its pack")
         with source.path.open("rb") as handle:
             handle.seek(source.offset)
