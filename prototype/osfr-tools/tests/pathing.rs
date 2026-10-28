@@ -1,12 +1,26 @@
 //! W164: the 98/1 path request and its 98/2 reply (layouts and evidence: `src/pathing.rs`).
 use osfr_tools::{
+    character_store::CharacterState,
+    gameplay::Gameplay,
     pathing::{MAX_PER_SECOND, MAX_POINTS, Pathing, Refusal, STEP},
+    road_graph::{CONTENT_FILE, RoadGraph},
     terrain::{HeightGrid, Terrain},
 };
 use std::{
     fs,
-    sync::atomic::{AtomicU32, Ordering},
+    path::PathBuf,
+    sync::{
+        Arc,
+        atomic::{AtomicU32, Ordering},
+    },
 };
+
+#[path = "support/json.rs"]
+mod json;
+#[path = "support/node_content.rs"]
+mod node_content;
+#[path = "support/terrain.rs"]
+mod terrain_support;
 
 const ZONE: u32 = 7;
 const PLAYER: [f32; 3] = [10.0, 1.0, 10.0];
@@ -18,16 +32,88 @@ fn terrain() -> Terrain {
     let p = |x: f32, z: f32| [x, x / 10.0, z];
     grid.add_triangle([p(-100.0, -100.0), p(500.0, -100.0), p(500.0, 100.0)]);
     grid.add_triangle([p(-100.0, -100.0), p(500.0, 100.0), p(-100.0, 100.0)]);
-    let dir = std::env::temp_dir().join(format!(
-        "osfr-w164-{}-{}",
-        std::process::id(),
-        NEXT.fetch_add(1, Ordering::Relaxed)
-    ));
+    load_terrain(ZONE, grid)
+}
+
+/// Flat ground at y = 3 over `min..max`, in `zone`.
+fn flat_terrain(zone: u32, min: [f32; 2], max: [f32; 2]) -> Terrain {
+    load_terrain(zone, terrain_support::surface(min, max, 20.0, |_, _| 3.0))
+}
+
+/// One zone's grid, loaded through the production loader from a temporary directory.
+fn load_terrain(zone: u32, grid: HeightGrid) -> Terrain {
+    let dir = temp_dir("terrain");
     fs::create_dir_all(&dir).unwrap();
-    fs::write(dir.join(format!("zone_{ZONE}.hgt")), grid.to_bytes()).unwrap();
+    fs::write(dir.join(format!("zone_{zone}.hgt")), grid.to_bytes()).unwrap();
     let terrain = Terrain::load(&dir).unwrap();
     fs::remove_dir_all(&dir).unwrap();
     terrain
+}
+
+fn temp_dir(tag: &str) -> PathBuf {
+    std::env::temp_dir().join(format!(
+        "osfr-w164-{tag}-{}-{}",
+        std::process::id(),
+        NEXT.fetch_add(1, Ordering::Relaxed)
+    ))
+}
+
+/// The shipped `data/content/road_graph.json`, through the production loader.
+fn shipped_graph() -> RoadGraph {
+    RoadGraph::load(&node_content::content_dir())
+        .expect("the shipped road graph loads")
+        .expect("the shipped road graph is present")
+}
+
+/// A synthetic road graph, loaded through the production loader from a temporary directory.
+fn road_graph(document: serde_json::Value) -> RoadGraph {
+    graph_load(document)
+        .expect("the graph loads")
+        .expect("the graph is present")
+}
+
+fn graph_load(document: serde_json::Value) -> std::io::Result<Option<RoadGraph>> {
+    let dir = temp_dir("graph");
+    json::write_pretty(&dir.join(CONTENT_FILE), &document);
+    let graph = RoadGraph::load(&dir);
+    fs::remove_dir_all(&dir).unwrap();
+    graph
+}
+
+/// A five-node graph in `ZONE`: 0-1-2-4 is 30 m and 0-1-3-4 is about 39 m, so A* must
+/// prefer the shorter branch instead of the first edge it sees.
+fn five_node_graph() -> serde_json::Value {
+    serde_json::json!({
+        "schema_version": 1,
+        "source": {"asset": "synthetic", "sha256": "", "decoder": "test"},
+        "zone": ZONE,
+        "snap_radius_m": 40,
+        "max_route_m": 600,
+        "nodes": [
+            [0, 0.0, 0.0, 0.0, [1]],
+            [1, 10.0, 0.0, 0.0, [0, 2, 3]],
+            [2, 20.0, 0.0, 0.0, [1, 4]],
+            [3, 15.0, 0.0, 10.0, [1, 4]],
+            [4, 30.0, 0.0, 0.0, [2, 3]]
+        ]
+    })
+}
+
+/// Three nodes where the road from 0 to 2 swings through (15, 30): about 67 m of road
+/// against 30 m straight.
+fn detour_graph(max_route_m: f32) -> serde_json::Value {
+    serde_json::json!({
+        "schema_version": 1,
+        "source": {"asset": "synthetic", "sha256": "", "decoder": "test"},
+        "zone": ZONE,
+        "snap_radius_m": 40,
+        "max_route_m": max_route_m,
+        "nodes": [
+            [0, 0.0, 0.0, 0.0, [1]],
+            [1, 15.0, 0.0, 30.0, [0, 2]],
+            [2, 30.0, 0.0, 0.0, [1]]
+        ]
+    })
 }
 
 /// A 98/1 request: handle, kind, aux, two vec4, tail.
@@ -72,7 +158,16 @@ fn decode(reply: &[u8]) -> Decoded {
 type Answer = Option<Result<Vec<u8>, Refusal>>;
 
 fn ask(path: &mut Pathing, terrain: &Terrain, packet: &[u8], now: u64) -> Answer {
-    path.answer(packet, ZONE, PLAYER, Some(terrain), now)
+    path.answer(packet, ZONE, PLAYER, Some(terrain), None, now)
+}
+
+/// The request answered with `graph` on a fresh budget.
+fn ask_road(graph: &RoadGraph, terrain: &Terrain, packet: &[u8]) -> Vec<u8> {
+    let road = Some(graph);
+    Pathing::default()
+        .answer(packet, ZONE, PLAYER, Some(terrain), road, 0)
+        .unwrap()
+        .unwrap()
 }
 
 #[test]
@@ -179,7 +274,7 @@ fn refusals_each_have_a_canary() {
 fn a_zone_without_a_grid_gets_the_failure_reply_not_a_path() {
     let terrain = terrain();
     let mut path = Pathing::default();
-    let reply = path.answer(&walk(60.0), 99, PLAYER, Some(&terrain), 0);
+    let reply = path.answer(&walk(60.0), 99, PLAYER, Some(&terrain), None, 0);
     assert!(decode(&reply.unwrap().unwrap()).points.is_empty());
 }
 
@@ -231,7 +326,7 @@ fn the_rate_cap_holds_and_resets_each_second() {
 fn missing_terrain_gets_the_clients_failure_reply() {
     let mut path = Pathing::default();
     let reply = path
-        .answer(&walk(60.0), ZONE, PLAYER, None, 0)
+        .answer(&walk(60.0), ZONE, PLAYER, None, None, 0)
         .unwrap()
         .unwrap();
     // 98/2, kind 1, aux 7, zero nodes: HandleKynapsePathReply's "no path generated" branch.
@@ -339,4 +434,226 @@ fn other_packets_and_other_kinds_are_not_ours() {
     ] {
         assert_eq!(ask(&mut path, &terrain, packet, 0), None);
     }
+}
+
+/// Today's no-graph reply, the straight-line fallback the road cases must reproduce.
+fn straight_reply(terrain: &Terrain, packet: &[u8]) -> Vec<u8> {
+    ask(&mut Pathing::default(), terrain, packet, 0)
+        .unwrap()
+        .unwrap()
+}
+
+/// T554: A* over the synthetic graph prefers the shorter road and repeats exactly.
+#[test]
+fn astar_follows_the_shortest_road_on_a_five_node_graph() {
+    let graph = road_graph(five_node_graph());
+    let expected = vec![
+        [0.0, 0.0, 0.0],
+        [10.0, 0.0, 0.0],
+        [20.0, 0.0, 0.0],
+        [30.0, 0.0, 0.0],
+    ];
+    assert_eq!(
+        graph.route([0.0, 0.0, 0.0], [30.0, 0.0, 0.0]),
+        Some(expected)
+    );
+    assert_eq!(
+        graph.route([0.0, 0.0, 0.0], [30.0, 0.0, 0.0]),
+        graph.route([0.0, 0.0, 0.0], [30.0, 0.0, 0.0]),
+        "the same request gives the same route"
+    );
+}
+
+/// Both ends must be within the graph's snap radius; a far end has no road route.
+#[test]
+fn an_end_outside_the_snap_radius_has_no_road_route() {
+    let graph = road_graph(five_node_graph());
+    assert!(graph.route([0.0, 0.0, 0.0], [30.0, 0.0, 0.0]).is_some());
+    assert!(graph.route([0.0, 0.0, 0.0], [30.0, 0.0, 100.0]).is_none());
+    assert!(graph.route([100.0, 0.0, 0.0], [30.0, 0.0, 0.0]).is_none());
+}
+
+#[test]
+fn broken_and_out_of_bounds_graphs_are_refused_at_load() {
+    let mut dangling = five_node_graph();
+    dangling["nodes"][0][4] = serde_json::json!([99]);
+    assert!(graph_load(dangling).is_err(), "dangling neighbour");
+
+    let mut one_way = five_node_graph();
+    one_way["nodes"][1][4] = serde_json::json!([0, 2]);
+    assert!(graph_load(one_way).is_err(), "one-way edge");
+
+    for (field, value) in [
+        ("snap_radius_m", 4.0),
+        ("snap_radius_m", 201.0),
+        ("max_route_m", 49.0),
+        ("max_route_m", 5001.0),
+    ] {
+        let mut document = five_node_graph();
+        document[field] = serde_json::json!(value);
+        assert!(graph_load(document).is_err(), "{field} {value}");
+    }
+    // A content set with no graph is not an error: it answers straight lines.
+    assert!(RoadGraph::load(&temp_dir("missing")).unwrap().is_none());
+}
+
+/// The graph belongs to its own zone (FabledRealms is zone 0); the same request on the
+/// zone-7 terrain is exactly today's straight line.
+#[test]
+fn a_graph_for_another_zone_keeps_the_straight_line() {
+    let terrain = terrain();
+    let straight = straight_reply(&terrain, &walk(110.0));
+    let reply = ask_road(&shipped_graph(), &terrain, &walk(110.0));
+    assert_eq!(reply, straight);
+    assert_eq!(decode(&reply).points.len(), 21);
+}
+
+#[test]
+fn an_end_outside_the_snap_radius_keeps_the_straight_line() {
+    let terrain = flat_terrain(ZONE, [-10.0, -10.0], [40.0, 110.0]);
+    let packet = request(1, [0.0, 3.0, 0.0, 1.0], [30.0, 3.0, 100.0, 1.0]);
+    let straight = straight_reply(&terrain, &packet);
+    let reply = ask_road(&road_graph(five_node_graph()), &terrain, &packet);
+    assert_eq!(reply, straight);
+}
+
+#[test]
+fn a_disconnected_road_keeps_the_straight_line() {
+    let terrain = flat_terrain(ZONE, [-10.0, -10.0], [40.0, 40.0]);
+    let packet = request(1, [0.0, 3.0, 0.0, 1.0], [30.0, 3.0, 0.0, 1.0]);
+    let mut document = detour_graph(600.0);
+    document["nodes"][1][4] = serde_json::json!([0]);
+    document["nodes"][2] = serde_json::json!([2, 30.0, 0.0, 0.0, []]);
+    let straight = straight_reply(&terrain, &packet);
+    let reply = ask_road(&road_graph(document), &terrain, &packet);
+    assert_eq!(reply, straight);
+}
+
+#[test]
+fn a_route_longer_than_the_limit_keeps_the_straight_line() {
+    let terrain = flat_terrain(ZONE, [-10.0, -10.0], [40.0, 40.0]);
+    let packet = request(1, [0.0, 3.0, 0.0, 1.0], [30.0, 3.0, 0.0, 1.0]);
+    let straight = straight_reply(&terrain, &packet);
+    // About 67 m of road against a 50 m limit.
+    let limited = ask_road(&road_graph(detour_graph(50.0)), &terrain, &packet);
+    assert_eq!(limited, straight);
+    // The same road fits a 600 m limit, so the limit is what fell back.
+    let allowed = ask_road(&road_graph(detour_graph(600.0)), &terrain, &packet);
+    assert_ne!(allowed, straight);
+    assert_eq!(decode(&allowed).points.len(), 15);
+}
+
+/// Planar distance from a point to a segment in the x/z plane.
+fn point_segment(point: [f32; 2], a: [f32; 2], b: [f32; 2]) -> f32 {
+    let (dx, dz) = (b[0] - a[0], b[1] - a[1]);
+    let length_sq = dx * dx + dz * dz;
+    let t = if length_sq == 0.0 {
+        0.0
+    } else {
+        (((point[0] - a[0]) * dx + (point[1] - a[1]) * dz) / length_sq).clamp(0.0, 1.0)
+    };
+    ((point[0] - a[0] - t * dx).powi(2) + (point[1] - a[1] - t * dz).powi(2)).sqrt()
+}
+
+/// Planar distance from (x, z) to the nearest road edge in the shipped graph document.
+fn distance_to_edges(document: &serde_json::Value, x: f32, z: f32) -> f32 {
+    let rows = document["nodes"].as_array().unwrap();
+    let positions: Vec<[f32; 2]> = rows
+        .iter()
+        .map(|row| {
+            [
+                row[1].as_f64().unwrap() as f32,
+                row[3].as_f64().unwrap() as f32,
+            ]
+        })
+        .collect();
+    let mut nearest = f32::INFINITY;
+    for row in rows {
+        let a = positions[row[0].as_u64().unwrap() as usize];
+        for neighbour in row[4].as_array().unwrap() {
+            let b = positions[neighbour.as_u64().unwrap() as usize];
+            nearest = nearest.min(point_segment([x, z], a, b));
+        }
+    }
+    nearest
+}
+
+/// The 213 m request between FabledRealms road nodes 316 and 851, and the flat zone-0 ground
+/// it is answered on.
+const ROAD_FROM: [f32; 4] = [-600.49866, -1.0554962, -127.82866, 1.0];
+const ROAD_TO: [f32; 4] = [-640.18634, -1.4318695, -336.721, 1.0];
+
+fn road_terrain() -> Terrain {
+    flat_terrain(0, [-650.0, -355.0], [-438.0, -118.0])
+}
+
+/// The decoded reply must follow the shipped graph's edges: every sample within 5 m of an
+/// edge, within the point cap, with the client's own two ends, and bent away from the
+/// direct line (the furthest sample is 172 m off it), so the graph answered and not the
+/// straight-line fallback.
+fn assert_follows_the_roads(reply: &[u8]) {
+    let document = json::read(&node_content::content_dir().join(CONTENT_FILE));
+    let decoded = decode(reply);
+    assert!(decoded.points.len() <= MAX_POINTS);
+    assert_eq!(decoded.points[0], ROAD_FROM);
+    assert_eq!(*decoded.points.last().unwrap(), ROAD_TO);
+    for point in &decoded.points {
+        assert!(
+            distance_to_edges(&document, point[0], point[2]) <= 5.0,
+            "sample {point:?} is not on a road edge"
+        );
+    }
+    let (from, to) = ([ROAD_FROM[0], ROAD_FROM[2]], [ROAD_TO[0], ROAD_TO[2]]);
+    let off_line = decoded
+        .points
+        .iter()
+        .map(|point| point_segment([point[0], point[2]], from, to))
+        .fold(0.0, f32::max);
+    assert!(off_line > 20.0, "the reply is the straight line");
+}
+
+/// T554 gate: the shipped graph answers the request along the roads.
+#[test]
+fn a_shipped_road_request_follows_the_graphs_edges() {
+    let player = [ROAD_FROM[0], ROAD_FROM[1], ROAD_FROM[2]];
+    let reply = Pathing::default()
+        .answer(
+            &request(1, ROAD_FROM, ROAD_TO),
+            0,
+            player,
+            Some(&road_terrain()),
+            Some(&shipped_graph()),
+            0,
+        )
+        .unwrap()
+        .unwrap();
+    assert_follows_the_roads(&reply);
+}
+
+/// The production binding: `Gameplay::load` reads the content set's `road_graph.json` and
+/// hands it to the path request, for both kinds, and a zone without a graph gets the
+/// straight line.
+#[test]
+fn a_loaded_game_answers_road_routes_from_its_content_set() {
+    let mut game = Gameplay::load(&node_content::content_dir(), None).unwrap();
+    game.set_terrain(Some(Arc::new(road_terrain())));
+    let player = |zone| CharacterState {
+        guid: 1,
+        zone_id: zone,
+        position: [ROAD_FROM[0], ROAD_FROM[1], ROAD_FROM[2]],
+        rotation: [1.0, 0.0, 0.0],
+    };
+    let mut reply = |kind: u32, zone: u32, at: u64| {
+        let out = game
+            .handle_in_world(&request(kind, ROAD_FROM, ROAD_TO), &player(zone), at)
+            .unwrap();
+        assert_eq!(out.replies.len(), 1);
+        out.replies.into_iter().next().unwrap()
+    };
+    assert_follows_the_roads(&reply(1, 0, 1_000));
+    let take_me_there = reply(2, 0, 2_000);
+    assert_eq!(decode(&take_me_there).kind, 2);
+    assert_follows_the_roads(&take_me_there);
+    // Zone 99 has no height grid: the client's empty failure reply, not a road route.
+    assert!(decode(&reply(1, 99, 3_000)).points.is_empty());
 }

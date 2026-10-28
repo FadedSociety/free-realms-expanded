@@ -29,13 +29,23 @@
 //!   10 m. A non-empty reply replaces the route with the nodes (start to goal) and the
 //!   client re-requests as the player moves.
 //!
+//! Route (T554): the client ships its own road graph (`FabledRealms.map`), and kind 1 and
+//! kind 2 follow it on its zone (`road_graph`). Each end snaps to the nearest road node
+//! within the graph's `snap_radius_m`; A* over the roads gives the polyline, resampled
+//! every [`STEP`] metres and ground-snapped. An end with no node in range, no path, a
+//! route longer than `max_route_m`, another zone, or no loaded graph falls back to the
+//! straight line.
+//!
 //! (R) Not recovered, chosen here: kind 2 gets the same path as kind 1; the reply echoes
-//! the request's `kind` (the client routes the reply by it) and `aux`; the path is a
-//! straight line sampled every [`STEP`] metres with ground heights from
-//! [`Terrain`] (no obstacle avoidance); the request handle and tail are ignored; the
-//! rate cap; "own zone" means both points are covered by the zone's height grid and
-//! the start is within 300 m of the server's position for the player.
-use crate::terrain::Terrain;
+//! the request's `kind` (the client routes the reply by it) and `aux`; the fallback is a
+//! straight line sampled every [`STEP`] metres (no obstacle avoidance); road nodes in the
+//! reply carry w = 1.0; the request handle and tail are ignored; the rate cap; "own zone"
+//! means both points are covered by the zone's height grid and the start is within 300 m
+//! of the server's position for the player.
+use crate::{
+    road_graph::RoadGraph,
+    terrain::{HeightGrid, Terrain},
+};
 
 const FAMILY: u16 = 98;
 const REQUEST: u8 = 1;
@@ -103,12 +113,14 @@ fn reply(kind: u32, aux: u32, points: &[[f32; 4]]) -> Vec<u8> {
 impl Pathing {
     /// `None`: not a 98/1 kind 1 or 2 request, the caller carries on. `Some(Err)`: refused,
     /// send nothing. `Some(Ok)`: the 98/2 reply, a path or the client's empty failure reply.
+    /// `road` is the content set's road graph (`None`: straight lines).
     pub fn answer(
         &mut self,
         inner: &[u8],
         zone: u32,
         player: [f32; 3],
         terrain: Option<&Terrain>,
+        road: Option<&RoadGraph>,
         now_ms: u64,
     ) -> Option<Result<Vec<u8>, Refusal>> {
         if !inner.starts_with(&[FAMILY as u8, 0, REQUEST]) {
@@ -120,7 +132,7 @@ impl Pathing {
         if !KINDS.contains(&request.kind) {
             return None;
         }
-        Some(self.breadcrumb(&request, zone, player, terrain, now_ms))
+        Some(self.breadcrumb(&request, zone, player, terrain, road, now_ms))
     }
 
     fn breadcrumb(
@@ -129,6 +141,7 @@ impl Pathing {
         zone: u32,
         player: [f32; 3],
         terrain: Option<&Terrain>,
+        road: Option<&RoadGraph>,
         now_ms: u64,
     ) -> Result<Vec<u8>, Refusal> {
         let (from, to) = (request.from, request.to);
@@ -163,23 +176,73 @@ impl Pathing {
             return Err(Refusal::OutOfZone);
         }
         self.used += 1;
-        let run = (sq(from[0], to[0]) + sq(from[2], to[2])).sqrt();
-        let segments = ((run / STEP).ceil() as usize).clamp(1, MAX_POINTS - 1);
-        let mut y = from[1];
-        let points: Vec<[f32; 4]> = (0..=segments)
-            .map(|i| {
-                let t = i as f32 / segments as f32;
-                let lerp = |k: usize| from[k] + (to[k] - from[k]) * t;
-                // The ends are the client's own points; between them follow the ground,
-                // holding the last height across a hole in the grid.
-                y = match i {
-                    0 => from[1],
-                    _ if i == segments => to[1],
-                    _ => grid.height_at(lerp(0), lerp(2)).unwrap_or(y),
-                };
-                [lerp(0), y, lerp(2), lerp(3)]
-            })
-            .collect();
-        Ok(reply(request.kind, request.aux, &points))
+        let anchors = route_anchors(road, zone, from, to);
+        Ok(reply(request.kind, request.aux, &sample(grid, &anchors)))
     }
+}
+
+/// The polyline to sample: the road route for this zone when one applies, else the
+/// straight line between the client's own two points.
+fn route_anchors(
+    road: Option<&RoadGraph>,
+    zone: u32,
+    from: [f32; 4],
+    to: [f32; 4],
+) -> Vec<[f32; 4]> {
+    let nodes = road
+        .filter(|graph| graph.zone() == zone)
+        .and_then(|graph| graph.route([from[0], from[1], from[2]], [to[0], to[1], to[2]]));
+    let Some(nodes) = nodes else {
+        return vec![from, to];
+    };
+    let mut anchors = Vec::with_capacity(nodes.len() + 2);
+    anchors.push(from);
+    anchors.extend(nodes.into_iter().map(|p| [p[0], p[1], p[2], 1.0]));
+    anchors.push(to);
+    anchors
+}
+
+/// One point every [`STEP`] metres along the x/z polyline, with the ground height between
+/// the client's own ends and the last height held across a hole in the grid.
+fn sample(grid: &HeightGrid, anchors: &[[f32; 4]]) -> Vec<[f32; 4]> {
+    let run: f32 = anchors
+        .windows(2)
+        .map(|pair| ((pair[1][0] - pair[0][0]).powi(2) + (pair[1][2] - pair[0][2]).powi(2)).sqrt())
+        .sum();
+    let segments = ((run / STEP).ceil() as usize).clamp(1, MAX_POINTS - 1);
+    let first = anchors.first().copied().unwrap_or([0.0; 4]);
+    let last = anchors.last().copied().unwrap_or(first);
+    let mut y = first[1];
+    (0..=segments)
+        .map(|i| {
+            // The ends are the client's own points; between them follow the ground,
+            // holding the last height across a hole in the grid.
+            let mut point = match i {
+                0 => first,
+                _ if i == segments => last,
+                _ => along(anchors, run * i as f32 / segments as f32),
+            };
+            if i != 0 && i != segments {
+                y = grid.height_at(point[0], point[2]).unwrap_or(y);
+                point[1] = y;
+            }
+            point
+        })
+        .collect()
+}
+
+/// The point `distance` metres along the polyline, clamped to its ends; zero-length
+/// segments (a road node equal to a client point) are skipped.
+fn along(anchors: &[[f32; 4]], distance: f32) -> [f32; 4] {
+    let mut left = distance.max(0.0);
+    for pair in anchors.windows(2) {
+        let (a, b) = (pair[0], pair[1]);
+        let length = ((b[0] - a[0]).powi(2) + (b[2] - a[2]).powi(2)).sqrt();
+        if length > 0.0 && left <= length {
+            let t = left / length;
+            return std::array::from_fn(|k| a[k] + (b[k] - a[k]) * t);
+        }
+        left -= length;
+    }
+    anchors.last().copied().unwrap_or([0.0; 4])
 }

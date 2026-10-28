@@ -94,6 +94,7 @@ pub mod quests;
 pub mod recipe_book;
 pub mod recipes;
 pub mod rewards;
+pub mod road_graph;
 pub mod security_log;
 pub mod session;
 pub mod smelting;

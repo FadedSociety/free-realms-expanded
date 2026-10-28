@@ -207,6 +207,8 @@ pub struct Gameplay {
     terrain: Option<std::sync::Arc<crate::terrain::Terrain>>,
     /// 98/1 path-request budget for this session (W164).
     pathing: crate::pathing::Pathing,
+    /// The content set's road graph for 98/1 breadcrumbs (T554); `None` keeps straight lines.
+    road_graph: Option<Arc<crate::road_graph::RoadGraph>>,
     // World Builder live layer (`--world`); None keeps building in content_dir.
     world_dir: Option<PathBuf>,
     // Who may run developer `realm` commands (Build Plan 1.5). Player until
@@ -1229,6 +1231,7 @@ impl Gameplay {
             dev_tools: false,
             terrain: None,
             pathing: crate::pathing::Pathing::default(),
+            road_graph: crate::road_graph::RoadGraph::load(npc_content)?.map(Arc::new),
             world_dir: None,
             stock_text: None,
             role: crate::account_store::AccountRole::Player,
@@ -2162,6 +2165,7 @@ impl Gameplay {
             character.zone_id,
             character.position,
             self.terrain.as_deref(),
+            self.road_graph.as_deref(),
             now_ms,
         ) {
             return Ok(Outcome {
