@@ -306,6 +306,8 @@ impl Gameplay {
     ) -> io::Result<Option<Outcome>> {
         let minigame_active = self.blocks(|gates| gates.pets);
         let busy = crate::pets::PetBusy { minigame_active };
+        // T490: the 53/26 walk check samples the character's zone heightfield (none without a grid).
+        let ground = terrain_height(self.terrain.clone(), character.zone_id);
         let pets = &mut self.pets;
         let inventory = &mut self.inventory;
         // Pet need clocks are whole seconds and care timers (T485) milliseconds; the pet service
@@ -316,6 +318,7 @@ impl Gameplay {
             character.position,
             inventory,
             busy,
+            ground,
             now_ms,
         )?;
         let Some(wire) = wire else {

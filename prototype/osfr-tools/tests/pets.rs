@@ -122,19 +122,17 @@ fn follow_and_equipment_state_validate_owned_items_and_slots() {
     service
         .summon(pet_id, 44, 33, [0.0; 3], PetBusy::default(), 0)
         .unwrap();
-    let followed = service.follow_location([4.0, 5.0, 6.0]).unwrap();
-    assert_eq!(followed.owner_message[0..3], [53, 0, 26]);
-    assert_eq!(
-        followed.broadcasts,
-        [PetPresenceEvent::Follow {
-            actor_guid: 44,
-            target: [4.0, 5.0, 6.0]
-        }]
-    );
+    let followed =
+        service.follow_location([10.0, 0.0, 0.0, 0.0], [0.0; 3], |_, _| Some(0.0), 1_000);
+    let mut can_go = vec![53, 0, 26];
+    can_go.extend(44u64.to_le_bytes());
+    can_go.push(1);
+    assert_eq!(followed.private, vec![can_go], "the owned actor can go");
+    assert!(followed.shared.is_empty(), "the reply is owner-only");
     service.set_in_water(true).unwrap();
     assert_eq!(
         service.active_follow_state(),
-        Some((44, Some([4.0, 5.0, 6.0]), true))
+        Some((44, Some([10.0, 0.0, 0.0]), true))
     );
 
     service

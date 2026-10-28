@@ -802,6 +802,19 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     result.push(("pets", [vec![53, 0, 7], vec![0xff; 4]].concat()));
     result.push(("pets", [vec![53, 0, 8], vec![0xff; 4]].concat()));
     result.push(("pets", [vec![53, 0, 14], vec![0xff; 12]].concat()));
+    // T490: the tile-click can-go location (four floats and a flag).
+    result.push((
+        "pets",
+        [
+            vec![53, 0, 26],
+            10.0f32.to_le_bytes().to_vec(),
+            0.0f32.to_le_bytes().to_vec(),
+            0.0f32.to_le_bytes().to_vec(),
+            0.0f32.to_le_bytes().to_vec(),
+            vec![0],
+        ]
+        .concat(),
+    ));
     result.push(("gameplay.handle_in_world", vec![53, 0, 0xff, 0xff]));
     // T765: the card manager's ticket request (39/37), ignored without a started card run.
     result.push(("card_game", [vec![39, 0, 37], vec![0xff; 12]].concat()));

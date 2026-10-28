@@ -569,9 +569,8 @@ fn a_pet_lies_down_after_its_delay_fidgets_and_stands_when_the_owner_moves() {
     }
 }
 
-/// F809: a follow click moves the pet to the clicked spot, so the server pose follows it and
-/// stops counting as settled; otherwise a pet that lay down keeps its rest and fidgets while the
-/// client walks it.
+/// F809/T490: a routed follow click sends the pet walking on the next tick, so the server pose
+/// stops counting as settled and a pet that lay down stands up instead of fidgeting in place.
 #[test]
 fn a_follow_click_wakes_a_lying_pet_and_pauses_its_idle_life() {
     let content = content_with(|document| {
@@ -590,22 +589,27 @@ fn a_follow_click_wakes_a_lying_pet_and_pauses_its_idle_life() {
             .base_animation
             .is_some()
     );
-    // A refused click changes nothing: the pet stays where it lies, still settled.
+    // A refused click changes nothing: the pet stays where it lies, still settled and with no
+    // destination stored. The 53/26 reply (flag 0) is the only thing sent.
+    let actor = session.actor;
+    let can_go = |flag: bool| {
+        let mut packet = vec![53, 0, 26];
+        packet.extend(actor.to_le_bytes());
+        packet.push(u8::from(flag));
+        packet
+    };
     let before = session.service.view(OWNER).unwrap();
-    assert!(
-        session
-            .service
-            .follow_location([f32::NAN, 0.0, 0.0])
-            .is_err()
-    );
-    assert_eq!(session.service.view(OWNER).unwrap(), before);
-    // F833: a finite target beyond the follow rules is refused as well, before the pose or the
-    // pending target move; the next tick still finds the pet lying where it was.
-    for target in [[1e38, 1e38, 1e38], [0.0, 1e38, 0.0], [100.0, 0.0, 0.0]] {
-        assert!(
-            session.service.follow_location(target).is_err(),
-            "{target:?}"
-        );
+    for target in [
+        [f32::NAN, 0.0, 0.0, 0.0],
+        [1e38, 1e38, 1e38, 0.0],
+        [0.0, 1e38, 0.0, 0.0],
+        [100.0, 0.0, 0.0, 0.0],
+    ] {
+        let refused =
+            session
+                .service
+                .follow_location(target, session.owner, |_, _| Some(0.0), lying.at + 1);
+        assert_eq!(refused.private, vec![can_go(false)], "{target:?}");
         assert_eq!(session.service.view(OWNER).unwrap(), before, "{target:?}");
     }
     let still = session.tick(lying.at + TICK);
@@ -618,17 +622,20 @@ fn a_follow_click_wakes_a_lying_pet_and_pauses_its_idle_life() {
         session.service.view(OWNER).unwrap().base_animation,
         before.base_animation
     );
-    // Click "go there", within the click bound (40 m, the client's own maximum) but far from the
-    // settle spot: the client walks the pet, so the rest posture ends on the next tick instead of
-    // fidgeting on in place.
-    session
-        .service
-        .follow_location([20.0, 0.0, 20.0])
-        .expect("the active pet can go there");
+    // Click "go there", within the client's 8-40 m band but far from the settle spot: the server
+    // walks the pet there, so the rest posture ends on the next tick instead of fidgeting on in
+    // place.
+    let accepted = session.service.follow_location(
+        [20.0, 0.0, 0.0, 0.0],
+        session.owner,
+        |_, _| Some(0.0),
+        lying.at + TICK,
+    );
+    assert_eq!(accepted.private, vec![can_go(true)]);
     let up = session.tick(lying.at + 2 * TICK);
     assert_stand_up(&up);
     assert_eq!(session.service.view(OWNER).unwrap().base_animation, None);
-    // It walks back to its owner, so no rest pose resumes while the walk runs.
+    // It walks to the clicked spot, so no rest pose resumes while the walk runs.
     let walked = session.run(lying.at + 3 * TICK, lying.at + 6_000);
     assert!(
         walked

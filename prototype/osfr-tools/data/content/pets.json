@@ -54171,6 +54171,13 @@
     "warp_far_ms": 5000,
     "warp_climb_m": 6.0,
     "click_max_m": 40.0,
+    "min_click_m": 8.0,
+    "step_up_m": 1.0,
+    "step_down_m": 3.0,
+    "sample_m": 0.5,
+    "min_click_interval_ms": 200,
+    "resume_m": 3.0,
+    "go_timeout_ms": 10000,
     "send_ms": 500
   },
   "care": {

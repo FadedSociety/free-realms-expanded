@@ -292,6 +292,7 @@ fn every_refusal_sends_only_the_unlocks_and_changes_nothing() {
             PetBusy {
                 minigame_active: true,
             },
+            |_, _| None,
             at,
         )
         .unwrap()

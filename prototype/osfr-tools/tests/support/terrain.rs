@@ -47,3 +47,30 @@ pub fn slope_degrees(grid: &HeightGrid, x: f32, z: f32) -> f32 {
     let dz = (north - south) / 2.0;
     dx.hypot(dz).atan().to_degrees()
 }
+
+/// A synthetic `cell`-metre heightfield over `min..max`: each cell is two triangles whose
+/// corner heights come from `height`. A suite that needs a flat plane, a step or a cliff builds
+/// it here instead of copying the raster loop.
+pub fn surface(
+    min: [f32; 2],
+    max: [f32; 2],
+    cell: f32,
+    height: impl Fn(f32, f32) -> f32,
+) -> HeightGrid {
+    let mut grid = HeightGrid::new(min, max, cell).expect("a valid synthetic grid");
+    let cols = ((max[0] - min[0]) / cell).ceil() as i64;
+    let rows = ((max[1] - min[1]) / cell).ceil() as i64;
+    for col in 0..cols {
+        for row in 0..rows {
+            let (x0, z0) = (min[0] + col as f32 * cell, min[1] + row as f32 * cell);
+            let (x1, z1) = (x0 + cell, z0 + cell);
+            let h00 = height(x0, z0);
+            let h10 = height(x1, z0);
+            let h11 = height(x1, z1);
+            let h01 = height(x0, z1);
+            grid.add_triangle([[x0, h00, z0], [x1, h10, z0], [x1, h11, z1]]);
+            grid.add_triangle([[x0, h00, z0], [x1, h11, z1], [x0, h01, z1]]);
+        }
+    }
+    grid
+}

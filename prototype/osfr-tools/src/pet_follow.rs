@@ -5,6 +5,11 @@
 //! way it moves enemies. Every number is a reconstructed (R) default from the `pets.json`
 //! `follow` block; the behaviour (follow behind, settle beside a still owner, warp on a
 //! teleport) is the one OSFR PR #152 shows, read for behaviour only.
+//!
+//! T490: a click walks the pet to that spot (53/26), and every step of a path is checked
+//! against the heightfield first: a rise over `step_up_m`, a drop over `step_down_m` or
+//! unknown ground refuses the step, and a pet that makes no progress for `warp_far_ms` warps
+//! to its owner.
 
 use serde::{Deserialize, Serialize};
 
@@ -12,6 +17,9 @@ use serde::{Deserialize, Serialize};
 const STILL_EPS_M: f32 = 0.05;
 /// The pet has reached its spot (m).
 const ARRIVE_M: f32 = 0.1;
+/// (R) A safety bound on one walk check. Callers cap a click path with `click_max_m` (40 m at
+/// the shipped values); this only stops a bad caller from sampling a whole world.
+const MAX_WALK_SAMPLES: usize = 4_096;
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
@@ -34,8 +42,26 @@ pub struct FollowConfig {
     /// F833 (R): how far a follow click may land from its owner (and how far its height may
     /// differ) before it is refused. The client's own sender `00b5fcf0` reports only a target
     /// 8-40 m from the point it tracks, so 40 m admits every real click; reachability itself is
-    /// still unrecovered.
+    /// checked by `walkable` (T490).
     pub click_max_m: f32,
+    /// T490: the client's own minimum click distance from the owner (`DAT_0176b1b0` = 8.0 m in
+    /// `00b5fcf0`); a nearer click answers 0.
+    pub min_click_m: f32,
+    /// T490: the most the ground may rise between two walk samples (1 m, as OSFR PR #152
+    /// steps up; the value is (R)).
+    pub step_up_m: f32,
+    /// T490: the most the ground may fall between two walk samples (3 m, the same reference;
+    /// (R)).
+    pub step_down_m: f32,
+    /// T490: the distance between walk samples (the same reference samples every 0.5 m; (R)).
+    pub sample_m: f32,
+    /// T490: the client sends a click at most every 200 ms (`DAT_01b5d874` = 0xC8 against
+    /// `timeGetTime` milliseconds, sub_7027F0 / sub_8B0E20); the server answers one sooner 0.
+    pub min_click_interval_ms: u64,
+    /// T490: how far the owner may move before a waiting pet resumes following (R).
+    pub resume_m: f32,
+    /// T490: how long the pet waits at a clicked spot after reaching it (R).
+    pub go_timeout_ms: u64,
     pub send_ms: u64,
 }
 
@@ -69,18 +95,81 @@ impl FollowConfig {
             && (1..=60_000).contains(&self.warp_far_ms)
             && (1.0..=100.0).contains(&self.click_max_m)
             && self.click_max_m <= self.warp_far_m
+            && self.min_click_m.is_finite()
+            && 0.5 <= self.min_click_m
+            && self.min_click_m < self.click_max_m
+            && self.step_up_m.is_finite()
+            && (0.1..=10.0).contains(&self.step_up_m)
+            && self.step_down_m.is_finite()
+            && (0.1..=20.0).contains(&self.step_down_m)
+            && self.sample_m.is_finite()
+            && (0.1..=5.0).contains(&self.sample_m)
+            && self.min_click_interval_ms <= 60_000
+            && self.resume_m.is_finite()
+            && (0.5..=50.0).contains(&self.resume_m)
+            && (1_000..=600_000).contains(&self.go_timeout_ms)
             && (50..=10_000).contains(&self.send_ms)
             && self.catch_up_start_m > self.behind_m
             && self.warp_far_m > self.catch_up_start_m
     }
 
-    /// F833 (R): a follow click is admitted only within `click_max_m` of the owner, in both the
-    /// ground plane and height, so a forged coordinate cannot park the pet on the far side of the
-    /// world. The client's own bound is 8-40 m (`00b5fcf0`); this one only rejects what the client
-    /// would not send.
+    /// F833/T490 (R): a follow click is admitted only in the client's own 8-40 m band from the
+    /// owner, in both the ground plane and height, so a forged coordinate cannot park the pet on
+    /// the far side of the world. The client's own sender `00b5fcf0` rejects what this refuses.
     pub fn admits_click(&self, owner: [f32; 3], target: [f32; 3]) -> bool {
-        dist(owner, target) <= self.click_max_m && (target[1] - owner[1]).abs() <= self.click_max_m
+        let distance = dist(owner, target);
+        (self.min_click_m..=self.click_max_m).contains(&distance)
+            && (target[1] - owner[1]).abs() <= self.click_max_m
     }
+}
+
+/// T490: whether the ground along the straight (x, z) path from `from` to `to` is walkable.
+///
+/// The path is sampled every `sample_m`; each sample must exist, be finite, and differ from the
+/// previous one by at most `step_up` up and `step_down` down. Unknown ground (`None`) is never
+/// walkable, so a zone without a height grid refuses every path. Heights come only from
+/// `ground`, so a client-supplied y can never decide the check. Cost is the number of samples
+/// (`length / sample_m`), bounded by `MAX_WALK_SAMPLES` and by the caller's `click_max_m`.
+pub fn walkable(
+    ground: impl Fn(f32, f32) -> Option<f32>,
+    from: [f32; 3],
+    to: [f32; 3],
+    step_up: f32,
+    step_down: f32,
+    sample_m: f32,
+) -> bool {
+    if !from.iter().all(|value| value.is_finite())
+        || !to.iter().all(|value| value.is_finite())
+        || !step_up.is_finite()
+        || !step_down.is_finite()
+        || !(sample_m > 0.0)
+    {
+        return false;
+    }
+    let (dx, dz) = (to[0] - from[0], to[2] - from[2]);
+    let length = (dx * dx + dz * dz).sqrt();
+    if !length.is_finite() {
+        return false;
+    }
+    let samples = (length / sample_m).ceil();
+    if samples > MAX_WALK_SAMPLES as f32 {
+        return false;
+    }
+    let samples = samples as usize;
+    let Some(mut previous) = ground(from[0], from[2]).filter(|y| y.is_finite()) else {
+        return false;
+    };
+    for sample in 1..=samples {
+        let t = sample as f32 / samples as f32;
+        let Some(y) = ground(from[0] + dx * t, from[2] + dz * t).filter(|y| y.is_finite()) else {
+            return false;
+        };
+        if y - previous > step_up || previous - y > step_down {
+            return false;
+        }
+        previous = y;
+    }
+    true
 }
 
 /// The owner as the server last accepted it: position and the time of that update.
@@ -105,6 +194,17 @@ pub struct Move {
     pub heading: [f32; 3],
 }
 
+/// T490: a clicked spot the pet walks to and then waits at (session only, like the pose).
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct GoTarget {
+    target: [f32; 3],
+    /// The owner's position when the click was accepted; moving `resume_m` from it ends the go.
+    owner: [f32; 3],
+    /// When the pet reached the spot; the wait timeout counts from here, not from the click,
+    /// so a long walk never expires before it arrives.
+    arrived_ms: Option<u64>,
+}
+
 /// Session-only pet pose: never saved and never part of the roster.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct PetPose {
@@ -121,11 +221,16 @@ pub struct PetPose {
     moving: bool,
     settled: bool,
     paused: bool,
+    /// T490: the clicked destination the pet walks to or waits at.
+    go: Option<GoTarget>,
+    /// T490: when a walk step was last refused, for the `warp_far_ms` no-progress warp.
+    blocked_since_ms: Option<u64>,
 }
 
 impl PetPose {
     /// The pet has walked to its spot beside a still owner and stands there (T531: its idle life
-    /// runs only while this holds; a walk, a warp or the pet window clears it).
+    /// runs only while this holds; a walk, a warp or the pet window clears it). T490: a pet
+    /// waiting at a clicked spot counts as settled too.
     pub fn settled(&self) -> bool {
         self.settled
     }
@@ -137,13 +242,10 @@ impl PetPose {
             .map_or(self.position, |owner| owner.position)
     }
 
-    /// A follow click places the pet at `target`: it is no longer settled beside its owner, so the
-    /// idle life stops until the follow step parks it again. The click's 125 already moved the
-    /// client pet there, so the server pose follows it instead of walking back from the old spot.
-    pub fn goto(&mut self, target: [f32; 3]) {
-        self.position = target;
-        self.moving = false;
-        self.settled = false;
+    /// T490: the spot a 53/26 click sent the pet to, while it walks there or waits; `None` once
+    /// following resumes. Session-only, like the pose.
+    pub fn go_target(&self) -> Option<[f32; 3]> {
+        self.go.map(|go| go.target)
     }
 }
 
@@ -177,6 +279,25 @@ fn spawn_inner(owner: [f32; 3]) -> PetPose {
         moving: false,
         settled: false,
         paused: false,
+        go: None,
+        blocked_since_ms: None,
+    }
+}
+
+/// T490: the pet was sent to `target` (a 53/26 the server accepted). The caller has already
+/// checked the click's bounds and walkability; this only records the destination, and the next
+/// `step` walks there.
+pub fn go_to(pet: PetPose, target: [f32; 3], owner: [f32; 3]) -> PetPose {
+    PetPose {
+        go: Some(GoTarget {
+            target,
+            owner,
+            arrived_ms: None,
+        }),
+        // A new accepted click starts a new goal: a no-progress clock from the old walk must not
+        // warp the pet before it takes its first step toward this one.
+        blocked_since_ms: None,
+        ..pet
     }
 }
 
@@ -234,10 +355,51 @@ pub fn step(
         p.paused = true;
         p.moving = false;
         p.settled = false;
+        p.blocked_since_ms = None;
         p.heading = face;
         return (p, fresh.then(|| frame(MoveKind::Stop, &p)));
     }
     p.paused = false;
+
+    // T490: a clicked destination owns the pet until it arrives and its wait ends.
+    if let Some(go) = p.go {
+        let resumed = dist(go.owner, owner.position) > config.resume_m;
+        let waited = go
+            .arrived_ms
+            .is_some_and(|at| now.saturating_sub(at) >= config.go_timeout_ms);
+        if resumed || waited {
+            p.go = None;
+            p.blocked_since_ms = None;
+            // The clicked spot's wait is over; the follow rules decide where the pet goes next.
+            p.settled = false;
+        } else if go.arrived_ms.is_some() {
+            return (p, None);
+        } else {
+            let pace = config.min_speed;
+            return match advance(config, &mut p, owner, &ground, go.target, pace, now, dt) {
+                Advance::Bad => (pet, None),
+                Advance::Blocked => (p, None),
+                Advance::Warp => warp(config, p, owner, &ground),
+                Advance::Moved { arrived, moving } => {
+                    if arrived {
+                        p.go = Some(GoTarget {
+                            arrived_ms: Some(now),
+                            ..go
+                        });
+                        p.settled = true;
+                        p.moving = false;
+                        p.heading = unit(sub(owner.position, p.position)).unwrap_or(p.heading);
+                        let stop = sent(&mut p, now, MoveKind::Stop);
+                        return (p, Some(stop));
+                    }
+                    p.settled = false;
+                    p.moving = moving;
+                    let walk = walk_if_due(config, &mut p, now);
+                    (p, walk)
+                }
+            };
+        }
+    }
 
     let side = side_of(p.owner_facing, owner.position, p.position);
     let settling = p
@@ -267,47 +429,113 @@ pub fn step(
         speed = boosted.min(speed * config.max_speed_multiplier);
     }
 
-    let to_target = sub(target, p.position);
+    match advance(config, &mut p, owner, &ground, target, speed, now, dt) {
+        Advance::Bad => (pet, None),
+        Advance::Blocked => (p, None),
+        Advance::Warp => warp(config, p, owner, &ground),
+        Advance::Moved { arrived, moving } => {
+            if arrived && settling {
+                p.settled = true;
+                p.moving = false;
+                p.heading = unit(sub(owner.position, p.position)).unwrap_or(p.heading);
+                let stop = sent(&mut p, now, MoveKind::Stop);
+                return (p, Some(stop));
+            }
+            p.moving = moving;
+            let walk = walk_if_due(config, &mut p, now);
+            (p, walk)
+        }
+    }
+}
+
+/// What one `advance` did, so the follow and clicked-destination steps share every rule.
+enum Advance {
+    /// A bad ground value: the caller keeps the pose it had before the step.
+    Bad,
+    /// The heightfield refused the walk: the pet stays and the no-progress timer runs.
+    Blocked,
+    /// The climb limit or the no-progress timeout puts the pet beside its owner.
+    Warp,
+    Moved {
+        arrived: bool,
+        /// The distance was over the arrival radius before the step (a snap reports a walk).
+        moving: bool,
+    },
+}
+
+/// One movement toward `target` at `speed` m/s: the single place the ground height, the 6 m
+/// climb limit and the T490 walk check are applied.
+fn advance(
+    config: &FollowConfig,
+    p: &mut PetPose,
+    owner: OwnerPose,
+    ground: &impl Fn(f32, f32) -> Option<f32>,
+    target: [f32; 3],
+    speed: f32,
+    now: u64,
+    dt: f32,
+) -> Advance {
+    let from = p.position;
+    let to_target = sub(target, from);
     let remaining = (to_target[0] * to_target[0] + to_target[1] * to_target[1]).sqrt();
     let reach = speed * dt;
-    let (x, z, arrived) = if remaining <= ARRIVE_M.max(reach) {
-        (target[0], target[2], true)
+    let (x, z, arrived, heading) = if remaining <= ARRIVE_M.max(reach) {
+        (target[0], target[2], true, None)
     } else {
         let d = [to_target[0] / remaining, to_target[1] / remaining];
-        p.heading = d;
         (
-            p.position[0] + d[0] * reach,
-            p.position[2] + d[1] * reach,
+            from[0] + d[0] * reach,
+            from[2] + d[1] * reach,
             false,
+            Some(d),
         )
     };
-    let y = match ground(x, z) {
-        Some(y) if !y.is_finite() => return (pet, None),
+    let stepped = ground(x, z);
+    let y = match stepped {
+        Some(y) if !y.is_finite() => return Advance::Bad,
         Some(y) if (y - p.position[1]).abs() > config.warp_climb_m && p.last_sent_ms.is_some() => {
-            return warp(config, p, owner, &ground);
+            return Advance::Warp;
         }
         Some(y) => y,
-        // A zone without a terrain grid keeps the owner's height (R).
+        // A zone without a terrain grid keeps the owner's height (R); the walk check below is
+        // skipped only when neither end of the step has ground.
         None => owner.position[1],
     };
-    p.position = [x, y, z];
-
-    if arrived && settling {
-        p.settled = true;
-        p.moving = false;
-        p.heading = unit(sub(owner.position, p.position)).unwrap_or(p.heading);
-        let stop = sent(&mut p, now, MoveKind::Stop);
-        return (p, Some(stop));
+    let checked = stepped.is_some_and(|y| y.is_finite())
+        || ground(from[0], from[2]).is_some_and(|y| y.is_finite());
+    if checked
+        && (x != from[0] || z != from[2])
+        && !walkable(
+            ground,
+            from,
+            [x, y, z],
+            config.step_up_m,
+            config.step_down_m,
+            config.sample_m,
+        )
+    {
+        let since = *p.blocked_since_ms.get_or_insert(now);
+        if now.saturating_sub(since) >= config.warp_far_ms {
+            return Advance::Warp;
+        }
+        return Advance::Blocked;
     }
-    p.moving = remaining > ARRIVE_M;
+    p.blocked_since_ms = None;
+    if let Some(heading) = heading {
+        p.heading = heading;
+    }
+    p.position = [x, y, z];
+    Advance::Moved {
+        arrived,
+        moving: remaining > ARRIVE_M,
+    }
+}
+
+fn walk_if_due(config: &FollowConfig, p: &mut PetPose, now: u64) -> Option<Move> {
     let due = p
         .last_sent_ms
         .is_none_or(|sent| now.saturating_sub(sent) >= config.send_ms);
-    if p.moving && due {
-        let walk = sent(&mut p, now, MoveKind::Walk);
-        return (p, Some(walk));
-    }
-    (p, None)
+    (p.moving && due).then(|| sent(p, now, MoveKind::Walk))
 }
 
 fn warp(
@@ -330,6 +558,8 @@ fn warp(
     p.catching_up = false;
     p.moving = false;
     p.settled = false;
+    p.go = None;
+    p.blocked_since_ms = None;
     let now = owner.at_ms;
     let warp = sent(&mut p, now, MoveKind::Warp);
     (p, Some(warp))

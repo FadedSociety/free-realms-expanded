@@ -297,6 +297,7 @@ fn a_reconnect_starts_without_the_buff() {
         [0.0; 3],
         &mut fixture.inventory,
         PetBusy::default(),
+        |_, _| None,
         NOW,
     )
     .unwrap();

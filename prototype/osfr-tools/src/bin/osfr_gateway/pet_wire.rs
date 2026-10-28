@@ -7,6 +7,7 @@
 //! T485: the care panel's utility (53/16), feed (53/19) and water (53/28) bodies.
 //! T488: groom (53/18) and the tactile stroke report (53/22).
 //! T489: perform trick (53/7), gesture result (53/8) and favourite trick (53/14).
+//! T490: the tile-click can-go location (53/26).
 #![allow(dead_code)] // each includer uses a subset
 
 /// Client `SendPetSummon` (`00b5a650`): `53 00 | 4 | u32 pet id | action 1`.
@@ -85,5 +86,16 @@ pub fn favorite(pet_id: u32, slot: u32, trick_id: u32) -> Vec<u8> {
     for value in [pet_id, slot, trick_id] {
         bytes.extend(value.to_le_bytes());
     }
+    bytes
+}
+
+/// T490: the tile-click sender (`00b5fcf0`, ctor `00b51b20`, serializer `00b5a530`):
+/// `53 00 | 26 | f32 x | f32 y | f32 z | f32 w | u8 0`. The client always writes the flag 0.
+pub fn can_go(position: [f32; 4]) -> Vec<u8> {
+    let mut bytes = vec![53, 0, 26];
+    for value in position {
+        bytes.extend(value.to_le_bytes());
+    }
+    bytes.push(0);
     bytes
 }

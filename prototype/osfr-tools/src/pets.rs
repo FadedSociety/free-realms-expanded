@@ -34,7 +34,12 @@ const PET_GUID_TAG: u64 = 0x4000_0000_0000_0000;
 /// T485: the pet subtypes `PetRequest::decode` accepts; the gateway's pet label reads this list.
 /// T488: 18 (groom) and 22 (tactile stroke) join them.
 /// T489: 7 (perform trick), 8 (gesture result) and 14 (favourite trick) join them.
-pub const DECODED_SUBTYPES: [u8; 12] = [4, 6, 7, 8, 14, 16, 18, 19, 22, 24, 28, 32];
+/// T490: 26 (the tile-click can-go location) joins them.
+pub const DECODED_SUBTYPES: [u8; 13] = [4, 6, 7, 8, 14, 16, 18, 19, 22, 24, 26, 28, 32];
+
+/// T490: a parsed 53/26 coordinate may not exceed this (m). It is a parser sanity bound, not a
+/// gameplay rule: the click is refused unless it is within `click_max_m` of the owner anyway.
+const MAX_CLICK_COORD: f32 = 1_000_000.0;
 /// T485: the client's utility slots are the kit item's definition slot minus 199 (`00c077a0`):
 /// shampoo 200 -> 1 .. vitamins 206 -> 7. [`KitRole`] owns both directions.
 const UTILITY_SLOT_OFFSET: i32 = 199;
@@ -906,7 +911,6 @@ pub struct PetPresence {
 pub enum PetPresenceEvent {
     Spawn(PetPresence),
     Despawn { owner_guid: u64, actor_guid: u64 },
-    Follow { actor_guid: u64, target: [f32; 3] },
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -933,7 +937,7 @@ enum Need {
 }
 
 /// A decoded pet request. Only layouts pinned by a client sender are accepted.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum PetRequest {
     Summon {
         pet_id: u32,
@@ -997,6 +1001,14 @@ pub enum PetRequest {
         pet_id: u32,
         slot: u32,
         trick_id: u32,
+    },
+    /// T490 53/26 `PetCanGoLocation` (tile-click sender `00b5fcf0`, packet ctor `00b51b20`,
+    /// serializer `00b5a530`): four f32 and a flag byte the client always writes 0. Words 0..2
+    /// are the clicked (x, y, z); word 3 is the fourth component of the same 4-float vector
+    /// (`00b5fcf0` copies all four, and the owner-position reader `008a7d50` fills four), so the
+    /// server requires it finite but never uses it (R).
+    CanGo {
+        position: [f32; 4],
     },
 }
 
@@ -1147,6 +1159,29 @@ impl PetRequest {
                     trick_id: word(8)?,
                 }))
             }
+            26 => {
+                // T490: four floats, then the flag byte the ctor `00b51b20` zeroes and the
+                // sender never assigns, so anything else is not this client's layout.
+                if body.len() != 17 {
+                    return Err(invalid("pet can-go request has the wrong length"));
+                }
+                if body[16] != 0 {
+                    return Err(invalid("pet can-go request has an unknown flag"));
+                }
+                let mut position = [0.0f32; 4];
+                for (index, slot) in position.iter_mut().enumerate() {
+                    let at = index * 4;
+                    *slot =
+                        f32::from_le_bytes([body[at], body[at + 1], body[at + 2], body[at + 3]]);
+                }
+                if !position
+                    .iter()
+                    .all(|value| value.is_finite() && value.abs() <= MAX_CLICK_COORD)
+                {
+                    return Err(invalid("pet can-go request has an invalid position"));
+                }
+                Ok(Some(PetRequest::CanGo { position }))
+            }
             // Other client-bound pet subtypes are not enabled without a recovered layout.
             _ => Ok(None),
         }
@@ -1173,7 +1208,9 @@ struct ActivePet {
     owner_guid: u64,
     actor_guid: u64,
     position: [f32; 3],
-    follow_target: Option<[f32; 3]>,
+    /// T490: when the last 53/26 click was accepted (ms), for the client's 200 ms minimum
+    /// interval. Session only, like the pose.
+    last_click_ms: Option<u64>,
     in_water: bool,
     /// T455: session-only follow pose; never saved, never part of the roster.
     pose: crate::pet_follow::PetPose,
@@ -1407,7 +1444,7 @@ impl PetService {
 
     pub fn active_follow_state(&self) -> Option<(u64, Option<[f32; 3]>, bool)> {
         self.active
-            .map(|active| (active.actor_guid, active.follow_target, active.in_water))
+            .map(|active| (active.actor_guid, active.pose.go_target(), active.in_water))
     }
 
     pub fn adopt_from_owned_item(
@@ -1626,7 +1663,7 @@ impl PetService {
             owner_guid,
             actor_guid,
             position: pose.position,
-            follow_target: None,
+            last_click_ms: None,
             in_water: false,
             pose,
             feeding: None,
@@ -1826,6 +1863,9 @@ impl PetService {
             | PetRequest::PerformTrick { .. }
             | PetRequest::TrickResult { .. }
             | PetRequest::Favorite { .. } => Err(invalid("pet care requires the live inventory")),
+            // T490: the can-go decision needs the live clock, the owner position and the terrain;
+            // only `handle_at_ms` has them.
+            PetRequest::CanGo { .. } => Err(invalid("pet can-go requires the live clock")),
             // The client reports water whether or not a pet is out; only a summoned pet keeps it.
             // T488: entering water ends a grooming session. T489: and a trick.
             PetRequest::Water(in_water) => {
@@ -1909,12 +1949,15 @@ impl PetService {
             owner_position,
             inventory,
             busy,
+            |_, _| None,
             now.saturating_mul(1_000),
         )
     }
 
     /// The gateway route with the session's millisecond clock: care timers (T485) run in ms,
-    /// need clocks in whole seconds.
+    /// need clocks in whole seconds. T490: `ground` is the character's zone heightfield, for the
+    /// 53/26 walk check; a zone without a grid passes a closure that is always `None`, which
+    /// refuses every click (R).
     pub fn handle_at_ms(
         &mut self,
         inner: &[u8],
@@ -1922,6 +1965,7 @@ impl PetService {
         owner_position: [f32; 3],
         inventory: &mut Inventory,
         busy: PetBusy,
+        ground: impl Fn(f32, f32) -> Option<f32>,
         now_ms: u64,
     ) -> io::Result<Option<PetWire>> {
         let Some(request) = PetRequest::decode(inner)? else {
@@ -1955,6 +1999,16 @@ impl PetService {
                     duration_ms,
                     movement,
                     busy,
+                    now_ms,
+                )));
+            }
+            // T490: the tile click; on yes the pet walks there on the following updates and
+            // ticks. A refusal changes nothing but the 53/26 reply.
+            PetRequest::CanGo { position } => {
+                return Ok(Some(self.follow_location(
+                    position,
+                    owner_position,
+                    ground,
                     now_ms,
                 )));
             }
@@ -2035,23 +2089,6 @@ impl PetService {
                 }
                 PetPresenceEvent::Despawn { actor_guid, .. } => {
                     wire.shared.push(pet_removal_packet(actor_guid));
-                }
-                // T455: a follow click moves the pet to the spot with the enemy 125 writer (R).
-                PetPresenceEvent::Follow { actor_guid, target } => {
-                    let heading = self.active.map_or([0.0, 0.0, 1.0], |active| {
-                        let d = [
-                            target[0] - active.position[0],
-                            target[2] - active.position[2],
-                        ];
-                        let n = (d[0] * d[0] + d[1] * d[1]).sqrt();
-                        if n > 1e-4 {
-                            [d[0] / n, 0.0, d[1] / n]
-                        } else {
-                            [0.0, 0.0, 1.0]
-                        }
-                    });
-                    wire.shared
-                        .push(crate::enemies::movement_packet(actor_guid, target, heading));
                 }
             }
         }
@@ -2436,42 +2473,57 @@ impl PetService {
         bytes
     }
 
-    /// Store a follow destination and return the client acknowledgement plus a world-adapter
-    /// event. F833 (R): a target farther from the owner than `follow.click_max_m` (ground plane or
-    /// height) is refused before anything moves, so a forged coordinate cannot park the pet there;
-    /// reachability itself remains unrecovered.
-    pub fn follow_location(&mut self, target: [f32; 3]) -> io::Result<PetTransition> {
-        if !target.iter().all(|value| value.is_finite()) {
-            return Err(invalid("invalid pet follow location"));
+    /// T490: the routed 53/26 tile click. On yes the pet walks to `target` on the following
+    /// updates and ticks; on no it answers flag 0 and changes nothing. A target is refused when
+    /// it is outside the client's own click band from the owner (8 m to 40 m; `00b5fcf0`), was
+    /// sent inside `min_click_interval_ms` of the last accepted click (200 ms, the same sender),
+    /// is farther from the pet than one click path (`click_max_m`, which also bounds the walk
+    /// check's cost), or is not walkable from the pet (unknown ground included, so a zone
+    /// without a grid answers 0 (R)). Without an active pet there is no actor to name and
+    /// nothing is sent.
+    pub fn follow_location(
+        &mut self,
+        target: [f32; 4],
+        owner_position: [f32; 3],
+        ground: impl Fn(f32, f32) -> Option<f32>,
+        now_ms: u64,
+    ) -> PetWire {
+        let reply = |active: &ActivePet, can_go: bool| PetWire {
+            private: vec![pet_can_go_packet(active.actor_guid, can_go)],
+            ..PetWire::default()
+        };
+        let Some(active) = self.active.as_mut() else {
+            return PetWire::default();
+        };
+        let Some(follow) = self.content.follow.as_ref() else {
+            return reply(active, false);
+        };
+        let spot = [target[0], target[1], target[2]];
+        let (px, pz) = (spot[0] - active.position[0], spot[2] - active.position[2]);
+        let from_pet = (px * px + pz * pz).sqrt();
+        let too_soon = active
+            .last_click_ms
+            .is_some_and(|last| now_ms.saturating_sub(last) < follow.min_click_interval_ms);
+        // The cheap refusals run before the heightfield walk: a refused click costs one reply
+        // and no sampling.
+        if too_soon || !follow.admits_click(owner_position, spot) || from_pet > follow.click_max_m {
+            return reply(active, false);
         }
-        let active = self
-            .active
-            .as_mut()
-            .ok_or_else(|| invalid("no active pet"))?;
-        // Without follow rules there is no anchor to bound the click against, so it fails closed.
-        let follow = self
-            .content
-            .follow
-            .as_ref()
-            .ok_or_else(|| invalid("no pet follow rules"))?;
-        if !follow.admits_click(active.pose.owner_position(), target) {
-            return Err(invalid("pet follow location out of range"));
+        if !crate::pet_follow::walkable(
+            &ground,
+            active.position,
+            spot,
+            follow.step_up_m,
+            follow.step_down_m,
+            follow.sample_m,
+        ) {
+            return reply(active, false);
         }
-        active.follow_target = Some(target);
-        // T531: the click's 125 already moves the client pet to `target`; move the server pose too
-        // and stop it counting as settled, so the idle life pauses until the follow step parks it.
-        // `active.position` stays behind until that step copies the pose, so `wire` still derives
-        // the 125 heading from the pet's position before the click.
-        active.pose.goto(target);
-        // (R) No distance constants were recovered; a finite target receives an allow reply here.
-        Ok(PetTransition {
-            owner_message: pet_can_go_packet(active.actor_guid, true),
-            broadcasts: vec![PetPresenceEvent::Follow {
-                actor_guid: active.actor_guid,
-                target,
-            }],
-            changed: false,
-        })
+        active.last_click_ms = Some(now_ms);
+        // The pet walks from where it is; the clicked y never becomes its height (the walk step
+        // reads the heightfield), so a client-supplied y cannot move the pet.
+        active.pose = crate::pet_follow::go_to(active.pose, spot, owner_position);
+        reply(active, true)
     }
 
     pub fn set_in_water(&mut self, in_water: bool) -> io::Result<()> {
@@ -3187,8 +3239,9 @@ fn pet_favorite_packet(pet_id: u32, slot: u32, trick_id: u32) -> Vec<u8> {
     bytes
 }
 
+/// T490: 53/26 PetCanGoLocation reply (reader `00b578d0`: `sub_B55280` base header,
+/// `sub_8E2410` reads the u64 actor, the byte at +32 is the can-go flag at client +0x12f9).
 fn pet_can_go_packet(actor_guid: u64, can_go: bool) -> Vec<u8> {
-    // Reader 00b578d0 consumes a guid pair and flag; server acknowledgement is (R).
     let mut bytes = pet_header(26);
     bytes.extend(actor_guid.to_le_bytes());
     bytes.push(u8::from(can_go));
