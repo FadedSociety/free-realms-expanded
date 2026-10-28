@@ -19,10 +19,10 @@
 mod npc_quest_chain;
 
 use npc_quest_chain::{
-    CHARACTER, Fixture, accept, character_at_for, coins, content_dir, content_position, counts,
-    end_screen_reward, finish_quest, npc_interact, objective_activated, objective_complete,
-    objective_update, offer, pending_turnin, profile_xp, quest_status, release_end_screen, saved,
-    seed_active_profile, send, talk, zone_player,
+    CHARACTER, Fixture, accept, character_at_for, click_from, coins, collect, content_dir,
+    content_position, counts, end_screen_reward, finish_quest, objective_update, offer,
+    pending_turnin, pick, pickups, profile_xp, quest_status, release_end_screen, removed, said,
+    saved, seed_active_profile, shipped_nodes, talk, zone_player,
 };
 use osfr_tools::{
     gameplay::{Gameplay, Outcome},
@@ -63,12 +63,6 @@ fn fixture() -> Fixture {
     fixture
 }
 
-fn shipped_nodes() -> GatheringNodes {
-    GatheringNodes::load(&content_dir())
-        .expect("the shipped node tables load")
-        .expect("the shipped node tables are present")
-}
-
 fn node_named(name: &str) -> NodeActor {
     shipped_nodes()
         .actors()
@@ -77,62 +71,10 @@ fn node_named(name: &str) -> NodeActor {
         .clone()
 }
 
-fn tin_ore() -> Vec<NodeActor> {
-    let mut rows: Vec<NodeActor> = shipped_nodes()
-        .actors()
-        .filter(|actor| actor.name == "Tin Ore")
-        .cloned()
-        .collect();
-    rows.sort_by_key(|actor| actor.guid);
-    rows
-}
-
-/// The client's click (26/8) on `guid` from `position`, after the location report and the
-/// pose-driven NPC view update a moving player sends (which is what puts the node in this
-/// character's visible set, so the click's `NpcVisibility::refresh` can remove it).
-fn click_from(
-    game: &mut Gameplay,
-    player: u64,
-    guid: u64,
-    zone_id: u32,
-    position: [f32; 3],
-    now: u64,
-) -> Outcome {
-    let character = character_at_for(player, zone_id, position);
-    game.on_location(&character, now)
-        .expect("the location report is accepted");
-    game.update_npc_visibility(&character)
-        .expect("the NPC view update is served");
-    send(game, &character, &npc_interact(guid), now + 1)
-}
-
-fn has_guid(packet: &[u8], guid: u64) -> bool {
-    packet.windows(8).any(|window| window == guid.to_le_bytes())
-}
-
-fn removed(outcome: &Outcome, guid: u64) -> bool {
-    outcome
-        .replies
-        .iter()
-        .any(|packet| packet.starts_with(&[35, 0, 3, 0]) && has_guid(packet, guid))
-}
-
 fn added(outcome: &Outcome, guid: u64) -> bool {
-    outcome
-        .replies
-        .iter()
-        .any(|packet| packet.starts_with(&[35, 0, 2, 0]) && has_guid(packet, guid))
-}
-
-fn said(outcome: &Outcome, needle: &str) -> bool {
     outcome.replies.iter().any(|packet| {
-        if !packet.starts_with(&[15, 0, 3, 0]) || packet.len() < 9 {
-            return false;
-        }
-        let length = u32::from_le_bytes(packet[4..8].try_into().unwrap()) as usize;
-        packet
-            .get(8..8 + length)
-            .is_some_and(|text| String::from_utf8_lossy(text).contains(needle))
+        packet.starts_with(&[35, 0, 2, 0])
+            && packet.windows(8).any(|window| window == guid.to_le_bytes())
     })
 }
 
@@ -148,14 +90,6 @@ fn accept_booming(game: &mut Gameplay, player: u64, now: &mut u64) {
     *now += 20;
 }
 
-/// One pickup click; returns the outcome and the exact timestamp the handler saw.
-fn pick(game: &mut Gameplay, player: u64, node: &NodeActor, now: &mut u64) -> (Outcome, u64) {
-    let clicked_at = *now + 1;
-    let clicked = click_from(game, player, node.guid, 0, node.position, *now);
-    *now += 10;
-    (clicked, clicked_at)
-}
-
 fn tick(game: &mut Gameplay, now: u64) -> Outcome {
     game.tick(&character_at_for(CHARACTER, 0, [0.0, 0.0, 0.0]), now)
         .unwrap_or_else(|error| panic!("tick at {now}: {error}"))
@@ -163,43 +97,6 @@ fn tick(game: &mut Gameplay, now: u64) -> Outcome {
 
 fn mining_active(game: &Gameplay) -> bool {
     serde_json::to_value(game.state()).unwrap()["mining"]["active"].is_object()
-}
-
-/// The five pickups of A Booming Problem, asserting each counted update; returns the
-/// timestamp of the fifth click.
-fn pick_all_five(game: &mut Gameplay, player: u64, now: &mut u64) -> u64 {
-    let nodes = tin_ore();
-    assert_eq!(nodes.len(), 5, "five tin-ore spawns are shipped");
-    let mut last = *now;
-    for (index, node) in nodes.iter().enumerate() {
-        let current = index as u32 + 1;
-        let (clicked, clicked_at) = pick(game, player, node, now);
-        last = clicked_at;
-        assert!(
-            !said(&clicked, "You don't need that right now."),
-            "pickup {current} was refused"
-        );
-        assert!(
-            removed(&clicked, node.guid),
-            "pickup {current} must hide the node for this player"
-        );
-        assert!(
-            objective_update(&clicked, QUEST, 1, current),
-            "pickup {current} must send the counted 49/9 update"
-        );
-        assert_eq!(counts(game, QUEST), [current, 0]);
-        if current == 5 {
-            assert!(
-                objective_complete(&clicked, QUEST, 1),
-                "the fifth pickup completes the collect step"
-            );
-            assert!(
-                objective_activated(&clicked, QUEST, 2),
-                "the ordered talk step opens after the collect step"
-            );
-        }
-    }
-    last
 }
 
 fn turn_in(game: &mut Gameplay, player: u64, now: u64) {
@@ -221,7 +118,7 @@ fn a_booming_problem_end_to_end() {
     accept_booming(&mut game, CHARACTER, &mut now);
     assert_eq!(counts(&game, QUEST), [0, 0]);
 
-    pick_all_five(&mut game, CHARACTER, &mut now);
+    collect(&mut game, CHARACTER, QUEST, 1, "tin-ore", 5, 2, &mut now);
     turn_in(&mut game, CHARACTER, now);
 
     assert_eq!(coins(&game), coins_before + COINS);
@@ -234,7 +131,7 @@ fn pickup_refused_when_not_needed() {
     let fixture = fixture();
     let mut game = zone_player(&fixture, CHARACTER, ADVENTURER);
     let mut now = 1_000;
-    let nodes = tin_ore();
+    let nodes = pickups("tin-ore");
     let first = &nodes[0];
 
     // 1. No quest at all: one chat line, the node stays, the save is unchanged.
@@ -247,13 +144,13 @@ fn pickup_refused_when_not_needed() {
 
     // The refusal left the node usable: the same click succeeds once the quest is active.
     accept_booming(&mut game, CHARACTER, &mut now);
-    let (picked, _) = pick(&mut game, CHARACTER, first, &mut now);
+    let picked = pick(&mut game, CHARACTER, first, &mut now);
     assert!(removed(&picked, first.guid));
     assert_eq!(counts(&game, QUEST)[0], 1);
 
     // 2. The count is already 5 (the objective is full): a regrown node is refused.
     for (index, node) in nodes.iter().enumerate().skip(1) {
-        let (clicked, _) = pick(&mut game, CHARACTER, node, &mut now);
+        let clicked = pick(&mut game, CHARACTER, node, &mut now);
         assert!(
             objective_update(&clicked, QUEST, 1, index as u32 + 1),
             "pickup {} was not counted",
@@ -312,7 +209,7 @@ fn pickup_refused_out_of_range_or_busy() {
     let mut game = fixture.game_as(CHARACTER, Some(state));
     let mut now = 1_000;
     accept_booming(&mut game, CHARACTER, &mut now);
-    let node = tin_ore().remove(0);
+    let node = pickups("tin-ore").remove(0);
 
     // Beyond interact_range 12.
     let far = [node.position[0] + 30.0, node.position[1], node.position[2]];
@@ -359,9 +256,10 @@ fn picked_node_regrows_after_respawn() {
     let mut game = zone_player(&fixture, CHARACTER, ADVENTURER);
     let mut now = 1_000;
     accept_booming(&mut game, CHARACTER, &mut now);
-    let node = tin_ore().remove(0);
+    let node = pickups("tin-ore").remove(0);
 
-    let (picked, picked_at) = pick(&mut game, CHARACTER, &node, &mut now);
+    let picked_at = now + 1;
+    let picked = pick(&mut game, CHARACTER, &node, &mut now);
     assert!(removed(&picked, node.guid));
     assert_eq!(counts(&game, QUEST)[0], 1);
 
@@ -378,7 +276,7 @@ fn picked_node_regrows_after_respawn() {
     let back = tick(&mut game, picked_at + RESPAWN_MS);
     assert!(added(&back, node.guid), "the node regrows after 30 s");
 
-    let (second, _) = pick(&mut game, CHARACTER, &node, &mut now);
+    let second = pick(&mut game, CHARACTER, &node, &mut now);
     assert!(removed(&second, node.guid));
     assert!(objective_update(&second, QUEST, 1, 2));
     assert_eq!(counts(&game, QUEST), [2, 0]);
@@ -390,7 +288,7 @@ fn count_survives_reconnect() {
     let mut game = zone_player(&fixture, CHARACTER, ADVENTURER);
     let mut now = 1_000;
     accept_booming(&mut game, CHARACTER, &mut now);
-    let nodes = tin_ore();
+    let nodes = pickups("tin-ore");
     for node in nodes.iter().take(3) {
         pick(&mut game, CHARACTER, node, &mut now);
     }
@@ -402,7 +300,7 @@ fn count_survives_reconnect() {
 
     // Nodes are not saved: a fresh login sees every node, including one this
     // character already picked in its previous session.
-    let (picked_again, _) = pick(&mut game, CHARACTER, &nodes[0], &mut now);
+    let picked_again = pick(&mut game, CHARACTER, &nodes[0], &mut now);
     assert!(removed(&picked_again, nodes[0].guid));
     assert_eq!(counts(&game, QUEST), [4, 0]);
     pick(&mut game, CHARACTER, &nodes[3], &mut now);
@@ -420,10 +318,10 @@ fn two_players_do_not_share_nodes() {
     let mut now = 1_000;
     accept_booming(&mut a, CHARACTER, &mut now);
     accept_booming(&mut b, OTHER, &mut now);
-    let node = tin_ore().remove(0);
+    let node = pickups("tin-ore").remove(0);
 
     let b_before = saved(&b);
-    let (picked, _) = pick(&mut a, CHARACTER, &node, &mut now);
+    let picked = pick(&mut a, CHARACTER, &node, &mut now);
     assert!(removed(&picked, node.guid));
     assert_eq!(counts(&a, QUEST), [1, 0]);
     assert_eq!(counts(&b, QUEST), [0, 0], "A's pickup credited B");

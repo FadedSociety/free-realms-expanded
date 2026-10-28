@@ -30,6 +30,7 @@ use osfr_tools::{
     encounter::{FieldParticipant, SharedFieldAction, SharedFieldState},
     gameplay::{Gameplay, GameplayState, Outcome},
     gateway::Gateway,
+    harvest_nodes::{GatheringNodes, NodeActor},
     inventory::InventoryItem,
     npc_interaction::{decode_dialogue_26_3, decode_quest_offer_49_1},
     quest_engine::{QuestProgress, QuestStatus},
@@ -1079,8 +1080,23 @@ pub fn zone_player_unlocked(
     active: i32,
     unlocked: &[i32],
 ) -> Gameplay {
+    zone_player_with_quests(fixture, guid, active, unlocked, &[])
+}
+
+/// [`zone_player_unlocked`] with `completed` quests seeded as completed with their counters,
+/// so a follow-up's offer gate runs against the loader's own state.
+pub fn zone_player_with_quests(
+    fixture: &Fixture,
+    guid: u64,
+    active: i32,
+    unlocked: &[i32],
+    completed: &[(u32, &[u32])],
+) -> Gameplay {
     let mut state = fixture.game_as(guid, None).state();
     seed_active_profile(&mut state, active, unlocked);
+    for (quest, counters) in completed {
+        seed_quest(&mut state, *quest, QuestStatus::Completed, counters);
+    }
     fixture.game_as(guid, Some(state))
 }
 
@@ -1372,4 +1388,120 @@ pub fn objective_activated(outcome: &Outcome, quest: u32, objective: u32) -> boo
             && packet.len() >= 14
             && u32::from_le_bytes(packet[10..14].try_into().unwrap()) == objective
     })
+}
+
+/// The shipped quest-node tables (`data/content`), read through the production loader.
+pub fn shipped_nodes() -> GatheringNodes {
+    GatheringNodes::load(&content_dir())
+        .expect("the shipped node tables load")
+        .expect("the shipped node tables are present")
+}
+
+/// The placed pickups of one `quest_nodes.json` node type, in guid order.
+pub fn pickups(node_type: &str) -> Vec<NodeActor> {
+    let nodes = shipped_nodes();
+    let mut rows: Vec<NodeActor> = nodes
+        .actors()
+        .filter(|actor| {
+            nodes
+                .pickup_kind(actor.guid)
+                .is_some_and(|kind| kind == node_type)
+        })
+        .cloned()
+        .collect();
+    rows.sort_by_key(|actor| actor.guid);
+    rows
+}
+
+/// The client's click (26/8) on `guid` from `position`, after the location report and the
+/// pose-driven NPC view update that puts the actor in this character's visible set.
+pub fn click_from(
+    game: &mut Gameplay,
+    player: u64,
+    guid: u64,
+    zone_id: u32,
+    position: [f32; 3],
+    now: u64,
+) -> Outcome {
+    let character = character_at_for(player, zone_id, position);
+    game.on_location(&character, now)
+        .expect("the location report is accepted");
+    game.update_npc_visibility(&character)
+        .expect("the NPC view update is served");
+    send(game, &character, &npc_interact(guid), now + 1)
+}
+
+/// One pickup click at `node`'s placed position in the open world; advances `now`.
+pub fn pick(game: &mut Gameplay, player: u64, node: &NodeActor, now: &mut u64) -> Outcome {
+    let clicked = click_from(game, player, node.guid, 0, node.position, *now);
+    *now += 10;
+    clicked
+}
+
+/// Whether the outcome carries a 15/3 system chat line containing `needle`.
+pub fn said(outcome: &Outcome, needle: &str) -> bool {
+    outcome.replies.iter().any(|packet| {
+        if !packet.starts_with(&[15, 0, 3, 0]) || packet.len() < 9 {
+            return false;
+        }
+        let length = u32::from_le_bytes(packet[4..8].try_into().unwrap()) as usize;
+        packet
+            .get(8..8 + length)
+            .is_some_and(|text| String::from_utf8_lossy(text).contains(needle))
+    })
+}
+
+/// 35/3 removal of `guid`: the four-byte header, then the actor guid.
+pub fn removed(outcome: &Outcome, guid: u64) -> bool {
+    outcome.replies.iter().any(|packet| {
+        packet.starts_with(&[35, 0, 3, 0])
+            && packet.windows(8).any(|window| window == guid.to_le_bytes())
+    })
+}
+
+/// Pick every spawn of one node type, asserting the counted 49/9 update and, on the last
+/// pickup, the 49/10 complete and the next objective's 49/8.
+pub fn collect(
+    game: &mut Gameplay,
+    player: u64,
+    quest: u32,
+    objective: u32,
+    node_type: &str,
+    quantity: u32,
+    next: u32,
+    now: &mut u64,
+) {
+    let nodes = pickups(node_type);
+    assert_eq!(
+        nodes.len(),
+        quantity as usize,
+        "{node_type} must ship one spawn per required pickup"
+    );
+    for (index, node) in nodes.iter().enumerate() {
+        let current = index as u32 + 1;
+        let clicked = pick(game, player, node, now);
+        assert!(
+            !said(&clicked, "You don't need that right now."),
+            "{node_type} pickup {current} was refused"
+        );
+        assert!(
+            removed(&clicked, node.guid),
+            "{node_type} pickup {current} must hide the node"
+        );
+        assert!(
+            objective_update(&clicked, quest, objective, current),
+            "{node_type} pickup {current} must send the counted 49/9 update"
+        );
+        assert_eq!(counts(game, quest)[objective as usize - 1], current);
+        if current == quantity {
+            assert!(
+                objective_complete(&clicked, quest, objective),
+                "{node_type} pickup {current} must complete the step"
+            );
+            assert!(
+                objective_activated(&clicked, quest, next),
+                "objective {next} must open after {objective}"
+            );
+        }
+    }
 }

@@ -48699,7 +48699,7 @@
       ],
       "presence": "listed",
       "title_or_role": [
-        "Troll who runs the quarry; turn-in of Question at the Quarry"
+        "Troll who runs the quarry; turn-in of Question at the Quarry and giver of its Tools for Smashing and Box O' Rocks follow-ups"
       ],
       "roles": [
         "quest_giver"
@@ -48846,7 +48846,7 @@
         "title_or_role": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) authored for this slice (T498), not read from a guide row"
+            "evidence": "(R) authored for this slice (T498), not read from a guide row. F867: extended for the T539 quarry follow-ups Burglz gives (3000342 Tools for Smashing, 3000343 Box O' Rocks)."
           }
         ],
         "roles": [

@@ -7,7 +7,7 @@
     "legacy_license": "AGPL-3.0; data rows only, no source code copied",
     "node_tables": "src/Resources/CollectionNodeTypes.json (keys tin-ore, smashing-hammers, smashing-chisels, box-o-rocks, hastis-homework) and src/Resources/CollectionNodePools.json (keys briarwood-tin-ore, briarwood-smashing-hammers, briarwood-smashing-chisels, briarwood-box-o-rocks, briarwood-hastis-homework) at 37ef175",
     "spawn_tables": "src/Resources/CollectionNodeSpawns/1/{briarwood-tin-ore,briarwood-smashing-hammers,briarwood-smashing-chisels,briarwood-box-o-rocks,briarwood-hastis-homework}.json at e19669c",
-    "client_name": "CollectionNodeTypes.json has no NameId for these types; the client name string id is 0 (R)",
+    "client_name": "CollectionNodeTypes.json has no NameId for these types; the client name string id is 0 (R). F867: the display names follow the client's Resources/Models.txt props (197 sh_shovel_01.adr, 196 sh_pick_01.adr, 84 sh_crate_01.adr, 584 sg_papers_01.adr).",
     "policy": "(R) T503: the whole file is quest-only. A node type with a non-empty drop_table is a load error, and a pickup grants no item; the counted collect_node objective is the only reward."
   },
   "node_types": [
@@ -36,7 +36,7 @@
     },
     {
       "key": "smashing-hammers",
-      "name": "Hammer",
+      "name": "Shovel",
       "model_id": 197,
       "scale": 1.0,
       "composite_effect_id": 5386,
@@ -47,8 +47,8 @@
       "source_tag": "legacy-data",
       "source_tags": {
         "key": "legacy-data Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeTypes.json key smashing-hammers",
-        "name": "legacy-data as above, Name Hammer; the row has no NameId, so name id 0 (R)",
-        "model_id": "legacy-data as above, ModelId 197",
+        "name": "legacy-data as above, Name Hammer; the row has no NameId, so name id 0 (R). F867: the client's Resources/Models.txt row 197 is sh_shovel_01.adr, so the display name is Shovel, matching locale 70221 'Collect the lost shovels'.",
+        "model_id": "legacy-data as above, ModelId 197; client Resources/Models.txt row 197 maps it to sh_shovel_01.adr",
         "scale": "legacy-data as above, Scale 1.0",
         "composite_effect_id": "legacy-data as above, CompositeEffectId 5386",
         "interact_range": "legacy-data as above, InteractRange 12",
@@ -59,7 +59,7 @@
     },
     {
       "key": "smashing-chisels",
-      "name": "Chisel",
+      "name": "Pick",
       "model_id": 196,
       "scale": 1.0,
       "composite_effect_id": 5386,
@@ -70,8 +70,8 @@
       "source_tag": "legacy-data",
       "source_tags": {
         "key": "legacy-data Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeTypes.json key smashing-chisels",
-        "name": "legacy-data as above, Name Chisel; the row has no NameId, so name id 0 (R)",
-        "model_id": "legacy-data as above, ModelId 196",
+        "name": "legacy-data as above, Name Chisel; the row has no NameId, so name id 0 (R). F867: the client's Resources/Models.txt row 196 is sh_pick_01.adr, so the display name is Pick, matching locale 70227 'Collect the lost picks'.",
+        "model_id": "legacy-data as above, ModelId 196; client Resources/Models.txt row 196 maps it to sh_pick_01.adr",
         "scale": "legacy-data as above, Scale 1.0",
         "composite_effect_id": "legacy-data as above, CompositeEffectId 5386",
         "interact_range": "legacy-data as above, InteractRange 12",
@@ -94,7 +94,7 @@
       "source_tags": {
         "key": "legacy-data Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeTypes.json key box-o-rocks",
         "name": "legacy-data as above, Name Rock; the row has no NameId, so name id 0 (R)",
-        "model_id": "legacy-data as above, ModelId 84",
+        "model_id": "legacy-data as above, ModelId 84; client Resources/Models.txt row 84 maps it to sh_crate_01.adr (the locale goal says 'crates full of rocks')",
         "scale": "legacy-data as above, Scale 1.0",
         "composite_effect_id": "legacy-data as above, CompositeEffectId 5386",
         "interact_range": "legacy-data as above, InteractRange 12",
@@ -117,7 +117,7 @@
       "source_tags": {
         "key": "legacy-data Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeTypes.json key hastis-homework",
         "name": "legacy-data as above, Name Hasti's Homework; the row has no NameId, so name id 0 (R)",
-        "model_id": "legacy-data as above, ModelId 584",
+        "model_id": "legacy-data as above, ModelId 584; client Resources/Models.txt row 584 maps it to sg_papers_01.adr",
         "scale": "legacy-data as above, Scale 1.0",
         "composite_effect_id": "legacy-data as above, CompositeEffectId 5386",
         "interact_range": "legacy-data as above, InteractRange 12",
