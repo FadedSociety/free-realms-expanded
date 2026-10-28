@@ -233,12 +233,21 @@ impl Launches {
 
     /// The run's lifecycle packets (39/5 start, 39/6 leave, 39/7 ack). A 39/37, while the run is
     /// offered or later, mints the character's launch ticket and answers 39/0x28; the Start
-    /// click is refused until one was sent.
+    /// click is refused until one was sent. T866: an accepted Start renews that ticket's expiry
+    /// (same value), so a run panel read past `ticket_ttl_ms` no longer refuses the card login.
     pub fn route(&mut self, packet: &[u8], character: u64, now_ms: u64) -> io::Result<RunOutcome> {
         let mut outcome = self.runs.handle_client(packet)?;
         if let Some(request) = outcome.card_ticket {
             let ticket = self.tickets.mint(character, now_ms)?;
             outcome.replies.push(card_start_packet(request, ticket));
+        }
+        // Only an accepted Start changes the run to Starting (`MinigameRuns::start`), so both
+        // halves of the guard are needed. A repeated 39/37 *re-mints* - even while Starting,
+        // replacing the ticket the client already passed to the card DLL - and the 39/7 ack
+        // reports Starting; both leave `changed` false and must not renew. The other changed
+        // outcomes (39/6 leave, 26/42 close) are not Starting.
+        if outcome.changed && outcome.state == Some(RunState::Starting) {
+            self.tickets.renew(character, now_ms);
         }
         Ok(outcome)
     }

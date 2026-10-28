@@ -10,6 +10,7 @@ use osfr_tools::{
     activity_portal::{Catalogue, Refusal, Viewer},
     card_game::{self, Content, FIRST_INSTANCE_ID, Launches},
     gateway::{Gateway, GatewayOutcome},
+    minigame::RunState,
 };
 use serde_json::{Value, json};
 use std::{
@@ -403,6 +404,171 @@ fn the_type_16_handshake_sends_a_one_time_ticket_in_39_28() {
     assert!(after.replies.is_empty());
 }
 
+/// T866: a card run offered at 1,000 ms whose ticket was minted at 1,000 ms, with the content
+/// lifetime `ttl`: (launches, instance, ticket as decimal text, character id as decimal text).
+fn ticketed(ttl: u64) -> (Launches, i32, String, String) {
+    let cards = with_launch(ttl).unwrap();
+    let mut launches = Launches::new(cards.launch().unwrap()).unwrap();
+    let offer = launches.begin(cards.row(TCG_ROW).unwrap()).unwrap();
+    let instance = i32_at(&offer.replies[0], 3);
+    let asked = launches
+        .route(&client(37, instance), CHARACTER, 1_000)
+        .unwrap();
+    (
+        launches,
+        instance,
+        ticket_of(&asked.replies[0]).to_string(),
+        CHARACTER.to_string(),
+    )
+}
+
+/// T866 (native 2026-10-28): the ticket is minted while the run panel is open and lives
+/// `ticket_ttl_ms`; a player who reads the panel for almost the whole lifetime must still start.
+/// The Start click moves that ticket's expiry to now + the content lifetime, changing neither
+/// its value (no second 39/0x28) nor its one use, and the card login then redeems it past the
+/// first expiry.
+#[test]
+fn the_start_click_renews_the_launch_ticket_for_a_long_read_of_the_panel() {
+    const TTL: u64 = 60_000;
+    let (mut launches, instance, ticket, character) = ticketed(TTL);
+
+    // Start one second before the mint's own expiry, then redeem past it.
+    let start = launches
+        .route(&client(5, instance), CHARACTER, 1_000 + TTL - 1_000)
+        .unwrap();
+    assert_eq!(subs(&start.replies), vec![(39, 17)], "no second 39/0x28");
+    assert_eq!(
+        launches.redeem(&ticket, &character, 1_000 + TTL + 5_000),
+        Some(Ok(CHARACTER)),
+        "the renewed ticket redeems past the first expiry"
+    );
+    assert_eq!(
+        launches.redeem(&ticket, &character, 1_000 + TTL + 6_000),
+        None,
+        "still single use"
+    );
+}
+
+/// T866: the native run's timing (the T866 brief's run): a 60 s ticket minted at 07:39:48 and
+/// the Start click 68 s later, so the ticket was already past its first expiry when Start
+/// arrived. The Start click is what makes the value the client holds redeemable again.
+#[test]
+fn a_start_after_the_first_expiry_revives_the_ticket_the_client_holds() {
+    const TTL: u64 = 60_000;
+    let (mut launches, instance, ticket, character) = ticketed(TTL);
+
+    // The card login before Start: expired, refused, and the refusal spent nothing.
+    assert_eq!(
+        launches.redeem(&ticket, &character, 1_000 + TTL),
+        Some(Err("expired"))
+    );
+    let start = launches
+        .route(&client(5, instance), CHARACTER, 1_000 + 68_000)
+        .unwrap();
+    assert!(start.accepted);
+    assert_eq!(
+        launches.redeem(&ticket, &character, 1_000 + 69_000),
+        Some(Ok(CHARACTER))
+    );
+}
+
+/// T866: without an accepted Start nothing moves. Another run's Start is refused, the client's
+/// 39/7 ack is accepted without being a Start, and leaving ends the run; the ticket still
+/// expires at the mint's own lifetime and every refusal spent nothing.
+#[test]
+fn a_ticket_whose_start_never_came_stays_expired() {
+    const TTL: u64 = 60_000;
+    let (mut launches, instance, ticket, character) = ticketed(TTL);
+
+    let stray = launches
+        .route(&client(5, instance + 1), CHARACTER, 1_000 + TTL - 1_000)
+        .unwrap();
+    assert!(!stray.accepted && stray.replies.is_empty());
+    let ack = launches
+        .route(&client(7, instance), CHARACTER, 1_000 + TTL - 900)
+        .unwrap();
+    assert!(ack.accepted && ack.replies.is_empty() && !ack.changed);
+    for now in [1_000 + TTL, 1_000 + TTL + 5_000] {
+        assert_eq!(
+            launches.redeem(&ticket, &character, now),
+            Some(Err("expired")),
+            "no Start, no renewal (now {now})"
+        );
+    }
+    // Leaving the panel does not revive it either.
+    launches
+        .route(&client(6, instance), CHARACTER, 1_000 + TTL + 6_000)
+        .unwrap();
+    assert_eq!(
+        launches.redeem(&ticket, &character, 1_000 + TTL + 7_000),
+        Some(Err("expired"))
+    );
+}
+
+/// T866: renewal only ever moves an unspent ticket's expiry. A card login that redeemed the
+/// ticket before the Start click spent it, so Start has nothing to renew and the same value
+/// stays unknown: a spent ticket is never brought back.
+#[test]
+fn a_start_does_not_revive_a_spent_ticket() {
+    const TTL: u64 = 60_000;
+    let (mut launches, instance, ticket, character) = ticketed(TTL);
+    assert_eq!(
+        launches.redeem(&ticket, &character, 2_000),
+        Some(Ok(CHARACTER))
+    );
+    let start = launches
+        .route(&client(5, instance), CHARACTER, 1_000 + TTL / 2)
+        .unwrap();
+    assert!(start.accepted);
+    assert_eq!(
+        launches.redeem(&ticket, &character, 1_000 + TTL / 2 + 1_000),
+        None,
+        "the spent ticket is not revived"
+    );
+}
+
+/// T866 review finding 2: the guard keys on the accepted Start, not on "the run is Starting".
+/// A 39/7 ack reports Starting with `changed` false, so it must not renew; a repeated 39/37 is a
+/// re-mint (a fresh 39/0x28 that replaces the ticket the client already holds), not a renewal,
+/// and it also leaves `changed` false. Only the Start moves the same ticket's expiry.
+#[test]
+fn a_starting_state_ack_and_a_repeat_ticket_request_do_not_renew() {
+    const TTL: u64 = 60_000;
+    let (mut launches, instance, ticket, character) = ticketed(TTL);
+
+    let start = launches
+        .route(&client(5, instance), CHARACTER, TTL)
+        .unwrap();
+    assert!(start.accepted && start.changed);
+    assert_eq!(start.state, Some(RunState::Starting));
+    // Start moved the expiry to TTL + TTL; an ack a second later must not move it again.
+    let ack = launches
+        .route(&client(7, instance), CHARACTER, TTL + 1_000)
+        .unwrap();
+    assert!(ack.accepted && ack.replies.is_empty() && !ack.changed);
+    assert_eq!(ack.state, Some(RunState::Starting));
+    assert_eq!(
+        launches.redeem(&ticket, &character, TTL + TTL),
+        Some(Err("expired")),
+        "the ack did not renew the ticket"
+    );
+
+    // The 39/37 while Starting re-mints: a new value in 39/0x28, `changed` false, the value the
+    // client already passed to the DLL replaced rather than renewed.
+    let again = launches
+        .route(&client(37, instance), CHARACTER, TTL + TTL + 1)
+        .unwrap();
+    assert!(again.accepted && !again.changed);
+    assert_eq!(subs(&again.replies), vec![(39, 0x28)]);
+    let fresh = ticket_of(&again.replies[0]).to_string();
+    assert_ne!(fresh, ticket, "a re-mint replaces the held ticket");
+    assert_eq!(
+        launches.redeem(&ticket, &character, TTL + TTL + 2),
+        None,
+        "the replaced ticket is not revived"
+    );
+}
+
 /// The whole order through a production-shaped session, as the client sends it: Play, the
 /// ticket request while the run is offered, the Start click, the window close. The refused early
 /// Start leaves the run where it was.
@@ -464,6 +630,52 @@ fn the_card_start_order_runs_end_to_end_through_the_gateway() {
     assert_eq!(subs(&left), vec![(39, 19)]);
     let ack = send(&mut gateway, &client(7, instance), 4_010);
     assert!(ack.replies.is_empty());
+}
+
+/// T866 through the production dispatch: a short-lived ticket (2 s of content), the player's
+/// read of the run panel past it, then Start. The card login before Start is the native
+/// "Your session is not valid" refusal (expired); the accepted Start click renews the same
+/// ticket, which then redeems in the minting session, once.
+#[test]
+fn a_start_after_the_ticket_expired_renews_it_through_the_gateway() {
+    if !private_fixture_available() {
+        return;
+    }
+    let fixture = card_fixture(&launch_json(2_000));
+    let mut gateway = player(&fixture, 5_067);
+    let offered = bodies(&send(&mut gateway, &portal_play(TCG_ROW), 1_000));
+    let instance = i32_at(
+        offered
+            .iter()
+            .find(|p| p.starts_with(&[39, 0, 16]))
+            .expect("39/16 offer"),
+        3,
+    );
+    let asked = bodies(&send(&mut gateway, &client(37, instance), 2_000));
+    let ticket = ticket_of(&asked[0]).to_string();
+    let character = 5_067.to_string();
+    let before = gateway.snapshot();
+
+    let service = gateway.gameplay_mut().unwrap();
+    assert_eq!(
+        service.redeem_card_ticket(&ticket, &character, 4_001),
+        Some(Err("expired")),
+        "the 2 s ticket is past its expiry before Start"
+    );
+    let started = bodies(&send(&mut gateway, &client(5, instance), 7_000));
+    assert_eq!(subs(&started), vec![(39, 17)]);
+    assert_eq!(gateway.snapshot(), before, "a ticket marks no save");
+    let service = gateway.gameplay_mut().unwrap();
+    assert_eq!(
+        service.redeem_card_ticket(&ticket, &character, 7_030),
+        Some(Ok(5_067)),
+        "the Start click renewed the ticket the client holds"
+    );
+    assert_eq!(
+        service.redeem_card_ticket(&ticket, &character, 7_040),
+        None,
+        "single use"
+    );
 }
 
 #[test]

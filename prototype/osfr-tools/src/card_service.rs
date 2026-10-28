@@ -574,6 +574,23 @@ impl LaunchTickets {
         Ok(ticket)
     }
 
+    /// T866: move the expiry of `character`'s outstanding ticket to `now_ms + ttl_ms`, keeping
+    /// its value: the client already holds that ticket (`00ad32e0` stores the 39/0x28 halves,
+    /// `00ad47f0` passes them to the card DLL unchanged), so only the server's expiry can move.
+    /// The ticket may already be past the first expiry when the Start click arrives (native
+    /// 2026-10-28: Start 68 s after a 60 s mint); it stays unspent because only `redeem` spends,
+    /// and an expired one is swept only by the next mint. A spent or swept ticket is not
+    /// revived: a character without one is left as it was.
+    pub fn renew(&mut self, character: u64, now_ms: u64) {
+        if let Some((_, (_, expires))) = self
+            .issued
+            .iter_mut()
+            .find(|(_, (owner, _))| *owner == character)
+        {
+            *expires = now_ms.saturating_add(self.ttl_ms);
+        }
+    }
+
     /// Redeem the ticket and character id a 411 carries (decimal text, the client's `%llu`):
     /// `Some` holds the character the ticket was issued to, while it has not expired. `None`
     /// means this store does not hold the ticket at all (never minted here, already spent, or
