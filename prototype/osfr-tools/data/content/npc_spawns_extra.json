@@ -63661,37 +63661,6 @@
       "position_w": null
     },
     {
-      "spawn_guid": 9000000215,
-      "legacy_npc_id": null,
-      "content_key": 9000000215,
-      "model_id": 657,
-      "model_file_name": "fairy_m_freestyle_08.agr",
-      "name": "Tevin",
-      "name_string_id": 79022,
-      "position": [
-        303.51282,
-        27.23725,
-        410.2941
-      ],
-      "heading": -1.07071997,
-      "capture_match": null,
-      "source": [
-        {
-          "kind": "reference",
-          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3950 spawnNpcWithGuid(33741); src/Resources/Npcs.json Id=33741"
-        },
-        {
-          "kind": "client",
-          "evidence": "Global.Text.79022 = Tevin (lab/reports/locale-id-to-text.json); Models.txt 657 = fairy_m_freestyle_08.agr"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
-        }
-      ],
-      "position_w": null
-    },
-    {
       "spawn_guid": 9500000738,
       "legacy_npc_id": null,
       "content_key": 9500000738,
@@ -64000,37 +63969,6 @@
       ],
       "position_w": null,
       "sub_text_name_string_id": 3922
-    },
-    {
-      "spawn_guid": 9000000098,
-      "legacy_npc_id": null,
-      "content_key": 9000000098,
-      "model_id": 966,
-      "model_file_name": "human_m_gerold.agr",
-      "name": "Gerold",
-      "name_string_id": 104054,
-      "position": [
-        -207.1201,
-        -19.14542,
-        290.6031
-      ],
-      "heading": -1.39930999,
-      "capture_match": null,
-      "source": [
-        {
-          "kind": "reference",
-          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4163 spawnNpcWithGuid(34006); src/Resources/Npcs.json Id=34006"
-        },
-        {
-          "kind": "client",
-          "evidence": "Global.Text.104054 = Gerold (lab/reports/locale-id-to-text.json); Models.txt 966 = human_m_gerold.agr"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
-        }
-      ],
-      "position_w": null
     },
     {
       "spawn_guid": 9500000844,

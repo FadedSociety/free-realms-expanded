@@ -606,6 +606,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T505: job 120 gates the offer to a Card Duelist (profile 120 learned at Sam Potts); giver Poe stays 9000000170; stays disabled until a duel result exists (no server path credits a TYPE 16 duel)."
+        },
+        {
+          "kind": "client",
+          "evidence": "original quest 1304 (2014 capture, notes/Research/original-quest-coverage.json): objective 12597 text 103739, reward item 51187 Duelist Nature Cap, plus a value 300 of unconfirmed kind; job browser capture row profile 120."
         }
       ],
       "description_string_id": 103745,
@@ -1818,6 +1822,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T505: giver moved from Esther to Dominic 9000000074 (the NPC lists moved with it); Esther takes the turn-in through her quests_accepted entry; job 120 gates the offer; stays disabled until a duel result exists."
+        },
+        {
+          "kind": "client",
+          "evidence": "original quest 1875: objectives 15573 Meet Esther (407045) and 15574 Play and beat Esther's Friendly Deck (407047)"
         }
       ],
       "description_string_id": 407020,

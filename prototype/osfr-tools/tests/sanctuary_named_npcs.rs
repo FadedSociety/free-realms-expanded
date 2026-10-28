@@ -11,7 +11,9 @@
 //! No new wire shape.
 //!
 //! T506 moved 19 more drawn NPCs (the Lakeshore merchants, Skye, Drill Sergeant Dewey and
-//! others) from their POI guesses to the same placements, so 109 rows are `reference_data`.
+//! others) from their POI guesses to the same placements, so 109 rows became `reference_data`.
+//! T544 converted Gerold and Tevin to drawn `legacy_data` rows and removed their extras
+//! bodies, leaving 107 `reference_data` rows.
 
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
@@ -102,8 +104,8 @@ fn every_reference_row_is_drawn_once() {
     let rows = moved();
     assert_eq!(
         rows.len(),
-        109,
-        "T470 drew 90 named NPCs, T506 moved 19 more"
+        107,
+        "T470 drew 90 named NPCs, T506 moved 19 more; T544 converted Gerold and Tevin"
     );
     let extras = extra_rows();
     let guids: BTreeSet<_> = extras

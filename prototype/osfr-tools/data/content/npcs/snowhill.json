@@ -17594,7 +17594,7 @@
           "id": 38092
         }
       ],
-      "name_string_id_reason": null,
+      "name_string_id_reason": "Global.Text 38092 from the Sanctuary NameId; the row's former raw name hash 4090496530 maps to 38092 in lab/reports/locale-id-map.json (hash_to_ids); AddNpc reader 0x00921a10 reads the name dword after the GUID.",
       "zone": "Snowhill",
       "zone_id": 13,
       "zone_reason": null,
@@ -17906,6 +17906,10 @@
           {
             "kind": "wiki",
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Mayor's helpers, residents and the Crystal Barrier, row 85; source cell: [client][wiki]"
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 38092 = 'Garrison Gold'; the row's former raw name hash 4090496530 maps to 38092 in lab/reports/locale-id-map.json (hash_to_ids). AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "zone": [
@@ -18306,14 +18310,14 @@
       ],
       "name": "Gerold",
       "name_reason": null,
-      "name_string_id": 752220903,
+      "name_string_id": 104054,
       "name_string_ids": [
         {
-          "table": "ucdt",
-          "id": 752220903
+          "table": "client_locale",
+          "id": 104054
         }
       ],
-      "name_string_id_reason": null,
+      "name_string_id_reason": "Global.Text 104054 from the Sanctuary NameId; the row's former raw name hash 752220903 maps to 104054 in lab/reports/locale-id-map.json (hash_to_ids); AddNpc reader 0x00921a10 reads the name dword after the GUID.",
       "zone": "Snowhill",
       "zone_id": 13,
       "zone_reason": null,
@@ -18446,8 +18450,8 @@
         0.0,
         0.7650644000842751
       ],
-      "placement": "reference_data",
-      "placement_source": "reference_spawn",
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
       "placement_confidence": "medium",
       "placement_candidates": [],
       "capture_match": null,
@@ -18464,6 +18468,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:4163; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=34006 (ModelId=966, ModelFileName=human_m_gerold.agr, NameId=104054; Npcs.json line 36390); commit 10f129e, spawn added in e3deee7"
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 966 = human_m_gerold.agr (line 967); the client's model table maps this id to this body."
+        },
+        {
+          "kind": "client",
+          "evidence": "lab/reports/locale-id-to-text.json Global.Text 104054 = 'Gerold'; the row's former raw name hash 752220903 maps to 104054 in lab/reports/locale-id-map.json (hash_to_ids). AddNpc reader 0x00921a10 reads the name dword after the GUID."
         }
       ],
       "field_sources": {
@@ -18531,32 +18547,32 @@
         ],
         "name_string_id": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 131; source cell: [client][wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:4163; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=34006 (ModelId=966, ModelFileName=human_m_gerold.agr, NameId=104054; Npcs.json line 36390); commit 10f129e, spawn added in e3deee7"
           },
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 131; source cell: [client][wiki]"
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 104054 = 'Gerold'; the row's former raw name hash 752220903 maps to 104054 in lab/reports/locale-id-map.json (hash_to_ids). AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_ids": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 131; source cell: [client][wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:4163; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=34006 (ModelId=966, ModelFileName=human_m_gerold.agr, NameId=104054; Npcs.json line 36390); commit 10f129e, spawn added in e3deee7"
           },
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 131; source cell: [client][wiki]"
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 104054 = 'Gerold'; the row's former raw name hash 752220903 maps to 104054 in lab/reports/locale-id-map.json (hash_to_ids). AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_id_reason": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 131; source cell: [client][wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:4163; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=34006 (ModelId=966, ModelFileName=human_m_gerold.agr, NameId=104054; Npcs.json line 36390); commit 10f129e, spawn added in e3deee7"
           },
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 131; source cell: [client][wiki]"
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 104054 = 'Gerold'; the row's former raw name hash 752220903 maps to 104054 in lab/reports/locale-id-map.json (hash_to_ids). AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "zone": [
@@ -18825,14 +18841,14 @@
         ],
         "position": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4163 spawnNpcWithGuid(34006); src/Resources/Npcs.json Id=34006"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:4163; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=34006 (ModelId=966, ModelFileName=human_m_gerold.agr, NameId=104054; Npcs.json line 36390); commit 10f129e, spawn added in e3deee7"
           }
         ],
         "position_reason": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4163 spawnNpcWithGuid(34006); src/Resources/Npcs.json Id=34006"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:4163; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=34006 (ModelId=966, ModelFileName=human_m_gerold.agr, NameId=104054; Npcs.json line 36390); commit 10f129e, spawn added in e3deee7"
           }
         ],
         "position_w": [
@@ -18843,48 +18859,70 @@
         ],
         "rotation": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4163 spawnNpcWithGuid(34006); src/Resources/Npcs.json Id=34006"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:4163; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=34006 (ModelId=966, ModelFileName=human_m_gerold.agr, NameId=104054; Npcs.json line 36390); commit 10f129e, spawn added in e3deee7"
           }
         ],
         "placement": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4163 spawnNpcWithGuid(34006); src/Resources/Npcs.json Id=34006"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:4163; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=34006 (ModelId=966, ModelFileName=human_m_gerold.agr, NameId=104054; Npcs.json line 36390); commit 10f129e, spawn added in e3deee7"
           }
         ],
         "placement_source": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4163 spawnNpcWithGuid(34006); src/Resources/Npcs.json Id=34006"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:4163; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=34006 (ModelId=966, ModelFileName=human_m_gerold.agr, NameId=104054; Npcs.json line 36390); commit 10f129e, spawn added in e3deee7"
           }
         ],
         "placement_confidence": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4163 spawnNpcWithGuid(34006); src/Resources/Npcs.json Id=34006"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:4163; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=34006 (ModelId=966, ModelFileName=human_m_gerold.agr, NameId=104054; Npcs.json line 36390); commit 10f129e, spawn added in e3deee7"
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4163 spawnNpcWithGuid(34006); src/Resources/Npcs.json Id=34006"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:4163; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=34006 (ModelId=966, ModelFileName=human_m_gerold.agr, NameId=104054; Npcs.json line 36390); commit 10f129e, spawn added in e3deee7"
           }
         ],
         "capture_match": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+            "kind": "legacy-data",
+            "evidence": "No identity-matched AddNpc capture was assigned to this regional row."
           }
         ],
         "heading": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4163 spawnNpcWithGuid(34006); src/Resources/Npcs.json Id=34006"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:4163; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=34006 (ModelId=966, ModelFileName=human_m_gerold.agr, NameId=104054; Npcs.json line 36390); commit 10f129e, spawn added in e3deee7"
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:4163; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=34006 (ModelId=966, ModelFileName=human_m_gerold.agr, NameId=104054; Npcs.json line 36390); commit 10f129e, spawn added in e3deee7"
+          },
+          {
+            "kind": "client",
+            "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 966 = human_m_gerold.agr (line 967); the client's model table maps this id to this body."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:4163; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=34006 (ModelId=966, ModelFileName=human_m_gerold.agr, NameId=104054; Npcs.json line 36390); commit 10f129e, spawn added in e3deee7"
+          },
+          {
+            "kind": "client",
+            "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 966 = human_m_gerold.agr (line 967); the client's model table maps this id to this body."
           }
         ]
       },
-      "heading": -1.39930999
+      "heading": -1.39930999,
+      "model_id": 966,
+      "model_file_name": "human_m_gerold.agr"
     },
     {
       "npc_id": 9500000750,
@@ -40334,14 +40372,14 @@
       ],
       "name": "Tevin",
       "name_reason": null,
-      "name_string_id": 3316189035,
+      "name_string_id": 79022,
       "name_string_ids": [
         {
-          "table": "ucdt",
-          "id": 3316189035
+          "table": "client_locale",
+          "id": 79022
         }
       ],
-      "name_string_id_reason": null,
+      "name_string_id_reason": "Global.Text 79022 from the Sanctuary NameId; the row's former raw name hash 3316189035 maps to 79022 in lab/reports/locale-id-map.json (hash_to_ids); AddNpc reader 0x00921a10 reads the name dword after the GUID.",
       "zone": "Snowhill",
       "zone_id": 13,
       "zone_reason": null,
@@ -40430,8 +40468,8 @@
         0.0,
         0.8600850384113797
       ],
-      "placement": "reference_data",
-      "placement_source": "reference_spawn",
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
       "placement_confidence": "medium",
       "placement_candidates": [],
       "capture_match": null,
@@ -40448,6 +40486,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3950; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33741 (ModelId=657, ModelFileName=fairy_m_freestyle_08.agr, NameId=79022; Npcs.json line 32226); commit 10f129e, spawn added in e3deee7"
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 657 = fairy_m_freestyle_08.agr (line 658); the client's model table maps this id to this body."
+        },
+        {
+          "kind": "client",
+          "evidence": "lab/reports/locale-id-to-text.json Global.Text 79022 = 'Tevin'; the row's former raw name hash 3316189035 maps to 79022 in lab/reports/locale-id-map.json (hash_to_ids). AddNpc reader 0x00921a10 reads the name dword after the GUID."
         }
       ],
       "field_sources": {
@@ -40515,32 +40565,32 @@
         ],
         "name_string_id": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Town centre: town hall, Clocktower, gates, Post Office, stage, row 26; source cell: [client][wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3950; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33741 (ModelId=657, ModelFileName=fairy_m_freestyle_08.agr, NameId=79022; Npcs.json line 32226); commit 10f129e, spawn added in e3deee7"
           },
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Town centre: town hall, Clocktower, gates, Post Office, stage, row 26; source cell: [client][wiki]"
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 79022 = 'Tevin'; the row's former raw name hash 3316189035 maps to 79022 in lab/reports/locale-id-map.json (hash_to_ids). AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_ids": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Town centre: town hall, Clocktower, gates, Post Office, stage, row 26; source cell: [client][wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3950; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33741 (ModelId=657, ModelFileName=fairy_m_freestyle_08.agr, NameId=79022; Npcs.json line 32226); commit 10f129e, spawn added in e3deee7"
           },
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Town centre: town hall, Clocktower, gates, Post Office, stage, row 26; source cell: [client][wiki]"
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 79022 = 'Tevin'; the row's former raw name hash 3316189035 maps to 79022 in lab/reports/locale-id-map.json (hash_to_ids). AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_id_reason": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Town centre: town hall, Clocktower, gates, Post Office, stage, row 26; source cell: [client][wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3950; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33741 (ModelId=657, ModelFileName=fairy_m_freestyle_08.agr, NameId=79022; Npcs.json line 32226); commit 10f129e, spawn added in e3deee7"
           },
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Town centre: town hall, Clocktower, gates, Post Office, stage, row 26; source cell: [client][wiki]"
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 79022 = 'Tevin'; the row's former raw name hash 3316189035 maps to 79022 in lab/reports/locale-id-map.json (hash_to_ids). AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "zone": [
@@ -40781,14 +40831,14 @@
         ],
         "position": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3950 spawnNpcWithGuid(33741); src/Resources/Npcs.json Id=33741"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3950; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33741 (ModelId=657, ModelFileName=fairy_m_freestyle_08.agr, NameId=79022; Npcs.json line 32226); commit 10f129e, spawn added in e3deee7"
           }
         ],
         "position_reason": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3950 spawnNpcWithGuid(33741); src/Resources/Npcs.json Id=33741"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3950; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33741 (ModelId=657, ModelFileName=fairy_m_freestyle_08.agr, NameId=79022; Npcs.json line 32226); commit 10f129e, spawn added in e3deee7"
           }
         ],
         "position_w": [
@@ -40799,48 +40849,70 @@
         ],
         "rotation": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3950 spawnNpcWithGuid(33741); src/Resources/Npcs.json Id=33741"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3950; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33741 (ModelId=657, ModelFileName=fairy_m_freestyle_08.agr, NameId=79022; Npcs.json line 32226); commit 10f129e, spawn added in e3deee7"
           }
         ],
         "placement": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3950 spawnNpcWithGuid(33741); src/Resources/Npcs.json Id=33741"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3950; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33741 (ModelId=657, ModelFileName=fairy_m_freestyle_08.agr, NameId=79022; Npcs.json line 32226); commit 10f129e, spawn added in e3deee7"
           }
         ],
         "placement_source": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3950 spawnNpcWithGuid(33741); src/Resources/Npcs.json Id=33741"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3950; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33741 (ModelId=657, ModelFileName=fairy_m_freestyle_08.agr, NameId=79022; Npcs.json line 32226); commit 10f129e, spawn added in e3deee7"
           }
         ],
         "placement_confidence": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3950 spawnNpcWithGuid(33741); src/Resources/Npcs.json Id=33741"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3950; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33741 (ModelId=657, ModelFileName=fairy_m_freestyle_08.agr, NameId=79022; Npcs.json line 32226); commit 10f129e, spawn added in e3deee7"
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3950 spawnNpcWithGuid(33741); src/Resources/Npcs.json Id=33741"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3950; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33741 (ModelId=657, ModelFileName=fairy_m_freestyle_08.agr, NameId=79022; Npcs.json line 32226); commit 10f129e, spawn added in e3deee7"
           }
         ],
         "capture_match": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+            "kind": "legacy-data",
+            "evidence": "No identity-matched AddNpc capture was assigned to this regional row."
           }
         ],
         "heading": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3950 spawnNpcWithGuid(33741); src/Resources/Npcs.json Id=33741"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3950; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33741 (ModelId=657, ModelFileName=fairy_m_freestyle_08.agr, NameId=79022; Npcs.json line 32226); commit 10f129e, spawn added in e3deee7"
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3950; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33741 (ModelId=657, ModelFileName=fairy_m_freestyle_08.agr, NameId=79022; Npcs.json line 32226); commit 10f129e, spawn added in e3deee7"
+          },
+          {
+            "kind": "client",
+            "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 657 = fairy_m_freestyle_08.agr (line 658); the client's model table maps this id to this body."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3950; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33741 (ModelId=657, ModelFileName=fairy_m_freestyle_08.agr, NameId=79022; Npcs.json line 32226); commit 10f129e, spawn added in e3deee7"
+          },
+          {
+            "kind": "client",
+            "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 657 = fairy_m_freestyle_08.agr (line 658); the client's model table maps this id to this body."
           }
         ]
       },
-      "heading": -1.07071997
+      "heading": -1.07071997,
+      "model_id": 657,
+      "model_file_name": "fairy_m_freestyle_08.agr"
     },
     {
       "npc_id": 9000000217,

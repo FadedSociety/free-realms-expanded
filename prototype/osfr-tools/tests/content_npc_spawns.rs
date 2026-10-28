@@ -306,8 +306,10 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // Sanctuary-main NPCs as extras (2,765); T500 already draws Dani and Honey as
     // `legacy_data` regional rows, so they must not gain a second body. T536 drew Sanctuary's two
     // permanent-dance radios (2,767); T546 drew the Sanctuary, Lakeshore and Snowhill warpstone
-    // actors Sanctuary-main places at those three hubs (2,770).
-    assert_eq!(extra_rows.len(), 2770);
+    // actors Sanctuary-main places at those three hubs (2,770). T544 converted Gerold 9000000098
+    // and Tevin 9000000215 from T470's reference row plus extras body to a drawn `legacy_data`
+    // regional row, removing those two duplicate bodies (2,768).
+    assert_eq!(extra_rows.len(), 2768);
     assert_eq!(captured_actors.len(), 9);
     println!(
         "NPC placements: {regional_legacy} Legacy, {regional_reconstructed} reconstructed; {} extra spawns, {} capture-confirmed",

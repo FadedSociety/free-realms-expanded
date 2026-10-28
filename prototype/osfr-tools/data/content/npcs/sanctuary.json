@@ -42451,7 +42451,7 @@
           "id": 38111
         }
       ],
-      "name_string_id_reason": null,
+      "name_string_id_reason": "Global.Text 38111 from the Sanctuary NameId; the row's former raw name hash 4287171865 maps to 38111 in lab/reports/locale-id-map.json (hash_to_ids); AddNpc reader 0x00921a10 reads the name dword after the GUID.",
       "zone": "Sanctuary",
       "zone_id": 10,
       "zone_reason": null,
@@ -42939,6 +42939,10 @@
           {
             "kind": "wiki",
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 53; source cell: [client] [wiki]"
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 38111 = 'Poe Tatters'; the row's former raw name hash 4287171865 maps to 38111 in lab/reports/locale-id-map.json (hash_to_ids). AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "zone": [
@@ -51030,7 +51034,7 @@
           "id": 74093
         }
       ],
-      "name_string_id_reason": null,
+      "name_string_id_reason": "Global.Text 74093 from the Sanctuary NameId; the row's former raw name hash 1159662914 maps to 74093 in lab/reports/locale-id-map.json (hash_to_ids); AddNpc reader 0x00921a10 reads the name dword after the GUID.",
       "zone": "Sanctuary",
       "zone_id": 10,
       "zone_reason": null,
@@ -51415,6 +51419,10 @@
           {
             "kind": "wiki",
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 52; source cell: [client] [video `Agau4t-9A58/00030`: title partly hidden, \"Card Duelist Trainer?\" low confidence] [wiki]"
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 74093 = 'Sam Potts'; the row's former raw name hash 1159662914 maps to 74093 in lab/reports/locale-id-map.json (hash_to_ids). AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "zone": [
