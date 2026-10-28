@@ -1471,7 +1471,7 @@ fn the_reconstructed_default_catalog_has_source_tagged_fixture_rows() {
     );
 }
 
-/// The generated table the server ships in its content directory (T518).
+/// The generated table the server ships in its content directory (T518/T869).
 fn bundled_fixtures() -> FixtureConfig {
     FixtureConfig::load(
         &PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/housing_fixtures.json"),
@@ -1483,10 +1483,10 @@ fn bundled_fixtures() -> FixtureConfig {
 fn the_bundled_fixture_table_covers_the_placeable_items() {
     let config = bundled_fixtures();
     config.validate().expect("the generated table validates");
-    assert!(
-        config.rows.len() > 1_000,
-        "one row per placeable item, got {}",
-        config.rows.len()
+    assert_eq!(
+        config.rows.len(),
+        1_198,
+        "one row per placeable item: T518's item rows plus T869's model-joined placement rows"
     );
     // The generator sorts by item id, so a regenerated table reviews as a small diff.
     assert!(
@@ -1553,6 +1553,58 @@ fn the_bundled_fixture_table_covers_the_placeable_items() {
     assert_eq!(fixtures.len(), config.rows.len(), "unique fixture ids");
     assert!(config.rows.iter().all(|row| row.model_id > 0));
     assert!(config.rows.iter().all(|row| !row.provenance.is_empty()));
+    // T869: the Lxzxrus placement table is joined by model name, never by its Id column. Its
+    // extra ids are runtime-generated Lxzxrus items that collide with real client items, so an
+    // item is a fixture only when its own ModelName equals a reference ASSET_NAME. That finds the
+    // boombox items below; item 560 (military boots) and 563 (a helmet) are not fixtures even
+    // though the reference maps their ids to a brazier and a palisade.
+    let placement_rows: Vec<&FixtureConfigRow> = config
+        .rows
+        .iter()
+        .filter(|row| row.provenance.contains("HousingPlacementData.txt"))
+        .collect();
+    assert_eq!(placement_rows.len(), 12, "model-joined placement rows");
+    assert_eq!(
+        placement_rows
+            .iter()
+            .map(|row| row.item_definition_id)
+            .collect::<BTreeSet<_>>(),
+        BTreeSet::from([
+            878, 1_180, 1_913, 8_185, 35_759, 56_774, 69_825, 76_928, 76_930, 76_933, 76_935,
+            77_329,
+        ]),
+        "only the items whose own ModelName is a reference asset are added"
+    );
+    let placement_pin = concat!(
+        "Lxzxrus-Free-Realms-Server@37ef17587d43e9b33bfb10e5484518f61a82c6be ",
+        "(AGPL-3.0) src/Resources/HousingPlacementData.txt"
+    );
+    assert!(
+        placement_rows
+            .iter()
+            .all(|row| row.provenance.contains(placement_pin)),
+        "every placement row carries repository, licence, revision and file"
+    );
+    for item in [560, 563] {
+        assert!(
+            config.row_for_item_definition(item).is_err(),
+            "item {item} is not a fixture"
+        );
+    }
+    for item in [10_451, 11_494, 15_971, 16_193, 76_878] {
+        assert!(
+            config.row_for_item_definition(item).is_err(),
+            "item {item} is not in the pinned item data"
+        );
+    }
+    // The new rows carry the model of the item's own ModelName (the same client Models.txt id).
+    for (item, model) in [(878, 1_936), (69_825, 4_428), (76_928, 2_201)] {
+        assert_eq!(
+            config.row_for_item_definition(item).unwrap().model_id,
+            model,
+            "item {item}"
+        );
+    }
 }
 
 /// Canary: a duplicated row must fail validation (the generator refuses the same case).

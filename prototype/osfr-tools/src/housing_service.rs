@@ -1004,11 +1004,11 @@ const SAVE_MISSING: &[&str] = &[
 ];
 
 /// One row of the fixture configuration table: which item definition places as which fixture
-/// definition and model. The production rows are generated from the pinned item data and the
-/// client `Models.txt` (`scripts/build_housing_fixtures.py`, T518); the fixture definition id is
-/// our own convention (R) except for the seven captured rows, because the client receives the
-/// definition in 127/42 and 127/43 and only needs a stable unique key. (R) The retail server-side
-/// fixture definition and action table is not recovered.
+/// definition and model. The production rows are generated from the pinned item data, the client
+/// `Models.txt` and the Lxzxrus `HousingPlacementData.txt` (`scripts/build_housing_fixtures.py`,
+/// T518/T869); the fixture definition id is our own convention (R) except for the seven captured
+/// rows, because the client receives the definition in 127/42 and 127/43 and only needs a stable
+/// unique key. (R) The retail server-side fixture definition and action table is not recovered.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct FixtureConfigRow {

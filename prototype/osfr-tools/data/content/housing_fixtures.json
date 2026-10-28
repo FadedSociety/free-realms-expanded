@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "provenance": "item-derived housing fixture table: every placeable item (category group 50 minus the surface categories 51/55/59/60, plus item type 29) whose ModelName is a client Models.txt MODEL_FILE_NAME; fixture definition id is the captured id for the seven packet rows, otherwise the item id (R: the client receives the definition in 127/42 and 127/43, so it only has to be a stable unique key)",
+  "provenance": "item-derived housing fixture table: every placeable item (category group 50 minus the surface categories 51/55/59/60, plus item type 29) whose ModelName is a client Models.txt MODEL_FILE_NAME, plus every item whose own ModelName equals a Lxzxrus HousingPlacementData.txt ASSET_NAME (case-insensitive) that is a client Models.txt MODEL_FILE_NAME (joined by model name, not by the reference id; the item-derived row wins when both name the item); fixture definition id is the captured id for the seven packet rows, otherwise the item id (R: the client receives the definition in 127/42 and 127/43, so it only has to be a stable unique key); surfaces (item type 17, categories 51/55/59/60) stay out until the surface apply path is recovered",
   "rows": [
     {
       "fixture_definition_id": 218,
@@ -25,6 +25,17 @@
       "provenance": "legacy-data:FreeRealms-Legacy@9e08202 ClientItemDefinitions.json Id=225; client Models.txt id 1965"
     },
     {
+      "fixture_definition_id": 878,
+      "item_definition_id": 878,
+      "model_id": 1936,
+      "category": "3",
+      "lua_call": "",
+      "texture_alias": "boombox-xmas-M",
+      "tint_alias": "dyetint",
+      "default_tint_id": 0,
+      "provenance": "Lxzxrus-Free-Realms-Server@37ef17587d43e9b33bfb10e5484518f61a82c6be (AGPL-3.0) src/Resources/HousingPlacementData.txt ASSET_NAME=mkt_boombox_xmas_01.adr (rows 878, 1936); legacy-data:FreeRealms-Legacy@9e08202 ClientItemDefinitions.json Id=878; client Models.txt id 1936"
+    },
+    {
       "fixture_definition_id": 1179,
       "item_definition_id": 1179,
       "model_id": 1894,
@@ -36,6 +47,17 @@
       "provenance": "legacy-data:FreeRealms-Legacy@9e08202 ClientItemDefinitions.json Id=1179; client Models.txt id 1894"
     },
     {
+      "fixture_definition_id": 1180,
+      "item_definition_id": 1180,
+      "model_id": 1973,
+      "category": "3",
+      "lua_call": "",
+      "texture_alias": "boombox-realmsroll-M",
+      "tint_alias": "dyetint",
+      "default_tint_id": 0,
+      "provenance": "Lxzxrus-Free-Realms-Server@37ef17587d43e9b33bfb10e5484518f61a82c6be (AGPL-3.0) src/Resources/HousingPlacementData.txt ASSET_NAME=mkt_boombox_realmsroll_01.adr (rows 1180, 1973); legacy-data:FreeRealms-Legacy@9e08202 ClientItemDefinitions.json Id=1180; client Models.txt id 1973"
+    },
+    {
       "fixture_definition_id": 1834,
       "item_definition_id": 1834,
       "model_id": 1857,
@@ -45,6 +67,17 @@
       "tint_alias": "dyetint",
       "default_tint_id": 228,
       "provenance": "legacy-data:FreeRealms-Legacy@9e08202 ClientItemDefinitions.json Id=1834; client Models.txt id 1857"
+    },
+    {
+      "fixture_definition_id": 1913,
+      "item_definition_id": 1913,
+      "model_id": 1979,
+      "category": "3",
+      "lua_call": "",
+      "texture_alias": "boombox-rainbow-M",
+      "tint_alias": "dyetint",
+      "default_tint_id": 0,
+      "provenance": "Lxzxrus-Free-Realms-Server@37ef17587d43e9b33bfb10e5484518f61a82c6be (AGPL-3.0) src/Resources/HousingPlacementData.txt ASSET_NAME=mkt_boombox_rainbow_01.adr (rows 1913, 1979); legacy-data:FreeRealms-Legacy@9e08202 ClientItemDefinitions.json Id=1913; client Models.txt id 1979"
     },
     {
       "fixture_definition_id": 2705,
@@ -848,6 +881,17 @@
       "tint_alias": "dyetint",
       "default_tint_id": 0,
       "provenance": "legacy-data:FreeRealms-Legacy@9e08202 ClientItemDefinitions.json Id=8156; client Models.txt id 2110"
+    },
+    {
+      "fixture_definition_id": 8185,
+      "item_definition_id": 8185,
+      "model_id": 2217,
+      "category": "3",
+      "lua_call": "",
+      "texture_alias": "boombox-totem-M",
+      "tint_alias": "dyetint",
+      "default_tint_id": 0,
+      "provenance": "Lxzxrus-Free-Realms-Server@37ef17587d43e9b33bfb10e5484518f61a82c6be (AGPL-3.0) src/Resources/HousingPlacementData.txt ASSET_NAME=mkt_boombox_totem.adr (rows 2217, 8185); legacy-data:FreeRealms-Legacy@9e08202 ClientItemDefinitions.json Id=8185; client Models.txt id 2217"
     },
     {
       "fixture_definition_id": 8851,
@@ -4885,6 +4929,17 @@
       "tint_alias": "dyetint",
       "default_tint_id": 243,
       "provenance": "legacy-data:FreeRealms-Legacy@9e08202 ClientItemDefinitions.json Id=32690; client Models.txt id 1991"
+    },
+    {
+      "fixture_definition_id": 35759,
+      "item_definition_id": 35759,
+      "model_id": 4012,
+      "category": "3",
+      "lua_call": "",
+      "texture_alias": "boombox-dwarftech-M",
+      "tint_alias": "dyetint",
+      "default_tint_id": 0,
+      "provenance": "Lxzxrus-Free-Realms-Server@37ef17587d43e9b33bfb10e5484518f61a82c6be (AGPL-3.0) src/Resources/HousingPlacementData.txt ASSET_NAME=mkt_boombox_dwarftech_01.adr (rows 4012, 35759); legacy-data:FreeRealms-Legacy@9e08202 ClientItemDefinitions.json Id=35759; client Models.txt id 4012"
     },
     {
       "fixture_definition_id": 36099,
@@ -9716,6 +9771,28 @@
       "provenance": "legacy-data:FreeRealms-Legacy@9e08202 ClientItemDefinitions.json Id=38924; client Models.txt id 4147"
     },
     {
+      "fixture_definition_id": 56774,
+      "item_definition_id": 56774,
+      "model_id": 1661,
+      "category": "3",
+      "lua_call": "",
+      "texture_alias": "boombox-ghettoblaster-M",
+      "tint_alias": "dyetint",
+      "default_tint_id": 0,
+      "provenance": "Lxzxrus-Free-Realms-Server@37ef17587d43e9b33bfb10e5484518f61a82c6be (AGPL-3.0) src/Resources/HousingPlacementData.txt ASSET_NAME=mkt_boombox_ghettoblaster_01.adr (rows 1661, 56774); legacy-data:FreeRealms-Legacy@9e08202 ClientItemDefinitions.json Id=56774; client Models.txt id 1661"
+    },
+    {
+      "fixture_definition_id": 69825,
+      "item_definition_id": 69825,
+      "model_id": 4428,
+      "category": "3",
+      "lua_call": "",
+      "texture_alias": "boombox-realmshake-M",
+      "tint_alias": "dyetint",
+      "default_tint_id": 0,
+      "provenance": "Lxzxrus-Free-Realms-Server@37ef17587d43e9b33bfb10e5484518f61a82c6be (AGPL-3.0) src/Resources/HousingPlacementData.txt ASSET_NAME=mkt_boombox_realmshake_01.adr (rows 4428, 69825, 76935); legacy-data:FreeRealms-Legacy@9e08202 ClientItemDefinitions.json Id=69825; client Models.txt id 4428"
+    },
+    {
       "fixture_definition_id": 70426,
       "item_definition_id": 70426,
       "model_id": 402,
@@ -9890,6 +9967,50 @@
       "tint_alias": "dyetint",
       "default_tint_id": 0,
       "provenance": "legacy-data:FreeRealms-Legacy@9e08202 ClientItemDefinitions.json Id=76824; client Models.txt id 2032"
+    },
+    {
+      "fixture_definition_id": 76928,
+      "item_definition_id": 76928,
+      "model_id": 2201,
+      "category": "3",
+      "lua_call": "",
+      "texture_alias": "boombox-tiki-M",
+      "tint_alias": "dyetint",
+      "default_tint_id": 0,
+      "provenance": "Lxzxrus-Free-Realms-Server@37ef17587d43e9b33bfb10e5484518f61a82c6be (AGPL-3.0) src/Resources/HousingPlacementData.txt ASSET_NAME=mkt_boombox_tiki_01.adr (rows 2201, 76928); legacy-data:FreeRealms-Legacy@9e08202 ClientItemDefinitions.json Id=76928; client Models.txt id 2201"
+    },
+    {
+      "fixture_definition_id": 76930,
+      "item_definition_id": 76930,
+      "model_id": 4096,
+      "category": "3",
+      "lua_call": "",
+      "texture_alias": "boombox-bigband-M",
+      "tint_alias": "dyetint",
+      "default_tint_id": 0,
+      "provenance": "Lxzxrus-Free-Realms-Server@37ef17587d43e9b33bfb10e5484518f61a82c6be (AGPL-3.0) src/Resources/HousingPlacementData.txt ASSET_NAME=mkt_boombox_bigband_01.adr (rows 4096, 76930); legacy-data:FreeRealms-Legacy@9e08202 ClientItemDefinitions.json Id=76930; client Models.txt id 4096"
+    },
+    {
+      "fixture_definition_id": 76933,
+      "item_definition_id": 76933,
+      "model_id": 4099,
+      "category": "3",
+      "lua_call": "",
+      "texture_alias": "boombox-western-M",
+      "tint_alias": "dyetint",
+      "default_tint_id": 0,
+      "provenance": "Lxzxrus-Free-Realms-Server@37ef17587d43e9b33bfb10e5484518f61a82c6be (AGPL-3.0) src/Resources/HousingPlacementData.txt ASSET_NAME=mkt_boombox_western_01.adr (rows 4099, 76933); legacy-data:FreeRealms-Legacy@9e08202 ClientItemDefinitions.json Id=76933; client Models.txt id 4099"
+    },
+    {
+      "fixture_definition_id": 76935,
+      "item_definition_id": 76935,
+      "model_id": 4428,
+      "category": "3",
+      "lua_call": "",
+      "texture_alias": "boombox-realmshake-M",
+      "tint_alias": "dyetint",
+      "default_tint_id": 0,
+      "provenance": "Lxzxrus-Free-Realms-Server@37ef17587d43e9b33bfb10e5484518f61a82c6be (AGPL-3.0) src/Resources/HousingPlacementData.txt ASSET_NAME=mkt_boombox_realmshake_01.adr (rows 4428, 69825, 76935); legacy-data:FreeRealms-Legacy@9e08202 ClientItemDefinitions.json Id=76935; client Models.txt id 4428"
     },
     {
       "fixture_definition_id": 77044,
@@ -12937,6 +13058,17 @@
       "tint_alias": "dyetint",
       "default_tint_id": 237,
       "provenance": "legacy-data:FreeRealms-Legacy@9e08202 ClientItemDefinitions.json Id=77322; client Models.txt id 1990"
+    },
+    {
+      "fixture_definition_id": 77329,
+      "item_definition_id": 77329,
+      "model_id": 2059,
+      "category": "3",
+      "lua_call": "",
+      "texture_alias": "boombox-valentines-M",
+      "tint_alias": "dyetint",
+      "default_tint_id": 0,
+      "provenance": "Lxzxrus-Free-Realms-Server@37ef17587d43e9b33bfb10e5484518f61a82c6be (AGPL-3.0) src/Resources/HousingPlacementData.txt ASSET_NAME=mkt_boombox_valentines_01.adr (rows 2059, 77329); legacy-data:FreeRealms-Legacy@9e08202 ClientItemDefinitions.json Id=77329; client Models.txt id 2059"
     },
     {
       "fixture_definition_id": 77422,
