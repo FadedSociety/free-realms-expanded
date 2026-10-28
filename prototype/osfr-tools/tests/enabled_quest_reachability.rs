@@ -13,8 +13,8 @@
 //! `defeat`, `collect_item`, `equip_item`, `craft_recipe`, `complete_dungeon`,
 //! `finish_minigame`, `gather_resource`, `collect_node`, `job_level`,
 //! `perform_pet_trick`, `use_ability` and `use_item`. The item, recipe, dungeon,
-//! minigame, gather, quest-pickup, pet-trick, ability and enemy kinds additionally
-//! resolve their target ids in the id sets owned by
+//! minigame, gather, quest-pickup, pet-trick, ability, enemy and single-use
+//! consumable kinds additionally resolve their target ids in the id sets owned by
 //! `tests/support/quest_target_sets.rs`, which names the owning loader and every
 //! `FinishMinigame` emitter. A
 //! `collect_node` node type must have at least one placed spawn in
@@ -451,10 +451,15 @@ impl Catalogue {
                             .unwrap_or(0);
                         if item <= 0 {
                             violations.push(format!("{owner}: use_item target must be positive"));
-                        }
-                        if item > 0 && !self.targets.items.contains(&item) {
+                        } else if !self.targets.items.contains(&item) {
                             violations.push(format!(
                                 "{owner} (use_item): item {item} is not defined by the shipped item catalogue"
+                            ));
+                        } else if !self.targets.consumables.contains(&item) {
+                            // The item bar spends only a single-use effect row; a catalogue item
+                            // without one can never produce the event the step waits for.
+                            violations.push(format!(
+                                "{owner} (use_item): item {item} has no single-use consumable row, so the bar can never spend it"
                             ));
                         }
                     }
@@ -1298,13 +1303,15 @@ fn unknown_ability_is_rejected_at_load() {
     );
 }
 
-/// T789: a `use_item` step must name a shipped catalogue item. The fixture's own second item
-/// resolves, so only the patch can fail.
+/// T789: a `use_item` step must name a shipped catalogue item with a single-use consumable
+/// row, because the bar only credits an item it actually spent. The fixture's own item
+/// resolves, so only the patches can fail.
 #[test]
 fn unknown_use_item_is_rejected_at_load() {
     let clean = fixture("use-item-clean", Defect::None);
     let catalogue = Catalogue::load(clean.path()).expect("the clean fixture loads");
     assert!(catalogue.targets.items.contains(&FIXTURE_USE_ITEM));
+    assert!(catalogue.targets.consumables.contains(&FIXTURE_USE_ITEM));
     assert!(
         catalogue.target_violations().is_empty(),
         "{:?}",
@@ -1321,6 +1328,26 @@ fn unknown_use_item_is_rejected_at_load() {
             && violations[0].contains("use_item")
             && violations[0].contains("999999"),
         "the unknown use item was not reported: {violations:?}"
+    );
+
+    // Gate canary: a real catalogue item whose definition has no single-use consumable row is
+    // bindable nowhere, so the bar can never spend it and the step could never tick.
+    let non_consumable = fixture("use-item-non-consumable", Defect::None);
+    patch_fixture_objective(
+        &non_consumable,
+        FIXTURE_QUEST,
+        "use_item",
+        "item_id",
+        FIXTURE_ITEM as u64,
+    );
+    let catalogue = Catalogue::load(non_consumable.path()).expect("the altered quest loads");
+    let violations = catalogue.target_violations();
+    assert_eq!(violations.len(), 1, "{violations:?}");
+    assert!(
+        violations[0].contains(&format!("quest {FIXTURE_QUEST} objective 12 (#10)"))
+            && violations[0].contains("use_item")
+            && violations[0].contains("single-use consumable"),
+        "a catalogued item with no consumable row was not reported: {violations:?}"
     );
 }
 
@@ -1362,6 +1389,12 @@ fn every_authored_use_goal_resolves_in_the_shipped_tables() {
                     assert!(
                         targets.items.contains(&item),
                         "quest {} objective {}: item {item} is not a shipped catalogue item",
+                        quest.id,
+                        goal["id"].as_u64().unwrap_or(0)
+                    );
+                    assert!(
+                        targets.consumables.contains(&item),
+                        "quest {} objective {}: item {item} has no single-use consumable row, so the bar can never spend it",
                         quest.id,
                         goal["id"].as_u64().unwrap_or(0)
                     );

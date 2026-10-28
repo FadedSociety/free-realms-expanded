@@ -1114,16 +1114,8 @@ fn validate_goal(
         ContentGoal::PerformPetTrick {
             trick_id, count, ..
         } => {
-            if *trick_id == 0 || !(1..=crate::quest_engine::MAX_COUNT).contains(count) {
-                return Err(ContentError::InvalidRecord {
-                    record: owner.to_owned(),
-                    detail: format!(
-                        "goal.trick_id must be positive and goal.count 1..={}",
-                        crate::quest_engine::MAX_COUNT
-                    ),
-                });
-            }
-            Ok(())
+            positive_goal_field(owner, "goal.trick_id", u64::from(*trick_id))?;
+            use_goal_count(owner, count)
         }
         // (R) T787: every authored bound must be within the documented sanity range,
         // so a typo cannot make an objective no result can ever meet.

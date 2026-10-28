@@ -326,15 +326,35 @@ fn activate_item(
     target: u64,
     now: u64,
 ) -> Outcome {
-    let packet = encode_client_request_start_ability(2, 0, Target::Guid(target));
+    activate_item_slot(game, character, 0, target, now)
+}
+
+fn activate_item_slot(
+    game: &mut Gameplay,
+    character: &CharacterState,
+    slot: i32,
+    target: u64,
+    now: u64,
+) -> Outcome {
+    let packet = encode_client_request_start_ability(2, slot, Target::Guid(target));
     send(game, character, &packet, now)
 }
 
 fn assign(game: &mut Gameplay, character: &CharacterState, instance: i32, now: u64) -> Outcome {
+    assign_slot(game, character, 0, instance, now)
+}
+
+fn assign_slot(
+    game: &mut Gameplay,
+    character: &CharacterState,
+    slot: i32,
+    instance: i32,
+    now: u64,
+) -> Outcome {
     send(
         game,
         character,
-        &encode_item_action_bar_assign(0, instance),
+        &encode_item_action_bar_assign(slot, instance),
         now,
     )
 }
@@ -396,6 +416,66 @@ fn an_accepted_ability_on_the_target_credits_the_objective() {
     );
     assert_eq!(quest_status(&game, QUEST), QuestStatus::Active);
     assert!(game.state().encounter.as_ref().unwrap().active.is_none());
+}
+
+/// T789 regression: a lethal cast on the last enemy of a run is the same accepted cast a
+/// `use_ability` step counts, but `win_run` moves the phase to Won before the event is built.
+/// The target kind must be captured from the resolved actor before the blow lands.
+#[test]
+fn a_lethal_cast_that_ends_the_run_credits_the_targeted_goal() {
+    let fixture = Fixture::for_character(A);
+    fixture.copy_content("job_abilities.json");
+    let dungeon = read_json(&fixture.path().join("encounters.json"))["dungeons"][0].clone();
+    let actor = dungeon["enemies"][0].clone();
+    let guid = actor["guid"].as_u64().unwrap();
+    let kind = u32::try_from(actor["definition_id"].as_u64().unwrap()).unwrap();
+    let zone = u32::try_from(dungeon["zone"]["zone_id"].as_u64().unwrap()).unwrap();
+    let at = character_at_for(
+        A,
+        zone,
+        serde_json::from_value(actor["position"].clone()).unwrap(),
+    );
+    write_quest(&fixture, ability_goal(EXPLOSIVE_ARROW, 1, Some(kind)));
+
+    let mut state = archer_state(&fixture, A);
+    enter_dungeon(&mut state, &fixture, A, EncounterPhase::Fighting, 1_000);
+    {
+        // Every other enemy is already down and the primary has one point left: this cast is
+        // the run's killing blow, so the winning phase change happens inside the cast.
+        let active = state.encounter.as_mut().unwrap().active.as_mut().unwrap();
+        for enemy in &mut active.enemies {
+            enemy.health = 0;
+        }
+        active
+            .enemies
+            .iter_mut()
+            .find(|enemy| enemy.guid == guid)
+            .expect("the primary is in the run")
+            .health = 1;
+    }
+    let mut game = fixture.game_as(A, Some(state));
+    game.initialize_world(&at, 0).unwrap();
+
+    let out = cast(&mut game, &at, 2, guid, 0);
+    assert_eq!(
+        game.state()
+            .encounter
+            .as_ref()
+            .unwrap()
+            .active
+            .as_ref()
+            .unwrap()
+            .phase,
+        EncounterPhase::Won,
+        "the cast was the run's killing blow"
+    );
+    assert_eq!(
+        counts(&game, QUEST),
+        [1],
+        "the targeted goal ticks on the lethal cast"
+    );
+    assert!(objective_update(&out, QUEST, OBJECTIVE, 1));
+    assert!(objective_complete(&out, QUEST, OBJECTIVE));
 }
 
 #[test]
@@ -574,6 +654,87 @@ fn an_accepted_item_use_credits_the_objective() {
     assert!(!owned(&game, instance), "the single-use item was spent");
 }
 
+/// The 36/10 bar-2 activation is the other accepted use path: it spends through the same
+/// `ItemBar::consume` and must credit the goal and decrement the stack.
+#[test]
+fn an_activated_item_credits_the_objective_and_spends_the_stack() {
+    let fixture = use_fixture(item_goal(POTION, 1), &[]);
+    let at = [0.0, 0.0, 0.0];
+    let character = character_at_for(A, 0, at);
+    let (mut game, instance) = item_player(&fixture, A, at, POTION, 1);
+    assign(&mut game, &character, instance, 0);
+
+    // 36/10 bar 2, slot 0, self target (`00a342e0`, sender `00a35150`).
+    let used = activate_item(&mut game, &character, A, 1);
+    assert_eq!(counts(&game, QUEST), [1]);
+    assert!(objective_complete(&used, QUEST, OBJECTIVE));
+    assert_eq!(stack(&game, instance), 0, "the single-use item was spent");
+}
+
+/// T789 follow-up: a refused 42/15 must keep the confirmation it was sent with. One potion is
+/// checked, the second bar slot (same stack) is activated and stamps the shared recast, so the
+/// checked confirm is refused by that recast; the same confirmation must then succeed after it.
+#[test]
+fn a_refused_confirm_keeps_the_pending_check() {
+    let fixture = use_fixture(item_goal(POTION, 2), &[]);
+    let at = [0.0, 0.0, 0.0];
+    let character = character_at_for(A, 0, at);
+    let (mut game, instance) = item_player(&fixture, A, at, POTION, 2);
+    assign_slot(&mut game, &character, 0, instance, 0);
+    assign_slot(&mut game, &character, 1, instance, 0);
+
+    // 42/16 stages the confirmation; nothing is spent.
+    let check = send(
+        &mut game,
+        &character,
+        &encode_immediate_activation(ImmediateActivation::Check, instance),
+        0,
+    );
+    assert!(
+        check
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[38, 0, 30, 0]))
+    );
+    assert_eq!(stack(&game, instance), 2);
+
+    // 36/10 bar 2, slot 1: accepted, spends one and stamps the 10 s recast.
+    activate_item_slot(&mut game, &character, 1, A, 1);
+    assert_eq!(counts(&game, QUEST), [1]);
+    assert_eq!(stack(&game, instance), 1);
+
+    // 42/15 while the recast is live: refused, but it must keep the pending confirmation.
+    let before = saved(&game);
+    let refused = send(
+        &mut game,
+        &character,
+        &encode_immediate_activation(ImmediateActivation::Use, instance),
+        2,
+    );
+    assert_refused_nothing(&game, &refused, &before, "confirm during recast");
+    assert_eq!(
+        stack(&game, instance),
+        1,
+        "the refused confirm spends nothing"
+    );
+    assert_eq!(counts(&game, QUEST), [1]);
+
+    // After the recast the same confirmation still works: the refusal did not clear it.
+    let used = send(
+        &mut game,
+        &character,
+        &encode_immediate_activation(ImmediateActivation::Use, instance),
+        11_000,
+    );
+    assert_eq!(counts(&game, QUEST), [2]);
+    assert_eq!(
+        stack(&game, instance),
+        0,
+        "the preserved confirmation spends the last potion"
+    );
+    assert!(objective_complete(&used, QUEST, OBJECTIVE));
+}
+
 #[test]
 fn refused_item_use_credits_nothing() {
     let fixture = use_fixture(
@@ -730,19 +891,24 @@ fn reload_between_use_and_turnin_keeps_progress() {
     cast(&mut game, &character, 2, ENEMY_GUID, 0);
     assert_eq!(counts(&game, QUEST), [1]);
 
-    // The serialized round trip is the reconnect: the counter is part of the quest state.
-    let mut game = fixture.reload_serialized(&game);
+    // Disconnect and reconnect through the production save envelope (`game_store`), not a
+    // `GameplayState` proxy: the counter is part of the quest block the real login restores.
+    let mut game = fixture.save_and_reload(&game, &character);
     game.initialize_world(&character, 0).unwrap();
-    assert_eq!(counts(&game, QUEST), [1], "the counter survives the reload");
+    assert_eq!(
+        counts(&game, QUEST),
+        [1],
+        "the counter survives the reconnect"
+    );
     assert_eq!(quest_status(&game, QUEST), QuestStatus::Active);
 
     cast(&mut game, &character, 2, ENEMY_GUID, 5_000);
     assert_eq!(
         counts(&game, QUEST),
         [2],
-        "the reloaded session credits the second use"
+        "the reconnected session credits the second use"
     );
-    let mut game = fixture.reload_serialized(&game);
+    let mut game = fixture.save_and_reload(&game, &character);
     game.initialize_world(&character, 0).unwrap();
     assert_eq!(counts(&game, QUEST), [2]);
     assert_eq!(
@@ -790,6 +956,55 @@ fn only_the_caster_is_credited() {
         saved(&b),
         before,
         "the shared tick left the other player unchanged"
+    );
+}
+
+/// T789 follow-up: 3010011's use step casts an Archer-only ability (Explosive Arrow 62019), so
+/// the record must gate its offer to that job and level. Without the gate another job could
+/// accept it and reach a step its toolbar can never resolve; the shipped content carries the
+/// guide's Band 2 (Archer level 5 to 10) as `job: 35, min_level: 5`.
+#[test]
+fn the_pondblaster_quest_requires_archer_level_five() {
+    const SHIPPED_QUEST: u32 = 3_010_011;
+    const GIVER_NPC: u64 = 9_000_000_106;
+
+    let fixture = Fixture::for_character(A);
+    let catalogue = fixture.quest_catalogue();
+    let path = catalogue.join("quests/archer.json");
+    let mut document = read_json(&path);
+    let record = document["records"]
+        .as_array_mut()
+        .expect("archer records")
+        .iter_mut()
+        .find(|record| record["id"].as_u64() == Some(u64::from(SHIPPED_QUEST)))
+        .expect("the shipped Archer record exists");
+    // The shipped record stays disabled behind its hollow prerequisite, so enable it in this
+    // private copy to exercise the offer gate; the gate fields themselves are asserted as shipped.
+    assert_eq!(
+        record["job"].as_u64(),
+        Some(35),
+        "the offer gate is the Archer job"
+    );
+    assert_eq!(record["min_level"].as_u64(), Some(5), "Archer level 5");
+    record["enabled"] = json!(true);
+    record["prerequisite_quest_ids"] = json!([]);
+    fs::write(&path, serde_json::to_vec(&document).unwrap()).unwrap();
+
+    let offered = |job: &str, level: u8| {
+        let mut eligibility = eligibility();
+        eligibility.job_levels = std::collections::BTreeMap::from([(job.to_owned(), level)]);
+        let mut engine = QuestEngine::from_split_content(&catalogue, A, eligibility, None)
+            .expect("the altered catalogue loads");
+        engine.offer(SHIPPED_QUEST, GIVER_NPC).changed
+    };
+    assert!(offered("archer", 5), "an Archer at level 5 is offered it");
+    assert!(
+        !offered("archer", 4),
+        "an Archer below level 5 is not offered the level-5 step"
+    );
+    assert!(
+        !offered("brawler", 20),
+        "another job cannot accept a step its bar can never cast"
     );
 }
 

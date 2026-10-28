@@ -1,5 +1,6 @@
 use osfr_tools::{
-    encounter::EncounterEngine,
+    character_store::CharacterState,
+    encounter::{EncounterEngine, EncounterPhase},
     opening_abilities::{JobAbility, OpeningAbilities},
 };
 use serde_json::{Value, json};
@@ -97,6 +98,37 @@ fn hits_from(out: &osfr_tools::encounter::EncounterOutcome, attacker: u64) -> Ve
 fn timed_effect(effects: Value) -> JobAbility {
     serde_json::from_value(json!({"slot":1,"definition_id":62001,"name_id":1,"icon_id":1,"min_level":1,"cooldown_ms":0,"damage_multiplier":0.0,"heal":0,"effects":effects})).unwrap()
 }
+/// T789 regression: `job_ability` used to read the primary target's definition *after*
+/// `strike_damage`, so the killing blow of a run (which sets the phase to Won) resolved no
+/// enemy and reported no target. A targeted `use_ability` goal could never tick on that cast.
+#[test]
+fn a_lethal_cast_that_wins_the_run_still_reports_its_target_kind() {
+    let f = Fixture::new(10_000, 100);
+    let mut e = f.load(11, 1);
+    let home = CharacterState {
+        guid: 1,
+        zone_id: 0,
+        position: [9.0, 2.0, 3.0],
+        rotation: [0.0; 3],
+    };
+    e.begin(411, home, 11).unwrap();
+    e.on_zone_ready(11, 0).unwrap();
+    // The fixture's cave holds one 50-health enemy (definition 401) at the origin; a x10
+    // ability kills it, so this cast is the run's winning blow.
+    let lethal = skill(json!([]), 10.0, 0);
+    let out = e.job_ability(&lethal, 200, [0.0; 3], 11, 700).unwrap();
+    assert_eq!(
+        e.run_phase(),
+        Some(EncounterPhase::Won),
+        "the only enemy died, so the run is won"
+    );
+    assert_eq!(
+        out.abilities_used,
+        vec![(lethal.definition_id, Some(401))],
+        "the winning cast still reports the primary target's enemy definition"
+    );
+}
+
 #[test]
 fn self_heal_clamps_and_scales_with_the_existing_hp_curve() {
     let f = Fixture::new(10000, 100);

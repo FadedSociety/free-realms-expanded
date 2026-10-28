@@ -164,6 +164,7 @@ impl EncounterEngine {
         };
         let base = (base as f32 * self.damage_scale).round() as u32;
         let mut targets = Vec::new();
+        let mut target_actor_kind_id = None;
         if offensive {
             let area = ability.effects.iter().find_map(|e| match *e {
                 JobEffect::AreaDamage {
@@ -220,6 +221,18 @@ impl EncounterEngine {
                 self.last_tick = Some(now_ms);
             }
             self.last_attack = Some(now_ms);
+            // T789: the primary target's enemy definition for a `use_ability` objective,
+            // resolved before any hit lands. A lethal blow on the last enemy ends the run
+            // (`win_run` sets Won), after which `enemy` no longer resolves the actor; capturing
+            // it later would drop the target and a targeted goal would never tick. The
+            // definition comes from the resolved actor, never from the client's target field; an
+            // area cast names the selected target, not every splash victim.
+            target_actor_kind_id = targets
+                .first()
+                .and_then(|guid| self.enemy(*guid))
+                .map(|(actor, _)| actor.definition_id)
+                .filter(|definition| *definition > 0)
+                .and_then(|definition| u32::try_from(definition).ok());
             // All hits reuse the existing authoritative shield/summon/defeat/reward
             // path; secondary hits and later DoT ticks do not consume swing time.
             if ability.damage_multiplier > 0.0 {
@@ -234,15 +247,6 @@ impl EncounterEngine {
                 }
             }
         }
-        // T789: the primary target's enemy definition for a `use_ability` objective. The
-        // definition comes from the resolved actor, never from the client's target field; an
-        // area cast names the selected target, not every splash victim.
-        let target_actor_kind_id = targets
-            .first()
-            .and_then(|guid| self.enemy(*guid))
-            .map(|(actor, _)| actor.definition_id)
-            .filter(|definition| *definition > 0)
-            .and_then(|definition| u32::try_from(definition).ok());
         if ability.heal > 0 {
             let before = self.state.player_health;
             // (R) Heals follow the damage tier ladder (live Triage 254 / 444 / 776 /

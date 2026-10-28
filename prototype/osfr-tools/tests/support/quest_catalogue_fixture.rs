@@ -36,8 +36,10 @@ pub const FIXTURE_PET_TRICK: u32 = 11;
 pub const FIXTURE_ABILITY: u32 = 9_100_103;
 pub const FIXTURE_ENEMY: u32 = 9_100_104;
 /// T789: a second catalogue item, so Canary C (which removes `FIXTURE_ITEM`) keeps
-/// its exact collect_item/equip_item violation count.
-pub const FIXTURE_USE_ITEM: i32 = 9_100_105;
+/// its exact collect_item/equip_item violation count. It is also the built-in potion row
+/// (`item_bar::Effects::default`) the fixture's absent `consumables.json` is loaded with, so a
+/// `use_item` step can name an id the bar can actually spend.
+pub const FIXTURE_USE_ITEM: i32 = 11_002;
 const FIXTURE_GIVER: u64 = 9_000_100_001;
 const FIXTURE_TARGET: u64 = 9_000_100_002;
 const FIXTURE_MISSING_GIVER: u64 = 9_000_100_099;

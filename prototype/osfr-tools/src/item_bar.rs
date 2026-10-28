@@ -398,6 +398,8 @@ pub struct ItemBar {
     /// Last accepted use per item definition, in the caller's millisecond clock.
     #[serde(skip)]
     last_used: BTreeMap<i32, u64>,
+    /// The instance the last accepted 42/16 check confirmed. Cleared only by an accepted
+    /// 42/15; a refused confirm is a no-op, so it keeps this confirmation.
     #[serde(skip)]
     pending: Option<i32>,
 }
@@ -635,7 +637,7 @@ impl ItemBar {
         player: &Player,
         now_ms: u64,
     ) -> io::Result<Reply> {
-        if self.pending.take() != Some(id) {
+        if self.pending != Some(id) {
             return Ok(Reply {
                 replies: vec![chat::system("Confirm the item before using it.")],
                 ..Reply::default()
@@ -643,6 +645,9 @@ impl ItemBar {
         }
         match self.consume(id, inventory, player, now_ms) {
             Ok(used) => {
+                // T789 follow-up: a refused 42/15 changed nothing, so it also keeps the
+                // confirmation it was checked with; only a successful use consumes it.
+                self.pending = None;
                 let mut replies = used.replies;
                 replies.extend(self.refresh(inventory, now_ms)?);
                 Ok(Reply {

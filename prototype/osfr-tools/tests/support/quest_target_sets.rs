@@ -57,6 +57,10 @@
 //!   `enemies::EnemyEngine::load` owns (it exposes no id list). The encounter
 //!   engine reports this definition id on a kill and on an accepted cast, so a
 //!   `use_ability` target must be one of them.
+//! * `consumables`: the single-use rows of `item_bar::Effects` (the loaded
+//!   `consumables.json`, or the built-in potion table when it is absent). A
+//!   `use_item` goal only ever credits when `ItemBar::consume` actually spends
+//!   the item, so only a single-use effect row can produce the event.
 
 use super::quest_records::as_u32;
 use osfr_tools::{
@@ -64,6 +68,7 @@ use osfr_tools::{
     harvest_nodes::GatheringNodes,
     harvesting,
     inventory::Inventory,
+    item_bar::Effects,
     mining::{self, Type8Engine},
     pets::PetContent,
     recipes::{CraftingJob, RecipeCatalog},
@@ -129,6 +134,8 @@ pub struct Targets {
     pub abilities: BTreeSet<u32>,
     /// `enemies.json` definition ids a `use_ability` target may name.
     pub enemy_kinds: BTreeSet<u32>,
+    /// Single-use `item_bar::Effects` definitions a `use_item` step may name.
+    pub consumables: BTreeSet<i32>,
 }
 
 impl Targets {
@@ -307,6 +314,15 @@ impl Targets {
             .extend(read_ids(root, "enemies.json", |document| {
                 array_ids(document, "definitions", "definition_id")
             }));
+        // T789: the item bar owns the single-use rule (`consume` spends only a `single_use`
+        // row), so its own loader decides which item ids can produce a `use_item` event.
+        targets.consumables.extend(
+            Effects::load(root)?
+                .rows()
+                .iter()
+                .filter(|row| row.single_use)
+                .map(|row| row.definition),
+        );
         Ok(targets)
     }
 }

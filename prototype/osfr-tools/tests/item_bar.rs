@@ -655,18 +655,19 @@ fn the_check_then_use_flow_confirms_once_and_only_for_the_checked_instance() {
     );
     assert_eq!(packet[24], 1);
     assert_eq!(count(&inventory, 10), 3); // a check never spends
-    // A use for a different instance neither works nor keeps the confirmation.
+    // A use for a different instance is refused, and a refusal changes nothing: the checked
+    // instance's confirmation stays pending, so its own 42/15 still confirms.
     let reply = run(&mut bar, &mut inventory, &use_item(11), &ALIVE, 1).unwrap();
     assert!(is_chat(&reply) && count(&inventory, 11) == 1);
     let reply = run(&mut bar, &mut inventory, &use_item(10), &ALIVE, 1).unwrap();
-    assert!(is_chat(&reply) && count(&inventory, 10) == 3);
-    // Canary: check, then use once spends one and heals.
-    run(&mut bar, &mut inventory, &check(10), &ALIVE, 2).unwrap();
-    let reply = run(&mut bar, &mut inventory, &use_item(10), &ALIVE, 2).unwrap();
     assert_eq!((reply.heal_percent, count(&inventory, 10)), (35, 2));
-    // A replayed 42/15 needs a new check.
+    // Canary: after the recast a new check and use spend one and heal again.
+    run(&mut bar, &mut inventory, &check(10), &ALIVE, 20_000).unwrap();
     let reply = run(&mut bar, &mut inventory, &use_item(10), &ALIVE, 20_000).unwrap();
-    assert!(is_chat(&reply) && reply.heal_percent == 0 && count(&inventory, 10) == 2);
+    assert_eq!((reply.heal_percent, count(&inventory, 10)), (35, 1));
+    // A replayed 42/15 needs a new check.
+    let reply = run(&mut bar, &mut inventory, &use_item(10), &ALIVE, 30_000).unwrap();
+    assert!(is_chat(&reply) && reply.heal_percent == 0 && count(&inventory, 10) == 1);
 }
 
 #[test]
