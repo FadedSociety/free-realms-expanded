@@ -2,6 +2,8 @@
 //! tables, the loader keeps rows inside their bounds, and through the real `Gameplay` route an
 //! owned box binds to the item bar and a press spends nothing (T461 places the box; see its
 //! gateway tests for the world side).
+#[path = "support/client_assets.rs"]
+mod client_assets;
 #[path = "support/models.rs"]
 mod models;
 #[allow(dead_code)]
@@ -297,19 +299,6 @@ fn animation_group_slots(group: i32) -> Vec<String> {
         .collect()
 }
 
-/// The extracted bytes of a client actor definition named in `catalog.tsv`.
-fn actor_definition(catalogue: &str, file: &str) -> Vec<u8> {
-    let relative = catalogue
-        .lines()
-        .find_map(|line| {
-            let fields: Vec<_> = line.split('\t').collect();
-            (fields.get(2).copied() == Some(file)).then(|| *fields.last().unwrap())
-        })
-        .unwrap_or_else(|| panic!("{file} in the extracted asset catalogue"));
-    let path = lab(&format!("extracted/client-assets/{relative}"));
-    fs::read(&path).unwrap_or_else(|error| panic!("{}: {error}", path.display()))
-}
-
 /// Whether `adr` maps `slot` to one of the model's own `_emo_dance_` clips. The actor definition
 /// stores each mapping as `[len]slot\0\x02[len]file\0`; the length counts the trailing NUL.
 fn adr_plays(adr: &[u8], model: &str, slot: &str) -> bool {
@@ -339,7 +328,8 @@ fn adr_plays(adr: &[u8], model: &str, slot: &str) -> bool {
 fn the_independent_clip_sets_are_rebuilt_from_the_client() {
     let ids = animation_slot_ids();
     let models = models::read_models();
-    let catalogue = read(&lab("extracted/client-assets/catalog.tsv"));
+    let assets =
+        client_assets::Assets::open().expect("the private extracted client assets are present");
     let sanctuary: Value = serde_json::from_str(&read(&lab(
         "references/Sanctuary-main-20261019/src/Resources/Consumables.json",
     )))
@@ -367,7 +357,7 @@ fn the_independent_clip_sets_are_rebuilt_from_the_client() {
                 .iter()
                 .find_map(|file| file.strip_suffix(".adr"))
                 .unwrap_or_else(|| panic!("{item}: model {model} has no .adr"));
-            let adr = actor_definition(&catalogue, &format!("{name}.adr"));
+            let adr = assets.read(&format!("{name}.adr"));
             let mut rebuilt: Vec<i32> = slots
                 .iter()
                 .filter(|slot| adr_plays(&adr, name, slot))
@@ -468,14 +458,15 @@ fn the_catalogue_is_exactly_the_client_boombox_items_with_their_model_and_item_p
 #[test]
 fn every_boombox_wears_an_alias_its_client_model_defines() {
     let models = models::read_models();
-    let catalog = read(&lab("extracted/client-assets/catalog.tsv"));
+    let assets =
+        client_assets::Assets::open().expect("the private extracted client assets are present");
     for row in rows() {
         let model = row["model_id"].as_i64().unwrap();
         let file = models[&model]
             .iter()
             .find(|name| name.ends_with(".adr"))
             .unwrap_or_else(|| panic!("{}: model {model} has no .adr", row["item_id"]));
-        let (textures, tints) = adr_look(&actor_definition(&catalog, file));
+        let (textures, tints) = adr_look(&assets.read(file));
         let texture = row["texture_alias"].as_str().unwrap();
         assert!(
             texture.is_empty() || textures.contains(texture),

@@ -8,16 +8,16 @@
 //! Content checks that every extra row already gets (client model table, locale
 //! id presence, source kind) stay in `tests/content_npc_spawns.rs`. This suite
 //! owns only the three placements: the curated hub they stand at, the unique
-//! model-280 actor, and the 35/2 packet the production visibility loader draws.
+//! model-280 actor, the stock-locale name behind the row's own NameId, and the
+//! 35/2 packet the production visibility loader draws.
 //!
 //! The `animation_id` in 35/2 is the client's `AnimationTypes.xml` slot selector
 //! (1 = `loc_stand`), and every content actor carries the template's 1, so that
-//! pin alone does not show a visible spin. The private asset test below pins the
-//! client model's stand-animation bank instead: the stone has one `loc_stand`
-//! slot on its own `sg_warpstone.gr2` clip and a rig with `SPIN_BASE`/`SPIN_EYE`
-//! bones, while the still dais beside it has no animation bank at all. The
-//! intended spin is the client playing that clip; only a native run can confirm
-//! it and that remains a lead task (see `notes/Autopilot/F780.md`).
+//! pin alone does not show a visible spin. The ignored private asset test below
+//! records the model's stand-clip bank (`sg_warpstone.gr2`) and spin rig; that is
+//! evidence the model can animate, not that the client plays the spin, so it is
+//! not spin coverage. Whether the stone visibly rotates stays an open native
+//! task for the lead (`notes/Autopilot/F780.md`, `notes/Autopilot/F831.md`).
 
 #[path = "../src/restoration/piece_077.rs"]
 #[allow(dead_code)]
@@ -28,18 +28,23 @@ mod piece_098;
 // Canonical placement helpers (position reader and planar distance).
 #[path = "support/placement.rs"]
 mod placement;
+// The canonical 35/2 view of a fresh `NpcVisibility` update.
+#[path = "support/npc_visibility.rs"]
+mod npc_visibility;
+// The extracted client corpus for the private gate below.
+#[path = "support/client_assets.rs"]
+mod client_assets;
 // One JSON reader for the content gates (`tests/support/json.rs`).
 #[path = "support/json.rs"]
 mod json;
+// The stock `en_us_data.dat` rows behind the row NameIds (`tests/common/npc_greetings.rs`).
+#[path = "common/npc_greetings.rs"]
+mod npc_greetings;
 
-use osfr_tools::{startup_world, world::NpcVisibility};
+use osfr_tools::{world::NpcVisibility, world_text::locale_hash};
 use piece_077::{OPEN_WORLD_ZONE, curated_definitions};
 use piece_098::{load_actor, load_skeleton, probe_granny};
-use std::{
-    collections::HashMap,
-    fs,
-    path::{Path, PathBuf},
-};
+use std::{collections::BTreeSet, path::Path};
 
 /// One new stone: the actor guid the row spawns, the curated hub it belongs to,
 /// its client name and locale id, and the Lua placement.
@@ -89,8 +94,15 @@ fn the_three_zone_warpstones_are_drawn_at_their_curated_hubs() {
     let extra = json::read(&content.join("npc_spawns_extra.json"));
     let rows = extra["records"].as_array().expect("extra rows");
     let hubs = curated_definitions();
-    let mut visibility =
+    let visibility =
         NpcVisibility::load(&content).expect("the production visibility loader accepts it");
+    // The stock client locale resolves each pinned NameId the way the client's
+    // `Global.Text.<id>` lookup does; the row's own id is checked against this text below.
+    let wanted: BTreeSet<u32> = NEW_STONES
+        .iter()
+        .map(|stone| locale_hash(i32::try_from(stone.name_id).expect("stock locale id fits i32")))
+        .collect();
+    let locale = npc_greetings::locale_rows(&wanted);
 
     for stone in &NEW_STONES {
         let row = rows
@@ -119,6 +131,23 @@ fn the_three_zone_warpstones_are_drawn_at_their_curated_hubs() {
             stone.name
         );
         assert_eq!(row["name"].as_str(), Some(stone.name));
+        // The client draws the nameplate from the row's own NameId, so the id must
+        // name this stone, not merely exist in the locale: `content_npc_spawns` only
+        // gates presence, and a pinned id alone would pass if the pin drifted with it.
+        let name_id = row["name_string_id"]
+            .as_u64()
+            .unwrap_or_else(|| panic!("{}: NameId is missing", stone.name));
+        let (line, locale_name) = locale
+            .get(&locale_hash(
+                i32::try_from(name_id).expect("a stock locale id fits i32"),
+            ))
+            .unwrap_or_else(|| panic!("{}: NameId {name_id} has no stock locale row", stone.name));
+        assert_eq!(
+            locale_name.as_str(),
+            stone.name,
+            "{}: NameId {name_id} names {locale_name:?} at en_us_data.dat:{line}",
+            stone.name
+        );
         assert_eq!(
             row["name_string_id"].as_u64(),
             Some(u64::from(stone.name_id)),
@@ -175,13 +204,12 @@ fn the_three_zone_warpstones_are_drawn_at_their_curated_hubs() {
         );
 
         // The production loader draws this actor, at this position, facing the
-        // Lua heading. `animation_id` only selects the client's stand slot; the
-        // model-to-clip binding that can actually spin is checked below.
-        let spawn = visibility
-            .update(OPEN_WORLD_ZONE, stone.position)
-            .expect("visibility update")
-            .iter()
-            .filter_map(|packet| startup_world::parse_add_npc(packet).ok())
+        // Lua heading. `seen_from` is the canonical 35/2 view the other placement
+        // suites use (`tests/support/npc_visibility.rs`); `animation_id` only
+        // selects the client's stand slot, and the model binding that could spin
+        // is the ignored asset test below.
+        let spawn = npc_visibility::seen_from(&visibility, stone.position)
+            .into_iter()
             .find(|spawn| spawn.actor_id == stone.guid)
             .unwrap_or_else(|| {
                 panic!(
@@ -211,41 +239,17 @@ fn the_three_zone_warpstones_are_drawn_at_their_curated_hubs() {
     }
 }
 
-/// The private extracted client assets, when the lab is present.
-fn client_assets() -> Option<PathBuf> {
-    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../lab/extracted/client-assets");
-    root.join("catalog.tsv").is_file().then_some(root)
-}
-
-/// Client asset name (lowercase) -> extracted file path, from the pack catalogue.
-fn asset_index(root: &Path) -> Option<HashMap<String, PathBuf>> {
-    let catalog = fs::read_to_string(root.join("catalog.tsv")).ok()?;
-    let mut index = HashMap::new();
-    for line in catalog.lines().skip(1) {
-        let fields: Vec<&str> = line.split('\t').collect();
-        if fields.len() == 7 {
-            index.insert(fields[2].to_ascii_lowercase(), root.join(fields[6]));
-        }
-    }
-    Some(index)
-}
-
+/// Private gate: the stone's actor definition binds one `loc_stand` clip over a rig with the
+/// spin bones, while the dais it stands on has no animation bank. Model-bank evidence only,
+/// not the native spin.
 #[test]
+#[ignore = "requires the private extracted client assets (lab/extracted/client-assets)"]
 fn the_stone_has_a_stand_animation_bank_and_the_still_dais_does_not() {
-    let Some(root) = client_assets() else {
-        eprintln!("skip the warpstone stand-clip check: the private client assets are absent");
-        return;
-    };
-    let index = asset_index(&root).expect("the client pack catalogue parses");
-    let read = |name: &str| -> Vec<u8> {
-        let path = index
-            .get(name)
-            .unwrap_or_else(|| panic!("client asset {name} is absent from catalog.tsv"));
-        fs::read(path).unwrap_or_else(|error| panic!("{}: {error}", path.display()))
-    };
+    let assets =
+        client_assets::Assets::open().expect("the private extracted client assets are absent");
 
     // The stone: one stand slot, on its own clip, over a rig with the spin bones.
-    let stone = load_actor(&read("sg_warpstone_01.adr")).expect("sg_warpstone_01.adr loads");
+    let stone = load_actor(&assets.read("sg_warpstone_01.adr")).expect("sg_warpstone_01.adr loads");
     assert_eq!(
         stone.skeleton_file.as_deref(),
         Some("sg_warpstone_01.dsk"),
@@ -260,19 +264,21 @@ fn the_stone_has_a_stand_animation_bank_and_the_still_dais_does_not() {
     assert_eq!(slot.slot_name, "loc_stand");
     assert_eq!(slot.gr2_file, "sg_warpstone.gr2");
     assert_eq!(slot.speed, Some(40.0));
-    let rig = load_skeleton(&read("sg_warpstone_01.dsk")).expect("the stone skeleton loads");
+    let rig = load_skeleton(&assets.read("sg_warpstone_01.dsk")).expect("the stone skeleton loads");
     for bone in ["SPIN_BASE", "SPIN_EYE"] {
         assert!(
             rig.bone_names.iter().any(|name| name == bone),
             "the warpstone rig carries {bone}"
         );
     }
-    let clip = probe_granny(&read("sg_warpstone.gr2")).expect("the stand clip is a Granny file");
+    let clip =
+        probe_granny(&assets.read("sg_warpstone.gr2")).expect("the stand clip is a Granny file");
     assert!(clip.bytes > 0 && clip.section_count > 0);
 
     // The dais the stone stands on: no animation bank and no skeleton, so the
     // same stand slot selects nothing. This is the still control for the test.
-    let dais = load_actor(&read("sg_warpstone_dais_01.adr")).expect("the dais definition loads");
+    let dais =
+        load_actor(&assets.read("sg_warpstone_dais_01.adr")).expect("the dais definition loads");
     assert!(
         dais.animation_slots.is_empty(),
         "the still dais must not carry a stand animation"

@@ -1,5 +1,9 @@
+#[path = "support/client_assets.rs"]
+mod client_assets;
 #[path = "support/models.rs"]
 mod models;
+#[path = "support/paths.rs"]
+mod paths;
 
 use osfr_tools::{startup_world, world};
 use serde_json::Value;
@@ -48,10 +52,8 @@ fn models_map(models: &HashMap<i64, HashSet<String>>, model_id: u64, model_file:
 
 #[test]
 fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
-    let crate_root = Path::new(env!("CARGO_MANIFEST_DIR"));
-    let project_root = crate_root.parent().unwrap().parent().unwrap();
-    let lab_root = project_root.parent().unwrap().join("lab");
-    let content_root = crate_root.join("data/content");
+    let content_root = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let lab_root = paths::project_parent().join("lab");
 
     let locale: Value = read_json(&lab_root.join("reports/locale-id-to-text.json"));
     let locale_ids: HashSet<u64> = locale
@@ -60,13 +62,9 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
         .iter()
         .map(|row| row["id"].as_u64().unwrap())
         .collect();
-    let catalog = fs::read_to_string(lab_root.join("extracted/client-assets/catalog.tsv")).unwrap();
-    let catalog_names: HashSet<String> = catalog
-        .lines()
-        .skip(1)
-        .filter_map(|line| line.split('\t').nth(2))
-        .map(str::to_ascii_lowercase)
-        .collect();
+    let catalog_names: HashSet<String> = client_assets::Assets::open()
+        .expect("the private extracted client assets are present")
+        .names();
     // The extracted pack catalogue is not complete for every model named by the
     // client itself: 145 Models.txt `.adr` names are absent. The client's own
     // Assets_manifest.txt is the shipped asset list (`.z` entries), so a model

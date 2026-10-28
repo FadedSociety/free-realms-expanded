@@ -49,6 +49,7 @@ pub fn content_dir() -> PathBuf {
 /// Full server content used by the existing in-world router tests. It has no
 /// `npcs/` directory, so `Gameplay::load` takes the NPC rows from the bundled
 /// `data/content` (the same rows the suites edit).
+#[allow(dead_code)] // A suite that reads only the stock locale never loads Gameplay.
 pub fn gameplay_dir() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../../../lab/references/opening-anvil-placement-v1/content")

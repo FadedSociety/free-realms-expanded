@@ -9,13 +9,16 @@
 mod json;
 #[path = "npc_visibility.rs"]
 mod npc_visibility;
+#[path = "paths.rs"]
+mod paths;
+
+pub use paths::project_parent;
 
 use osfr_tools::world::NpcVisibility;
 use serde_json::Value;
 use std::{
     collections::{BTreeMap, HashMap, HashSet},
     fs,
-    path::{Path, PathBuf},
 };
 
 /// A content row's `position` (or any `[x, y, z]` array) as `f32`s.
@@ -67,18 +70,6 @@ pub fn distance(left: [f32; 3], right: [f32; 3]) -> f64 {
 /// Distance in the X/Z plane, the metric `piece_077` uses for warpstone attunement.
 pub fn planar_distance(left: [f32; 3], right: [f32; 3]) -> f32 {
     (left[0] - right[0]).hypot(left[2] - right[2])
-}
-
-/// The CartoonMMO root, the parent of the repository checkout and `lab/`.
-pub fn project_parent() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .parent()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .to_path_buf()
 }
 
 /// Every regional NPC row of `data/content/npcs/*.json`, in file order.
