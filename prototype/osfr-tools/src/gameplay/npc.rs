@@ -212,14 +212,17 @@ impl Gameplay {
             if self.quest_conversation.is_some() {
                 return Ok(Some(self.npc_conversation_answer(selected, character)?));
             }
-            // T773: a greeter tips row re-renders the same dialogue with that page's
-            // body. It is read-only, so the interaction (and its offered rows) stays
-            // open for another page or Goodbye. `record_dialogue` stored the exact rows
-            // and the runtime actor, so the replay keeps a quest row and the camera
-            // target on the NPC the player clicked.
+            // T773: a greeter tips row answers with the same dialogue rows and that
+            // page's body. T844: the client only rebuilds the dialog window when
+            // `isDialogShown` is false (`dialog.lua` `Show`), so the same 26/4 the
+            // Goodbye row sends closes it first (`00aa0870` hides it) and the page 26/3
+            // then runs `Show` again. It is read-only, so the interaction (and its
+            // offered rows) stays open for another page or Goodbye. `record_dialogue`
+            // stored the exact rows and the runtime actor, so the replay keeps a quest
+            // row and the camera target on the NPC the player clicked.
             if let Some(page) = self
                 .npc_interaction
-                .as_ref()
+                .as_mut()
                 .and_then(|interaction| interaction.explainer_page(selected))
             {
                 let mut dialogue = dialogue_packet_rows(page.body_string_id, page.rows)
@@ -231,7 +234,7 @@ impl Gameplay {
                     "response_id": selected
                 }));
                 return Ok(Some(Outcome {
-                    replies: vec![dialogue],
+                    replies: vec![END_DIALOG_26_4.to_vec(), dialogue],
                     ..Outcome::default()
                 }));
             }
@@ -385,6 +388,17 @@ impl Gameplay {
         if inner.starts_with(&[26, 0, 4, 0]) {
             if inner.len() != 4 {
                 return Err(invalid("invalid dialogue close request"));
+            }
+            // T844: a page replay closes the dialog first and the client echoes that
+            // close (`00aa0870` -> `009f6890` sends its own 26/4 while hiding), so the
+            // first close after a page is the echo, not the player leaving: swallow it
+            // and keep the recorded page rows answerable.
+            let echoed = self
+                .npc_interaction
+                .as_mut()
+                .is_some_and(|interaction| interaction.take_dialog_close_echo());
+            if echoed {
+                return Ok(Some(Outcome::default()));
             }
             // T543: the player closed the dialog; a complete_after_dialogue step stays
             // open and its next Talk starts the conversation again at the first line.

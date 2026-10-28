@@ -296,6 +296,11 @@ struct OpenDialogue {
     rows: Vec<[u32; 5]>,
     /// The explainer rows among them, with the body each one opens.
     pages: Vec<ExplainTopic>,
+    /// (R) T844: a page replay answered the row with the dialog close, and the client
+    /// echoes that close (handler `00aa0870` -> `009f6890` sends its own 26/4 while it
+    /// hides) before the page 26/3 can be shown again. That echo is not the player
+    /// leaving, so it must not end the interaction; the next 26/4 is the player's.
+    close_echo_expected: bool,
 }
 
 /// The loaded NPC, price and vendor-stock tables. Immutable after [`NpcInteraction::load`];
@@ -827,6 +832,7 @@ impl NpcInteraction {
                 runtime_guid,
                 rows,
                 pages,
+                close_echo_expected: false,
             });
         }
     }
@@ -835,20 +841,35 @@ impl NpcInteraction {
     /// exact rows the client was shown. Read-only: the id must be one this dialogue sent,
     /// so a hostile 26/6 can only re-read an offered locale text, never a page, item or
     /// effect of its choosing. Replaying the stored rows keeps the dialog's quest row and
-    /// its old labels stable even if the content reloads.
-    pub(crate) fn explainer_page(&self, response_id: i32) -> Option<DialoguePage> {
-        let active = self.active.as_ref()?;
-        let dialogue = active.dialogue.as_ref()?;
-        let topic = dialogue
+    /// its old labels stable even if the content reloads. T844: the caller re-shows the
+    /// page by closing the dialog first, so choosing the page also marks the close the
+    /// client will echo, here, where the page that earns that close is chosen.
+    pub(crate) fn explainer_page(&mut self, response_id: i32) -> Option<DialoguePage> {
+        let active = self.active.as_mut()?;
+        let dialogue = active.dialogue.as_mut()?;
+        let body_string_id = dialogue
             .pages
             .iter()
-            .find(|topic| topic.response_id == response_id)?;
+            .find(|topic| topic.response_id == response_id)?
+            .body_string_id;
+        dialogue.close_echo_expected = true;
         Some(DialoguePage {
             content_key: active.npc_id,
             runtime_guid: dialogue.runtime_guid,
-            body_string_id: topic.body_string_id,
+            body_string_id,
             rows: dialogue.rows.clone(),
         })
+    }
+
+    /// (R) T844: consume the client's echo of the dialog close the server sent to re-show
+    /// a greeter page. The reliable channel delivers that echo before the re-shown dialog
+    /// can send another 26/6, so the first close after a page is the echo and the next one
+    /// is the player leaving. A close with no page replay pending is never swallowed.
+    pub(crate) fn take_dialog_close_echo(&mut self) -> bool {
+        self.active
+            .as_mut()
+            .and_then(|active| active.dialogue.as_mut())
+            .is_some_and(|dialogue| std::mem::take(&mut dialogue.close_echo_expected))
     }
 
     /// End the offered menu once its choice committed. Refused choices keep it

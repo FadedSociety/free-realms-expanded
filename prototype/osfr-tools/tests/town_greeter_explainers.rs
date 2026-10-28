@@ -6,15 +6,21 @@
 //! `0097c1e0` (`Global.Text.<id>`) into `HandlerDialog:SetDialogText`/`:SetChoiceText`,
 //! hides unused rows, and stops after five (`wndDialog.xml` btn0..btn4). The display
 //! stores each row's first dword in the dialog's `this+4+index` table; `009f6aa0` reads
-//! that slot for the clicked button and sends it in 26/6, so a second 26/3 re-renders
-//! the open dialog with another body.
+//! that slot for the clicked button and sends it in 26/6.
+//!
+//! T844: a 26/3 that arrives while the dialog is open does not re-show it. Lua
+//! `DialogHandler:Show` (dialog.lua) only pushes the window context when `isDialogShown`
+//! is false, and `Hide` is what clears it; the 26/4 handler `00aa0870` hides through
+//! `009f6890`, which also sends the client's own 26/4. So a page row is answered with the
+//! close first and then the page 26/3, and the server must keep the recorded rows across
+//! that client close echo.
 //!
 //! The pages live on the NPC record (`explainer_topics`). A Talk that also offers a
 //! quest sends the quest row first, then the pages, then Goodbye. This suite walks the
 //! real request path gateway -> Gameplay -> gameplay/npc.rs -> npc_interaction with the
 //! bundled quest catalogue bound, so the production quest givers are covered; it asserts
-//! the ids the client reads, that a page replay keeps the same rows, and that a refused
-//! row leaves the saved character untouched.
+//! the ids the client reads, the close-then-page order, that a page keeps the same rows
+//! answerable, and that a refused row leaves the saved character untouched.
 
 #[path = "common/npc_greetings.rs"]
 mod npc_greetings;
@@ -27,9 +33,9 @@ use osfr_tools::{
     character_store::CharacterState,
     gameplay::Gameplay,
     npc_interaction::{
-        DialoguePacket26_3, EXPLAIN_CHOICE_RESPONSE_BASE, decode_dialogue_26_3,
-        encode_dialogue_close_26_4, explainer_dialogue_choice, goodbye_dialogue_choice,
-        quest_dialogue_choice,
+        DialoguePacket26_3, EXPLAIN_CHOICE_RESPONSE_BASE, QUEST_CHOICE_RESPONSE,
+        decode_dialogue_26_3, decode_quest_offer_49_1, encode_dialogue_close_26_4,
+        explainer_dialogue_choice, goodbye_dialogue_choice, quest_dialogue_choice,
     },
     world_text::locale_hash,
 };
@@ -121,23 +127,74 @@ fn talk(game: &mut Gameplay, greeter: &Greeter) -> DialoguePacket26_3 {
     gameplay_talk_packet(game, greeter.file, greeter.npc_id)
 }
 
-/// The 26/3(body, rows) reply to one 26/6 row, if the server sent one, and whether the
-/// reply was the ordinary 26/4 close.
-fn choose(game: &mut Gameplay, greeter: &Greeter, response_id: i32) -> (Option<Vec<u8>>, bool) {
+/// The replies to one 26/6 row, in wire order.
+fn choose(game: &mut Gameplay, greeter: &Greeter, response_id: i32) -> Vec<Vec<u8>> {
     let character = character(greeter);
-    let outcome = game
-        .handle_in_world(&dialogue_choice(response_id), &character, 1_200)
-        .expect("26/6 is accepted");
-    let dialogue = outcome
+    game.handle_in_world(&dialogue_choice(response_id), &character, 1_200)
+        .expect("26/6 is accepted")
         .replies
+}
+
+/// The dialog-shaping replies among `replies`, in wire order: the 26/4 close and the 26/3
+/// dialogue. Markers or pins the router appends after the dialog are not part of it.
+fn dialogue_replies(replies: &[Vec<u8>]) -> Vec<&[u8]> {
+    let close = encode_dialogue_close_26_4();
+    replies
         .iter()
-        .find(|packet| packet.starts_with(&GREETING_HEADER))
-        .cloned();
-    let closed = outcome
-        .replies
-        .iter()
-        .any(|packet| *packet == encode_dialogue_close_26_4());
-    (dialogue, closed)
+        .map(Vec::as_slice)
+        .filter(|packet| packet.starts_with(&GREETING_HEADER) || *packet == close.as_slice())
+        .collect()
+}
+
+/// One page row's answer: the 26/4 close that lets the client's `Show` run again, then the
+/// page 26/3. Returns the decoded dialogue the client re-shows.
+fn page_after_close(
+    replies: &[Vec<u8>],
+    greeter: &Greeter,
+    response_id: i32,
+) -> DialoguePacket26_3 {
+    let dialog = dialogue_replies(replies);
+    assert_eq!(
+        dialog.len(),
+        2,
+        "NPC {} ({}): row {response_id} answers the close and the page, found {} dialog packets",
+        greeter.npc_id,
+        greeter.name,
+        dialog.len()
+    );
+    assert_eq!(
+        dialog[0],
+        encode_dialogue_close_26_4().as_slice(),
+        "NPC {} ({}): row {response_id} must close the dialog before the page so `Show` runs again",
+        greeter.npc_id,
+        greeter.name
+    );
+    decode_dialogue_26_3(dialog[1]).expect("the page 26/3 decodes")
+}
+
+/// The client's acknowledgement of the server's close: handler `00aa0870` destroys the
+/// dialog record and `009f6890` sends its own 26/4 while Lua `Hide` clears `isDialogShown`.
+/// It answers nothing, changes no saved state, and must not end the server interaction.
+fn close_echo(game: &mut Gameplay, greeter: &Greeter) {
+    let character = character(greeter);
+    let before = saved(game);
+    let echo = game
+        .handle_in_world(&encode_dialogue_close_26_4(), &character, 1_300)
+        .expect("the client's close echo is accepted");
+    assert!(
+        echo.replies.is_empty(),
+        "NPC {} ({}): the close echo answers nothing: {:?}",
+        greeter.npc_id,
+        greeter.name,
+        echo.replies
+    );
+    assert_eq!(
+        before,
+        saved(game),
+        "NPC {} ({}): the close echo changes no saved state",
+        greeter.npc_id,
+        greeter.name
+    );
 }
 
 fn saved(game: &Gameplay) -> serde_json::Value {
@@ -171,9 +228,11 @@ fn every_town_greeter_offers_its_explainer_rows_behind_the_greeting() {
     }
 }
 
-/// Choosing an explainer row replays the same dialogue with that page's body; the rows
-/// stay clickable (including a pending quest row), so a player can read another page,
-/// and Goodbye still closes.
+/// Choosing an explainer row closes the dialog and re-shows it with that page's body: the
+/// client's `Show` only rebuilds the window when `isDialogShown` is false, and only `Hide`
+/// clears that flag, so the client answers the 26/4 with its own close. The recorded rows
+/// stay answerable across that echo (another page, then Goodbye), including a pending
+/// quest row.
 #[test]
 fn choosing_an_explainer_row_replays_the_dialogue_with_that_page() {
     let mut game = new_game();
@@ -181,15 +240,8 @@ fn choosing_an_explainer_row_replays_the_dialogue_with_that_page() {
         talk(&mut game, greeter);
         for (index, (label, body)) in greeter.topics.iter().enumerate() {
             let response_id = FIRST_PAGE_ROW + index as i32;
-            let (packet, closed) = choose(&mut game, greeter, response_id);
-            let packet = packet.unwrap_or_else(|| {
-                panic!(
-                    "NPC {} ({}): row {response_id} must answer 26/3",
-                    greeter.npc_id, greeter.name
-                )
-            });
-            assert!(!closed, "a replay keeps the dialog open");
-            let dialogue = decode_dialogue_26_3(&packet).expect("the replay decodes");
+            let replies = choose(&mut game, greeter, response_id);
+            let dialogue = page_after_close(&replies, greeter, response_id);
             assert_eq!(
                 dialogue.initial_dwords[0], *body,
                 "NPC {} ({}): row {response_id} body",
@@ -217,17 +269,58 @@ fn choosing_an_explainer_row_replays_the_dialogue_with_that_page() {
                 greeter.npc_id,
                 greeter.name
             );
+            // The client echoes the close before the re-shown dialog can answer.
+            close_echo(&mut game, greeter);
         }
-        // Goodbye (300) ends the conversation and leaves the greeting reachable again.
-        let (packet, closed) = choose(&mut game, greeter, 300);
-        assert!(packet.is_none(), "Goodbye sends no new dialogue");
-        assert!(closed, "Goodbye answers the client's 26/4 close");
+        // Goodbye (300) still closes from the re-shown dialog and leaves the greeting
+        // reachable again.
+        let replies = choose(&mut game, greeter, 300);
+        assert_eq!(
+            dialogue_replies(&replies),
+            vec![encode_dialogue_close_26_4().as_slice()],
+            "NPC {} ({}): Goodbye sends only the close",
+            greeter.npc_id,
+            greeter.name
+        );
         assert_eq!(
             talk(&mut game, greeter).initial_dwords[0],
             greeter.greeting,
             "NPC {} ({}): a fresh Talk reopens the greeting",
             greeter.npc_id,
             greeter.name
+        );
+    }
+}
+
+/// A page row leaves the recorded quest row answerable: after the page and the client's
+/// close echo, row 301 still opens that greeter's 49/1 offer.
+#[test]
+fn a_page_row_then_the_quest_row_still_opens_the_offer() {
+    for greeter in GREETERS {
+        let Some((quest_id, _title)) = greeter.offer else {
+            continue;
+        };
+        // A fresh game per greeter: a live offer counts against the eligibility limit, so
+        // the second greeter's Talk must not inherit the first greeter's offer.
+        let mut game = new_game();
+        talk(&mut game, greeter);
+        let replies = choose(&mut game, greeter, FIRST_PAGE_ROW);
+        page_after_close(&replies, greeter, FIRST_PAGE_ROW);
+        close_echo(&mut game, greeter);
+        let replies = choose(&mut game, greeter, QUEST_CHOICE_RESPONSE);
+        let offer = replies
+            .iter()
+            .find_map(|packet| decode_quest_offer_49_1(packet).ok())
+            .unwrap_or_else(|| {
+                panic!(
+                    "NPC {} ({}): the quest row after a page must open 49/1",
+                    greeter.npc_id, greeter.name
+                )
+            });
+        assert_eq!(
+            offer.quest_id, quest_id,
+            "NPC {} ({}): the offer names the greeter's own quest",
+            greeter.npc_id, greeter.name
         );
     }
 }
@@ -360,10 +453,10 @@ fn a_refused_row_changes_no_saved_state_and_the_npc_reopens() {
     for greeter in GREETERS {
         talk(&mut game, greeter);
         let before = saved(&game);
-        let (packet, closed) = choose(&mut game, greeter, i32::MAX);
-        assert!(packet.is_none(), "an unoffered row sends no dialogue");
-        assert!(
-            closed,
+        let replies = choose(&mut game, greeter, i32::MAX);
+        assert_eq!(
+            dialogue_replies(&replies),
+            vec![encode_dialogue_close_26_4().as_slice()],
             "an unoffered row is answered with the ordinary 26/4 close"
         );
         assert_eq!(
@@ -392,12 +485,12 @@ fn a_refused_row_changes_no_saved_state_and_the_npc_reopens() {
     // A row sent with no dialogue open is the same ordinary close and changes nothing.
     let mut fresh = new_game();
     let before = saved(&fresh);
-    let (packet, closed) = choose(&mut fresh, &GREETERS[0], FIRST_PAGE_ROW);
-    assert!(
-        packet.is_none(),
-        "a row with no open dialogue sends no 26/3"
+    let replies = choose(&mut fresh, &GREETERS[0], FIRST_PAGE_ROW);
+    assert_eq!(
+        dialogue_replies(&replies),
+        vec![encode_dialogue_close_26_4().as_slice()],
+        "a row with no open dialogue is the ordinary close"
     );
-    assert!(closed, "a row with no open dialogue is the ordinary close");
     assert_eq!(
         before,
         saved(&fresh),
