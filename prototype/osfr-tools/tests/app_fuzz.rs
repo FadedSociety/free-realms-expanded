@@ -699,6 +699,12 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     collect.extend(COLLECT_NODE.to_le_bytes());
     collect.push(0);
     result.push(("npc_interaction", collect));
+    // T538: a 26/8 click on an event actor's guid (the bin's event-guid route). This harness
+    // drives the gateway, not the bin, and no event run is live: it must change nothing.
+    let mut event = words(26, 8, &[]);
+    event.extend(0x4556_4e54_0000_0100_u64.to_le_bytes());
+    event.push(0);
+    result.push(("npc_interaction", event));
     for sub in [14, 15, 17, 21, 30] {
         result.push(("social_router", words(26, sub, &[u32::MAX; 5])));
     }

@@ -49,6 +49,7 @@ mod collection_pickup;
 mod content_presence;
 mod content_reload;
 mod crafting;
+mod dance_off;
 mod derby_session;
 mod encounter_rewards;
 mod field_battle;
@@ -250,6 +251,8 @@ pub struct Gameplay {
     content_dir: PathBuf,
     mystery_chests: Option<Arc<MysteryChests>>,
     pending_chest: Option<i32>,
+    /// T538: the world tick's queued dance-off join hook; transient, never saved.
+    dance_off: dance_off::TickState,
     npc_visibility: Option<crate::world::NpcVisibility>,
     /// T507: per-model ambient animation rows; immutable content loaded at
     /// start. Not in `realm reload`'s commit list, so a table edit needs a restart.
@@ -1150,6 +1153,7 @@ impl Gameplay {
         Ok(Self {
             mystery_chests,
             pending_chest: None,
+            dance_off: dance_off::TickState::default(),
             npc_visibility,
             npc_ambient,
             placement_watch: placement_watch::PlacementWatch::default(),

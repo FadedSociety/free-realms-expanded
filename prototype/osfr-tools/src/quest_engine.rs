@@ -851,6 +851,26 @@ pub enum QuestEvent {
         objective_id: u32,
         npc_id: u64,
     },
+    /// T538: the character joined a dance-off side by wearing that side's costume inside
+    /// the dance area. The hook is emitted once per run; the listening quest is separate.
+    JoinDanceOff {
+        team: DanceTeam,
+    },
+}
+
+/// The two sides of a dance-off. Content names them `vampire` and `werewolf`; a quest
+/// objective and the event hook both carry the side this names (T538).
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum DanceTeam {
+    Vampire,
+    Werewolf,
+}
+
+impl DanceTeam {
+    pub(crate) fn index(self) -> usize {
+        self as usize
+    }
 }
 
 impl From<OpeningTrigger> for ObjectiveKind {
@@ -3370,6 +3390,7 @@ fn validate_event(event: &QuestEvent) -> io::Result<()> {
             objective_id,
             npc_id,
         } => *quest_id != 0 && *objective_id != 0 && *npc_id != 0,
+        QuestEvent::JoinDanceOff { .. } => true,
         QuestEvent::VisitPosition { position, .. } => position
             .iter()
             .all(|value| value.is_finite() && value.abs() <= 1_000_000.0),

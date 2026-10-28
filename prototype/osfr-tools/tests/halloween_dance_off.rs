@@ -326,8 +326,8 @@ fn stopping_early_switches_the_song_off_and_removes_every_actor() {
         .collect();
     assert_eq!(
         (spawned, removed.len()),
-        (10, 10),
-        "every shown actor is removed"
+        (11, 11),
+        "every shown actor is removed: the ten stage actors and T538's Voting Box"
     );
     assert!(
         removed.iter().all(|effect| *effect == POOF),

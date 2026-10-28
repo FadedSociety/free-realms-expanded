@@ -273,6 +273,16 @@ impl Gameplay {
                     return Ok(Some(out));
                 }
             }
+            // T538: after a click on an actor this router does not own (a world-event actor such
+            // as the Voting Box), the 26/6 belongs to the bin's event route: a close here would
+            // hide the client's prompt before the vote is read. Any content-NPC click clears it.
+            if self
+                .npc_interaction
+                .as_ref()
+                .is_some_and(npc_interaction::NpcInteraction::foreign_click)
+            {
+                return Ok(None);
+            }
             // A row this dialog did not send is answered with the ordinary close. That
             // is session-only: `pending_quest_choice` is this session's dialog state and
             // the saved character is untouched, which the T773 suite asserts.
@@ -640,6 +650,12 @@ impl Gameplay {
             let request = npc_interaction::decode_npc_interact_26_8(inner)
                 .map_err(|_| invalid("invalid NPC interaction request"))?;
             let Some(key) = self.content_npc_key(request.target) else {
+                // T538: a click on an actor this router does not own (a player menu or a
+                // world-event actor such as the Voting Box) marks the next 26/6 as that
+                // route's; the open menu itself stays, as the T773 suite pins.
+                if let Some(interaction) = &mut self.npc_interaction {
+                    interaction.note_foreign_click();
+                }
                 npc_event(serde_json::json!({
                     "event": "npc_interact",
                     "guid": request.target,

@@ -11,6 +11,15 @@
 //!
 //! T464 adds `face` (turn in place) and ships the Halloween dance-off as the first scheduled event.
 //!
+//! T538, participation: an event row's optional `dance_off` block names a Voting Box actor, the
+//! two costume teams (client item name ids), their vote rows, the winning cakes and the lines
+//! they show. A character standing in the block's area in a team's costume joins that team for
+//! the run (keyed by character guid, so a disconnect keeps it); a vote is one per character; the
+//! side with more votes wins the run's `one_of` ending, and a tie or no votes keeps the draw the
+//! run made at its start. The winning cake answers one 15/4 line per participant, once. The
+//! interaction and vote packets are answered by the bin's event-guid route; `gameplay/npc.rs`
+//! answers a 26/6 only when it sent the dialogue, so it never closes an event actor's prompt.
+//!
 //! T462, part 3: an event row's optional `schedule` starts it on wall-clock slots from the world
 //! tick (`schedule.rs` holds the slot rules): season gate, overlap skips, a kickoff line before
 //! the start. Admin start and stop stay as they were; a slot whose event is already running
@@ -49,6 +58,7 @@ use crate::client_areas::ClientAreas;
 use crate::encounter::animation;
 use crate::players::{PlayerRegistry, SessionId, ZoneInstance};
 use crate::power_ups::Rng;
+use crate::quest_engine::DanceTeam;
 use crate::social_chat::LOCAL_CHAT_RADIUS;
 use crate::startup_world::{NpcSpawn, build_add_npc};
 use serde::Deserialize;
@@ -84,6 +94,11 @@ const MAX_CYCLE_IDS: usize = 32;
 const MIN_CYCLE_MS: u64 = 100;
 const MAX_TEXT_BYTES: usize = 256;
 const MAX_RADIUS_M: f32 = 10_000.0;
+/// T538: at most this many costume name ids per team.
+const MAX_COSTUME_IDS: usize = 16;
+/// T538: bounds on the content's join scan cadence (server tuning, not a client value).
+const MIN_JOIN_SCAN_MS: u64 = 50;
+const MAX_JOIN_SCAN_MS: u64 = 10_000;
 const MAX_COORD: f32 = 1_000_000.0;
 const MIN_SPEED_MPS: f32 = 0.1;
 /// The bound the sibling content loaders use (`abilities.rs`, `power_ups.rs`).
@@ -113,6 +128,52 @@ struct EventRow {
     actors: Vec<ActorRow>,
     timeline: Vec<StepRow>,
     schedule: Option<ScheduleRow>,
+    /// T538: the run's costume teams, Voting Box, cakes and lines.
+    #[serde(default)]
+    dance_off: Option<DanceOffRow>,
+}
+
+/// One row's dance-off block: the area, the Voting Box, the prompt and refusal lines, and the
+/// two teams with their costume name ids and cakes.
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct DanceOffRow {
+    /// The area a costume joins in; the run's instance is the event's instance.
+    center: [f32; 3],
+    radius_m: f32,
+    /// The interactable actor that offers the vote.
+    voting_box: String,
+    /// How often the world tick scans this run's area for costume joins (server tuning, not a
+    /// client value; the loader bounds it).
+    join_scan_ms: u64,
+    /// Client locale id of the 26/3 prompt ("Which side..?").
+    prompt_string_id: i32,
+    /// Client locale id of the 15/4 line for a second vote.
+    already_voted_string_id: i32,
+    /// Client locale id of the 15/4 line for a character who never joined a team.
+    not_participant_string_id: i32,
+    /// Client locale id of the 15/4 line for a second cake use.
+    used_cake_string_id: i32,
+    teams: Vec<DanceTeamRow>,
+    /// Provenance for the block (client ids, notes, evidence); required, never sent.
+    source: String,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct DanceTeamRow {
+    team: DanceTeam,
+    /// Client item name ids (`ClientItemDefinition.NameId`) that put a character on this team.
+    costume_name_ids: Vec<i32>,
+    /// The interactable cake actor; its spawn in a `one_of` branch is this team's ending.
+    cake_actor: String,
+    /// The client 26/6 row id this team's vote row answers with (R: above the NPC rows;
+    /// content data, not a protocol constant).
+    vote_response_id: i32,
+    /// Client locale id of the vote row's label.
+    vote_label_string_id: i32,
+    /// Client locale id of the 15/4 line one cake use answers.
+    cake_say_string_id: i32,
 }
 
 #[derive(Deserialize)]
@@ -226,6 +287,55 @@ pub struct WorldEvent {
     /// The branch count of each `one_of`, in file order.
     branches: Vec<usize>,
     schedule: Option<Schedule>,
+    /// T538: `None` for an event nobody joins.
+    dance_off: Option<DanceOff>,
+}
+
+/// One compiled dance-off. Teams are indexed by [`DanceTeam::index`].
+#[derive(Debug, PartialEq)]
+struct DanceOff {
+    center: [f32; 3],
+    radius_m: f32,
+    voting_box: usize,
+    join_scan_ms: u64,
+    prompt_string_id: i32,
+    already_voted_string_id: i32,
+    not_participant_string_id: i32,
+    used_cake_string_id: i32,
+    teams: [TeamCostume; 2],
+}
+
+#[derive(Debug, PartialEq)]
+struct TeamCostume {
+    team: DanceTeam,
+    costume_name_ids: Vec<i32>,
+    cake: usize,
+    vote_response_id: i32,
+    vote_label_string_id: i32,
+    cake_say_string_id: i32,
+    /// The `(one_of group, branch)` that spawns `cake`; the other team's cake is in the
+    /// sibling branch of the same group.
+    branch: (usize, usize),
+}
+
+/// T538: one run's participation. Every map is keyed by character guid, never by session, so a
+/// disconnect keeps the character's team, vote and used cake for the run.
+#[derive(Clone, Debug, Default, PartialEq)]
+struct LiveDanceOff {
+    teams: BTreeMap<u64, DanceTeam>,
+    votes: BTreeMap<u64, DanceTeam>,
+    /// Characters with an open vote prompt and the run serial that owns it, so an answer counts
+    /// in the run whose prompt the client is looking at.
+    prompted: BTreeMap<u64, u32>,
+    used_cake: BTreeSet<u64>,
+    /// The side the ending went to; votes and joins stop once it is set.
+    decided: Option<DanceTeam>,
+    /// The per-side vote count at the ending, recorded when the draw is decided (the decision
+    /// is where a miscount matters; tests pin it directly).
+    tally: Option<[usize; 2]>,
+    /// The next tick that scans for costume joins (the row's `join_scan_ms`): a spectator in
+    /// the area is not rescanned at the full tick rate.
+    next_scan_ms: u64,
 }
 
 #[derive(Debug, PartialEq)]
@@ -260,11 +370,17 @@ enum Op {
     TagOn(i32),
     TagOff(i32),
     Say(i32),
-    Move { to: [f32; 3], speed: f32 },
+    Move {
+        to: [f32; 3],
+        speed: f32,
+    },
     Face([f32; 3]),
     Broadcast(usize),
     Area(i32, bool),
     Cycle(usize),
+    /// The `one_of` decision point: runs at its own `at_ms`, before the branch steps it
+    /// covers, and lets a dance-off replace the branch drawn at the run's start.
+    OneOf(usize),
 }
 
 #[derive(Debug, PartialEq)]
@@ -361,6 +477,7 @@ fn compile(row: EventRow) -> io::Result<WorldEvent> {
         actors: rows,
         timeline,
         schedule,
+        dance_off,
     } = row;
     let fail = |what: String| invalid(format!("world event {key}: {what}"));
     if !valid_key(&key) || rows.len() > MAX_ACTORS || timeline.len() > MAX_STEPS {
@@ -436,6 +553,10 @@ fn compile(row: EventRow) -> io::Result<WorldEvent> {
             actors[step.actor].remove_effect = effect;
         }
     }
+    let dance_off = dance_off
+        .map(|row| compile_dance_off(row, &index, &steps, &branches, &mut actors))
+        .transpose()
+        .map_err(&fail)?;
     Ok(WorldEvent {
         key,
         actors,
@@ -444,6 +565,143 @@ fn compile(row: EventRow) -> io::Result<WorldEvent> {
         broadcasts,
         branches,
         schedule,
+        dance_off,
+    })
+}
+
+/// T538: one row's `dance_off` block. The two cakes must be the two branches of one `one_of`;
+/// that pairing is the only mapping from a vote to the run's ending, so a content edit cannot
+/// leave a second flag to keep in sync. Role actors become interactable; every other event actor
+/// stays scenery.
+fn compile_dance_off(
+    row: DanceOffRow,
+    index: &BTreeMap<String, usize>,
+    steps: &[Step],
+    branches: &[usize],
+    actors: &mut [Actor],
+) -> Result<DanceOff, String> {
+    if !row
+        .center
+        .iter()
+        .all(|value| value.is_finite() && value.abs() <= MAX_COORD)
+        || !(row.radius_m > 0.0 && row.radius_m <= MAX_RADIUS_M)
+        || !(MIN_JOIN_SCAN_MS..=MAX_JOIN_SCAN_MS).contains(&row.join_scan_ms)
+        || row.source.is_empty()
+        || row.source.len() > 4096
+    {
+        return Err(
+            "dance_off needs a finite center, a radius of 1-10000 m, join_scan_ms, and a source"
+                .into(),
+        );
+    }
+    let positive_id = |id: i32| positive(id).map_err(|_| "dance_off ids must be > 0".to_string());
+    let prompt_string_id = positive_id(row.prompt_string_id)?;
+    let already_voted_string_id = positive_id(row.already_voted_string_id)?;
+    let not_participant_string_id = positive_id(row.not_participant_string_id)?;
+    let used_cake_string_id = positive_id(row.used_cake_string_id)?;
+    let voting_box = *index
+        .get(&row.voting_box)
+        .ok_or_else(|| "dance_off names an unknown Voting Box actor".to_string())?;
+    if !steps.iter().any(|step| {
+        step.actor == voting_box && step.branch.is_none() && matches!(step.op, Op::Spawn(_))
+    }) {
+        return Err("the Voting Box must be spawned outside a one_of".into());
+    }
+    if row.teams.len() != 2 {
+        return Err("dance_off needs exactly two teams".into());
+    }
+    let mut teams: [Option<TeamCostume>; 2] = [None, None];
+    for team in row.teams {
+        let slot = &mut teams[team.team.index()];
+        if slot.is_some() {
+            return Err("dance_off names a team twice".into());
+        }
+        let cake = *index
+            .get(&team.cake_actor)
+            .ok_or_else(|| format!("dance_off names an unknown cake actor {}", team.cake_actor))?;
+        if cake == voting_box {
+            return Err("the Voting Box cannot be a cake".into());
+        }
+        if team.costume_name_ids.is_empty()
+            || team.costume_name_ids.len() > MAX_COSTUME_IDS
+            || team.costume_name_ids.iter().any(|id| *id <= 0)
+        {
+            return Err(format!(
+                "team {} needs 1-{MAX_COSTUME_IDS} costume name ids > 0",
+                team.cake_actor
+            ));
+        }
+        let vote_response_id = positive_id(team.vote_response_id)?;
+        let vote_label_string_id = positive_id(team.vote_label_string_id)?;
+        let cake_say_string_id = positive_id(team.cake_say_string_id)?;
+        // The ending is the branch that spawns this team's cake; a cake spawned anywhere else
+        // would make the vote-to-ending mapping ambiguous.
+        if steps.iter().any(|step| {
+            step.actor == cake && step.branch.is_none() && matches!(step.op, Op::Spawn(_))
+        }) {
+            return Err(format!(
+                "cake {} must be spawned inside a one_of branch",
+                team.cake_actor
+            ));
+        }
+        let mut spawns = steps.iter().filter(|step| {
+            step.actor == cake && step.branch.is_some() && matches!(step.op, Op::Spawn(_))
+        });
+        let Some(branch) = spawns.next().and_then(|step| step.branch) else {
+            return Err(format!("cake {} has no one_of spawn", team.cake_actor));
+        };
+        if spawns.next().is_some() {
+            return Err(format!(
+                "cake {} is spawned in more than one branch",
+                team.cake_actor
+            ));
+        }
+        *slot = Some(TeamCostume {
+            team: team.team,
+            costume_name_ids: team.costume_name_ids,
+            cake,
+            vote_response_id,
+            vote_label_string_id,
+            cake_say_string_id,
+            branch,
+        });
+    }
+    let [Some(vampire), Some(werewolf)] = teams else {
+        return Err("dance_off needs one vampire and one werewolf team".into());
+    };
+    let teams = [vampire, werewolf];
+    if teams[0].vote_response_id == teams[1].vote_response_id {
+        return Err("the two teams need distinct vote response ids".into());
+    }
+    if teams[0]
+        .costume_name_ids
+        .iter()
+        .any(|id| teams[1].costume_name_ids.contains(id))
+    {
+        return Err("the two teams cannot share a costume name id".into());
+    }
+    if teams[0].branch.0 != teams[1].branch.0 || teams[0].branch.1 == teams[1].branch.1 {
+        return Err("the two cakes must be the two branches of one one_of".into());
+    }
+    let group = teams[0].branch.0;
+    if branches.get(group).copied() != Some(2) {
+        return Err("the cakes' one_of needs exactly the two branches".into());
+    }
+    let template = crate::world::content_spawn_template();
+    for index in [voting_box, teams[0].cake, teams[1].cake] {
+        actors[index].spawn.is_interactable = 1;
+        actors[index].spawn.interact_range = template.interact_range;
+    }
+    Ok(DanceOff {
+        center: row.center,
+        radius_m: row.radius_m,
+        voting_box,
+        join_scan_ms: row.join_scan_ms,
+        prompt_string_id,
+        already_voted_string_id,
+        not_participant_string_id,
+        used_cake_string_id,
+        teams,
     })
 }
 
@@ -580,6 +838,15 @@ impl Builder<'_> {
                 }
                 let group = self.branches.len();
                 self.branches.push(branches.len());
+                // The decision point runs before the branch rows it covers (stable sort keeps
+                // this order among equal `at_ms`), so a dance-off's votes replace the draw
+                // before any branch step is due.
+                self.steps.push(Step {
+                    at_ms,
+                    actor: 0,
+                    op: Op::OneOf(group),
+                    branch: None,
+                });
                 for (number, rows) in branches.into_iter().enumerate() {
                     for row in rows {
                         self.add(row, at_ms, Some((group, number)))?;
@@ -619,14 +886,19 @@ struct Run {
     instance: ZoneInstance,
     started_ms: u64,
     serial: u32,
-    /// This run's timeline: the event's steps without the `one_of` branches that were not drawn.
+    /// This run's timeline: every event step, the branch steps skipped when their branch is not
+    /// `drawn`. A dance-off may replace one draw at its `one_of` step, so the branch steps stay.
     steps: Vec<Step>,
     next_step: usize,
+    /// The branch each `one_of` group runs; drawn at the start and possibly re-decided.
+    drawn: Vec<usize>,
     actors: Vec<Shown>,
     rng: Rng,
     cycles: Vec<Playing>,
     /// Areas this run switched on and not yet off; `stop` and the run's end switch them off.
     areas: BTreeSet<i32>,
+    /// T538: `None` for an event with no `dance_off` row.
+    dance_off: Option<LiveDanceOff>,
 }
 
 /// A `cycle_anim` that is running: its next play, its last allowed play and the plays so far.
@@ -693,6 +965,54 @@ fn within(a: [f32; 3], b: [f32; 3], radius: f32, flat: bool) -> bool {
     let d = |axis: usize| f64::from(a[axis]) - f64::from(b[axis]);
     let height = if flat { 0.0 } else { d(1) };
     d(0) * d(0) + height * height + d(2) * d(2) <= f64::from(radius).powi(2)
+}
+
+/// T538: an event guid's run serial and actor index, from the low half `Run::guid` writes.
+fn event_guid_parts(guid: u64) -> Option<(u32, usize)> {
+    if !WorldEvents::is_event_guid(guid) {
+        return None;
+    }
+    let serial = (guid as u32) >> 8;
+    (serial != 0).then_some((serial, (guid & 0xff) as usize))
+}
+
+/// T538: a team's vote row is content (`DanceTeamRow::vote_response_id`); the 26/3 prompt row and
+/// the 26/6 answer lookup read the same field, so they cannot drift. (R) The rows sit above the
+/// NPC conversation's `1..=5` and the greeter/quest rows so a vote click cannot advance an NPC
+/// dialogue the server still had open; the client echoes the row's own id (`009f6aa0`).
+///
+/// T538: the 26/3 vote prompt (reader `00a9ef10`). The body is the client's "Which side..?"
+/// text id and the dialog camera targets the Voting Box; the rows carry the teams' labels.
+fn vote_prompt_packet(actor: u64, dance: &DanceOff) -> Option<Vec<u8>> {
+    let choices = dance
+        .teams
+        .iter()
+        .map(|team| {
+            crate::npc_interaction::dialogue_choice_row(
+                team.vote_response_id,
+                team.vote_label_string_id as u32,
+            )
+        })
+        .collect();
+    crate::npc_interaction::encode_dialogue_26_3(&crate::npc_interaction::DialoguePacket26_3 {
+        initial_dwords: [
+            dance.prompt_string_id as u32,
+            0,
+            actor as u32,
+            (actor >> 32) as u32,
+        ],
+        initial_flag: false,
+        initial_float_bits: 0,
+        choices,
+        choice_vectors: [[0; 4]; 2],
+        vector_flag: false,
+        final_vector: [0; 4],
+        float_after_vector_bits: 0,
+        final_flags: [false; 3],
+        final_float_bits: 0,
+        final_dword: 0,
+    })
+    .ok()
 }
 
 impl WorldEvents {
@@ -777,15 +1097,10 @@ impl WorldEvents {
             .iter()
             .map(|count| (rng.next_u64() % *count as u64) as usize)
             .collect();
-        let steps = event
-            .steps
-            .iter()
-            .filter(|step| {
-                step.branch
-                    .is_none_or(|(group, number)| drawn[group] == number)
-            })
-            .copied()
-            .collect();
+        let dance_off = event.dance_off.as_ref().map(|_| LiveDanceOff::default());
+        // Every step stays: the `one_of` marker skips the branch that was not drawn, and a
+        // dance-off may replace the draw at that marker.
+        let steps = event.steps.clone();
         let run = Run {
             actors: vec![Shown::default(); event.actors.len()],
             event,
@@ -794,9 +1109,11 @@ impl WorldEvents {
             serial,
             steps,
             next_step: 0,
+            drawn,
             rng,
             cycles: Vec::new(),
             areas: BTreeSet::new(),
+            dance_off,
         };
         self.runs.insert(run.event.key.clone(), run);
         true
@@ -852,6 +1169,13 @@ impl WorldEvents {
                 .filter(|step| run.started_ms.saturating_add(step.at_ms) <= now_ms)
             {
                 run.next_step += 1;
+                // A branch step waits for its group's draw; the marker before it decided.
+                if step
+                    .branch
+                    .is_some_and(|(group, number)| run.drawn.get(group) != Some(&number))
+                {
+                    continue;
+                }
                 if let Err(reason) = run.apply(step, &mut env, &mut out) {
                     println!(
                         "{}",
@@ -914,11 +1238,317 @@ impl WorldEvents {
             }
         }
     }
+
+    /// T538: whether `guid` is an event actor's guid (the `EVNT` tag). The bin routes these
+    /// interactions here; no content NPC or player guid uses the range.
+    pub fn is_event_guid(guid: u64) -> bool {
+        guid >> 32 == GUID_TAG >> 32
+    }
+
+    /// T538: the world tick's per-run scan cadence: true at most every row's `join_scan_ms` for
+    /// an open dance-off, so a spectator standing in the area is not rescanned at the full tick
+    /// rate. False when no dance-off is live.
+    pub fn dance_off_scan_due(&mut self, now_ms: u64) -> bool {
+        let mut due = false;
+        for run in self.runs.values_mut() {
+            let Some(scan_ms) = run
+                .event
+                .dance_off
+                .as_ref()
+                .map(|dance| dance.join_scan_ms)
+                .filter(|_| {
+                    run.dance_off
+                        .as_ref()
+                        .is_some_and(|live| live.decided.is_none())
+                })
+            else {
+                continue;
+            };
+            let Some(live) = run.dance_off.as_mut() else {
+                continue;
+            };
+            if now_ms >= live.next_scan_ms {
+                live.next_scan_ms = now_ms.saturating_add(scan_ms);
+                due = true;
+            }
+        }
+        due
+    }
+
+    /// T538: the `(instance, serial)` of every open dance-off; the world tick's join pass starts
+    /// here. A file without one costs one run scan and no player scan.
+    pub fn open_dance_offs(&self) -> Vec<(ZoneInstance, u32)> {
+        let mut open: Vec<_> = self
+            .runs
+            .values()
+            .filter(|run| {
+                run.dance_off
+                    .as_ref()
+                    .is_some_and(|live| live.decided.is_none())
+            })
+            .map(|run| (run.instance, run.serial))
+            .collect();
+        open.sort_unstable();
+        open
+    }
+
+    /// T538: whether run `serial` still accepts a join and `position` is inside its area: the
+    /// area test the join pass needs before it reads any equipment. The position is the
+    /// committed registry pose, never a raw client report.
+    pub fn dance_off_area(&self, serial: u32, position: [f32; 3]) -> bool {
+        self.runs.values().any(|run| {
+            run.serial == serial
+                && run
+                    .dance_off
+                    .as_ref()
+                    .is_some_and(|live| live.decided.is_none())
+                && run
+                    .event
+                    .dance_off
+                    .as_ref()
+                    .is_some_and(|dance| within(position, dance.center, dance.radius_m, false))
+        })
+    }
+
+    /// T538: the team `character` would join in run `serial` by standing in the area in a team's
+    /// costume. `name_ids` are the equipped whole-body costume `NameId`s. Read-only: the caller
+    /// queues the quest hook and records the join with `join_dance_off`.
+    pub fn dance_off_team(
+        &self,
+        serial: u32,
+        character: u64,
+        name_ids: &[i32],
+    ) -> Option<DanceTeam> {
+        let run = self.runs.values().find(|run| {
+            run.serial == serial
+                && run.dance_off.as_ref().is_some_and(|live| {
+                    live.decided.is_none() && !live.teams.contains_key(&character)
+                })
+        })?;
+        run.event
+            .dance_off
+            .as_ref()?
+            .teams
+            .iter()
+            .find(|team| team.costume_name_ids.iter().any(|id| name_ids.contains(id)))
+            .map(|team| team.team)
+    }
+
+    /// T538: record the join `dance_off_team` detected. False, changing nothing, when the run
+    /// ended, was decided or already has the character. Keyed by character guid, so a
+    /// disconnect keeps the team for the run.
+    pub fn join_dance_off(&mut self, serial: u32, character: u64, team: DanceTeam) -> bool {
+        let Some(run) = self.runs.values_mut().find(|run| run.serial == serial) else {
+            return false;
+        };
+        let Some(live) = run.dance_off.as_mut().filter(|live| live.decided.is_none()) else {
+            return false;
+        };
+        if live.teams.contains_key(&character) {
+            return false;
+        }
+        live.teams.insert(character, team);
+        true
+    }
+
+    /// T538: the team run `serial` recorded for `character`, which is what the cake serves and
+    /// what the join pass re-checks after a reconnect.
+    pub fn dance_off_participant(&self, serial: u32, character: u64) -> Option<DanceTeam> {
+        self.runs
+            .values()
+            .find(|run| run.serial == serial)?
+            .dance_off
+            .as_ref()?
+            .teams
+            .get(&character)
+            .copied()
+    }
+
+    /// T538: one client 26/8 click on an event actor, answered in the bin's event-guid route.
+    /// The Voting Box opens the 26/3 vote prompt; a live cake answers its 15/4 line. Every
+    /// other event actor, an out-of-reach click, a stale guid and a decided run answer nothing.
+    pub fn interact(
+        &mut self,
+        target: u64,
+        character: u64,
+        instance: ZoneInstance,
+        position: [f32; 3],
+    ) -> Vec<Vec<u8>> {
+        let Some((serial, index)) = event_guid_parts(target) else {
+            return Vec::new();
+        };
+        let Some(run) = self.runs.values_mut().find(|run| run.serial == serial) else {
+            return Vec::new();
+        };
+        let Some(live) = run.dance_off.as_mut() else {
+            return Vec::new();
+        };
+        if run.instance != instance || !run.actors.get(index).is_some_and(|actor| actor.live) {
+            return Vec::new();
+        }
+        let event = Arc::clone(&run.event);
+        let Some(dance) = event.dance_off.as_ref() else {
+            return Vec::new();
+        };
+        let reach = crate::npc_interaction::INTERACTION_RADIUS as f32;
+        if !within(position, run.actors[index].position, reach, false) {
+            return Vec::new();
+        }
+        if index == dance.voting_box {
+            if live.decided.is_some() {
+                return Vec::new();
+            }
+            let Some(packet) = vote_prompt_packet(target, dance) else {
+                return Vec::new();
+            };
+            // Re-opening replaces any prompt already open; a refused click above left it alone.
+            live.prompted.insert(character, run.serial);
+            return vec![packet];
+        }
+        let Some(team) = dance.teams.iter().find(|team| team.cake == index) else {
+            return Vec::new();
+        };
+        if !live.teams.contains_key(&character) {
+            return vec![crate::chat::string_say(
+                target,
+                dance.not_participant_string_id,
+            )];
+        }
+        if !live.used_cake.insert(character) {
+            return vec![crate::chat::string_say(target, dance.used_cake_string_id)];
+        }
+        vec![crate::chat::string_say(target, team.cake_say_string_id)]
+    }
+
+    /// T538: the client's 26/6 answer to an open vote prompt, owned by the run whose prompt the
+    /// client is looking at. `None` when no prompt is open or the row is not one of that run's
+    /// vote rows, so another dialogue's answer stays with the NPC dialogue path. Only a counted
+    /// vote changes the run and closes the prompt; a refused answer sends nothing, so the client
+    /// keeps the prompt and the player can step back into reach and answer.
+    pub fn vote(
+        &mut self,
+        character: u64,
+        response_id: i32,
+        instance: ZoneInstance,
+        position: [f32; 3],
+    ) -> Option<Vec<Vec<u8>>> {
+        let serial = self
+            .runs
+            .values()
+            .find_map(|run| run.dance_off.as_ref()?.prompted.get(&character).copied())?;
+        let run = self.runs.values_mut().find(|run| run.serial == serial)?;
+        let event = Arc::clone(&run.event);
+        let dance = event.dance_off.as_ref()?;
+        // Only the row a team's vote offers counts; any other 26/6 belongs to another dialogue.
+        let team = dance
+            .teams
+            .iter()
+            .find(|team| team.vote_response_id == response_id)
+            .map(|team| team.team)?;
+        let instance_ok = run.instance == instance;
+        let box_guid = run.guid(dance.voting_box);
+        let box_live = run
+            .actors
+            .get(dance.voting_box)
+            .is_some_and(|actor| actor.live);
+        let box_at = run.actors[dance.voting_box].position;
+        let live = run.dance_off.as_mut()?;
+        let reach = crate::npc_interaction::INTERACTION_RADIUS as f32;
+        if !instance_ok || !box_live || !within(position, box_at, reach, false) {
+            // A refusal changes nothing: no close, so the client keeps the prompt.
+            return Some(Vec::new());
+        }
+        if live.decided.is_some() {
+            return Some(Vec::new());
+        }
+        if live.votes.contains_key(&character) {
+            return Some(vec![
+                crate::chat::string_say(box_guid, dance.already_voted_string_id),
+                crate::npc_interaction::encode_dialogue_close_26_4(),
+            ]);
+        }
+        live.prompted.remove(&character);
+        live.votes.insert(character, team);
+        Some(vec![crate::npc_interaction::encode_dialogue_close_26_4()])
+    }
+
+    /// T538: a click on another actor ends any open vote prompt, so a later 26/6 cannot be
+    /// answered by a prompt the player abandoned. A run's end clears its own prompts.
+    pub fn clear_vote_prompt(&mut self, character: u64) {
+        for run in self.runs.values_mut() {
+            if let Some(live) = &mut run.dance_off {
+                live.prompted.remove(&character);
+            }
+        }
+    }
 }
 
 impl Run {
     fn guid(&self, index: usize) -> u64 {
         GUID_TAG | u64::from(self.serial) << 8 | index as u64
+    }
+
+    /// T538: the `one_of` at `group` is due, so its draw is final. A dance-off whose cakes are
+    /// that group's branches gives the ending to the side with more votes; a tie or no votes
+    /// keeps the draw the run made at its start. Every group then drops the steps of the branch
+    /// it will not take, so the run ends with its drawn branch instead of waiting for a skipped
+    /// step far later (the marker sorts before the branch rows it covers).
+    fn decide(&mut self, group: usize) {
+        let Some(&drawn) = self.drawn.get(group) else {
+            return;
+        };
+        let mut chosen = drawn;
+        let mut team = None;
+        let mut tally = None;
+        if let (Some(live), Some(data)) = (self.dance_off.as_ref(), self.event.dance_off.as_ref())
+            && group == data.teams[0].branch.0
+            && live.decided.is_none()
+        {
+            let mut counted = [0usize; 2];
+            for voted in live.votes.values() {
+                counted[voted.index()] += 1;
+            }
+            team = match counted[0].cmp(&counted[1]) {
+                std::cmp::Ordering::Greater => Some(DanceTeam::Vampire),
+                std::cmp::Ordering::Less => Some(DanceTeam::Werewolf),
+                std::cmp::Ordering::Equal => data
+                    .teams
+                    .iter()
+                    .find(|team| team.branch.1 == drawn)
+                    .map(|team| team.team),
+            };
+            if let Some(side) = team {
+                chosen = data.teams[side.index()].branch.1;
+            }
+            tally = Some(counted);
+        }
+        self.drawn[group] = chosen;
+        if let Some(live) = self.dance_off.as_mut()
+            && let Some(counted) = tally
+        {
+            if let Some(side) = team {
+                live.decided = Some(side);
+                // The box closes with the ending: a prompt still open answers nothing after it.
+                live.prompted.clear();
+            }
+            live.tally = Some(counted);
+        }
+        let mut next_step = 0;
+        let mut kept = Vec::with_capacity(self.steps.len());
+        for (index, step) in self.steps.iter().copied().enumerate() {
+            if step
+                .branch
+                .is_some_and(|(branch_group, branch)| branch_group == group && branch != chosen)
+            {
+                continue;
+            }
+            if index < self.next_step {
+                next_step += 1;
+            }
+            kept.push(step);
+        }
+        self.steps = kept;
+        self.next_step = next_step;
     }
 
     /// One step. An op the actor's state does not allow (anything but spawn before it is live,
@@ -951,6 +1581,10 @@ impl Run {
                     end_ms: at.saturating_add(until),
                     count: 0,
                 });
+                return Ok(());
+            }
+            Op::OneOf(group) => {
+                self.decide(group);
                 return Ok(());
             }
             _ => {}
@@ -1037,7 +1671,9 @@ impl Run {
                 deliver(out, heard, || crate::chat::string_say(guid, string_id));
                 return Ok(());
             }
-            Op::Broadcast(_) | Op::Area(..) | Op::Cycle(_) => unreachable!("handled above"),
+            Op::Broadcast(_) | Op::Area(..) | Op::Cycle(_) | Op::OneOf(_) => {
+                unreachable!("handled above")
+            }
         };
         let seen_by = &self.actors[index].seen_by;
         out.extend(seen_by.iter().map(|session| (*session, packet.clone())));
@@ -2005,5 +2641,704 @@ mod tests {
         let mut empty = event("show", say("hi", 1, json!(10.0)));
         empty["actors"] = json!([]);
         assert!(load_json("no actors", &json!({"events": [empty]})).is_err());
+    }
+
+    /// T538: three actors and one ending `one_of` whose branches spawn the two teams' cakes.
+    fn dance() -> serde_json::Value {
+        json!({
+            "key": "dance",
+            "actors": [actor("voting_box"), actor("cake_vampire"), actor("cake_werewolf")],
+            "timeline": [
+                {"at_ms": 0, "op": {"spawn": {"actor": "voting_box"}}},
+                {"at_ms": 1000, "op": {"one_of": {"branches": [
+                    [{"at_ms": 100, "op": {"spawn": {"actor": "cake_vampire"}}}],
+                    [{"at_ms": 100, "op": {"spawn": {"actor": "cake_werewolf"}}}]]}}},
+                {"at_ms": 5000, "op": {"remove": {"actor": "voting_box", "effect_id": 21}}},
+                {"at_ms": 5000, "op": {"remove": {"actor": "cake_vampire", "effect_id": 21}}},
+                {"at_ms": 5000, "op": {"remove": {"actor": "cake_werewolf", "effect_id": 21}}}
+            ],
+            "dance_off": dance_off()
+        })
+    }
+
+    fn dance_off() -> serde_json::Value {
+        json!({
+            "center": [0.0, 0.0, 0.0],
+            "radius_m": 30.0,
+            "voting_box": "voting_box",
+            "join_scan_ms": 500,
+            "prompt_string_id": 432429,
+            "already_voted_string_id": 5252,
+            "not_participant_string_id": 432505,
+            "used_cake_string_id": 432430,
+            "teams": [
+                {"team": "vampire", "costume_name_ids": [14688], "cake_actor": "cake_vampire",
+                 "vote_response_id": 401, "vote_label_string_id": 432207,
+                 "cake_say_string_id": 432434},
+                {"team": "werewolf", "costume_name_ids": [14690], "cake_actor": "cake_werewolf",
+                 "vote_response_id": 402, "vote_label_string_id": 432208,
+                 "cake_say_string_id": 432435}
+            ],
+            "source": "T538 unit fixture"
+        })
+    }
+
+    /// One run started from a fixed seed, so a test can draw the branch itself.
+    fn dance_run(seed: u64) -> WorldEvents {
+        let event = load_json("dance", &json!({"events": [dance()]}))
+            .unwrap()
+            .pop()
+            .unwrap();
+        let mut events = WorldEvents::default();
+        assert!(events.begin(Arc::new(event), WORLD, 0, Some(seed)));
+        events
+    }
+
+    /// The prompt's response row a team answers with.
+    fn response_for(team: DanceTeam) -> i32 {
+        match team {
+            DanceTeam::Vampire => 401,
+            DanceTeam::Werewolf => 402,
+        }
+    }
+
+    /// Opens the vote prompt and answers it for `character`.
+    fn cast(events: &mut WorldEvents, character: u64, team: DanceTeam) -> Vec<Vec<u8>> {
+        let box_guid = events.runs["dance"].guid(0);
+        assert_eq!(
+            events.interact(box_guid, character, WORLD, [0.0; 3]).len(),
+            1,
+            "the prompt"
+        );
+        events
+            .vote(character, response_for(team), WORLD, [0.0; 3])
+            .unwrap_or_else(|| panic!("vote {team:?} had no open prompt"))
+    }
+
+    /// The world tick's two steps for one character: the area gate, then detect the team from
+    /// the outfit and record the join. `None` when the area, costume or run refuses the join.
+    fn join(
+        events: &mut WorldEvents,
+        position: [f32; 3],
+        character: u64,
+        names: &[i32],
+    ) -> Option<DanceTeam> {
+        let serial = events.runs["dance"].serial;
+        if !events.dance_off_area(serial, position) {
+            return None;
+        }
+        let team = events.dance_off_team(serial, character, names)?;
+        assert!(
+            events.join_dance_off(serial, character, team),
+            "the join was refused right after detection"
+        );
+        Some(team)
+    }
+
+    #[test]
+    fn the_dance_off_loader_refuses_bad_rows_and_makes_the_roles_interactable() {
+        let ok = json!({"events": [dance()]});
+        let compiled = load_json("dance-ok", &ok).unwrap().pop().unwrap();
+        assert!(compiled.dance_off.is_some());
+        assert_eq!(compiled.actors[0].spawn.is_interactable, 1);
+        assert_eq!(
+            compiled.actors[0].spawn.interact_range,
+            crate::world::content_spawn_template().interact_range
+        );
+        assert_eq!(compiled.actors[1].spawn.is_interactable, 1);
+        assert_eq!(compiled.actors[2].spawn.is_interactable, 1);
+        let mut bad = Vec::new();
+        let mut one_team = dance();
+        one_team["dance_off"]["teams"].as_array_mut().unwrap().pop();
+        bad.push(("one team", one_team));
+        let mut twice = dance();
+        twice["dance_off"]["teams"][1]["team"] = json!("vampire");
+        bad.push(("team twice", twice));
+        let mut shared = dance();
+        shared["dance_off"]["teams"][1]["costume_name_ids"] = json!([14688]);
+        bad.push(("shared costume", shared));
+        let mut zero_name = dance();
+        zero_name["dance_off"]["teams"][0]["costume_name_ids"] = json!([0]);
+        bad.push(("costume 0", zero_name));
+        let mut no_names = dance();
+        no_names["dance_off"]["teams"][0]["costume_name_ids"] = json!([]);
+        bad.push(("no costume", no_names));
+        let mut unknown_cake = dance();
+        unknown_cake["dance_off"]["teams"][0]["cake_actor"] = json!("nope");
+        bad.push(("unknown cake", unknown_cake));
+        let mut unknown_box = dance();
+        unknown_box["dance_off"]["voting_box"] = json!("nope");
+        bad.push(("unknown box", unknown_box));
+        let mut box_is_cake = dance();
+        box_is_cake["dance_off"]["voting_box"] = json!("cake_vampire");
+        bad.push(("box is a cake", box_is_cake));
+        let mut outside = dance();
+        outside["timeline"]
+            .as_array_mut()
+            .unwrap()
+            .push(json!({"at_ms": 0, "op": {"spawn": {"actor": "cake_vampire"}}}));
+        bad.push(("cake outside a branch", outside));
+        let mut same_branch = dance();
+        same_branch["timeline"][1]["op"]["one_of"]["branches"][1][0]["op"]["spawn"]["actor"] =
+            json!("cake_vampire");
+        bad.push(("one cake branch", same_branch));
+        let mut third = dance();
+        third["timeline"][1]["op"]["one_of"]["branches"]
+            .as_array_mut()
+            .unwrap()
+            .push(json!([]));
+        bad.push(("three branches", third));
+        let mut prompt = dance();
+        prompt["dance_off"]["prompt_string_id"] = json!(0);
+        bad.push(("prompt 0", prompt));
+        let mut label = dance();
+        label["dance_off"]["teams"][0]["vote_label_string_id"] = json!(0);
+        bad.push(("label 0", label));
+        let mut radius = dance();
+        radius["dance_off"]["radius_m"] = json!(0.0);
+        bad.push(("radius 0", radius));
+        let mut cadence = dance();
+        cadence["dance_off"]["join_scan_ms"] = json!(0);
+        bad.push(("cadence 0", cadence));
+        let mut slow = dance();
+        slow["dance_off"]["join_scan_ms"] = json!(MAX_JOIN_SCAN_MS + 1);
+        bad.push(("cadence over the bound", slow));
+        let mut row = dance();
+        row["dance_off"]["teams"][0]["vote_response_id"] = json!(0);
+        bad.push(("vote row 0", row));
+        let mut shared_row = dance();
+        shared_row["dance_off"]["teams"][1]["vote_response_id"] = json!(401);
+        bad.push(("shared vote row", shared_row));
+        let mut far = dance();
+        far["dance_off"]["center"] = json!([1e39, 0.0, 0.0]);
+        bad.push(("infinite center", far));
+        let mut source = dance();
+        source["dance_off"]["source"] = json!("");
+        bad.push(("no source", source));
+        let mut extra = dance();
+        extra["dance_off"]["winner"] = json!("vampire");
+        bad.push(("unknown field", extra));
+        for (label, row) in bad {
+            let file = json!({"events": [row]});
+            assert!(load_json(label, &file).is_err(), "{label} accepted");
+        }
+        // The shipped dance-off compiles with its roles interactable.
+        let shipped = load(&Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")).unwrap();
+        let event = shipped
+            .iter()
+            .find(|event| event.key == "halloween_dance_off")
+            .expect("the shipped dance-off");
+        let dance_off = event.dance_off.as_ref().expect("its dance_off block");
+        let voting = &event.actors[dance_off.voting_box];
+        assert_eq!(
+            (voting.spawn.is_interactable, voting.spawn.interact_range),
+            (1, crate::world::content_spawn_template().interact_range)
+        );
+        assert_eq!(voting.spawn.npc_name, "Voting Box");
+        assert_eq!(dance_off.teams[0].team, DanceTeam::Vampire);
+        assert_eq!(dance_off.teams[0].costume_name_ids, [14688, 119187, 119191]);
+        assert_eq!(dance_off.teams[1].costume_name_ids, [14690, 119208]);
+        assert_eq!(
+            dance_off
+                .teams
+                .iter()
+                .map(|team| (team.team, team.vote_response_id))
+                .collect::<Vec<_>>(),
+            [(DanceTeam::Vampire, 401), (DanceTeam::Werewolf, 402)]
+        );
+        assert_eq!(dance_off.join_scan_ms, 500);
+    }
+
+    /// T538 (review finding 5): the join pass scans an open dance-off at most every row's
+    /// `join_scan_ms`, so a spectator in the area is not rescanned at the full 20 Hz; the open
+    /// list is what the bin's pass starts from and is empty after the ending.
+    #[test]
+    fn the_costume_scan_is_cadenced_and_lists_the_open_dance_offs() {
+        let players = registry_with(1, [0.0; 3]);
+        let mut events = dance_run(2);
+        let serial = events.runs["dance"].serial;
+        let scan = events.runs["dance"]
+            .event
+            .dance_off
+            .as_ref()
+            .unwrap()
+            .join_scan_ms;
+        assert_eq!(scan, 500);
+        assert_eq!(events.open_dance_offs(), [(WORLD, serial)]);
+        assert!(events.dance_off_scan_due(0));
+        assert!(!events.dance_off_scan_due(scan - 1));
+        assert!(events.dance_off_scan_due(scan));
+        tick(&mut events, 1_000, &players);
+        assert!(events.open_dance_offs().is_empty());
+        assert!(!events.dance_off_scan_due(scan * 2));
+    }
+
+    #[test]
+    fn a_costume_in_the_area_joins_one_team_for_the_whole_run() {
+        let mut events = dance_run(1);
+        let serial = events.runs["dance"].serial;
+        assert!(events.dance_off_area(serial, [0.0; 3]));
+        assert_eq!(
+            join(&mut events, [1.0, 0.0, 1.0], 11, &[14690]),
+            Some(DanceTeam::Werewolf)
+        );
+        assert_eq!(
+            events.dance_off_participant(serial, 11),
+            Some(DanceTeam::Werewolf)
+        );
+        // A joined character reads no equipment again: the team lookup refuses and the join is
+        // not offered a second time.
+        assert_eq!(
+            events.dance_off_team(serial, 11, &[14690]),
+            None,
+            "a joined character is not scanned again"
+        );
+        assert_eq!(
+            events.open_dance_offs(),
+            [(WORLD, serial)],
+            "only the run's own instance is scanned"
+        );
+        assert_eq!(
+            join(&mut events, [0.0; 3], 12, &[14688]),
+            Some(DanceTeam::Vampire)
+        );
+        // Two costumes at once: the first team in content order wins (R).
+        assert_eq!(
+            join(&mut events, [0.0; 3], 13, &[14690, 14688]),
+            Some(DanceTeam::Vampire)
+        );
+        // No costume, outside the radius, another serial and an existing member do nothing.
+        assert_eq!(join(&mut events, [0.0; 3], 14, &[]), None);
+        assert_eq!(join(&mut events, [100.0, 0.0, 0.0], 15, &[14690]), None);
+        assert_eq!(events.dance_off_team(serial + 1, 16, &[14690]), None);
+        assert_eq!(join(&mut events, [0.0; 3], 11, &[14690]), None);
+        // The area gate applies before any equipment is read.
+        assert!(!events.dance_off_area(serial, [100.0, 0.0, 0.0]));
+        // The ending closes joining, even for a character never seen before.
+        let players = registry_with(1, [0.0; 3]);
+        tick(&mut events, 1_000, &players);
+        assert_eq!(join(&mut events, [0.0; 3], 17, &[14690]), None);
+        assert!(
+            !events.join_dance_off(serial, 17, DanceTeam::Werewolf),
+            "the record refuses after the ending"
+        );
+        assert!(
+            !events.dance_off_area(serial, [0.0; 3]),
+            "the ending closes joins"
+        );
+        let live = events.runs["dance"].dance_off.as_ref().unwrap();
+        assert_eq!(live.teams.len(), 3);
+        assert!(live.decided.is_some(), "the ending closed the run");
+    }
+
+    #[test]
+    fn votes_decide_the_ending_and_a_tie_or_no_votes_keeps_the_draw() {
+        let players = registry_with(1, [0.0; 3]);
+        // More votes for one team: that team's cake is the ending, whatever the draw was. The
+        // recorded tally is asserted too, so a vote counted twice cannot pass unnoticed (the
+        // brief's canary doubles every count, which preserves a majority).
+        let mut events = dance_run(7);
+        tick(&mut events, 0, &players);
+        cast(&mut events, 41, DanceTeam::Vampire);
+        cast(&mut events, 42, DanceTeam::Vampire);
+        cast(&mut events, 43, DanceTeam::Werewolf);
+        tick(&mut events, 1_000, &players);
+        let live = events.runs["dance"].dance_off.as_ref().unwrap();
+        assert_eq!(live.decided, Some(DanceTeam::Vampire));
+        assert_eq!(live.tally, Some([2, 1]), "the counted votes, per side");
+        let out = tick(&mut events, 1_100, &players);
+        let cake = events.runs["dance"].guid(1);
+        assert!(
+            out.iter()
+                .any(|(_, packet)| packet.starts_with(&[35, 0, 2, 0])
+                    && packet[4..12] == cake.to_le_bytes()),
+            "the vampire cake spawned"
+        );
+        // A tie keeps the branch drawn at the start.
+        let mut events = dance_run(7);
+        tick(&mut events, 0, &players);
+        cast(&mut events, 51, DanceTeam::Vampire);
+        cast(&mut events, 52, DanceTeam::Werewolf);
+        let drawn = events.runs["dance"].drawn[0];
+        tick(&mut events, 1_000, &players);
+        let live = events.runs["dance"].dance_off.as_ref().unwrap();
+        assert_eq!(live.tally, Some([1, 1]));
+        assert_eq!(
+            live.decided,
+            Some(if drawn == 0 {
+                DanceTeam::Vampire
+            } else {
+                DanceTeam::Werewolf
+            })
+        );
+        // No votes keeps it too.
+        let mut events = dance_run(7);
+        let drawn = events.runs["dance"].drawn[0];
+        tick(&mut events, 1_100, &players);
+        let live = events.runs["dance"].dance_off.as_ref().unwrap();
+        assert_eq!(live.tally, Some([0, 0]));
+        assert_eq!(
+            live.decided,
+            Some(if drawn == 0 {
+                DanceTeam::Vampire
+            } else {
+                DanceTeam::Werewolf
+            })
+        );
+    }
+
+    /// T538 (review finding 7): two dance-offs in one instance are keyed by their run serial, so
+    /// a join, a prompt and a vote always land in the run they were made for.
+    #[test]
+    fn two_dance_offs_in_one_instance_keep_their_own_joins_and_votes() {
+        let mut first = dance();
+        first["key"] = json!("dance_a");
+        let mut second = dance();
+        second["key"] = json!("dance_b");
+        // The second run's box and area are 50 m away, so a click reaches one run's box only.
+        second["actors"][0]["position"] = json!([50.0, 0.0, 0.0]);
+        second["dance_off"]["center"] = json!([50.0, 0.0, 0.0]);
+        let mut events = WorldEvents::default();
+        for (seed, row) in [first, second].into_iter().enumerate() {
+            let event = load_json("two runs", &json!({"events": [row]}))
+                .unwrap()
+                .pop()
+                .unwrap();
+            assert!(events.begin(Arc::new(event), WORLD, 0, Some(seed as u64 + 1)));
+        }
+        let serial_a = events.runs["dance_a"].serial;
+        let serial_b = events.runs["dance_b"].serial;
+        assert_ne!(serial_a, serial_b);
+        assert_eq!(
+            events.open_dance_offs(),
+            [(WORLD, serial_a), (WORLD, serial_b)]
+        );
+        // A costume join names its run: no lookup picks "the first dance-off".
+        assert!(events.dance_off_area(serial_a, [0.0; 3]));
+        assert!(!events.dance_off_area(serial_a, [50.0, 0.0, 0.0]));
+        assert_eq!(
+            events.dance_off_team(serial_b, 1, &[14688]),
+            Some(DanceTeam::Vampire)
+        );
+        assert!(events.join_dance_off(serial_b, 1, DanceTeam::Vampire));
+        assert_eq!(
+            events.dance_off_participant(serial_b, 1),
+            Some(DanceTeam::Vampire)
+        );
+        assert_eq!(
+            events.dance_off_participant(serial_a, 1),
+            None,
+            "the join did not leak into the other run"
+        );
+        // A prompt answers in the run whose box the player clicked: the other run's box is out
+        // of reach, so that answer is refused and leaves its prompt open.
+        let players = registry_with(1, [0.0; 3]);
+        tick(&mut events, 0, &players);
+        let box_a = events.runs["dance_a"].guid(0);
+        let box_b = events.runs["dance_b"].guid(0);
+        let box_a = events.runs["dance_a"].guid(0);
+        let box_b = events.runs["dance_b"].guid(0);
+        let at_b = [50.0, 0.0, 0.0];
+        assert_eq!(events.interact(box_a, 2, WORLD, [0.0; 3]).len(), 1);
+        assert_eq!(events.interact(box_b, 3, WORLD, at_b).len(), 1);
+        // Character 2's prompt is run A's, so an answer at run B's box is out of reach and is
+        // refused without consuming it; the answer at A counts.
+        assert_eq!(events.vote(2, 401, WORLD, at_b), Some(Vec::new()));
+        assert!(events.vote(2, 401, WORLD, [0.0; 3]).is_some());
+        assert!(events.vote(3, 401, WORLD, at_b).is_some());
+        assert_eq!(
+            events.runs["dance_a"]
+                .dance_off
+                .as_ref()
+                .unwrap()
+                .votes
+                .get(&2),
+            Some(&DanceTeam::Vampire)
+        );
+        assert_eq!(
+            events.runs["dance_b"]
+                .dance_off
+                .as_ref()
+                .unwrap()
+                .votes
+                .get(&3),
+            Some(&DanceTeam::Vampire)
+        );
+        assert!(
+            !events.runs["dance_a"]
+                .dance_off
+                .as_ref()
+                .unwrap()
+                .votes
+                .contains_key(&3),
+            "the B prompt's answer did not count in A"
+        );
+    }
+
+    #[test]
+    fn one_vote_per_character_and_only_an_open_prompt_counts() {
+        let players = registry_with(1, [0.0; 3]);
+        let mut events = dance_run(3);
+        tick(&mut events, 0, &players);
+        let box_guid = events.runs["dance"].guid(0);
+        // A 26/6 with no prompt belongs to the NPC dialogue path.
+        assert!(events.vote(61, 1, WORLD, [0.0; 3]).is_none());
+        assert!(
+            events
+                .interact(box_guid, 61, WORLD, [100.0, 0.0, 0.0])
+                .is_empty()
+        );
+        cast(&mut events, 61, DanceTeam::Vampire);
+        let again = {
+            assert_eq!(events.interact(box_guid, 61, WORLD, [0.0; 3]).len(), 1);
+            events.vote(61, 402, WORLD, [0.0; 3]).unwrap()
+        };
+        assert_eq!(
+            again,
+            [
+                crate::chat::string_say(box_guid, 5252),
+                crate::npc_interaction::encode_dialogue_close_26_4()
+            ],
+            "a second vote answers the already-voted line and changes no tally"
+        );
+        let live = events.runs["dance"].dance_off.as_ref().unwrap();
+        assert_eq!(live.votes.get(&61), Some(&DanceTeam::Vampire));
+        assert_eq!(live.votes.len(), 1);
+        // A prompt opened before the ending is closed by the ending: its answer is refused and
+        // counts nothing.
+        assert_eq!(events.interact(box_guid, 62, WORLD, [0.0; 3]).len(), 1);
+        assert_eq!(events.interact(box_guid, 63, WORLD, [0.0; 3]).len(), 1);
+        tick(&mut events, 1_000, &players);
+        assert_eq!(events.vote(62, 401, WORLD, [0.0; 3]), None);
+        assert!(
+            events.runs["dance"]
+                .dance_off
+                .as_ref()
+                .unwrap()
+                .votes
+                .get(&62)
+                .is_none()
+        );
+        // The box opens nothing after the ending, and a close drops a prompt left open.
+        assert!(events.interact(box_guid, 64, WORLD, [0.0; 3]).is_empty());
+        events.clear_vote_prompt(63);
+        assert_eq!(events.vote(63, 1, WORLD, [0.0; 3]), None);
+    }
+
+    /// T538 (review finding 4 and the attempt-2 blocker): a refused click or vote leaves the
+    /// prompt open and answers nothing, so the client keeps its dialog and the player can step
+    /// back and answer. Only a counted vote consumes the prompt.
+    #[test]
+    fn a_refused_click_or_vote_keeps_the_prompt_open() {
+        let players = registry_with(1, [0.0; 3]);
+        let mut events = dance_run(9);
+        tick(&mut events, 0, &players);
+        let box_guid = events.runs["dance"].guid(0);
+        let close = crate::npc_interaction::encode_dialogue_close_26_4();
+        assert_eq!(events.interact(box_guid, 61, WORLD, [0.0; 3]).len(), 1);
+        // Out of reach: the click and the answer are refused without a reply or a close, and
+        // the prompt stays.
+        assert!(
+            events
+                .interact(box_guid, 61, WORLD, [100.0, 0.0, 0.0])
+                .is_empty()
+        );
+        assert_eq!(
+            events.vote(61, 401, WORLD, [100.0, 0.0, 0.0]),
+            Some(Vec::new()),
+            "an out-of-reach answer sends nothing, so the client keeps the prompt"
+        );
+        assert!(
+            events.runs["dance"]
+                .dance_off
+                .as_ref()
+                .unwrap()
+                .prompted
+                .contains_key(&61),
+            "the out-of-reach refusal kept the prompt"
+        );
+        // A row that is not a vote belongs to another dialogue: the event route leaves it
+        // alone (and the prompt open).
+        assert_eq!(events.vote(61, 1, WORLD, [0.0; 3]), None);
+        assert!(
+            events.runs["dance"]
+                .dance_off
+                .as_ref()
+                .unwrap()
+                .prompted
+                .contains_key(&61)
+        );
+        // Back in reach the same prompt counts the vote once and consumes it.
+        assert_eq!(events.vote(61, 401, WORLD, [0.0; 3]), Some(vec![close]));
+        let live = events.runs["dance"].dance_off.as_ref().unwrap();
+        assert_eq!(live.votes.get(&61), Some(&DanceTeam::Vampire));
+        assert!(
+            !live.prompted.contains_key(&61),
+            "the counted vote consumed it"
+        );
+        // One content field drives the prompt rows and the answer rows, so they cannot drift.
+        let dance = events.runs["dance"].event.dance_off.as_ref().unwrap();
+        assert_eq!(
+            dance
+                .teams
+                .iter()
+                .map(|team| (team.team, team.vote_response_id))
+                .collect::<Vec<_>>(),
+            [(DanceTeam::Vampire, 401), (DanceTeam::Werewolf, 402)]
+        );
+    }
+
+    /// T538 (review finding 7): the `one_of` marker drops the branch the run did not draw, so
+    /// the run ends with the drawn branch's last step instead of a skipped step far later.
+    #[test]
+    fn a_one_of_ends_with_its_drawn_branch_not_a_skipped_late_step() {
+        let branch = |id: i32, anim_at: u64| {
+            json!([
+                {"at_ms": 0, "op": {"spawn": {"actor": "a"}}},
+                {"at_ms": 1000, "op": {"remove": {"actor": "a"}}},
+                {"at_ms": anim_at, "op": {"play_anim": {"actor": "a", "id": id}}}
+            ])
+        };
+        // Branch 0 ends at 2000; branch 1 has a step at 7000.
+        let event = one(json!([
+            {"at_ms": 1000, "op": {"one_of": {"branches": [branch(21, 1000), branch(22, 6000)]}}}
+        ]));
+        let mut seed = 0;
+        loop {
+            let mut rng = Rng::seeded(seed);
+            if rng.next_u64() % 2 == 0 {
+                break;
+            }
+            seed += 1;
+            assert!(seed < 64, "a seed draws the short branch");
+        }
+        let mut events = WorldEvents::default();
+        assert!(events.begin(Arc::new(event), WORLD, 0, Some(seed)));
+        assert_eq!(events.runs["show"].drawn[0], 0);
+        let players = registry_with(1, [1.0, 0.0, 0.0]);
+        tick(&mut events, 1_000, &players);
+        tick(&mut events, 2_100, &players);
+        assert!(
+            events.runs.is_empty(),
+            "the skipped branch's 7000 ms step must not keep the run alive: {:?}",
+            events.runs.keys().collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn the_winning_cake_serves_each_participant_once_and_refuses_the_rest() {
+        let players = registry_with(1, [0.0; 3]);
+        let mut events = dance_run(11);
+        tick(&mut events, 0, &players);
+        assert_eq!(
+            join(&mut events, [0.0; 3], 71, &[14688]),
+            Some(DanceTeam::Vampire)
+        );
+        assert_eq!(
+            join(&mut events, [0.0; 3], 72, &[14690]),
+            Some(DanceTeam::Werewolf)
+        );
+        cast(&mut events, 71, DanceTeam::Vampire);
+        cast(&mut events, 72, DanceTeam::Vampire);
+        tick(&mut events, 1_000, &players);
+        tick(&mut events, 1_100, &players);
+        let cake = events.runs["dance"].guid(1);
+        let loser = events.runs["dance"].guid(2);
+        assert!(events.interact(loser, 71, WORLD, [0.0; 3]).is_empty());
+        assert_eq!(
+            events.interact(cake, 73, WORLD, [0.0; 3]),
+            [crate::chat::string_say(cake, 432505)],
+            "a non-participant is refused with the participant line"
+        );
+        assert_eq!(
+            events.interact(cake, 71, WORLD, [0.0; 3]),
+            [crate::chat::string_say(cake, 432434)]
+        );
+        assert_eq!(
+            events.interact(cake, 72, WORLD, [0.0; 3]),
+            [crate::chat::string_say(cake, 432434)],
+            "the losing team's participant may use the winning cake; the cake speaks"
+        );
+        assert_eq!(
+            events.interact(cake, 71, WORLD, [0.0; 3]),
+            [crate::chat::string_say(cake, 432430)],
+            "the second use is refused"
+        );
+        assert_eq!(
+            events.interact(cake, 74, WORLD, [100.0, 0.0, 0.0]),
+            Vec::<Vec<u8>>::new(),
+            "out of reach"
+        );
+        let live = events.runs["dance"].dance_off.as_ref().unwrap();
+        assert_eq!(
+            live.used_cake.iter().copied().collect::<BTreeSet<_>>(),
+            BTreeSet::from([71, 72])
+        );
+        assert_eq!(live.teams.len(), 2);
+    }
+
+    #[test]
+    fn the_prompt_is_the_client_26_3_and_the_lines_are_the_client_15_4() {
+        let mut events = dance_run(5);
+        let players = registry_with(1, [0.0; 3]);
+        tick(&mut events, 0, &players);
+        let box_guid = events.runs["dance"].guid(0);
+        let replies = events.interact(box_guid, 81, WORLD, [0.0; 3]);
+        assert_eq!(replies.len(), 1);
+        let mut expected = vec![26, 0, 3, 0];
+        for value in [432429u32, 0, box_guid as u32, (box_guid >> 32) as u32] {
+            expected.extend(value.to_le_bytes());
+        }
+        expected.push(0);
+        expected.extend(0u32.to_le_bytes());
+        expected.extend(2u32.to_le_bytes());
+        for row in [[401u32, 17, 432207, 0, 18], [402, 17, 432208, 0, 18]] {
+            for value in row {
+                expected.extend(value.to_le_bytes());
+            }
+        }
+        expected.extend([0u8; 32]); // two zero float4s
+        expected.push(0);
+        expected.extend([0u8; 16]); // the final vector
+        expected.extend(0u32.to_le_bytes());
+        expected.extend([0, 0, 0]);
+        expected.extend(0u32.to_le_bytes());
+        expected.extend(0u32.to_le_bytes());
+        assert_eq!(replies[0], expected, "reader 00a9ef10, 93 + 20*n bytes");
+        assert_eq!(
+            events.vote(81, 401, WORLD, [0.0; 3]),
+            Some(vec![crate::npc_interaction::encode_dialogue_close_26_4()])
+        );
+        assert_eq!(events.interact(box_guid, 82, WORLD, [0.0; 3]).len(), 1);
+        events.clear_vote_prompt(82);
+        assert!(events.vote(82, 1, WORLD, [0.0; 3]).is_none());
+    }
+
+    #[test]
+    fn participation_votes_and_cake_use_are_kept_by_character_guid() {
+        let mut events = dance_run(13);
+        let players = registry_with(1, [0.0; 3]);
+        tick(&mut events, 0, &players);
+        assert_eq!(
+            join(&mut events, [0.0; 3], 91, &[14690]),
+            Some(DanceTeam::Werewolf)
+        );
+        cast(&mut events, 91, DanceTeam::Werewolf);
+        // The run's state names no session: a tick with a different registry, as after a
+        // disconnect and a reconnect, keeps the character's team and vote.
+        let other = registry_with(2, [50.0, 0.0, 0.0]);
+        tick(&mut events, 200, &other);
+        let live = events.runs["dance"].dance_off.as_ref().unwrap();
+        assert_eq!(live.teams.get(&91), Some(&DanceTeam::Werewolf));
+        assert_eq!(live.votes.get(&91), Some(&DanceTeam::Werewolf));
+        assert_eq!(join(&mut events, [0.0; 3], 91, &[14690]), None);
+        let box_guid = events.runs["dance"].guid(0);
+        assert_eq!(events.interact(box_guid, 91, WORLD, [0.0; 3]).len(), 1);
+        let again = events.vote(91, 401, WORLD, [0.0; 3]).unwrap();
+        assert_eq!(again[0], crate::chat::string_say(box_guid, 5252));
+        assert_eq!(
+            events.runs["dance"].dance_off.as_ref().unwrap().votes.len(),
+            1
+        );
     }
 }

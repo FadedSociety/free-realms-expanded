@@ -4,6 +4,18 @@
 //! deliveries use.
 use super::*;
 
+/// One trade service message per recipient, wrapped in the application tunnel. Moved out of the
+/// binary root unchanged; the trade lifecycle is `w163_trade_routing`'s subject.
+pub(super) fn trade_deliveries(messages: Vec<TradeMessage>) -> Vec<Delivery> {
+    messages
+        .into_iter()
+        .map(|message| Delivery {
+            recipient: message.recipient,
+            bytes: wrap_application(&message.bytes),
+        })
+        .collect()
+}
+
 /// Queue one delivery: on the current session, or on the recipient's own session when it is
 /// still connected (a recipient that left is skipped).
 pub(super) fn queue_delivery(

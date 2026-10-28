@@ -118,6 +118,26 @@ fn collect(event: &Value) -> Ids {
     if !announce.is_null() {
         ids.strings.insert(int(&announce["locale_id"]));
     }
+    // T538: the participation block's prompt, line and costume name ids (client `Global.Text`
+    // rows). The item name ids are locale rows too; the shop/definition join is checked by the
+    // item-catalogue gates, not here.
+    let dance_off = &event["dance_off"];
+    if !dance_off.is_null() {
+        for key in [
+            "prompt_string_id",
+            "already_voted_string_id",
+            "not_participant_string_id",
+            "used_cake_string_id",
+        ] {
+            ids.strings.insert(int(&dance_off[key]));
+        }
+        for team in dance_off["teams"].as_array().unwrap() {
+            ids.strings.insert(int(&team["vote_label_string_id"]));
+            ids.strings.insert(int(&team["cake_say_string_id"]));
+            ids.strings
+                .extend(team["costume_name_ids"].as_array().unwrap().iter().map(int));
+        }
+    }
     for (name, op) in ops(&event["timeline"]) {
         match name.as_str() {
             "say" => drop(ids.strings.insert(int(&op["string_id"]))),

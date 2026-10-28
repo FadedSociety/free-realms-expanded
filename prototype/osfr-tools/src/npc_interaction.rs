@@ -50,7 +50,7 @@ const GOODBYE_STRING_ID: u32 = 8075;
 // localized Shop label was not recovered. Choice behavior is authoritative in the server.
 const SHOP_STRING_ID: u32 = 432156;
 // (R) The existing server reach is 12 m. Native prompt acquisition has separate client rules.
-const INTERACTION_RADIUS: f64 = 12.0;
+pub const INTERACTION_RADIUS: f64 = 12.0;
 const MAX_NPC_FILE_BYTES: u64 = 8 * 1024 * 1024;
 const MAX_NPC_TOTAL_BYTES: u64 = 32 * 1024 * 1024;
 const MAX_NPCS: usize = 20_000;
@@ -332,6 +332,9 @@ struct NpcContent {
 pub struct NpcInteraction {
     content: Arc<NpcContent>,
     active: Option<ActiveInteraction>,
+    /// T538: the last 26/8 named an actor this router does not own (a player menu or a
+    /// world-event actor), so a following 26/6 is that route's, not a dialogue's here.
+    foreign_click: bool,
 }
 
 impl NpcInteraction {
@@ -443,6 +446,7 @@ impl NpcInteraction {
                 job_trainers: BTreeMap::new(),
             }),
             active: None,
+            foreign_click: false,
         })
     }
 
@@ -544,6 +548,8 @@ impl NpcInteraction {
         position: [f32; 3],
         quests: Option<&QuestEngine>,
     ) -> Result<InteractionMenu, NpcInteractionError> {
+        // T538: a click on a content NPC makes a following 26/6 this dialogue's again.
+        self.foreign_click = false;
         let npc = self
             .content
             .npcs
@@ -859,6 +865,19 @@ impl NpcInteraction {
             body_string_id,
             rows: dialogue.rows.clone(),
         })
+    }
+
+    /// T538: the last 26/8 targeted a runtime actor this router does not own (an event actor
+    /// such as the Voting Box). A 26/6 that follows belongs to that route, not to a
+    /// dialogue here, so the fallback close must not answer it. Any click on a content
+    /// NPC clears it (`interact`).
+    pub(crate) fn note_foreign_click(&mut self) {
+        self.foreign_click = true;
+    }
+
+    /// T538: whether the last 26/8 targeted an actor this router does not own.
+    pub(crate) fn foreign_click(&self) -> bool {
+        self.foreign_click
     }
 
     /// (R) T844: consume the client's echo of the dialog close the server sent to re-show

@@ -7,6 +7,11 @@
 use super::test_support::{self, Scratch};
 use super::*;
 use osfr_tools::account_store::AccountRole;
+use osfr_tools::inventory::InventoryItem;
+
+// T538: the shared client packet builders (26/8, 26/6 and the 5/1 tunnel), not a local copy.
+#[path = "../../../tests/common/gateway_packets.rs"]
+mod gateway_packets;
 
 const STAR: [f32; 3] = [2000.0, 0.0, 2000.0];
 const NEAR: [f32; 3] = [2005.0, 0.0, 2000.0];
@@ -271,6 +276,23 @@ impl Rig {
         let id = SessionId(u64::from(self.viewers[viewer].connection_id));
         let players = &mut self.server.world.players;
         players.update_pose(id, OPEN_WORLD, position, 0.0).unwrap();
+    }
+
+    /// One session tick, as `Server::step` runs it after the world tick. T538: the staged
+    /// gameplay of this transaction is where a queued dance-off join hook is emitted and saved.
+    fn session_tick(&mut self, key: SessionKey, now: u64) {
+        let server = &mut self.server;
+        let mut session = server.sessions.remove(&key).unwrap();
+        session
+            .tick(
+                &server.options,
+                now,
+                &mut server.world,
+                &mut server.membership,
+                &mut server.sessions,
+            )
+            .unwrap();
+        server.sessions.insert(key, session);
     }
 
     /// Everything a refused command must leave alone.
@@ -567,7 +589,12 @@ fn t458_server_step_runs_the_world_event_tick() {
     let Some(mut rig) = Rig::new("t458-step", Some(show())) else {
         return;
     };
-    // The server clock, which already passed the rig's last admin poll (300 ms).
+    // The server clock, which already passed the rig's last admin poll (300 ms). The fixture is
+    // fast enough to finish before that on a quiet machine, so wait for the clock explicitly.
+    let deadline = Instant::now() + std::time::Duration::from_secs(2);
+    while rig.server.start.elapsed().as_millis() < 300 && Instant::now() < deadline {
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    }
     let now = rig.server.start.elapsed().as_millis() as u64;
     assert!(now >= 300, "the sender clock never runs backwards here");
     rig.realm("event start show", now);
@@ -672,5 +699,388 @@ fn t462_a_scheduled_event_announces_then_starts_through_the_tick() {
         rig.tick_at(T0 + 400, start + 1_000),
         quiet,
         "the slot does not repeat"
+    );
+}
+
+/// T538: a dance-off whose area is the logged-in admin's own position, with the Voting Box and
+/// both cakes within interaction reach. Ids are the shipped client rows the unit tests use.
+fn t538_event(at: [f32; 3]) -> serde_json::Value {
+    let cake = [at[0] + 1.0, at[1], at[2]];
+    json!({"events": [{
+        "key": "dance_off",
+        "actors": [
+            {"key": "voting_box", "model_id": 1, "name_string_id": 432403, "npc_name": "Voting Box", "position": at, "heading": 0.0, "stand_animation_id": 1, "hide_nameplate": false, "source": "T538 bin fixture"},
+            {"key": "cake_vampire", "model_id": 1, "name_string_id": 432404, "npc_name": "Vampire Cake", "position": cake, "heading": 0.0, "stand_animation_id": 1, "hide_nameplate": false, "source": "T538 bin fixture"},
+            {"key": "cake_werewolf", "model_id": 1, "name_string_id": 432405, "npc_name": "Werewolf Cake", "position": cake, "heading": 0.0, "stand_animation_id": 1, "hide_nameplate": false, "source": "T538 bin fixture"}
+        ],
+        "timeline": [
+            {"at_ms": 0, "op": {"spawn": {"actor": "voting_box"}}},
+            {"at_ms": 4000, "op": {"one_of": {"branches": [
+                [{"at_ms": 100, "op": {"spawn": {"actor": "cake_vampire"}}}],
+                [{"at_ms": 100, "op": {"spawn": {"actor": "cake_werewolf"}}}]]}}}
+        ],
+        "dance_off": {
+            "center": at, "radius_m": 30.0, "voting_box": "voting_box", "join_scan_ms": 500,
+            "prompt_string_id": 432429, "already_voted_string_id": 5252,
+            "not_participant_string_id": 432505, "used_cake_string_id": 432430,
+            "teams": [
+                {"team": "vampire", "costume_name_ids": [14688], "cake_actor": "cake_vampire",
+                 "vote_response_id": 401, "vote_label_string_id": 432207,
+                 "cake_say_string_id": 432434},
+                {"team": "werewolf", "costume_name_ids": [14690], "cake_actor": "cake_werewolf",
+                 "vote_response_id": 402, "vote_label_string_id": 432208,
+                 "cake_say_string_id": 432435}
+            ],
+            "source": "T538 bin fixture"
+        }
+    }]})
+}
+
+/// The guid of every AddNpc in `messages` (the 5/1 tunnel stripped).
+fn t538_spawned(messages: &[Vec<u8>]) -> Vec<u64> {
+    messages
+        .iter()
+        .filter_map(|message| {
+            let body = gateway_packets::body(message);
+            (body.starts_with(&[35, 0, 2, 0]))
+                .then(|| u64::from_le_bytes(body[4..12].try_into().unwrap()))
+        })
+        .collect()
+}
+
+/// The string id of the first 15/4 line in `messages`.
+fn t538_says(messages: &[Vec<u8>]) -> Option<i32> {
+    messages.iter().find_map(|message| {
+        let body = gateway_packets::body(message);
+        (body.starts_with(&[15, 0, 4, 0]))
+            .then(|| i32::from_le_bytes(body[12..16].try_into().unwrap()))
+    })
+}
+
+/// Give the session a costume item and wear it in the whole-body slot on the profile others see,
+/// the way a purchase and an equip would. `adopt_trade_inventory` is the public inventory
+/// boundary that validates the state, so the fixture cannot wear an item the catalogue does not
+/// define. Returns after asserting that the costume scan sees `name_id`.
+fn t538_wears(session: &mut Session, definition_id: i32, name_id: i32) {
+    let game = session.gateway.gameplay_mut().expect("gameplay is loaded");
+    let mut state = game.inventory_state().clone();
+    let next = state.next_instance_id.unwrap_or(0).max(
+        state
+            .items
+            .iter()
+            .map(|item| i64::from(item.id))
+            .max()
+            .unwrap_or(0)
+            + 1,
+    );
+    let id = i32::try_from(next).expect("an instance id fits");
+    state.next_instance_id = Some(i64::from(id) + 1);
+    state.items.push(InventoryItem {
+        definition_id,
+        tint: 0,
+        id,
+        count: 1,
+        consumed_count: 0,
+        stored_count: 0,
+        last_cast_time: 0,
+        rental: None,
+        ability_count: 0,
+        activate_enabled: false,
+    });
+    let profile = game.active_profile().unwrap_or(1);
+    let slot = state
+        .equipment
+        .iter()
+        .position(|entry| entry.profile_id == profile && entry.slot == 17)
+        .or_else(|| state.equipment.iter().position(|entry| entry.slot == 17))
+        .expect("a whole-body costume slot");
+    state.equipment[slot].item_id = id;
+    game.adopt_trade_inventory(state)
+        .expect("the costume equips");
+    assert!(
+        game.equipped_costume_name_ids().contains(&name_id),
+        "the worn costume's client NameId is what the dance-off scans"
+    );
+}
+
+/// T538 end to end: the real `route_application` for 26/8 and 26/6, the world tick's costume
+/// join, the votes choosing the ending and the winning cake serving each participant once.
+#[test]
+fn t538_costume_votes_choose_the_cake_which_serves_participants_once() {
+    let Some(mut rig) = Rig::new("t538-dance", None) else {
+        return;
+    };
+    let at = rig.server.sessions[&rig.admin].gateway.state().position;
+    // The t458 viewers are bare spectators; T538 needs their client packets (votes and cake
+    // clicks) to take the real post-commit route, so they join the shared world like the admin.
+    for key in rig.viewers {
+        rig.server
+            .world
+            .joined
+            .insert(SessionId(u64::from(key.connection_id)));
+    }
+    let content = rig
+        .server
+        .options
+        .content
+        .clone()
+        .expect("content directory");
+    fs::write(
+        content.join("world_events.json"),
+        t538_event(at).to_string(),
+    )
+    .unwrap();
+    // The admin wears the werewolf outfit (definition 17736, client NameId 14690).
+    t538_wears(
+        rig.server.sessions.get_mut(&rig.admin).unwrap(),
+        17_736,
+        14_690,
+    );
+    assert_eq!(
+        rig.realm("event start dance_off", T0),
+        ["World event dance_off started."]
+    );
+    // Both viewers stand at the dance area so their votes can answer the box.
+    rig.walk(0, at);
+    rig.walk(1, at);
+    let _ = rig.tick(T0);
+    let box_guid = *t538_spawned(&rig.drain(rig.admin, T0))
+        .first()
+        .expect("the Voting Box AddNpc");
+    let serial = rig
+        .server
+        .world
+        .world_events
+        .open_dance_offs()
+        .first()
+        .map(|(_, serial)| *serial)
+        .expect("the open dance-off");
+    // The world tick joined the werewolf costume before the event steps; the team is the run's
+    // record, keyed by character guid (the same key a reconnect reuses).
+    assert_eq!(
+        rig.server
+            .world
+            .world_events
+            .dance_off_participant(serial, rig.server.sessions[&rig.admin].character_guid),
+        Some(osfr_tools::quest_engine::DanceTeam::Werewolf),
+        "the costume join recorded the werewolf team"
+    );
+    // The world tick only queues the quest hook on the live gameplay; the session's own tick
+    // emits it from its staged clone, so the existing commit saves it (no second save writer).
+    assert!(
+        !rig.server.sessions[&rig.admin]
+            .gateway
+            .gameplay()
+            .unwrap()
+            .dance_off_join_credited(serial, osfr_tools::quest_engine::DanceTeam::Werewolf),
+        "the world tick only queues the join hook"
+    );
+    rig.session_tick(rig.admin, T0 + 1);
+    assert!(
+        rig.server.sessions[&rig.admin]
+            .gateway
+            .gameplay()
+            .unwrap()
+            .dance_off_join_credited(serial, osfr_tools::quest_engine::DanceTeam::Werewolf),
+        "the session tick emitted the join hook"
+    );
+    // Admin: open the vote prompt, step out of the box's reach and answer. The refusal sends no
+    // close and changes nothing; a client 26/4 echo then must not clear the prompt either.
+    rig.dispatch(
+        rig.admin,
+        &gateway_packets::wrap(&gateway_packets::interact(box_guid)),
+        T0 + 10,
+    );
+    let prompt = rig.drain(rig.admin, T0 + 10);
+    assert!(
+        prompt
+            .iter()
+            .any(|message| gateway_packets::body(message).starts_with(&[26, 0, 3, 0])),
+        "the Voting Box answers the 26/3 prompt"
+    );
+    let me = rig.server.sessions[&rig.admin].id;
+    let far = [at[0] + 100.0, at[1], at[2]];
+    rig.server
+        .world
+        .players
+        .update_pose(me, OPEN_WORLD, far, 0.0)
+        .unwrap();
+    let before = rig.server.world.world_events.clone();
+    rig.dispatch(
+        rig.admin,
+        &gateway_packets::wrap(&gateway_packets::dialogue_choice(401)),
+        T0 + 20,
+    );
+    let refused = rig.drain(rig.admin, T0 + 20);
+    assert!(
+        refused.is_empty(),
+        "an out-of-reach answer sends no close, so the client keeps its prompt: {refused:?}"
+    );
+    assert_eq!(
+        rig.server.world.world_events, before,
+        "the refused answer changed nothing"
+    );
+    // The client echoes a 26/4 it was sent; it is not the server's close here. It must not clear
+    // the prompt, or the player could never answer after stepping back.
+    rig.dispatch(rig.admin, &gateway_packets::wrap(&[26, 0, 4, 0]), T0 + 25);
+    let echo = rig.drain(rig.admin, T0 + 25);
+    assert!(echo.is_empty(), "a stray close answers nothing: {echo:?}");
+    assert_eq!(
+        rig.server.world.world_events, before,
+        "the close echo changed nothing"
+    );
+    // Back in reach, the same prompt still answers: no second click on the box is needed.
+    rig.server
+        .world
+        .players
+        .update_pose(me, OPEN_WORLD, at, 0.0)
+        .unwrap();
+    rig.dispatch(
+        rig.admin,
+        &gateway_packets::wrap(&gateway_packets::dialogue_choice(401)),
+        T0 + 30,
+    );
+    let _ = rig.drain(rig.admin, T0 + 30);
+    // Viewers: one more vampire vote and one werewolf vote make it 2-1.
+    for (index, response) in [(0usize, 401i32), (1, 402)] {
+        let key = rig.viewers[index];
+        rig.dispatch(
+            key,
+            &gateway_packets::wrap(&gateway_packets::interact(box_guid)),
+            T0 + 30,
+        );
+        let _ = rig.drain(key, T0 + 30);
+        rig.dispatch(
+            key,
+            &gateway_packets::wrap(&gateway_packets::dialogue_choice(response)),
+            T0 + 40,
+        );
+        let _ = rig.drain(key, T0 + 40);
+    }
+    // A second vote is refused with the client's already-voted line and changes nothing: the
+    // prompt it re-opened stays open, so the snapshot is taken after the click.
+    rig.dispatch(
+        rig.admin,
+        &gateway_packets::wrap(&gateway_packets::interact(box_guid)),
+        T0 + 50,
+    );
+    let _ = rig.drain(rig.admin, T0 + 50);
+    let before = rig.server.world.world_events.clone();
+    rig.dispatch(
+        rig.admin,
+        &gateway_packets::wrap(&gateway_packets::dialogue_choice(402)),
+        T0 + 60,
+    );
+    let refused = rig.drain(rig.admin, T0 + 60);
+    assert_eq!(
+        t538_says(&refused),
+        Some(5252),
+        "already voted: {refused:?}"
+    );
+    assert_eq!(
+        rig.server.world.world_events, before,
+        "the second vote changed no state"
+    );
+    // A disconnect keeps the character's vote and team: drop the viewer's session, re-add a
+    // fresh one with the same character guid, and its second vote is still refused.
+    let gone = rig.viewers[0];
+    let gone_id = SessionId(u64::from(gone.connection_id));
+    rig.server.sessions.remove(&gone);
+    let _ = rig.server.world.players.leave(gone_id);
+    rig.server.world.session_keys.remove(&gone_id);
+    rig.server.world.joined.remove(&gone_id);
+    rig.add(gone, Some(at));
+    rig.server.world.joined.insert(gone_id);
+    rig.dispatch(
+        gone,
+        &gateway_packets::wrap(&gateway_packets::interact(box_guid)),
+        T0 + 70,
+    );
+    let _ = rig.drain(gone, T0 + 70);
+    let before = rig.server.world.world_events.clone();
+    rig.dispatch(
+        gone,
+        &gateway_packets::wrap(&gateway_packets::dialogue_choice(401)),
+        T0 + 80,
+    );
+    let reconnected = rig.drain(gone, T0 + 80);
+    assert_eq!(
+        t538_says(&reconnected),
+        Some(5252),
+        "the vote survived the reconnect"
+    );
+    assert_eq!(
+        rig.server.world.world_events, before,
+        "the refused second vote changed no state"
+    );
+    // The ending: 2-1 for the vampires, so the vampire cake spawns.
+    let _ = rig.tick(T0 + 4_100);
+    let ended = rig.drain(rig.admin, T0 + 4_100);
+    let cakes = t538_spawned(&ended);
+    assert_eq!(cakes.len(), 1, "exactly the winning cake spawns: {cakes:?}");
+    let cake_guid = cakes[0];
+    // The werewolf-costumed admin is a participant, so the winning cake serves it once.
+    rig.dispatch(
+        rig.admin,
+        &gateway_packets::wrap(&gateway_packets::interact(cake_guid)),
+        T0 + 4_110,
+    );
+    let used = rig.drain(rig.admin, T0 + 4_110);
+    assert_eq!(
+        t538_says(&used),
+        Some(432434),
+        "the vampire cake's line: the votes chose it"
+    );
+    let before = rig.server.world.world_events.clone();
+    rig.dispatch(
+        rig.admin,
+        &gateway_packets::wrap(&gateway_packets::interact(cake_guid)),
+        T0 + 4_120,
+    );
+    let again = rig.drain(rig.admin, T0 + 4_120);
+    assert_eq!(t538_says(&again), Some(432430), "a second use is refused");
+    assert_eq!(
+        rig.server.world.world_events, before,
+        "the second use changed no state"
+    );
+    // A non-participant (a voter with no costume) is refused and changes nothing.
+    let before = rig.server.world.world_events.clone();
+    rig.dispatch(
+        rig.viewers[0],
+        &gateway_packets::wrap(&gateway_packets::interact(cake_guid)),
+        T0 + 4_130,
+    );
+    let denied = rig.drain(rig.viewers[0], T0 + 4_130);
+    assert_eq!(t538_says(&denied), Some(432505), "not a participant");
+    assert_eq!(
+        rig.server.world.world_events, before,
+        "the non-participant changed no state"
+    );
+    // After the ending the box opens nothing and a stray vote changes nothing.
+    let before = rig.server.world.world_events.clone();
+    rig.dispatch(
+        rig.viewers[1],
+        &gateway_packets::wrap(&gateway_packets::interact(box_guid)),
+        T0 + 4_140,
+    );
+    let late = rig.drain(rig.viewers[1], T0 + 4_140);
+    assert!(
+        late.iter()
+            .all(|message| !gateway_packets::body(message).starts_with(&[26, 0, 3, 0])),
+        "no prompt after the ending"
+    );
+    rig.dispatch(
+        rig.viewers[1],
+        &gateway_packets::wrap(&gateway_packets::dialogue_choice(401)),
+        T0 + 4_150,
+    );
+    let late_vote = rig.drain(rig.viewers[1], T0 + 4_150);
+    assert!(
+        late_vote.is_empty(),
+        "a vote after the ending gets no reply and changes nothing: {late_vote:?}"
+    );
+    assert_eq!(
+        rig.server.world.world_events, before,
+        "a vote after the ending changed nothing"
     );
 }

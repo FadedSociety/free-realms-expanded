@@ -4,6 +4,7 @@
 //! admin's own transaction commits and answers with one chat line. `tick` runs in the 20 Hz world
 //! tick beside the shared fields.
 use super::*;
+use osfr_tools::npc_interaction;
 use osfr_tools::world_events::{self, WorldEventCommand};
 
 /// (R) Runs use the public open world: zone 0 keeps the startup instance id 0 (`World::stage_public`).
@@ -11,6 +12,138 @@ const OPEN_WORLD: ZoneInstance = ZoneInstance {
     zone_id: 0,
     instance_id: 0,
 };
+
+/// T538: one event-guid answer, wrapped for `session`. Empty replies still count as handled:
+/// an event guid never belongs to the content NPC catalogue, so it must not fall through.
+fn deliveries(session: &Session, replies: Vec<Vec<u8>>) -> Vec<Delivery> {
+    replies
+        .into_iter()
+        .map(|reply| Delivery {
+            recipient: session.id,
+            bytes: wrap_application(&reply),
+        })
+        .collect()
+}
+
+/// T538: the bin's route for family 26 on an event actor's guid (the `EVNT` range), the way
+/// `route_player_radial` claims player guids. `None` leaves the packet with its existing path,
+/// so a normal NPC click, a player menu and an NPC dialogue answer are untouched. The voting
+/// box opens the 26/3 prompt; a 26/6 that answers one of the prompt's own rows counts the vote,
+/// and the winning cake answers its 15/4 line. A refusal changes nothing and answers nothing,
+/// so the client keeps its prompt open. A client 26/4 is deliberately not routed: it may be the
+/// client's echo of a close the server sent, and clearing the prompt on it refused a retry.
+pub(super) fn application(
+    session: &Session,
+    inner: &[u8],
+    world: &mut SharedWorld,
+) -> Option<Vec<Delivery>> {
+    // The registry's character guid, not the session's: a viewer session that never logged in
+    // still has one, and a reconnect reuses it, which is what the run's participation keys on.
+    let place = world
+        .players
+        .get(session.id)
+        .map(|player| (player.zone, player.position, player.character_guid));
+    match inner {
+        [26, 0, 8, ..] if inner.len() == 13 => {
+            let Some((_, _, character)) = place else {
+                return None;
+            };
+            let request = npc_interaction::decode_npc_interact_26_8(inner).ok()?;
+            if !osfr_tools::world_events::WorldEvents::is_event_guid(request.target) {
+                // The player moved on to a content NPC: an abandoned vote prompt must not
+                // answer a later 26/6 for that NPC's dialogue.
+                world.world_events.clear_vote_prompt(character);
+                return None;
+            }
+            let (instance, position, _) = place?;
+            let replies =
+                world
+                    .world_events
+                    .interact(request.target, character, instance, position);
+            Some(deliveries(session, replies))
+        }
+        // No event interaction uses 26/10 today; an event guid still never reaches gameplay.
+        [26, 0, 10, ..] if inner.len() == 16 => {
+            let target = u64::from_le_bytes(inner[4..12].try_into().ok()?);
+            osfr_tools::world_events::WorldEvents::is_event_guid(target).then(Vec::new)
+        }
+        [26, 0, 6, ..] if inner.len() == 8 => {
+            // The canonical 26/6 reader, shared with the NPC dialogue path.
+            let response = npc_interaction::decode_dialogue_response_26_6(inner).ok()?;
+            let (instance, position, character) = place?;
+            let replies = world
+                .world_events
+                .vote(character, response, instance, position)?;
+            Some(deliveries(session, replies))
+        }
+        _ => None,
+    }
+}
+
+/// T538: one world tick's costume join. It runs from `tick`, before the event steps, against the
+/// committed registry instance and pose (the same values the vote and cake routes validate), so a
+/// scene transfer cannot mix the old instance with a new position. The join is recorded in the
+/// run (in-memory) and the quest hook is queued on the player's live gameplay; the session's own
+/// tick emits and saves it through `commit_outcome`. Nothing is saved or installed here, so this
+/// is not a second character-save writer, and one player's failure is logged, never propagated
+/// out of the world tick (worker rule 17).
+fn participate(world: &mut SharedWorld, sessions: &mut SessionMap, now_ms: u64) {
+    if !world.world_events.dance_off_scan_due(now_ms) {
+        return;
+    }
+    let candidates: Vec<(u32, SessionId, u64)> = {
+        let events = &world.world_events;
+        let players = &world.players;
+        events
+            .open_dance_offs()
+            .into_iter()
+            .flat_map(|(instance, serial)| {
+                players.sessions_in(instance).filter_map(move |player| {
+                    events.dance_off_area(serial, player.position).then_some((
+                        serial,
+                        player.session_id,
+                        player.character_guid,
+                    ))
+                })
+            })
+            .collect()
+    };
+    for (serial, id, character) in candidates {
+        let Some(key) = world.session_keys.get(&id).copied() else {
+            continue;
+        };
+        let Some(session) = sessions.get_mut(&key) else {
+            continue;
+        };
+        let Some(game) = session.gateway.gameplay() else {
+            continue;
+        };
+        let team = match world.world_events.dance_off_participant(serial, character) {
+            Some(team) => team,
+            None => {
+                let names = game.equipped_costume_name_ids();
+                let Some(team) = world.world_events.dance_off_team(serial, character, &names)
+                else {
+                    continue;
+                };
+                if !world.world_events.join_dance_off(serial, character, team) {
+                    event(json!({"event": "world_event_join_expired", "character": character}));
+                    continue;
+                }
+                team
+            }
+        };
+        // Queue the hook on the live gameplay; the session's own tick emits it in its staged
+        // clone. A participant whose hook was lost (a disconnect) is queued again next scan.
+        let credited = session
+            .gateway
+            .gameplay()
+            .is_some_and(|game| game.dance_off_join_credited(serial, team));
+        if !credited && let Some(game) = session.gateway.gameplay_mut() {
+            game.queue_dance_off_join(serial, team);
+        }
+    }
+}
 
 pub(super) fn apply(
     admin: &mut Session,
@@ -78,6 +211,7 @@ pub(super) fn schedule(world: &mut SharedWorld, options: &Options) {
 /// saw) and one log line; the runner owes it the removals it missed and shows it the live
 /// actors again later (`WorldEvents::refused`). Only that session is affected (worker rule 17).
 pub(super) fn tick(world: &mut SharedWorld, sessions: &mut SessionMap, now_ms: u64, unix_ms: u64) {
+    participate(world, sessions, now_ms);
     let mut refused: BTreeMap<SessionId, Vec<Vec<u8>>> = BTreeMap::new();
     let areas = &mut world.client_areas;
     for (recipient, packet) in world

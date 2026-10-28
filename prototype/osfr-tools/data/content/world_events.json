@@ -46,7 +46,8 @@
         {"key": "werewolf2", "model_id": 3294, "name_string_id": 0, "npc_name": "Werewolf Dancer", "position": [-2392.49, -25.39, 1218.85], "heading": 1.5192, "stand_animation_id": 4310, "hide_nameplate": true, "source": "Sanctuary 10f129e src/Resources/Npcs.json id 40006 (model, name, nameplate); client Models.txt model 3294; position and heading from src/Scripts/Zone/HalloweenDanceOff.lua (e3deee7); crew spot is a fixed (R) pick behind the leader"},
         {"key": "werewolf3", "model_id": 3295, "name_string_id": 0, "npc_name": "Werewolf Dancer", "position": [-2391.65, -25.39, 1217.47], "heading": 1.3947, "stand_animation_id": 4310, "hide_nameplate": true, "source": "Sanctuary 10f129e src/Resources/Npcs.json id 40007 (model, name, nameplate); client Models.txt model 3295; position and heading from src/Scripts/Zone/HalloweenDanceOff.lua (e3deee7); crew spot is a fixed (R) pick behind the leader"},
         {"key": "cake_vampire", "model_id": 3324, "name_string_id": 432404, "npc_name": "Vampire Cake", "position": [-2384.4, -26.77, 1217.5], "heading": 3.1416, "stand_animation_id": 1, "hide_nameplate": false, "source": "Sanctuary 10f129e src/Resources/Npcs.json id 40012 (model, name, nameplate); client Models.txt model 3324; position and heading from src/Scripts/Zone/HalloweenDanceOff.lua (e3deee7)"},
-        {"key": "cake_werewolf", "model_id": 1724, "name_string_id": 432405, "npc_name": "Werewolf Cake", "position": [-2384.4, -26.77, 1217.5], "heading": 3.1416, "stand_animation_id": 1, "hide_nameplate": false, "source": "Sanctuary 10f129e src/Resources/Npcs.json id 40009 (model, name, nameplate); client Models.txt model 1724; position and heading from src/Scripts/Zone/HalloweenDanceOff.lua (e3deee7)"}
+        {"key": "cake_werewolf", "model_id": 1724, "name_string_id": 432405, "npc_name": "Werewolf Cake", "position": [-2384.4, -26.77, 1217.5], "heading": 3.1416, "stand_animation_id": 1, "hide_nameplate": false, "source": "Sanctuary 10f129e src/Resources/Npcs.json id 40009 (model, name, nameplate); client Models.txt model 1724; position and heading from src/Scripts/Zone/HalloweenDanceOff.lua (e3deee7)"},
+        {"key": "voting_box", "model_id": 1661, "name_string_id": 432403, "npc_name": "Voting Box", "position": [-2384.4, -26.77, 1211.5], "heading": 0.0985, "stand_animation_id": 1, "hide_nameplate": false, "source": "T538 (R): client locale 432403 names it. No Voting Box model, placement or original interaction was recovered (Sanctuary 10f129e HalloweenDanceOff.lua has no voting box), so the model reuses the event boombox (client Models.txt model 1661) and the position sits beside the boombox. The vote prompt and labels are client locale 432429/432207/432208; the costumes are the client item NameIds 14688/119187/119191 and 14690/119208."}
       ],
       "timeline": [
         {"at_ms": 0, "op": {"spawn": {"actor": "boombox"}}},
@@ -59,6 +60,7 @@
         {"at_ms": 0, "op": {"spawn": {"actor": "werewolf1"}}},
         {"at_ms": 0, "op": {"spawn": {"actor": "werewolf2"}}},
         {"at_ms": 0, "op": {"spawn": {"actor": "werewolf3"}}},
+        {"at_ms": 0, "op": {"spawn": {"actor": "voting_box"}}},
         {"at_ms": 0, "op": {"broadcast": {"text": "Pumpkin Prince: Let the Dance-off begin!", "locale_id": 432431, "radius_m": 120}}},
         {"at_ms": 0, "op": {"say": {"actor": "prince", "string_id": 432436}}},
         {"at_ms": 3000, "op": {"say": {"actor": "ed", "string_id": 432151}}},
@@ -253,8 +255,24 @@
         {"at_ms": 606540, "op": {"remove": {"actor": "jake", "effect_id": 21}}},
         {"at_ms": 606540, "op": {"remove": {"actor": "werewolf1", "effect_id": 21}}},
         {"at_ms": 606540, "op": {"remove": {"actor": "werewolf2", "effect_id": 21}}},
-        {"at_ms": 606540, "op": {"remove": {"actor": "werewolf3", "effect_id": 21}}}
+        {"at_ms": 606540, "op": {"remove": {"actor": "werewolf3", "effect_id": 21}}},
+        {"at_ms": 606540, "op": {"remove": {"actor": "voting_box", "effect_id": 21}}}
       ],
+      "dance_off": {
+        "center": [-2384.4, -26.77, 1214.94],
+        "radius_m": 30,
+        "voting_box": "voting_box",
+        "join_scan_ms": 500,
+        "prompt_string_id": 432429,
+        "already_voted_string_id": 5252,
+        "not_participant_string_id": 432505,
+        "used_cake_string_id": 432430,
+        "teams": [
+          {"team": "vampire", "costume_name_ids": [14688, 119187, 119191], "cake_actor": "cake_vampire", "vote_response_id": 401, "vote_label_string_id": 432207, "cake_say_string_id": 432434},
+          {"team": "werewolf", "costume_name_ids": [14690, 119208], "cake_actor": "cake_werewolf", "vote_response_id": 402, "vote_label_string_id": 432208, "cake_say_string_id": 432435}
+        ],
+        "source": "T538. Center: Sanctuary 10f129e src/Scripts/Zone/HalloweenDanceOff.lua:193 DanceSpot (client FabledRealmsAreas.xml:3488 song area 4299 centre matches). Radius 30 m: (R), chosen for the dance area; the client song area sphere is larger. join_scan_ms 500: (R) server tuning, loader-bounded 50-10000. Prompt 432429 and labels 432207/432208: client locale. Already-voted line 5252: client locale 'You have already voted.'. Non-participant line 432505 and second-use line 432430: client locale (the research pack corrected the brief's 2077101154 to 432505). Cakes: the two one_of branches the shipped timeline spawns (cake_vampire/cake_werewolf). Costume names: the item definition NameId word (client item catalogue). Werewolf: 14690 'Werewolf Outfit' rows 17736/79166-79170, and 119208 'LIMITED EDITION Werewolf Outfit' rows 69193-69227. Vampire: 14688 'Vampire Outfit' has no item row in the shipped catalogue, so the team also accepts the real rows 69337-69371 (NameId 119187 'Vampire Countess Outfit') and 69479+ (NameId 119191 'Vampire Count Outfit'), a (R) addition. Cake lines 432434/432435: (R) the only client cake-adjacent lines; Sanctuary's reward lines are 432433/432435. Vote response rows 401/402: (R) invented, above the NPC dialogue rows 1..=5 and 300/301 so a vote click cannot advance an NPC dialogue; they are content data, and the 26/3 prompt row and 26/6 answer read the same field. Winning side: the side with more votes, ties and no votes keep the run's random draw (R)."
+      },
       "schedule": {"slot_minutes": 30, "offset_minutes": 0, "season": "Halloween", "announce_lead_ms": 120000, "announce": {"text": "The Vampires vs Werewolves Dance-off is about to kick-off in Blackspore!", "locale_id": 5197}, "skip_if_slot_matches": ["bruce_snowhill", "bruce_wugachug"]}
     }
   ]

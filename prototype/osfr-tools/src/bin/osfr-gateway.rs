@@ -47,7 +47,7 @@ mod encounter_invites;
 mod group_arena;
 use delivery::{
     chat_error_delivery, field_packet, field_packets_for, field_recipient_matches, queue_delivery,
-    refresh_public_look, rider_event, wrap_application,
+    refresh_public_look, rider_event, trade_deliveries, wrap_application,
 };
 #[path = "osfr_gateway/boombox_routing.rs"]
 mod boombox_routing;
@@ -2144,6 +2144,11 @@ impl Session {
         world: &mut SharedWorld,
         now_ms: u64,
     ) -> Vec<Delivery> {
+        // T538: an event actor's guid is the bin's route (like a player guid in the radial
+        // menu); a content NPC, player menu or NPC dialogue answer falls through.
+        if let Some(deliveries) = world_event_routing::application(self, inner, world) {
+            return deliveries;
+        }
         // T519: 156/2 is answered from the target's live presentation; 115 is checked and
         // dropped. A refusal sends nothing and stores nothing.
         if fotomat::handles(inner) {
@@ -2518,16 +2523,6 @@ impl Session {
 
 /// (R) Longest a pose-only change waits before it is written (crash loss bound).
 const POSITION_SAVE_MS: u64 = 5_000;
-
-fn trade_deliveries(messages: Vec<TradeMessage>) -> Vec<Delivery> {
-    messages
-        .into_iter()
-        .map(|message| Delivery {
-            recipient: message.recipient,
-            bytes: wrap_application(&message.bytes),
-        })
-        .collect()
-}
 
 /// (W163) Keep the trade service's copy of this character's inventory current. A character
 /// whose inventory does not validate is not tradable: it is unregistered, which also ends a

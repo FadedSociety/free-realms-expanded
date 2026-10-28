@@ -510,9 +510,11 @@ impl Gameplay {
     /// (`follow_pet` covers both cases). T533: and its treasure hunt, which also runs for a chest
     /// still waiting after its pet is gone; a find marks the save (the cooldown). T532: the
     /// happy-speed buff ticks too, so a mood drop or dismissal ends it here. `None` means there is
-    /// still nothing to send.
+    /// still nothing to send. T538: this is also the common world path's per-tick gameplay step,
+    /// so a join hook the world tick queued is emitted and saved here.
     pub fn pet_tick(&mut self, character: &CharacterState, now_ms: u64) -> Option<Outcome> {
         let mut out = Outcome::default();
+        self.credit_dance_off_join(&mut out);
         self.follow_pet(character, now_ms, &mut out);
         self.sync_happy_buff(character, now_ms, &mut out);
         if self.pets.active_pet_id().is_some() {
@@ -523,7 +525,7 @@ impl Gameplay {
             out.replies.extend(care.replies);
             // T488: a grooming session that times out plays its dry-off animation for the viewers.
             out.nearby.extend(care.nearby);
-        } else if !self.pets.has_treasure() {
+        } else if !self.pets.has_treasure() && !out.changed {
             return (!out.replies.is_empty()).then_some(out);
         }
         self.tick_pet_treasure(character, now_ms, &mut out);
