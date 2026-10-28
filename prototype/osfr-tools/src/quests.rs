@@ -10,7 +10,7 @@ use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::io::{self, Read};
-use std::path::{Component, Path};
+use std::path::Path;
 
 const MAX_CONTENT: usize = 131_072;
 const MAX_JOURNAL: usize = 1_048_576;
@@ -237,23 +237,14 @@ impl QuestEngine {
         {
             return Err(invalid("invalid checkpoint activity"));
         }
-        let journal = if content.journal.hex.is_empty() {
-            let path = Path::new(&content.journal.file);
-            if path.components().count() != 1
-                || !matches!(path.components().next(), Some(Component::Normal(_)))
-            {
-                return Err(invalid("quest journal must be a direct relative filename"));
-            }
-            bounded_file(&directory.join(path), MAX_JOURNAL)?
-        } else {
-            // T853: the release ships the fresh journal span as typed JSON hex; the same
-            // length/hash/offset proof below still pins it.
-            if content.journal.hex.len() > MAX_JOURNAL * 2 {
-                return Err(invalid("quest journal hex too large"));
-            }
-            osfr_tools::startup_snapshot::decode_hex(&content.journal.hex)
-                .map_err(|_| invalid("invalid quest journal hex"))?
-        };
+        // T853/F860: one rule for the local file or the release's typed JSON hex. The
+        // absolute path keeps the `#[path]` restoration targets (piece_069/071) compiling.
+        let journal = osfr_tools::startup_snapshot::embedded_bytes(
+            directory,
+            &content.journal.file,
+            &content.journal.hex,
+            MAX_JOURNAL,
+        )?;
         if journal.len() < 4
             || journal.len() != content.journal.length
             || format!("{:x}", Sha256::digest(&journal)) != content.journal.sha256

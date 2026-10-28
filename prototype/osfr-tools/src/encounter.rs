@@ -917,16 +917,9 @@ impl EncounterEngine {
         }
         let mut content: Content =
             serde_json::from_slice(&bytes).map_err(|e| invalid(&e.to_string()))?;
-        let path = Path::new(&content.template_file);
-        if path.components().count() != 1
-            || !matches!(
-                path.components().next(),
-                Some(std::path::Component::Normal(_))
-            )
-        {
-            return Err(invalid("encounter template must be a local filename"));
-        }
-        content.template = fs::read(directory.join(path))?;
+        // The same local-filename rule the other template descriptors use.
+        content.template =
+            crate::startup_snapshot::embedded_bytes(directory, &content.template_file, "", 4096)?;
         let t = &content.template;
         if t.len() != 334
             || t[..4] != [35, 0, 2, 0]

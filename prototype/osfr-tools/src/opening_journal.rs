@@ -209,37 +209,22 @@ impl OpeningJournal {
             serde_json::from_slice(&bounded_file(&directory.join("quests.json"))?)
                 .map_err(|e| invalid(&format!("invalid quest reference: {e}")))?;
         let journal = reference.journal;
-        let name = Path::new(&journal.file);
         if reference.schema_version != 1
             || journal.offset < 13
             || journal
                 .offset
                 .checked_add(journal.length)
                 .is_none_or(|end| end > MAX_BYTES)
-            || (journal.hex.is_empty()
-                && (name.is_absolute()
-                    || name.components().count() != 1
-                    || !matches!(
-                        name.components().next(),
-                        Some(std::path::Component::Normal(_))
-                    )
-                    || journal.file.contains(['/', '\\', ':'])))
         {
-            return Err(invalid(
-                "invalid opening journal reference path/schema/offset",
-            ));
+            return Err(invalid("invalid opening journal reference schema/offset"));
         }
-        let original = if journal.hex.is_empty() {
-            bounded_file(&directory.join(name))?
-        } else {
-            // T853: the release ships the fresh journal span as typed JSON hex; no
-            // capture character journal binary is published.
-            if journal.hex.len() > MAX_BYTES * 2 {
-                return Err(invalid("opening journal hex too large"));
-            }
-            crate::startup_snapshot::decode_hex(&journal.hex)
-                .map_err(|_| invalid("invalid opening journal hex"))?
-        };
+        // T853/F860: one rule for the local file or the release's typed JSON hex.
+        let original = crate::startup_snapshot::embedded_bytes(
+            directory,
+            &journal.file,
+            &journal.hex,
+            MAX_BYTES,
+        )?;
         if original.len() != journal.length
             || format!("{:x}", Sha256::digest(&original)) != journal.sha256
         {

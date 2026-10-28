@@ -2,11 +2,7 @@
 use crate::opening::OpeningActor;
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
-use std::{
-    fs, io,
-    path::{Component, Path},
-    sync::Arc,
-};
+use std::{fs, io, path::Path, sync::Arc};
 
 #[derive(Deserialize)]
 struct Template {
@@ -32,22 +28,13 @@ impl OpeningWorld {
         let descriptor: Template =
             serde_json::from_slice(&fs::read(directory.join("combat.json"))?)
                 .map_err(|_| invalid("invalid actor template descriptor"))?;
-        let bytes = if descriptor.template_hex.is_empty() {
-            let filename = Path::new(&descriptor.template_file);
-            if filename.components().count() != 1
-                || !matches!(filename.components().next(), Some(Component::Normal(_)))
-            {
-                return Err(invalid("actor template must use a local filename"));
-            }
-            fs::read(directory.join(filename))?
-        } else {
-            // T853: typed JSON hex replaces the capture-derived binary in the release.
-            if descriptor.template_hex.len() > 4096 {
-                return Err(invalid("actor template hex too large"));
-            }
-            crate::startup_snapshot::decode_hex(&descriptor.template_hex)
-                .map_err(|_| invalid("invalid actor template hex"))?
-        };
+        // T853/F860: one rule for the local file or the release's typed JSON hex.
+        let bytes = crate::startup_snapshot::embedded_bytes(
+            directory,
+            &descriptor.template_file,
+            &descriptor.template_hex,
+            4096,
+        )?;
         if bytes.len() != 334
             || bytes[..4] != [35, 0, 2, 0]
             || format!("{:x}", Sha256::digest(&bytes)) != descriptor.template_sha256

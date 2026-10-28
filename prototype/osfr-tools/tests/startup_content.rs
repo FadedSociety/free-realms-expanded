@@ -9,7 +9,6 @@
 //! `export_scrubbed_startup_content` rewrites the three files and `tests/fixtures/startup_golden.json`;
 //! `content_startup_equals_the_captured_startup_except_the_scrub` compares both gateways.
 use osfr_tools::{
-    character_store::CharacterState,
     gateway::Gateway,
     startup_selfdata::{self, SelfData},
     startup_snapshot::StartupSnapshot,
@@ -29,9 +28,11 @@ mod gateway_reference;
 mod json;
 #[path = "support/npc_visibility.rs"]
 mod npc_visibility;
-use gateway_packets::{login_with_version, wrap};
+#[path = "support/startup.rs"]
+mod startup;
 use json::read as read_json;
 use npc_visibility::content_dir as content;
+use startup::{content_version, startup_of};
 
 fn golden_path() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/startup_golden.json")
@@ -100,32 +101,6 @@ fn scrub_snapshot(snapshot: &mut StartupSnapshot) {
     }
 }
 
-fn write_json(path: &Path, value: &impl serde::Serialize) {
-    fs::create_dir_all(path.parent().unwrap()).unwrap();
-    let mut text = serde_json::to_vec_pretty(value).unwrap();
-    text.push(b'\n');
-    fs::write(path, text).unwrap();
-}
-
-/// A session up to the client's ready and loaded signals: the 46 startup messages, in order.
-fn startup_of(gateway: &mut Gateway, state: &CharacterState, version: &str) -> Vec<Vec<u8>> {
-    let mut messages = gateway
-        .handle(&login_with_version(state.guid, version))
-        .unwrap()
-        .replies;
-    messages.extend(gateway.handle(&wrap(&[13, 0])).unwrap().replies);
-    assert!(gateway.handle(&wrap(&[10, 0])).unwrap().entered_world);
-    assert!(gateway.is_world_loaded());
-    messages
-}
-
-fn content_version() -> String {
-    read_json(&content().join("startup/manifest.json"))["client_version"]
-        .as_str()
-        .unwrap()
-        .to_owned()
-}
-
 fn describe(messages: &[Vec<u8>]) -> Value {
     let rows: Vec<Value> = messages
         .iter()
@@ -153,7 +128,7 @@ fn a_gateway_without_a_reference_folder_reaches_world_ready_with_the_golden_star
     let content = content();
     let state = Gateway::content_state(&content).unwrap();
     let mut gateway = Gateway::load_from_content(&content, state.clone()).unwrap();
-    let messages = startup_of(&mut gateway, &state, &content_version());
+    let messages = startup_of(&mut gateway, &state, &content_version(&content));
     assert_eq!(messages.len(), 46);
     assert_eq!(describe(&messages), read_json(&golden_path()));
     let opcodes: Vec<u64> = describe(&messages)["messages"]
@@ -172,7 +147,7 @@ fn content_startup_is_the_same_as_a_reference_run_with_that_snapshot() {
     // synthetic) differs. Every other message comes from the typed snapshot in both modes.
     let content = content();
     let state = Gateway::content_state(&content).unwrap();
-    let version = content_version();
+    let version = content_version(&content);
     let mut from_content = Gateway::load_from_content(&content, state.clone()).unwrap();
     let reference = gateway_reference::Reference::new(&version, None);
     let snapshot = StartupSnapshot::load(&content.join("startup/snapshot.json")).unwrap();
@@ -207,7 +182,7 @@ fn startup_content_has_no_capture_server_text() {
     // Text inside hex spans only shows once built.
     let state = Gateway::content_state(&content()).unwrap();
     let mut gateway = Gateway::load_from_content(&content(), state.clone()).unwrap();
-    for (index, message) in startup_of(&mut gateway, &state, &content_version())
+    for (index, message) in startup_of(&mut gateway, &state, &content_version(&content()))
         .iter()
         .enumerate()
     {
@@ -250,7 +225,7 @@ fn unusable_startup_content_is_refused_not_panicked() {
     assert!(Gateway::load_from_content(&root, state.clone()).is_err());
     let mut data = read_json(&source.join("self_data.json"));
     data["post_effect_tail"] = json!("0");
-    write_json(&directory.join("self_data.json"), &data);
+    json::write_pretty(&directory.join("self_data.json"), &data);
     assert!(Gateway::load_from_content(&root, state.clone()).is_err());
     fs::copy(
         source.join("self_data.json"),
@@ -259,12 +234,12 @@ fn unusable_startup_content_is_refused_not_panicked() {
     .unwrap();
     let mut manifest = read_json(&source.join("manifest.json"));
     manifest["schema_version"] = json!(2);
-    write_json(&directory.join("manifest.json"), &manifest);
+    json::write_pretty(&directory.join("manifest.json"), &manifest);
     assert!(Gateway::load_from_content(&root, state.clone()).is_err());
     // An initial zone the snapshot does not belong to, and no snapshot at all.
     manifest["schema_version"] = json!(1);
     manifest["initial_state"]["zone_id"] = json!(5);
-    write_json(&directory.join("manifest.json"), &manifest);
+    json::write_pretty(&directory.join("manifest.json"), &manifest);
     let mut elsewhere = state.clone();
     elsewhere.zone_id = 5;
     let error = Gateway::load_from_content(&root, elsewhere).err().unwrap();
@@ -322,7 +297,7 @@ fn export_scrubbed_startup_content() {
     let state = Gateway::reference_state(&reference).unwrap();
     let version = read_json(&reference.join("manifest.json"))["client_version"].clone();
     let directory = content().join("startup");
-    write_json(
+    json::write_pretty(
         &directory.join("manifest.json"),
         &json!({
             "schema_version": 1,
@@ -342,14 +317,14 @@ fn export_scrubbed_startup_content() {
     let template = fs::read(reference.join("0007-login.bin")).unwrap();
     let mut data = startup_selfdata::parse_self(&template);
     scrub_self(&mut data);
-    write_json(&directory.join("self_data.json"), &data);
+    json::write_pretty(&directory.join("self_data.json"), &data);
     let mut snapshot = StartupSnapshot::load(&lab_snapshot).unwrap();
     scrub_snapshot(&mut snapshot);
-    write_json(&directory.join("snapshot.json"), &snapshot);
+    json::write_pretty(&directory.join("snapshot.json"), &snapshot);
 
     let mut gateway = Gateway::load_from_content(&content(), state.clone()).unwrap();
     let messages = startup_of(&mut gateway, &state, version.as_str().unwrap());
-    write_json(&golden_path(), &describe(&messages));
+    json::write_pretty(&golden_path(), &describe(&messages));
 }
 
 /// The capture folder and the typed lab snapshot beside it.
@@ -370,7 +345,7 @@ fn lab_inputs() -> (PathBuf, PathBuf) {
 fn content_startup_equals_the_captured_startup_except_the_scrub() {
     let (reference, lab_snapshot) = lab_inputs();
     let state = Gateway::reference_state(&reference).unwrap();
-    let version = content_version();
+    let version = content_version(&content());
     let mut scrubbed = StartupSnapshot::load(&lab_snapshot).unwrap();
     scrub_snapshot(&mut scrubbed);
 

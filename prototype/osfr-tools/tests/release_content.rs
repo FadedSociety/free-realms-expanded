@@ -16,8 +16,14 @@
 //! The overlay carries no binary: the two capture-derived templates are typed JSON hex fields
 //! (`combat.json` `template_hex`, `quests.json` journal `hex`) built by the same loaders, as
 //! T807 typed the captured self data.
+//!
+//! F860: the three supplement provenance blocks keep their full community source tags, and the
+//! rows they contributed stay as tagged community data rows (upload-policy rule 6; NOTICE): six
+//! definitions the shipped gameplay references, plus quest 1617's reward item. Nine unused
+//! hammer variants are dropped. Every row keeps the catalogue's `source`/`reconstructed_fields`,
+//! and the publishable test asserts those tags positively and that no overlay file says "kept
+//! private".
 use osfr_tools::{
-    character_store::CharacterState,
     combat::Combat,
     gateway::Gateway,
     inventory::{Inventory, InventoryItem},
@@ -27,6 +33,7 @@ use osfr_tools::{
     profiles::Profiles,
     quests::QuestEngine,
     startup_selfdata::{self, SelfData},
+    startup_snapshot::decode_hex,
 };
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
@@ -43,9 +50,11 @@ mod gateway_packets;
 mod json;
 #[path = "support/npc_visibility.rs"]
 mod npc_visibility;
-use gateway_packets::{login_with_version, wrap};
+#[path = "support/startup.rs"]
+mod startup;
 use json::read as read_json;
 use npc_visibility::content_dir as content;
+use startup::{content_version, startup_and_world};
 
 /// The 44/2 reference-data payload captured from the original game server: 71 categories,
 /// 74 group associations, 2,675 bytes. `categories.json` rebuilds exactly these bytes and
@@ -73,6 +82,45 @@ const RELEASE_FILES: [&str; 11] = [
     "forging-campaign.json",
 ];
 
+/// Six supplement definitions that gameplay content references, kept as community-derived rows
+/// under upload-policy rule 6 and NOTICE. Each row keeps the private catalogue's own
+/// `source`/`reconstructed_fields` tags; the release provenance carries the project tags.
+const RECONSTRUCTED_DEFINITION_IDS: [i64; 6] = [35, 55, 2506, 2885, 2890, 30280];
+
+/// Nine unused coloured hammer variants from the same supplement; nothing references them, so
+/// they are dropped. The provenance blocks still record where they came from.
+const DROPPED_DEFINITION_IDS: [i64; 9] = [
+    30281, 30282, 30283, 30284, 30285, 30286, 30287, 30288, 30289,
+];
+
+/// Quest 1617's reward item, added from the same tagged catalogue.
+const QUEST_REWARD_DEFINITION_ID: i64 = 1843;
+
+/// The community catalogue's full source tags (NOTICE; upload-policy rule 6). The release keeps
+/// them on the supplement blocks, the six rows and quest 1617's reward row.
+const COMMUNITY_REPOSITORY: &str = "https://github.com/raisingkaines/FreeRealms-Legacy";
+const COMMUNITY_LICENSE: &str = "AGPL-3.0";
+const COMMUNITY_REVISION: &str = "9e082025391177d5a33ee18c714ddd06b457a695";
+const COMMUNITY_CATALOG_SHA256: &str =
+    "40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025";
+
+/// Replaces the stale "kept private" scope sentence in the private supplement blocks
+/// (lead, 2026-10-28).
+const COMMUNITY_SCOPE: &str = "published as tagged community data rows (NOTICE; lead 2026-10-28)";
+
+/// One release-format definition row from the private catalogue. The catalogue's per-row
+/// `source`/`reconstructed_fields` provenance stays on the row: community-derived data rows keep
+/// their tags (NOTICE; upload-policy rule 6).
+fn catalogue_definition(catalogue: &Value, id: i64) -> Value {
+    catalogue["definitions"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["id"] == id)
+        .unwrap_or_else(|| panic!("the catalogue has no definition {id}"))
+        .clone()
+}
+
 fn crate_dir() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).to_path_buf()
 }
@@ -87,13 +135,6 @@ fn sha(bytes: &[u8]) -> String {
 
 fn hex(bytes: &[u8]) -> String {
     bytes.iter().map(|byte| format!("{byte:02x}")).collect()
-}
-
-fn write_json(path: &Path, value: &Value) {
-    fs::create_dir_all(path.parent().unwrap()).unwrap();
-    let mut bytes = serde_json::to_vec_pretty(value).unwrap();
-    bytes.push(b'\n');
-    fs::write(path, bytes).unwrap();
 }
 
 /// The private lab native package; only the ignored exporter reads it.
@@ -127,26 +168,6 @@ fn merged_content(name: &str) -> PathBuf {
     content_copy::copy_tree(&content(), &root);
     content_copy::copy_tree(&release_dir(), &root);
     root
-}
-
-fn startup_of(gateway: &mut Gateway, state: &CharacterState, version: &str) -> Vec<Vec<u8>> {
-    let mut messages = gateway
-        .handle(&login_with_version(state.guid, version))
-        .unwrap()
-        .replies;
-    messages.extend(gateway.handle(&wrap(&[13, 0])).unwrap().replies);
-    let world = gateway.handle(&wrap(&[10, 0])).unwrap();
-    assert!(world.entered_world);
-    assert!(gateway.is_world_loaded());
-    messages.extend(world.replies);
-    messages
-}
-
-fn client_version() -> String {
-    read_json(&content().join("startup/manifest.json"))["client_version"]
-        .as_str()
-        .unwrap()
-        .to_owned()
 }
 
 /// The bytes of the fresh character's journal span in the typed self data: an empty first
@@ -525,7 +546,7 @@ fn export_release_content() {
     ] {
         let mut value = read_json(&source.join(file));
         scrub_json(&mut value);
-        write_json(&release.join(file), &value);
+        json::write_pretty(&release.join(file), &value);
     }
     let opening = fs::read(release.join("opening.json")).unwrap();
     let cooking = fs::read(release.join("cooking.json")).unwrap();
@@ -533,7 +554,7 @@ fn export_release_content() {
     // The markers are derivable from the two files the loader checks; stale lab hashes for
     // files the release does not ship are not copied.
     let cooking_marker = read_json(&source.join("cooking-campaign.json"));
-    write_json(
+    json::write_pretty(
         &release.join("cooking-campaign.json"),
         &json!({
             "schema_version": 1,
@@ -544,7 +565,7 @@ fn export_release_content() {
         }),
     );
     let forging_marker = read_json(&source.join("forging-campaign.json"));
-    write_json(
+    json::write_pretty(
         &release.join("forging-campaign.json"),
         &json!({
             "schema_version": 1,
@@ -565,12 +586,12 @@ fn export_release_content() {
     combat["provenance"]["template"] = json!(
         "T853 overlay: the AddNpc skeleton is embedded as template_hex; the release ships no binary. The bytes are the captured 0010-ready.bin shape with the name, aliases and effects zeroed by the lab exporter."
     );
-    write_json(&release.join("combat.json"), &combat);
+    json::write_pretty(&release.join("combat.json"), &combat);
     assert_eq!(template.len(), 334);
 
     // Categories are rebuilt from the original server's 44/2 capture, not the community tables.
     let (categories, groups) = captured_categories(&capture_path(&source));
-    write_json(
+    json::write_pretty(
         &release.join("categories.json"),
         &json!({
             "schema_version": 1,
@@ -603,7 +624,7 @@ fn export_release_content() {
     quests["provenance"]["release"] = json!(
         "T853 overlay: the journal is the fresh character's 21-byte empty span from data/content/startup/self_data.json, embedded as hex; no capture character journal is published, and the original quest 1617 starts unaccepted."
     );
-    write_json(&release.join("quests.json"), &quests);
+    json::write_pretty(&release.join("quests.json"), &quests);
 
     // Profile rows are capture game data. The starter kit map and its community license
     // provenance are removed; T846 moves the kit into start-quest rewards (R).
@@ -617,7 +638,7 @@ fn export_release_content() {
     profiles["provenance"]["release"] = json!(
         "T853 overlay: the 16 captured job rows, active/default progression and profile bytes stay; starter_items is empty (R) and T846 moves the starter kit to start-quest rewards."
     );
-    write_json(&release.join("profiles.json"), &profiles);
+    json::write_pretty(&release.join("profiles.json"), &profiles);
 
     // Item definitions stay (game data). The live state is the fresh character typed in the
     // startup self: no coins, no owned items, the empty equipment slot rows, guid 1.
@@ -629,6 +650,41 @@ fn export_release_content() {
         .as_object_mut()
         .unwrap()
         .remove("starter_definitions");
+    // The supplement blocks stay with their full community source tags (NOTICE; upload-policy
+    // rule 6); only the stale "kept private" scope sentence is replaced. The six referenced rows
+    // and quest 1617's reward stay as tagged community data rows and the nine unused variants
+    // are dropped; a row the catalogue agrees with keeps its bytes and its own tags.
+    inventory["provenance"]["forging_supplement"]["source"]["scope"] = json!(COMMUNITY_SCOPE);
+    let catalogue = read_json(&source.join("item-catalogue.json"));
+    let mut definitions = inventory["definitions"].as_array().unwrap().clone();
+    definitions.retain(|row| !DROPPED_DEFINITION_IDS.contains(&row["id"].as_i64().unwrap()));
+    for id in RECONSTRUCTED_DEFINITION_IDS {
+        let rebuilt = catalogue_definition(&catalogue, id);
+        let row = definitions
+            .iter_mut()
+            .find(|row| row["id"] == id)
+            .unwrap_or_else(|| panic!("the source inventory has no definition {id}"));
+        assert_eq!(
+            row["serialized_hex"], rebuilt["serialized_hex"],
+            "definition {id} does not match the catalogue's serialized bytes"
+        );
+        *row = rebuilt;
+    }
+    definitions.push(catalogue_definition(&catalogue, QUEST_REWARD_DEFINITION_ID));
+    inventory["definitions"] = Value::Array(definitions);
+    inventory["provenance"]["reconstructed_definitions"] = json!({
+        "ids": RECONSTRUCTED_DEFINITION_IDS,
+        "quest_reward_id": QUEST_REWARD_DEFINITION_ID,
+        "dropped_community_variant_ids": DROPPED_DEFINITION_IDS,
+        "source": {
+            "repository": COMMUNITY_REPOSITORY,
+            "revision": COMMUNITY_REVISION,
+            "license": COMMUNITY_LICENSE,
+            "catalog_sha256": COMMUNITY_CATALOG_SHA256,
+            "scope": COMMUNITY_SCOPE,
+        },
+        "facts": "Id plus the client locale/icon ids, class, type, stack, cost, tint and model fields of the private community item catalogue; fields the catalogue could not establish are zero. Each shipped row keeps the catalogue's own source and reconstructed_fields tags.",
+    });
     let mut spans = vec![json!({
         "kind": "coins",
         "offset": derived.coins_offset,
@@ -655,9 +711,9 @@ fn export_release_content() {
     spans.sort_by_key(|span| span["offset"].as_u64().unwrap());
     inventory["spans"] = Value::Array(spans);
     inventory["provenance"]["release"] = json!(
-        "T853 overlay: the 1,703 capture item definitions and 16 job slot tables stay; default_state is the fresh character typed in data/content/startup/self_data.json (0 coins, no owned items, the empty equipment slot rows), the capture inventory and 7-item starter kit are gone, and the spans were recomputed from that serialized self. T846 moves the kit to start-quest rewards (R)."
+        "T853/F860 overlay: 1,695 item definitions (1,703 captured rows less nine unused community hammer variants, six supplement rows kept with their community source tags, plus quest 1617's tagged reward item 1843) and 16 job slot tables; default_state is the fresh character typed in data/content/startup/self_data.json (0 coins, no owned items, the empty equipment slot rows), the capture inventory and 7-item starter kit are gone, and the spans were recomputed from that serialized self. T846 moves the kit to start-quest rewards (R)."
     );
-    write_json(&release.join("inventory.json"), &inventory);
+    json::write_pretty(&release.join("inventory.json"), &inventory);
 
     println!(
         "wrote {} release files to {}",
@@ -672,7 +728,7 @@ fn the_release_overlay_reaches_world_entry_with_the_opening_active() {
     let state = Gateway::content_state(&merged).unwrap();
     let mut gateway = Gateway::load_gameplay_from_content(state.clone(), &merged, None).unwrap();
     assert!(gateway.gameplay().unwrap().is_opening());
-    let messages = startup_of(&mut gateway, &state, &client_version());
+    let messages = startup_and_world(&mut gateway, &state, &content_version(&content()));
     assert!(!messages.is_empty());
     let summary = gateway.gameplay_summary().expect("gameplay is loaded");
     let opening = &summary["opening"];
@@ -761,6 +817,10 @@ fn the_release_overlay_is_publishable() {
             panic!("{name} is not UTF-8 JSON; release content carries no binary")
         });
         assert_no_absolute_path(&text);
+        assert!(
+            !text.to_ascii_lowercase().contains("kept private"),
+            "{name} ships a source marked kept private"
+        );
         for forbidden in ["osfr", "discord", "open source"] {
             assert!(
                 !text.to_ascii_lowercase().contains(forbidden),
@@ -787,7 +847,7 @@ fn the_release_overlay_is_publishable() {
     }
 
     let combat = read_json(&release.join("combat.json"));
-    let template = hex_bytes(combat["template_hex"].as_str().unwrap());
+    let template = decode_hex(combat["template_hex"].as_str().unwrap()).unwrap();
     assert_eq!(template.len(), 334);
     assert_eq!(sha(&template), COMBAT_TEMPLATE_SHA256);
     assert_eq!(combat["template_sha256"], COMBAT_TEMPLATE_SHA256);
@@ -823,6 +883,82 @@ fn the_release_overlay_is_publishable() {
         inventory["profiles"].as_array().unwrap().len() + 2
     );
     assert!(inventory["provenance"].get("starter_definitions").is_none());
+    // F860: the supplement blocks keep their full community source tags (NOTICE; upload-policy
+    // rule 6). Only the stale "kept private" scope sentence is replaced, the six referenced rows
+    // and quest 1617's reward stay as tagged community data rows, and nine unused variants are
+    // dropped. The rows' own source/reconstructed_fields tags are asserted below.
+    for (block, nested) in [
+        ("cooking_supplement", false),
+        ("forging_supplement", false),
+        ("harvesting_supplement", true),
+    ] {
+        let source = if nested {
+            &inventory["provenance"][block]["source"]["community_catalog"]
+        } else {
+            &inventory["provenance"][block]["source"]
+        };
+        assert_eq!(source["repository"], COMMUNITY_REPOSITORY, "{block}");
+        assert_eq!(source["license"], COMMUNITY_LICENSE, "{block}");
+        assert_eq!(source["revision"], COMMUNITY_REVISION, "{block}");
+        assert_eq!(
+            source["catalog_sha256"], COMMUNITY_CATALOG_SHA256,
+            "{block}"
+        );
+    }
+    assert_eq!(
+        inventory["provenance"]["forging_supplement"]["source"]["scope"],
+        COMMUNITY_SCOPE
+    );
+    let community_source = &inventory["provenance"]["reconstructed_definitions"]["source"];
+    assert_eq!(community_source["repository"], COMMUNITY_REPOSITORY);
+    assert_eq!(community_source["license"], COMMUNITY_LICENSE);
+    assert_eq!(community_source["revision"], COMMUNITY_REVISION);
+    assert_eq!(community_source["catalog_sha256"], COMMUNITY_CATALOG_SHA256);
+    assert_eq!(community_source["scope"], COMMUNITY_SCOPE);
+    let block_ids: Vec<i64> = inventory["provenance"]["reconstructed_definitions"]["ids"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|id| id.as_i64().unwrap())
+        .collect();
+    assert_eq!(block_ids, RECONSTRUCTED_DEFINITION_IDS);
+    assert_eq!(
+        inventory["provenance"]["reconstructed_definitions"]["quest_reward_id"],
+        QUEST_REWARD_DEFINITION_ID
+    );
+    let definitions = inventory["definitions"].as_array().unwrap();
+    let ids: Vec<i64> = definitions
+        .iter()
+        .map(|row| row["id"].as_i64().unwrap())
+        .collect();
+    for id in RECONSTRUCTED_DEFINITION_IDS
+        .iter()
+        .copied()
+        .chain([QUEST_REWARD_DEFINITION_ID])
+    {
+        let row = definitions
+            .iter()
+            .find(|row| row["id"] == id)
+            .unwrap_or_else(|| panic!("community-derived definition {id} does not ship"));
+        assert!(
+            row["source"]
+                .as_str()
+                .is_some_and(|source| !source.is_empty()),
+            "community-derived definition {id} lost its source tag"
+        );
+        assert!(
+            row["reconstructed_fields"]
+                .as_array()
+                .is_some_and(|fields| !fields.is_empty()),
+            "community-derived definition {id} lost its reconstructed_fields tag"
+        );
+    }
+    for id in DROPPED_DEFINITION_IDS {
+        assert!(
+            !ids.contains(&id),
+            "dropped community variant {id} still ships"
+        );
+    }
 
     let quests = read_json(&release.join("quests.json"));
     let journal = &quests["journal"];
@@ -836,7 +972,7 @@ fn the_release_overlay_is_publishable() {
             .is_empty()
     );
     assert_eq!(journal["length"], 21);
-    let journal_bytes = hex_bytes(journal["hex"].as_str().unwrap());
+    let journal_bytes = decode_hex(journal["hex"].as_str().unwrap()).unwrap();
     assert_eq!(sha(&journal_bytes), journal["sha256"].as_str().unwrap());
     assert!(
         journal_bytes
@@ -867,14 +1003,6 @@ fn the_release_overlay_is_publishable() {
     );
 }
 
-fn hex_bytes(text: &str) -> Vec<u8> {
-    assert_eq!(text.len() % 2, 0);
-    (0..text.len())
-        .step_by(2)
-        .map(|index| u8::from_str_radix(&text[index..index + 2], 16).unwrap())
-        .collect()
-}
-
 #[test]
 fn every_release_reward_and_recipe_item_has_a_definition() {
     let release = release_dir();
@@ -893,13 +1021,21 @@ fn every_release_reward_and_recipe_item_has_a_definition() {
             ids.push(row[0].as_i64().unwrap() as i32);
         }
     }
+    for definition in read_json(&release.join("quests.json"))["definitions"]
+        .as_array()
+        .unwrap()
+    {
+        for row in definition["items"].as_array().unwrap() {
+            ids.push(row[0].as_i64().unwrap() as i32);
+        }
+    }
     ids.sort_unstable();
     ids.dedup();
     assert!(!ids.is_empty());
     for id in ids {
         assert!(
             inventory.has_definition(id),
-            "release reward/recipe item {id} is not defined"
+            "release reward/recipe/quest item {id} is not defined"
         );
     }
 }
@@ -917,8 +1053,18 @@ fn a_wrong_embedded_template_or_journal_hex_is_refused() {
         serde_json::to_vec(&combat).unwrap(),
     )
     .unwrap();
-    assert!(Combat::load(&directory, None).is_err());
-    assert!(OpeningWorld::load(&directory).is_err());
+    let error = Combat::load(&directory, None).err().unwrap();
+    assert!(
+        error.to_string().contains("combat template hash mismatch"),
+        "{error}"
+    );
+    let error = OpeningWorld::load(&directory).err().unwrap();
+    assert!(
+        error
+            .to_string()
+            .contains("actor template differs from verified evidence"),
+        "{error}"
+    );
 
     let mut quests = read_json(&release_dir().join("quests.json"));
     quests["journal"]["hex"] = json!("00".repeat(21));
@@ -927,23 +1073,36 @@ fn a_wrong_embedded_template_or_journal_hex_is_refused() {
         serde_json::to_vec(&quests).unwrap(),
     )
     .unwrap();
-    assert!(QuestEngine::load(&directory, None).is_err());
-    assert!(OpeningJournal::load(&directory).is_err());
+    let error = QuestEngine::load(&directory, None).err().unwrap();
+    assert!(
+        error
+            .to_string()
+            .contains("quest journal hash/length/offset mismatch"),
+        "{error}"
+    );
+    let error = OpeningJournal::load(&directory).err().unwrap();
+    assert!(
+        error
+            .to_string()
+            .contains("opening journal reference hash/length mismatch"),
+        "{error}"
+    );
     let _ = fs::remove_dir_all(directory);
+}
+
+/// The bytes of the overlay files in one directory, so a refusal can be shown to change nothing.
+fn overlay_snapshot(directory: &Path) -> Vec<(String, Vec<u8>)> {
+    RELEASE_FILES
+        .iter()
+        .map(|name| ((*name).to_owned(), fs::read(directory.join(name)).unwrap()))
+        .collect()
 }
 
 #[test]
 fn a_broken_overlay_is_refused_without_touching_the_files() {
+    let release = release_dir();
+    let pristine = overlay_snapshot(&release);
     let broken = merged_content("broken");
-    let before: Vec<(String, Vec<u8>)> = RELEASE_FILES
-        .iter()
-        .map(|name| {
-            (
-                (*name).to_owned(),
-                fs::read(release_dir().join(name)).unwrap(),
-            )
-        })
-        .collect();
     let mut marker = read_json(&broken.join("forging-campaign.json"));
     marker["opening_sha256"] = json!("00".repeat(32));
     fs::write(
@@ -951,6 +1110,7 @@ fn a_broken_overlay_is_refused_without_touching_the_files() {
         serde_json::to_vec(&marker).unwrap(),
     )
     .unwrap();
+    let before = overlay_snapshot(&broken);
     let state = Gateway::content_state(&broken).unwrap();
     let error = Gateway::load_gameplay_from_content(state, &broken, None)
         .err()
@@ -959,13 +1119,17 @@ fn a_broken_overlay_is_refused_without_touching_the_files() {
         error.to_string().contains("forging campaign marker"),
         "{error}"
     );
-    for (name, bytes) in &before {
-        assert_eq!(
-            &fs::read(release_dir().join(name)).unwrap(),
-            bytes,
-            "a refused load changed {name}"
-        );
-    }
+    // The files the refused load actually read are unchanged, and so is the shipped overlay.
+    assert_eq!(
+        overlay_snapshot(&broken),
+        before,
+        "a refused load changed the content copy it read"
+    );
+    assert_eq!(
+        overlay_snapshot(&release),
+        pristine,
+        "a refused load changed the release overlay"
+    );
     let _ = fs::remove_dir_all(broken);
 
     let merged = merged_content("categories");
@@ -976,14 +1140,26 @@ fn a_broken_overlay_is_refused_without_touching_the_files() {
         serde_json::to_vec(&categories).unwrap(),
     )
     .unwrap();
+    let before = overlay_snapshot(&merged);
     let state = Gateway::content_state(&merged).unwrap();
-    assert!(Gateway::load_gameplay_from_content(state, &merged, None).is_err());
-    for (name, bytes) in &before {
-        assert_eq!(
-            &fs::read(release_dir().join(name)).unwrap(),
-            bytes,
-            "a refused load changed {name}"
-        );
-    }
+    let error = Gateway::load_gameplay_from_content(state, &merged, None)
+        .err()
+        .expect("the broken category proof is refused");
+    assert!(
+        error
+            .to_string()
+            .contains("item category packet differs from prepared proof"),
+        "{error}"
+    );
+    assert_eq!(
+        overlay_snapshot(&merged),
+        before,
+        "a refused load changed the content copy it read"
+    );
+    assert_eq!(
+        overlay_snapshot(&release),
+        pristine,
+        "a refused load changed the release overlay"
+    );
     let _ = fs::remove_dir_all(merged);
 }

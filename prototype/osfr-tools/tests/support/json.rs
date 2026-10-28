@@ -4,6 +4,7 @@
 //! read shipped JSON; one reader keeps the panic message and the read rule from
 //! drifting apart. Test-only: production loaders have their own typed readers.
 
+use serde::Serialize;
 use serde_json::Value;
 use std::{fs, path::Path};
 
@@ -13,4 +14,13 @@ pub fn read(path: &Path) -> Value {
         &fs::read(path).unwrap_or_else(|error| panic!("{}: {error}", path.display())),
     )
     .unwrap_or_else(|error| panic!("{}: {error}", path.display()))
+}
+
+/// Write a JSON document in the shipped two-space form with a trailing newline.
+#[allow(dead_code)] // Some suites include this reader only to read content.
+pub fn write_pretty(path: &Path, value: &impl Serialize) {
+    fs::create_dir_all(path.parent().unwrap()).unwrap();
+    let mut bytes = serde_json::to_vec_pretty(value).unwrap();
+    bytes.push(b'\n');
+    fs::write(path, bytes).unwrap();
 }

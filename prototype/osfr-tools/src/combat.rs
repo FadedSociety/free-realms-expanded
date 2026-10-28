@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::fmt;
 use std::fs;
-use std::path::{Component, Path};
+use std::path::Path;
 use std::sync::Arc;
 
 pub const NPC_GUID: u64 = 0x5255_5354_0000_0001;
@@ -122,23 +122,13 @@ impl Combat {
         }
         let mut content: Content =
             serde_json::from_slice(&config).map_err(|e| invalid(&e.to_string()))?;
-        if content.template_hex.is_empty() {
-            let path = Path::new(&content.template_file);
-            if path.components().count() != 1
-                || !matches!(path.components().next(), Some(Component::Normal(_)))
-            {
-                return Err(invalid("combat template must be a local filename"));
-            }
-            content.template = fs::read(directory.join(path))?;
-        } else {
-            // T853: the release ships typed JSON with no binary template. The bytes are
-            // the same AddNpc skeleton `validate_template` pins; the hash still verifies.
-            if content.template_hex.len() > 4096 {
-                return Err(invalid("combat template hex too large"));
-            }
-            content.template = crate::startup_snapshot::decode_hex(&content.template_hex)
-                .map_err(|_| invalid("invalid combat template hex"))?;
-        }
+        // T853/F860: one rule for the local file or the release's typed JSON hex.
+        content.template = crate::startup_snapshot::embedded_bytes(
+            directory,
+            &content.template_file,
+            &content.template_hex,
+            4096,
+        )?;
         if format!("{:x}", Sha256::digest(&content.template)) != content.template_sha256 {
             return Err(invalid("combat template hash mismatch"));
         }

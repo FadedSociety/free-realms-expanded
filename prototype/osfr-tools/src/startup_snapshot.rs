@@ -8,7 +8,11 @@ use crate::{
 };
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::{fs, io, path::Path};
+use std::{
+    fs,
+    io::{self, Read},
+    path::Path,
+};
 
 const MAX_SNAPSHOT_BYTES: usize = 16 * 1024 * 1024;
 const MAX_ROWS: usize = 100_000;
@@ -634,11 +638,16 @@ impl<'a> Reader<'a> {
 fn read_file(path: &Path, maximum: usize) -> io::Result<Vec<u8>> {
     let metadata = fs::symlink_metadata(path)?;
     if !metadata.file_type().is_file() || metadata.len() > maximum as u64 {
-        return Err(invalid("startup input is not a bounded regular file"));
+        return Err(invalid("content input is not a bounded regular file"));
     }
-    let bytes = fs::read(path)?;
+    // Bound the read itself: a file that grows after the metadata check must not
+    // allocate past the loader's limit.
+    let mut bytes = Vec::new();
+    fs::File::open(path)?
+        .take(maximum as u64 + 1)
+        .read_to_end(&mut bytes)?;
     if bytes.len() > maximum {
-        return Err(invalid("startup input grew beyond its limit"));
+        return Err(invalid("content input grew beyond its limit"));
     }
     Ok(bytes)
 }
@@ -920,6 +929,36 @@ pub fn decode_hex(value: &str) -> io::Result<Vec<u8>> {
             Ok((high << 4) | low)
         })
         .collect()
+}
+
+/// Read a content field that is either one local filename (`file`) or an embedded hex span
+/// (`hex`), bounded at `maximum` bytes for either form. A non-empty span wins and cannot name
+/// a path; an empty one must be one normal path component under `directory`. The combat,
+/// opening-world, quest and opening-journal descriptors all use this one rule so their bounds
+/// and path checks cannot drift apart. (T853/F860.)
+pub fn embedded_bytes(
+    directory: &Path,
+    file: &str,
+    hex: &str,
+    maximum: usize,
+) -> io::Result<Vec<u8>> {
+    if hex.is_empty() {
+        let path = Path::new(file);
+        if file.contains(['/', '\\', ':'])
+            || path.components().count() != 1
+            || !matches!(
+                path.components().next(),
+                Some(std::path::Component::Normal(_))
+            )
+        {
+            return Err(invalid("embedded content must name one local file"));
+        }
+        read_file(&directory.join(path), maximum)
+    } else if hex.len() > maximum.saturating_mul(2) {
+        Err(invalid("embedded content hex exceeds its bound"))
+    } else {
+        decode_hex(hex).map_err(|_| invalid("invalid embedded content hex"))
+    }
 }
 
 pub(crate) fn encode_hex(bytes: &[u8]) -> String {
