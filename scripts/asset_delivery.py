@@ -4,6 +4,13 @@ Native readers FUN_010ebd70/010ebee0: BE A1B2C3D4, BE raw length, zlib1.2.3.
 Manifest CRCs cover raw bytes. Manifest sizes describe the delivered wire body.
 The request's trailing .z selects the compressed envelope; other names are raw.
 No network fallback or unverified substitution is performed here.
+
+The client's own downloaded TCG asset cache (`assets/assetpack000_manifest.txt` over
+`assets/assetpack000W_*.pack`, folder "assets", set "assetpack000" in
+`AssetDelivery::IndirectLoader` 0x10143B20/0x10140150) is a second, allowlisted source:
+its names are served only when the manifest row's CRC matches the pack entry, and the
+served manifest carries the rows so the client can find them. Nothing is invented: a
+name whose bytes the player's own pack does not hold is not offered.
 """
 import csv
 import hashlib
@@ -14,11 +21,18 @@ import struct
 import threading
 import zlib
 from collections import OrderedDict
+from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
 MAX_ASSET = 128 * 1024 * 1024
 CACHE_BYTES = 64 * 1024 * 1024
+MAX_PACK_MANIFEST = 8 * 1024 * 1024
+MAX_PACK_BLOCKS = 65536
+PACK_MANIFEST = "assets/assetpack000_manifest.txt"
+PACKS = "assetpack000W_*.pack"
+PACK_PATH_CHARS = frozenset("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_- .()")
+PACK_PART_SUFFIX = ".osfr-part"
 
 
 def _asset_name(value):
@@ -30,6 +44,81 @@ def _asset_name(value):
 def _canonical_name(value):
     name = value.strip().lower()
     return name[:-2] if name.endswith(".z") else name
+
+
+def _pack_path(value):
+    """The launcher's `patch::valid_path` rule: portable relative names only.
+
+    Used for rows of the client's own pack manifest. The name is never resolved as a
+    path (the pack index supplies the bytes), so this is an allowlist shape rule.
+    """
+    if not value or len(value) > 220:
+        return False
+    for part in value.split("/"):
+        base = part.split(".", 1)[0].rstrip().upper()
+        if (
+            not part
+            or part.startswith(".")
+            or part.endswith((".", " "))
+            or part.lower().endswith(PACK_PART_SUFFIX)
+            or base in ("CON", "PRN", "AUX", "NUL")
+            or (len(base) == 4 and base[:3] in ("COM", "LPT") and base[3].isdigit())
+            or not set(part) <= PACK_PATH_CHARS
+        ):
+            return False
+    return True
+
+
+@dataclass(frozen=True)
+class PackSource:
+    """One asset's bytes inside the client's own pack (read on demand, CRC-checked)."""
+
+    path: Path
+    offset: int
+    size: int
+    crc: int
+
+
+def read_pack_index(path: Path):
+    """The supplied packs' directory blocks: BE absolute next-block offset, BE entry count,
+    then length-prefixed name and BE (offset, size, crc32) (osfr-tools `catalog`)."""
+    size = path.stat().st_size
+    entries = {}
+    visited = set()
+    block = 0
+    with path.open("rb") as handle:
+        while True:
+            if block in visited or block + 8 > size or len(visited) >= MAX_PACK_BLOCKS:
+                raise ValueError(f"invalid or cyclic directory block: {path.name}")
+            visited.add(block)
+            handle.seek(block)
+            header = handle.read(8)
+            if len(header) != 8:
+                raise ValueError(f"truncated directory block: {path.name}")
+            next_block, count = struct.unpack(">II", header)
+            if count > (size - block - 8) // 16:
+                raise ValueError(f"invalid entry count: {path.name}")
+            for _ in range(count):
+                raw_length = handle.read(4)
+                if len(raw_length) != 4:
+                    raise ValueError(f"truncated asset name: {path.name}")
+                length = struct.unpack(">I", raw_length)[0]
+                if not 1 <= length <= 4096:
+                    raise ValueError(f"invalid asset name length: {path.name}")
+                name = handle.read(length)
+                fields = handle.read(12)
+                if len(name) != length or len(fields) != 12:
+                    raise ValueError(f"truncated asset entry: {path.name}")
+                text = name.decode("utf-8")
+                if any(ord(char) < 32 or ord(char) == 127 for char in text):
+                    raise ValueError(f"control character in asset name: {path.name}")
+                offset, entry_size, crc = struct.unpack(">III", fields)
+                if offset + entry_size > size or entry_size > MAX_ASSET:
+                    raise ValueError(f"asset extends past end of pack: {path.name}")
+                entries.setdefault(text.lower(), (offset, entry_size, crc))
+            if next_block == 0:
+                return entries
+            block = next_block
 
 
 def manifest_wire(manifest: bytes) -> bytes:
@@ -60,8 +149,7 @@ def baseline_ini(ini: str, endpoint: str, asset_url: str) -> str:
 
 
 class AssetDelivery:
-    def __init__(self, lab: Path, manifest: bytes):
-        self.manifest_wire = manifest_wire(manifest)
+    def __init__(self, lab: Path, manifest: bytes, client: Path | None = None):
         self.manifest = {}
         # R: index both community bare names and local .z names by one asset name.
         for row in csv.reader(manifest.decode("utf-8-sig").splitlines()):
@@ -137,19 +225,91 @@ class AssetDelivery:
                 self._add_community_source(name, source)
                 self.sources.setdefault(name, source)
 
+        self.client_rows = 0
+        self.extra_rows = []
+        if client is not None:
+            self._add_client_pack(Path(client))
+        # The served manifest carries the client's own pack rows, so the client's
+        # delivery can find the names it holds (the row form is raw: CRC, raw length).
+        self.served_manifest = self._merge_manifest(manifest)
+        self.manifest_wire = manifest_wire(self.served_manifest)
+
         self.cache = OrderedDict()
         self.cache_bytes = 0
         self.lock = threading.Lock()
 
+    def _add_client_pack(self, client: Path) -> None:
+        """Admit the client's own downloaded TCG pack rows it can actually serve.
+
+        A row is offered only when the pack holds that exact name and both the row's
+        and the pack entry's CRC agree. `.z` rows are announced raw (the pack holds raw
+        bytes), so no compression is invented for them.
+        """
+        manifest_path = client / PACK_MANIFEST
+        folder = client / "assets"
+        if not manifest_path.is_file() or not folder.is_dir():
+            return
+        if manifest_path.stat().st_size > MAX_PACK_MANIFEST:
+            raise ValueError("client asset-pack manifest exceeds its size limit")
+        index = {}
+        for pack in sorted(folder.glob(PACKS)):
+            for name, fields in read_pack_index(pack).items():
+                index.setdefault(name, (pack, *fields))
+        with manifest_path.open(encoding="utf-8-sig", newline="") as handle:
+            for row in csv.reader(handle):
+                if len(row) != 3:
+                    continue
+                name, raw_crc, _raw_length = (part.strip() for part in row)
+                if not raw_crc.isdigit():
+                    continue
+                crc = int(raw_crc)
+                key = _canonical_name(name)
+                if crc > 0xFFFFFFFF or not _pack_path(key) or key in self.manifest:
+                    continue
+                entry = index.get(key)
+                if entry is None or entry[3] != crc:
+                    continue
+                pack, offset, size, _entry_crc = entry
+                if size > MAX_ASSET:
+                    continue
+                self.manifest[key] = (crc, size)
+                self.sources[key] = PackSource(pack, offset, size, crc)
+                self.extra_rows.append(f"{key},{crc},{size}")
+        self.client_rows = len(self.extra_rows)
+
+    def _merge_manifest(self, manifest: bytes) -> bytes:
+        if not self.extra_rows:
+            return manifest
+        separator = b"\r\n" if b"\r\n" in manifest else b"\n"
+        merged = manifest
+        if merged and not merged.endswith((b"\n", b"\r")):
+            merged += separator
+        return merged + separator.join(row.encode("ascii") for row in self.extra_rows) + separator
+
+    @staticmethod
+    def _pack_bytes(source: PackSource) -> bytes:
+        if not 0 <= source.size <= MAX_ASSET or source.offset + source.size > source.path.stat().st_size:
+            raise ValueError("client pack entry lies outside its pack")
+        with source.path.open("rb") as handle:
+            handle.seek(source.offset)
+            raw = handle.read(source.size)
+        if len(raw) != source.size or zlib.crc32(raw) != source.crc:
+            raise ValueError("client pack entry differs from its manifest row")
+        return raw
+
     def get(self, request: str):
         url = urlsplit(request)
         parts = unquote(url.path).split("/")
-        if len(parts) != 3 or not parts[1].isdigit() or not _asset_name(parts[2]):
+        if len(parts) < 3 or not parts[1].isdigit():
             return None
-        request_name = parts[2].lower()
+        raw_name = "/".join(parts[2:]).lower()
+        # Flat names are the existing asset set; `/`-separated names are admissible only
+        # through the client's own pack allowlist (the manifest lookup below is that list).
+        if not (_pack_path(raw_name) if "/" in raw_name else _asset_name(raw_name)):
+            return None
         # Native FUN_0109b400 strips this suffix and sets the compressed flag.
-        compressed = request_name.endswith(".z")
-        key = _canonical_name(request_name)
+        compressed = raw_name.endswith(".z")
+        key = _canonical_name(raw_name)
         expected = self.manifest.get(key)
         source = self.sources.get(key)
         if expected is None or source is None or url.query != str(expected[0]):
@@ -161,16 +321,21 @@ class AssetDelivery:
                 self.cache.move_to_end(cache_key)
                 return cached
 
-        path, size, crc, sha = source
-        resolved = path.resolve()
-        if not any(resolved.is_relative_to(root) for root in self.roots):
-            raise ValueError("asset source resolves outside its extraction directory")
-        if not 0 <= size <= MAX_ASSET or path.stat().st_size != size:
-            raise ValueError("asset source size differs from verified catalog")
-        raw = path.read_bytes()
-        raw_sha = hashlib.sha256(raw).hexdigest()
-        if zlib.crc32(raw) != crc or (sha is not None and raw_sha != sha):
-            raise ValueError("asset source hash/CRC differs from proof")
+        if isinstance(source, PackSource):
+            raw = self._pack_bytes(source)
+            crc = source.crc
+            raw_sha = hashlib.sha256(raw).hexdigest()
+        else:
+            path, size, crc, sha = source
+            resolved = path.resolve()
+            if not any(resolved.is_relative_to(root) for root in self.roots):
+                raise ValueError("asset source resolves outside its extraction directory")
+            if not 0 <= size <= MAX_ASSET or path.stat().st_size != size:
+                raise ValueError("asset source size differs from verified catalog")
+            raw = path.read_bytes()
+            raw_sha = hashlib.sha256(raw).hexdigest()
+            if zlib.crc32(raw) != crc or (sha is not None and raw_sha != sha):
+                raise ValueError("asset source hash/CRC differs from proof")
         # R: reject a raw response whose source length differs from its manifest wire length.
         if not compressed and len(raw) != expected[1]:
             raise ValueError("plain asset length differs from manifest")
@@ -179,6 +344,7 @@ class AssetDelivery:
         proof = {
             "name": key,
             "encoding": "native-zlib" if compressed else "raw",
+            "source": "client-pack" if isinstance(source, PackSource) else "lab",
             "raw_bytes": len(raw),
             "raw_crc32": crc,
             "raw_sha256": raw_sha,

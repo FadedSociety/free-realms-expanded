@@ -1,0 +1,544 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index 71d9cb7..722a353 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -2114,6 +2114,7 @@ dependencies = [
+  "gilrs",
+  "image",
+  "log",
++ "miniz_oxide 0.8.9",
+  "serde",
+  "serde_json",
+  "subtle",
+diff --git a/Cargo.toml b/Cargo.toml
+index 2fe9214..3d6fd88 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -18,6 +18,7 @@ serde = { version = "=1.0.229", features = ["derive"] }
+ serde_json = "=1.0.151"
+ ed25519-dalek = { version = "2.2", default-features = false, features = ["std", "fast"] }
+ getrandom = "0.2.17"
++miniz_oxide = "=0.8.9"
+ subtle = "2.6"
+ zeroize = "1.8"
+ 
+diff --git a/src/assets.rs b/src/assets.rs
+index 85d1d0b..440578e 100644
+--- a/src/assets.rs
++++ b/src/assets.rs
+@@ -5,12 +5,21 @@
+ //! (scripts/run-local-baseline.py, run 20261021T193008Z) this answers
+ //! `manifest.crc` from the client's own `Assets_manifest.txt` and serves asset
+ //! bodies from `<client>/indirect-assets/`, while the `Responder` lives.
++//!
++//! The client also keeps the TCG's downloaded asset cache in `assets/`:
++//! `assetpack000_manifest.txt` (name, CRC, wire length rows) over
++//! `assetpack000W_*.pack` (raw bytes). The card window asks the same delivery system for
++//! `images/card/<id>.jpg`, and those rows are absent from `Assets_manifest.txt`, so the
++//! face falls back to a placeholder. When the player's pack holds a row, the announced
++//! manifest carries it (raw form) and the bytes are served from the pack. Only rows the
++//! client already holds are offered; nothing is downloaded or invented here.
+ use crate::{Result, bounded_read, hard_link, io_error, patch::valid_path, regular};
+ use std::{
++    collections::{HashMap, HashSet},
+     fs::File,
+-    io::{self, Read, Write},
++    io::{self, Cursor, Read, Seek, SeekFrom, Write},
+     net::{Ipv4Addr, Shutdown, SocketAddr, TcpListener, TcpStream},
+-    path::Path,
++    path::{Path, PathBuf},
+     sync::{
+         Arc,
+         atomic::{AtomicBool, AtomicUsize, Ordering},
+@@ -22,13 +31,32 @@ use std::{
+ /// under the requested manifest name: a `.z` file holds the A1B2C3D4 envelope
+ /// the client inflates (AssetReceived 0x0109b400, envelope reader 0x010ebee0).
+ const FOLDER: &str = "indirect-assets";
++/// The client's own downloaded TCG asset cache (`AssetDelivery::IndirectLoader`
++/// 0x10143B20, folder "assets", set "assetpack000"; constructed by the card window's
++/// `WASOEAssetLoader` 0x102B4A30).
++const PACK_FOLDER: &str = "assets";
++const PACK_MANIFEST: &str = "assets/assetpack000_manifest.txt";
++const PACK_PREFIX: &str = "assetpack000W_";
++const PACK_SUFFIX: &str = ".pack";
+ /// (R) Bounds the manifest read into memory; the harness's is 9,479,368 bytes.
+ const LIMIT: u64 = 64 * 1024 * 1024;
++/// (R) Bounds one pack row body; the card faces are tens of kilobytes.
++const ENTRY_LIMIT: u64 = 16 * 1024 * 1024;
+ /// (R) Connections served at once; more are closed unanswered and the client
+ /// retries (0x010a1980). Bounds the threads any local process can pin open.
+ pub(crate) const CONNECTIONS: usize = 64;
+ /// (R) The whole request head must arrive within this, however it is trickled.
+ const HEAD_TIME: Duration = Duration::from_secs(5);
++/// The native raw-asset envelope: BE magic, BE raw length, zlib (0x010ebee0).
++const MAGIC: u32 = 0xA1B2_C3D4;
++
++/// One raw asset inside the client's own pack.
++struct PackEntry {
++    file: PathBuf,
++    offset: u64,
++    size: u64,
++    crc: u32,
++}
+ 
+ /// Serves until dropped. Keep it with the client's `Child`.
+ pub struct Responder {
+@@ -50,14 +78,21 @@ impl Drop for Slot {
+ impl Responder {
+     pub fn start(root: &Path) -> Result<Self> {
+         let manifest = bounded_read(&regular(root, "Assets_manifest.txt")?, LIMIT)?;
++        // The client's own TCG pack rows are announced too, in raw form, so its card
++        // window can resolve the faces this install actually holds.
++        let pack = Arc::new(pack_entries(root));
++        let served = merged_manifest(&manifest, &pack);
+         // 0x010a1980 splits the body at ','; OnManifestCrcReceived 0x0109bd00 then
+         // keeps its local `%s_manifest.txt` when its CRC (0x00704a40) matches, so the
+         // client never asks for manifest.txt.z, and it never requests the manifest
+         // by its local name (request strings 0x018858a0, 0x01885920). The CRLF
+         // matches the harness.
+-        let crc: Arc<[u8]> = format!("{},{}\r\n", crc32(&manifest), manifest.len())
++        let crc: Arc<[u8]> = format!("{},{}\r\n", crc32(&served), served.len())
+             .into_bytes()
+             .into();
++        // With rows appended the CRC no longer matches the client's own file, so the
++        // client fetches this once per run; the payload is the native `.z` envelope.
++        let envelope: Arc<[u8]> = wire(&served).into();
+         let listener = TcpListener::bind((Ipv4Addr::LOCALHOST, 0)).map_err(io_error)?;
+         let address = listener.local_addr().map_err(io_error)?;
+         let stop = Arc::new(AtomicBool::new(false));
+@@ -79,11 +114,17 @@ impl Responder {
+                     // One thread per connection, as the harness's ThreadingHTTPServer:
+                     // an idle client connection never holds up another.
+                     active.fetch_add(1, Ordering::SeqCst);
+-                    let (folder, crc, slot) = (folder.clone(), crc.clone(), Slot(active.clone()));
++                    let (folder, crc, envelope, pack, slot) = (
++                        folder.clone(),
++                        crc.clone(),
++                        envelope.clone(),
++                        pack.clone(),
++                        Slot(active.clone()),
++                    );
+                     // Builder, not spawn: a failed thread start must not end this loop.
+                     let _ = std::thread::Builder::new().spawn(move || {
+                         let _slot = slot;
+-                        let _ = serve(&stream, &folder, &crc);
++                        let _ = serve(&stream, &folder, &crc, &envelope, &pack);
+                     });
+                 }
+             }
+@@ -103,7 +144,13 @@ impl Drop for Responder {
+     }
+ }
+ 
+-fn serve(mut stream: &TcpStream, folder: &Path, crc: &[u8]) -> io::Result<()> {
++fn serve(
++    mut stream: &TcpStream,
++    folder: &Path,
++    crc: &[u8],
++    envelope: &[u8],
++    pack: &HashMap<String, PackEntry>,
++) -> io::Result<()> {
+     let start = Instant::now();
+     stream.set_write_timeout(Some(Duration::from_secs(30)))?;
+     // Read the whole head (GetRequest 0x00d31140 ends it `Host: %s\r\n\r\n`):
+@@ -130,7 +177,7 @@ fn serve(mut stream: &TcpStream, folder: &Path, crc: &[u8]) -> io::Result<()> {
+     let found = line
+         .strip_prefix("GET ")
+         .and_then(|rest| rest.rsplit_once(' '))
+-        .and_then(|(target, _)| body(target, folder, crc));
++        .and_then(|(target, _)| body(target, folder, crc, envelope, pack));
+     let status = if found.is_some() {
+         "200 OK"
+     } else {
+@@ -147,20 +194,49 @@ fn serve(mut stream: &TcpStream, folder: &Path, crc: &[u8]) -> io::Result<()> {
+ }
+ 
+ /// The reply body and its length; files stream, so a held slot costs one copy buffer.
+-fn body<'a>(target: &str, folder: &Path, crc: &'a [u8]) -> Option<(u64, Box<dyn Read + 'a>)> {
+-    // Requests are the base URL plus `manifest.crc` or `%03u/<manifest name>?<crc>`
+-    // (0x010a1e00, 0x010a09c0); harness log: /960/sg_bixie_fence_tall_01_lod0.dme.z.
+-    let path = target.split('?').next()?;
++fn body<'a>(
++    target: &str,
++    folder: &Path,
++    crc: &'a [u8],
++    envelope: &'a [u8],
++    pack: &HashMap<String, PackEntry>,
++) -> Option<(u64, Box<dyn Read + 'a>)> {
++    // Requests are the base URL plus `manifest.crc`, `manifest.txt.z` or
++    // `%03u/<manifest name>?<crc>` (0x010a1e00, 0x010a09c0); harness log:
++    // /960/sg_bixie_fence_tall_01_lod0.dme.z.
++    let (path, query) = match target.split_once('?') {
++        Some((path, query)) => (path, Some(query)),
++        None => (target, None),
++    };
+     if path == "/manifest.crc" {
+         return Some((crc.len() as u64, Box::new(crc)));
+     }
++    if path == "/manifest.txt.z" {
++        return Some((envelope.len() as u64, Box::new(envelope)));
++    }
+     let (bucket, name) = path.strip_prefix('/')?.split_once('/')?;
+-    // One patchable file name only: no `..`, separators, `%`, `:` or devices.
+-    if bucket.is_empty()
+-        || !bucket.bytes().all(|b| b.is_ascii_digit())
+-        || name.contains('/')
+-        || !valid_path(name)
+-    {
++    if bucket.is_empty() || !bucket.bytes().all(|b| b.is_ascii_digit()) {
++        return None;
++    }
++    // Names with a `/` are admissible only through the client pack allowlist; a `.z`
++    // request for one gets the same native envelope the pack rows are stored raw for.
++    let lower = name.to_ascii_lowercase();
++    let (key, compressed) = match lower.strip_suffix(".z") {
++        Some(key) => (key, true),
++        None => (lower.as_str(), false),
++    };
++    if let Some(entry) = pack.get(key) {
++        // The client asks with the CRC our own manifest announced; a stale or forged
++        // query is refused rather than answered with bytes for a different version.
++        if query.and_then(|query| query.parse::<u32>().ok()) != Some(entry.crc) {
++            return None;
++        }
++        let raw = read_entry(entry).ok()?;
++        let body = if compressed { wire(&raw) } else { raw };
++        let length = body.len() as u64;
++        return Some((length, Box::new(Cursor::new(body))));
++    }
++    if name.contains('/') || !valid_path(name) {
+         return None;
+     }
+     // `regular` also refuses links and anything resolving outside the folder; a
+@@ -175,8 +251,226 @@ fn body<'a>(target: &str, folder: &Path, crc: &'a [u8]) -> Option<(u64, Box<dyn
+     Some((length, Box::new(file.take(length))))
+ }
+ 
++/// The client's own pack rows it can serve: `/`-separated manifest names whose row CRC
++/// equals the pack entry's CRC. A row or entry that disagrees is not offered.
++fn pack_entries(root: &Path) -> HashMap<String, PackEntry> {
++    let Ok(manifest_path) = regular(root, PACK_MANIFEST) else {
++        return HashMap::new();
++    };
++    let Ok(manifest) = bounded_read(&manifest_path, LIMIT) else {
++        return HashMap::new();
++    };
++    let Ok(folder) = regular_directory(root, PACK_FOLDER) else {
++        return HashMap::new();
++    };
++    let mut index: HashMap<String, PackEntry> = HashMap::new();
++    let Ok(listing) = std::fs::read_dir(&folder) else {
++        return HashMap::new();
++    };
++    let mut packs: Vec<PathBuf> = listing
++        .flatten()
++        .map(|entry| entry.file_name())
++        .filter(|name| {
++            name.to_str()
++                .is_some_and(|name| name.starts_with(PACK_PREFIX) && name.ends_with(PACK_SUFFIX))
++        })
++        .map(|name| folder.join(name))
++        .collect();
++    packs.sort();
++    for pack in packs {
++        let Ok(name) = pack.strip_prefix(root).map(Path::to_str) else {
++            continue;
++        };
++        let Some(name) = name else { continue };
++        let Ok(pack) = regular(root, name) else {
++            continue;
++        };
++        if hard_link(&pack).unwrap_or(true) {
++            continue;
++        }
++        let Ok(entries) = read_pack_index(&pack) else {
++            continue;
++        };
++        for (name, (offset, size, crc)) in entries {
++            index.entry(name).or_insert(PackEntry {
++                file: pack.clone(),
++                offset,
++                size,
++                crc,
++            });
++        }
++    }
++    let mut entries = HashMap::new();
++    let text = String::from_utf8_lossy(&manifest);
++    for line in text.lines() {
++        let mut fields = line.split(',');
++        let (Some(name), Some(raw_crc), Some(_wire), None) =
++            (fields.next(), fields.next(), fields.next(), fields.next())
++        else {
++            continue;
++        };
++        let Ok(crc) = raw_crc.trim().parse::<u32>() else {
++            continue;
++        };
++        let name = name.trim().to_ascii_lowercase();
++        let name = name.strip_suffix(".z").unwrap_or(&name).to_owned();
++        if !valid_path(&name) || entries.contains_key(&name) {
++            continue;
++        }
++        let Some(entry) = index.get(&name) else {
++            continue;
++        };
++        if entry.crc != crc || entry.size > ENTRY_LIMIT {
++            continue;
++        }
++        entries.insert(
++            name,
++            PackEntry {
++                file: entry.file.clone(),
++                offset: entry.offset,
++                size: entry.size,
++                crc,
++            },
++        );
++    }
++    entries
++}
++
++/// `assets/` resolved inside the client folder, refusing links and escapes.
++fn regular_directory(root: &Path, relative: &str) -> Result<PathBuf> {
++    let path = root.join(relative);
++    let metadata = std::fs::symlink_metadata(&path).map_err(io_error)?;
++    if !metadata.is_dir() || !path.canonicalize().map_err(io_error)?.starts_with(root) {
++        return Err(format!("Missing or unsafe client folder: {relative}"));
++    }
++    Ok(path)
++}
++
++/// The supplied packs' directory blocks: BE absolute next-block offset, BE entry count,
++/// then a length-prefixed name and BE (offset, size, crc32) (osfr-tools `catalog`).
++fn read_pack_index(path: &Path) -> io::Result<HashMap<String, (u64, u64, u32)>> {
++    const MAX_BLOCKS: usize = 65536;
++    let size = std::fs::metadata(path)?.len();
++    let mut file = File::open(path)?;
++    let mut entries = HashMap::new();
++    let mut visited = HashSet::new();
++    let mut block = 0_u64;
++    let mut be32 = |file: &mut File| -> io::Result<u32> {
++        let mut bytes = [0; 4];
++        file.read_exact(&mut bytes)?;
++        Ok(u32::from_be_bytes(bytes))
++    };
++    while !visited.contains(&block) && visited.len() < MAX_BLOCKS {
++        if block + 8 > size {
++            return Err(io::Error::new(io::ErrorKind::InvalidData, "bad pack block"));
++        }
++        visited.insert(block);
++        file.seek(SeekFrom::Start(block))?;
++        let next = u64::from(be32(&mut file)?);
++        let count = u64::from(be32(&mut file)?);
++        if count > (size - block - 8) / 16 {
++            return Err(io::Error::new(io::ErrorKind::InvalidData, "bad pack count"));
++        }
++        for _ in 0..count {
++            let length = be32(&mut file)? as u64;
++            if !(1..=4096).contains(&length) {
++                return Err(io::Error::new(
++                    io::ErrorKind::InvalidData,
++                    "bad name length",
++                ));
++            }
++            let mut bytes = vec![0; length as usize];
++            file.read_exact(&mut bytes)?;
++            let name = String::from_utf8(bytes)
++                .map_err(|_| io::Error::new(io::ErrorKind::InvalidData, "bad pack name"))?;
++            if name.chars().any(char::is_control) {
++                return Err(io::Error::new(io::ErrorKind::InvalidData, "bad pack name"));
++            }
++            let offset = u64::from(be32(&mut file)?);
++            let entry = u64::from(be32(&mut file)?);
++            let crc = be32(&mut file)?;
++            if entry > ENTRY_LIMIT || offset.checked_add(entry).is_none_or(|end| end > size) {
++                return Err(io::Error::new(io::ErrorKind::InvalidData, "bad pack entry"));
++            }
++            entries
++                .entry(name.to_ascii_lowercase())
++                .or_insert((offset, entry, crc));
++        }
++        if next == 0 {
++            return Ok(entries);
++        }
++        block = next;
++    }
++    Err(io::Error::new(
++        io::ErrorKind::InvalidData,
++        "bad pack blocks",
++    ))
++}
++
++/// Append the client pack rows the base manifest lacks, in raw form (`name,crc,length`).
++fn merged_manifest(manifest: &[u8], pack: &HashMap<String, PackEntry>) -> Vec<u8> {
++    let mut merged = manifest.to_vec();
++    if pack.is_empty() {
++        return merged;
++    }
++    let line: &[u8] = if manifest.windows(2).any(|window| window == b"\r\n") {
++        b"\r\n"
++    } else {
++        b"\n"
++    };
++    if !merged.ends_with(b"\n") && !merged.ends_with(b"\r") {
++        merged.extend_from_slice(line);
++    }
++    let mut known = HashSet::new();
++    for row in String::from_utf8_lossy(manifest).lines() {
++        if let Some(name) = row.split(',').next() {
++            let name = name.trim().to_ascii_lowercase();
++            known.insert(name.strip_suffix(".z").unwrap_or(&name).to_owned());
++        }
++    }
++    let mut rows: Vec<(&String, &PackEntry)> = pack.iter().collect();
++    rows.sort_by(|left, right| left.0.cmp(right.0));
++    let mut first = true;
++    for (name, entry) in rows {
++        if !known.insert(name.clone()) {
++            continue;
++        }
++        if !first {
++            merged.extend_from_slice(line);
++        }
++        first = false;
++        merged.extend_from_slice(format!("{name},{},{}", entry.crc, entry.size).as_bytes());
++        merged.extend_from_slice(line);
++    }
++    merged
++}
++
++/// One pack row's raw bytes, verified against the CRC the manifest announced.
++fn read_entry(entry: &PackEntry) -> io::Result<Vec<u8>> {
++    let mut file = File::open(&entry.file)?;
++    file.seek(SeekFrom::Start(entry.offset))?;
++    let mut raw = vec![0; entry.size as usize];
++    file.read_exact(&mut raw)?;
++    if crc32(&raw) != entry.crc {
++        return Err(io::Error::new(
++            io::ErrorKind::InvalidData,
++            "pack row CRC differs",
++        ));
++    }
++    Ok(raw)
++}
++
++/// The native envelope (`manifest.txt.z` and `.z` asset bodies).
++fn wire(raw: &[u8]) -> Vec<u8> {
++    let mut body = Vec::with_capacity(raw.len() / 2 + 16);
++    body.extend_from_slice(&MAGIC.to_be_bytes());
++    body.extend_from_slice(&(raw.len() as u32).to_be_bytes());
++    body.extend_from_slice(&miniz_oxide::deflate::compress_to_vec_zlib(raw, 6));
++    body
++}
++
+ /// Standard CRC-32, the harness's `zlib.crc32`.
+-fn crc32(bytes: &[u8]) -> u32 {
++pub(crate) fn crc32(bytes: &[u8]) -> u32 {
+     let table: [u32; 256] = std::array::from_fn(|n| {
+         (0..8).fold(n as u32, |c, _| {
+             (c >> 1) ^ (0xEDB8_8320 & (c & 1).wrapping_neg())
+diff --git a/src/tests.rs b/src/tests.rs
+index 96ceda6..6f5fd66 100644
+--- a/src/tests.rs
++++ b/src/tests.rs
+@@ -559,3 +559,99 @@ fn responder_closes_connections_past_its_cap() {
+         reply().starts_with(b"HTTP/1.0 200 OK\r\n")
+     }));
+ }
++
++use super::assets::crc32;
++
++/// One big-endian pack directory block with each entry's raw bytes after it.
++fn pack(entries: &[(&str, &[u8])]) -> Vec<u8> {
++    let directory = 8 + entries
++        .iter()
++        .map(|(name, _)| 4 + name.len() + 12)
++        .sum::<usize>();
++    let mut bytes = Vec::new();
++    bytes.extend_from_slice(&0_u32.to_be_bytes());
++    bytes.extend_from_slice(&(entries.len() as u32).to_be_bytes());
++    let mut payload = Vec::new();
++    for (name, raw) in entries {
++        bytes.extend_from_slice(&(name.len() as u32).to_be_bytes());
++        bytes.extend_from_slice(name.as_bytes());
++        bytes.extend_from_slice(&((directory + payload.len()) as u32).to_be_bytes());
++        bytes.extend_from_slice(&(raw.len() as u32).to_be_bytes());
++        bytes.extend_from_slice(&crc32(raw).to_be_bytes());
++        payload.extend_from_slice(raw);
++    }
++    bytes.extend_from_slice(&payload);
++    bytes
++}
++
++fn inflate(body: &[u8]) -> Vec<u8> {
++    miniz_oxide::inflate::decompress_to_vec_zlib(body).unwrap()
++}
++
++#[test]
++fn launched_client_gets_the_card_art_its_own_pack_holds() {
++    let scratch = Scratch::new();
++    let assets = scratch.0.join("assets");
++    fs::create_dir(&assets).unwrap();
++    // The client's own manifest is CRLF; the appended row must keep that form.
++    fs::write(scratch.0.join("Assets_manifest.txt"), b"flat.dds,1,2\r\n").unwrap();
++    let card = b"\xff\xd8\xff\xe0 synthetic card".as_slice();
++    fs::write(
++        assets.join("assetpack000W_000.pack"),
++        pack(&[("images/card/1.jpg", card)]),
++    )
++    .unwrap();
++    fs::write(
++        assets.join("assetpack000_manifest.txt"),
++        format!(
++            "images/card/1.jpg,{},{}\r\nimages/card/2.jpg,7,8\r\n",
++            crc32(card),
++            card.len()
++        ),
++    )
++    .unwrap();
++    let plan = LaunchPlan::build(
++        &scratch.0,
++        "127.0.0.1:20042",
++        None,
++        LaunchSettings::default(),
++        &mut LocalLoginStub,
++    )
++    .unwrap();
++    let url = plan.assets.url.clone();
++    let ok = "HTTP/1.0 200 OK".to_owned();
++    // Appended rows change the manifest CRC, so the client fetches the native envelope.
++    let (status, envelope) = get(&url, "/manifest.txt.z");
++    assert_eq!(status, ok);
++    assert_eq!(envelope[..4], 0xA1B2_C3D4_u32.to_be_bytes());
++    let served = inflate(&envelope[8..]);
++    assert_eq!(
++        u32::from_be_bytes(envelope[4..8].try_into().unwrap()) as usize,
++        served.len()
++    );
++    let text = String::from_utf8(served.clone()).unwrap();
++    assert!(text.contains(&format!(
++        "images/card/1.jpg,{},{}\r\n",
++        crc32(card),
++        card.len()
++    )));
++    assert!(text.starts_with("flat.dds,1,2\r\n"));
++    assert!(!text.contains("images/card/2.jpg"));
++    assert_eq!(
++        get(&url, "/manifest.crc").1,
++        format!("{},{}\r\n", crc32(&served), served.len()).into_bytes()
++    );
++    // The face is served raw from the player's own pack.
++    assert_eq!(
++        get(&url, &format!("/562/images/card/1.jpg?{}", crc32(card))),
++        (ok, card.to_vec())
++    );
++    let missing = ("HTTP/1.0 404 Not Found".to_owned(), Vec::new());
++    for target in [
++        "/562/images/card/2.jpg?7".to_owned(),
++        format!("/562/images/../card/1.jpg?{}", crc32(card)),
++        format!("/562/images/card/1.jpg?{}", crc32(card) + 1),
++    ] {
++        assert_eq!(get(&url, &target), missing, "{target}");
++    }
++}

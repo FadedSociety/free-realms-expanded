@@ -158,11 +158,14 @@ else:
     (server / "Config.json").write_text(json.dumps(config, indent=2), encoding="utf-8")
     server_command = [str(server / "OSFRServer.exe"), "--verbose"]
 endpoint = f"127.0.0.1:{front.getsockname()[1]}"
-# OSFR v1.0 release documents serving manifest.crc locally. Its published
-# CRC/length pair matches zlib.crc32(Assets_manifest.txt); use this run's own
-# preserved manifest so the client does not request an unrelated asset set.
+# OSFR v1.0 release documents serving manifest.crc locally; use this run's own
+# preserved manifest so the client does not request an unrelated asset set. The
+# client's own downloaded TCG pack (`assets/assetpack000*`) rows it holds are
+# appended so the card window's faces can resolve, and only those: nothing is
+# offered whose bytes the client's own pack lacks.
 manifest_bytes = (client / "Assets_manifest.txt").read_bytes()
-manifest_crc = manifest_crc_body(manifest_bytes)
+asset_delivery = AssetDelivery(lab, manifest_bytes, client)
+manifest_crc = manifest_crc_body(asset_delivery.served_manifest)
 # The card window's own asset set (`tcg/AssetsTcg_manifest.txt`) is answered under /tcg/: its CRC
 # check passes against this run's local copy, and the local TCG pack already holds every file.
 tcg_routes = {}
@@ -172,7 +175,6 @@ if (client / "tcg/AssetsTcg_manifest.txt").is_file():
                   "/tcg/manifest.txt.z": manifest_wire(tcg_manifest)}
 http_requests = []
 http_counts = Counter()
-asset_delivery = AssetDelivery(lab, manifest_bytes)
 asset_proofs = {}
 http_metrics_lock = threading.Lock()
 
@@ -263,6 +265,7 @@ result = {"run_directory": str(run), "started_utc": datetime.now(timezone.utc).i
           "client_endpoint": endpoint, "server_port": server_port,
           "asset_url": asset_url, "asset_manifest_crc": manifest_crc.decode("ascii").strip(),
           "asset_manifest_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
+          "asset_manifest_client_pack_rows": asset_delivery.client_rows,
           "relay_receive_buffer_bytes": back.getsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF),
           "input_automation": False, "configuration_backup": str(before)}
 result["developer_tools_enabled"] = run_options.dev_tools
