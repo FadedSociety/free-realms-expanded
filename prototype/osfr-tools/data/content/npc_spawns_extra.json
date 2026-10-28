@@ -64158,6 +64158,4240 @@
         }
       ],
       "position_w": null
+    },
+    {
+      "spawn_guid": 100000033100,
+      "legacy_npc_id": null,
+      "model_id": 403,
+      "model_file_name": "rabbit.adr",
+      "name": "Rabbit",
+      "name_string_id": 4231,
+      "position": [
+        -1430.057,
+        -31.778555,
+        217.45319
+      ],
+      "heading": -1.83717773,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3391 spawnNpcWithGuid(33100); src/Resources/Npcs.json Id=33100 (ModelId 403, ModelFileName rabbit.adr, NameId 4231, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.4231 = Rabbit (lab/reports/locale-id-to-text.json); Models.txt 403 = rabbit.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033111,
+      "legacy_npc_id": null,
+      "model_id": 384,
+      "model_file_name": "fairy_sanctuary_f.adr",
+      "name": "Dog Owner",
+      "name_string_id": 74626,
+      "position": [
+        -1396.3861,
+        -30.62195,
+        242.5025
+      ],
+      "heading": -1.55872703,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3402 spawnNpcWithGuid(33111); src/Resources/Npcs.json Id=33111 (ModelId 384, ModelFileName fairy_sanctuary_f.adr, NameId 74626, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.74626 = Dog Owner (lab/reports/locale-id-to-text.json); Models.txt 384 = fairy_sanctuary_f.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033112,
+      "legacy_npc_id": null,
+      "model_id": 555,
+      "model_file_name": "human_m_freestyle_09.agr",
+      "name": "Dog Owner",
+      "name_string_id": 74626,
+      "position": [
+        -1398.686,
+        -30.58393,
+        242.39099
+      ],
+      "heading": 1.58826399,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3403 spawnNpcWithGuid(33112); src/Resources/Npcs.json Id=33112 (ModelId 555, ModelFileName human_m_freestyle_09.agr, NameId 74626, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.74626 = Dog Owner (lab/reports/locale-id-to-text.json); Models.txt 555 = human_m_freestyle_09.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033114,
+      "legacy_npc_id": null,
+      "model_id": 173,
+      "model_file_name": "dog_small_pointy.adr",
+      "name": "Dog",
+      "name_string_id": 2239,
+      "position": [
+        -1402.1168,
+        -30.520235,
+        246.3921
+      ],
+      "heading": 2.12774326,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3405 spawnNpcWithGuid(33114); src/Resources/Npcs.json Id=33114 (ModelId 173, ModelFileName dog_small_pointy.adr, NameId 2239, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2239 = Dog (lab/reports/locale-id-to-text.json); Models.txt 173 = dog_small_pointy.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033118,
+      "legacy_npc_id": null,
+      "model_id": 169,
+      "model_file_name": "dog_large_floppy.adr",
+      "name": "Buddy",
+      "name_string_id": 91516,
+      "position": [
+        -1389.403,
+        -30.39674,
+        248.30171
+      ],
+      "heading": 0.56553738,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3409 spawnNpcWithGuid(33118); src/Resources/Npcs.json Id=33118 (ModelId 169, ModelFileName dog_large_floppy.adr, NameId 91516, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.91516 = Buddy (lab/reports/locale-id-to-text.json); Models.txt 169 = dog_large_floppy.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033119,
+      "legacy_npc_id": null,
+      "model_id": 170,
+      "model_file_name": "dog_large_pointy.adr",
+      "name": "Dog",
+      "name_string_id": 2239,
+      "position": [
+        -1386.3997,
+        -30.40755,
+        248.02258
+      ],
+      "heading": 1.04477538,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3410 spawnNpcWithGuid(33119); src/Resources/Npcs.json Id=33119 (ModelId 170, ModelFileName dog_large_pointy.adr, NameId 2239, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2239 = Dog (lab/reports/locale-id-to-text.json); Models.txt 170 = dog_large_pointy.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033120,
+      "legacy_npc_id": null,
+      "model_id": 172,
+      "model_file_name": "dog_small_floppy.adr",
+      "name": "Dog",
+      "name_string_id": 2239,
+      "position": [
+        -1382.0438,
+        -30.407446,
+        252.23578
+      ],
+      "heading": 1.283852,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3411 spawnNpcWithGuid(33120); src/Resources/Npcs.json Id=33120 (ModelId 172, ModelFileName dog_small_floppy.adr, NameId 2239, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2239 = Dog (lab/reports/locale-id-to-text.json); Models.txt 172 = dog_small_floppy.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033121,
+      "legacy_npc_id": null,
+      "model_id": 384,
+      "model_file_name": "fairy_sanctuary_f.adr",
+      "name": "Dog Owner",
+      "name_string_id": 74626,
+      "position": [
+        -1379.7146,
+        -30.408886,
+        252.92238
+      ],
+      "heading": -1.85656202,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3412 spawnNpcWithGuid(33121); src/Resources/Npcs.json Id=33121 (ModelId 384, ModelFileName fairy_sanctuary_f.adr, NameId 74626, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.74626 = Dog Owner (lab/reports/locale-id-to-text.json); Models.txt 384 = fairy_sanctuary_f.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033166,
+      "legacy_npc_id": null,
+      "model_id": 403,
+      "model_file_name": "rabbit.adr",
+      "name": "Rabbit",
+      "name_string_id": 4231,
+      "position": [
+        -1450.3767,
+        -32.58472,
+        355.83633
+      ],
+      "heading": 2.08797597,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3457 spawnNpcWithGuid(33166); src/Resources/Npcs.json Id=33166 (ModelId 403, ModelFileName rabbit.adr, NameId 4231, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.4231 = Rabbit (lab/reports/locale-id-to-text.json); Models.txt 403 = rabbit.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033318,
+      "legacy_npc_id": null,
+      "model_id": 241,
+      "model_file_name": "fairychild_f_pigtailsdress.adr",
+      "name": "Pixie Child",
+      "name_string_id": 15903,
+      "position": [
+        -1377.5925,
+        -27.034447,
+        320.0037
+      ],
+      "heading": -1.39532195,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3549 spawnNpcWithGuid(33318); src/Resources/Npcs.json Id=33318 (ModelId 241, ModelFileName fairychild_f_pigtailsdress.adr, NameId 15903, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.15903 = Pixie Child (lab/reports/locale-id-to-text.json); Models.txt 241 = fairychild_f_pigtailsdress.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033360,
+      "legacy_npc_id": null,
+      "model_id": 403,
+      "model_file_name": "rabbit.adr",
+      "name": "Rabbit",
+      "name_string_id": 4231,
+      "position": [
+        -1405.7081,
+        -32.7463,
+        415.35898
+      ],
+      "heading": -0.819914232,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3590 spawnNpcWithGuid(33360); src/Resources/Npcs.json Id=33360 (ModelId 403, ModelFileName rabbit.adr, NameId 4231, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.4231 = Rabbit (lab/reports/locale-id-to-text.json); Models.txt 403 = rabbit.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033361,
+      "legacy_npc_id": null,
+      "model_id": 402,
+      "model_file_name": "squirrel.adr",
+      "name": "Squirrel",
+      "name_string_id": 4233,
+      "position": [
+        -1394.5199,
+        -32.269848,
+        459.49216
+      ],
+      "heading": 0.74785035,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3591 spawnNpcWithGuid(33361); src/Resources/Npcs.json Id=33361 (ModelId 402, ModelFileName squirrel.adr, NameId 4233, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.4233 = Squirrel (lab/reports/locale-id-to-text.json); Models.txt 402 = squirrel.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033368,
+      "legacy_npc_id": null,
+      "model_id": 889,
+      "model_file_name": "human_f_sanctuary.adr",
+      "name": "Shopper",
+      "name_string_id": 76404,
+      "position": [
+        -1279.4806,
+        -14.784537,
+        312.4176
+      ],
+      "heading": 0.0930468056,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3593 spawnNpcWithGuid(33368); src/Resources/Npcs.json Id=33368 (ModelId 889, ModelFileName human_f_sanctuary.adr, NameId 76404, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.76404 = Shopper (lab/reports/locale-id-to-text.json); Models.txt 889 = human_f_sanctuary.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033401,
+      "legacy_npc_id": null,
+      "model_id": 241,
+      "model_file_name": "fairychild_f_pigtailsdress.adr",
+      "name": "May",
+      "name_string_id": 10091,
+      "position": [
+        -1348.6791,
+        -29.548563,
+        170.08826
+      ],
+      "heading": -0.920198039,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3625 spawnNpcWithGuid(33401); src/Resources/Npcs.json Id=33401 (ModelId 241, ModelFileName fairychild_f_pigtailsdress.adr, NameId 10091, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.10091 = May (lab/reports/locale-id-to-text.json); Models.txt 241 = fairychild_f_pigtailsdress.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033412,
+      "legacy_npc_id": null,
+      "model_id": 12,
+      "model_file_name": "fairychild_m_pointyhair.adr",
+      "name": "June",
+      "name_string_id": 10092,
+      "position": [
+        -1351.1377,
+        -29.43583,
+        164.047
+      ],
+      "heading": -2.86578513,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3636 spawnNpcWithGuid(33412); src/Resources/Npcs.json Id=33412 (ModelId 12, ModelFileName fairychild_m_pointyhair.adr, NameId 10092, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.10092 = June (lab/reports/locale-id-to-text.json); Models.txt 12 = fairychild_m_pointyhair.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033443,
+      "legacy_npc_id": null,
+      "model_id": 345,
+      "model_file_name": "fairy_royalguard_m.adr",
+      "name": "Royal Guard",
+      "name_string_id": 15915,
+      "position": [
+        -1225.7955,
+        2.64537,
+        314.2979
+      ],
+      "heading": -1.54870999,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3667 spawnNpcWithGuid(33443); src/Resources/Npcs.json Id=33443 (ModelId 345, ModelFileName fairy_royalguard_m.adr, NameId 15915, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.15915 = Royal Guard (lab/reports/locale-id-to-text.json); Models.txt 345 = fairy_royalguard_m.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033444,
+      "legacy_npc_id": null,
+      "model_id": 345,
+      "model_file_name": "fairy_royalguard_m.adr",
+      "name": "Royal Guard",
+      "name_string_id": 15915,
+      "position": [
+        -1225.8984,
+        2.57755,
+        301.2252
+      ],
+      "heading": -1.39408004,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3668 spawnNpcWithGuid(33444); src/Resources/Npcs.json Id=33444 (ModelId 345, ModelFileName fairy_royalguard_m.adr, NameId 15915, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.15915 = Royal Guard (lab/reports/locale-id-to-text.json); Models.txt 345 = fairy_royalguard_m.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033448,
+      "legacy_npc_id": null,
+      "model_id": 384,
+      "model_file_name": "fairy_sanctuary_f.adr",
+      "name": "Shopper",
+      "name_string_id": 76404,
+      "position": [
+        -1251.9866,
+        -14.225539,
+        167.01625
+      ],
+      "heading": 2.61217499,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3672 spawnNpcWithGuid(33448); src/Resources/Npcs.json Id=33448 (ModelId 384, ModelFileName fairy_sanctuary_f.adr, NameId 76404, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.76404 = Shopper (lab/reports/locale-id-to-text.json); Models.txt 384 = fairy_sanctuary_f.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033452,
+      "legacy_npc_id": null,
+      "model_id": 545,
+      "model_file_name": "human_f_freestyle_03.agr",
+      "name": "Shopper",
+      "name_string_id": 76404,
+      "position": [
+        -1255.6029,
+        -14.283214,
+        165.63243
+      ],
+      "heading": -2.01428484,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3675 spawnNpcWithGuid(33452); src/Resources/Npcs.json Id=33452 (ModelId 545, ModelFileName human_f_freestyle_03.agr, NameId 76404, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.76404 = Shopper (lab/reports/locale-id-to-text.json); Models.txt 545 = human_f_freestyle_03.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033586,
+      "legacy_npc_id": null,
+      "model_id": 15,
+      "model_file_name": "chugawug_m_miner_01.adr",
+      "name": "Builder2",
+      "name_string_id": 430054,
+      "position": [
+        127.50063,
+        77.40744,
+        217.2745
+      ],
+      "heading": 2.48868295,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3808 spawnNpcWithGuid(33586); src/Resources/Npcs.json Id=33586 (ModelId 15, ModelFileName chugawug_m_miner_01.adr, NameId 430054, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.430054 = Builder2 (lab/reports/locale-id-to-text.json); Models.txt 15 = chugawug_m_miner_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033590,
+      "legacy_npc_id": null,
+      "model_id": 38,
+      "model_file_name": "human_m_miner_01.adr",
+      "name": "Builder1",
+      "name_string_id": 430053,
+      "position": [
+        129.25043,
+        77.595795,
+        216.25696
+      ],
+      "heading": -0.963508048,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3812 spawnNpcWithGuid(33590); src/Resources/Npcs.json Id=33590 (ModelId 38, ModelFileName human_m_miner_01.adr, NameId 430053, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.430053 = Builder1 (lab/reports/locale-id-to-text.json); Models.txt 38 = human_m_miner_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033591,
+      "legacy_npc_id": null,
+      "model_id": 391,
+      "model_file_name": "fairy_m_warrior_01.agr",
+      "name": "Noob Warrior",
+      "name_string_id": 71401,
+      "position": [
+        253.37454,
+        47.74012,
+        219.73053
+      ],
+      "heading": 2.63921,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3813 spawnNpcWithGuid(33591); src/Resources/Npcs.json Id=33591 (ModelId 391, ModelFileName fairy_m_warrior_01.agr, NameId 71401, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.71401 = Noob Warrior (lab/reports/locale-id-to-text.json); Models.txt 391 = fairy_m_warrior_01.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033593,
+      "legacy_npc_id": null,
+      "model_id": 135,
+      "model_file_name": "billygoat.adr",
+      "name": "Billygoat",
+      "name_string_id": 18744,
+      "position": [
+        192.5776,
+        68.14587,
+        241.89723
+      ],
+      "heading": 1.27154196,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3815 spawnNpcWithGuid(33593); src/Resources/Npcs.json Id=33593 (ModelId 135, ModelFileName billygoat.adr, NameId 18744, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.18744 = Billygoat (lab/reports/locale-id-to-text.json); Models.txt 135 = billygoat.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033594,
+      "legacy_npc_id": null,
+      "model_id": 136,
+      "model_file_name": "nannygoat.adr",
+      "name": "Goat",
+      "name_string_id": 5254,
+      "position": [
+        192.15997,
+        68.15102,
+        243.82843
+      ],
+      "heading": 2.23610901,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3816 spawnNpcWithGuid(33594); src/Resources/Npcs.json Id=33594 (ModelId 136, ModelFileName nannygoat.adr, NameId 5254, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.5254 = Goat (lab/reports/locale-id-to-text.json); Models.txt 136 = nannygoat.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033597,
+      "legacy_npc_id": null,
+      "model_id": 132,
+      "model_file_name": "forest_buck.adr",
+      "name": "Deer",
+      "name_string_id": 2060,
+      "position": [
+        56.86481,
+        20.872908,
+        297.00925
+      ],
+      "heading": 2.27016259,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3819 spawnNpcWithGuid(33597); src/Resources/Npcs.json Id=33597 (ModelId 132, ModelFileName forest_buck.adr, NameId 2060, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2060 = Deer (lab/reports/locale-id-to-text.json); Models.txt 132 = forest_buck.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033611,
+      "legacy_npc_id": null,
+      "model_id": 382,
+      "model_file_name": "dwarf_miner_m.adr",
+      "name": "Dwarf",
+      "name_string_id": 2243,
+      "position": [
+        106.40485,
+        23.17146,
+        342.0469
+      ],
+      "heading": -1.46207296,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3832 spawnNpcWithGuid(33611); src/Resources/Npcs.json Id=33611 (ModelId 382, ModelFileName dwarf_miner_m.adr, NameId 2243, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2243 = Dwarf (lab/reports/locale-id-to-text.json); Models.txt 382 = dwarf_miner_m.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033612,
+      "legacy_npc_id": null,
+      "model_id": 14,
+      "model_file_name": "chugawug_m_01.adr",
+      "name": "Chugawug",
+      "name_string_id": 2236,
+      "position": [
+        103.67694,
+        23.51829,
+        342.08643
+      ],
+      "heading": 1.53471005,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3833 spawnNpcWithGuid(33612); src/Resources/Npcs.json Id=33612 (ModelId 14, ModelFileName chugawug_m_01.adr, NameId 2236, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2236 = Chugawug (lab/reports/locale-id-to-text.json); Models.txt 14 = chugawug_m_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033618,
+      "legacy_npc_id": null,
+      "model_id": 19,
+      "model_file_name": "humanchild_f_skates.adr",
+      "name": "Smart Kid",
+      "name_string_id": 36749,
+      "position": [
+        119.4824,
+        22.095486,
+        386.24805
+      ],
+      "heading": -1.57174397,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3839 spawnNpcWithGuid(33618); src/Resources/Npcs.json Id=33618 (ModelId 19, ModelFileName humanchild_f_skates.adr, NameId 36749, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.36749 = Smart Kid (lab/reports/locale-id-to-text.json); Models.txt 19 = humanchild_f_skates.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033619,
+      "legacy_npc_id": null,
+      "model_id": 8,
+      "model_file_name": "humanchild_m_tshirtwithbaggypants.adr",
+      "name": "Smart Kid",
+      "name_string_id": 36749,
+      "position": [
+        119.185974,
+        22.043234,
+        384.4489
+      ],
+      "heading": -1.40957904,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3840 spawnNpcWithGuid(33619); src/Resources/Npcs.json Id=33619 (ModelId 8, ModelFileName humanchild_m_tshirtwithbaggypants.adr, NameId 36749, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.36749 = Smart Kid (lab/reports/locale-id-to-text.json); Models.txt 8 = humanchild_m_tshirtwithbaggypants.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033637,
+      "legacy_npc_id": null,
+      "model_id": 826,
+      "model_file_name": "human_f_snowhill.adr",
+      "name": "Customer",
+      "name_string_id": 36719,
+      "position": [
+        198.86241,
+        23.00951,
+        356.02124
+      ],
+      "heading": -0.44849999,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3856 spawnNpcWithGuid(33637); src/Resources/Npcs.json Id=33637 (ModelId 826, ModelFileName human_f_snowhill.adr, NameId 36719, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.36719 = Customer (lab/reports/locale-id-to-text.json); Models.txt 826 = human_f_snowhill.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033638,
+      "legacy_npc_id": null,
+      "model_id": 826,
+      "model_file_name": "human_f_snowhill.adr",
+      "name": "Customer",
+      "name_string_id": 36719,
+      "position": [
+        198.23573,
+        23.01726,
+        357.24484
+      ],
+      "heading": 2.7102699,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3857 spawnNpcWithGuid(33638); src/Resources/Npcs.json Id=33638 (ModelId 826, ModelFileName human_f_snowhill.adr, NameId 36719, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.36719 = Customer (lab/reports/locale-id-to-text.json); Models.txt 826 = human_f_snowhill.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033639,
+      "legacy_npc_id": null,
+      "model_id": 837,
+      "model_file_name": "human_m_snowhill.adr",
+      "name": "Customer",
+      "name_string_id": 36719,
+      "position": [
+        199.56088,
+        23.02193,
+        354.58838
+      ],
+      "heading": 2.72495007,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3858 spawnNpcWithGuid(33639); src/Resources/Npcs.json Id=33639 (ModelId 837, ModelFileName human_m_snowhill.adr, NameId 36719, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.36719 = Customer (lab/reports/locale-id-to-text.json); Models.txt 837 = human_m_snowhill.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033640,
+      "legacy_npc_id": null,
+      "model_id": 837,
+      "model_file_name": "human_m_snowhill.adr",
+      "name": "Customer",
+      "name_string_id": 36719,
+      "position": [
+        197.67397,
+        22.91913,
+        358.50922
+      ],
+      "heading": 2.74459006,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3859 spawnNpcWithGuid(33640); src/Resources/Npcs.json Id=33640 (ModelId 837, ModelFileName human_m_snowhill.adr, NameId 36719, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.36719 = Customer (lab/reports/locale-id-to-text.json); Models.txt 837 = human_m_snowhill.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033643,
+      "legacy_npc_id": null,
+      "model_id": 339,
+      "model_file_name": "human_f_freestyle_01.agr",
+      "name": "Iggy's Owner",
+      "name_string_id": 24426,
+      "position": [
+        209.01079,
+        22.77694,
+        378.26913
+      ],
+      "heading": 0.68202377,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3862 spawnNpcWithGuid(33643); src/Resources/Npcs.json Id=33643 (ModelId 339, ModelFileName human_f_freestyle_01.agr, NameId 24426, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.24426 = Iggy's Owner (lab/reports/locale-id-to-text.json); Models.txt 339 = human_f_freestyle_01.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033655,
+      "legacy_npc_id": null,
+      "model_id": 41,
+      "model_file_name": "fairy_f_01.adr",
+      "name": "Pixie",
+      "name_string_id": 2231,
+      "position": [
+        165.78479,
+        28.02605,
+        422.5228
+      ],
+      "heading": -1.00600004,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3874 spawnNpcWithGuid(33655); src/Resources/Npcs.json Id=33655 (ModelId 41, ModelFileName fairy_f_01.adr, NameId 2231, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2231 = Pixie (lab/reports/locale-id-to-text.json); Models.txt 41 = fairy_f_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033656,
+      "legacy_npc_id": null,
+      "model_id": 49,
+      "model_file_name": "fairy_m_02.adr",
+      "name": "Pixie",
+      "name_string_id": 2231,
+      "position": [
+        163.675,
+        27.86546,
+        423.6749
+      ],
+      "heading": 2.07149004,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3875 spawnNpcWithGuid(33656); src/Resources/Npcs.json Id=33656 (ModelId 49, ModelFileName fairy_m_02.adr, NameId 2231, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2231 = Pixie (lab/reports/locale-id-to-text.json); Models.txt 49 = fairy_m_02.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033658,
+      "legacy_npc_id": null,
+      "model_id": 321,
+      "model_file_name": "human_f_diana.adr",
+      "name": "Storyteller",
+      "name_string_id": 421106,
+      "position": [
+        215.15163,
+        23.681824,
+        408.54498
+      ],
+      "heading": -0.0145129998,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3876 spawnNpcWithGuid(33658); src/Resources/Npcs.json Id=33658 (ModelId 321, ModelFileName human_f_diana.adr, NameId 421106, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.421106 = Storyteller (lab/reports/locale-id-to-text.json); Models.txt 321 = human_f_diana.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033659,
+      "legacy_npc_id": null,
+      "model_id": 7,
+      "model_file_name": "humanchild_f_skirtandtunic.adr",
+      "name": "Human Child",
+      "name_string_id": 3277,
+      "position": [
+        216.25394,
+        24.023422,
+        412.0741
+      ],
+      "heading": -2.74811699,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3877 spawnNpcWithGuid(33659); src/Resources/Npcs.json Id=33659 (ModelId 7, ModelFileName humanchild_f_skirtandtunic.adr, NameId 3277, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.3277 = Human Child (lab/reports/locale-id-to-text.json); Models.txt 7 = humanchild_f_skirtandtunic.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033660,
+      "legacy_npc_id": null,
+      "model_id": 688,
+      "model_file_name": "humanchild_m_afro.adr",
+      "name": "Human Child",
+      "name_string_id": 3277,
+      "position": [
+        214.98738,
+        24.128159,
+        412.17505
+      ],
+      "heading": 3.12737989,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3878 spawnNpcWithGuid(33660); src/Resources/Npcs.json Id=33660 (ModelId 688, ModelFileName humanchild_m_afro.adr, NameId 3277, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.3277 = Human Child (lab/reports/locale-id-to-text.json); Models.txt 688 = humanchild_m_afro.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033661,
+      "legacy_npc_id": null,
+      "model_id": 9,
+      "model_file_name": "humanchild_m_tshirtwithbeltbig.adr",
+      "name": "Human Child",
+      "name_string_id": 3277,
+      "position": [
+        213.32672,
+        24.14536,
+        411.85242
+      ],
+      "heading": 2.72654794,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3879 spawnNpcWithGuid(33661); src/Resources/Npcs.json Id=33661 (ModelId 9, ModelFileName humanchild_m_tshirtwithbeltbig.adr, NameId 3277, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.3277 = Human Child (lab/reports/locale-id-to-text.json); Models.txt 9 = humanchild_m_tshirtwithbeltbig.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033673,
+      "legacy_npc_id": null,
+      "model_id": 41,
+      "model_file_name": "fairy_f_01.adr",
+      "name": "Edward",
+      "name_string_id": 39812,
+      "position": [
+        263.76233,
+        23.93757,
+        281.1213
+      ],
+      "heading": -0.183090008,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3891 spawnNpcWithGuid(33673); src/Resources/Npcs.json Id=33673 (ModelId 41, ModelFileName fairy_f_01.adr, NameId 39812, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.39812 = Edward (lab/reports/locale-id-to-text.json); Models.txt 41 = fairy_f_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033675,
+      "legacy_npc_id": null,
+      "model_id": 382,
+      "model_file_name": "dwarf_miner_m.adr",
+      "name": "Miner",
+      "name_string_id": 2470,
+      "position": [
+        262.02832,
+        23.181099,
+        336.1552
+      ],
+      "heading": -2.88087844,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3892 spawnNpcWithGuid(33675); src/Resources/Npcs.json Id=33675 (ModelId 382, ModelFileName dwarf_miner_m.adr, NameId 2470, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2470 = Miner (lab/reports/locale-id-to-text.json); Models.txt 382 = dwarf_miner_m.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033681,
+      "legacy_npc_id": null,
+      "model_id": 385,
+      "model_file_name": "fairy_f_warrior_01.agr",
+      "name": "Noob Warrior",
+      "name_string_id": 71401,
+      "position": [
+        256.87262,
+        47.97723,
+        217.21951
+      ],
+      "heading": -1.00746599,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3895 spawnNpcWithGuid(33681); src/Resources/Npcs.json Id=33681 (ModelId 385, ModelFileName fairy_f_warrior_01.agr, NameId 71401, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.71401 = Noob Warrior (lab/reports/locale-id-to-text.json); Models.txt 385 = fairy_f_warrior_01.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033683,
+      "legacy_npc_id": null,
+      "model_id": 38,
+      "model_file_name": "human_m_miner_01.adr",
+      "name": "Human",
+      "name_string_id": 2230,
+      "position": [
+        203.41928,
+        28.094063,
+        433.78305
+      ],
+      "heading": -1.09328412,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3897 spawnNpcWithGuid(33683); src/Resources/Npcs.json Id=33683 (ModelId 38, ModelFileName human_m_miner_01.adr, NameId 2230, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2230 = Human (lab/reports/locale-id-to-text.json); Models.txt 38 = human_m_miner_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033684,
+      "legacy_npc_id": null,
+      "model_id": 173,
+      "model_file_name": "dog_small_pointy.adr",
+      "name": "Dog",
+      "name_string_id": 2239,
+      "position": [
+        208.48053,
+        27.962614,
+        428.27914
+      ],
+      "heading": -1.63031793,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3898 spawnNpcWithGuid(33684); src/Resources/Npcs.json Id=33684 (ModelId 173, ModelFileName dog_small_pointy.adr, NameId 2239, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2239 = Dog (lab/reports/locale-id-to-text.json); Models.txt 173 = dog_small_pointy.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033686,
+      "legacy_npc_id": null,
+      "model_id": 780,
+      "model_file_name": "human_sanctuary_m.adr",
+      "name": "Human",
+      "name_string_id": 2230,
+      "position": [
+        197.34506,
+        28.990257,
+        438.75992
+      ],
+      "heading": -0.962950631,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3900 spawnNpcWithGuid(33686); src/Resources/Npcs.json Id=33686 (ModelId 780, ModelFileName human_sanctuary_m.adr, NameId 2230, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2230 = Human (lab/reports/locale-id-to-text.json); Models.txt 780 = human_sanctuary_m.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033687,
+      "legacy_npc_id": null,
+      "model_id": 505,
+      "model_file_name": "human_m_freestyle_11.agr",
+      "name": "Human",
+      "name_string_id": 2230,
+      "position": [
+        200.31204,
+        28.914505,
+        436.7041
+      ],
+      "heading": -0.81196234,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3901 spawnNpcWithGuid(33687); src/Resources/Npcs.json Id=33687 (ModelId 505, ModelFileName human_m_freestyle_11.agr, NameId 2230, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2230 = Human (lab/reports/locale-id-to-text.json); Models.txt 505 = human_m_freestyle_11.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033689,
+      "legacy_npc_id": null,
+      "model_id": 571,
+      "model_file_name": "fairy_f_freestyle_09.agr",
+      "name": "Pixie",
+      "name_string_id": 2231,
+      "position": [
+        241.3033,
+        26.26079,
+        416.6469
+      ],
+      "heading": 0.357899985,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3903 spawnNpcWithGuid(33689); src/Resources/Npcs.json Id=33689 (ModelId 571, ModelFileName fairy_f_freestyle_09.agr, NameId 2231, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2231 = Pixie (lab/reports/locale-id-to-text.json); Models.txt 571 = fairy_f_freestyle_09.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033693,
+      "legacy_npc_id": null,
+      "model_id": 403,
+      "model_file_name": "rabbit.adr",
+      "name": "Rabbit",
+      "name_string_id": 4231,
+      "position": [
+        258.6072,
+        26.864948,
+        397.46698
+      ],
+      "heading": -1.9114573,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3907 spawnNpcWithGuid(33693); src/Resources/Npcs.json Id=33693 (ModelId 403, ModelFileName rabbit.adr, NameId 4231, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.4231 = Rabbit (lab/reports/locale-id-to-text.json); Models.txt 403 = rabbit.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033697,
+      "legacy_npc_id": null,
+      "model_id": 222,
+      "model_file_name": "chugawug_f_02.adr",
+      "name": "Chugawug",
+      "name_string_id": 2236,
+      "position": [
+        242.06029,
+        26.29063,
+        418.80573
+      ],
+      "heading": -2.71497009,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3911 spawnNpcWithGuid(33697); src/Resources/Npcs.json Id=33697 (ModelId 222, ModelFileName chugawug_f_02.adr, NameId 2236, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2236 = Chugawug (lab/reports/locale-id-to-text.json); Models.txt 222 = chugawug_f_02.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033703,
+      "legacy_npc_id": null,
+      "model_id": 43,
+      "model_file_name": "fairy_f_03.adr",
+      "name": "Julie",
+      "name_string_id": 3310,
+      "position": [
+        293.3481,
+        24.85989,
+        277.51422
+      ],
+      "heading": 1.02848996,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3917 spawnNpcWithGuid(33703); src/Resources/Npcs.json Id=33703 (ModelId 43, ModelFileName fairy_f_03.adr, NameId 3310, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.3310 = Julie (lab/reports/locale-id-to-text.json); Models.txt 43 = fairy_f_03.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033704,
+      "legacy_npc_id": null,
+      "model_id": 42,
+      "model_file_name": "fairy_f_02.adr",
+      "name": "Brittany",
+      "name_string_id": 3062,
+      "position": [
+        295.2038,
+        24.509836,
+        279.01215
+      ],
+      "heading": -2.24316407,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3918 spawnNpcWithGuid(33704); src/Resources/Npcs.json Id=33704 (ModelId 42, ModelFileName fairy_f_02.adr, NameId 3062, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.3062 = Brittany (lab/reports/locale-id-to-text.json); Models.txt 42 = fairy_f_02.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033705,
+      "legacy_npc_id": null,
+      "model_id": 221,
+      "model_file_name": "chugawug_m_02.adr",
+      "name": "Tower Defender",
+      "name_string_id": 92420,
+      "position": [
+        286.25418,
+        26.521133,
+        363.2331
+      ],
+      "heading": 2.47036601,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3919 spawnNpcWithGuid(33705); src/Resources/Npcs.json Id=33705 (ModelId 221, ModelFileName chugawug_m_02.adr, NameId 92420, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.92420 = Tower Defender (lab/reports/locale-id-to-text.json); Models.txt 221 = chugawug_m_02.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033708,
+      "legacy_npc_id": null,
+      "model_id": 826,
+      "model_file_name": "human_f_snowhill.adr",
+      "name": "Tower Defender",
+      "name_string_id": 92420,
+      "position": [
+        288.69592,
+        26.17412,
+        360.6451
+      ],
+      "heading": -0.654699993,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3922 spawnNpcWithGuid(33708); src/Resources/Npcs.json Id=33708 (ModelId 826, ModelFileName human_f_snowhill.adr, NameId 92420, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.92420 = Tower Defender (lab/reports/locale-id-to-text.json); Models.txt 826 = human_f_snowhill.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033720,
+      "legacy_npc_id": null,
+      "model_id": 826,
+      "model_file_name": "human_f_snowhill.adr",
+      "name": "Human",
+      "name_string_id": 2230,
+      "position": [
+        301.55093,
+        25.56523,
+        348.3712
+      ],
+      "heading": -2.30893996,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3931 spawnNpcWithGuid(33720); src/Resources/Npcs.json Id=33720 (ModelId 826, ModelFileName human_f_snowhill.adr, NameId 2230, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2230 = Human (lab/reports/locale-id-to-text.json); Models.txt 826 = human_f_snowhill.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033721,
+      "legacy_npc_id": null,
+      "model_id": 837,
+      "model_file_name": "human_m_snowhill.adr",
+      "name": "Human",
+      "name_string_id": 2230,
+      "position": [
+        299.3808,
+        25.24769,
+        346.4185
+      ],
+      "heading": 0.988699961,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3932 spawnNpcWithGuid(33721); src/Resources/Npcs.json Id=33721 (ModelId 837, ModelFileName human_m_snowhill.adr, NameId 2230, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2230 = Human (lab/reports/locale-id-to-text.json); Models.txt 837 = human_m_snowhill.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033733,
+      "legacy_npc_id": null,
+      "model_id": 9,
+      "model_file_name": "humanchild_m_tshirtwithbeltbig.adr",
+      "name": "Joel",
+      "name_string_id": 3429,
+      "position": [
+        270.73727,
+        27.962193,
+        437.33044
+      ],
+      "heading": 2.39548992,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3942 spawnNpcWithGuid(33733); src/Resources/Npcs.json Id=33733 (ModelId 9, ModelFileName humanchild_m_tshirtwithbeltbig.adr, NameId 3429, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.3429 = Joel (lab/reports/locale-id-to-text.json); Models.txt 9 = humanchild_m_tshirtwithbeltbig.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033734,
+      "legacy_npc_id": null,
+      "model_id": 8,
+      "model_file_name": "humanchild_m_tshirtwithbaggypants.adr",
+      "name": "Brian",
+      "name_string_id": 3427,
+      "position": [
+        272.819,
+        28.957596,
+        435.25845
+      ],
+      "heading": -0.719456021,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3943 spawnNpcWithGuid(33734); src/Resources/Npcs.json Id=33734 (ModelId 8, ModelFileName humanchild_m_tshirtwithbaggypants.adr, NameId 3427, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.3427 = Brian (lab/reports/locale-id-to-text.json); Models.txt 8 = humanchild_m_tshirtwithbaggypants.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033752,
+      "legacy_npc_id": null,
+      "model_id": 382,
+      "model_file_name": "dwarf_miner_m.adr",
+      "name": "Miner",
+      "name_string_id": 2470,
+      "position": [
+        324.27948,
+        29.302073,
+        343.4458
+      ],
+      "heading": -1.73438216,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3953 spawnNpcWithGuid(33752); src/Resources/Npcs.json Id=33752 (ModelId 382, ModelFileName dwarf_miner_m.adr, NameId 2470, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2470 = Miner (lab/reports/locale-id-to-text.json); Models.txt 382 = dwarf_miner_m.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033759,
+      "legacy_npc_id": null,
+      "model_id": 826,
+      "model_file_name": "human_f_snowhill.adr",
+      "name": "Snowhill Neighbor",
+      "name_string_id": 36853,
+      "position": [
+        272.6024,
+        26.81921,
+        456.74362
+      ],
+      "heading": 0.730200004,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3954 spawnNpcWithGuid(33759); src/Resources/Npcs.json Id=33759 (ModelId 826, ModelFileName human_f_snowhill.adr, NameId 36853, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.36853 = Snowhill Neighbor (lab/reports/locale-id-to-text.json); Models.txt 826 = human_f_snowhill.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033760,
+      "legacy_npc_id": null,
+      "model_id": 504,
+      "model_file_name": "human_f_freestyle_07.agr",
+      "name": "Human",
+      "name_string_id": 2230,
+      "position": [
+        314.85168,
+        25.15953,
+        364.4867
+      ],
+      "heading": -0.0551900013,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3955 spawnNpcWithGuid(33760); src/Resources/Npcs.json Id=33760 (ModelId 504, ModelFileName human_f_freestyle_07.agr, NameId 2230, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2230 = Human (lab/reports/locale-id-to-text.json); Models.txt 504 = human_f_freestyle_07.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033766,
+      "legacy_npc_id": null,
+      "model_id": 8,
+      "model_file_name": "humanchild_m_tshirtwithbaggypants.adr",
+      "name": "Pleading Son",
+      "name_string_id": 36854,
+      "position": [
+        283.5709,
+        26.039423,
+        453.1799
+      ],
+      "heading": 0.818709024,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3961 spawnNpcWithGuid(33766); src/Resources/Npcs.json Id=33766 (ModelId 8, ModelFileName humanchild_m_tshirtwithbaggypants.adr, NameId 36854, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.36854 = Pleading Son (lab/reports/locale-id-to-text.json); Models.txt 8 = humanchild_m_tshirtwithbaggypants.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033767,
+      "legacy_npc_id": null,
+      "model_id": 170,
+      "model_file_name": "dog_large_pointy.adr",
+      "name": "Curious Dog",
+      "name_string_id": 46375,
+      "position": [
+        204.0,
+        34.317085,
+        501.95837
+      ],
+      "heading": 0.680256044,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3962 spawnNpcWithGuid(33767); src/Resources/Npcs.json Id=33767 (ModelId 170, ModelFileName dog_large_pointy.adr, NameId 46375, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.46375 = Curious Dog (lab/reports/locale-id-to-text.json); Models.txt 170 = dog_large_pointy.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033769,
+      "legacy_npc_id": null,
+      "model_id": 171,
+      "model_file_name": "dog_large_shortears.adr",
+      "name": "Backyard Dog",
+      "name_string_id": 92352,
+      "position": [
+        241.05609,
+        24.778809,
+        491.27936
+      ],
+      "heading": 1.92963803,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3964 spawnNpcWithGuid(33769); src/Resources/Npcs.json Id=33769 (ModelId 171, ModelFileName dog_large_shortears.adr, NameId 92352, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.92352 = Backyard Dog (lab/reports/locale-id-to-text.json); Models.txt 171 = dog_large_shortears.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000036286,
+      "legacy_npc_id": null,
+      "model_id": 780,
+      "model_file_name": "human_sanctuary_m.adr",
+      "name": "Human",
+      "name_string_id": 2230,
+      "position": [
+        272.576,
+        24.664322,
+        365.32654
+      ],
+      "heading": -0.605485404,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4264 spawnNpcWithGuid(36286); src/Resources/Npcs.json Id=36286 (ModelId 780, ModelFileName human_sanctuary_m.adr, NameId 2230, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2230 = Human (lab/reports/locale-id-to-text.json); Models.txt 780 = human_sanctuary_m.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033456,
+      "legacy_npc_id": null,
+      "model_id": 417,
+      "model_file_name": "duck_f_01.adr",
+      "name": "Lakeshore Duck",
+      "name_string_id": 73446,
+      "position": [
+        -774.4335,
+        -0.6943347,
+        860.22284
+      ],
+      "heading": -2.4822585,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3678 spawnNpcWithGuid(33456); src/Resources/Npcs.json Id=33456 (ModelId 417, ModelFileName duck_f_01.adr, NameId 73446, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.73446 = Lakeshore Duck (lab/reports/locale-id-to-text.json); Models.txt 417 = duck_f_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033459,
+      "legacy_npc_id": null,
+      "model_id": 131,
+      "model_file_name": "antelope_female.adr",
+      "name": "Antelope",
+      "name_string_id": 41197,
+      "position": [
+        -844.8772,
+        -11.31119,
+        987.9919
+      ],
+      "heading": 1.7216401,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3681 spawnNpcWithGuid(33459); src/Resources/Npcs.json Id=33459 (ModelId 131, ModelFileName antelope_female.adr, NameId 41197, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.41197 = Antelope (lab/reports/locale-id-to-text.json); Models.txt 131 = antelope_female.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033460,
+      "legacy_npc_id": null,
+      "model_id": 184,
+      "model_file_name": "human_m_freestyle_01.agr",
+      "name": "Fisherman",
+      "name_string_id": 20178,
+      "position": [
+        -735.3629,
+        -4.70594,
+        798.01855
+      ],
+      "heading": -3.10308003,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3682 spawnNpcWithGuid(33460); src/Resources/Npcs.json Id=33460 (ModelId 184, ModelFileName human_m_freestyle_01.agr, NameId 20178, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.20178 = Fisherman (lab/reports/locale-id-to-text.json); Models.txt 184 = human_m_freestyle_01.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033461,
+      "legacy_npc_id": null,
+      "model_id": 557,
+      "model_file_name": "human_m_freestyle_11.agr",
+      "name": "Fisherman",
+      "name_string_id": 20178,
+      "position": [
+        -753.32,
+        -7.398761,
+        813.43335
+      ],
+      "heading": -2.69000601,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3683 spawnNpcWithGuid(33461); src/Resources/Npcs.json Id=33461 (ModelId 557, ModelFileName human_m_freestyle_11.agr, NameId 20178, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.20178 = Fisherman (lab/reports/locale-id-to-text.json); Models.txt 557 = human_m_freestyle_11.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033462,
+      "legacy_npc_id": null,
+      "model_id": 398,
+      "model_file_name": "fairy_sanctuary_m_01.adr",
+      "name": "Fisherman",
+      "name_string_id": 20178,
+      "position": [
+        -754.2553,
+        -9.364044,
+        811.5317
+      ],
+      "heading": 0.481581013,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3684 spawnNpcWithGuid(33462); src/Resources/Npcs.json Id=33462 (ModelId 398, ModelFileName fairy_sanctuary_m_01.adr, NameId 20178, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.20178 = Fisherman (lab/reports/locale-id-to-text.json); Models.txt 398 = fairy_sanctuary_m_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033504,
+      "legacy_npc_id": null,
+      "model_id": 377,
+      "model_file_name": "fairy_farmer_f.adr",
+      "name": "Pixie Farmer",
+      "name_string_id": 78101,
+      "position": [
+        -800.17053,
+        5.1954865,
+        937.0818
+      ],
+      "heading": -1.34739483,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3726 spawnNpcWithGuid(33504); src/Resources/Npcs.json Id=33504 (ModelId 377, ModelFileName fairy_farmer_f.adr, NameId 78101, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.78101 = Pixie Farmer (lab/reports/locale-id-to-text.json); Models.txt 377 = fairy_farmer_f.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033513,
+      "legacy_npc_id": null,
+      "model_id": 424,
+      "model_file_name": "human_m_farmer_henry.agr",
+      "name": "Human Farmer",
+      "name_string_id": 78124,
+      "position": [
+        -791.6487,
+        5.30302,
+        932.34155
+      ],
+      "heading": 0.959262002,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3735 spawnNpcWithGuid(33513); src/Resources/Npcs.json Id=33513 (ModelId 424, ModelFileName human_m_farmer_henry.agr, NameId 78124, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.78124 = Human Farmer (lab/reports/locale-id-to-text.json); Models.txt 424 = human_m_farmer_henry.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033514,
+      "legacy_npc_id": null,
+      "model_id": 424,
+      "model_file_name": "human_m_farmer_henry.agr",
+      "name": "Human Farmer",
+      "name_string_id": 78124,
+      "position": [
+        -789.7915,
+        5.312377,
+        933.84924
+      ],
+      "heading": -2.22160102,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3736 spawnNpcWithGuid(33514); src/Resources/Npcs.json Id=33514 (ModelId 424, ModelFileName human_m_farmer_henry.agr, NameId 78124, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.78124 = Human Farmer (lab/reports/locale-id-to-text.json); Models.txt 424 = human_m_farmer_henry.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033543,
+      "legacy_npc_id": null,
+      "model_id": 545,
+      "model_file_name": "human_f_freestyle_03.agr",
+      "name": "Human Girl",
+      "name_string_id": 21359,
+      "position": [
+        -750.3093,
+        4.134318,
+        886.6468
+      ],
+      "heading": -3.00973797,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3765 spawnNpcWithGuid(33543); src/Resources/Npcs.json Id=33543 (ModelId 545, ModelFileName human_f_freestyle_03.agr, NameId 21359, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.21359 = Human Girl (lab/reports/locale-id-to-text.json); Models.txt 545 = human_f_freestyle_03.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033544,
+      "legacy_npc_id": null,
+      "model_id": 573,
+      "model_file_name": "fairy_f_freestyle_11.agr",
+      "name": "Pixie Girl",
+      "name_string_id": 21357,
+      "position": [
+        -747.22253,
+        3.614951,
+        883.3975
+      ],
+      "heading": -1.86554206,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3766 spawnNpcWithGuid(33544); src/Resources/Npcs.json Id=33544 (ModelId 573, ModelFileName fairy_f_freestyle_11.agr, NameId 21357, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.21357 = Pixie Girl (lab/reports/locale-id-to-text.json); Models.txt 573 = fairy_f_freestyle_11.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033547,
+      "legacy_npc_id": null,
+      "model_id": 403,
+      "model_file_name": "rabbit.adr",
+      "name": "Rabbit",
+      "name_string_id": 4231,
+      "position": [
+        -665.3996,
+        2.021712,
+        855.8546
+      ],
+      "heading": 1.49061656,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3769 spawnNpcWithGuid(33547); src/Resources/Npcs.json Id=33547 (ModelId 403, ModelFileName rabbit.adr, NameId 4231, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.4231 = Rabbit (lab/reports/locale-id-to-text.json); Models.txt 403 = rabbit.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033549,
+      "legacy_npc_id": null,
+      "model_id": 417,
+      "model_file_name": "duck_f_01.adr",
+      "name": "Lakeshore Duck",
+      "name_string_id": 73446,
+      "position": [
+        -751.0074,
+        5.9631066,
+        909.43195
+      ],
+      "heading": 0.211486696,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3771 spawnNpcWithGuid(33549); src/Resources/Npcs.json Id=33549 (ModelId 417, ModelFileName duck_f_01.adr, NameId 73446, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.73446 = Lakeshore Duck (lab/reports/locale-id-to-text.json); Models.txt 417 = duck_f_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033550,
+      "legacy_npc_id": null,
+      "model_id": 391,
+      "model_file_name": "fairy_m_warrior_01.agr",
+      "name": "Guard",
+      "name_string_id": 40577,
+      "position": [
+        -737.83606,
+        8.402511,
+        922.9496
+      ],
+      "heading": 1.56215918,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3772 spawnNpcWithGuid(33550); src/Resources/Npcs.json Id=33550 (ModelId 391, ModelFileName fairy_m_warrior_01.agr, NameId 40577, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.40577 = Guard (lab/reports/locale-id-to-text.json); Models.txt 391 = fairy_m_warrior_01.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033553,
+      "legacy_npc_id": null,
+      "model_id": 424,
+      "model_file_name": "human_m_farmer_henry.agr",
+      "name": "Human Farmer",
+      "name_string_id": 78124,
+      "position": [
+        -760.5936,
+        7.88313,
+        958.36084
+      ],
+      "heading": 2.27234918,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3775 spawnNpcWithGuid(33553); src/Resources/Npcs.json Id=33553 (ModelId 424, ModelFileName human_m_farmer_henry.agr, NameId 78124, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.78124 = Human Farmer (lab/reports/locale-id-to-text.json); Models.txt 424 = human_m_farmer_henry.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033554,
+      "legacy_npc_id": null,
+      "model_id": 32,
+      "model_file_name": "fairy_m_farmer_01.adr",
+      "name": "Pixie Farmer",
+      "name_string_id": 78101,
+      "position": [
+        -760.2949,
+        7.818255,
+        950.98584
+      ],
+      "heading": -1.60133231,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3776 spawnNpcWithGuid(33554); src/Resources/Npcs.json Id=33554 (ModelId 32, ModelFileName fairy_m_farmer_01.adr, NameId 78101, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.78101 = Pixie Farmer (lab/reports/locale-id-to-text.json); Models.txt 32 = fairy_m_farmer_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033555,
+      "legacy_npc_id": null,
+      "model_id": 403,
+      "model_file_name": "rabbit.adr",
+      "name": "Rabbit",
+      "name_string_id": 4231,
+      "position": [
+        -739.81213,
+        8.519882,
+        940.9581
+      ],
+      "heading": -2.2928569,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3777 spawnNpcWithGuid(33555); src/Resources/Npcs.json Id=33555 (ModelId 403, ModelFileName rabbit.adr, NameId 4231, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.4231 = Rabbit (lab/reports/locale-id-to-text.json); Models.txt 403 = rabbit.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033560,
+      "legacy_npc_id": null,
+      "model_id": 403,
+      "model_file_name": "rabbit.adr",
+      "name": "Rabbit",
+      "name_string_id": 4231,
+      "position": [
+        -733.328,
+        0.41548926,
+        1019.15857
+      ],
+      "heading": -1.166857,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3782 spawnNpcWithGuid(33560); src/Resources/Npcs.json Id=33560 (ModelId 403, ModelFileName rabbit.adr, NameId 4231, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.4231 = Rabbit (lab/reports/locale-id-to-text.json); Models.txt 403 = rabbit.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033563,
+      "legacy_npc_id": null,
+      "model_id": 131,
+      "model_file_name": "antelope_female.adr",
+      "name": "Antelope",
+      "name_string_id": 41197,
+      "position": [
+        -705.9405,
+        0.70518935,
+        1017.43396
+      ],
+      "heading": 1.10149516,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3785 spawnNpcWithGuid(33563); src/Resources/Npcs.json Id=33563 (ModelId 131, ModelFileName antelope_female.adr, NameId 41197, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.41197 = Antelope (lab/reports/locale-id-to-text.json); Models.txt 131 = antelope_female.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033573,
+      "legacy_npc_id": null,
+      "model_id": 131,
+      "model_file_name": "antelope_female.adr",
+      "name": "Antelope",
+      "name_string_id": 41197,
+      "position": [
+        -606.93524,
+        0.5102767,
+        934.37103
+      ],
+      "heading": 2.64462422,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3795 spawnNpcWithGuid(33573); src/Resources/Npcs.json Id=33573 (ModelId 131, ModelFileName antelope_female.adr, NameId 41197, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.41197 = Antelope (lab/reports/locale-id-to-text.json); Models.txt 131 = antelope_female.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033574,
+      "legacy_npc_id": null,
+      "model_id": 131,
+      "model_file_name": "antelope_female.adr",
+      "name": "Antelope",
+      "name_string_id": 41197,
+      "position": [
+        -627.31506,
+        2.5469837,
+        990.36316
+      ],
+      "heading": -2.92986226,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3796 spawnNpcWithGuid(33574); src/Resources/Npcs.json Id=33574 (ModelId 131, ModelFileName antelope_female.adr, NameId 41197, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.41197 = Antelope (lab/reports/locale-id-to-text.json); Models.txt 131 = antelope_female.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033576,
+      "legacy_npc_id": null,
+      "model_id": 130,
+      "model_file_name": "antelope.adr",
+      "name": "Antelope",
+      "name_string_id": 41197,
+      "position": [
+        -598.7757,
+        0.95744044,
+        947.28467
+      ],
+      "heading": -1.43173671,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3798 spawnNpcWithGuid(33576); src/Resources/Npcs.json Id=33576 (ModelId 130, ModelFileName antelope.adr, NameId 41197, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.41197 = Antelope (lab/reports/locale-id-to-text.json); Models.txt 130 = antelope.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033579,
+      "legacy_npc_id": null,
+      "model_id": 131,
+      "model_file_name": "antelope_female.adr",
+      "name": "Antelope",
+      "name_string_id": 41197,
+      "position": [
+        -639.2516,
+        3.7423348,
+        903.63855
+      ],
+      "heading": 1.43616117,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3801 spawnNpcWithGuid(33579); src/Resources/Npcs.json Id=33579 (ModelId 131, ModelFileName antelope_female.adr, NameId 41197, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.41197 = Antelope (lab/reports/locale-id-to-text.json); Models.txt 131 = antelope_female.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033584,
+      "legacy_npc_id": null,
+      "model_id": 130,
+      "model_file_name": "antelope.adr",
+      "name": "Deer",
+      "name_string_id": 2060,
+      "position": [
+        -1.6447979,
+        14.004056,
+        310.42404
+      ],
+      "heading": -0.727977438,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3806 spawnNpcWithGuid(33584); src/Resources/Npcs.json Id=33584 (ModelId 130, ModelFileName antelope.adr, NameId 2060, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2060 = Deer (lab/reports/locale-id-to-text.json); Models.txt 130 = antelope.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033596,
+      "legacy_npc_id": null,
+      "model_id": 133,
+      "model_file_name": "forest_doe.adr",
+      "name": "Deer",
+      "name_string_id": 2060,
+      "position": [
+        12.653031,
+        13.937168,
+        274.1109
+      ],
+      "heading": 2.03864954,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3818 spawnNpcWithGuid(33596); src/Resources/Npcs.json Id=33596 (ModelId 133, ModelFileName forest_doe.adr, NameId 2060, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2060 = Deer (lab/reports/locale-id-to-text.json); Models.txt 133 = forest_doe.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033598,
+      "legacy_npc_id": null,
+      "model_id": 402,
+      "model_file_name": "squirrel.adr",
+      "name": "Squirrel",
+      "name_string_id": 4233,
+      "position": [
+        15.260172,
+        15.608151,
+        264.7178
+      ],
+      "heading": 0.689495603,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3820 spawnNpcWithGuid(33598); src/Resources/Npcs.json Id=33598 (ModelId 402, ModelFileName squirrel.adr, NameId 4233, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.4233 = Squirrel (lab/reports/locale-id-to-text.json); Models.txt 402 = squirrel.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033828,
+      "legacy_npc_id": null,
+      "model_id": 132,
+      "model_file_name": "forest_buck.adr",
+      "name": "Deer",
+      "name_string_id": 2060,
+      "position": [
+        -50.04388,
+        9.730134,
+        372.62122
+      ],
+      "heading": -1.04968309,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3991 spawnNpcWithGuid(33828); src/Resources/Npcs.json Id=33828 (ModelId 132, ModelFileName forest_buck.adr, NameId 2060, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2060 = Deer (lab/reports/locale-id-to-text.json); Models.txt 132 = forest_buck.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033829,
+      "legacy_npc_id": null,
+      "model_id": 131,
+      "model_file_name": "antelope_female.adr",
+      "name": "Deer",
+      "name_string_id": 2060,
+      "position": [
+        -19.773895,
+        12.107851,
+        322.70123
+      ],
+      "heading": -2.06792424,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3992 spawnNpcWithGuid(33829); src/Resources/Npcs.json Id=33829 (ModelId 131, ModelFileName antelope_female.adr, NameId 2060, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2060 = Deer (lab/reports/locale-id-to-text.json); Models.txt 131 = antelope_female.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033832,
+      "legacy_npc_id": null,
+      "model_id": 402,
+      "model_file_name": "squirrel.adr",
+      "name": "Squirrel",
+      "name_string_id": 4233,
+      "position": [
+        -34.712513,
+        7.231348,
+        305.87076
+      ],
+      "heading": -0.691460872,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3994 spawnNpcWithGuid(33832); src/Resources/Npcs.json Id=33832 (ModelId 402, ModelFileName squirrel.adr, NameId 4233, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.4233 = Squirrel (lab/reports/locale-id-to-text.json); Models.txt 402 = squirrel.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033833,
+      "legacy_npc_id": null,
+      "model_id": 402,
+      "model_file_name": "squirrel.adr",
+      "name": "Squirrel",
+      "name_string_id": 4233,
+      "position": [
+        -50.966377,
+        5.143218,
+        334.33746
+      ],
+      "heading": -2.88357423,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3995 spawnNpcWithGuid(33833); src/Resources/Npcs.json Id=33833 (ModelId 402, ModelFileName squirrel.adr, NameId 4233, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.4233 = Squirrel (lab/reports/locale-id-to-text.json); Models.txt 402 = squirrel.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033835,
+      "legacy_npc_id": null,
+      "model_id": 133,
+      "model_file_name": "forest_doe.adr",
+      "name": "Deer",
+      "name_string_id": 2060,
+      "position": [
+        -66.23153,
+        6.6802015,
+        358.57095
+      ],
+      "heading": 2.77160286,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3997 spawnNpcWithGuid(33835); src/Resources/Npcs.json Id=33835 (ModelId 133, ModelFileName forest_doe.adr, NameId 2060, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2060 = Deer (lab/reports/locale-id-to-text.json); Models.txt 133 = forest_doe.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033836,
+      "legacy_npc_id": null,
+      "model_id": 145,
+      "model_file_name": "cow.adr",
+      "name": "Cow",
+      "name_string_id": 313,
+      "position": [
+        -49.75366,
+        4.0502,
+        311.73724
+      ],
+      "heading": 2.98205997,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3998 spawnNpcWithGuid(33836); src/Resources/Npcs.json Id=33836 (ModelId 145, ModelFileName cow.adr, NameId 313, HideNamePlate true, Scale 1.25)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.313 = Cow (lab/reports/locale-id-to-text.json); Models.txt 145 = cow.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null,
+      "scale": 1.25
+    },
+    {
+      "spawn_guid": 100000033840,
+      "legacy_npc_id": null,
+      "model_id": 145,
+      "model_file_name": "cow.adr",
+      "name": "Cow",
+      "name_string_id": 313,
+      "position": [
+        -64.59987,
+        4.17014,
+        312.33826
+      ],
+      "heading": 1.76715004,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4001 spawnNpcWithGuid(33840); src/Resources/Npcs.json Id=33840 (ModelId 145, ModelFileName cow.adr, NameId 313, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.313 = Cow (lab/reports/locale-id-to-text.json); Models.txt 145 = cow.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033841,
+      "legacy_npc_id": null,
+      "model_id": 145,
+      "model_file_name": "cow.adr",
+      "name": "Cow",
+      "name_string_id": 313,
+      "position": [
+        -64.69276,
+        4.15729,
+        310.23187
+      ],
+      "heading": 1.31553997,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4002 spawnNpcWithGuid(33841); src/Resources/Npcs.json Id=33841 (ModelId 145, ModelFileName cow.adr, NameId 313, HideNamePlate true, Scale 0.75)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.313 = Cow (lab/reports/locale-id-to-text.json); Models.txt 145 = cow.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null,
+      "scale": 0.75
+    },
+    {
+      "spawn_guid": 100000033843,
+      "legacy_npc_id": null,
+      "model_id": 145,
+      "model_file_name": "cow.adr",
+      "name": "Cow",
+      "name_string_id": 313,
+      "position": [
+        -63.80554,
+        4.17678,
+        314.14618
+      ],
+      "heading": 2.29974007,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4004 spawnNpcWithGuid(33843); src/Resources/Npcs.json Id=33843 (ModelId 145, ModelFileName cow.adr, NameId 313, HideNamePlate true, Scale 0.75)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.313 = Cow (lab/reports/locale-id-to-text.json); Models.txt 145 = cow.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null,
+      "scale": 0.75
+    },
+    {
+      "spawn_guid": 100000033845,
+      "legacy_npc_id": null,
+      "model_id": 402,
+      "model_file_name": "squirrel.adr",
+      "name": "Squirrel",
+      "name_string_id": 4233,
+      "position": [
+        -36.289482,
+        10.780318,
+        249.15878
+      ],
+      "heading": -0.0217703834,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4005 spawnNpcWithGuid(33845); src/Resources/Npcs.json Id=33845 (ModelId 402, ModelFileName squirrel.adr, NameId 4233, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.4233 = Squirrel (lab/reports/locale-id-to-text.json); Models.txt 402 = squirrel.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033847,
+      "legacy_npc_id": null,
+      "model_id": 145,
+      "model_file_name": "cow.adr",
+      "name": "Cow",
+      "name_string_id": 313,
+      "position": [
+        -74.92757,
+        4.17864,
+        305.63315
+      ],
+      "heading": -1.72542,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4007 spawnNpcWithGuid(33847); src/Resources/Npcs.json Id=33847 (ModelId 145, ModelFileName cow.adr, NameId 313, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.313 = Cow (lab/reports/locale-id-to-text.json); Models.txt 145 = cow.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033848,
+      "legacy_npc_id": null,
+      "model_id": 145,
+      "model_file_name": "cow.adr",
+      "name": "Cow",
+      "name_string_id": 313,
+      "position": [
+        -75.94563,
+        4.02938,
+        308.34055
+      ],
+      "heading": -1.56588995,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4008 spawnNpcWithGuid(33848); src/Resources/Npcs.json Id=33848 (ModelId 145, ModelFileName cow.adr, NameId 313, HideNamePlate true, Scale 0.75)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.313 = Cow (lab/reports/locale-id-to-text.json); Models.txt 145 = cow.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null,
+      "scale": 0.75
+    },
+    {
+      "spawn_guid": 100000033859,
+      "legacy_npc_id": null,
+      "model_id": 424,
+      "model_file_name": "human_m_farmer_henry.agr",
+      "name": "Human Farmer",
+      "name_string_id": 78124,
+      "position": [
+        -51.830677,
+        11.045063,
+        234.14629
+      ],
+      "heading": 1.58215201,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4018 spawnNpcWithGuid(33859); src/Resources/Npcs.json Id=33859 (ModelId 424, ModelFileName human_m_farmer_henry.agr, NameId 78124, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.78124 = Human Farmer (lab/reports/locale-id-to-text.json); Models.txt 424 = human_m_farmer_henry.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033880,
+      "legacy_npc_id": null,
+      "model_id": 145,
+      "model_file_name": "cow.adr",
+      "name": "Cow",
+      "name_string_id": 313,
+      "position": [
+        -71.58083,
+        11.02579,
+        242.31525
+      ],
+      "heading": -0.0349499992,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4039 spawnNpcWithGuid(33880); src/Resources/Npcs.json Id=33880 (ModelId 145, ModelFileName cow.adr, NameId 313, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.313 = Cow (lab/reports/locale-id-to-text.json); Models.txt 145 = cow.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033882,
+      "legacy_npc_id": null,
+      "model_id": 377,
+      "model_file_name": "fairy_farmer_f.adr",
+      "name": "Pixie Farmer",
+      "name_string_id": 78101,
+      "position": [
+        -57.00597,
+        11.13576,
+        218.08044
+      ],
+      "heading": -2.87786006,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4041 spawnNpcWithGuid(33882); src/Resources/Npcs.json Id=33882 (ModelId 377, ModelFileName fairy_farmer_f.adr, NameId 78101, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.78101 = Pixie Farmer (lab/reports/locale-id-to-text.json); Models.txt 377 = fairy_farmer_f.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033901,
+      "legacy_npc_id": null,
+      "model_id": 424,
+      "model_file_name": "human_m_farmer_henry.agr",
+      "name": "Human Farmer",
+      "name_string_id": 78124,
+      "position": [
+        -78.25497,
+        11.04002,
+        234.3501
+      ],
+      "heading": -2.3006599,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4060 spawnNpcWithGuid(33901); src/Resources/Npcs.json Id=33901 (ModelId 424, ModelFileName human_m_farmer_henry.agr, NameId 78124, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.78124 = Human Farmer (lab/reports/locale-id-to-text.json); Models.txt 424 = human_m_farmer_henry.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033908,
+      "legacy_npc_id": null,
+      "model_id": 135,
+      "model_file_name": "billygoat.adr",
+      "name": "Billygoat",
+      "name_string_id": 18744,
+      "position": [
+        -44.741558,
+        39.02398,
+        194.2626
+      ],
+      "heading": -0.576254987,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4067 spawnNpcWithGuid(33908); src/Resources/Npcs.json Id=33908 (ModelId 135, ModelFileName billygoat.adr, NameId 18744, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.18744 = Billygoat (lab/reports/locale-id-to-text.json); Models.txt 135 = billygoat.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033923,
+      "legacy_npc_id": null,
+      "model_id": 424,
+      "model_file_name": "human_m_farmer_henry.agr",
+      "name": "Human Farmer",
+      "name_string_id": 78124,
+      "position": [
+        -70.73126,
+        11.196408,
+        213.75655
+      ],
+      "heading": 3.10249996,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4081 spawnNpcWithGuid(33923); src/Resources/Npcs.json Id=33923 (ModelId 424, ModelFileName human_m_farmer_henry.agr, NameId 78124, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.78124 = Human Farmer (lab/reports/locale-id-to-text.json); Models.txt 424 = human_m_farmer_henry.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033924,
+      "legacy_npc_id": null,
+      "model_id": 32,
+      "model_file_name": "fairy_m_farmer_01.adr",
+      "name": "Pixie Farmer",
+      "name_string_id": 78101,
+      "position": [
+        -77.53454,
+        11.026012,
+        217.02046
+      ],
+      "heading": 1.48347211,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4082 spawnNpcWithGuid(33924); src/Resources/Npcs.json Id=33924 (ModelId 32, ModelFileName fairy_m_farmer_01.adr, NameId 78101, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.78101 = Pixie Farmer (lab/reports/locale-id-to-text.json); Models.txt 32 = fairy_m_farmer_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033934,
+      "legacy_npc_id": null,
+      "model_id": 136,
+      "model_file_name": "nannygoat.adr",
+      "name": "Goat",
+      "name_string_id": 5254,
+      "position": [
+        -47.958866,
+        38.927246,
+        192.4029
+      ],
+      "heading": -0.576254987,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4092 spawnNpcWithGuid(33934); src/Resources/Npcs.json Id=33934 (ModelId 136, ModelFileName nannygoat.adr, NameId 5254, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.5254 = Goat (lab/reports/locale-id-to-text.json); Models.txt 136 = nannygoat.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033935,
+      "legacy_npc_id": null,
+      "model_id": 133,
+      "model_file_name": "forest_doe.adr",
+      "name": "Deer",
+      "name_string_id": 2060,
+      "position": [
+        -105.25094,
+        0.81284034,
+        311.85828
+      ],
+      "heading": 3.0483861,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4093 spawnNpcWithGuid(33935); src/Resources/Npcs.json Id=33935 (ModelId 133, ModelFileName forest_doe.adr, NameId 2060, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2060 = Deer (lab/reports/locale-id-to-text.json); Models.txt 133 = forest_doe.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033937,
+      "legacy_npc_id": null,
+      "model_id": 402,
+      "model_file_name": "squirrel.adr",
+      "name": "Squirrel",
+      "name_string_id": 4233,
+      "position": [
+        -108.97432,
+        -5.2243466,
+        357.33282
+      ],
+      "heading": -2.27999115,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4095 spawnNpcWithGuid(33937); src/Resources/Npcs.json Id=33937 (ModelId 402, ModelFileName squirrel.adr, NameId 4233, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.4233 = Squirrel (lab/reports/locale-id-to-text.json); Models.txt 402 = squirrel.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033938,
+      "legacy_npc_id": null,
+      "model_id": 131,
+      "model_file_name": "antelope_female.adr",
+      "name": "Deer",
+      "name_string_id": 2060,
+      "position": [
+        -120.829765,
+        -2.8187723,
+        267.5469
+      ],
+      "heading": 1.02659356,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4096 spawnNpcWithGuid(33938); src/Resources/Npcs.json Id=33938 (ModelId 131, ModelFileName antelope_female.adr, NameId 2060, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2060 = Deer (lab/reports/locale-id-to-text.json); Models.txt 131 = antelope_female.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033942,
+      "legacy_npc_id": null,
+      "model_id": 135,
+      "model_file_name": "billygoat.adr",
+      "name": "Billygoat",
+      "name_string_id": 18744,
+      "position": [
+        -57.889553,
+        42.18835,
+        179.48665
+      ],
+      "heading": -1.25611498,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4100 spawnNpcWithGuid(33942); src/Resources/Npcs.json Id=33942 (ModelId 135, ModelFileName billygoat.adr, NameId 18744, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.18744 = Billygoat (lab/reports/locale-id-to-text.json); Models.txt 135 = billygoat.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033943,
+      "legacy_npc_id": null,
+      "model_id": 130,
+      "model_file_name": "antelope.adr",
+      "name": "Deer",
+      "name_string_id": 2060,
+      "position": [
+        -25.938,
+        71.47934,
+        160.6147
+      ],
+      "heading": -0.611150007,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4101 spawnNpcWithGuid(33943); src/Resources/Npcs.json Id=33943 (ModelId 130, ModelFileName antelope.adr, NameId 2060, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2060 = Deer (lab/reports/locale-id-to-text.json); Models.txt 130 = antelope.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033946,
+      "legacy_npc_id": null,
+      "model_id": 548,
+      "model_file_name": "human_f_freestyle_06.agr",
+      "name": "Pet Owner",
+      "name_string_id": 70337,
+      "position": [
+        -137.40854,
+        -12.438289,
+        332.67838
+      ],
+      "heading": 0.620946101,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4104 spawnNpcWithGuid(33946); src/Resources/Npcs.json Id=33946 (ModelId 548, ModelFileName human_f_freestyle_06.agr, NameId 70337, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.70337 = Pet Owner (lab/reports/locale-id-to-text.json); Models.txt 548 = human_f_freestyle_06.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033948,
+      "legacy_npc_id": null,
+      "model_id": 172,
+      "model_file_name": "dog_small_floppy.adr",
+      "name": "Dog",
+      "name_string_id": 2239,
+      "position": [
+        -129.1991,
+        -11.427175,
+        349.53055
+      ],
+      "heading": 1.07665489,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4106 spawnNpcWithGuid(33948); src/Resources/Npcs.json Id=33948 (ModelId 172, ModelFileName dog_small_floppy.adr, NameId 2239, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2239 = Dog (lab/reports/locale-id-to-text.json); Models.txt 172 = dog_small_floppy.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033949,
+      "legacy_npc_id": null,
+      "model_id": 130,
+      "model_file_name": "antelope.adr",
+      "name": "Deer",
+      "name_string_id": 2060,
+      "position": [
+        -109.30648,
+        -0.15115309,
+        388.21054
+      ],
+      "heading": -2.00750663,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4107 spawnNpcWithGuid(33949); src/Resources/Npcs.json Id=33949 (ModelId 130, ModelFileName antelope.adr, NameId 2060, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2060 = Deer (lab/reports/locale-id-to-text.json); Models.txt 130 = antelope.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033950,
+      "legacy_npc_id": null,
+      "model_id": 130,
+      "model_file_name": "antelope.adr",
+      "name": "Deer",
+      "name_string_id": 2060,
+      "position": [
+        -104.15022,
+        3.0405195,
+        393.68564
+      ],
+      "heading": 0.0692069321,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4108 spawnNpcWithGuid(33950); src/Resources/Npcs.json Id=33950 (ModelId 130, ModelFileName antelope.adr, NameId 2060, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2060 = Deer (lab/reports/locale-id-to-text.json); Models.txt 130 = antelope.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033957,
+      "legacy_npc_id": null,
+      "model_id": 169,
+      "model_file_name": "dog_large_floppy.adr",
+      "name": "Dog",
+      "name_string_id": 2239,
+      "position": [
+        -141.23326,
+        -12.284404,
+        327.43686
+      ],
+      "heading": 1.12110331,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4115 spawnNpcWithGuid(33957); src/Resources/Npcs.json Id=33957 (ModelId 169, ModelFileName dog_large_floppy.adr, NameId 2239, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2239 = Dog (lab/reports/locale-id-to-text.json); Models.txt 169 = dog_large_floppy.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033963,
+      "legacy_npc_id": null,
+      "model_id": 136,
+      "model_file_name": "nannygoat.adr",
+      "name": "Goat",
+      "name_string_id": 5254,
+      "position": [
+        -89.858444,
+        22.66942,
+        170.83446
+      ],
+      "heading": -1.48682594,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4121 spawnNpcWithGuid(33963); src/Resources/Npcs.json Id=33963 (ModelId 136, ModelFileName nannygoat.adr, NameId 5254, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.5254 = Goat (lab/reports/locale-id-to-text.json); Models.txt 136 = nannygoat.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033976,
+      "legacy_npc_id": null,
+      "model_id": 978,
+      "model_file_name": "dog_large_lab.adr",
+      "name": "Dog",
+      "name_string_id": 2239,
+      "position": [
+        -153.45001,
+        -12.506359,
+        338.40073
+      ],
+      "heading": -2.80755637,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4134 spawnNpcWithGuid(33976); src/Resources/Npcs.json Id=33976 (ModelId 978, ModelFileName dog_large_lab.adr, NameId 2239, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2239 = Dog (lab/reports/locale-id-to-text.json); Models.txt 978 = dog_large_lab.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033977,
+      "legacy_npc_id": null,
+      "model_id": 171,
+      "model_file_name": "dog_large_shortears.adr",
+      "name": "Sleeping Dog",
+      "name_string_id": 415162,
+      "position": [
+        -150.57268,
+        -12.466326,
+        359.29904
+      ],
+      "heading": -2.99724889,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4135 spawnNpcWithGuid(33977); src/Resources/Npcs.json Id=33977 (ModelId 171, ModelFileName dog_large_shortears.adr, NameId 415162, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.415162 = Sleeping Dog (lab/reports/locale-id-to-text.json); Models.txt 171 = dog_large_shortears.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033978,
+      "legacy_npc_id": null,
+      "model_id": 135,
+      "model_file_name": "billygoat.adr",
+      "name": "Billygoat",
+      "name_string_id": 18744,
+      "position": [
+        -92.1288,
+        22.15182,
+        167.28136
+      ],
+      "heading": -1.20457397,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4136 spawnNpcWithGuid(33978); src/Resources/Npcs.json Id=33978 (ModelId 135, ModelFileName billygoat.adr, NameId 18744, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.18744 = Billygoat (lab/reports/locale-id-to-text.json); Models.txt 135 = billygoat.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033987,
+      "legacy_npc_id": null,
+      "model_id": 169,
+      "model_file_name": "dog_large_floppy.adr",
+      "name": "Sniffing Dog",
+      "name_string_id": 415164,
+      "position": [
+        -166.83015,
+        -12.552787,
+        332.37265
+      ],
+      "heading": 0.0434538295,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4145 spawnNpcWithGuid(33987); src/Resources/Npcs.json Id=33987 (ModelId 169, ModelFileName dog_large_floppy.adr, NameId 415164, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.415164 = Sniffing Dog (lab/reports/locale-id-to-text.json); Models.txt 169 = dog_large_floppy.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033988,
+      "legacy_npc_id": null,
+      "model_id": 402,
+      "model_file_name": "squirrel.adr",
+      "name": "Squirrel",
+      "name_string_id": 4233,
+      "position": [
+        -159.2751,
+        -4.476059,
+        173.11806
+      ],
+      "heading": 0.308783303,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4146 spawnNpcWithGuid(33988); src/Resources/Npcs.json Id=33988 (ModelId 402, ModelFileName squirrel.adr, NameId 4233, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.4233 = Squirrel (lab/reports/locale-id-to-text.json); Models.txt 402 = squirrel.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033998,
+      "legacy_npc_id": null,
+      "model_id": 402,
+      "model_file_name": "squirrel.adr",
+      "name": "Squirrel",
+      "name_string_id": 4233,
+      "position": [
+        -183.6117,
+        -14.095148,
+        308.42935
+      ],
+      "heading": -1.65730619,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4156 spawnNpcWithGuid(33998); src/Resources/Npcs.json Id=33998 (ModelId 402, ModelFileName squirrel.adr, NameId 4233, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.4233 = Squirrel (lab/reports/locale-id-to-text.json); Models.txt 402 = squirrel.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000034005,
+      "legacy_npc_id": null,
+      "model_id": 133,
+      "model_file_name": "forest_doe.adr",
+      "name": "Deer",
+      "name_string_id": 2060,
+      "position": [
+        -139.74028,
+        2.875045,
+        134.08626
+      ],
+      "heading": 0.756183356,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4162 spawnNpcWithGuid(34005); src/Resources/Npcs.json Id=34005 (ModelId 133, ModelFileName forest_doe.adr, NameId 2060, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2060 = Deer (lab/reports/locale-id-to-text.json); Models.txt 133 = forest_doe.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000034009,
+      "legacy_npc_id": null,
+      "model_id": 133,
+      "model_file_name": "forest_doe.adr",
+      "name": "Deer",
+      "name_string_id": 2060,
+      "position": [
+        -191.53146,
+        -4.9235234,
+        153.49974
+      ],
+      "heading": -1.7190516,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4165 spawnNpcWithGuid(34009); src/Resources/Npcs.json Id=34009 (ModelId 133, ModelFileName forest_doe.adr, NameId 2060, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2060 = Deer (lab/reports/locale-id-to-text.json); Models.txt 133 = forest_doe.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000034014,
+      "legacy_npc_id": null,
+      "model_id": 133,
+      "model_file_name": "forest_doe.adr",
+      "name": "Deer",
+      "name_string_id": 2060,
+      "position": [
+        -198.42154,
+        -4.362236,
+        141.48972
+      ],
+      "heading": -0.0881690026,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4170 spawnNpcWithGuid(34014); src/Resources/Npcs.json Id=34014 (ModelId 133, ModelFileName forest_doe.adr, NameId 2060, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2060 = Deer (lab/reports/locale-id-to-text.json); Models.txt 133 = forest_doe.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000034015,
+      "legacy_npc_id": null,
+      "model_id": 132,
+      "model_file_name": "forest_buck.adr",
+      "name": "Deer",
+      "name_string_id": 2060,
+      "position": [
+        -197.12332,
+        -4.26608,
+        225.14497
+      ],
+      "heading": 1.25662002,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4171 spawnNpcWithGuid(34015); src/Resources/Npcs.json Id=34015 (ModelId 132, ModelFileName forest_buck.adr, NameId 2060, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.2060 = Deer (lab/reports/locale-id-to-text.json); Models.txt 132 = forest_buck.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000034018,
+      "legacy_npc_id": null,
+      "model_id": 655,
+      "model_file_name": "fairy_m_freestyle_06.agr",
+      "name": "Upset Mechanic",
+      "name_string_id": 401730,
+      "position": [
+        -257.47543,
+        0.4965859,
+        44.70965
+      ],
+      "heading": 0.0603343846,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4174 spawnNpcWithGuid(34018); src/Resources/Npcs.json Id=34018 (ModelId 655, ModelFileName fairy_m_freestyle_06.agr, NameId 401730, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.401730 = Upset Mechanic (lab/reports/locale-id-to-text.json); Models.txt 655 = fairy_m_freestyle_06.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000034019,
+      "legacy_npc_id": null,
+      "model_id": 668,
+      "model_file_name": "chugawug_m_02_ltgreen_drinking.agr",
+      "name": "Lazy Chugawug",
+      "name_string_id": 401708,
+      "position": [
+        -250.1252,
+        0.878981,
+        40.101883
+      ],
+      "heading": 2.15645504,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4175 spawnNpcWithGuid(34019); src/Resources/Npcs.json Id=34019 (ModelId 668, ModelFileName chugawug_m_02_ltgreen_drinking.agr, NameId 401708, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.401708 = Lazy Chugawug (lab/reports/locale-id-to-text.json); Models.txt 668 = chugawug_m_02_ltgreen_drinking.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000034020,
+      "legacy_npc_id": null,
+      "model_id": 667,
+      "model_file_name": "chugawug_m_01_blue_drinking.agr",
+      "name": "Lazy Chugawug",
+      "name_string_id": 401708,
+      "position": [
+        -245.86076,
+        0.878981,
+        40.31405
+      ],
+      "heading": -2.06996701,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4176 spawnNpcWithGuid(34020); src/Resources/Npcs.json Id=34020 (ModelId 667, ModelFileName chugawug_m_01_blue_drinking.agr, NameId 401708, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.401708 = Lazy Chugawug (lab/reports/locale-id-to-text.json); Models.txt 667 = chugawug_m_01_blue_drinking.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000036129,
+      "legacy_npc_id": null,
+      "model_id": 3986,
+      "model_file_name": "vulture_sunstone.adr",
+      "name": "Vulture",
+      "name_string_id": 36239,
+      "position": [
+        816.2107,
+        -2.29193,
+        2212.3289
+      ],
+      "heading": 0.829891158,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4191 spawnNpcWithGuid(36129); src/Resources/Npcs.json Id=36129 (ModelId 3986, ModelFileName vulture_sunstone.adr, NameId 36239, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.36239 = Vulture (lab/reports/locale-id-to-text.json); Models.txt 3986 = vulture_sunstone.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000036135,
+      "legacy_npc_id": null,
+      "model_id": 3986,
+      "model_file_name": "vulture_sunstone.adr",
+      "name": "Vulture",
+      "name_string_id": 36239,
+      "position": [
+        875.43256,
+        8.2112,
+        2094.9736
+      ],
+      "heading": 1.84355306,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4197 spawnNpcWithGuid(36135); src/Resources/Npcs.json Id=36135 (ModelId 3986, ModelFileName vulture_sunstone.adr, NameId 36239, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.36239 = Vulture (lab/reports/locale-id-to-text.json); Models.txt 3986 = vulture_sunstone.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000036139,
+      "legacy_npc_id": null,
+      "model_id": 3986,
+      "model_file_name": "vulture_sunstone.adr",
+      "name": "Vulture",
+      "name_string_id": 36239,
+      "position": [
+        874.33966,
+        17.01086,
+        2200.2747
+      ],
+      "heading": -2.50167155,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4201 spawnNpcWithGuid(36139); src/Resources/Npcs.json Id=36139 (ModelId 3986, ModelFileName vulture_sunstone.adr, NameId 36239, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.36239 = Vulture (lab/reports/locale-id-to-text.json); Models.txt 3986 = vulture_sunstone.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000036145,
+      "legacy_npc_id": null,
+      "model_id": 3986,
+      "model_file_name": "vulture_sunstone.adr",
+      "name": "Vulture",
+      "name_string_id": 36239,
+      "position": [
+        919.1631,
+        14.35876,
+        2276.2136
+      ],
+      "heading": 2.68727868,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4207 spawnNpcWithGuid(36145); src/Resources/Npcs.json Id=36145 (ModelId 3986, ModelFileName vulture_sunstone.adr, NameId 36239, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.36239 = Vulture (lab/reports/locale-id-to-text.json); Models.txt 3986 = vulture_sunstone.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000036153,
+      "legacy_npc_id": null,
+      "model_id": 3986,
+      "model_file_name": "vulture_sunstone.adr",
+      "name": "Vulture",
+      "name_string_id": 36239,
+      "position": [
+        1009.6485,
+        17.80415,
+        2197.4941
+      ],
+      "heading": -0.507202359,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4215 spawnNpcWithGuid(36153); src/Resources/Npcs.json Id=36153 (ModelId 3986, ModelFileName vulture_sunstone.adr, NameId 36239, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.36239 = Vulture (lab/reports/locale-id-to-text.json); Models.txt 3986 = vulture_sunstone.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000036154,
+      "legacy_npc_id": null,
+      "model_id": 3986,
+      "model_file_name": "vulture_sunstone.adr",
+      "name": "Vulture",
+      "name_string_id": 36239,
+      "position": [
+        994.4415,
+        13.46359,
+        2192.282
+      ],
+      "heading": 0.540980901,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4216 spawnNpcWithGuid(36154); src/Resources/Npcs.json Id=36154 (ModelId 3986, ModelFileName vulture_sunstone.adr, NameId 36239, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.36239 = Vulture (lab/reports/locale-id-to-text.json); Models.txt 3986 = vulture_sunstone.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000036155,
+      "legacy_npc_id": null,
+      "model_id": 3986,
+      "model_file_name": "vulture_sunstone.adr",
+      "name": "Vulture",
+      "name_string_id": 36239,
+      "position": [
+        1010.54297,
+        11.66718,
+        2207.201
+      ],
+      "heading": -0.926347558,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4217 spawnNpcWithGuid(36155); src/Resources/Npcs.json Id=36155 (ModelId 3986, ModelFileName vulture_sunstone.adr, NameId 36239, HideNamePlate true)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.36239 = Vulture (lab/reports/locale-id-to-text.json); Models.txt 3986 = vulture_sunstone.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T549: Sanctuary-main places this 2014 client NPC here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied)."
+        }
+      ],
+      "position_w": null
     }
   ]
 }

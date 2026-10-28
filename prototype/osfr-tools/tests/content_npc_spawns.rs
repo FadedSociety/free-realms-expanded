@@ -308,8 +308,9 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // permanent-dance radios (2,767); T546 drew the Sanctuary, Lakeshore and Snowhill warpstone
     // actors Sanctuary-main places at those three hubs (2,770). T544 converted Gerold 9000000098
     // and Tevin 9000000215 from T470's reference row plus extras body to a drawn `legacy_data`
-    // regional row, removing those two duplicate bodies (2,768).
-    assert_eq!(extra_rows.len(), 2768);
+    // regional row, removing those two duplicate bodies (2,768). T549 appended the 141
+    // ambient critter and townsfolk rows Sanctuary-main places that nothing else drew (2,909).
+    assert_eq!(extra_rows.len(), 2909);
     assert_eq!(captured_actors.len(), 9);
     println!(
         "NPC placements: {regional_legacy} Legacy, {regional_reconstructed} reconstructed; {} extra spawns, {} capture-confirmed",
