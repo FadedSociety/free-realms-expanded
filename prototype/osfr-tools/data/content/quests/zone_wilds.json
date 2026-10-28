@@ -332,6 +332,183 @@
           "evidence": "(R) T498: minted id 3000341 = 3000300 + (fork QuestId 3041 - 3000); XP rung 15 (one goal); coin value 30 is the fork's RewardCoins."
         }
       ]
+    },
+    {
+      "id": 3000342,
+      "title_string_id": 70218,
+      "intro_text_string_id": 70299,
+      "description_string_id": 70219,
+      "end_text_string_id": 70196,
+      "giver_npc_id": 9500001007,
+      "prerequisite_quest_ids": [
+        3000341
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "node_type": "smashing-hammers",
+          "quantity": 5,
+          "text_string_id": 70221,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3042 goal 1: NameId 70221; Type 2 RequiredCount 5 CollectNodeType \"smashing-hammers\". Type 2 is the fork's Collect objective (Lxzxrus-Free-Realms-Server@37ef175 src/Sanctuary.Game/Resources/Definitions/QuestGoal.cs:5-9,57-59; src/Sanctuary.Game/Quests/QuestManager.cs:163 matches a collect goal by node type); \"smashing-hammers\" is the node type key in data/content/quest_nodes.json. The locale row says shovels while the fork node type is the Hammer model; the fork ids are kept."
+            },
+            {
+              "kind": "client",
+              "evidence": "Global.Text.70221 'Collect the lost shovels' resolves in lab/reports/locale-id-to-text.json."
+            }
+          ]
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "node_type": "smashing-chisels",
+          "quantity": 5,
+          "text_string_id": 70227,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3042 goal 2: NameId 70227; Type 2 RequiredCount 5 CollectNodeType \"smashing-chisels\". Type 2 is the fork's Collect objective (Lxzxrus-Free-Realms-Server@37ef175 src/Sanctuary.Game/Resources/Definitions/QuestGoal.cs:5-9,57-59; src/Sanctuary.Game/Quests/QuestManager.cs:163 matches a collect goal by node type); \"smashing-chisels\" is the node type key in data/content/quest_nodes.json. The locale row says picks while the fork node type is the Chisel model; the fork ids are kept."
+            },
+            {
+              "kind": "client",
+              "evidence": "Global.Text.70227 'Collect the lost picks' resolves in lab/reports/locale-id-to-text.json."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9500001007,
+          "dialogue_string_id": 70196,
+          "text_string_id": 70230,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3042 goal 3: NameId 70230; DialogueId 70196; TargetGuid 100000003120 = definition 3120 (Burglz, NameId 441415, Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Npcs.json Id 3120 and src/Scripts/Zone/FabledRealms.lua:1700), bound to npcs/wilds.json 9500001007 at the same spawn; the last goal at the turn-in NPC: its DialogueId 70196 is the quest's end_text_string_id."
+            },
+            {
+              "kind": "client",
+              "evidence": "Global.Text.70230 'Return to Burgl' and the end text 70196 resolve in lab/reports/locale-id-to-text.json."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {
+            "1": 25
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3042: RewardCoins 30, RewardItems []. Its RewardExperience 100 is not used; job_xp follows the T202 ladder."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 25 goes to profile 1 (Adventurer) on the T202 collect rung (notes/Autopilot/T202.md:137-141)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3042 'Tools for Smashing' (quest data last changed in 1c36ad7): TitleId 70218, DescriptionId 70219, GiverDialogueId 70299, ObjectiveDescriptionId 70219, GiverGuid and TargetGuid 100000003120 (definition 3120 = Burglz), PrerequisiteQuestId 3041, NextQuestId 3043. AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 70218 'Tools for Smashing' (title), 70219 (description), 70299 (intro), 70221/70227 (collect goals), 70230 (talk goal) and 70196 (end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T539: minted id 3000342 = 3000300 + (fork QuestId 3042 - 3000); XP rung 25 (collect row); coin value 30 is the fork's RewardCoins."
+        }
+      ]
+    },
+    {
+      "id": 3000343,
+      "title_string_id": 70201,
+      "intro_text_string_id": 70505,
+      "description_string_id": 70202,
+      "end_text_string_id": 70202,
+      "giver_npc_id": 9500001007,
+      "prerequisite_quest_ids": [
+        3000342
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "node_type": "box-o-rocks",
+          "quantity": 3,
+          "text_string_id": 70289,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3043 goal 1: NameId 70289; Type 2 RequiredCount 3 CollectNodeType \"box-o-rocks\". Type 2 is the fork's Collect objective (Lxzxrus-Free-Realms-Server@37ef175 src/Sanctuary.Game/Resources/Definitions/QuestGoal.cs:5-9,57-59; src/Sanctuary.Game/Quests/QuestManager.cs:163 matches a collect goal by node type); \"box-o-rocks\" is the node type key in data/content/quest_nodes.json. The fork goal DescriptionId 70288 has no field in the split schema; recorded here."
+            },
+            {
+              "kind": "client",
+              "evidence": "Global.Text.70289 'Collect the crates full of rocks' resolves in lab/reports/locale-id-to-text.json."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000955,
+          "dialogue_string_id": 70202,
+          "text_string_id": 70291,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3043 goal 2: NameId 70291; DialogueId 70202; TargetGuid 100000003145 = definition 3145 (Vergosh, NameId 21081, Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Npcs.json Id 3145 and src/Scripts/Zone/FabledRealms.lua:1725), bound to npcs/wilds.json 9500000955 at the same spawn; the last goal at the turn-in NPC (the giver is Burglz, the fork TargetGuid is Vergosh): its DialogueId 70202 is the quest's end_text_string_id, reusing the description id as the fork does."
+            },
+            {
+              "kind": "client",
+              "evidence": "Global.Text.70291 'Deliver the rocks to Vergosh' and 70202 (description and end text) resolve in lab/reports/locale-id-to-text.json."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {
+            "1": 30
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3043: RewardCoins 30, RewardItems []. Its RewardExperience 100 is not used; job_xp follows the T202 ladder."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 30 goes to profile 1 (Adventurer) on the T202 ladder (chapter-finale rung, last of the four-quest chain)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3043 \"Box O' Rocks\" (quest data last changed in 1c36ad7): TitleId 70201, DescriptionId 70202, GiverDialogueId 70505, ObjectiveDescriptionId 70288, GiverGuid 100000003120 (definition 3120 = Burglz), TargetGuid 100000003145 (definition 3145 = Vergosh), PrerequisiteQuestId 3042, NextQuestId 0. Goal 2 reuses the description id 70202; kept. AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 70201 \"Box O' Rocks\" (title), 70202 (description and end text), 70505 (intro), 70289 (collect goal) and 70291 (talk goal) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T539: minted id 3000343 = 3000300 + (fork QuestId 3043 - 3000); XP rung 30 (last quest of the four-quest chain); coin value 30 is the fork's RewardCoins."
+        }
+      ]
     }
   ]
 }

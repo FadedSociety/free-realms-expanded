@@ -37,6 +37,8 @@ const HASTI: u64 = 9_500_001_008;
 const HASTI_SPAWN: u64 = 100_000_003_016;
 const OTHER: u64 = CHARACTER + 1;
 const MINER: i32 = 14;
+/// T539: the homework follow-up Nomi offers once her little brother is home.
+const HOMEWORK: u32 = 3_000_302;
 
 /// Suni's row lives in Shrouded Glade; Hasti is an extra spawn keyed to his row.
 const MAP: ZoneQuests = ZoneQuests {
@@ -114,13 +116,8 @@ fn nomis_little_brother_through_the_extra_spawn() {
         quest_status(&game, LITTLE_BROTHER.id),
         QuestStatus::Completed
     );
-    assert_no_offer(
-        &mut game,
-        &MAP.at(CHARACTER, NOMI),
-        NOMI,
-        &mut now,
-        "Nomi after",
-    );
+    // T539: completing Nomi's Little Brother opens Hasti's Homework Heist.
+    offer(&mut game, &MAP.at(CHARACTER, NOMI), NOMI, HOMEWORK, now);
 }
 
 #[test]

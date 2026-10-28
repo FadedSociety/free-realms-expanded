@@ -44298,8 +44298,24 @@
       "quests_given_text": [
         "Collect crates of rocks at the quarry for him (3047426870, 2207463536); check the other camps (1990199215). Titles not found."
       ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "quests_accepted": [
+        {
+          "quest_id": 3000343,
+          "title": "Box O' Rocks",
+          "title_string_id": 70201,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3043: TargetGuid 100000003145 = definition 3145 (Vergosh, NameId 21081, src/Resources/Npcs.json Id 3145); its last goal (NameId 70291) is a talk to Vergosh with DialogueId 70202."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T539: Box O' Rocks is handed in to Vergosh, the fork's TargetGuid, not to its giver Burglz; the row's quests_accepted entry opens the menu TurnInQuest option."
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": "T539: Box O' Rocks (3000343) is handed in to this NPC, the fork's TargetGuid (R); see the entry's source.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [],
@@ -44555,14 +44571,18 @@
         ],
         "quests_accepted": [
           {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3043: TargetGuid 100000003145"
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+            "evidence": "(R) T539 hand-in binding; see the entry source"
           }
         ],
         "quests_accepted_reason": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+            "evidence": "(R) T539: the fork's TargetGuid for Box O' Rocks names this NPC"
           }
         ],
         "vendor_stock": [
@@ -48689,7 +48709,10 @@
         "Legacy built-content spawn Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1700, in the Forest Troll Village area"
       ],
       "quests_given": [],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3000342,
+        3000343
+      ],
       "quests_given_text": [],
       "quests_accepted": [
         {
@@ -48853,7 +48876,7 @@
         "quest_ids_given": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) none yet: Tools for Smashing and Box O' Rocks follow in quest-pickups-wilds-sanctuary"
+            "evidence": "(R) T539: the fork's Quests.json QuestId=3042 and 3043 name GiverGuid 100000003120 = definition 3120 (Burglz); both rows are listed here."
           }
         ],
         "quests_given_text": [

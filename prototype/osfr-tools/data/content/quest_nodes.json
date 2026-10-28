@@ -5,9 +5,9 @@
     "legacy_revision": "37ef175",
     "spawn_revision": "e19669c",
     "legacy_license": "AGPL-3.0; data rows only, no source code copied",
-    "node_tables": "src/Resources/CollectionNodeTypes.json (key tin-ore) and src/Resources/CollectionNodePools.json (key briarwood-tin-ore) at 37ef175",
-    "spawn_tables": "src/Resources/CollectionNodeSpawns/1/briarwood-tin-ore.json at e19669c",
-    "client_name": "CollectionNodeTypes.json has no NameId for tin-ore; the client name string id is 0 (R)",
+    "node_tables": "src/Resources/CollectionNodeTypes.json (keys tin-ore, smashing-hammers, smashing-chisels, box-o-rocks, hastis-homework) and src/Resources/CollectionNodePools.json (keys briarwood-tin-ore, briarwood-smashing-hammers, briarwood-smashing-chisels, briarwood-box-o-rocks, briarwood-hastis-homework) at 37ef175",
+    "spawn_tables": "src/Resources/CollectionNodeSpawns/1/{briarwood-tin-ore,briarwood-smashing-hammers,briarwood-smashing-chisels,briarwood-box-o-rocks,briarwood-hastis-homework}.json at e19669c",
+    "client_name": "CollectionNodeTypes.json has no NameId for these types; the client name string id is 0 (R)",
     "policy": "(R) T503: the whole file is quest-only. A node type with a non-empty drop_table is a load error, and a pickup grants no item; the counted collect_node objective is the only reward."
   },
   "node_types": [
@@ -33,6 +33,98 @@
         "placement_y_offset": "legacy-data as above, PlacementYOffset 0.0",
         "drop_table": "legacy-data as above, DropTable empty; (R) quest nodes are quest-only"
       }
+    },
+    {
+      "key": "smashing-hammers",
+      "name": "Hammer",
+      "model_id": 197,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "key": "legacy-data Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeTypes.json key smashing-hammers",
+        "name": "legacy-data as above, Name Hammer; the row has no NameId, so name id 0 (R)",
+        "model_id": "legacy-data as above, ModelId 197",
+        "scale": "legacy-data as above, Scale 1.0",
+        "composite_effect_id": "legacy-data as above, CompositeEffectId 5386",
+        "interact_range": "legacy-data as above, InteractRange 12",
+        "cursor_id": "legacy-data as above, CursorId 17",
+        "placement_y_offset": "legacy-data as above, PlacementYOffset 0.0",
+        "drop_table": "legacy-data as above, DropTable empty; (R) quest nodes are quest-only"
+      }
+    },
+    {
+      "key": "smashing-chisels",
+      "name": "Chisel",
+      "model_id": 196,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "key": "legacy-data Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeTypes.json key smashing-chisels",
+        "name": "legacy-data as above, Name Chisel; the row has no NameId, so name id 0 (R)",
+        "model_id": "legacy-data as above, ModelId 196",
+        "scale": "legacy-data as above, Scale 1.0",
+        "composite_effect_id": "legacy-data as above, CompositeEffectId 5386",
+        "interact_range": "legacy-data as above, InteractRange 12",
+        "cursor_id": "legacy-data as above, CursorId 17",
+        "placement_y_offset": "legacy-data as above, PlacementYOffset 0.0",
+        "drop_table": "legacy-data as above, DropTable empty; (R) quest nodes are quest-only"
+      }
+    },
+    {
+      "key": "box-o-rocks",
+      "name": "Rock",
+      "model_id": 84,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "key": "legacy-data Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeTypes.json key box-o-rocks",
+        "name": "legacy-data as above, Name Rock; the row has no NameId, so name id 0 (R)",
+        "model_id": "legacy-data as above, ModelId 84",
+        "scale": "legacy-data as above, Scale 1.0",
+        "composite_effect_id": "legacy-data as above, CompositeEffectId 5386",
+        "interact_range": "legacy-data as above, InteractRange 12",
+        "cursor_id": "legacy-data as above, CursorId 17",
+        "placement_y_offset": "legacy-data as above, PlacementYOffset 0.0",
+        "drop_table": "legacy-data as above, DropTable empty; (R) quest nodes are quest-only"
+      }
+    },
+    {
+      "key": "hastis-homework",
+      "name": "Hasti's Homework",
+      "model_id": 584,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "key": "legacy-data Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeTypes.json key hastis-homework",
+        "name": "legacy-data as above, Name Hasti's Homework; the row has no NameId, so name id 0 (R)",
+        "model_id": "legacy-data as above, ModelId 584",
+        "scale": "legacy-data as above, Scale 1.0",
+        "composite_effect_id": "legacy-data as above, CompositeEffectId 5386",
+        "interact_range": "legacy-data as above, InteractRange 12",
+        "cursor_id": "legacy-data as above, CursorId 17",
+        "placement_y_offset": "legacy-data as above, PlacementYOffset 0.0",
+        "drop_table": "legacy-data as above, DropTable empty; (R) quest nodes are quest-only"
+      }
     }
   ],
   "pools": [
@@ -48,6 +140,66 @@
         "zone_definition_id": "legacy-data as above, ZoneDefinitionId 1",
         "node_type": "legacy-data as above, NodeType tin-ore",
         "max_active_nodes": "legacy-data as above, MaxActiveNodes 5",
+        "respawn_seconds": "legacy-data as above, RespawnSeconds 30"
+      }
+    },
+    {
+      "key": "briarwood-smashing-hammers",
+      "zone_definition_id": 1,
+      "node_type": "smashing-hammers",
+      "max_active_nodes": 5,
+      "respawn_seconds": 30,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "key": "legacy-data Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodePools.json key briarwood-smashing-hammers",
+        "zone_definition_id": "legacy-data as above, ZoneDefinitionId 1",
+        "node_type": "legacy-data as above, NodeType smashing-hammers",
+        "max_active_nodes": "legacy-data as above, MaxActiveNodes 5",
+        "respawn_seconds": "legacy-data as above, RespawnSeconds 30"
+      }
+    },
+    {
+      "key": "briarwood-smashing-chisels",
+      "zone_definition_id": 1,
+      "node_type": "smashing-chisels",
+      "max_active_nodes": 5,
+      "respawn_seconds": 30,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "key": "legacy-data Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodePools.json key briarwood-smashing-chisels",
+        "zone_definition_id": "legacy-data as above, ZoneDefinitionId 1",
+        "node_type": "legacy-data as above, NodeType smashing-chisels",
+        "max_active_nodes": "legacy-data as above, MaxActiveNodes 5",
+        "respawn_seconds": "legacy-data as above, RespawnSeconds 30"
+      }
+    },
+    {
+      "key": "briarwood-box-o-rocks",
+      "zone_definition_id": 1,
+      "node_type": "box-o-rocks",
+      "max_active_nodes": 3,
+      "respawn_seconds": 30,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "key": "legacy-data Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodePools.json key briarwood-box-o-rocks",
+        "zone_definition_id": "legacy-data as above, ZoneDefinitionId 1",
+        "node_type": "legacy-data as above, NodeType box-o-rocks",
+        "max_active_nodes": "legacy-data as above, MaxActiveNodes 3",
+        "respawn_seconds": "legacy-data as above, RespawnSeconds 30"
+      }
+    },
+    {
+      "key": "briarwood-hastis-homework",
+      "zone_definition_id": 1,
+      "node_type": "hastis-homework",
+      "max_active_nodes": 8,
+      "respawn_seconds": 30,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "key": "legacy-data Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodePools.json key briarwood-hastis-homework",
+        "zone_definition_id": "legacy-data as above, ZoneDefinitionId 1",
+        "node_type": "legacy-data as above, NodeType hastis-homework",
+        "max_active_nodes": "legacy-data as above, MaxActiveNodes 8",
         "respawn_seconds": "legacy-data as above, RespawnSeconds 30"
       }
     }
@@ -130,6 +282,342 @@
       "source_tag": "legacy-data",
       "source_tags": {
         "position": "legacy-data Lxzxrus-Free-Realms-Server@e19669c src/Resources/CollectionNodeSpawns/1/briarwood-tin-ore.json id 104; (R) round hand-placed numbers",
+        "heading": "legacy-data as above, Heading 0.0"
+      }
+    },
+    {
+      "id": 87,
+      "pool_key": "briarwood-smashing-hammers",
+      "zone_definition_id": 1,
+      "position": [
+        -595.0,
+        1.0,
+        1225.0
+      ],
+      "heading": 0.0,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "position": "legacy-data Lxzxrus-Free-Realms-Server@e19669c src/Resources/CollectionNodeSpawns/1/briarwood-smashing-hammers.json id 87; hand-placed (R)",
+        "heading": "legacy-data as above, Heading 0.0"
+      }
+    },
+    {
+      "id": 88,
+      "pool_key": "briarwood-smashing-hammers",
+      "zone_definition_id": 1,
+      "position": [
+        -438.0,
+        4.0,
+        1186.0
+      ],
+      "heading": 0.0,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "position": "legacy-data Lxzxrus-Free-Realms-Server@e19669c src/Resources/CollectionNodeSpawns/1/briarwood-smashing-hammers.json id 88; hand-placed (R)",
+        "heading": "legacy-data as above, Heading 0.0"
+      }
+    },
+    {
+      "id": 89,
+      "pool_key": "briarwood-smashing-hammers",
+      "zone_definition_id": 1,
+      "position": [
+        -503.0,
+        1.0,
+        1078.0
+      ],
+      "heading": 0.0,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "position": "legacy-data Lxzxrus-Free-Realms-Server@e19669c src/Resources/CollectionNodeSpawns/1/briarwood-smashing-hammers.json id 89; hand-placed (R)",
+        "heading": "legacy-data as above, Heading 0.0"
+      }
+    },
+    {
+      "id": 90,
+      "pool_key": "briarwood-smashing-hammers",
+      "zone_definition_id": 1,
+      "position": [
+        -399.0,
+        5.0,
+        1092.0
+      ],
+      "heading": 0.0,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "position": "legacy-data Lxzxrus-Free-Realms-Server@e19669c src/Resources/CollectionNodeSpawns/1/briarwood-smashing-hammers.json id 90; hand-placed (R)",
+        "heading": "legacy-data as above, Heading 0.0"
+      }
+    },
+    {
+      "id": 91,
+      "pool_key": "briarwood-smashing-hammers",
+      "zone_definition_id": 1,
+      "position": [
+        -440.0,
+        1.0,
+        1310.0
+      ],
+      "heading": 0.0,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "position": "legacy-data Lxzxrus-Free-Realms-Server@e19669c src/Resources/CollectionNodeSpawns/1/briarwood-smashing-hammers.json id 91; hand-placed (R)",
+        "heading": "legacy-data as above, Heading 0.0"
+      }
+    },
+    {
+      "id": 92,
+      "pool_key": "briarwood-smashing-chisels",
+      "zone_definition_id": 1,
+      "position": [
+        -608.0,
+        1.0,
+        1213.0
+      ],
+      "heading": 0.0,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "position": "legacy-data Lxzxrus-Free-Realms-Server@e19669c src/Resources/CollectionNodeSpawns/1/briarwood-smashing-chisels.json id 92; hand-placed (R)",
+        "heading": "legacy-data as above, Heading 0.0"
+      }
+    },
+    {
+      "id": 93,
+      "pool_key": "briarwood-smashing-chisels",
+      "zone_definition_id": 1,
+      "position": [
+        -425.0,
+        4.0,
+        1174.0
+      ],
+      "heading": 0.0,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "position": "legacy-data Lxzxrus-Free-Realms-Server@e19669c src/Resources/CollectionNodeSpawns/1/briarwood-smashing-chisels.json id 93; hand-placed (R)",
+        "heading": "legacy-data as above, Heading 0.0"
+      }
+    },
+    {
+      "id": 94,
+      "pool_key": "briarwood-smashing-chisels",
+      "zone_definition_id": 1,
+      "position": [
+        -491.0,
+        1.0,
+        1066.0
+      ],
+      "heading": 0.0,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "position": "legacy-data Lxzxrus-Free-Realms-Server@e19669c src/Resources/CollectionNodeSpawns/1/briarwood-smashing-chisels.json id 94; hand-placed (R)",
+        "heading": "legacy-data as above, Heading 0.0"
+      }
+    },
+    {
+      "id": 95,
+      "pool_key": "briarwood-smashing-chisels",
+      "zone_definition_id": 1,
+      "position": [
+        -387.0,
+        5.0,
+        1080.0
+      ],
+      "heading": 0.0,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "position": "legacy-data Lxzxrus-Free-Realms-Server@e19669c src/Resources/CollectionNodeSpawns/1/briarwood-smashing-chisels.json id 95; hand-placed (R)",
+        "heading": "legacy-data as above, Heading 0.0"
+      }
+    },
+    {
+      "id": 96,
+      "pool_key": "briarwood-smashing-chisels",
+      "zone_definition_id": 1,
+      "position": [
+        -428.0,
+        1.0,
+        1323.0
+      ],
+      "heading": 0.0,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "position": "legacy-data Lxzxrus-Free-Realms-Server@e19669c src/Resources/CollectionNodeSpawns/1/briarwood-smashing-chisels.json id 96; hand-placed (R)",
+        "heading": "legacy-data as above, Heading 0.0"
+      }
+    },
+    {
+      "id": 97,
+      "pool_key": "briarwood-box-o-rocks",
+      "zone_definition_id": 1,
+      "position": [
+        -535.0,
+        0.5,
+        1350.0
+      ],
+      "heading": 0.0,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "position": "legacy-data Lxzxrus-Free-Realms-Server@e19669c src/Resources/CollectionNodeSpawns/1/briarwood-box-o-rocks.json id 97; hand-placed (R)",
+        "heading": "legacy-data as above, Heading 0.0"
+      }
+    },
+    {
+      "id": 98,
+      "pool_key": "briarwood-box-o-rocks",
+      "zone_definition_id": 1,
+      "position": [
+        -550.0,
+        0.5,
+        1365.0
+      ],
+      "heading": 0.0,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "position": "legacy-data Lxzxrus-Free-Realms-Server@e19669c src/Resources/CollectionNodeSpawns/1/briarwood-box-o-rocks.json id 98; hand-placed (R)",
+        "heading": "legacy-data as above, Heading 0.0"
+      }
+    },
+    {
+      "id": 99,
+      "pool_key": "briarwood-box-o-rocks",
+      "zone_definition_id": 1,
+      "position": [
+        -525.0,
+        0.5,
+        1355.0
+      ],
+      "heading": 0.0,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "position": "legacy-data Lxzxrus-Free-Realms-Server@e19669c src/Resources/CollectionNodeSpawns/1/briarwood-box-o-rocks.json id 99; hand-placed (R)",
+        "heading": "legacy-data as above, Heading 0.0"
+      }
+    },
+    {
+      "id": 79,
+      "pool_key": "briarwood-hastis-homework",
+      "zone_definition_id": 1,
+      "position": [
+        -1090.0,
+        5.4,
+        384.0
+      ],
+      "heading": 0.0,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "position": "legacy-data Lxzxrus-Free-Realms-Server@e19669c src/Resources/CollectionNodeSpawns/1/briarwood-hastis-homework.json id 79; hand-placed (R)",
+        "heading": "legacy-data as above, Heading 0.0"
+      }
+    },
+    {
+      "id": 80,
+      "pool_key": "briarwood-hastis-homework",
+      "zone_definition_id": 1,
+      "position": [
+        -1072.0,
+        5.3,
+        348.0
+      ],
+      "heading": 0.0,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "position": "legacy-data Lxzxrus-Free-Realms-Server@e19669c src/Resources/CollectionNodeSpawns/1/briarwood-hastis-homework.json id 80; hand-placed (R)",
+        "heading": "legacy-data as above, Heading 0.0"
+      }
+    },
+    {
+      "id": 81,
+      "pool_key": "briarwood-hastis-homework",
+      "zone_definition_id": 1,
+      "position": [
+        -938.0,
+        4.75,
+        230.0
+      ],
+      "heading": 0.0,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "position": "legacy-data Lxzxrus-Free-Realms-Server@e19669c src/Resources/CollectionNodeSpawns/1/briarwood-hastis-homework.json id 81; hand-placed (R)",
+        "heading": "legacy-data as above, Heading 0.0"
+      }
+    },
+    {
+      "id": 82,
+      "pool_key": "briarwood-hastis-homework",
+      "zone_definition_id": 1,
+      "position": [
+        -1000.0,
+        6.4,
+        202.0
+      ],
+      "heading": 0.0,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "position": "legacy-data Lxzxrus-Free-Realms-Server@e19669c src/Resources/CollectionNodeSpawns/1/briarwood-hastis-homework.json id 82; hand-placed (R)",
+        "heading": "legacy-data as above, Heading 0.0"
+      }
+    },
+    {
+      "id": 83,
+      "pool_key": "briarwood-hastis-homework",
+      "zone_definition_id": 1,
+      "position": [
+        -1005.0,
+        6.4,
+        198.0
+      ],
+      "heading": 0.0,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "position": "legacy-data Lxzxrus-Free-Realms-Server@e19669c src/Resources/CollectionNodeSpawns/1/briarwood-hastis-homework.json id 83; hand-placed (R)",
+        "heading": "legacy-data as above, Heading 0.0"
+      }
+    },
+    {
+      "id": 84,
+      "pool_key": "briarwood-hastis-homework",
+      "zone_definition_id": 1,
+      "position": [
+        -1099.0,
+        5.19,
+        225.0
+      ],
+      "heading": 0.0,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "position": "legacy-data Lxzxrus-Free-Realms-Server@e19669c src/Resources/CollectionNodeSpawns/1/briarwood-hastis-homework.json id 84; hand-placed (R)",
+        "heading": "legacy-data as above, Heading 0.0"
+      }
+    },
+    {
+      "id": 85,
+      "pool_key": "briarwood-hastis-homework",
+      "zone_definition_id": 1,
+      "position": [
+        -1115.0,
+        5.17,
+        306.0
+      ],
+      "heading": 0.0,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "position": "legacy-data Lxzxrus-Free-Realms-Server@e19669c src/Resources/CollectionNodeSpawns/1/briarwood-hastis-homework.json id 85; hand-placed (R)",
+        "heading": "legacy-data as above, Heading 0.0"
+      }
+    },
+    {
+      "id": 86,
+      "pool_key": "briarwood-hastis-homework",
+      "zone_definition_id": 1,
+      "position": [
+        -1052.0,
+        4.63,
+        307.0
+      ],
+      "heading": 0.0,
+      "source_tag": "legacy-data",
+      "source_tags": {
+        "position": "legacy-data Lxzxrus-Free-Realms-Server@e19669c src/Resources/CollectionNodeSpawns/1/briarwood-hastis-homework.json id 86; hand-placed (R)",
         "heading": "legacy-data as above, Heading 0.0"
       }
     }

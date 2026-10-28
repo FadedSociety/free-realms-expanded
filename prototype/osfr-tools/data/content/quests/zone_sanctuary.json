@@ -71,6 +71,86 @@
       ]
     },
     {
+      "id": 3000302,
+      "title_string_id": 74437,
+      "intro_text_string_id": 74436,
+      "description_string_id": 74456,
+      "end_text_string_id": 72906,
+      "giver_npc_id": 9500000509,
+      "prerequisite_quest_ids": [
+        3000301
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "node_type": "hastis-homework",
+          "quantity": 8,
+          "text_string_id": 46489,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3002 goal 1: NameId 46489; Type 2 RequiredCount 8 CollectNodeType \"hastis-homework\". Type 2 is the fork's Collect objective (Lxzxrus-Free-Realms-Server@37ef175 src/Sanctuary.Game/Resources/Definitions/QuestGoal.cs:5-9,57-59; src/Sanctuary.Game/Quests/QuestManager.cs:163 matches a collect goal by node type); \"hastis-homework\" is the node type key in data/content/quest_nodes.json. The fork goal DescriptionId 74456 has no field in the split schema; recorded here."
+            },
+            {
+              "kind": "client",
+              "evidence": "Global.Text.46489 'Missing Homework' resolves in lab/reports/locale-id-to-text.json."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000509,
+          "dialogue_string_id": 72906,
+          "text_string_id": 74455,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3002 goal 2: NameId 74455; DialogueId 72906; TargetGuid 100000002335 = definition 2335 (Nomi, NameId 46272, Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Npcs.json Id 2335 and src/Scripts/Zone/FabledRealms.lua:941), bound to npcs/sanctuary.json 9500000509 at the same spawn; the last goal at the turn-in NPC: its DialogueId 72906 is the quest's end_text_string_id."
+            },
+            {
+              "kind": "client",
+              "evidence": "Global.Text.74455 'Return to Nomi' and the end text 72906 resolve in lab/reports/locale-id-to-text.json."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 40,
+          "items": [],
+          "job_xp": {
+            "1": 25
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3002: RewardCoins 40. Its RewardExperience 100 is not used; job_xp follows the T202 ladder. The fork reward item is deferred; see the reconstructed note."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 25 goes to profile 1 (Adventurer) on the T202 collect rung (notes/Autopilot/T202.md:137-141). The fork RewardItems [69834] is recorded only here and grants no item: item rewards wait for T412."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3002 \"Hasti's Homework Heist\" (quest data last changed in 1c36ad7): TitleId 74437, DescriptionId 74456, GiverDialogueId 74436, ObjectiveDescriptionId 74456, GiverGuid and TargetGuid 100000002335 (definition 2335 = Nomi), PrerequisiteQuestId 3001, NextQuestId 0. AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 74437 \"Hasti's Homework Heist\" (title), 74456 (description and collect goal description), 74436 (intro), 46489 (collect goal) and 74455/72906 (talk goal and end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T539: minted id 3000302 = 3000300 + (fork QuestId 3002 - 3000); XP rung 25 (collect row); coin value 40 is the fork's RewardCoins; the fork's item 69834 is recorded here only and is not granted."
+        }
+      ]
+    },
+    {
       "id": 3000310,
       "title_string_id": 390787,
       "intro_text_string_id": 390786,

@@ -38,6 +38,8 @@ const GROSH: u64 = 9_000_000_335;
 const NOG: u64 = 9_500_000_925;
 /// The new row this slice adds (the fork's definition 3120).
 const BURGLZ: u64 = 9_500_001_007;
+/// T539: the quarry follow-up Burglz offers once the Quarry is complete.
+const TOOLS: u32 = 3_000_342;
 const OTHER: u64 = CHARACTER + 1;
 const MINER: i32 = 14;
 
@@ -148,8 +150,9 @@ fn lazy_trolls_then_the_quarry() {
         "a duplicate 49/14",
     );
     assert_no_offer(&mut game, &vergosh, VERGOSH, &mut now, "Vergosh after both");
+    // T539: completing the Quarry opens the Burglz quarry follow-up.
     let burglz = MAP.at(CHARACTER, BURGLZ);
-    assert_no_offer(&mut game, &burglz, BURGLZ, &mut now, "Burglz after both");
+    offer(&mut game, &burglz, BURGLZ, TOOLS, now);
 }
 
 #[test]

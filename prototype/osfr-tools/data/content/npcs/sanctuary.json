@@ -39379,7 +39379,8 @@
       ],
       "quests_given": [],
       "quest_ids_given": [
-        3000301
+        3000301,
+        3000302
       ],
       "quests_given_text": [],
       "quests_accepted": [],
@@ -39568,7 +39569,7 @@
         "quest_ids_given": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) T500: Nomi's Little Brother (3000301) is given and handed in here; id minted from Lxzxrus QuestId 3001"
+            "evidence": "(R) T500/T539: Nomi's Little Brother (3000301) and Hasti's Homework Heist (3000302) are given and handed in here; ids minted from Lxzxrus QuestId 3001 and 3002."
           }
         ],
         "quests_given_text": [
