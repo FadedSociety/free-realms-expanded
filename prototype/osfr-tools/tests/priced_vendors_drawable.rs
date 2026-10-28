@@ -19,7 +19,7 @@
 #[path = "common/gateway_vendor.rs"]
 mod gateway_vendor;
 
-use gateway_vendor::{inner_packets, interact, login, select, send, wrap};
+use gateway_vendor::{bundle, inner_packets, interact, login, select, send, wrap};
 use osfr_tools::{
     account_store::AccountRole,
     character_store::CharacterState,
@@ -598,6 +598,46 @@ fn a_far_or_wrong_zone_click_changes_nothing() {
         "a wrong-zone click must be refused"
     );
     assert_eq!(game.state(), before, "a wrong-zone click changed state");
+}
+
+/// T836/F843: only a combined `[0,25]` datagram turns a handler `Err` into a session end
+/// (`Gateway::handle_at`), so the single-message test above passed while a bundled far click
+/// killed the client. A far 26/8 and a far 26/10 in one bundle must answer `Ok` with no
+/// delivery and no state change.
+#[test]
+fn a_far_click_bundle_never_ends_the_session() {
+    const FLORINA: u64 = 9_500_000_482;
+    let content = content_dir();
+    let npcs = npc_rows(&content);
+    let npc = npcs.get(&FLORINA).expect("Florina row");
+    let choice = shop_choice(&content, FLORINA);
+    let mut far = connect(
+        character_at([npc.position[0] + 100.0, npc.position[1], npc.position[2]]),
+        base_state().clone(),
+    );
+    let before = far.snapshot();
+    let outcome = far
+        .handle_at(
+            &bundle(&[
+                wrap(&interact(FLORINA)),
+                wrap(&select(FLORINA, choice as u32)),
+            ]),
+            NOW,
+        )
+        .expect("a far click bundle is a per-session refusal, not a session end");
+    assert!(
+        inner_packets(&outcome).is_empty(),
+        "a far click bundle sent a reply"
+    );
+    assert!(
+        !outcome.state_changed,
+        "a far click bundle reported a state change"
+    );
+    assert_eq!(
+        far.snapshot(),
+        before,
+        "a far click bundle changed the session"
+    );
 }
 
 #[test]

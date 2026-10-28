@@ -673,7 +673,7 @@ impl Gameplay {
                 Err(error) => {
                     npc_event(serde_json::json!({
                         "event": "npc_menu", "guid": request.target, "content_key": key,
-                        "options": [], "outcome": "refused", "reason": format!("{error:?}")
+                        "options": [], "outcome": "refused", "reason": refusal_reason(&error)
                     }));
                     return Ok(None);
                 }
@@ -907,13 +907,13 @@ impl Gameplay {
                         Some("quest_engine_unavailable"),
                     ));
                 }
-                Err(_) => {
+                Err(error) => {
                     npc_event(select_event_with_reason(
                         runtime_guid,
                         Some(key),
                         option_id,
                         "none",
-                        Some("selection_rejected"),
+                        Some(refusal_reason(&error)),
                     ));
                     // T836: refused (stale or far): nothing happens and the session stays.
                     return Ok(None);
@@ -1417,6 +1417,26 @@ impl Gameplay {
     }
 }
 
+/// The stable `npc_menu`/`npc_select` trace reason for a refused click or choice. Fixed names
+/// keep a native log searchable and tell an out-of-range click from a stale or unoffered row;
+/// `Debug` would rename the value with the variant.
+fn refusal_reason(error: &npc_interaction::NpcInteractionError) -> &'static str {
+    use npc_interaction::NpcInteractionError;
+    match error {
+        NpcInteractionError::UnknownNpc => "unknown_npc",
+        NpcInteractionError::OutOfRange => "out_of_range",
+        NpcInteractionError::WrongZone => "wrong_zone",
+        NpcInteractionError::MissingPosition => "missing_position",
+        NpcInteractionError::NoInteraction => "no_interaction",
+        NpcInteractionError::NoOpenShop => "no_open_shop",
+        NpcInteractionError::InvalidOption => "invalid_option",
+        NpcInteractionError::WrongMerchant => "wrong_merchant",
+        NpcInteractionError::InvalidPacket => "invalid_packet",
+        NpcInteractionError::NeedsQuestEngine => "quest_engine_unavailable",
+        NpcInteractionError::CoinShop(_) => "coin_shop_error",
+    }
+}
+
 /// One `npc_select` telemetry row for the reason-less outcomes (shop, race, derby, fish
 /// and learn): the five-key shape the old literals emitted.
 fn select_event(
@@ -1732,7 +1752,7 @@ mod tests {
             ("quest_choice", Some("no_eligible_quest")),
             ("quest_turnin", Some("quest_turnin")),
             ("none", Some("npc_content_unavailable")),
-            ("none", Some("selection_rejected")),
+            ("none", Some("out_of_range")),
             ("none", Some("quest_engine_unavailable")),
         ] {
             let event = select_event_with_reason(9, Some(11), 2, outcome, reason);
@@ -1757,6 +1777,40 @@ mod tests {
         assert_eq!(event["guid"], 9);
         assert_eq!(event["content_key"], 11);
         assert_eq!(event["item_count"], 4);
+    }
+
+    /// T836/F843: a refused 26/8 or 26/10 row names its cause. The old `selection_rejected`
+    /// constant hid whether the click was far, stale or unoffered; no two causes may collapse.
+    #[test]
+    fn refusal_reasons_name_every_npc_error() {
+        use npc_interaction::NpcInteractionError;
+        let reasons = [
+            (NpcInteractionError::UnknownNpc, "unknown_npc"),
+            (NpcInteractionError::OutOfRange, "out_of_range"),
+            (NpcInteractionError::WrongZone, "wrong_zone"),
+            (NpcInteractionError::MissingPosition, "missing_position"),
+            (NpcInteractionError::NoInteraction, "no_interaction"),
+            (NpcInteractionError::NoOpenShop, "no_open_shop"),
+            (NpcInteractionError::InvalidOption, "invalid_option"),
+            (NpcInteractionError::WrongMerchant, "wrong_merchant"),
+            (NpcInteractionError::InvalidPacket, "invalid_packet"),
+            (
+                NpcInteractionError::NeedsQuestEngine,
+                "quest_engine_unavailable",
+            ),
+            (
+                NpcInteractionError::CoinShop(io::ErrorKind::Other),
+                "coin_shop_error",
+            ),
+        ];
+        for (error, expected) in &reasons {
+            assert_eq!(refusal_reason(error), *expected);
+        }
+        let names: BTreeSet<&str> = reasons
+            .iter()
+            .map(|(error, _)| refusal_reason(error))
+            .collect();
+        assert_eq!(names.len(), reasons.len(), "two refusals share a reason");
     }
 
     /// T318: a display row the client entry reader cannot instantiate makes the 49/1

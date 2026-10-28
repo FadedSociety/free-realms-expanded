@@ -19,7 +19,7 @@
 mod gateway_packets;
 // Each `#[path]` suite uses a different subset of these request builders.
 #[allow(unused_imports)]
-pub use gateway_packets::{interact, login, select};
+pub use gateway_packets::{bundle, interact, login, select};
 
 use osfr_tools::{
     character_store::CharacterState,

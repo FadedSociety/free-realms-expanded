@@ -66,10 +66,10 @@ fn send_error(
 ) {
     let before = saved(game);
     let refused = game.handle_in_world(packet, character, now);
+    // T836/F843: a refused NPC click must stay `Ok`; an `Err` here ends the client's session
+    // when the same request rides a combined `[0,25]` datagram, so it is not a refusal.
     assert!(
-        refused
-            .as_ref()
-            .map_or(true, |out| out.replies.is_empty() && !out.changed),
+        refused.is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "{label}: the request must be refused"
     );
     assert_eq!(saved(game), before, "{label}: a refusal changed the save");
