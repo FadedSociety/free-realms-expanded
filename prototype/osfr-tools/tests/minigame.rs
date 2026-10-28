@@ -528,18 +528,31 @@ fn prize_wheel_landing_is_server_selected_and_stop_report_cannot_pay() {
     assert!(duplicate.reward_packets.is_empty());
 }
 
-/// T795: flag `+616` (end-of-game dialog on 39/19, `009bf190`) stays on for every shared run;
-/// only a card run, whose result belongs to the card window, may leave it off. A card run's
-/// start waits for its ticket request (39/37), which the offered run already answers.
+/// T856: flag `+616` (end-of-game dialog on 39/19, `009bf190`) stays on for every run; a card
+/// run is no exception, because the dialogless handler runs Lua `:QuitGameWithNoEndGameScreen`,
+/// which re-enters the minigame leave while the 39/19 handler is on the stack and overflows the
+/// client. A card run's start still waits for its ticket request (39/37).
 #[test]
-fn only_a_card_run_may_skip_the_end_dialog_and_it_starts_after_its_ticket() {
+fn every_run_keeps_the_end_dialog_and_a_card_run_starts_after_its_ticket() {
     let mut dialogless = spec();
     dialogless.flags[4] = 0;
     assert!(MinigameRuns::new(1).unwrap().offer(dialogless).is_err());
 
+    let mut runs = MinigameRuns::new(61_000_001).unwrap();
+    let before = runs.snapshot().unwrap();
     let mut card = RunSpec::empty(500, 16, RunMode::CardClient);
     card.flags[4] = 0;
-    let mut runs = MinigameRuns::new(61_000_001).unwrap();
+    assert!(
+        runs.offer(card).is_err(),
+        "a card run keeps +616 too (T856)"
+    );
+    assert_eq!(
+        runs.snapshot().unwrap(),
+        before,
+        "the refused offer changes nothing"
+    );
+
+    let card = RunSpec::empty(500, 16, RunMode::CardClient);
     assert!(runs.offer(card).unwrap().accepted);
     let before = runs.snapshot().unwrap();
     let early = runs.handle_client(&request(5, 61_000_001)).unwrap();

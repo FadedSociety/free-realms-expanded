@@ -216,15 +216,16 @@ impl Launches {
     }
 
     /// Offer the row's run (39/16). The card asset list in it starts the client's loader, which
-    /// ends in the client's 39/37 ticket request and then its 39/5 Start click. Flag `+616` is
-    /// off: the card window owns the result, so 39/19 must not open an empty end-of-game dialog
-    /// (`009bf190`) (R).
+    /// ends in the client's 39/37 ticket request and then its 39/5 Start click. The flags stay
+    /// the client default: `+616` = 1 makes the server's 39/19 on leaving take the standard
+    /// end-of-game path (`009bf190` -> `009b7170`). Clearing it instead runs Lua
+    /// `:QuitGameWithNoEndGameScreen`, which re-enters the minigame leave while the 39/19
+    /// handler is on the stack and overflows the client's stack (T856, native 0xC00000FD).
     pub fn begin(&mut self, row: &Row) -> io::Result<RunOutcome> {
         let game_id = i32::try_from(row.minigame_id)
             .map_err(|_| invalid("card mini-game id is out of range"))?;
         let mut spec = RunSpec::empty(game_id, CARD_GAME_TYPE, RunMode::CardClient);
         spec.preload_file.clone_from(&self.preload_file);
-        spec.flags[4] = 0;
         self.runs.offer(spec)
     }
 

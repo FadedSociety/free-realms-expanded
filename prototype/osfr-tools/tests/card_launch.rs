@@ -394,9 +394,10 @@ fn the_card_start_order_runs_end_to_end_through_the_gateway() {
         .expect("39/16 offer");
     let instance = i32_at(offer, 3);
     assert_eq!(offer_preload(offer), "TradingCardAssets.txt");
-    // The start screen waits for the Start click, and no end-of-game dialog follows the card
-    // window (`009bf190` reads game bytes `+2311` and `+2312`, set from these flags).
-    assert_eq!(offer_flags(offer), [1, 1, 1, 1, 0]);
+    // The flags stay the client default: `+616` = 1 (`009bf190` reads it as game byte `+2312`)
+    // makes the 39/19 on leaving take the standard end-of-game path instead of the Lua
+    // `:QuitGameWithNoEndGameScreen` re-entry that overflows the client (T856).
+    assert_eq!(offer_flags(offer), [1, 1, 1, 1, 1]);
 
     // Start before the ticket: nothing is sent and nothing is saved.
     let before = gateway.snapshot();

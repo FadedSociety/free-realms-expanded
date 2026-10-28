@@ -102,9 +102,10 @@ impl RunSpec {
             || self.objectives.len() % INFO_OBJECTIVE_BYTES != 0
             || self.objectives.len() / INFO_OBJECTIVE_BYTES > 4096
             || self.flags.iter().any(|flag| *flag > 1)
-            // Flag `+616` asks for the end-of-game dialog on 39/19 (`009bf190`). Only a card run
-            // may drop it: its result belongs to the card window, not to a 39/18 result record.
-            || (self.flags[4] != 1 && self.mode != RunMode::CardClient)
+            // Flag `+616` asks for the end-of-game dialog on 39/19 (`009bf190`). Every run keeps
+            // it: without the flag the handler runs Lua `:QuitGameWithNoEndGameScreen`, which
+            // re-enters the minigame leave and overflows the client's stack (T856).
+            || self.flags[4] != 1
             || self.preload_file.len() > 1024
             || self
                 .preload_file
