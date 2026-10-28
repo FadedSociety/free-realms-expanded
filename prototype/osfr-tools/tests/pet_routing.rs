@@ -11,7 +11,7 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
-#[path = "../src/bin/osfr_gateway/pet_wire.rs"]
+#[path = "support/pet_wire.rs"]
 mod pet_wire;
 use pet_wire::{summon, summon_by_item};
 

@@ -12,7 +12,7 @@ mod json;
 mod npc_quest_chain;
 #[path = "support/pet_inventory.rs"]
 mod pet_inventory;
-#[path = "../src/bin/osfr_gateway/pet_wire.rs"]
+#[path = "support/pet_wire.rs"]
 mod pet_wire;
 
 use care::*;

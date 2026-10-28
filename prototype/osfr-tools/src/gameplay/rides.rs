@@ -5,10 +5,10 @@ use crate::item_bar::use_wire;
 
 mod pet_treasure;
 
-/// F778: the shared client `53/*` pet request bodies, the same file the gateway's session tests
-/// and `tests/pet_routing.rs` include (test-only).
+/// F820: the shared client `53/*` pet request bodies (`tests/support/pet_wire.rs`), included by
+/// the pet suites, the gateway's session tests and this module (test-only support tree).
 #[cfg(test)]
-#[path = "../bin/osfr_gateway/pet_wire.rs"]
+#[path = "../../tests/support/pet_wire.rs"]
 mod pet_wire;
 
 /// The terrain height under (x, z) in `zone`, and whether that zone has a height grid at all:

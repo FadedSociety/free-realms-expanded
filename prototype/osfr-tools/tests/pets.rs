@@ -15,7 +15,7 @@ static SEQUENCE: AtomicU64 = AtomicU64::new(0);
 mod pet_inventory;
 use pet_inventory::InventoryFixture;
 
-#[path = "../src/bin/osfr_gateway/pet_wire.rs"]
+#[path = "support/pet_wire.rs"]
 mod pet_wire;
 use pet_wire::can_go_reply;
 

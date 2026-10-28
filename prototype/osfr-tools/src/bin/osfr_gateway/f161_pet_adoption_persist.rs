@@ -6,7 +6,7 @@ use super::test_support::{self, Scene, Scratch, bin_test_target};
 use super::*;
 use osfr_tools::inventory::InventoryItem;
 
-#[path = "pet_wire.rs"]
+#[path = "../../../tests/support/pet_wire.rs"]
 pub(crate) mod pet_wire;
 
 /// Bundled `pets.json`: species 1000015 (Char) is adopted from item 70352.

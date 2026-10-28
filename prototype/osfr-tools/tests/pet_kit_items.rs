@@ -18,7 +18,7 @@ mod care;
 mod json;
 #[path = "support/pet_inventory.rs"]
 mod pet_inventory;
-#[path = "../src/bin/osfr_gateway/pet_wire.rs"]
+#[path = "support/pet_wire.rs"]
 mod pet_wire;
 #[path = "common/round70_content.rs"]
 mod round70_content;

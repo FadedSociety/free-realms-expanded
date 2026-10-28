@@ -15,7 +15,7 @@
 mod gateway_packets;
 #[path = "support/pet_inventory.rs"]
 mod pet_inventory;
-#[path = "../src/bin/osfr_gateway/pet_wire.rs"]
+#[path = "support/pet_wire.rs"]
 mod pet_wire;
 #[path = "../src/restoration/piece_056.rs"]
 #[allow(dead_code)]

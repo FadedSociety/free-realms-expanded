@@ -8,7 +8,7 @@ mod gateway_packets;
 mod json;
 #[path = "support/pet_inventory.rs"]
 mod pet_inventory;
-#[path = "../src/bin/osfr_gateway/pet_wire.rs"]
+#[path = "support/pet_wire.rs"]
 mod pet_wire;
 
 use gateway_packets::{body, wrap};
@@ -484,6 +484,15 @@ fn a_feed_apply_sets_both_save_flags_and_survives_a_whole_document_reload() {
         .handle_at(&wrap(&pet_wire::feed(1)), NOW + 4)
         .unwrap();
     assert_eq!(notify_kind(&started.replies), Some(1), "the feed begins");
+    // F820: the saved-document assertion below is only meaningful when the food need actually
+    // rises, so pin the pre-feed value (the start level is below full).
+    let before = gateway.gameplay().unwrap().pets_document().unwrap()["pets"][0]["needs"]["food"]
+        .as_f64()
+        .unwrap();
+    assert!(
+        before < 100.0,
+        "the feed has room to raise the need: {before}"
+    );
     // F778: this is the opening scene's tick branch, which used to run `gameplay.tick` alone, so
     // the feed never applied there.
     let applied = gateway.tick_at(NOW + 1_000).unwrap();
@@ -546,10 +555,10 @@ fn a_feed_apply_sets_both_save_flags_and_survives_a_whole_document_reload() {
             "the eaten food is in the saved document"
         );
         let pets = document.pets.as_ref().expect("the roster is saved");
-        assert_eq!(
-            pets["pets"][0]["needs"]["food"].as_f64(),
-            Some(100.0),
-            "the raised food need is saved"
+        let saved = pets["pets"][0]["needs"]["food"].as_f64().unwrap();
+        assert!(
+            saved > before,
+            "the raised food need is saved: {before} -> {saved}"
         );
         assert_eq!(
             pets["pets"][0]["equipment"]["utilities"][6],

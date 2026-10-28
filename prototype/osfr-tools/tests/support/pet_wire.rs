@@ -1,5 +1,6 @@
-//! Client `53/*` pet request bodies shared by the gateway's session tests and
-//! `tests/pet_routing.rs`. Test-only; production never includes this file.
+//! Client `53/*` pet request bodies shared by the pet suites, the gateway's session tests and the
+//! `Gameplay` pet tests. Test-only; production never includes this file. F820: it lives in the
+//! shared test support tree, so a library test does not depend on a binary's sources.
 //!
 //! `SendPetSummonByItemId` (`00b60110`) writes subtype 32, then the `ItemRecord`
 //! definition (`+4`) and tint (`+8`) that `00a1ec00` pushes at `00a1f2c2`-`00a1f2d2`;

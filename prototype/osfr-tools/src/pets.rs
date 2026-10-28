@@ -2316,8 +2316,8 @@ impl PetService {
     /// a decayed view (the roster is not written) goes out as 53/3
     /// once it moved by `status_epsilon` and `status_interval_ms` has passed. T531: a settled pet's
     /// idle animations and its thought bubbles ride the same tick (`idle_tick`). F778: an apply that
-    /// emptied the fitted food's stack also echoes that slot as a 53/16 clear, so the care panel
-    /// does not keep a ghost food. T828: the apply also sets `notice` (the feed's one completion
+    /// emptied a fitted food's stack echoes every slot that lost it as a 53/16 clear, so the care
+    /// panel does not keep a ghost food. T828: the apply also sets `notice` (the feed's one completion
     /// line) next to the eat animation. A failure is a refusal for this player, never an error out
     /// of the tick.
     pub fn care_tick(&mut self, inventory: &mut Inventory, now_ms: u64) -> PetWire {
@@ -2331,7 +2331,17 @@ impl PetService {
             let elapsed = now_ms.saturating_sub(feeding.started_ms);
             if let Some(food) = feeding.food.filter(|_| elapsed >= care.feed_effect_ms) {
                 feeding.food = None;
-                let fitted = self.pet(active.pet_id).map(|pet| pet.equipment.utilities);
+                // F778/F820: an emptied stack is cleared from every pet that fitted it
+                // (`spend_one`); remember each (pet, slot) holding the food so the client can be
+                // told.
+                let mut fitted = Vec::new();
+                for pet in &self.roster.pets {
+                    for (index, was) in pet.equipment.utilities.iter().enumerate() {
+                        if *was == Some(food) {
+                            fitted.push((pet.id, index));
+                        }
+                    }
+                }
                 // A food that left the bag consumes nothing; the feed still ends on time.
                 if let Ok(outcome) = self.care(
                     active.pet_id,
@@ -2355,19 +2365,16 @@ impl PetService {
                     // eat (R). A food that left the bag reaches no `care`, so it says nothing.
                     wire.notice = Some(FEED_FINISHED);
                     wire.changed = true;
-                    // F778: the last unit clears its fitted slot in `care` (`spend_one`); the
-                    // care panel still shows the food the 53/16 echo told it about (`00b5ce60`
-                    // case 16), so clear those slots on the client too.
-                    if let (Some(fitted), Some(pet)) = (fitted, self.pet(active.pet_id)) {
-                        for (index, was) in fitted.iter().enumerate() {
-                            if *was == Some(food) && pet.equipment.utilities[index].is_none() {
-                                wire.private.push(pet_utility_packet(
-                                    true,
-                                    active.pet_id,
-                                    index as u32,
-                                    0,
-                                ));
-                            }
+                    // F778/F820: echo every slot that actually lost the food. (R) The care panel
+                    // otherwise keeps showing it from the 53/16 echo; the recovered part is the
+                    // client's write into its pet record (`00b5ce60` case 16, `00b5ea69`).
+                    for (pet_id, index) in fitted {
+                        if self
+                            .pet(pet_id)
+                            .is_some_and(|pet| pet.equipment.utilities[index].is_none())
+                        {
+                            wire.private
+                                .push(pet_utility_packet(true, pet_id, index as u32, 0));
                         }
                     }
                     let needs = self.pet(active.pet_id).map(|pet| pet.needs);

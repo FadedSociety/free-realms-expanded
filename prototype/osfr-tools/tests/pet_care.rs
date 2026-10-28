@@ -8,7 +8,7 @@ mod care;
 mod json;
 #[path = "support/pet_inventory.rs"]
 mod pet_inventory;
-#[path = "../src/bin/osfr_gateway/pet_wire.rs"]
+#[path = "support/pet_wire.rs"]
 mod pet_wire;
 
 use care::*;
@@ -395,6 +395,53 @@ fn feeding_the_last_food_clears_the_fitted_slot_for_the_client() {
             .cloned()
             .collect::<Vec<_>>(),
         vec![words(&[53, 0, 16, 1], &[pet, 6, 0])]
+    );
+    assert_eq!(count(&fixture, BOWL_ITEM), 1, "the bowl stays");
+}
+
+/// F820: `spend_one` clears the emptied instance from every pet that fitted it, so the apply's
+/// 53/16 clears must cover those slots too, not only the summoned pet's: the other pet's care
+/// panel kept a ghost food.
+#[test]
+fn feeding_the_last_food_clears_every_pet_that_fitted_it() {
+    let (mut service, pet) = dog();
+    let content = PetContent::bundled().unwrap();
+    let mut definition = content.definition(1_000_015).unwrap();
+    definition.model = content.model(364).unwrap().adr.clone();
+    let other = service.adopt_vendor_grant(2, &definition, 0).unwrap();
+    let mut fixture =
+        InventoryFixture::with_kit_items(&[(BOWL_ITEM, BOWL, 1), (FOOD_ITEM, FOOD, 1)], &KIT);
+    send(&mut service, &mut fixture, &fit(pet, 5, BOWL_ITEM), T0);
+    send(&mut service, &mut fixture, &fit(pet, 6, FOOD_ITEM), T0);
+    // The same owned instance fits a second pet's slot: no rule refuses a duplicate fit.
+    assert!(
+        send(&mut service, &mut fixture, &fit(other, 6, FOOD_ITEM), T0).changed,
+        "the second pet takes the shared food"
+    );
+    send(&mut service, &mut fixture, &summon(pet), T0);
+    send(&mut service, &mut fixture, &feed(pet), T0 + 1_000);
+    let applied = service.care_tick(&mut fixture.inventory, T0 + 2_000);
+    assert!(applied.changed);
+    assert_eq!(count(&fixture, FOOD_ITEM), 0, "the last food is eaten");
+    for who in [pet, other] {
+        assert_eq!(
+            service.pet(who).unwrap().equipment.utilities[6],
+            None,
+            "pet {who} loses the emptied stack"
+        );
+    }
+    assert_eq!(
+        applied
+            .private
+            .iter()
+            .filter(|packet| packet.starts_with(&[53, 0, 16]))
+            .cloned()
+            .collect::<Vec<_>>(),
+        vec![
+            words(&[53, 0, 16, 1], &[pet, 6, 0]),
+            words(&[53, 0, 16, 1], &[other, 6, 0]),
+        ],
+        "one clear for every slot that lost the food"
     );
     assert_eq!(count(&fixture, BOWL_ITEM), 1, "the bowl stays");
 }
