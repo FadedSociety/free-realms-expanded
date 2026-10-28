@@ -70,7 +70,13 @@ struct Actor {
 #[derive(Deserialize)]
 struct Content {
     schema_version: u32,
+    /// T853: a local filename used by existing content; the release overlay leaves this empty.
+    #[serde(default)]
     template_file: String,
+    /// T853: the AddNpc skeleton as hex; when non-empty, `template_file` is not read.
+    /// `template_sha256` pins the bytes either way.
+    #[serde(default)]
+    template_hex: String,
     template_sha256: String,
     npc: Actor,
     enemy: Actor,
@@ -101,13 +107,23 @@ impl Combat {
         }
         let mut content: Content =
             serde_json::from_slice(&config).map_err(|e| invalid(&e.to_string()))?;
-        let path = Path::new(&content.template_file);
-        if path.components().count() != 1
-            || !matches!(path.components().next(), Some(Component::Normal(_)))
-        {
-            return Err(invalid("combat template must be a local filename"));
+        if content.template_hex.is_empty() {
+            let path = Path::new(&content.template_file);
+            if path.components().count() != 1
+                || !matches!(path.components().next(), Some(Component::Normal(_)))
+            {
+                return Err(invalid("combat template must be a local filename"));
+            }
+            content.template = fs::read(directory.join(path))?;
+        } else {
+            // T853: the release ships typed JSON with no binary template. The bytes are
+            // the same AddNpc skeleton `validate_template` pins; the hash still verifies.
+            if content.template_hex.len() > 4096 {
+                return Err(invalid("combat template hex too large"));
+            }
+            content.template = crate::startup_snapshot::decode_hex(&content.template_hex)
+                .map_err(|_| invalid("invalid combat template hex"))?;
         }
-        content.template = fs::read(directory.join(path))?;
         if format!("{:x}", Sha256::digest(&content.template)) != content.template_sha256 {
             return Err(invalid("combat template hash mismatch"));
         }

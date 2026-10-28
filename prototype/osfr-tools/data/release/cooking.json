@@ -1,0 +1,192 @@
+{
+  "description_id": 20520,
+  "game_id": 46,
+  "icon_id": 916,
+  "name_id": 386023,
+  "phase_notice": "Original game_cooking.gfx controls, six original stage types and ingredient art. MimicMiniGameData/MimicMiniGamePhaseData recipe rows are missing: this six-stage order, nominal90-second duration, fruit count, scores and meter speeds are reconstructed using supplied movie defaults/clamps. Game46 selection is reconstructed; original46/560 rows share metadata and the starter binding is unresolved. Recipe55824 StrongArm Stew has wiki-evidenced four each Bat Meat/Gummyfruit/Rainleaf/Spice; fixed one-food output35 is reconstructed. Client GameWon quantity0 cannot choose a reward. Student Chef Hat14794 remains a separate quest reward. Ordered reports and cumulative totals are checked; server does not simulate every mouse action.",
+  "phases": [
+    {
+      "data": [
+        10,
+        8,
+        15,
+        2,
+        50,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "duration": 90,
+      "end_id": 0,
+      "id": 4601,
+      "objective_id": 0,
+      "sequence": 1,
+      "stage_type": 1,
+      "start_id": 0
+    },
+    {
+      "data": [
+        24,
+        15,
+        1,
+        1,
+        100,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "duration": 90,
+      "end_id": 0,
+      "id": 4602,
+      "objective_id": 0,
+      "sequence": 2,
+      "stage_type": 2,
+      "start_id": 0
+    },
+    {
+      "data": [
+        40,
+        2,
+        2,
+        0,
+        20,
+        20,
+        2,
+        3,
+        100,
+        200,
+        400
+      ],
+      "duration": 90,
+      "end_id": 0,
+      "id": 4603,
+      "objective_id": 0,
+      "sequence": 3,
+      "stage_type": 3,
+      "start_id": 0
+    },
+    {
+      "data": [
+        49,
+        8,
+        3,
+        100,
+        500,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "duration": 90,
+      "end_id": 0,
+      "id": 4604,
+      "objective_id": 0,
+      "sequence": 4,
+      "stage_type": 6,
+      "start_id": 0
+    },
+    {
+      "data": [
+        46,
+        0,
+        500,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "duration": 90,
+      "end_id": 0,
+      "id": 4605,
+      "objective_id": 0,
+      "sequence": 5,
+      "stage_type": 17,
+      "start_id": 0
+    },
+    {
+      "data": [
+        46,
+        10,
+        0,
+        100,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "duration": 90,
+      "end_id": 0,
+      "id": 4606,
+      "objective_id": 0,
+      "sequence": 6,
+      "stage_type": 7,
+      "start_id": 0
+    }
+  ],
+  "profile_id": 45,
+  "provenance": {
+    "community_reader": "dbg-pack8feac971cc21449b20f1cb58d0f1ff900fd6b849; prior original-cooking-proposal.json",
+    "recipe": "https://freerealms.fandom.com/wiki/List_of_Recipes_(Chef)?oldid=45318",
+    "scope": "Original game_cooking.gfx controls, six original stage types and ingredient art. MimicMiniGameData/MimicMiniGamePhaseData recipe rows are missing: this six-stage order, nominal90-second duration, fruit count, scores and meter speeds are reconstructed using supplied movie defaults/clamps. Game46 selection is reconstructed; original46/560 rows share metadata and the starter binding is unresolved. Recipe55824 StrongArm Stew has wiki-evidenced four each Bat Meat/Gummyfruit/Rainleaf/Spice; fixed one-food output35 is reconstructed. Client GameWon quantity0 cannot choose a reward. Student Chef Hat14794 remains a separate quest reward. Ordered reports and cumulative totals are checked; server does not simulate every mouse action.",
+    "source_sha256": {
+      "lab:client-assets/pack_08/003398.txt": "46e347bcc92f3cd8442bc99b07b2ffa033e9bd3c95000fc3bd1a78692d0596c6",
+      "lab:client-assets/pack_08/003573.gfx": "6b105f899451ff131ea0b4dcdb00b13e99dcce64c60c6e8ebe1630d2cc9cbc9c",
+      "lab:client/Resources/MiniGameData.txt": "8ce3cc61a2ad324912465e8d1785d246ccd680a01712e256fddf702ce856c252",
+      "lab:minigame-scripts/minigames/cooking/scripts/__Packages/Cooking/Bucket.as": "3801a629c530d4fdb1f8639bc0ca43d175837c570a9092fc257556337595ff8d",
+      "lab:minigame-scripts/minigames/cooking/scripts/__Packages/Cooking/CookingData.as": "68c14586963b5b890d80c04e90b5d976c37e039b0723d3504bdef0594f55dcf7",
+      "lab:minigame-scripts/minigames/cooking/scripts/__Packages/Cooking/CookingGameClient.as": "8c9bd97abfc6d75845ca05512b72b68b4740a56a9366c52a718a8fe5533532bf",
+      "lab:minigame-scripts/minigames/cooking/scripts/__Packages/Cooking/CookingGameServer.as": "d4768444dc3402e7679d7ffbb72839ddb940b5dfec1b67ebcfd0775182ad2974",
+      "lab:minigame-scripts/minigames/cooking/scripts/__Packages/Cooking/CookingIngredient.as": "44fc6febe0f707492bf103413a6f2c827a3f9d12f2eb700193605c15294e731b",
+      "lab:minigame-scripts/minigames/cooking/scripts/__Packages/Cooking/RoundAddIngredient.as": "374192bf7c8bc641057aa3c07a4ebf93eb235ad180d926eba9335975e11f9704",
+      "lab:minigame-scripts/minigames/cooking/scripts/__Packages/Cooking/RoundChop.as": "52e35c1a7ddb706bb55e56b311865f96d0dac86cc455d58d62ad30347451b5df",
+      "lab:minigame-scripts/minigames/cooking/scripts/__Packages/Cooking/RoundMeasure.as": "14eb0d30b7cd61b2d079813045079bd60ec7dabf8bbe0c5cbd671a9cf3933009",
+      "lab:minigame-scripts/minigames/cooking/scripts/__Packages/Cooking/RoundSmash.as": "87216fb416eb093964f597cb8fb88139d024b47698ee3f5cf46450651368eb08",
+      "lab:minigame-scripts/minigames/cooking/scripts/__Packages/Cooking/RoundStir.as": "74ae18cdebd1ed054d1ea1df1041eb47b1cc334fa95c1e9aefa5c6f1ba58cba9",
+      "lab:minigame-scripts/minigames/cooking/scripts/__Packages/Cooking/StageType.as": "423a2e0543f4bf5cd192a0f07d3a32532f417660ccd63085630865bad673d207",
+      "lab:minigame-scripts/minigames/cooking/scripts/__Packages/Cooking/TenderizeElem.as": "bb4ddecc2608a9191e4b3a1881d8f0bdce8e44df591c5bc0f33b440575412b45",
+      "lab:minigame-scripts/minigames/cooking/scripts/__Packages/GameExternalNetwork.as": "5f76bf92a1effede953568ebf47fdbb948f3bcc5f11f19179fe87a9b94b5cd88",
+      "lab:minigame-scripts/minigames/cooking/scripts/__Packages/Library/Timer.as": "f98894d086fe76543f5eda907ff3ead38479b7ab605c42a613615d180ae8b0a9",
+      "lab:minigame-scripts/minigames/cooking/scripts/__Packages/com/sonyonline/game/SoeNetworkTypeFreeRealms.as": "22bc63cd225365533c360ffdb48f30c8b2c1724fdcfe68e326a16b006babd152"
+    },
+    "tool": "Official JPEXS26.3.0 private GPL3 script export"
+  },
+  "recipe": {
+    "consumes": [
+      [
+        2862,
+        4
+      ],
+      [
+        2875,
+        4
+      ],
+      [
+        2884,
+        4
+      ],
+      [
+        2900,
+        4
+      ]
+    ],
+    "product_definition_id": 35,
+    "product_quantity": 1
+  },
+  "reconstructed_phase_values": true,
+  "schema_version": 1
+}

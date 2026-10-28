@@ -1,0 +1,42 @@
+{
+  "cooldown_ms": 600,
+  "enemy": {
+    "definition_id": 1294,
+    "model_id": 4,
+    "name": "Training Robgoblin",
+    "position": [
+      -1407.0,
+      -28.2,
+      344.0
+    ],
+    "texture_alias": "longjohns"
+  },
+  "hit_damage": 25,
+  "max_health": 100,
+  "npc": {
+    "definition_id": 0,
+    "model_id": 3311,
+    "name": "Realm Guide (sandbox)",
+    "position": [
+      -1414.0,
+      -28.2,
+      342.0
+    ],
+    "texture_alias": ""
+  },
+  "provenance": {
+    "definition_source": "Sanctuary 4f028dcc274f628b65ef665fd59b184f5f3d3e3e src/Resources/Npcs.json #1294; data facts only",
+    "layout": "Supplied Gateway.NPC.NPCSystem AddNpc; zero attachments/aliases/name/effects template only",
+    "models_sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+    "rules": "Original sandbox: stationary enemy, fixed damage, cooldown, explicit respawn, no authentic AI claim",
+    "source_file": "0010-ready.bin",
+    "source_manifest": "lab:references/rust-gateway-reference/manifest.json",
+    "source_manifest_sha256": "4608f6f0a6970aa484c211875eb10cab9794514e78d26909c183c2d2896e58c3",
+    "source_sha256": "ecdb77aa3b6ec56b9afcf843c18face8a7834fb81ff026cdabbeafab797720f4",
+    "template": "T853 overlay: the AddNpc skeleton is embedded as template_hex; the release ships no binary. The bytes are the captured 0010-ready.bin shape with the name, aliases and effects zeroed by the lab exporter."
+  },
+  "range": 8.0,
+  "schema_version": 1,
+  "template_hex": "230002007153687ceb73ec2507980600ef0c000000673c0600f0e2d400010000000000803f238105c55ccf03c217d981440000803fe1e3bdbc0000000064ee7f3f0000000000000000000000000100000000000000000000000000000001cdccccbd000000000000000000000000000000000000000000000000000000000000000000000064000000ffffffffffffffffffffffff0000ffffffff00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ffffffff000000000100000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000800000000000000720d00000000000000000000",
+  "template_sha256": "602c66b1a4ea9fac97eaec2d64c380bee17c33ff86e0aa9fe0b10c1da3bbfc19"
+}

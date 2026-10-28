@@ -1,0 +1,132 @@
+{
+  "description_id": 37273,
+  "game_id": 77,
+  "icon_id": 913,
+  "name_id": 386068,
+  "phase_notice": "Original game_smelting.gfx controls, physics and four-stage logic; original server phase table missing. Nominal90-second duration columns, phase tuning and the fixed ten-bar server recipe output are reconstructed. This supplied movie uses a stopwatch; nominal duration is not an enforced countdown. Ten is the movie's explicit SendGameWon request constant, not a recovered authoritative reward rule. Copper ore5/coal3 inputs are community wiki evidence, not a recovered2014 recipe table.",
+  "phases": [
+    {
+      "data": [
+        1,
+        5,
+        1,
+        1,
+        0,
+        20,
+        2,
+        3,
+        50,
+        100,
+        200
+      ],
+      "duration": 90,
+      "end_id": 0,
+      "id": 7701,
+      "objective_id": 0,
+      "sequence": 1,
+      "stage_type": 101,
+      "start_id": 0
+    },
+    {
+      "data": [
+        65,
+        8,
+        3,
+        100,
+        100,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "duration": 90,
+      "end_id": 0,
+      "id": 7702,
+      "objective_id": 0,
+      "sequence": 2,
+      "stage_type": 102,
+      "start_id": 0
+    },
+    {
+      "data": [
+        100,
+        1,
+        500,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "duration": 90,
+      "end_id": 0,
+      "id": 7703,
+      "objective_id": 0,
+      "sequence": 3,
+      "stage_type": 103,
+      "start_id": 0
+    },
+    {
+      "data": [
+        2,
+        500,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "duration": 90,
+      "end_id": 0,
+      "id": 7704,
+      "objective_id": 0,
+      "sequence": 4,
+      "stage_type": 104,
+      "start_id": 0
+    }
+  ],
+  "profile_id": 14,
+  "provenance": {
+    "community_schema": "Pinned Sanctuary closed PR76 MiniGameInfo/RewardBundle/BaseMiniGame/GameOver",
+    "input_recipe": "https://freerealms.fandom.com/wiki/Miner?oldid=46068",
+    "limits": "Original game_smelting.gfx controls, physics and four-stage logic; original server phase table missing. Nominal90-second duration columns, phase tuning and the fixed ten-bar server recipe output are reconstructed. This supplied movie uses a stopwatch; nominal duration is not an enforced countdown. Ten is the movie's explicit SendGameWon request constant, not a recovered authoritative reward rule. Copper ore5/coal3 inputs are community wiki evidence, not a recovered2014 recipe table.",
+    "native_payload": "FUN_009b2340/FUN_009538e0; SendMessage x86 strlen+1 at00c08519",
+    "source_sha256": {
+      "lab:client-assets/pack_08/003924.gfx": "e755dfe1b42be08e39ddeda43962f06aece2b0f3abe822378aac678f6ad10f80",
+      "lab:client/Resources/MiniGameData.txt": "8ce3cc61a2ad324912465e8d1785d246ccd680a01712e256fddf702ce856c252",
+      "lab:minigame-scripts/minigames/smelting/scripts/__Packages/Smelting/RoundBreakDownOre.as": "85e6af36ada6a99bde77d48b8fe223800d16a13afbb1c7cc3ca15dda34d0f75e",
+      "lab:minigame-scripts/minigames/smelting/scripts/__Packages/Smelting/RoundMeasure.as": "7887fdbf35538730a33d7385aabe10f2ac1255c366f4079326403e50fb1caee2",
+      "lab:minigame-scripts/minigames/smelting/scripts/__Packages/Smelting/SmeltingData.as": "663bd85f9cbcdc15ccec1a253d8a77fdca98771b56ea516396d77f6b070a8b59",
+      "lab:minigame-scripts/minigames/smelting/scripts/__Packages/Smelting/SmeltingGameClient.as": "49b759ae033eb6dcd000f786c7d60da1eaa6dd09841aac6e2005dead2c362ed5",
+      "lab:minigame-scripts/minigames/smelting/scripts/__Packages/Smelting/SmeltingGameServer.as": "88b40b430cfdc056ee3ed1ab14672453578da7d1dfc5f39b464bc8ca23b6d197",
+      "lab:minigame-scripts/minigames/smelting/scripts/__Packages/SpecialRounds/HeatFurnace/RoundHeatFurnace.as": "e20ca403a792b230dd1c98e82a8d6ec20698dd7871c176b6fc79b3ed3de3501f",
+      "lab:minigame-scripts/minigames/smelting/scripts/__Packages/com/sonyonline/game/SoeNetworkTypeFreeRealms.as": "22bc63cd225365533c360ffdb48f30c8b2c1724fdcfe68e326a16b006babd152"
+    },
+    "tool": "JPEXS26.3.0 script export (private GPL3 tool)"
+  },
+  "recipe": {
+    "consumes": [
+      [
+        2739,
+        5
+      ],
+      [
+        879,
+        3
+      ]
+    ],
+    "product_definition_id": 21785,
+    "product_quantity": 10
+  },
+  "reconstructed_phase_values": true,
+  "schema_version": 1
+}

@@ -1,0 +1,38 @@
+{
+  "changes": [
+    "native original cooking movie with explicit reconstructed rows/binding/output",
+    "four-count Chef gathering and once acceptance supplies",
+    "only missing complete food definition35",
+    "original artifact3934 preserved with verified Y-only placement",
+    "completed artifact visibility"
+  ],
+  "cooking_sha256": "c85184f30163ce564ebd51b7c64ff4fceac11fc4976a648ee4eb7a0f50d67eba",
+  "goal_shape_changes": [
+    {
+      "after": 4,
+      "before": 3,
+      "objective_id": 91000404,
+      "stage_id": 910004
+    },
+    {
+      "after": 4,
+      "before": 3,
+      "objective_id": 91000405,
+      "stage_id": 910004
+    },
+    {
+      "after": 4,
+      "before": 3,
+      "objective_id": 91001302,
+      "stage_id": 910013
+    },
+    {
+      "after": 4,
+      "before": 3,
+      "objective_id": 91001303,
+      "stage_id": 910013
+    }
+  ],
+  "opening_sha256": "c1f5ed3b124bdc35a5b51f56cbe596f83c88efa577242495b02b0421832a4470",
+  "schema_version": 1
+}

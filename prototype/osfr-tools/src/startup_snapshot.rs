@@ -899,7 +899,9 @@ fn read_coin_entries(reader: &mut Reader<'_>) -> io::Result<Vec<CoinStoreEntrySn
     Ok(entries)
 }
 
-pub(crate) fn decode_hex(value: &str) -> io::Result<Vec<u8>> {
+/// Decode an even-length byte span from the hex form the typed startup/content files use.
+/// (T853: the content loaders reuse it for their optional embedded templates.)
+pub fn decode_hex(value: &str) -> io::Result<Vec<u8>> {
     if value.len() % 2 != 0 {
         return Err(invalid("odd-length startup hex field"));
     }

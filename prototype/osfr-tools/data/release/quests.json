@@ -1,0 +1,97 @@
+{
+  "definitions": [
+    {
+      "coins": 0,
+      "description": "Protect Snowhill from the wandering yetis that have been harassing travelers. Jonathon Forkpath has promised you another medal for this.",
+      "giver_guid": 0,
+      "goals": [
+        {
+          "enemy_definition": 0,
+          "id": 14096,
+          "required": 20,
+          "text": "Defeat Petty Yetis"
+        }
+      ],
+      "id": 1617,
+      "initially_accepted": false,
+      "items": [
+        [
+          1843,
+          1
+        ]
+      ],
+      "original": true,
+      "title": "Harassing the Harassers"
+    },
+    {
+      "coins": 25,
+      "description": "Reconstructed local encounter: defeat three training Robgoblins. This is not an original Free Realms quest.",
+      "giver_guid": 5932739704372854785,
+      "goals": [
+        {
+          "enemy_definition": 1294,
+          "id": 1,
+          "required": 3,
+          "text": "Defeat three training Robgoblins"
+        }
+      ],
+      "id": 900001,
+      "initially_accepted": false,
+      "items": [
+        [
+          1195,
+          1
+        ]
+      ],
+      "original": false,
+      "title": "Local restoration: Robgoblin patrol"
+    }
+  ],
+  "journal": {
+    "bindings": [],
+    "hex": "0000000000000000ffffffff000a0000001e000000",
+    "length": 21,
+    "offset": 114943,
+    "sha256": "07b7d61577c2ece0c2c85edbabeaea6065bae552b78db2f36b45a290248ef5d2"
+  },
+  "provenance": {
+    "character_json_sha256": "e471ab7fd98532328fada3e759bdcb073f2baf626a4650f7334a540718358777",
+    "incremental_quest_packets": "unknown; native journal restored on reconnect",
+    "locale_export_sha256": "f1f22a30107c824af4b3021c8c7c323c927d3c6a9b82efc387e9eaba6ae62844",
+    "locale_tool": "Udaya-X2/FreeRealmsLocaleTools@ba2ede225ff33edab8e8e0d20c45d4c5156309e5 (MIT)",
+    "original_quests": 25,
+    "release": "T853 overlay: the journal is the fresh character's 21-byte empty span from data/content/startup/self_data.json, embedded as hex; no capture character journal is published, and the original quest 1617 starts unaccepted.",
+    "self_packet_sha256": "f4b8b4caeaf0beb52e5d36cee96fefdf5a6249dd70abf68bc999bc57a5f1bec3",
+    "serializer": "supplied ClientPcData.cs lines1492-1529; exact full-span match",
+    "trial": "reconstructed checkpoint activity; not original minigame protocol"
+  },
+  "schema_version": 1,
+  "trial": {
+    "checkpoints": [
+      [
+        -1390.6434326171875,
+        -27.634824752807617,
+        351.5563659667969
+      ],
+      [
+        -1390.6434326171875,
+        -27.634824752807617,
+        375.5563659667969
+      ],
+      [
+        -1414.6434326171875,
+        -27.634824752807617,
+        351.5563659667969
+      ]
+    ],
+    "cooldown_ms": 30000,
+    "radius": 6.0,
+    "reward_coins": 10,
+    "start": [
+      -1414.6434326171875,
+      -27.634824752807617,
+      351.5563659667969
+    ],
+    "time_limit_ms": 90000
+  }
+}

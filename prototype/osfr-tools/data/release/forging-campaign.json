@@ -1,0 +1,43 @@
+{
+  "changes": [
+    "native139 at both anvils",
+    "once-only tutorial supplies",
+    "native77 repeat supplies",
+    "75030 goal replaced by genuine30280",
+    "turn-in duplicate hammer removed"
+  ],
+  "disappear_after_interaction": [
+    {
+      "actor_guid": 5715144128442925065,
+      "objective_id": 91000302,
+      "stage_id": 910003
+    },
+    {
+      "actor_guid": 5715144128442925066,
+      "objective_id": 91000303,
+      "stage_id": 910003
+    },
+    {
+      "actor_guid": 5715144128442925067,
+      "objective_id": 91000304,
+      "stage_id": 910003
+    },
+    {
+      "actor_guid": 5715144128442925077,
+      "objective_id": 91001001,
+      "stage_id": 910010
+    },
+    {
+      "actor_guid": 5715144128442925078,
+      "objective_id": 91001002,
+      "stage_id": 910010
+    },
+    {
+      "actor_guid": 5715144128442925079,
+      "objective_id": 91001003,
+      "stage_id": 910010
+    }
+  ],
+  "opening_sha256": "c1f5ed3b124bdc35a5b51f56cbe596f83c88efa577242495b02b0421832a4470",
+  "schema_version": 1
+}

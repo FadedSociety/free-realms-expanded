@@ -1,0 +1,1835 @@
+{
+  "actors": [
+    {
+      "action": null,
+      "definition_id": 6445,
+      "guid": 5715144128442925057,
+      "heading": 2.995849,
+      "interaction_radius": 12.0,
+      "kind": "guide",
+      "model_file_name": "fairy_darkthorne_f.adr",
+      "model_id": 353,
+      "name": "Darkthorne",
+      "name_id": 441292,
+      "position": [
+        -1897.0,
+        -39.7,
+        412.6
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Local placement.",
+      "required_profile": null,
+      "zone_id": 0
+    },
+    {
+      "action": {
+        "actor_guid": 5715144128442925058,
+        "kind": "interact"
+      },
+      "definition_id": 920010,
+      "guid": 5715144128442925058,
+      "heading": 0.0,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "model_file_name": "sg_book_01.adr",
+      "model_id": 797,
+      "name": "Hero's Journal",
+      "name_id": 4419617,
+      "position": [
+        -1901.0,
+        -39.7,
+        418.0
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Local placement.",
+      "required_profile": null,
+      "zone_id": 0
+    },
+    {
+      "action": null,
+      "definition_id": 3211,
+      "guid": 5715144128442925059,
+      "heading": -0.618079,
+      "interaction_radius": 12.0,
+      "kind": "guide",
+      "model_file_name": "human_m_pappy_farnum.agr",
+      "model_id": 430,
+      "name": "Pappy Farnum",
+      "name_id": 19091,
+      "position": [
+        -2184.513,
+        -31.53728,
+        328.1112
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Pinned community spawn position.",
+      "required_profile": null,
+      "zone_id": 0
+    },
+    {
+      "action": null,
+      "definition_id": 2538,
+      "guid": 5715144128442925060,
+      "heading": 2.328618,
+      "interaction_radius": 12.0,
+      "kind": "guide",
+      "model_file_name": "human_f_mae_farnum.agr",
+      "model_id": 782,
+      "name": "Mae Farnum",
+      "name_id": 46913,
+      "position": [
+        -2112.839,
+        -56.52175,
+        208.5168
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Pinned community spawn position.",
+      "required_profile": null,
+      "zone_id": 0
+    },
+    {
+      "action": null,
+      "definition_id": 3232,
+      "guid": 5715144128442925061,
+      "heading": 2.076398,
+      "interaction_radius": 12.0,
+      "kind": "guide",
+      "model_file_name": "human_m_andrew.agr",
+      "model_id": 438,
+      "name": "Cleetus Farnum",
+      "name_id": 5101863,
+      "position": [
+        -2078.389,
+        -55.64841,
+        200.7649
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Pinned community spawn position.",
+      "required_profile": null,
+      "zone_id": 0
+    },
+    {
+      "action": null,
+      "definition_id": 2087,
+      "guid": 5715144128442925062,
+      "heading": -0.109688,
+      "interaction_radius": 12.0,
+      "kind": "guide",
+      "model_file_name": "chugawug_m_02.adr",
+      "model_id": 221,
+      "name": "Bartle",
+      "name_id": 20942,
+      "position": [
+        -1860.185,
+        -51.30442,
+        341.1369
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Pinned community spawn position.",
+      "required_profile": null,
+      "zone_id": 0
+    },
+    {
+      "action": null,
+      "definition_id": 31331,
+      "guid": 5715144128442925063,
+      "heading": -1.496669,
+      "interaction_radius": 12.0,
+      "kind": "guide",
+      "model_file_name": "fairy_queenvalerian.adr",
+      "model_id": 400,
+      "name": "Queen Valerian",
+      "name_id": 130547,
+      "position": [
+        -1054.135,
+        4.629629,
+        305.7209
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Pinned community spawn position.",
+      "required_profile": null,
+      "zone_id": 0
+    },
+    {
+      "action": {
+        "actor_guid": 5715144128442925064,
+        "kind": "interact"
+      },
+      "definition_id": 6433,
+      "guid": 5715144128442925064,
+      "heading": 0.269979,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "model_file_name": "farming_well_01.adr",
+      "model_id": 3519,
+      "name": "Water Well",
+      "name_id": 5100023,
+      "position": [
+        -2113.0,
+        -56.5,
+        222.0
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Local placement. Explicit reconstruction: original registered farming well3519 replaces unavailable housing well3097 for local farm quest visualization. Placement and GUID/action stay local; this is not proof of the original quest well binding.",
+      "required_profile": null,
+      "zone_id": 0
+    },
+    {
+      "action": {
+        "actor_guid": 5715144128442925065,
+        "kind": "interact"
+      },
+      "definition_id": 2489,
+      "guid": 5715144128442925065,
+      "heading": -0.135653,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "model_file_name": "bw_campfire_01.adr",
+      "model_id": 204,
+      "name": "Fire",
+      "name_id": 5100342,
+      "position": [
+        -2123.0,
+        -56.5,
+        215.0
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Local placement. Explicit reconstruction: original registered campfire204 with complete CRC-verified geometry/material/flame dependencies replaces unavailable seasonal luau model1939. These are local quest fire visuals, not recovered original Gloam fire bindings.",
+      "required_profile": null,
+      "zone_id": 0
+    },
+    {
+      "action": {
+        "actor_guid": 5715144128442925066,
+        "kind": "interact"
+      },
+      "definition_id": 2489,
+      "guid": 5715144128442925066,
+      "heading": -0.135653,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "model_file_name": "bw_campfire_01.adr",
+      "model_id": 204,
+      "name": "Fire",
+      "name_id": 5100342,
+      "position": [
+        -2133.0,
+        -56.5,
+        226.0
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Local placement. Explicit reconstruction: original registered campfire204 with complete CRC-verified geometry/material/flame dependencies replaces unavailable seasonal luau model1939. These are local quest fire visuals, not recovered original Gloam fire bindings.",
+      "required_profile": null,
+      "zone_id": 0
+    },
+    {
+      "action": {
+        "actor_guid": 5715144128442925067,
+        "kind": "interact"
+      },
+      "definition_id": 2489,
+      "guid": 5715144128442925067,
+      "heading": -0.135653,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "model_file_name": "bw_campfire_01.adr",
+      "model_id": 204,
+      "name": "Fire",
+      "name_id": 5100342,
+      "position": [
+        -2124.0,
+        -55.65,
+        237.0
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Local placement. Explicit reconstruction: original registered campfire204 with complete CRC-verified geometry/material/flame dependencies replaces unavailable seasonal luau model1939. These are local quest fire visuals, not recovered original Gloam fire bindings. Base Y adjusted from-56.5 to-55.65 against original terrain floor-55.703051; prior location buries the complete campfire mesh.",
+      "required_profile": null,
+      "zone_id": 0
+    },
+    {
+      "action": {
+        "kind": "gather",
+        "resource_id": 1001
+      },
+      "definition_id": 2540,
+      "guid": 5715144128442925068,
+      "heading": -2.036677,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "model_file_name": "overworld_tree_rainleaf_harvestable_01.adr",
+      "model_id": 3653,
+      "name": "Collect Bundles of Rainleaf and Gummy Fruit",
+      "name_id": 5100033,
+      "position": [
+        -2122.528,
+        -56.22014,
+        206.9492
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Pinned community spawn position.",
+      "required_profile": 45,
+      "zone_id": 0
+    },
+    {
+      "action": {
+        "kind": "gather",
+        "resource_id": 1002
+      },
+      "definition_id": 2546,
+      "guid": 5715144128442925069,
+      "heading": 0.130585,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "model_file_name": "overworld_vinelow_gummyfruit_harvestable_01.adr",
+      "model_id": 3633,
+      "name": "Collect Bundles of Rainleaf and Gummy Fruit",
+      "name_id": 5100033,
+      "position": [
+        -2116.325,
+        -56.67786,
+        199.2877
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Pinned community spawn position.",
+      "required_profile": 45,
+      "zone_id": 0
+    },
+    {
+      "action": {
+        "kind": "craft",
+        "recipe_id": 2001
+      },
+      "definition_id": 2537,
+      "guid": 5715144128442925070,
+      "heading": -0.761661,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "model_file_name": "sg_cooking_table_nodes_01.adr",
+      "model_id": 419,
+      "name": "Cooking Table",
+      "name_id": 2061,
+      "position": [
+        -2109.244,
+        -56.61908,
+        210.265
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Pinned community spawn position.",
+      "required_profile": 45,
+      "zone_id": 0
+    },
+    {
+      "action": {
+        "kind": "gather",
+        "resource_id": 1003
+      },
+      "definition_id": 920011,
+      "guid": 5715144128442925071,
+      "heading": 0.0,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "model_file_name": "sg_mining_node_ore_naturaldirt_copper_01.agr",
+      "model_id": 607,
+      "name": "Copper Ore",
+      "name_id": 21917,
+      "position": [
+        -2072.0,
+        -55.6,
+        207.0
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Local placement.",
+      "required_profile": 14,
+      "zone_id": 0
+    },
+    {
+      "action": {
+        "kind": "craft",
+        "recipe_id": 2002
+      },
+      "definition_id": 920012,
+      "guid": 5715144128442925072,
+      "heading": 0.0,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "model_file_name": "sh_forge_01.adr",
+      "model_id": 484,
+      "name": "Smelt 5 Copper Bars",
+      "name_id": 5100121,
+      "position": [
+        -2076.0,
+        -55.6,
+        190.0
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Local placement.",
+      "required_profile": 14,
+      "zone_id": 0
+    },
+    {
+      "action": {
+        "kind": "craft",
+        "recipe_id": 2003
+      },
+      "definition_id": 3600,
+      "guid": 5715144128442925073,
+      "heading": -1.007059,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "model_file_name": "sg_anvil_stump_01.adr",
+      "model_id": 273,
+      "name": "Anvil",
+      "name_id": 36164,
+      "position": [
+        -2088.0,
+        -54.79,
+        200.0
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Local placement.",
+      "required_profile": 16,
+      "zone_id": 0
+    },
+    {
+      "action": null,
+      "definition_id": 3156,
+      "guid": 5715144128442925074,
+      "heading": 0.208813,
+      "interaction_radius": 12.0,
+      "kind": "enemy",
+      "model_file_name": "wolf_generic.adr",
+      "model_id": 3284,
+      "name": "Hooligan Wolf",
+      "name_id": 5100200,
+      "position": [
+        -2100.965,
+        -45.98195,
+        456.7631
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Pinned community spawn position.",
+      "required_profile": null,
+      "zone_id": 0
+    },
+    {
+      "action": null,
+      "definition_id": 920001,
+      "guid": 5715144128442925075,
+      "heading": 0.0,
+      "interaction_radius": 12.0,
+      "kind": "enemy",
+      "model_file_name": "gloam_m_construct.adr",
+      "model_id": 3933,
+      "name": "Gloam Creature",
+      "name_id": 5101961,
+      "position": [
+        -2173.0,
+        -31.5,
+        348.0
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Local placement.",
+      "required_profile": null,
+      "zone_id": 0
+    },
+    {
+      "action": null,
+      "definition_id": 920002,
+      "guid": 5715144128442925076,
+      "heading": 0.0,
+      "interaction_radius": 12.0,
+      "kind": "enemy",
+      "model_file_name": "human_m_hooligan_boss_02.agr",
+      "model_id": 3897,
+      "name": "Mac",
+      "name_id": 5100344,
+      "position": [
+        -1828.0,
+        -51.3,
+        365.0
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Local placement.",
+      "required_profile": null,
+      "zone_id": 0
+    },
+    {
+      "action": {
+        "actor_guid": 5715144128442925077,
+        "kind": "interact"
+      },
+      "definition_id": 920041,
+      "guid": 5715144128442925077,
+      "heading": 0.0,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "model_file_name": "gl_gloam_obelisk_large_01.adr",
+      "model_id": 3934,
+      "name": "Gloam Artifact",
+      "name_id": 5100327,
+      "position": [
+        -1858.0,
+        -51.17,
+        355.0
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Local placement. Explicit local placement reconstruction: original Gloam obelisk3934 is retained with all missing original geometry/collision/motion/material/particle dependencies recovered exactly by native manifest CRC and byte-identical envelope. Only Y aligns to original render terrain plus0.05, rounded to0.01; X/Z, model, GUID, action and objective order remain unchanged. Native collision/reachability is pending.",
+      "required_profile": null,
+      "zone_id": 0
+    },
+    {
+      "action": {
+        "actor_guid": 5715144128442925078,
+        "kind": "interact"
+      },
+      "definition_id": 920042,
+      "guid": 5715144128442925078,
+      "heading": 0.0,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "model_file_name": "gl_gloam_obelisk_large_01.adr",
+      "model_id": 3934,
+      "name": "Gloam Artifact",
+      "name_id": 5100327,
+      "position": [
+        -1844.0,
+        -54.47,
+        343.0
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Local placement. Explicit local placement reconstruction: original Gloam obelisk3934 is retained with all missing original geometry/collision/motion/material/particle dependencies recovered exactly by native manifest CRC and byte-identical envelope. Only Y aligns to original render terrain plus0.05, rounded to0.01; X/Z, model, GUID, action and objective order remain unchanged. Native collision/reachability is pending.",
+      "required_profile": null,
+      "zone_id": 0
+    },
+    {
+      "action": {
+        "actor_guid": 5715144128442925079,
+        "kind": "interact"
+      },
+      "definition_id": 920043,
+      "guid": 5715144128442925079,
+      "heading": 0.0,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "model_file_name": "gl_gloam_obelisk_large_01.adr",
+      "model_id": 3934,
+      "name": "Gloam Artifact",
+      "name_id": 5100327,
+      "position": [
+        -1838.0,
+        -46.92,
+        370.0
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Local placement. Explicit local placement reconstruction: original Gloam obelisk3934 is retained with all missing original geometry/collision/motion/material/particle dependencies recovered exactly by native manifest CRC and byte-identical envelope. Only Y aligns to original render terrain plus0.05, rounded to0.01; X/Z, model, GUID, action and objective order remain unchanged. Native collision/reachability is pending.",
+      "required_profile": null,
+      "zone_id": 0
+    },
+    {
+      "action": null,
+      "definition_id": 2385,
+      "guid": 5715144128442925080,
+      "heading": 1.491786,
+      "interaction_radius": 12.0,
+      "kind": "guide",
+      "model_file_name": "human_f_guildmaster_fighter.agr",
+      "model_id": 4213,
+      "name": "Ellandra Shieldbreaker",
+      "name_id": 442310,
+      "position": [
+        -1179.094,
+        5.245171,
+        226.7734
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Pinned community spawn position.",
+      "required_profile": null,
+      "zone_id": 0
+    },
+    {
+      "action": null,
+      "definition_id": 2338,
+      "guid": 5715144128442925081,
+      "heading": 1.680711,
+      "interaction_radius": 12.0,
+      "kind": "guide",
+      "model_file_name": "fairy_m_blacksmith_01.agr",
+      "model_id": 574,
+      "name": "Maximus Axegrinder",
+      "name_id": 442311,
+      "position": [
+        -1179.59,
+        5.572295,
+        363.1204
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Pinned community spawn position.",
+      "required_profile": null,
+      "zone_id": 0
+    },
+    {
+      "action": null,
+      "definition_id": 2351,
+      "guid": 5715144128442925082,
+      "heading": -2.491853,
+      "interaction_radius": 12.0,
+      "kind": "guide",
+      "model_file_name": "human_m_manager_landon.agr",
+      "model_id": 1457,
+      "name": "Scotty Trackrunner",
+      "name_id": 442312,
+      "position": [
+        -1080.5,
+        5.272346,
+        414.9592
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Pinned community spawn position.",
+      "required_profile": null,
+      "zone_id": 0
+    },
+    {
+      "action": null,
+      "definition_id": 2378,
+      "guid": 5715144128442925083,
+      "heading": -0.842952,
+      "interaction_radius": 12.0,
+      "kind": "guide",
+      "model_file_name": "fairy_royalguard_m.adr",
+      "model_id": 345,
+      "name": "Captain Sunspark",
+      "name_id": 437145,
+      "position": [
+        -1164.294,
+        5.642769,
+        227.7217
+      ],
+      "provenance": "Recovered model/name; local GUID and interaction binding. Pinned community spawn position.",
+      "required_profile": null,
+      "zone_id": 0
+    }
+  ],
+  "discoveries": [
+    {
+      "id": 1,
+      "name": "Briarwood Caverns",
+      "name_id": 442216,
+      "position": [
+        -1897.0,
+        -39.7,
+        412.6
+      ],
+      "provenance": "Recovered hub name/location where available; local four-location discovery checklist/radius/reward. Cavern marker is the reconstructed entry portal, not a claim of cave traversal.",
+      "radius": 25.0,
+      "reward": {
+        "coins": 5,
+        "items": [],
+        "stage_id": 920101
+      },
+      "zone_id": 0
+    },
+    {
+      "id": 2,
+      "name": "Farnum Farmstead",
+      "name_id": 18735,
+      "position": [
+        -2141.0,
+        -57.0,
+        260.0
+      ],
+      "provenance": "Recovered hub name/location where available; local four-location discovery checklist/radius/reward. Cavern marker is the reconstructed entry portal, not a claim of cave traversal.",
+      "radius": 100.0,
+      "reward": {
+        "coins": 5,
+        "items": [],
+        "stage_id": 920102
+      },
+      "zone_id": 0
+    },
+    {
+      "id": 3,
+      "name": "Cobblestone Village",
+      "name_id": 5100069,
+      "position": [
+        -1860.185,
+        -51.30442,
+        341.1369
+      ],
+      "provenance": "Recovered hub name/location where available; local four-location discovery checklist/radius/reward. Cavern marker is the reconstructed entry portal, not a claim of cave traversal.",
+      "radius": 45.0,
+      "reward": {
+        "coins": 5,
+        "items": [],
+        "stage_id": 920103
+      },
+      "zone_id": 0
+    },
+    {
+      "id": 4,
+      "name": "Royal Palace",
+      "name_id": 5100361,
+      "position": [
+        -1054.135,
+        4.629629,
+        305.7209
+      ],
+      "provenance": "Recovered hub name/location where available; local four-location discovery checklist/radius/reward. Cavern marker is the reconstructed entry portal, not a claim of cave traversal.",
+      "radius": 45.0,
+      "reward": {
+        "coins": 5,
+        "items": [],
+        "stage_id": 920104
+      },
+      "zone_id": 0
+    }
+  ],
+  "initial_profiles": [
+    1,
+    43
+  ],
+  "provenance": {
+    "cooking_campaign": {
+      "acceptance_supplies": "Local once per acceptance:4 Bat Meat/4 Spice. Leaves and fruit are granted only on newly counted Chef gathering progress.",
+      "artifact_repairs_sha256": "824722567c6ef6b91890a063f65fde0af4c5772162e4eee1a32e2bb10892a423",
+      "binding_and_quantity_reconstructed": true,
+      "goal_shape_changes": [
+        {
+          "after": 4,
+          "before": 3,
+          "objective_id": 91000404,
+          "stage_id": 910004
+        },
+        {
+          "after": 4,
+          "before": 3,
+          "objective_id": 91000405,
+          "stage_id": 910004
+        },
+        {
+          "after": 4,
+          "before": 3,
+          "objective_id": 91001302,
+          "stage_id": 910013
+        },
+        {
+          "after": 4,
+          "before": 3,
+          "objective_id": 91001303,
+          "stage_id": 910013
+        }
+      ],
+      "original_movie_sha256": "6b105f899451ff131ea0b4dcdb00b13e99dcce64c60c6e8ebe1630d2cc9cbc9c",
+      "prior_opening_sha256": "cef51222af55cd4f74bc5ad14f8857a074fa0317b94434553b056cbf0ff949a9",
+      "recipe": "https://freerealms.fandom.com/wiki/List_of_Recipes_(Chef)?oldid=45318"
+    },
+    "forging_campaign": {
+      "actor_asset_repairs_sha256": "acc6ecec4a6abebff320e1ef821d22f540cb761ce58e78fc1f6e559ec94e6ab9",
+      "definition_license": "AGPL-3.0",
+      "definition_revision": "9e082025391177d5a33ee18c714ddd06b457a695",
+      "disappear_after_interaction": [
+        {
+          "actor_guid": 5715144128442925065,
+          "objective_id": 91000302,
+          "stage_id": 910003
+        },
+        {
+          "actor_guid": 5715144128442925066,
+          "objective_id": 91000303,
+          "stage_id": 910003
+        },
+        {
+          "actor_guid": 5715144128442925067,
+          "objective_id": 91000304,
+          "stage_id": 910003
+        },
+        {
+          "actor_guid": 5715144128442925077,
+          "objective_id": 91001001,
+          "stage_id": 910010
+        },
+        {
+          "actor_guid": 5715144128442925078,
+          "objective_id": 91001002,
+          "stage_id": 910010
+        },
+        {
+          "actor_guid": 5715144128442925079,
+          "objective_id": 91001003,
+          "stage_id": 910010
+        }
+      ],
+      "fire_visibility_notice": "Local reconstructed visual extinguishing: exact completed Interact fire actors are removed and remain absent on reconnect. Original FX/state transition was not recovered. Well/other resources stay visible.",
+      "genuine_movie_sha256": "78b53823ad24337bba1a7b2103c3820c1baf7e13f3f025709326bf9daa663d99",
+      "prior_opening_sha256": "837efeae605e567cd4a5e0f92b3666a8767ddf92a81a278d28f33a1fef94f06b",
+      "protocol_revision": "9236220c44086ba9a31393cc30b5ebd44d05787f"
+    },
+    "local_substitutions": {
+      "hammer": 30280,
+      "hammer_tint_selection_reconstructed": true,
+      "local_gloam_definition": 920001,
+      "local_mac_definition": 920002,
+      "original_hammer_name_id": 102173
+    },
+    "missing": [
+      "original quest DB and most reward bindings",
+      "exact original Mac/Gloam Creature actor IDs",
+      "original cooking/gathering minigame server rules",
+      "exact numeric smelting/forging rules, per-attempt recipes and hammer tint"
+    ],
+    "source_revision": "9e082025391177d5a33ee18c714ddd06b457a695",
+    "sources": [
+      {
+        "path": "lab:reports/locale-id-to-text.json",
+        "sha256": "f1f22a30107c824af4b3021c8c7c323c927d3c6a9b82efc387e9eaba6ae62844"
+      },
+      {
+        "path": "lab:references/FreeRealms-Legacy/src/Resources/Npcs.json",
+        "sha256": "f8f224482a022fbb6c7d96280bf977ed0a648135ba965b51fb854bb75d69cff2"
+      },
+      {
+        "path": "lab:references/FreeRealms-Legacy/src/Resources/Models.txt",
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be"
+      },
+      {
+        "path": "lab:references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua",
+        "sha256": "bc0673f8d1fc7ed4e20ae2d501d2197e9bcc8133a20edff962f60fe36b106e74"
+      },
+      {
+        "path": "lab:references/FreeRealms-Legacy/src/Sanctuary.Game/Zones/StartingZone.cs",
+        "sha256": "0e26fd20ad103e6d78461e150dbbcc7e80c175b1061cab7ee3785c14053cae37"
+      },
+      {
+        "path": "lab:references/freerealms-wiki/quest-pages.json",
+        "sha256": "db4266bed954da6aab394cb514de2c54da1181966cd393fc122cdaae90c66c05"
+      },
+      {
+        "path": "lab:server/Customize/ClientItemDefinitions.json",
+        "sha256": "a001f81ad6a716f0ab7b1ac5b20a7617635af61487e99249ca64b970879c83c8"
+      },
+      {
+        "path": "lab:client/Resources/CharacterCreate/ItemDefinitions.txt",
+        "sha256": "f9a5adf844bef0f10844fb3dd2485333b0d2783f6ceffc8649033dd47d935df7"
+      }
+    ],
+    "wiki_farnum": {
+      "hammer_names": {
+        "legacy_definition_ids": [
+          30280,
+          30281,
+          30282,
+          30283,
+          30284,
+          30285,
+          30286,
+          30287,
+          30288,
+          30289
+        ],
+        "supplied_definition_ids": [],
+        "wiki_dialogue_and_supplied_locale": "Spunky Scrapper Hammer",
+        "wiki_goal": "Funky Scrapper Hammer"
+      },
+      "historical_limit": "Wiki revisions are2013; supplied client is2014. Numeric quest IDs and exact2014 recipe/rewards are not established.",
+      "material_runtime_status": "Your First Weapon grant occurs once on acceptance:10 Copper Bars/5 Turquoise/5 Wooden Planks/5 Thorny Fasteners. Complete missing records recovered from pinned Legacy. Per-attempt consumption and repeat-quest supplies remain local reconstructed rules.",
+      "original_material_grant": [
+        {
+          "name": "Copper Bar",
+          "name_id": 104,
+          "quantity": 10,
+          "supplied_definition_ids": []
+        },
+        {
+          "name": "Turquoise",
+          "name_id": 21945,
+          "quantity": 5,
+          "supplied_definition_ids": [
+            2752
+          ]
+        },
+        {
+          "name": "Wooden Plank",
+          "name_id": 931,
+          "quantity": 5,
+          "supplied_definition_ids": []
+        },
+        {
+          "name": "{n}Thorny Fasteners{pl=\"Thorny Fasteners\"}",
+          "name_id": 932,
+          "quantity": 5,
+          "supplied_definition_ids": [
+            56
+          ]
+        }
+      ],
+      "quests": [
+        {
+          "revision_id": 27815,
+          "revision_timestamp": "2013-07-12T21:59:06Z",
+          "source_url": "https://freerealms.fandom.com/wiki/Quest:Your_First_Weapon",
+          "title": "Quest:Your First Weapon"
+        },
+        {
+          "revision_id": 28955,
+          "revision_timestamp": "2013-07-21T15:08:55Z",
+          "source_url": "https://freerealms.fandom.com/wiki/Quest:Fighting_off_the_Pack",
+          "title": "Quest:Fighting off the Pack"
+        }
+      ],
+      "title_variation": {
+        "supplied_locale": "Fighting the Pack",
+        "wiki": "Fighting off the Pack"
+      }
+    }
+  },
+  "reconstruction_notice": "Opening restoration: recovered story names/models and original Smelting77, Forging139 and Cooking movies/protocols. Game46 cooking selection, minigame tuning/phase rows, fixed outputs, local bindings/combat/discoveries and most rewards are reconstructed. Original gathering minigames, cinematics and full world/dungeon content remain unrestored. Alternate supplied well/fire visuals remain explicit substitutions. Original Gloam Artifact3934 dependencies are recovered exactly; only local terrain Y alignment is reconstructed.",
+  "schema_version": 1,
+  "scope": "Recovered NPX4.0 opening story, three optional farm stickers and beginner job/appearance epilogue. Local bindings are reconstructed.",
+  "stages": [
+    {
+      "description": "This is the Hero’s Journal, a gift from the Heartseed to aid you with defeating the Gloam. It will record your deeds and provide hints as what you can do next in your adventures.",
+      "description_id": 4419560,
+      "giver_guid": 5715144128442925057,
+      "id": 910001,
+      "objectives": [
+        {
+          "description": "Switch to Brawler using the native Jobs menu.",
+          "description_id": 0,
+          "id": 91000101,
+          "name_id": 0,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 43
+          }
+        },
+        {
+          "description": "Interact with the Hero's Journal",
+          "description_id": 4419602,
+          "id": 91000102,
+          "name_id": 4419602,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "actor_guid": 5715144128442925058,
+            "kind": "interact"
+          }
+        }
+      ],
+      "ordered": true,
+      "original_quest_id": null,
+      "provenance": "Recovered title/story actions; reconstructed reserved quest ID, prerequisites, counts, reward economy and actor bindings. No missing original Quests.json claims.",
+      "reward": {
+        "coins": 10,
+        "items": [],
+        "stage_id": 910001
+      },
+      "title": "Hero's Journal",
+      "title_id": 4419559,
+      "turnin_guid": 5715144128442925057,
+      "unlock_profiles": []
+    },
+    {
+      "description": "The Gloam have found Darkthorne and have trapped her in the Heartseed Chamber. Defend Darkthorne until she can find a way out.",
+      "description_id": 4419564,
+      "giver_guid": 5715144128442925057,
+      "id": 910002,
+      "objectives": [
+        {
+          "description": "Defend Darkthorne from the Gloam",
+          "description_id": 4419610,
+          "id": 91000201,
+          "name_id": 4419610,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "encounter_id": 411,
+            "kind": "dungeon_completed"
+          }
+        },
+        {
+          "description": "Talk to Pappy Farnum",
+          "description_id": 4419612,
+          "id": 91000202,
+          "name_id": 4419612,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "actor_guid": 5715144128442925059,
+            "kind": "talk"
+          }
+        }
+      ],
+      "ordered": true,
+      "original_quest_id": null,
+      "provenance": "Recovered title/story actions; reconstructed reserved quest ID, prerequisites, counts, reward economy and actor bindings. No missing original Quests.json claims.",
+      "reward": {
+        "coins": 25,
+        "items": [],
+        "stage_id": 910002
+      },
+      "title": "The Last Best Hope",
+      "title_id": 4419563,
+      "turnin_guid": 5715144128442925059,
+      "unlock_profiles": []
+    },
+    {
+      "description": "Darkthorne teleported you to Farnum's Farmstead, but Gloamlings have set it ablaze. Help the Farnums by putting out some of the fires.",
+      "description_id": 4420043,
+      "giver_guid": 5715144128442925059,
+      "id": 910003,
+      "objectives": [
+        {
+          "description": "Fill the water bucket",
+          "description_id": 4420047,
+          "id": 91000301,
+          "name_id": 4420047,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "actor_guid": 5715144128442925064,
+            "kind": "interact"
+          }
+        },
+        {
+          "description": "Extinguish farm fire1.",
+          "description_id": 5100043,
+          "id": 91000302,
+          "name_id": 5100043,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "actor_guid": 5715144128442925065,
+            "kind": "interact"
+          }
+        },
+        {
+          "description": "Extinguish farm fire2.",
+          "description_id": 5100043,
+          "id": 91000303,
+          "name_id": 5100043,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "actor_guid": 5715144128442925066,
+            "kind": "interact"
+          }
+        },
+        {
+          "description": "Extinguish farm fire3.",
+          "description_id": 5100043,
+          "id": 91000304,
+          "name_id": 5100043,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "actor_guid": 5715144128442925067,
+            "kind": "interact"
+          }
+        }
+      ],
+      "ordered": true,
+      "original_quest_id": null,
+      "provenance": "Recovered title/story actions; reconstructed reserved quest ID, prerequisites, counts, reward economy and actor bindings. No missing original Quests.json claims.",
+      "reward": {
+        "coins": 10,
+        "items": [],
+        "stage_id": 910003
+      },
+      "title": "Saving Farnum's Farm",
+      "title_id": 4420042,
+      "turnin_guid": 5715144128442925059,
+      "unlock_profiles": []
+    },
+    {
+      "description": "Learn how to cook some supplies for your journey.",
+      "description_id": 4420051,
+      "giver_guid": 5715144128442925060,
+      "id": 910004,
+      "objectives": [
+        {
+          "description": "Talk to Mae Farnum",
+          "description_id": 4420055,
+          "id": 91000401,
+          "name_id": 4420055,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "actor_guid": 5715144128442925060,
+            "kind": "talk"
+          }
+        },
+        {
+          "description": "Switch to Chef.",
+          "description_id": 0,
+          "id": 91000402,
+          "name_id": 0,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 45
+          }
+        },
+        {
+          "description": "Equip the Student Chef Shirt in the Chef equipment screen.",
+          "description_id": 0,
+          "id": 91000403,
+          "name_id": 0,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "definition_id": 13597,
+            "kind": "cosmetic_equipped"
+          }
+        },
+        {
+          "description": "Harvest 4 Rainleaf bundles.",
+          "description_id": 5100033,
+          "id": 91000404,
+          "name_id": 5100033,
+          "recovery": "Local four-count gathering objective, matching community StrongArm Stew recipe inputs. Each valid newly counted Chef interaction grants one material; original gathering minigame/drop table remains unrestored.",
+          "required": 4,
+          "trigger": {
+            "kind": "gather",
+            "resource_id": 1001
+          }
+        },
+        {
+          "description": "Harvest 4 Gummyfruit bundles.",
+          "description_id": 5100033,
+          "id": 91000405,
+          "name_id": 5100033,
+          "recovery": "Local four-count gathering objective, matching community StrongArm Stew recipe inputs. Each valid newly counted Chef interaction grants one material; original gathering minigame/drop table remains unrestored.",
+          "required": 4,
+          "trigger": {
+            "kind": "gather",
+            "resource_id": 1002
+          }
+        },
+        {
+          "description": "Complete the original cooking game to make StrongArm Stew.",
+          "description_id": 5100039,
+          "id": 91000406,
+          "name_id": 5100039,
+          "recovery": "Original game_cooking.gfx controls and protocol. Game46 binding, six-phase sequence/numeric tuning and one-food output are reconstructed; recipe materials four each2862/2875/2884/2900 are wiki-backed.",
+          "required": 1,
+          "trigger": {
+            "kind": "craft",
+            "recipe_id": 2001
+          }
+        }
+      ],
+      "ordered": true,
+      "original_quest_id": null,
+      "provenance": "Recovered title/story actions; reconstructed reserved quest ID, prerequisites, counts, reward economy and actor bindings. No missing original Quests.json claims. Original Cooking movie replaces click completion. Four-count leaf/fruit gathering and once-only local acceptance supplies4 Bat Meat/4 Spice enable the wiki recipe; original acceptance supply/drop rules are not recovered. Student Chef Hat remains the separate existing quest reward.",
+      "reward": {
+        "coins": 10,
+        "items": [
+          [
+            14794,
+            1
+          ]
+        ],
+        "stage_id": 910004
+      },
+      "title": "Cooking 101",
+      "title_id": 4420050,
+      "turnin_guid": 5715144128442925060,
+      "unlock_profiles": [
+        45
+      ]
+    },
+    {
+      "description": "It's time to start gearing up for your journey to the Queen. Mine ore and smelt it so it can be useful in creating some equipment.",
+      "description_id": 4420059,
+      "giver_guid": 5715144128442925061,
+      "id": 910005,
+      "objectives": [
+        {
+          "description": "Talk to Cleetus Farnum",
+          "description_id": 4420063,
+          "id": 91000501,
+          "name_id": 4420063,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "actor_guid": 5715144128442925061,
+            "kind": "talk"
+          }
+        },
+        {
+          "description": "Switch to Miner.",
+          "description_id": 0,
+          "id": 91000502,
+          "name_id": 0,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 14
+          }
+        },
+        {
+          "description": "Mine Copper Ore",
+          "description_id": 5100117,
+          "id": 91000503,
+          "name_id": 5100117,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 5,
+          "trigger": {
+            "kind": "gather",
+            "resource_id": 1003
+          }
+        },
+        {
+          "description": "Smelt 5 Copper Bars",
+          "description_id": 5100121,
+          "id": 91000504,
+          "name_id": 5100121,
+          "recovery": "Original Smelting77 movie/four stages; reconstructed numeric phase tuning and fixed recipe. Native completion consumes5 Copper Ore/3 Singing Coal and grants10 Copper Bars atomically.",
+          "required": 5,
+          "trigger": {
+            "kind": "craft",
+            "recipe_id": 2002
+          }
+        }
+      ],
+      "ordered": true,
+      "original_quest_id": null,
+      "provenance": "Recovered title/story actions; reconstructed reserved quest ID, prerequisites, counts, reward economy and actor bindings. No missing original Quests.json claims.",
+      "reward": {
+        "coins": 10,
+        "items": [],
+        "stage_id": 910005
+      },
+      "title": "Gear Up!",
+      "title_id": 4420058,
+      "turnin_guid": 5715144128442925061,
+      "unlock_profiles": [
+        14
+      ]
+    },
+    {
+      "description": "You're ready to begin forging your first weapon. This should be useful in defending yourself as you journey to the Queen.",
+      "description_id": 4420067,
+      "giver_guid": 5715144128442925061,
+      "id": 910006,
+      "objectives": [
+        {
+          "description": "Switch to Blacksmith.",
+          "description_id": 0,
+          "id": 91000601,
+          "name_id": 0,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 16
+          }
+        },
+        {
+          "description": "Win the original forging game to make a Spunky Scrapper Hammer. Board tuning, consumption and tint selection are local reconstructions.",
+          "description_id": 4420071,
+          "id": 91000602,
+          "name_id": 4420071,
+          "recovery": "Original Forging139 movie/protocol; quota5/180seconds/board tuning and consumption are reconstructed. Wiki revision27815 proves the acceptance grant, not a per-attempt recipe.",
+          "required": 1,
+          "trigger": {
+            "kind": "craft",
+            "recipe_id": 2003
+          }
+        }
+      ],
+      "ordered": true,
+      "original_quest_id": null,
+      "provenance": "Wiki Quest:Your First Weapon revision27815 proves16 coins and acceptance grant10 Copper Bars/5 Turquoise/5 Wooden Planks/5 Thorny Fasteners. Complete definitions recovered from pinned Legacy. Original Forging139 movie; numeric rules and consumption reconstructed. Output30280 is one genuine Spunky Scrapper tint variant; exact historical tint remains unknown. Reserved quest/actor bindings remain local.",
+      "reward": {
+        "coins": 16,
+        "items": [],
+        "stage_id": 910006
+      },
+      "title": "Your First Weapon",
+      "title_id": 4420066,
+      "turnin_guid": 5715144128442925061,
+      "unlock_profiles": [
+        16
+      ]
+    },
+    {
+      "description": "With a new weapon in hand, it is time to learn how to use it to become a hero and protector of the Realms.",
+      "description_id": 4420075,
+      "giver_guid": 5715144128442925061,
+      "id": 910007,
+      "objectives": [
+        {
+          "description": "Switch to Brawler.",
+          "description_id": 0,
+          "id": 91000701,
+          "name_id": 0,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 43
+          }
+        },
+        {
+          "description": "Equip the forged Spunky Scrapper Hammer as Brawler.",
+          "description_id": 4420079,
+          "id": 91000702,
+          "name_id": 4420079,
+          "recovery": "Genuine Legacy definition30280/name102173/class71/slot7; selected tint is a local choice.",
+          "required": 1,
+          "trigger": {
+            "definition_id": 30280,
+            "kind": "cosmetic_equipped"
+          }
+        },
+        {
+          "description": "Defeat Hooligan Wolves",
+          "description_id": 5100203,
+          "id": 91000703,
+          "name_id": 5100203,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 5,
+          "trigger": {
+            "definition_id": 3156,
+            "kind": "defeat"
+          }
+        }
+      ],
+      "ordered": true,
+      "original_quest_id": null,
+      "provenance": "Wiki Quest:Fighting off the Pack revision28955 proves Brawler, five Hooligan Wolves, Cleetus turn-in and18 coins. Supplied locale title4420074 is Fighting the Pack; local visible text uses the wiki title. Numeric quest binding, enemy balance and selected genuine hammer tint remain reconstructed.",
+      "reward": {
+        "coins": 18,
+        "items": [],
+        "stage_id": 910007
+      },
+      "title": "Fighting off the Pack",
+      "title_id": 4420074,
+      "turnin_guid": 5715144128442925061,
+      "unlock_profiles": []
+    },
+    {
+      "description": "Before you leave to find the Queen, Pappy Farnum asked for your help defeating one last Gloam Creature roaming nearby.",
+      "description_id": 4420083,
+      "giver_guid": 5715144128442925059,
+      "id": 910008,
+      "objectives": [
+        {
+          "description": "Talk to Pappy Farnum",
+          "description_id": 4420087,
+          "id": 91000801,
+          "name_id": 4420087,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "actor_guid": 5715144128442925059,
+            "kind": "talk"
+          }
+        },
+        {
+          "description": "Defeat the Gloam Creature",
+          "description_id": 5100268,
+          "id": 91000802,
+          "name_id": 5100268,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "definition_id": 920001,
+            "kind": "defeat"
+          }
+        }
+      ],
+      "ordered": true,
+      "original_quest_id": null,
+      "provenance": "Recovered title/story actions; reconstructed reserved quest ID, prerequisites, counts, reward economy and actor bindings. No missing original Quests.json claims.",
+      "reward": {
+        "coins": 20,
+        "items": [],
+        "stage_id": 910008
+      },
+      "title": "One More Gloam",
+      "title_id": 4420082,
+      "turnin_guid": 5715144128442925059,
+      "unlock_profiles": []
+    },
+    {
+      "description": "Expected help from nearby Cobblestone Village never arrived at Farnum Farmstead. Talk to Bartle and try to learn why.",
+      "description_id": 4420091,
+      "giver_guid": 5715144128442925059,
+      "id": 910009,
+      "objectives": [
+        {
+          "description": "Talk to Bartle",
+          "description_id": 4420095,
+          "id": 91000901,
+          "name_id": 4420095,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "actor_guid": 5715144128442925062,
+            "kind": "talk"
+          }
+        }
+      ],
+      "ordered": true,
+      "original_quest_id": null,
+      "provenance": "Recovered title/story actions; reconstructed reserved quest ID, prerequisites, counts, reward economy and actor bindings. No missing original Quests.json claims.",
+      "reward": {
+        "coins": 10,
+        "items": [],
+        "stage_id": 910009
+      },
+      "title": "Where's the Help?",
+      "title_id": 4420090,
+      "turnin_guid": 5715144128442925062,
+      "unlock_profiles": []
+    },
+    {
+      "description": "A gang of Hooligans led by Mac has blockaded Cobblestone Village. Destroy the Gloam Artifacts they're using to shield their camp.",
+      "description_id": 4420099,
+      "giver_guid": 5715144128442925062,
+      "id": 910010,
+      "objectives": [
+        {
+          "description": "Destroy Gloam Artifact1.",
+          "description_id": 5100332,
+          "id": 91001001,
+          "name_id": 5100332,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "actor_guid": 5715144128442925077,
+            "kind": "interact"
+          }
+        },
+        {
+          "description": "Destroy Gloam Artifact2.",
+          "description_id": 5100332,
+          "id": 91001002,
+          "name_id": 5100332,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "actor_guid": 5715144128442925078,
+            "kind": "interact"
+          }
+        },
+        {
+          "description": "Destroy Gloam Artifact3.",
+          "description_id": 5100332,
+          "id": 91001003,
+          "name_id": 5100332,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "actor_guid": 5715144128442925079,
+            "kind": "interact"
+          }
+        }
+      ],
+      "ordered": true,
+      "original_quest_id": null,
+      "provenance": "Recovered title/story actions; reconstructed reserved quest ID, prerequisites, counts, reward economy and actor bindings. No missing original Quests.json claims.",
+      "reward": {
+        "coins": 10,
+        "items": [],
+        "stage_id": 910010
+      },
+      "title": "Pull the Plug",
+      "title_id": 4420098,
+      "turnin_guid": 5715144128442925062,
+      "unlock_profiles": []
+    },
+    {
+      "description": "With their Artifacts destroyed, Mac and his gang are vulnerable to attack. Show them who's boss and free Cobblestone Village.",
+      "description_id": 4420107,
+      "giver_guid": 5715144128442925062,
+      "id": 910011,
+      "objectives": [
+        {
+          "description": "Defeat Mac",
+          "description_id": 4420111,
+          "id": 91001101,
+          "name_id": 4420111,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "definition_id": 920002,
+            "kind": "defeat"
+          }
+        }
+      ],
+      "ordered": true,
+      "original_quest_id": null,
+      "provenance": "Recovered title/story actions; reconstructed reserved quest ID, prerequisites, counts, reward economy and actor bindings. No missing original Quests.json claims.",
+      "reward": {
+        "coins": 25,
+        "items": [],
+        "stage_id": 910011
+      },
+      "title": "Cobblestone Showdown",
+      "title_id": 4420106,
+      "turnin_guid": 5715144128442925062,
+      "unlock_profiles": []
+    },
+    {
+      "description": "With Mac defeated and the Gloam Barrier dissipating you are free to head to Sanctuary and tell Queen Valerian about what happened to Briarheart and Darkthorne.",
+      "description_id": 4420115,
+      "giver_guid": 5715144128442925062,
+      "id": 910012,
+      "objectives": [
+        {
+          "description": "Enter the Royal Palace",
+          "description_id": 4420119,
+          "id": 91001201,
+          "name_id": 4420119,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "kind": "visit",
+            "position": [
+              -1054.135,
+              4.629629,
+              305.7209
+            ],
+            "radius": 25.0,
+            "zone_id": 0
+          }
+        },
+        {
+          "description": "Talk to Queen Valerian",
+          "description_id": 5100330,
+          "id": 91001202,
+          "name_id": 5100330,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "actor_guid": 5715144128442925063,
+            "kind": "talk"
+          }
+        }
+      ],
+      "ordered": true,
+      "original_quest_id": null,
+      "provenance": "Recovered title/story actions; reconstructed reserved quest ID, prerequisites, counts, reward economy and actor bindings. No missing original Quests.json claims.",
+      "reward": {
+        "coins": 25,
+        "items": [],
+        "stage_id": 910012
+      },
+      "title": "Off to the Queen",
+      "title_id": 4420114,
+      "turnin_guid": 5715144128442925063,
+      "unlock_profiles": []
+    },
+    {
+      "description": "Cook a 2nd helping of Strongarm Stew for Mae Farnum",
+      "description_id": 5100480,
+      "giver_guid": 5715144128442925060,
+      "id": 910013,
+      "objectives": [
+        {
+          "description": "Switch to Chef.",
+          "description_id": 0,
+          "id": 91001301,
+          "name_id": 0,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 45
+          }
+        },
+        {
+          "description": "Harvest 4 Rainleaf bundles.",
+          "description_id": 5100033,
+          "id": 91001302,
+          "name_id": 5100033,
+          "recovery": "Local four-count gathering objective, matching community StrongArm Stew recipe inputs. Each valid newly counted Chef interaction grants one material; original gathering minigame/drop table remains unrestored.",
+          "required": 4,
+          "trigger": {
+            "kind": "gather",
+            "resource_id": 1001
+          }
+        },
+        {
+          "description": "Harvest 4 Gummyfruit bundles.",
+          "description_id": 5100033,
+          "id": 91001303,
+          "name_id": 5100033,
+          "recovery": "Local four-count gathering objective, matching community StrongArm Stew recipe inputs. Each valid newly counted Chef interaction grants one material; original gathering minigame/drop table remains unrestored.",
+          "required": 4,
+          "trigger": {
+            "kind": "gather",
+            "resource_id": 1002
+          }
+        },
+        {
+          "description": "Complete the original cooking game to make StrongArm Stew.",
+          "description_id": 5100039,
+          "id": 91001304,
+          "name_id": 5100039,
+          "recovery": "Original game_cooking.gfx controls and protocol. Game46 binding, six-phase sequence/numeric tuning and one-food output are reconstructed; recipe materials four each2862/2875/2884/2900 are wiki-backed.",
+          "required": 1,
+          "trigger": {
+            "kind": "craft",
+            "recipe_id": 2001
+          }
+        }
+      ],
+      "ordered": true,
+      "original_quest_id": null,
+      "provenance": "Recovered title/story actions; reconstructed reserved quest ID, prerequisites, counts, reward economy and actor bindings. No missing original Quests.json claims. Original Cooking movie replaces click completion. Four-count leaf/fruit gathering and once-only local acceptance supplies4 Bat Meat/4 Spice enable the wiki recipe; original acceptance supply/drop rules are not recovered. Student Chef Hat remains the separate existing quest reward.",
+      "reward": {
+        "coins": 10,
+        "items": [],
+        "stage_id": 910013
+      },
+      "title": "Second Helping of Strongarm Stew",
+      "title_id": 5100479,
+      "turnin_guid": 5715144128442925060,
+      "unlock_profiles": []
+    },
+    {
+      "description": "Mine a large batch of Copper Ore for Cleetus Farnum",
+      "description_id": 5100484,
+      "giver_guid": 5715144128442925061,
+      "id": 910014,
+      "objectives": [
+        {
+          "description": "Switch to Miner.",
+          "description_id": 0,
+          "id": 91001401,
+          "name_id": 0,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 14
+          }
+        },
+        {
+          "description": "Mine10 more Copper Ore for the local bonus contract.",
+          "description_id": 5100117,
+          "id": 91001402,
+          "name_id": 5100117,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 10,
+          "trigger": {
+            "kind": "gather",
+            "resource_id": 1003
+          }
+        }
+      ],
+      "ordered": true,
+      "original_quest_id": null,
+      "provenance": "Recovered title/story actions; reconstructed reserved quest ID, prerequisites, counts, reward economy and actor bindings. No missing original Quests.json claims.",
+      "reward": {
+        "coins": 10,
+        "items": [],
+        "stage_id": 910014
+      },
+      "title": "Cleetus' Copper Collection",
+      "title_id": 5100483,
+      "turnin_guid": 5715144128442925061,
+      "unlock_profiles": []
+    },
+    {
+      "description": "Forge another Spunky Scrapper Hammer for Cleetus Farnum.",
+      "description_id": 5100488,
+      "giver_guid": 5715144128442925061,
+      "id": 910015,
+      "objectives": [
+        {
+          "description": "Switch to Miner.",
+          "description_id": 0,
+          "id": 91001501,
+          "name_id": 0,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 14
+          }
+        },
+        {
+          "description": "Smelt 5 Copper Bars",
+          "description_id": 5100121,
+          "id": 91001502,
+          "name_id": 5100121,
+          "recovery": "Original Smelting77 movie/four stages; reconstructed numeric phase tuning and fixed recipe. Native completion consumes5 Copper Ore/3 Singing Coal and grants10 Copper Bars atomically.",
+          "required": 5,
+          "trigger": {
+            "kind": "craft",
+            "recipe_id": 2002
+          }
+        },
+        {
+          "description": "Switch to Blacksmith.",
+          "description_id": 0,
+          "id": 91001503,
+          "name_id": 0,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 16
+          }
+        },
+        {
+          "description": "Win the original forging game to make another Spunky Scrapper Hammer.",
+          "description_id": 5100503,
+          "id": 91001504,
+          "name_id": 5100503,
+          "recovery": "Original Forging139 movie/protocol; quota5/180seconds/board tuning and consumption are reconstructed. Wiki revision27815 proves the acceptance grant, not a per-attempt recipe.",
+          "required": 1,
+          "trigger": {
+            "kind": "craft",
+            "recipe_id": 2003
+          }
+        }
+      ],
+      "ordered": true,
+      "original_quest_id": null,
+      "provenance": "Recovered title/story actions; reconstructed reserved quest ID, prerequisites, counts, reward economy and actor bindings. No missing original Quests.json claims. Original Smelting77 and Forging139 replace click completion. Repeat material grant is local:5 Copper Ore/3 Singing Coal/5 each Turquoise, Wooden Plank and Thorny Fasteners.",
+      "reward": {
+        "coins": 10,
+        "items": [],
+        "stage_id": 910015
+      },
+      "title": "Forging for Reinforcements",
+      "title_id": 5100487,
+      "turnin_guid": 5715144128442925061,
+      "unlock_profiles": []
+    },
+    {
+      "description": "Queen Valerian has suggested that you meet the different Job Trainers in the Job Center here in Sanctuary.",
+      "description_id": 5100582,
+      "giver_guid": 5715144128442925063,
+      "id": 910016,
+      "objectives": [
+        {
+          "description": "Talk to Ellandra Shieldbreaker",
+          "description_id": 5100586,
+          "id": 91001601,
+          "name_id": 5100586,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "actor_guid": 5715144128442925080,
+            "kind": "talk"
+          }
+        },
+        {
+          "description": "Talk to Maximus Axegrinder",
+          "description_id": 5100588,
+          "id": 91001602,
+          "name_id": 5100588,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "actor_guid": 5715144128442925081,
+            "kind": "talk"
+          }
+        },
+        {
+          "description": "Talk to Scotty Trackrunner",
+          "description_id": 5100590,
+          "id": 91001603,
+          "name_id": 5100590,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "actor_guid": 5715144128442925082,
+            "kind": "talk"
+          }
+        },
+        {
+          "description": "Talk to Captain Sunspark",
+          "description_id": 5100592,
+          "id": 91001604,
+          "name_id": 5100592,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "actor_guid": 5715144128442925083,
+            "kind": "talk"
+          }
+        }
+      ],
+      "ordered": true,
+      "original_quest_id": null,
+      "provenance": "Recovered title/story actions; reconstructed reserved quest ID, prerequisites, counts, reward economy and actor bindings. No missing original Quests.json claims.",
+      "reward": {
+        "coins": 10,
+        "items": [],
+        "stage_id": 910016
+      },
+      "title": "Visiting the Job Center",
+      "title_id": 5100581,
+      "turnin_guid": 5715144128442925083,
+      "unlock_profiles": [
+        11,
+        35
+      ]
+    },
+    {
+      "description": "Being an adventurer is dangerous work. Let me show you a trick that could help if you are attacked when you are not in a combat job like Brawler or Medic.",
+      "description_id": 5100617,
+      "giver_guid": 5715144128442925083,
+      "id": 910017,
+      "objectives": [
+        {
+          "description": "Switch to the Adventurer job",
+          "description_id": 5100611,
+          "id": 91001701,
+          "name_id": 5100611,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 1
+          }
+        },
+        {
+          "description": "Try the Medic job in the native Jobs menu.",
+          "description_id": 0,
+          "id": 91001702,
+          "name_id": 0,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 11
+          }
+        },
+        {
+          "description": "Try the Archer job in the native Jobs menu.",
+          "description_id": 0,
+          "id": 91001703,
+          "name_id": 0,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 35
+          }
+        },
+        {
+          "description": "Switch to Chef and show your earned hat.",
+          "description_id": 0,
+          "id": 91001704,
+          "name_id": 0,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 45
+          }
+        },
+        {
+          "description": "Equip the Student Chef Hat earned earlier.",
+          "description_id": 0,
+          "id": 91001705,
+          "name_id": 0,
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames.",
+          "required": 1,
+          "trigger": {
+            "definition_id": 14794,
+            "kind": "cosmetic_equipped"
+          }
+        }
+      ],
+      "ordered": true,
+      "original_quest_id": null,
+      "provenance": "Recovered title/story actions; reconstructed reserved quest ID, prerequisites, counts, reward economy and actor bindings. No missing original Quests.json claims.",
+      "reward": {
+        "coins": 10,
+        "items": [],
+        "stage_id": 910017
+      },
+      "title": "Talk to Captain Sunspark",
+      "title_id": 5100609,
+      "turnin_guid": 5715144128442925083,
+      "unlock_profiles": []
+    }
+  ]
+}

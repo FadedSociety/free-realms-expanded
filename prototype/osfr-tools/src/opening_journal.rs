@@ -47,7 +47,13 @@ struct Reference {
 
 #[derive(Deserialize)]
 struct JournalReference {
+    /// The journal file named by existing content; the release leaves it empty.
+    #[serde(default)]
     file: String,
+    /// T853: when non-empty this hex span replaces `file`; the same length/hash/offset proof
+    /// applies. The release uses it so no binary ships.
+    #[serde(default)]
+    hex: String,
     sha256: String,
     length: usize,
     offset: usize,
@@ -205,24 +211,35 @@ impl OpeningJournal {
         let journal = reference.journal;
         let name = Path::new(&journal.file);
         if reference.schema_version != 1
-            || name.is_absolute()
-            || name.components().count() != 1
-            || !matches!(
-                name.components().next(),
-                Some(std::path::Component::Normal(_))
-            )
-            || journal.file.contains(['/', '\\', ':'])
             || journal.offset < 13
             || journal
                 .offset
                 .checked_add(journal.length)
                 .is_none_or(|end| end > MAX_BYTES)
+            || (journal.hex.is_empty()
+                && (name.is_absolute()
+                    || name.components().count() != 1
+                    || !matches!(
+                        name.components().next(),
+                        Some(std::path::Component::Normal(_))
+                    )
+                    || journal.file.contains(['/', '\\', ':'])))
         {
             return Err(invalid(
                 "invalid opening journal reference path/schema/offset",
             ));
         }
-        let original = bounded_file(&directory.join(name))?;
+        let original = if journal.hex.is_empty() {
+            bounded_file(&directory.join(name))?
+        } else {
+            // T853: the release ships the fresh journal span as typed JSON hex; no
+            // capture character journal binary is published.
+            if journal.hex.len() > MAX_BYTES * 2 {
+                return Err(invalid("opening journal hex too large"));
+            }
+            crate::startup_snapshot::decode_hex(&journal.hex)
+                .map_err(|_| invalid("invalid opening journal hex"))?
+        };
         if original.len() != journal.length
             || format!("{:x}", Sha256::digest(&original)) != journal.sha256
         {

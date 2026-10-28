@@ -10,7 +10,13 @@ use std::{
 
 #[derive(Deserialize)]
 struct Template {
+    /// T853: a local filename used by existing content; the release overlay leaves this empty.
+    #[serde(default)]
     template_file: String,
+    /// T853: the AddNpc skeleton as hex; when non-empty, `template_file` is not read.
+    /// `template_sha256` pins the bytes either way.
+    #[serde(default)]
+    template_hex: String,
     template_sha256: String,
 }
 #[derive(Clone)]
@@ -26,13 +32,22 @@ impl OpeningWorld {
         let descriptor: Template =
             serde_json::from_slice(&fs::read(directory.join("combat.json"))?)
                 .map_err(|_| invalid("invalid actor template descriptor"))?;
-        let filename = Path::new(&descriptor.template_file);
-        if filename.components().count() != 1
-            || !matches!(filename.components().next(), Some(Component::Normal(_)))
-        {
-            return Err(invalid("actor template must use a local filename"));
-        }
-        let bytes = fs::read(directory.join(filename))?;
+        let bytes = if descriptor.template_hex.is_empty() {
+            let filename = Path::new(&descriptor.template_file);
+            if filename.components().count() != 1
+                || !matches!(filename.components().next(), Some(Component::Normal(_)))
+            {
+                return Err(invalid("actor template must use a local filename"));
+            }
+            fs::read(directory.join(filename))?
+        } else {
+            // T853: typed JSON hex replaces the capture-derived binary in the release.
+            if descriptor.template_hex.len() > 4096 {
+                return Err(invalid("actor template hex too large"));
+            }
+            crate::startup_snapshot::decode_hex(&descriptor.template_hex)
+                .map_err(|_| invalid("invalid actor template hex"))?
+        };
         if bytes.len() != 334
             || bytes[..4] != [35, 0, 2, 0]
             || format!("{:x}", Sha256::digest(&bytes)) != descriptor.template_sha256

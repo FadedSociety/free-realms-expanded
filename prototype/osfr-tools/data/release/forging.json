@@ -1,0 +1,70 @@
+{
+  "board": {
+    "collectable_percent": 10,
+    "duration_seconds": 180,
+    "height": 8,
+    "left": 3,
+    "mold_id": 6,
+    "quota": 5,
+    "seed": 139,
+    "selectable_types": [
+      1,
+      2,
+      3
+    ],
+    "top": 3,
+    "width": 8
+  },
+  "description_id": 22054,
+  "game_id": 139,
+  "icon_id": 910,
+  "name_id": 386081,
+  "profile_id": 16,
+  "provenance": {
+    "limits": "Original game_forging.gfx139/type8 controls, chain/queue/gravity protocol and hammer/mold6 art. Missing MatchThree server tables:8x8 board at3,3, three selectable colors,10% hammer spawns, 180 seconds and quota5 are local reconstructed tuning. Initial bottom two rows cannot be hammers; an initial three-tile move is guaranteed. Server validates real chains and hammer drops before victory. Consumption10 bars/5 turquoise/5 planks/5 fasteners is a reconstructed recipe derived from a historically documented tutorial GRANT, not a recovered per-attempt recipe. Output variant30280 is a local tint choice among ten genuine definitions, not a recovered quest reward.",
+    "mold_proof": "XML sprite435 mold6 references img1598665119188203228.dds; decoded genuine supplied image depicts hammer",
+    "source_sha256": {
+      "lab:client-assets/pack_05/000696.txt": "324ea95ed2fa2146150eec043c8b562ddba91142be14a1a1caa93d618d582ed8",
+      "lab:client-assets/pack_05/000788.gfx": "78b53823ad24337bba1a7b2103c3820c1baf7e13f3f025709326bf9daa663d99",
+      "lab:client/Resources/MiniGameData.txt": "8ce3cc61a2ad324912465e8d1785d246ccd680a01712e256fddf702ce856c252",
+      "lab:minigame-scripts/minigames/forging/movie.xml": "eeb83bf2987673a6c6f800bea67b137feee2b6409f9b48076032866fcc4caf6e",
+      "lab:minigame-scripts/minigames/forging/scripts/__Packages/GameClientNetwork.as": "571592993e9b9d72cb2c3e23e8b2967feb0ab35a8d3df960d71cfa39e5343e54",
+      "lab:minigame-scripts/minigames/forging/scripts/__Packages/GameData.as": "fc779888deb39e9d0078ff4adbd2613aa193506743bd7d10ad332b98530d47f1",
+      "lab:minigame-scripts/minigames/forging/scripts/__Packages/GameServerNetwork.as": "8c2b5c5a90b3cdc404776f4786b804ce60d49c30b0b5866276aeb6f2868ee3f8",
+      "lab:minigame-scripts/minigames/forging/scripts/__Packages/MoldMeter.as": "33a8382f2a188f462cede7aef35dcc690be25e4038daaccfbf1df71c71a69336",
+      "lab:minigame-scripts/minigames/forging/scripts/__Packages/com/sonyonline/game/SoeNetworkTypeFreeRealms.as": "22bc63cd225365533c360ffdb48f30c8b2c1724fdcfe68e326a16b006babd152",
+      "lab:minigame-scripts/minigames/forging/scripts/__Packages/core/Grid.as": "f8e4e82052116c01ef103edebfd6eeb7b2839132a586abbacd7816a42f36f697",
+      "lab:minigame-scripts/minigames/forging/scripts/__Packages/core/ServerGrid.as": "e1cf90298d90b97144f6e468fa5efcae87e45ba89f6023b9addd2a04a6a2c50a",
+      "lab:minigame-scripts/minigames/forging/scripts/__Packages/core/TileGenerator.as": "95554996ebd8a108eccbe62fc5b4198a150715690e8452da24b7a43f15b90a4e"
+    },
+    "tool": "Official JPEXS26.3.0 script/XML export (private GPL3 tool)",
+    "tutorial_grant": "https://freerealms.fandom.com/wiki/Quest:Your_First_Weapon?oldid=27815"
+  },
+  "recipe": {
+    "consumes": [
+      [
+        21785,
+        10
+      ],
+      [
+        2752,
+        5
+      ],
+      [
+        55,
+        5
+      ],
+      [
+        56,
+        5
+      ]
+    ],
+    "product_definition_id": 30280,
+    "product_quantity": 1,
+    "reconstructed_consumption": true,
+    "reconstructed_tint_selection": true
+  },
+  "reconstructed_rules": true,
+  "rule_notice": "Original game_forging.gfx139/type8 controls, chain/queue/gravity protocol and hammer/mold6 art. Missing MatchThree server tables:8x8 board at3,3, three selectable colors,10% hammer spawns, 180 seconds and quota5 are local reconstructed tuning. Initial bottom two rows cannot be hammers; an initial three-tile move is guaranteed. Server validates real chains and hammer drops before victory. Consumption10 bars/5 turquoise/5 planks/5 fasteners is a reconstructed recipe derived from a historically documented tutorial GRANT, not a recovered per-attempt recipe. Output variant30280 is a local tint choice among ten genuine definitions, not a recovered quest reward.",
+  "schema_version": 1
+}

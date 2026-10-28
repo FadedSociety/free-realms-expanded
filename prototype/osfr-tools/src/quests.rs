@@ -109,7 +109,13 @@ struct Binding {
 
 #[derive(Clone, Debug, Deserialize)]
 struct Journal {
+    /// The journal file named by existing content; the release leaves it empty.
+    #[serde(default)]
     file: String,
+    /// T853: when non-empty this hex span replaces `file`; the same length/hash/offset proof
+    /// applies. The release uses it so no binary ships.
+    #[serde(default)]
+    hex: String,
     sha256: String,
     length: usize,
     offset: usize,
@@ -208,13 +214,23 @@ impl QuestEngine {
         {
             return Err(invalid("invalid checkpoint activity"));
         }
-        let path = Path::new(&content.journal.file);
-        if path.components().count() != 1
-            || !matches!(path.components().next(), Some(Component::Normal(_)))
-        {
-            return Err(invalid("quest journal must be a direct relative filename"));
-        }
-        let journal = bounded_file(&directory.join(path), MAX_JOURNAL)?;
+        let journal = if content.journal.hex.is_empty() {
+            let path = Path::new(&content.journal.file);
+            if path.components().count() != 1
+                || !matches!(path.components().next(), Some(Component::Normal(_)))
+            {
+                return Err(invalid("quest journal must be a direct relative filename"));
+            }
+            bounded_file(&directory.join(path), MAX_JOURNAL)?
+        } else {
+            // T853: the release ships the fresh journal span as typed JSON hex; the same
+            // length/hash/offset proof below still pins it.
+            if content.journal.hex.len() > MAX_JOURNAL * 2 {
+                return Err(invalid("quest journal hex too large"));
+            }
+            osfr_tools::startup_snapshot::decode_hex(&content.journal.hex)
+                .map_err(|_| invalid("invalid quest journal hex"))?
+        };
         if journal.len() < 4
             || journal.len() != content.journal.length
             || format!("{:x}", Sha256::digest(&journal)) != content.journal.sha256
