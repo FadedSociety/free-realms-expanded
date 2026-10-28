@@ -3082,6 +3082,7 @@ mod tests {
                 speed: 1.0,
                 position: [0.0, 1.0, 0.0],
                 base_animation: None,
+                attachments: Vec::new(),
             }
         }
 

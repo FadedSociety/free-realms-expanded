@@ -95,7 +95,15 @@ fn summon_and_dismiss_return_client_pet_active_bytes_and_presence_events() {
         .adopt_from_owned_item(&mut fixture.inventory, 10, &definition(), 0)
         .unwrap();
     let summoned = service
-        .summon(id, 44, 33, [1.0, 2.0, 3.0], PetBusy::default(), 0)
+        .summon(
+            id,
+            44,
+            33,
+            [1.0, 2.0, 3.0],
+            PetBusy::default(),
+            0,
+            Vec::new(),
+        )
         .unwrap();
     let mut expected = vec![53, 0, 9];
     expected.extend(id.to_le_bytes());
@@ -124,7 +132,7 @@ fn follow_and_equipment_state_validate_owned_items_and_slots() {
         .adopt_from_owned_item(&mut fixture.inventory, 10, &definition(), 0)
         .unwrap();
     service
-        .summon(pet_id, 44, 33, [0.0; 3], PetBusy::default(), 0)
+        .summon(pet_id, 44, 33, [0.0; 3], PetBusy::default(), 0, Vec::new())
         .unwrap();
     let followed =
         service.follow_location([10.0, 0.0, 0.0, 0.0], [0.0; 3], |_, _| Some(0.0), 1_000);
@@ -184,7 +192,15 @@ fn care_consumes_one_owned_food_and_restores_food_need() {
         .adopt_from_owned_item(&mut fixture.inventory, 10, &definition(), 0)
         .unwrap();
     service
-        .summon(pet_id, 44, 33, [1.0, 2.0, 3.0], PetBusy::default(), 0)
+        .summon(
+            pet_id,
+            44,
+            33,
+            [1.0, 2.0, 3.0],
+            PetBusy::default(),
+            0,
+            Vec::new(),
+        )
         .unwrap();
     service
         .equip_item(pet_id, 11, PetEquipmentSlot::Utility(0), &fixture.inventory)
@@ -224,7 +240,15 @@ fn needs_decay_faster_while_summoned() {
     // 600 s of the shipped idle decay, from the shipped starting level (T812: below 100).
     assert!((50.0..60.0).contains(&idle_food), "{idle_food}");
     service
-        .summon(pet_id, 44, 33, [0.0; 3], PetBusy::default(), 600)
+        .summon(
+            pet_id,
+            44,
+            33,
+            [0.0; 3],
+            PetBusy::default(),
+            600,
+            Vec::new(),
+        )
         .unwrap();
     service.advance_time(1_200).unwrap();
     assert!(service.pet(pet_id).unwrap().needs.food < idle_food - 10.0);
@@ -283,7 +307,8 @@ fn minigame_busy_rule_rejects_summon_without_mutation() {
                 PetBusy {
                     minigame_active: true
                 },
-                0
+                0,
+                Vec::new()
             )
             .is_err()
     );

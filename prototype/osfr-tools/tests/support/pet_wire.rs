@@ -128,3 +128,14 @@ pub fn read_can_go_reply(packet: &[u8]) -> Option<([f32; 4], bool)> {
     }
     Some((position, packet[19] != 0))
 }
+
+/// T530: `Pet.EquipItem`/`Pet.UnequipItem` (senders `00b60220`/`00b602c0`, Lua `sub_C07990`,
+/// wrapper `00b5c7e0`): `53 00 | 11 | u8 clear (0 fit, 1 clear) | u32 pane slot | u32 item
+/// instance`.
+pub fn wear(clear: bool, slot: u32, item: u32) -> Vec<u8> {
+    let mut bytes = vec![53, 0, 11, u8::from(clear)];
+    for value in [slot, item] {
+        bytes.extend(value.to_le_bytes());
+    }
+    bytes
+}

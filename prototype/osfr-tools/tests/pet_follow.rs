@@ -505,7 +505,15 @@ fn follow_frames_use_the_enemy_movement_layout() {
     let mut service = PetService::new(content).unwrap();
     let id = service.adopt_vendor_grant(1, &definition, 0).unwrap();
     service
-        .summon(id, 44, 33, [0.0, 0.0, 0.0], PetBusy::default(), 0)
+        .summon(
+            id,
+            44,
+            33,
+            [0.0, 0.0, 0.0],
+            PetBusy::default(),
+            0,
+            Vec::new(),
+        )
         .unwrap();
     let mut frames = Vec::new();
     for t in 1..=20u64 {

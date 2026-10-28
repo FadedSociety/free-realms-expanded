@@ -40,7 +40,8 @@ const PET_GUID_TAG: u64 = 0x4000_0000_0000_0000;
 /// T488: 18 (groom) and 22 (tactile stroke) join them.
 /// T489: 7 (perform trick), 8 (gesture result) and 14 (favourite trick) join them.
 /// T490: 26 (the tile-click can-go location) joins them.
-pub const DECODED_SUBTYPES: [u8; 13] = [4, 6, 7, 8, 14, 16, 18, 19, 22, 24, 26, 28, 32];
+/// T530: 11 (the equip panel's item fit or clear) joins them.
+pub const DECODED_SUBTYPES: [u8; 14] = [4, 6, 7, 8, 11, 14, 16, 18, 19, 22, 24, 26, 28, 32];
 
 /// T490: a parsed 53/26 coordinate may not exceed this (m). It is a parser sanity bound, not a
 /// gameplay rule: the click is refused unless it is within `click_max_m` of the owner anyway.
@@ -50,6 +51,9 @@ const MAX_CLICK_COORD: f32 = 1_000_000.0;
 const UTILITY_SLOT_OFFSET: i32 = 199;
 /// T485: the item type of every pet kit row (Legacy ClientItemDefinitions slots 200..206).
 const PET_KIT_TYPE: i32 = 4;
+/// T530: the item type of pet clothing (the catalogue's `pet_dog_*`/`pet_cat_*` wearables and
+/// toys, slots 1/3/5/6/7; OSFR's `ItemDefinitionHelper` type 3).
+const PET_WEARABLE_TYPE: i32 = 3;
 /// T485: 53/20 PetUtilityNotify kinds (`00b5ce60` switch): begin, end + unlock, unlock.
 const NOTIFY_BEGIN: u32 = 1;
 const NOTIFY_END: u32 = 2;
@@ -871,6 +875,55 @@ pub struct PetEquipment {
     pub utilities: [Option<i32>; 8],
 }
 
+impl PetEquipment {
+    /// The owned instance id fitted in `slot`; `None` for an empty slot. A utility index past the
+    /// eight saved slots has nowhere to store an item and is `None` too.
+    pub fn worn(&self, slot: PetEquipmentSlot) -> Option<i32> {
+        self.slot_ref(slot).copied().flatten()
+    }
+
+    /// Store `item` (or `None` to empty) in `slot`. `false` when a utility index has no saved
+    /// slot, so a caller refuses instead of silently dropping the item.
+    pub fn fit(&mut self, slot: PetEquipmentSlot, item: Option<i32>) -> bool {
+        let Some(entry) = self.slot_mut(slot) else {
+            return false;
+        };
+        *entry = item;
+        true
+    }
+
+    /// Every instance id the pet wears or carries, in slot order. The trade gate (T530) reads
+    /// this one list rather than its own copy of the slots.
+    pub fn instances(&self) -> impl Iterator<Item = i32> + '_ {
+        [self.head, self.collar, self.chest, self.feet, self.toy]
+            .into_iter()
+            .chain(self.utilities)
+            .flatten()
+    }
+
+    fn slot_ref(&self, slot: PetEquipmentSlot) -> Option<&Option<i32>> {
+        match slot {
+            PetEquipmentSlot::Head => Some(&self.head),
+            PetEquipmentSlot::Collar => Some(&self.collar),
+            PetEquipmentSlot::Chest => Some(&self.chest),
+            PetEquipmentSlot::Feet => Some(&self.feet),
+            PetEquipmentSlot::Toy => Some(&self.toy),
+            PetEquipmentSlot::Utility(index) => self.utilities.get(index as usize),
+        }
+    }
+
+    fn slot_mut(&mut self, slot: PetEquipmentSlot) -> Option<&mut Option<i32>> {
+        match slot {
+            PetEquipmentSlot::Head => Some(&mut self.head),
+            PetEquipmentSlot::Collar => Some(&mut self.collar),
+            PetEquipmentSlot::Chest => Some(&mut self.chest),
+            PetEquipmentSlot::Feet => Some(&mut self.feet),
+            PetEquipmentSlot::Toy => Some(&mut self.toy),
+            PetEquipmentSlot::Utility(index) => self.utilities.get_mut(index as usize),
+        }
+    }
+}
+
 impl Default for PetEquipment {
     fn default() -> Self {
         Self {
@@ -949,6 +1002,11 @@ pub struct PetPresence {
     /// T531: the rest loop the pet is lying in, as a base animation; a late viewer is sent it
     /// with the spawn so it does not see a standing pet during the rest. `None` while standing.
     pub base_animation: Option<i32>,
+    /// T530: the rows the pet's clothes put on its actor, one per fitted wearable slot (at most
+    /// five). The summon carries them; `PetService::view` starts empty and the gateway's
+    /// `pet_view` fills them from the live inventory, so a presence built without one draws no
+    /// clothes.
+    pub attachments: Vec<startup_world::NpcAttachment>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -1012,6 +1070,17 @@ pub enum PetRequest {
     /// T485 `Pet.StartFeed` (`00b5f720`): the active pet id and a zero word.
     Feed {
         pet_id: u32,
+    },
+    /// T530 `Pet.EquipItem`/`Pet.UnequipItem`: the live Lua callbacks `sub_C07990`/`sub_C07AE0`
+    /// (registered as `EquipItem`/`UnequipItem`) build this body; `00b60220`/`00b602c0` are the
+    /// matching packet builders and wrapper `00b5c7e0` sends it. u8 clear flag (0 fit, 1 clear),
+    /// the pet equipment pane slot and the item instance the UI picked. The client's reader
+    /// (`00b55c30`) reads exactly those three fields; ids at or above 200 are the 53/16 utility
+    /// kit, not this packet.
+    Equip {
+        clear: bool,
+        slot: u32,
+        item: u32,
     },
     /// T485 53/28 (`00b60350`/`00b60420`): the owner entered (true) or left water.
     Water(bool),
@@ -1148,6 +1217,25 @@ impl PetRequest {
                     pet_id: word(1)?,
                     slot: word(5)?,
                     item: word(9)?,
+                }))
+            }
+            // T530: the writer `00b60220`/`00b602c0` always emits the flag plus both words. The
+            // slot is a pane row, so the handler refuses anything but the five wearables; the
+            // item is an owned instance (the clear path sends the one it is removing).
+            11 => {
+                if body.len() != 9 {
+                    return Err(invalid("pet equip request has the wrong length"));
+                }
+                let clear = match body[0] {
+                    0 => false,
+                    1 => true,
+                    _ => return Err(invalid("unknown pet equip action")),
+                };
+                let word = |offset: usize| word(offset).ok_or_else(|| invalid("short pet equip"));
+                Ok(Some(PetRequest::Equip {
+                    clear,
+                    slot: word(1)?,
+                    item: word(5)?,
                 }))
             }
             19 => {
@@ -1476,7 +1564,32 @@ impl PetService {
             speed: self.content.movement_speed.speed,
             position: active.position,
             base_animation: active.idle.base_animation(),
+            attachments: Vec::new(),
         })
+    }
+
+    /// T530: the AddNpc attachment rows `pet_id`'s fitted clothes put on its actor. The gateway's
+    /// summon, zoning resummon and late-viewer paths call this with the character's live
+    /// inventory; an unowned pet has no rows.
+    pub fn worn_attachments(
+        &self,
+        pet_id: u32,
+        inventory: &Inventory,
+    ) -> Vec<startup_world::NpcAttachment> {
+        self.pet(pet_id)
+            .map_or_else(Vec::new, |pet| worn_rows(&pet.equipment, inventory))
+    }
+
+    /// T530: every instance id a pet wears or holds, for the trade gate. Only ids the bag still
+    /// holds: a stale save entry names an item nobody can offer, and `TradeInventory` refuses a
+    /// set with an id its item list lacks.
+    pub fn equipped_instances(&self, inventory: &InventoryState) -> BTreeSet<i32> {
+        self.roster
+            .pets
+            .iter()
+            .flat_map(|pet| pet.equipment.instances())
+            .filter(|id| inventory.items.iter().any(|item| item.id == *id))
+            .collect()
     }
 
     /// Reset only the connection-scoped actor state; the saved roster stays. T487: the pet a zone
@@ -1677,6 +1790,9 @@ impl PetService {
         Ok(())
     }
 
+    /// T530: `attachments` are the AddNpc rows the pet's fitted clothes put on its actor; the
+    /// caller resolves them from the live inventory (`worn_attachments`), so the actor is dressed
+    /// from its first frame.
     pub fn summon(
         &mut self,
         pet_id: u32,
@@ -1685,6 +1801,7 @@ impl PetService {
         owner_position: [f32; 3],
         busy: PetBusy,
         now: u64,
+        attachments: Vec<startup_world::NpcAttachment>,
     ) -> io::Result<PetTransition> {
         if busy.minigame_active {
             return Err(invalid("cannot summon a pet during a minigame"));
@@ -1754,6 +1871,7 @@ impl PetService {
             position: pose.position,
             // A new summon stands, so it has no rest loop to replay.
             base_animation: None,
+            attachments,
         }));
         Ok(PetTransition {
             owner_message: pet_active_packet(pet_id, actor_guid),
@@ -1816,6 +1934,7 @@ impl PetService {
     /// then kept for the first update or tick after it ends), for a pet the roster no longer holds
     /// (forgotten silently) and with nothing remembered. The wire is the summon's own plus the
     /// roster a summon sends, and it never marks a save: only the session remembers the pet.
+    /// T530: `attachments` dress the actor, like `summon`.
     pub fn resummon(
         &mut self,
         actor_guid: u64,
@@ -1823,6 +1942,7 @@ impl PetService {
         owner_position: [f32; 3],
         busy: PetBusy,
         now: u64,
+        attachments: Vec<startup_world::NpcAttachment>,
     ) -> io::Result<Option<PetWire>> {
         let Some(pet_id) = self.remembered else {
             return Ok(None);
@@ -1836,7 +1956,15 @@ impl PetService {
         if self.pet(pet_id).is_none() {
             return Ok(None);
         }
-        let transition = self.summon(pet_id, actor_guid, owner_guid, owner_position, busy, now)?;
+        let transition = self.summon(
+            pet_id,
+            actor_guid,
+            owner_guid,
+            owner_position,
+            busy,
+            now,
+            attachments,
+        )?;
         let mut wire = self.wire(transition);
         wire.private.push(self.list_packet());
         wire.changed = false;
@@ -1876,12 +2004,58 @@ impl PetService {
             owner_position,
             busy,
             now,
+            Vec::new(),
         )?;
         Ok((transition, replies))
     }
 
+    /// Apply one summon on a staged clone (a refusal leaves the roster and actor untouched),
+    /// then answer with the actor, the roster that activates it (`53/9` after `53/5`) and the care
+    /// unlocks of the pet it replaces. T530: `attachments` dress the new actor; the gateway route
+    /// passes the live inventory's rows and `handle` (no inventory) passes none.
+    fn summon_pet(
+        &mut self,
+        pet_id: u32,
+        actor_guid: u64,
+        owner_guid: u64,
+        owner_position: [f32; 3],
+        busy: PetBusy,
+        now: u64,
+        attachments: Vec<startup_world::NpcAttachment>,
+    ) -> io::Result<PetWire> {
+        // T485: replacing the active pet ends its feed (nothing more is consumed). T488: a
+        // grooming session. T489: a trick (the unlocks).
+        let care_end = self.care_end_packets();
+        let mut next = self.clone();
+        next.rebase_clock(now);
+        let applied = next.summon(
+            pet_id,
+            actor_guid,
+            owner_guid,
+            owner_position,
+            busy,
+            now,
+            attachments,
+        );
+        match applied {
+            Ok(transition) => {
+                *self = next;
+                let mut wire = self.wire(transition);
+                wire.private.push(self.list_packet());
+                wire.private.extend(care_end);
+                Ok(wire)
+            }
+            Err(error) => Ok(PetWire {
+                private: vec![self.list_packet()],
+                notice: Some(refusal_text(&error)),
+                ..PetWire::default()
+            }),
+        }
+    }
+
     /// Decode and apply one pet-family request. Refusals are non-mutating and return a
-    /// private roster refresh plus a visible notice.
+    /// private roster refresh plus a visible notice. This route has no live inventory, so its
+    /// summon dresses no actor; the gateway route (`handle_at_ms`) is the one that does.
     pub fn handle(
         &mut self,
         inner: &[u8],
@@ -1894,17 +2068,24 @@ impl PetService {
             return Ok(None);
         };
         let mut next = self.clone();
-        let summoning = matches!(request, PetRequest::Summon { .. });
-        // T485: replacing or dismissing the active pet ends its feed (nothing more is consumed).
-        // T488: a grooming session. T489: a trick (the unlocks).
-        let care_end = (summoning || matches!(request, PetRequest::Dismiss))
+        // T485: dismissing the active pet ends its feed (nothing more is consumed). T488: a
+        // grooming session. T489: a trick (the unlocks).
+        let care_end = matches!(request, PetRequest::Dismiss)
             .then(|| self.care_end_packets())
             .unwrap_or_default();
         let applied = match request {
             PetRequest::Summon { pet_id } => {
-                next.rebase_clock(now);
-                let actor_guid = Self::pet_guid(owner_guid, pet_id);
-                next.summon(pet_id, actor_guid, owner_guid, owner_position, busy, now)
+                return self
+                    .summon_pet(
+                        pet_id,
+                        Self::pet_guid(owner_guid, pet_id),
+                        owner_guid,
+                        owner_position,
+                        busy,
+                        now,
+                        Vec::new(),
+                    )
+                    .map(Some);
             }
             PetRequest::Dismiss => {
                 if next.active.is_some() {
@@ -1919,8 +2100,10 @@ impl PetService {
             }
             // T485: fitting and feeding read and spend the live inventory (`handle_at_ms`).
             // T488: so do grooming and tactile strokes (`handle_at_ms`). T489: tricks and
-            // favourites run on the same route, with the millisecond clock.
-            PetRequest::Utility { .. }
+            // favourites run on the same route, with the millisecond clock. T530: and the equip
+            // panel's wearables and utilities.
+            PetRequest::Equip { .. }
+            | PetRequest::Utility { .. }
             | PetRequest::Feed { .. }
             | PetRequest::Groom { .. }
             | PetRequest::Tactile { .. }
@@ -1981,9 +2164,6 @@ impl PetService {
             Ok(transition) => {
                 *self = next;
                 let mut wire = self.wire(transition);
-                if summoning {
-                    wire.private.push(self.list_packet());
-                }
                 wire.private.extend(care_end);
                 Ok(Some(wire))
             }
@@ -2041,6 +2221,27 @@ impl PetService {
                 definition_id,
                 tint,
             } => (definition_id, tint),
+            // T530: a summon from the gateway carries the actor's clothing rows, resolved from
+            // the live inventory; `handle` (no inventory) cannot.
+            PetRequest::Summon { pet_id } => {
+                let actor_guid = Self::pet_guid(owner_guid, pet_id);
+                let attachments = self.worn_attachments(pet_id, inventory);
+                return self
+                    .summon_pet(
+                        pet_id,
+                        actor_guid,
+                        owner_guid,
+                        owner_position,
+                        busy,
+                        now,
+                        attachments,
+                    )
+                    .map(Some);
+            }
+            // T530: the 53/11 equip panel fit or clear.
+            PetRequest::Equip { clear, slot, item } => {
+                return Ok(Some(self.wear(clear, slot, item, inventory)));
+            }
             PetRequest::Utility {
                 remove,
                 pet_id,
@@ -2277,12 +2478,109 @@ impl PetService {
             .items
             .iter()
             .find(|owned| owned.id == item && owned.count > 0)?;
-        let (item_type, slot, class) = inventory.kit_facts(owned.definition_id)?;
+        let (item_type, slot, class) = inventory.item_facts(owned.definition_id)?;
         (!model.vanity
             && item_type == PET_KIT_TYPE
             && slot == index as i32 + UTILITY_SLOT_OFFSET
             && model.item_classes.iter().any(|known| known.id == class))
         .then_some(item)
+    }
+
+    /// T530: fit (flag 0) or clear (flag 1) one item in a pet equipment pane slot. The body names
+    /// no pet, and the client's Pet Inventory pane is the summoned pet's (`Pet.GetActivePetId`),
+    /// so the target is the active pet. A fit needs that pet, not vanity, and an owned Type-3 item
+    /// whose definition slot is the pane slot and whose class the model lists. Every accepted
+    /// change answers 53/11 with the slot's new item, the 53/5 roster (the client's equip panel
+    /// reads the record) and, while the pet is out, one 35/6 for its actor to the owner and the
+    /// viewers. A refusal changes nothing and echoes the slot as it stands; a slot outside the
+    /// five pane rows echoes nothing at all. T485's sibling rules live in `utility`.
+    fn wear(&mut self, clear: bool, slot: u32, item: u32, inventory: &Inventory) -> PetWire {
+        let Ok(wire_slot) = i32::try_from(slot) else {
+            return PetWire::default();
+        };
+        let Some(target) = PetEquipmentSlot::from_wearable_slot(wire_slot) else {
+            return PetWire::default();
+        };
+        let echo = |fitted: Option<i32>| PetWire {
+            private: vec![pet_equip_packet(
+                clear,
+                slot,
+                fitted.map_or(0, |id| id as u32),
+            )],
+            ..PetWire::default()
+        };
+        let Some(pet_id) = self.active_pet_id() else {
+            return echo(None);
+        };
+        let before = self.pet(pet_id).and_then(|pet| pet.equipment.worn(target));
+        let accepted = match self.pet(pet_id) {
+            Some(_) if clear => Some(None),
+            Some(pet) => self.wearable(pet, target, item, inventory).map(Some),
+            None => None,
+        };
+        let Some(next) = accepted else {
+            return echo(before);
+        };
+        if next == before {
+            return echo(next);
+        }
+        // The plan just read this instance out of the bag and the pane slot is a wearable one, so
+        // a failed write is an internal refusal: answer with the unchanged slot and change nothing.
+        let applied = match next {
+            Some(id) => self.equip_item(pet_id, id, target, inventory),
+            None => self.unequip_item(pet_id, target),
+        };
+        if applied.is_err() {
+            return echo(before);
+        }
+        let mut wire = echo(next);
+        wire.changed = true;
+        wire.private.push(self.list_packet());
+        // T530: the owner's and the viewers' pet actor swaps the attachment on the same slot. An
+        // unsummoned pet has no actor to change; the next summon carries the rows in its AddNpc.
+        if let Some(active) = self.active.filter(|active| active.pet_id == pet_id) {
+            let attachment = next.and_then(|id| inventory.attachment(id, wire_slot));
+            let change = crate::inventory::equip_change_packet(
+                active.actor_guid,
+                next.unwrap_or(0),
+                attachment.as_ref(),
+                wire_slot,
+                world::content_spawn_template().active_profile,
+            );
+            wire.private.push(change.clone());
+            wire.shared.push(change);
+        }
+        wire
+    }
+
+    /// T530: the owned instance `item` when it may be fitted to the pet's pane slot `slot`.
+    fn wearable(
+        &self,
+        pet: &Pet,
+        slot: PetEquipmentSlot,
+        item: u32,
+        inventory: &Inventory,
+    ) -> Option<i32> {
+        let model = self.content.model(self.content.model_id(&pet.model))?;
+        let item = i32::try_from(item).ok()?;
+        let owned = inventory
+            .state()
+            .items
+            .iter()
+            .find(|owned| owned.id == item && owned.count > 0)?;
+        let (item_type, definition_slot, class) = inventory.item_facts(owned.definition_id)?;
+        let pane_slot = slot.wearable_slot()?;
+        // A row with no model draws nothing: the client's attachment add (`sub_95A1C0`) returns
+        // without adding when the model string is empty, so such a definition cannot be fitted.
+        let draws = inventory
+            .attachment(item, pane_slot)
+            .is_some_and(|row| !row.model_name.is_empty());
+        let allowed = !model.vanity
+            && item_type == PET_WEARABLE_TYPE
+            && definition_slot == pane_slot
+            && model.item_classes.iter().any(|known| known.id == class)
+            && draws;
+        allowed.then_some(item)
     }
 
     /// T485: 53/19 starts a feed and answers 53/20 begin; `care_tick` consumes the food later.
@@ -2726,32 +3024,16 @@ impl PetService {
         }
         // (R) The local save stores owned inventory instance ids in client-shaped pet slots.
         let pet = pet_mut(&mut self.roster, pet_id)?;
-        match slot {
-            PetEquipmentSlot::Head => pet.equipment.head = Some(item_instance_id),
-            PetEquipmentSlot::Collar => pet.equipment.collar = Some(item_instance_id),
-            PetEquipmentSlot::Chest => pet.equipment.chest = Some(item_instance_id),
-            PetEquipmentSlot::Feet => pet.equipment.feet = Some(item_instance_id),
-            PetEquipmentSlot::Toy => pet.equipment.toy = Some(item_instance_id),
-            PetEquipmentSlot::Utility(index) if index < 8 => {
-                pet.equipment.utilities[index as usize] = Some(item_instance_id)
-            }
-            PetEquipmentSlot::Utility(_) => return Err(invalid("invalid pet utility slot")),
+        if !pet.equipment.fit(slot, Some(item_instance_id)) {
+            return Err(invalid("invalid pet utility slot"));
         }
         Ok(())
     }
 
     pub fn unequip_item(&mut self, pet_id: u32, slot: PetEquipmentSlot) -> io::Result<()> {
         let pet = pet_mut(&mut self.roster, pet_id)?;
-        match slot {
-            PetEquipmentSlot::Head => pet.equipment.head = None,
-            PetEquipmentSlot::Collar => pet.equipment.collar = None,
-            PetEquipmentSlot::Chest => pet.equipment.chest = None,
-            PetEquipmentSlot::Feet => pet.equipment.feet = None,
-            PetEquipmentSlot::Toy => pet.equipment.toy = None,
-            PetEquipmentSlot::Utility(index) if index < 8 => {
-                pet.equipment.utilities[index as usize] = None
-            }
-            PetEquipmentSlot::Utility(_) => return Err(invalid("invalid pet utility slot")),
+        if !pet.equipment.fit(slot, None) {
+            return Err(invalid("invalid pet utility slot"));
         }
         Ok(())
     }
@@ -2884,6 +3166,38 @@ pub enum PetEquipmentSlot {
     Feet,
     Toy,
     Utility(u8),
+}
+
+/// T530: the client's pet equipment pane slots, one table for both directions. The pane's own
+/// slot map (`ScriptsBase.lua` `PetInventorySlotMap`: `HeadData`, empty, `ChestData`, empty,
+/// `FeetData`, `CollarData`, `ToyData`) gives head 1, chest 3, feet 5, collar 6 and toy 7, and
+/// the shipped catalogue's pet rows use exactly those item `Slot` values. The utility kit (53/16)
+/// numbers its own slots 1..7, so this table is only for the five wearables.
+const WEARABLE_SLOTS: [(PetEquipmentSlot, i32); 5] = [
+    (PetEquipmentSlot::Head, 1),
+    (PetEquipmentSlot::Chest, 3),
+    (PetEquipmentSlot::Feet, 5),
+    (PetEquipmentSlot::Collar, 6),
+    (PetEquipmentSlot::Toy, 7),
+];
+
+impl PetEquipmentSlot {
+    /// The pane slot a wearable, or `None` for a utility slot.
+    pub fn from_wearable_slot(slot: i32) -> Option<Self> {
+        WEARABLE_SLOTS
+            .iter()
+            .find(|(_, wire)| *wire == slot)
+            .map(|(slot, _)| *slot)
+    }
+
+    /// The client's pane slot for a wearable; `None` for a utility slot (which the 53/16 record
+    /// numbers separately).
+    fn wearable_slot(self) -> Option<i32> {
+        WEARABLE_SLOTS
+            .iter()
+            .find(|(known, _)| *known == self)
+            .map(|(_, wire)| *wire)
+    }
 }
 
 fn insert_pet(
@@ -3107,6 +3421,21 @@ fn fitted_item<'a>(
         .find(|item| item.id == id && item.count > 0)
 }
 
+/// T530: the AddNpc attachment rows a pet's fitted clothes put on its actor, in pane-slot order
+/// (head, chest, feet, collar, toy). An instance the bag no longer holds is skipped (the same
+/// stale-save rule as the record's equipped list), and so is a definition that draws nothing: the
+/// client's attachment add (`00b5ce60` case 11 -> `sub_95A1C0`) ignores an empty model.
+fn worn_rows(equipment: &PetEquipment, inventory: &Inventory) -> Vec<startup_world::NpcAttachment> {
+    WEARABLE_SLOTS
+        .iter()
+        .filter_map(|&(slot, wire)| {
+            let id = equipment.worn(slot)?;
+            let row = inventory.attachment(id, wire)?;
+            (!row.model_name.is_empty()).then_some(row)
+        })
+        .collect()
+}
+
 fn clear_equipped_instance(equipment: &mut PetEquipment, item_instance_id: i32) {
     for slot in [
         &mut equipment.head,
@@ -3149,7 +3478,9 @@ fn pet_set_name_packet(actor_guid: u64, name: &str, accepted: bool) -> Vec<u8> {
 impl PetPresence {
     /// (R) AddNpc construction reuses the captured content template. The numeric model id
     /// comes from the recovered `Models.txt` binding and the species texture alias is
-    /// carried separately from the actor's display name.
+    /// carried separately from the actor's display name. T530: the actor's attachment list is
+    /// the pet's fitted clothes, so every spawn (summon, zoning resummon and a late viewer)
+    /// dresses it in one packet.
     pub fn spawn_packet(&self) -> Option<Vec<u8>> {
         let npc = startup_world::NpcSpawn {
             actor_id: self.actor_guid,
@@ -3161,6 +3492,7 @@ impl PetPresence {
             rotation: [0.0, 0.0, 1.0, 0.0],
             is_interactable: 0,
             interact_range: 0,
+            attachments: self.attachments.clone(),
             ..world::content_spawn_template()
         };
         world::unframe_tunnel(&startup_world::build_add_npc(&npc)).ok()
@@ -3328,6 +3660,20 @@ fn pet_status_packet(pet_id: u32, needs: &PetNeeds) -> Vec<u8> {
     let mut bytes = pet_header(3);
     bytes.extend(pet_id.to_le_bytes());
     for value in [needs.food, needs.groom, needs.play, needs.mood] {
+        bytes.extend(value.to_le_bytes());
+    }
+    bytes
+}
+
+/// T530: the 53/11 PetEquip echo in the client writer's shape (`sub_C07990`/`sub_C07AE0`, the
+/// `00b60220`/`00b602c0` packet builders and reader `00b55c30`): u8 clear flag (0 fitted, 1
+/// cleared), the equipment pane slot, then the item instance. The client's own inbound handler
+/// (`00b5ce60` case 11) reads the three fields and only refreshes the equip panel, so the words
+/// are the state the panel then re-reads from 53/5.
+fn pet_equip_packet(clear: bool, slot: u32, item: u32) -> Vec<u8> {
+    let mut bytes = pet_header(11);
+    bytes.push(u8::from(clear));
+    for value in [slot, item] {
         bytes.extend(value.to_le_bytes());
     }
     bytes

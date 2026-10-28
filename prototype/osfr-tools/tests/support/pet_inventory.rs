@@ -1,6 +1,6 @@
 //! Shared pet test inventory (T454, moved from tests/pets.rs): a temporary inventory package
 //! holding the given items, each with a minimal client-shaped definition, loaded through the
-//! real `Inventory::load`.
+//! real `Inventory::load`. T530: `with_pet_items` also builds pet clothing definitions.
 #![allow(dead_code)]
 
 use osfr_tools::inventory::{EquippedItem, Inventory, InventoryItem, InventoryState};
@@ -13,6 +13,37 @@ use std::{
 };
 
 static SEQUENCE: AtomicU64 = AtomicU64::new(0);
+
+/// T530: one pet clothing definition for a fixture. The serialized row carries the item type 3,
+/// the definition slot and the class the client's item filter and the server's `item_facts`
+/// read; the manifest row carries the look the attachment writer sends (model, texture, tint
+/// alias, effect, default tint).
+pub struct Wearable {
+    pub definition_id: i32,
+    pub slot: i32,
+    pub class: i32,
+    pub model: String,
+    pub texture: String,
+    pub tint_alias: String,
+    pub effect: i32,
+    pub default_tint: i32,
+}
+
+impl Wearable {
+    /// A shipped-shaped pet wearable: the client catalogue's `dyetint` alias and a dye default.
+    pub fn new(definition_id: i32, slot: i32, class: i32, model: &str) -> Self {
+        Self {
+            definition_id,
+            slot,
+            class,
+            model: model.to_owned(),
+            texture: "casual-treelogo-P".to_owned(),
+            tint_alias: "dyetint".to_owned(),
+            effect: 0,
+            default_tint: 263,
+        }
+    }
+}
 
 pub struct InventoryFixture {
     directory: PathBuf,
@@ -36,22 +67,36 @@ impl InventoryFixture {
 
     /// `(instance id, definition id, count, tint)` rows (T456: a tinted adoption item).
     pub fn with_tinted_items(rows: &[(i32, i32, u32, i32)]) -> Self {
-        Self::build(rows, &[])
+        Self::build(rows, &[], &[])
     }
 
     /// T485/F778: `with_items`, plus pet kit definitions `(definition id, slot, class)`. The
     /// serialized row carries them (type 4 after the model strings, class the ninth dword `+32`,
     /// slot the eleventh `+40`); the manifest's own `slot`/`class_id` stay generic so a fit can
-    /// only work when `Inventory::kit_facts` reads the row the client receives.
+    /// only work when `Inventory::item_facts` reads the row the client receives.
     pub fn with_kit_items(rows: &[(i32, i32, u32)], kit: &[(i32, i32, i32)]) -> Self {
+        Self::with_pet_items(rows, kit, &[])
+    }
+
+    /// T530: `with_kit_items`, plus pet clothing `wearables` (type 3 rows with the catalogue look
+    /// the attachment writer sends).
+    pub fn with_pet_items(
+        rows: &[(i32, i32, u32)],
+        kit: &[(i32, i32, i32)],
+        wearables: &[Wearable],
+    ) -> Self {
         let tinted: Vec<_> = rows
             .iter()
             .map(|&(id, def, count)| (id, def, count, 0))
             .collect();
-        Self::build(&tinted, kit)
+        Self::build(&tinted, kit, wearables)
     }
 
-    fn build(rows: &[(i32, i32, u32, i32)], kit: &[(i32, i32, i32)]) -> Self {
+    fn build(
+        rows: &[(i32, i32, u32, i32)],
+        kit: &[(i32, i32, i32)],
+        wearables: &[Wearable],
+    ) -> Self {
         let sequence = SEQUENCE.fetch_add(1, Ordering::Relaxed);
         let directory = std::env::temp_dir().join(format!(
             "osfr-pets-inventory-{}-{sequence}",
@@ -98,15 +143,21 @@ impl InventoryFixture {
         let definitions: Vec<_> = ids
             .into_iter()
             .map(|id| {
-                let bytes = match kit.iter().find(|row| row.0 == id) {
-                    // Prefix (46 bytes), two empty model strings, GenderUsage, then Type 4;
-                    // class is the ninth dword and slot the eleventh of the fixed prefix.
-                    Some(&(_, slot, class)) => {
+                let kit_row = kit
+                    .iter()
+                    .find(|row| row.0 == id)
+                    .map(|&(_, slot, class)| (slot, class, 4i32));
+                let clothing = wearables.iter().find(|row| row.definition_id == id);
+                let facts = kit_row.or_else(|| clothing.map(|w| (w.slot, w.class, 3i32)));
+                let bytes = match facts {
+                    // Prefix (46 bytes), two empty model strings, GenderUsage, then the item
+                    // type; class is the ninth dword and slot the eleventh of the fixed prefix.
+                    Some((slot, class, item_type)) => {
                         let mut bytes = vec![0; 62];
                         bytes[..4].copy_from_slice(&id.to_le_bytes());
                         bytes[32..36].copy_from_slice(&class.to_le_bytes());
                         bytes[40..44].copy_from_slice(&slot.to_le_bytes());
-                        bytes[58..].copy_from_slice(&4i32.to_le_bytes());
+                        bytes[58..].copy_from_slice(&item_type.to_le_bytes());
                         bytes
                     }
                     None => [id.to_le_bytes(), 8i32.to_le_bytes()].concat(),
@@ -116,12 +167,12 @@ impl InventoryFixture {
                     // The row above is the fact a reader must use (F778).
                     "slot": 0,
                     "class_id": 1,
-                    "default_tint": 0,
+                    "default_tint": clothing.map_or(0, |w| w.default_tint),
                     "max_stack": 20,
-                    "model": "",
-                    "texture": "",
-                    "tint_alias": "",
-                    "effect": 0,
+                    "model": clothing.map_or("", |w| w.model.as_str()),
+                    "texture": clothing.map_or("", |w| w.texture.as_str()),
+                    "tint_alias": clothing.map_or("", |w| w.tint_alias.as_str()),
+                    "effect": clothing.map_or(0, |w| w.effect),
                     "wield_type": 0,
                     "serialized_hex": bytes.iter().map(|b| format!("{b:02x}")).collect::<String>(),
                     "sha256": digest(&bytes),

@@ -815,6 +815,18 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
         ]
         .concat(),
     ));
+    // T530: the equip panel's fit or clear (flag, pane slot and item instance).
+    result.push(("pets", [vec![53, 0, 11], vec![0xff; 9]].concat()));
+    result.push((
+        "pets",
+        [
+            vec![53, 0, 11],
+            0u32.to_le_bytes().to_vec(),
+            3u32.to_le_bytes().to_vec(),
+            0xffff_ffffu32.to_le_bytes().to_vec(),
+        ]
+        .concat(),
+    ));
     result.push(("gameplay.handle_in_world", vec![53, 0, 0xff, 0xff]));
     // T765: the card manager's ticket request (39/37), ignored without a started card run.
     result.push(("card_game", [vec![39, 0, 37], vec![0xff; 12]].concat()));

@@ -285,9 +285,12 @@ impl Gameplay {
         self.pets.document_value()
     }
 
-    /// W177: the active pet as other players need it for AddNpc replay.
+    /// W177: the active pet as other players need it for AddNpc replay. T530: the actor's clothing
+    /// rows come from the live inventory, so a late viewer sees the pet dressed.
     pub fn pet_view(&self, owner_guid: u64) -> Option<crate::pets::PetPresence> {
-        self.pets.view(owner_guid)
+        let mut view = self.pets.view(owner_guid)?;
+        view.attachments = self.pets.worn_attachments(view.pet_id, &self.inventory);
+        Some(view)
     }
 
     fn pet_outcome(wire: crate::pets::PetWire) -> Outcome {
@@ -428,12 +431,15 @@ impl Gameplay {
             minigame_active: self.blocks(|gates| gates.pets),
         };
         let guid = character.guid;
+        // T530: the pet comes back dressed, from the same live inventory the summon reads.
+        let attachments = self.pets.worn_attachments(pet_id, &self.inventory);
         match self.pets.resummon(
             crate::pets::PetService::pet_guid(guid, pet_id),
             guid,
             character.position,
             busy,
             now_ms / 1_000,
+            attachments,
         ) {
             Ok(Some(wire)) => {
                 out.replies.extend(wire.private);

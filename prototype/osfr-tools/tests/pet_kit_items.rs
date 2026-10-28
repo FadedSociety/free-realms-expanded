@@ -169,7 +169,7 @@ fn every_client_pet_kit_item_is_recorded_with_its_slot_name_and_param() {
         // The runtime definition the client receives: type 4, the recorded slot and a class a pet
         // model lists (so the fit gate can accept it).
         let (item_type, installed_slot, class) = catalogue
-            .kit_facts(id as i32)
+            .item_facts(id as i32)
             .unwrap_or_else(|| panic!("item {id} has no runtime definition"));
         assert_eq!(item_type, 4, "item {id} type");
         assert_eq!(i64::from(installed_slot), slot, "item {id} runtime slot");

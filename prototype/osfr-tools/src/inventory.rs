@@ -574,6 +574,25 @@ impl Inventory {
         })
     }
 
+    /// T530: the AddNpc attachment row an owned instance puts on a pet actor in `slot`: the
+    /// definition's model, texture, tint alias and effect, the instance's dye tint (the
+    /// definition's default when the instance is undyed) and the caller's slot. The six fields
+    /// `write_attachment` sends, from one place. `None` when the instance is not owned or its
+    /// definition is not loaded.
+    pub fn attachment(
+        &self,
+        item_instance_id: i32,
+        slot: i32,
+    ) -> Option<crate::startup_world::NpcAttachment> {
+        let item = self
+            .state
+            .items
+            .iter()
+            .find(|item| item.id == item_instance_id && item.count > 0)?;
+        let definition = self.content.definitions.get(&item.definition_id)?;
+        Some(attachment_row(definition, item.tint, slot))
+    }
+
     /// Every item definition id the loaded catalogue defines, ascending. A
     /// content check can pick a real row without re-parsing the catalogue.
     pub fn definition_ids(&self) -> impl Iterator<Item = i32> + '_ {
@@ -690,13 +709,13 @@ impl Inventory {
         })
     }
 
-    /// T485: a definition's `(item type, slot, class)` for the pet utility check, all read from
-    /// the serialized `ClientItemDefinition` row the client receives: type from the block after
-    /// the model strings and class/slot from the fixed prefix (class the ninth dword `+32`, slot
-    /// the eleventh `+40`; `piece_096` `decode_items` `leading[8]`/`leading[10]`, and the 35/34
-    /// reply row sees them at `+44`/`+52` after its 12-byte header). `None` when the row is
-    /// unknown or too short to carry them.
-    pub fn kit_facts(&self, definition_id: i32) -> Option<(i32, i32, i32)> {
+    /// A definition's `(item type, slot, class)` for the pet kit (T485) and the pet clothing
+    /// (T530) rules, all read from the serialized `ClientItemDefinition` row the client
+    /// receives: type from the block after the model strings and class/slot from the fixed
+    /// prefix (class the ninth dword `+32`, slot the eleventh `+40`; `piece_096` `decode_items`
+    /// `leading[8]`/`leading[10]`, and the 35/34 reply row sees them at `+44`/`+52` after its
+    /// 12-byte header). `None` when the row is unknown or too short to carry them.
+    pub fn item_facts(&self, definition_id: i32) -> Option<(i32, i32, i32)> {
         let definition = self.content.definitions.get(&definition_id)?;
         let item_type = self.presentation(definition_id).ok()?.item_type;
         let class = read(&definition.bytes, 32).ok()?;
@@ -1617,10 +1636,6 @@ pub fn set_resell_value(record: &mut [u8], worth: u32) -> Option<()> {
     Some(())
 }
 
-fn write_text(bytes: &mut Vec<u8>, value: &str) {
-    put(bytes, value.len() as i32);
-    bytes.extend(value.as_bytes());
-}
 fn decode_hex(value: &str) -> io::Result<Vec<u8>> {
     if value.len() % 2 != 0 || value.len() > 131_072 {
         return Err(invalid("invalid definition hex size"));
@@ -1703,23 +1718,55 @@ fn item_update(item: &InventoryItem) -> Vec<u8> {
         last_cast_time: item.last_cast_time,
     })
 }
-fn write_attachment(bytes: &mut Vec<u8>, definition: &Definition, tint: i32, slot: i32) {
-    for value in [
-        &definition.model,
-        &definition.texture,
-        &definition.tint_alias,
-    ] {
-        write_text(bytes, value);
-    }
-    for value in [
-        if tint == 0 {
+/// One attachment row from a definition and an instance tint, on the same wire fields every
+/// attachment packet uses (three strings, tint, effect, slot).
+fn attachment_row(
+    definition: &Definition,
+    tint: i32,
+    slot: i32,
+) -> crate::startup_world::NpcAttachment {
+    crate::startup_world::NpcAttachment {
+        model_name: definition.model.clone(),
+        texture_alias: definition.texture.clone(),
+        tint_alias: definition.tint_alias.clone(),
+        tint_id: if tint == 0 {
             definition.default_tint
         } else {
             tint
         },
-        definition.effect,
+        composite_effect_id: definition.effect,
         slot,
-    ] {
-        put(bytes, value);
     }
+}
+
+fn write_attachment(bytes: &mut Vec<u8>, definition: &Definition, tint: i32, slot: i32) {
+    crate::startup_world::write_npc_attachment(bytes, &attachment_row(definition, tint, slot));
+}
+
+/// T530: one 35/6 `PlayerUpdatePacketEquipItemChange` for `actor_guid`, in the order the client's
+/// reader `0090a1f0` consumes: the actor, the item id, the six attachment fields, the profile id,
+/// a word the client reads but the server leaves 0, and the wield type. `attachment` `None` clears
+/// `slot`: item 0 selects the client's removal branch (`0092f540` case 6 -> `sub_96B970`) and the
+/// empty model, texture and tint alias match the player's own unequip broadcast
+/// (`gameplay::item_change_packet`). The caller owns the actor guid and the profile, so a pet can
+/// send its own actor and active profile.
+pub fn equip_change_packet(
+    actor_guid: u64,
+    item_id: i32,
+    attachment: Option<&crate::startup_world::NpcAttachment>,
+    slot: i32,
+    profile: i32,
+) -> Vec<u8> {
+    let mut bytes = header(35, 6);
+    bytes.extend(actor_guid.to_le_bytes());
+    put(&mut bytes, item_id);
+    let cleared = crate::startup_world::NpcAttachment {
+        slot,
+        ..Default::default()
+    };
+    crate::startup_world::write_npc_attachment(&mut bytes, attachment.unwrap_or(&cleared));
+    put(&mut bytes, profile);
+    put(&mut bytes, 0);
+    put(&mut bytes, 0);
+    bytes
 }

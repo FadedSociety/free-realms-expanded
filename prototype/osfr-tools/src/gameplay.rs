@@ -437,16 +437,10 @@ fn item_change_packet(inner: &[u8], guid: u64, replies: &[Vec<u8>]) -> Option<Ve
     if inner.len() == 12 && inner.starts_with(&[42, 0, 2, 0]) {
         let slot = i32::from_le_bytes(inner[4..8].try_into().ok()?);
         let profile = i32::from_le_bytes(inner[8..12].try_into().ok()?);
-        let mut packet = vec![35, 0, 6, 0];
-        packet.extend(guid.to_le_bytes());
-        packet.extend(0i32.to_le_bytes()); // no item; the empty model removes the slot
-        for _ in 0..3 {
-            packet.extend(0i32.to_le_bytes()); // empty model, texture and tint alias
-        }
-        for value in [0, 0, slot, profile, 0, 0] {
-            packet.extend(value.to_le_bytes()); // tint, effect, slot, profile, unused, wield
-        }
-        return Some(packet);
+        // The inventory owns the one 35/6 encoder; an empty attachment clears the slot.
+        return Some(crate::inventory::equip_change_packet(
+            guid, 0, None, slot, profile,
+        ));
     }
     let packet = replies
         .iter()
@@ -1323,7 +1317,7 @@ impl Gameplay {
     /// The inventory a trade validates offers against (W163): this character's items and
     /// coins plus the trade flags of the definitions it owns. `None` when the inventory does
     /// not validate, so such a character cannot trade. (R) The bag holds 100 stacks like the
-    /// reward bag (see `RewardState` below); nothing is equipped on a pet yet.
+    /// reward bag (see `RewardState` below); T530 blocks items a pet wears from being offered.
     /// The live inventory a trade commit compares with the settlement's `before` (lead).
     pub fn inventory_state(&self) -> &crate::inventory::InventoryState {
         self.inventory.state()
@@ -1354,7 +1348,7 @@ impl Gameplay {
         crate::trade::TradeInventory::new(
             state.clone(),
             definitions,
-            Default::default(),
+            self.pets.equipped_instances(state),
             state.items.len().max(100),
         )
         .ok()

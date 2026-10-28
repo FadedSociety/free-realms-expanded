@@ -20,6 +20,12 @@
 //! This file is a `#[path]` include so it exercises the real module before the lead registers
 //! `pub mod piece_045;` and the matching declarations in `src/lib.rs`.
 
+// T530: the included `inventory.rs` shares the attachment row type of `crate::startup_world`, so
+// this test crate compiles that module too (it depends only on serde).
+#[path = "../src/startup_world.rs"]
+#[allow(dead_code)]
+mod startup_world;
+
 #[path = "../src/restoration/piece_045.rs"]
 #[allow(dead_code)]
 mod piece_045;

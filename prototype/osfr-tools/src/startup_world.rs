@@ -753,7 +753,7 @@ fn read_effect_tag(reader: &mut Reader<'_>) -> Result<NpcEffectTag, String> {
     })
 }
 
-fn write_npc_attachment(out: &mut Vec<u8>, value: &NpcAttachment) {
+pub(crate) fn write_npc_attachment(out: &mut Vec<u8>, value: &NpcAttachment) {
     put_string(out, &value.model_name);
     put_string(out, &value.texture_alias);
     put_string(out, &value.tint_alias);

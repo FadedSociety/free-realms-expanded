@@ -556,7 +556,8 @@ fn a_pets_gate_holds_the_memory_and_a_summon_replaces_it() {
     let open = PetBusy {
         minigame_active: false,
     };
-    pets.summon(PET, actor, GUID, OWNER, open, 1).unwrap();
+    pets.summon(PET, actor, GUID, OWNER, open, 1, Vec::new())
+        .unwrap();
     assert_eq!(pets.remembered_pet_id(), None, "a summon remembers nothing");
     pets.zone_away(2).unwrap();
     assert!(pets.active_pet_id().is_none());
@@ -565,7 +566,7 @@ fn a_pets_gate_holds_the_memory_and_a_summon_replaces_it() {
     // A closed pets gate keeps the memory for a later attempt and changes nothing else.
     let before = pets.document_value();
     assert!(
-        pets.resummon(actor, GUID, OWNER, busy, 3)
+        pets.resummon(actor, GUID, OWNER, busy, 3, Vec::new())
             .unwrap()
             .is_none(),
         "a minigame refuses the resummon"
@@ -573,7 +574,7 @@ fn a_pets_gate_holds_the_memory_and_a_summon_replaces_it() {
     assert_eq!(pets.remembered_pet_id(), Some(PET), "kept for later");
     assert_eq!(pets.document_value(), before, "a refusal changes nothing");
     let wire = pets
-        .resummon(actor, GUID, OWNER, open, 4)
+        .resummon(actor, GUID, OWNER, open, 4, Vec::new())
         .unwrap()
         .expect("the pet comes back once the gate opens");
     assert_eq!(pets.active_pet_id(), Some(PET));
@@ -586,7 +587,7 @@ fn a_pets_gate_holds_the_memory_and_a_summon_replaces_it() {
     assert!(wire.private.iter().any(|packet| packet.get(2) == Some(&5)));
     assert!(!wire.changed, "a resummon never marks a save");
     assert!(
-        pets.resummon(actor, GUID, OWNER, open, 5)
+        pets.resummon(actor, GUID, OWNER, open, 5, Vec::new())
             .unwrap()
             .is_none(),
         "the memory is spent"
@@ -594,11 +595,12 @@ fn a_pets_gate_holds_the_memory_and_a_summon_replaces_it() {
 
     // A summon replaces the memory; a later dismiss drops what is left, so nothing returns.
     pets.zone_away(6).unwrap();
-    pets.summon(PET, actor, GUID, OWNER, open, 7).unwrap();
+    pets.summon(PET, actor, GUID, OWNER, open, 7, Vec::new())
+        .unwrap();
     assert_eq!(pets.remembered_pet_id(), None, "a summon replaces it");
     pets.dismiss(8).unwrap();
     assert!(
-        pets.resummon(actor, GUID, OWNER, open, 9)
+        pets.resummon(actor, GUID, OWNER, open, 9, Vec::new())
             .unwrap()
             .is_none(),
         "a dismiss leaves nothing to bring back"
@@ -611,11 +613,13 @@ fn a_pets_gate_holds_the_memory_and_a_summon_replaces_it() {
 
     // A pose the server cannot place is an error for the caller, which logs it; nothing returns,
     // the pending memory is dropped so it is not retried every tick, and the roster is untouched.
-    pets.summon(PET, actor, GUID, OWNER, open, 10).unwrap();
+    pets.summon(PET, actor, GUID, OWNER, open, 10, Vec::new())
+        .unwrap();
     pets.zone_away(11).unwrap();
     let before = pets.document_value();
     assert!(
-        pets.resummon(actor, GUID, [f32::NAN; 3], open, 12).is_err(),
+        pets.resummon(actor, GUID, [f32::NAN; 3], open, 12, Vec::new())
+            .is_err(),
         "an unusable owner pose refuses the summon"
     );
     assert!(
