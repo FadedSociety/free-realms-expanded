@@ -62,13 +62,13 @@ fn scrub_self(data: &mut SelfData) {
         row.value_bytes.clear();
     }
     // (R) None of the sample character's progress: its second quest list (101 records) and the
-    // achievement-points dword after it (client `00940e60`), known recipes, pet rows and active
-    // effect. Gameplay writes none of these at login.
+    // achievement-points dword after it (client `00940e60`), known recipes and pet rows. Gameplay
+    // writes none of these at login. The one effect row stays: with none, the client crashes
+    // (0xC0000005) while it reads the self packet (native 2026-10-28, bisected over each scrub).
     data.quest_records.second.clear();
     data.quest_records.second_tail = [0; 4];
     data.post_quest_records.recipes.clear();
     data.post_quest_records.variable_records.clear();
-    data.effects.clear();
     // Nothing owned or worn (the slot rows stay), nothing collected, an empty quest journal.
     data.inventory.items.clear();
     for worn in &mut data.inventory.equipment {
@@ -292,9 +292,11 @@ fn self_data_content_is_typed_json_that_round_trips() {
     );
     assert_eq!(data.name.first, "New");
     // A fresh character: nothing owned, no journal entries or other quest records, no recipes,
-    // pets or effects, no collected flag.
+    // pets or collected flag. Exactly one effect row: the client crashes on a self packet with none
+    // (native 2026-10-28).
     assert!(data.inventory.items.is_empty() && data.quest_records.first.is_empty());
-    assert!(data.quest_records.second.is_empty() && data.effects.is_empty());
+    assert!(data.quest_records.second.is_empty());
+    assert_eq!(data.effects.len(), 1, "the client needs one effect row");
     assert_eq!(
         data.quest_records.second_tail, [0; 4],
         "achievement points start at 0"
