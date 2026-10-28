@@ -6,7 +6,9 @@ use osfr_tools::card_service::{
 };
 #[path = "support/card_packets.rs"]
 mod card_packets;
-use card_packets::{frame, gateway_request, headers, int, read_results, session_login, text};
+use card_packets::{
+    ROUTING, frame, gateway_request, headers, int, read_results, session_login, text,
+};
 
 #[test]
 fn compact_integers_match_the_dll_writer() {
@@ -108,10 +110,10 @@ fn login_with(tickets: &mut LaunchTickets, character_id: &str, ticket: &str, now
 #[test]
 fn a_routed_session_login_names_every_field() {
     let body = session_login("123456789", "987654321");
-    let bytes = frame(Some([1_000_000_000, 0, 0]), &body);
+    let bytes = frame(Some(ROUTING), &body);
     let (used, parsed) = client_frame(&bytes).unwrap().unwrap();
     assert_eq!(used, bytes.len());
-    assert_eq!(parsed.routing, Some([1_000_000_000, 0, 0]));
+    assert_eq!(parsed.routing, Some(ROUTING));
     assert_eq!(
         SessionLogin::decode(parsed.body).unwrap(),
         SessionLogin {
@@ -427,6 +429,33 @@ fn the_client_status_and_join_request_decode() {
     ]
     .concat();
     assert_eq!(card_service::join_request(&join).unwrap(), (1, 3));
+}
+
+/// F785 review (F837): the client's 87 and 503 bodies, hand-built from the DLL readers' field
+/// order so a change to the server's own writers cannot move the fixture with them. 87
+/// `SynchronizationCommand_Update` v1 (`101db190`) is the three class headers alone. 503
+/// `AccountCommand_UploadAvatarImage` v1 (reader `10016810`) is the account level, a byte count
+/// and the image bytes. Compact ids: 87 = `27 05`, 503 = `27 1F`; account 7 = `07`, count 3 = `03`.
+#[test]
+fn the_client_sync_update_and_avatar_requests_match_the_dll_readers() {
+    let update = [0x27, 0x05, 0x01, 0x27, 0x05, 0x01, 0x27, 0x05, 0x01];
+    assert_eq!(headers(&[0x27, 0x05], 1), update);
+    assert_eq!(
+        card_service::class_id(&update).unwrap(),
+        card_service::SYNC_UPDATE
+    );
+
+    let avatar = [
+        0x27, 0x1F, 0x01, 0x27, 0x1F, 0x01, 0x27, 0x1F, 0x01, // 503 v1 at three levels
+        0x07, // account
+        0x03, // byte count
+        0x01, 0x02, 0x03, // the image
+    ];
+    assert_eq!(headers(&[0x27, 0x1F], 1), &avatar[..9]);
+    assert_eq!(
+        card_service::class_id(&avatar).unwrap(),
+        card_service::UPLOAD_AVATAR_IMAGE
+    );
 }
 
 /// T808: the client's ping (writer `10190020`: one header, then the spoof value) is echoed once

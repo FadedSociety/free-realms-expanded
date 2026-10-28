@@ -862,11 +862,8 @@ pub(super) mod tests {
             card_service::sync_start(account, &cards),
             "the Start follows the lobby"
         );
-        let update = {
-            let mut body = Vec::new();
-            card_service::put_headers(&mut body, card_service::SYNC_UPDATE, 1);
-            body
-        };
+        // The client's 87 Update v1 (`101db190`): the three class headers alone.
+        let update = headers(&[0x27, 0x05], 1);
         let steps = [
             card_service::sync_start_instances(account, &cards),
             card_service::sync_send_instances(&cards),
@@ -891,8 +888,8 @@ pub(super) mod tests {
         );
 
         // The status the client reports for itself comes back for this connection's account.
-        let mut status = Vec::new();
-        card_service::put_headers(&mut status, card_service::CHANGE_STATUS, 1);
+        // 137 v1 (reader `1015ea00`): the headers, the account it names (ignored) and the status.
+        let mut status = headers(&[0x29, 0x08], 1);
         status.extend(int(99));
         status.extend(int(7));
         player.write_all(&frame(Some(ROUTING), &status)).unwrap();
@@ -900,9 +897,9 @@ pub(super) mod tests {
             answer(&mut card, &mut player, 3),
             card_service::change_status(account, &status).unwrap()
         );
-        // Its own Join request: no answer, one event with the group and role.
-        let mut join = Vec::new();
-        card_service::put_headers(&mut join, card_service::JOIN, 4);
+        // Its own Join request (92 v4, reader `10163b20`): headers, account, group, role, the
+        // request's empty tail. No answer, one event with the group and role.
+        let mut join = headers(&[0x2C, 0x05], 4);
         for value in [
             int(account),
             int(1),
@@ -916,9 +913,9 @@ pub(super) mod tests {
             join.extend(value);
         }
         send(&mut card, &mut player, &join);
-        // Its avatar picture (account level, byte count, bytes): no answer either.
-        let mut avatar = Vec::new();
-        card_service::put_headers(&mut avatar, card_service::UPLOAD_AVATAR_IMAGE, 1);
+        // Its avatar picture (503 v1, reader `10016810`: account, byte count, bytes); no answer
+        // either.
+        let mut avatar = headers(&[0x27, 0x1F], 1);
         avatar.extend([int(account), int(3), vec![1, 2, 3]].concat());
         send(&mut card, &mut player, &avatar);
         assert!(!waiting(&player));
@@ -964,12 +961,12 @@ pub(super) mod tests {
         for _ in 0..4 {
             answer(&mut card, &mut player, 3);
         }
-        let mut complete = Vec::new();
-        card_service::put_headers(&mut complete, card_service::SYNC_COMPLETE, 2);
+        // 86 Complete v2 (reader `101d77c0`): headers and the delivery id; 87 Update
+        // (`101db190`): headers only.
+        let mut complete = headers(&[0x26, 0x05], 2);
         complete.extend(int(0));
         send(&mut card, &mut player, &complete);
-        let mut update = Vec::new();
-        card_service::put_headers(&mut update, card_service::SYNC_UPDATE, 1);
+        let update = headers(&[0x27, 0x05], 1);
         send(&mut card, &mut player, &update);
         assert!(!waiting(&player), "nothing after the client's Complete");
         let synced: Vec<_> = card
