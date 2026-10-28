@@ -340,6 +340,32 @@ struct Content {
     initial_state: Option<InventoryState>,
 }
 
+impl Content {
+    /// No `inventory.json` (T852). No spans, definitions, profiles or default items: the
+    /// empty `spans` list is also how `validate_content_state` recognises this case.
+    fn empty() -> Self {
+        Self {
+            player_guid: 0,
+            default_state: empty_state(),
+            supported_equipment: Vec::new(),
+            profiles: BTreeMap::new(),
+            spans: Vec::new(),
+            definitions: BTreeMap::new(),
+            captured_definition_ids: BTreeSet::new(),
+            initial_state: None,
+        }
+    }
+}
+
+fn empty_state() -> InventoryState {
+    InventoryState {
+        coins: 0,
+        items: Vec::new(),
+        equipment: Vec::new(),
+        next_instance_id: None,
+    }
+}
+
 /// An item's catalogue look (`Inventory::look`).
 #[derive(Clone, Debug, PartialEq)]
 pub struct ItemLook {
@@ -398,6 +424,17 @@ impl Inventory {
         result.validate_content_state()?;
         result.warn_undefined_items();
         Ok(result)
+    }
+
+    /// T852: the content set has no `inventory.json`. Every saved item instance stays in
+    /// `state` but no definition exists, so nothing is visible, grantable or equippable
+    /// (the same withholding `warn_undefined_items` already applies). Content cross-checks
+    /// are skipped: an empty catalogue proves nothing about a save written against a full one.
+    pub fn without_content(state: Option<InventoryState>) -> Self {
+        Self {
+            content: Arc::new(Content::empty()),
+            state: state.unwrap_or_else(empty_state),
+        }
     }
 
     fn parse_content(directory: &Path) -> io::Result<Arc<Content>> {
@@ -877,6 +914,11 @@ impl Inventory {
 
     fn validate_content_state(&self) -> io::Result<()> {
         Self::validate_state(&self.state)?;
+        // A loaded manifest always proves at least its coins and items spans; no spans means
+        // `without_content`, whose empty catalogue has nothing to compare the save against.
+        if self.content.spans.is_empty() {
+            return Ok(());
+        }
         let expected: BTreeSet<_> = self
             .content
             .supported_equipment

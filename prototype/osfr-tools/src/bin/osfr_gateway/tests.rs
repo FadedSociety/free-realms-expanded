@@ -1805,6 +1805,12 @@ mod l043_admin_move;
 #[path = "t458_world_events.rs"]
 mod t458_world_events;
 
+/// T852: a server started from `data/content` alone reaches world entry with the modules
+/// whose content is absent skipped, logged and their saved state kept.
+#[cfg(test)]
+#[path = "t852_content_presence.rs"]
+mod t852_content_presence;
+
 /// T478: a style card through the real dispatch and commit path: viewers in range, a late
 /// joiner's AddPc, a failed save and a relog.
 #[cfg(test)]

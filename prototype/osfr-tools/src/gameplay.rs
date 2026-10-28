@@ -46,6 +46,7 @@ pub use admin_move::{AdminMove, MoveTarget};
 mod card_launch;
 mod coin_authoring;
 mod collection_pickup;
+mod content_presence;
 mod content_reload;
 mod crafting;
 mod derby_session;
@@ -179,7 +180,8 @@ const PORTAL_REFRESH_MS: u64 = 250;
 #[derive(Clone)]
 pub struct Gameplay {
     inventory: Inventory,
-    categories: ItemCategories,
+    /// T852: `None` when the content set has no `categories.json`; no list is sent.
+    categories: Option<ItemCategories>,
     quests: QuestEngine,
     combat: Combat,
     profiles: Option<Profiles>,
@@ -312,8 +314,10 @@ pub struct Gameplay {
     housing: Option<housing::HousingSession>,
     /// T514: the fishing hole the player is in (`gameplay/fishing_scene.rs`). Session-only.
     fishing_hole: Option<fishing_scene::FishingHole>,
-    /// L046: the saved lots, kept unchanged while housing is dormant so a save never drops them.
-    dormant_housing: Option<crate::housing_service::HousingServiceState>,
+    /// T852: the save's state for every module this content set skips; `state()` writes it back.
+    dormant: Arc<content_presence::Dormant>,
+    /// T852: the `gameplay_module_skipped` records this load wrote, for tests and diagnostics.
+    presence: Arc<content_presence::Presence>,
     /// Style-card look and tables (`gameplay/style_card_use.rs`).
     style_cards: style_card_use::StyleCards,
     game_clock: crate::game_clock::GameClock, // T469 game_clock.json; never saved
@@ -632,6 +636,8 @@ impl Gameplay {
     }
 
     pub fn load(directory: &Path, state: Option<GameplayState>) -> io::Result<Self> {
+        let mut presence = content_presence::Presence::default();
+        let mut dormant = content_presence::Dormant::default();
         let saved_upgrades = state
             .as_ref()
             .map(|s| s.upgraded_rides.clone())
@@ -702,21 +708,17 @@ impl Gameplay {
                 BTreeSet::new(),
             ),
         };
-        let mut profiles = if directory.join("profiles.json").is_file() {
+        let mut profiles = if presence.has(directory, "profiles", content_presence::PROFILES) {
             let retired = saved_derby.as_ref().and_then(|derby| derby.previous_job);
             Some(Profiles::load_with_retired_job(
                 directory, profiles, retired,
             )?)
-        } else if profiles.is_some() {
-            return Err(invalid("class snapshot requires its opening content"));
         } else {
+            dormant.profiles = profiles;
             None
         };
         let (opening, encounter, world, journal, mut abilities) =
-            if directory.join("opening.json").is_file() {
-                if profiles.is_none() {
-                    return Err(invalid("opening content requires class definitions"));
-                }
+            if presence.has(directory, "opening", content_presence::OPENING) {
                 (
                     Some(OpeningEngine::load(directory, opening)?),
                     Some(EncounterEngine::load(directory, encounter)?),
@@ -724,26 +726,28 @@ impl Gameplay {
                     Some(OpeningJournal::load(directory)?),
                     Some(OpeningAbilities::load(directory)?),
                 )
-            } else if opening.is_some() || encounter.is_some() {
-                return Err(invalid("opening snapshot requires its content"));
             } else {
+                dormant.opening = opening;
+                dormant.encounter = encounter;
                 (None, None, None, None, None)
             };
-        let smelting = if directory.join("smelting.json").is_file() {
-            if opening.is_none() {
-                return Err(invalid("smelting requires opening content"));
-            }
-            Some(Smelting::load(directory, smelting)?)
-        } else if smelting.is_some() {
-            return Err(invalid("smelting snapshot requires its content"));
-        } else {
-            None
-        };
+        let smelting =
+            if presence.minigame(directory, "smelting", "smelting.json", opening.is_some()) {
+                Some(Smelting::load(directory, smelting)?)
+            } else {
+                dormant.smelting = smelting;
+                None
+            };
         // The isolated preparer does not silently enable139 in older campaigns.
         // Only an explicitly versioned, hash-bound campaign enables the new
         // original hammer objective and once-only tutorial material grants.
         let enabled = directory.join("forging-campaign.json");
-        let (forging, disappearing_actors) = if enabled.is_file() {
+        let (forging, disappearing_actors) = if presence.minigame(
+            directory,
+            "forging",
+            "forging-campaign.json",
+            opening.is_some(),
+        ) {
             if std::fs::metadata(&enabled)?.len() > 4096 {
                 return Err(invalid("forging campaign marker too large"));
             }
@@ -828,15 +832,19 @@ impl Gameplay {
                 });
             }
             (Some(Forging::load(directory, forging)?), disappearing)
-        } else if forging.is_some() {
-            return Err(invalid("forging snapshot requires its versioned campaign"));
         } else {
+            dormant.forging = forging;
             (None, Vec::new())
         };
         // Cooking changes future gathering requirements. An explicit campaign
         // marker binds that compatibility transition to the new opening hash.
         let cooking_marker = directory.join("cooking-campaign.json");
-        let cooking = if cooking_marker.is_file() {
+        let cooking = if presence.minigame(
+            directory,
+            "cooking",
+            "cooking-campaign.json",
+            opening.is_some(),
+        ) {
             if std::fs::metadata(&cooking_marker)?.len() > 4096 {
                 return Err(invalid("cooking campaign marker too large"));
             }
@@ -858,37 +866,32 @@ impl Gameplay {
                 return Err(invalid("cooking campaign marker does not match content"));
             }
             Some(Cooking::load(directory, cooking)?)
-        } else if cooking.is_some() {
-            return Err(invalid("cooking snapshot requires its versioned campaign"));
         } else {
+            dormant.cooking = cooking;
             None
         };
-        // Mining18 is opt-in through `mining.json` next to the campaign content.
-        // The reconstructed board only binds the accepted Miner job, and a saved
-        // run without its content file fails closed.
-        let mining = if directory.join(mining::CONTENT_FILE).is_file() {
-            if opening.is_none() {
-                return Err(invalid("mining requires opening content"));
-            }
-            let engine = Type8Engine::load(
-                directory,
-                mining::CONTENT_FILE,
-                mining::MINING_GAME_ID,
-                mining::FIRST_MINING_INSTANCE,
-                mining,
-            )?;
-            if engine.profile_id() != mining::MINER_PROFILE_ID {
-                return Err(invalid("mining content does not bind the Miner job"));
-            }
-            Some(engine)
-        } else if mining.is_some() {
-            return Err(invalid("mining snapshot requires its content"));
-        } else {
-            None
-        };
+        // Mining18 is opt-in through `mining.json` and binds only the accepted Miner job. A set
+        // without the opening campaign skips it and keeps a saved run in the save (T852).
+        let mining =
+            if presence.minigame(directory, "mining", mining::CONTENT_FILE, opening.is_some()) {
+                let engine = Type8Engine::load(
+                    directory,
+                    mining::CONTENT_FILE,
+                    mining::MINING_GAME_ID,
+                    mining::FIRST_MINING_INSTANCE,
+                    mining,
+                )?;
+                if engine.profile_id() != mining::MINER_PROFILE_ID {
+                    return Err(invalid("mining content does not bind the Miner job"));
+                }
+                Some(engine)
+            } else {
+                dormant.mining = mining;
+                None
+            };
         // Load the item catalogue once here so content bindings can be checked
         // against the definitions this save actually has.
-        let inventory = Inventory::load(directory, inventory)?;
+        let inventory = content_presence::inventory(directory, &mut presence, inventory)?;
         if let Some(saved) = &saved_derby {
             derby_session::restore_saved_derby_job(saved, &mut profiles);
         }
@@ -981,7 +984,7 @@ impl Gameplay {
             None => None,
         };
         let activities = crate::activity_portal::Catalogue::assemble(
-            battle_file.is_file().then_some(battle_file.as_path()),
+            content_presence::battle_rows(&battle_file, encounter.is_some()),
             chess.as_ref(),
             soccer_content.as_ref(),
             crate::card_game::Content::load_optional(npc_content)?.as_ref(),
@@ -1005,12 +1008,14 @@ impl Gameplay {
             profiles.as_ref(),
             saved_sc_wallet.clone(),
         )?;
-        // Harvesting111 is a separate opt-in candidate bound to Chef45 and the
-        // recovered farming assets. A saved run without its content fails closed.
-        let harvesting = if directory.join(harvesting::CONTENT_FILE).is_file() {
-            if opening.is_none() {
-                return Err(invalid("harvesting requires opening content"));
-            }
+        // Harvesting111 is a separate opt-in candidate bound to Chef45 and the recovered
+        // farming assets. Without the opening campaign it is skipped; its save is kept (T852).
+        let harvesting = if presence.minigame(
+            directory,
+            "harvesting",
+            harvesting::CONTENT_FILE,
+            opening.is_some(),
+        ) {
             let engine = Type8Engine::load(
                 directory,
                 harvesting::CONTENT_FILE,
@@ -1052,9 +1057,8 @@ impl Gameplay {
                 }
             }
             Some(engine)
-        } else if harvesting.is_some() {
-            return Err(invalid("harvesting snapshot requires its content"));
         } else {
+            dormant.harvesting = harvesting;
             None
         };
         if [
@@ -1146,7 +1150,9 @@ impl Gameplay {
         }
         let housing =
             housing::HousingSession::load(directory, saved_housing.as_ref(), inventory.state())?;
-        let dormant_housing = saved_housing.filter(|_| housing.is_none());
+        dormant.housing = saved_housing.filter(|_| housing.is_none());
+        let (categories, quests, combat) =
+            content_presence::core(directory, &mut presence, quests, combat)?;
         Ok(Self {
             mystery_chests,
             pending_chest: None,
@@ -1187,13 +1193,14 @@ impl Gameplay {
             achievement_bindings,
             collections,
             housing,
-            dormant_housing,
+            dormant: Arc::new(dormant),
+            presence: Arc::new(presence),
             fishing_hole: None,
             style_cards: style_card_use::StyleCards::saved(saved_look),
             inventory,
-            categories: ItemCategories::load(directory)?,
-            quests: QuestEngine::load(directory, quests)?,
-            combat: Combat::load(directory, combat).map_err(invalid)?,
+            categories,
+            quests,
+            combat,
             profiles,
             identity_fingerprint,
             gender: 0,
@@ -1385,7 +1392,7 @@ impl Gameplay {
     pub fn state(&self) -> GameplayState {
         let progression_extras =
             (!self.progression_extras.is_empty()).then(|| self.progression_extras.state());
-        GameplayState {
+        let mut state = GameplayState {
             inventory: self.inventory.state().clone(),
             quests: self.quests.state().clone(),
             combat: self.combat.state(),
@@ -1413,15 +1420,14 @@ impl Gameplay {
                 .npc_coin_shop
                 .as_ref()
                 .and_then(crate::coin_shop::CoinShop::saved_wallet),
-            housing: self
-                .housing
-                .as_ref()
-                .map_or_else(|| self.dormant_housing.clone(), |h| h.state()),
+            housing: self.housing.as_ref().and_then(|h| h.state()),
             appearance: self.style_cards.saved_look(),
             upgraded_rides: self.mounts.as_ref().map_or_else(BTreeSet::new, |mounts| {
                 mounts.saved_upgrades(self.inventory.state())
             }),
-        }
+        };
+        content_presence::restore_skipped(&mut state, &self.dormant);
+        state
     }
 
     /// Restore the character's rolling-hour fishing cap ledger after a reconnect. This is
@@ -1774,7 +1780,8 @@ impl Gameplay {
         }
         self.type8_tick_ms = None;
         self.forging_tick_ms = None;
-        out.replies.push(self.categories.initialization());
+        out.replies
+            .extend(self.categories.as_ref().map(ItemCategories::initialization));
         let profile = self.profiles.as_ref().unwrap().shown();
         out.replies.push(
             self.profiles
@@ -4937,7 +4944,8 @@ impl Gameplay {
 
     pub fn initialization(&mut self, position: [f32; 3]) -> io::Result<Outcome> {
         let mut out = Outcome::default();
-        out.replies.push(self.categories.initialization());
+        out.replies
+            .extend(self.categories.as_ref().map(ItemCategories::initialization));
         if let Some(profiles) = &self.profiles {
             out.replies
                 .push(profiles.activation(profiles.shown(), &self.inventory)?);

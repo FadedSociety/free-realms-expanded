@@ -805,7 +805,7 @@ fn repeat_win_grants_the_configured_bundle_exactly_once_per_run() {
 }
 
 #[test]
-fn mining_content_loads_fail_closed_without_a_bound_file() {
+fn mining_content_loads_fail_closed_and_skips_an_absent_file() {
     let fixture = Fixture::new(&winning_spec());
 
     // Wrong game binding.
@@ -861,21 +861,39 @@ fn mining_content_loads_fail_closed_without_a_bound_file() {
         "spec": winning_spec(),
     }));
 
-    // A saved run without its content file refuses to load.
+    // The valid, present file above stays fail-closed (every check before it). An ABSENT file
+    // is a skip (T852): the module stays inactive, one event names it, and the saved run is
+    // written back unchanged instead of the login failing.
     let state = fixture.miner_state();
     let mut gateway = fixture.gateway(state, true);
     say(&mut gateway, "realm mine", 2_000);
     let snapshot = gateway.snapshot();
     assert!(active_instance(&gateway).is_some());
+    let saved = snapshot.gameplay.expect("the run keeps gameplay");
     fs::remove_file(fixture.directory.join("mining.json")).unwrap();
+    let loaded = Gateway::load_gameplay(
+        &fixture.reference,
+        snapshot.character,
+        &fixture.directory,
+        Some(saved.clone()),
+    )
+    .expect("a missing mining file is a skip, not a failed load");
+    let records = loaded
+        .gameplay()
+        .expect("gameplay binds without mining")
+        .skipped_modules();
     assert!(
-        Gateway::load_gameplay(
-            &fixture.reference,
-            snapshot.character,
-            &fixture.directory,
-            snapshot.gameplay,
-        )
-        .is_err()
+        records.iter().any(|record| {
+            record["event"] == "gameplay_module_skipped"
+                && record["module"] == "mining"
+                && record["missing"] == "mining.json"
+        }),
+        "the skip is recorded: {records:?}"
+    );
+    assert_eq!(
+        loaded.snapshot().gameplay.expect("the save stays").mining,
+        saved.mining,
+        "the skipped module's saved run is kept"
     );
 }
 

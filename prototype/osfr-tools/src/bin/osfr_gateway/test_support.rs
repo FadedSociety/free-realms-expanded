@@ -370,6 +370,17 @@ impl Scene {
     }
 }
 
+/// Ready and Loaded, the two messages every world session sends after login, through the
+/// production dispatch path (`Scene::new` already sent the login). Returns the entry replies.
+pub fn enter_world(scene: &mut Scene, options: &Options) -> Vec<Vec<u8>> {
+    for (message, now) in [([13, 0], 100), ([10, 0], 200)] {
+        scene
+            .send(options, &message, now)
+            .expect("world entry commits");
+    }
+    scene.drain(200)
+}
+
 /// Whether this copy is the binary's own test target. The gateway source is embedded by five
 /// integration harnesses, which compile these test modules too; an embedded copy says so on
 /// stderr (libtest does not capture a direct fd write), so a green integration-target line is

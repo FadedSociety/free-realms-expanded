@@ -27,9 +27,10 @@ impl Gameplay {
         {
             bundled.as_path()
         } else {
-            if self.saved_npc_quests.is_some() {
-                return Err(invalid("saved NPC quests require split quest content"));
-            }
+            // T852: no split quest content. The saved regional progress stays in
+            // `saved_npc_quests` (which `npc_quest_state` writes back), so a smaller content
+            // set keeps the journal instead of refusing the login.
+            content_presence::record_skip(&mut self.presence, "regional_quests", "quests/");
             return Ok(());
         };
         let (mut crosswalk, listed) = crate::quest_journal::read_crosswalk(source)?;

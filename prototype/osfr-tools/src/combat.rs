@@ -90,12 +90,27 @@ struct Content {
 
 #[derive(Clone)]
 pub struct Combat {
-    content: Arc<Content>,
+    /// `None` when the content set has no `combat.json` (T852): the sandbox has no actors,
+    /// no menus and no attacks, but the saved defeat counter stays.
+    content: Option<Arc<Content>>,
     state: CombatState,
     last_attack: Option<u64>,
 }
 
 impl Combat {
+    /// T852: no `combat.json` in the content set. Every request answers with no packets, and
+    /// the saved `enemy_health`/`defeats` are kept unchanged for a later content set.
+    pub fn without_content(state: Option<CombatState>) -> Self {
+        Self {
+            content: None,
+            state: state.unwrap_or(CombatState {
+                enemy_health: 0,
+                defeats: 0,
+            }),
+            last_attack: None,
+        }
+    }
+
     pub fn load(
         directory: impl AsRef<Path>,
         state: Option<CombatState>,
@@ -159,7 +174,7 @@ impl Combat {
             return Err(invalid("saved enemy health exceeds maximum"));
         }
         Ok(Self {
-            content: Arc::new(content),
+            content: Some(Arc::new(content)),
             state,
             last_attack: None,
         })
@@ -171,9 +186,12 @@ impl Combat {
 
     /// Absolute content positions survive restarts; player position never moves actors.
     pub fn initialization(&self, _position: [f32; 3]) -> Vec<Vec<u8>> {
-        let mut replies = vec![self.spawn(&self.content.npc, NPC_GUID, 2)];
+        let Some(content) = &self.content else {
+            return Vec::new();
+        };
+        let mut replies = vec![self.spawn(content, &content.npc, NPC_GUID, 2)];
         if self.state.enemy_health != 0 {
-            replies.push(self.spawn(&self.content.enemy, ENEMY_GUID, 0));
+            replies.push(self.spawn(content, &content.enemy, ENEMY_GUID, 0));
         }
         replies.push(relevance(self.state.enemy_health != 0));
         replies
@@ -185,6 +203,9 @@ impl Combat {
         position: [f32; 3],
         now_ms: u64,
     ) -> Result<CombatOutcome, CombatError> {
+        let Some(content) = &self.content else {
+            return Ok(CombatOutcome::default());
+        };
         if inner.len() < 4 {
             return Ok(CombatOutcome::default());
         }
@@ -206,7 +227,7 @@ impl Combat {
                 let id = i32::from_le_bytes(inner[12..16].try_into().unwrap());
                 Ok(match (guid, id) {
                     (NPC_GUID, INTERACTION_QUEST)
-                        if self.near(position, self.content.npc.position) =>
+                        if self.near(content, position, content.npc.position) =>
                     {
                         CombatOutcome {
                             interacted: Some(NPC_GUID),
@@ -245,7 +266,10 @@ impl Combat {
     }
 
     pub fn attack(&mut self, position: [f32; 3], now_ms: u64) -> CombatOutcome {
-        if !self.near(position, self.content.enemy.position) {
+        let Some(content) = &self.content else {
+            return CombatOutcome::default();
+        };
+        if !self.near(content, position, content.enemy.position) {
             return CombatOutcome::feedback("Move within 8 units of the training enemy.");
         }
         if self.state.enemy_health == 0 {
@@ -256,7 +280,7 @@ impl Combat {
         if self.last_attack.is_some_and(|last| {
             now_ms
                 .checked_sub(last)
-                .is_none_or(|elapsed| elapsed < self.content.cooldown_ms)
+                .is_none_or(|elapsed| elapsed < content.cooldown_ms)
         }) {
             return CombatOutcome::feedback("Your training attack is cooling down.");
         }
@@ -264,21 +288,18 @@ impl Combat {
             return CombatOutcome::feedback("Encounter defeat counter is full.");
         }
         self.last_attack = Some(now_ms);
-        self.state.enemy_health = self
-            .state
-            .enemy_health
-            .saturating_sub(self.content.hit_damage);
+        self.state.enemy_health = self.state.enemy_health.saturating_sub(content.hit_damage);
         let mut outcome = CombatOutcome {
             changed: true,
             feedback: Some(format!(
                 "Training hit: {} / {} health remaining.",
-                self.state.enemy_health, self.content.max_health
+                self.state.enemy_health, content.max_health
             )),
             ..CombatOutcome::default()
         };
         if self.state.enemy_health == 0 {
             self.state.defeats += 1;
-            outcome.defeated = Some(self.content.enemy.definition_id);
+            outcome.defeated = Some(content.enemy.definition_id);
             outcome.replies.push(remove_enemy());
             outcome.replies.push(relevance(false));
             outcome.feedback = Some("Training enemy defeated! Quest progress recorded; realm respawn starts the next encounter.".to_owned());
@@ -287,20 +308,23 @@ impl Combat {
     }
 
     pub fn respawn(&mut self, position: [f32; 3]) -> CombatOutcome {
-        if !self.near(position, self.content.npc.position)
-            && !self.near(position, self.content.enemy.position)
+        let Some(content) = &self.content else {
+            return CombatOutcome::default();
+        };
+        if !self.near(content, position, content.npc.position)
+            && !self.near(content, position, content.enemy.position)
         {
             return CombatOutcome::feedback("Return to the Realm Guide to reset the encounter.");
         }
         if self.state.enemy_health != 0 {
             return CombatOutcome::feedback("The training enemy is still alive.");
         }
-        self.state.enemy_health = self.content.max_health;
+        self.state.enemy_health = content.max_health;
         self.last_attack = None;
         CombatOutcome {
             changed: true,
             replies: vec![
-                self.spawn(&self.content.enemy, ENEMY_GUID, 0),
+                self.spawn(content, &content.enemy, ENEMY_GUID, 0),
                 relevance(true),
             ],
             feedback: Some("Training enemy respawned.".to_owned()),
@@ -309,14 +333,17 @@ impl Combat {
     }
 
     fn interact(&self, guid: u64, position: [f32; 3]) -> CombatOutcome {
-        if guid == NPC_GUID && self.near(position, self.content.npc.position) {
+        let Some(content) = &self.content else {
+            return CombatOutcome::default();
+        };
+        if guid == NPC_GUID && self.near(content, position, content.npc.position) {
             CombatOutcome { replies: vec![menu(NPC_GUID, "Realm Guide - reconstructed local encounter", &[
                 (INTERACTION_QUEST, 79), (INTERACTION_RESPAWN, 3300)], false)],
                 interacted: Some(NPC_GUID), feedback: Some("Realm Guide: Quest opens your progress. Talk resets a defeated enemy. Commands: realm quest, realm attack, realm respawn.".to_owned()),
                 ..CombatOutcome::default() }
         } else if guid == ENEMY_GUID
             && self.state.enemy_health != 0
-            && self.near(position, self.content.enemy.position)
+            && self.near(content, position, content.enemy.position)
         {
             CombatOutcome {
                 replies: vec![menu(
@@ -331,17 +358,17 @@ impl Combat {
             CombatOutcome::default()
         }
     }
-    fn near(&self, from: [f32; 3], to: [f32; 3]) -> bool {
+    fn near(&self, content: &Content, from: [f32; 3], to: [f32; 3]) -> bool {
         valid_position(from)
             && from
                 .iter()
                 .zip(to)
                 .map(|(a, b)| (*a - b).powi(2))
                 .sum::<f32>()
-                <= self.content.range.powi(2)
+                <= content.range.powi(2)
     }
-    fn spawn(&self, actor: &Actor, guid: u64, disposition: i32) -> Vec<u8> {
-        let mut bytes = self.content.template.clone();
+    fn spawn(&self, content: &Content, actor: &Actor, guid: u64, disposition: i32) -> Vec<u8> {
+        let mut bytes = content.template.clone();
         bytes[4..12].copy_from_slice(&guid.to_le_bytes());
         bytes[12..16].copy_from_slice(&0_i32.to_le_bytes());
         bytes[16..20].copy_from_slice(&actor.model_id.to_le_bytes());
@@ -350,7 +377,7 @@ impl Combat {
         }
         bytes[69..73].copy_from_slice(&0_i32.to_le_bytes());
         bytes[77..81].copy_from_slice(&disposition.to_le_bytes());
-        bytes[133..137].copy_from_slice(&(self.content.range.ceil() as i32).to_le_bytes());
+        bytes[133..137].copy_from_slice(&(content.range.ceil() as i32).to_le_bytes());
         // Replace in reverse order so the known empty-field offsets remain valid.
         replace_empty_string(&mut bytes, 106, &actor.name);
         replace_empty_string(&mut bytes, 81, &actor.texture_alias);

@@ -151,7 +151,9 @@ struct ActiveTrial {
 
 #[derive(Clone, Debug)]
 pub struct QuestEngine {
-    content: Content,
+    /// `None` when the content set has no `quests.json` (T852): no quest, journal or
+    /// checkpoint activity exists, but the saved counters stay for a later content set.
+    content: Option<Content>,
     journal: Vec<u8>,
     state: QuestState,
     last_position: Option<[f32; 3]>,
@@ -159,7 +161,28 @@ pub struct QuestEngine {
     next_trial_ms: u64,
 }
 
+fn empty_state() -> QuestState {
+    QuestState {
+        version: 1,
+        quests: BTreeMap::new(),
+        trial_best_ms: None,
+        trial_completions: 0,
+    }
+}
+
 impl QuestEngine {
+    /// T852: no `quests.json` in the content set. Every request answers like an empty
+    /// catalogue (no offers, no messages) and the saved counters are kept unchanged.
+    pub fn without_content(state: Option<QuestState>) -> Self {
+        Self {
+            content: None,
+            journal: Vec::new(),
+            state: state.unwrap_or_else(empty_state),
+            last_position: None,
+            active_trial: None,
+            next_trial_ms: 0,
+        }
+    }
     pub fn load(directory: &Path, state: Option<QuestState>) -> io::Result<Self> {
         let content: Content =
             serde_json::from_slice(&bounded_file(&directory.join("quests.json"), MAX_CONTENT)?)
@@ -344,7 +367,7 @@ impl QuestEngine {
             }
         }
         Ok(Self {
-            content,
+            content: Some(content),
             journal,
             state,
             last_position: None,
@@ -379,10 +402,16 @@ impl QuestEngine {
     }
 
     pub fn initialization(&self) -> io::Result<QuestOutcome> {
+        if self.content.is_none() {
+            return Ok(QuestOutcome::default());
+        }
         Ok(QuestOutcome { messages: vec!["Local restoration: realm quest, realm quest accept 900001, realm race. Original quest counters appear in the journal after reconnect; the patrol and checkpoint activity are reconstructed.".into()], ..QuestOutcome::default() })
     }
 
     pub fn handle_command(&mut self, command: &str, now_ms: u64) -> io::Result<QuestOutcome> {
+        let Some(content) = &self.content else {
+            return Ok(QuestOutcome::default());
+        };
         if command.len() > 512 {
             return Err(invalid("quest command exceeds limit"));
         }
@@ -393,7 +422,7 @@ impl QuestEngine {
         let words: Vec<_> = command.split_whitespace().collect();
         match words.as_slice() {
             ["quest"] | ["quests"] | ["status"] | ["quest", "list"] | ["quest", "status"] => {
-                let messages = self.content.definitions.iter().map(|definition| {
+                let messages = content.definitions.iter().map(|definition| {
                     let progress = &self.state.quests[&definition.id];
                     let label = if definition.original { "original record" } else { "reconstructed" };
                     let status = if progress.completed { "completed; reward granted" } else if progress.accepted { "active" } else { "available" };
@@ -411,7 +440,7 @@ impl QuestEngine {
                 }),
             },
             ["race"] | ["race", "status"] => {
-                let trial = &self.content.trial;
+                let trial = &content.trial;
                 let status = if let Some(active) = &self.active_trial {
                     let target = trial.checkpoints[active.checkpoint];
                     format!("checkpoint {}/{} at X={:.1}, Z={:.1}; elapsed {:.1}s",active.checkpoint+1,trial.checkpoints.len(),target[0],target[2],now_ms.saturating_sub(active.start_ms) as f64/1000.0)
@@ -426,7 +455,12 @@ impl QuestEngine {
     }
 
     fn accept(&mut self, id: u32) -> io::Result<QuestOutcome> {
-        let Some(definition) = self.content.definitions.iter().find(|d| d.id == id) else {
+        let definition = self
+            .content
+            .as_ref()
+            .and_then(|content| content.definitions.iter().find(|d| d.id == id))
+            .cloned();
+        let Some(definition) = definition else {
             return Ok(QuestOutcome {
                 messages: vec![format!(
                     "Quest {id} is unavailable. Use realm quest to list available quests."
@@ -461,8 +495,10 @@ impl QuestEngine {
     }
 
     pub fn interaction(&mut self, guid: u64) -> io::Result<QuestOutcome> {
-        let id = self
-            .content
+        let Some(content) = &self.content else {
+            return Ok(QuestOutcome::default());
+        };
+        let id = content
             .definitions
             .iter()
             .find(|d| {
@@ -480,8 +516,11 @@ impl QuestEngine {
         if definition_id <= 0 {
             return Err(invalid("invalid defeated enemy definition"));
         }
+        let Some(content) = &self.content else {
+            return Ok(QuestOutcome::default());
+        };
         let mut outcome = QuestOutcome::default();
-        for definition in &self.content.definitions {
+        for definition in &content.definitions {
             let progress = self.state.quests.get_mut(&definition.id).unwrap();
             if !progress.accepted || progress.rewarded {
                 continue;
@@ -520,6 +559,9 @@ impl QuestEngine {
     }
 
     fn start_trial(&mut self, now_ms: u64) -> io::Result<QuestOutcome> {
+        let Some(trial) = self.content.as_ref().map(|content| &content.trial) else {
+            return Ok(QuestOutcome::default());
+        };
         if self.active_trial.is_some() {
             return Err(invalid("checkpoint activity is already active"));
         }
@@ -529,8 +571,9 @@ impl QuestEngine {
         let position = self
             .last_position
             .ok_or_else(|| invalid("position is not initialized"))?;
-        let trial = &self.content.trial;
-        if horizontal_squared(position, trial.start) > trial.radius.powi(2) {
+        let radius = trial.radius;
+        let next = trial.checkpoints[0];
+        if horizontal_squared(position, trial.start) > radius.powi(2) {
             return Err(invalid("move to the checkpoint activity start"));
         }
         self.active_trial = Some(ActiveTrial {
@@ -540,11 +583,10 @@ impl QuestEngine {
             travelled: 0.0,
             checkpoint: 0,
         });
-        let next = trial.checkpoints[0];
         Ok(QuestOutcome {
             messages: vec![format!(
                 "Reconstructed checkpoint activity started. Checkpoint 1: X={:.1}, Z={:.1} (radius {:.0}).",
-                next[0], next[2], trial.radius
+                next[0], next[2], radius
             )],
             ..QuestOutcome::default()
         })
@@ -555,6 +597,9 @@ impl QuestEngine {
             return Err(invalid("invalid activity position"));
         }
         self.last_position = Some(position);
+        let Some(trial) = self.content.as_ref().map(|content| &content.trial) else {
+            return Ok(QuestOutcome::default());
+        };
         let Some(active) = self.active_trial.as_mut() else {
             return Ok(QuestOutcome::default());
         };
@@ -567,7 +612,7 @@ impl QuestEngine {
         let maximum_step = 20.0 * delta as f32 / 1000.0 + 2.0;
         let step = horizontal_squared(position, active.last_position).sqrt();
         let travelled = active.travelled + step;
-        if elapsed > self.content.trial.time_limit_ms
+        if elapsed > trial.time_limit_ms
             || step > maximum_step
             || travelled > 20.0 * elapsed as f32 / 1000.0 + 2.0
         {
@@ -582,7 +627,6 @@ impl QuestEngine {
         active.last_ms = now_ms;
         active.last_position = position;
         active.travelled = travelled;
-        let trial = &self.content.trial;
         if horizontal_squared(position, trial.checkpoints[active.checkpoint]) > trial.radius.powi(2)
         {
             return Ok(QuestOutcome::default());
@@ -637,6 +681,9 @@ impl QuestEngine {
     /// Preserve the complete original journal and all surrounding self fields.
     /// Apply this before an inventory splice, which can move the journal span.
     pub fn patch_self_template(&self, message: &[u8]) -> io::Result<Vec<u8>> {
+        let Some(content) = &self.content else {
+            return Ok(message.to_vec());
+        };
         if message.len() < 13
             || message.len() > MAX_JOURNAL
             || message[..3] != [5, 0, 1]
@@ -646,7 +693,7 @@ impl QuestEngine {
         {
             return Err(invalid("invalid self packet for quest restoration"));
         }
-        let journal = &self.content.journal;
+        let journal = &content.journal;
         let end = journal
             .offset
             .checked_add(self.journal.len())

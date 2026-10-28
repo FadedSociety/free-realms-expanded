@@ -1096,21 +1096,43 @@ fn harvesting_content_loads_fail_closed_and_binds_region_111() {
     );
     fixture.write_harvesting(&fixture.bound_content(winning_spec()));
 
-    // A saved run without its content file refuses to load.
+    // The valid, present file above stays fail-closed (every check before it). An ABSENT file
+    // is a skip (T852): the module stays inactive, one event names it, and the saved run is
+    // written back unchanged instead of the login failing.
     let state = fixture.chef_state();
     let mut gateway = fixture.gateway(state, true);
     say(&mut gateway, "realm harvest", 2_000);
     assert!(active_instance(&gateway).is_some());
     let snapshot = gateway.snapshot();
+    let saved = snapshot.gameplay.expect("the run keeps gameplay");
     fs::remove_file(fixture.directory.join(CONTENT_FILE)).unwrap();
+    let loaded = Gateway::load_gameplay(
+        &fixture.reference,
+        snapshot.character,
+        &fixture.directory,
+        Some(saved.clone()),
+    )
+    .expect("a missing harvesting file is a skip, not a failed load");
+    let records = loaded
+        .gameplay()
+        .expect("gameplay binds without harvesting")
+        .skipped_modules();
     assert!(
-        Gateway::load_gameplay(
-            &fixture.reference,
-            snapshot.character,
-            &fixture.directory,
-            snapshot.gameplay,
-        )
-        .is_err()
+        records.iter().any(|record| {
+            record["event"] == "gameplay_module_skipped"
+                && record["module"] == "harvesting"
+                && record["missing"] == CONTENT_FILE
+        }),
+        "the skip is recorded: {records:?}"
+    );
+    assert_eq!(
+        loaded
+            .snapshot()
+            .gameplay
+            .expect("the save stays")
+            .harvesting,
+        saved.harvesting,
+        "the skipped module's saved run is kept"
     );
 }
 
