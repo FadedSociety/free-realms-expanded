@@ -19,6 +19,8 @@ use std::{
 #[path = "common/gateway_packets.rs"]
 #[allow(dead_code)]
 mod gateway_packets;
+#[path = "support/json.rs"]
+mod json;
 
 /// A listed ride: item 76856 (the five-hundred-and-fifty Station Cash mount) is 549 SC of
 /// provenance, so the shipped 0.25 scale lists it at 137.
@@ -882,6 +884,159 @@ fn moved_rows_are_station_cash_only_and_vendor_stock_keeps_coins() {
     assert_eq!(moved, 663, "the Station Cash only items moved from coins");
 }
 
+/// T871: the Marketplace Housing category carries the original housing fixtures. Every
+/// `housing_fixtures.json` row that `stores.json` prices must be a listed Housing bundle at
+/// `round(sc_price * sc_price_scale)`; the T871 rows are Station Cash only, are priced from the
+/// item Cost, and cite the community coin store (repository, AGPL-3.0, revision, file). A fixture
+/// with no Legacy Cost is never listed and an order for it changes nothing.
+#[test]
+fn every_priced_housing_fixture_lists_under_housing_at_its_item_cost() {
+    const HOUSING: u32 = 116;
+    const UNPRICED_FIXTURE: i32 = 1_179;
+    const SAMPLE_FIXTURE: i32 = 218;
+    let content = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let fixtures = json::read(&content.join("housing_fixtures.json"));
+    let fixture_ids: BTreeSet<u32> = fixtures["rows"]
+        .as_array()
+        .expect("fixture rows")
+        .iter()
+        .map(|row| {
+            u32::try_from(row["item_definition_id"].as_i64().expect("fixture item id"))
+                .expect("bounded")
+        })
+        .collect();
+    assert!(fixture_ids.len() > 1_000, "the shipped fixture table");
+    let stores = json::read(&stores());
+    let rows: BTreeMap<u32, &Value> = stores["items"]
+        .as_array()
+        .expect("store rows")
+        .iter()
+        .map(|row| {
+            (
+                u32::try_from(row["item_id"].as_i64().expect("item id")).expect("bounded"),
+                row,
+            )
+        })
+        .collect();
+    let shop = new_shop(Wallet::default(), usize::MAX);
+    let scale = shop.sc_catalogue().config().sc_price_scale;
+    let mut listed = 0;
+    let mut moved = 0;
+    for id in &fixture_ids {
+        let Some(row) = rows.get(id) else {
+            continue;
+        };
+        let Some(sc_price) = row["sc_price"].as_u64() else {
+            continue;
+        };
+        // Boombox fixtures (item category 3) list on the Boombox shelf, not Housing (T495/T634).
+        if row["boombox"] == true {
+            continue;
+        }
+        listed += 1;
+        let listing = shop
+            .sc_catalogue()
+            .listing(*id)
+            .unwrap_or_else(|| panic!("housing fixture {id} with sc_price {sc_price} is unlisted"));
+        assert_eq!(listing.group, HOUSING, "fixture {id} is not under Housing");
+        assert_eq!(
+            listing.price,
+            (sc_price as f64 * scale).round() as u32,
+            "fixture {id} lists at its scaled item data price"
+        );
+        assert!(listing.price > 0, "fixture {id} is listed at zero");
+        assert!(
+            !listing.deed && !listing.ride,
+            "fixture {id} is not a deed or a ride"
+        );
+        let tags: BTreeSet<&str> = row["source_tags"]
+            .as_array()
+            .expect("source tags")
+            .iter()
+            .filter_map(|tag| tag.as_str())
+            .collect();
+        if tags.contains("T871") {
+            moved += 1;
+            assert_eq!(row["no_sale"], true, "fixture {id} must be no_sale");
+            assert!(
+                row["purchase_price_coins"].is_null(),
+                "fixture {id} still sells for coins"
+            );
+            assert!(row["member_price_coins"].is_null() && row["sell_price_coins"].is_null());
+            assert_eq!(row["price_provenance"]["sc_basis"], "C", "fixture {id}");
+            assert_eq!(
+                row["price_provenance"]["legacy_coin_price"].as_u64(),
+                Some(sc_price),
+                "fixture {id} lost the item Cost in its provenance"
+            );
+            let coin = &row["price_provenance"]["coin_store"];
+            assert_eq!(coin["repository"], "Lxzxrus-Free-Realms-Server");
+            assert_eq!(coin["license"], "AGPL-3.0");
+            assert_eq!(coin["revision"], "37ef17587d43e9b33bfb10e5484518f61a82c6be");
+            assert_eq!(coin["file"], "src/Resources/CoinStoreItems.json");
+            assert_eq!(coin["category_id"], row["category_id"]);
+        }
+    }
+    assert!(
+        listed >= 1_100 && moved >= 1_100,
+        "the Housing category lists the original fixtures, not the old handful: {listed} listed, {moved} moved"
+    );
+    // The unpriced fixture (no Legacy Cost) is untouched and refused without changing anything.
+    let row = rows
+        .get(&(UNPRICED_FIXTURE as u32))
+        .expect("the snowman row");
+    assert!(row["sc_price"].is_null(), "no invented price");
+    assert!(
+        shop.sc_catalogue()
+            .listing(UNPRICED_FIXTURE as u32)
+            .is_none(),
+        "an unpriced fixture is not listed"
+    );
+    let mut poor = new_shop(wallet(5), usize::MAX);
+    let before = snapshot(&poor);
+    let refused = poor
+        .handle(&order_packet(
+            3,
+            301,
+            UNPRICED_FIXTURE as u32,
+            STORE,
+            1,
+            "",
+            "",
+            "",
+            "0",
+        ))
+        .expect("order parses");
+    assert_eq!(refused.result_code, station_cash::ORDER_FAILURE);
+    assert!(!refused.changed);
+    assert_eq!(snapshot(&poor), before);
+    // A moved fixture orders through the real 66/3 path: item 218 costs 20, so it lists at 5 SC,
+    // grants once and moves no coins.
+    let mut shop = new_shop(wallet(5), usize::MAX);
+    let before = snapshot(&shop);
+    let outcome = shop
+        .handle(&order_packet(
+            3,
+            302,
+            SAMPLE_FIXTURE as u32,
+            STORE,
+            1,
+            "",
+            "",
+            "",
+            "0",
+        ))
+        .expect("order parses");
+    assert_eq!(outcome.result_code, station_cash::ORDER_SUCCESS);
+    assert!(outcome.changed);
+    assert_eq!(shop.sc_wallet().balance, 0);
+    assert_eq!(shop.inventory().state().coins, before.0.coins);
+    assert_eq!(
+        count_definition(shop.inventory().state(), SAMPLE_FIXTURE),
+        count_definition(&before.0, SAMPLE_FIXTURE) + 1
+    );
+}
+
 #[test]
 fn catalogue_packets_carry_the_scaled_price_and_skip_earn_only() {
     let shop = new_shop(Wallet::default(), usize::MAX);
@@ -1017,11 +1172,12 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
     // 52 rides plus the 9 lot deeds L046 lists, plus T452's 29 listed OSFR-parity rides (6 more
     // are earn-only), plus the 55 items T634 priced from the wiki, plus the 663 Station Cash only
     // items T638 moved from their Legacy coin price, plus the 4 boomboxes T495 priced, plus the
-    // Training Saddle of Gliding T528 lists.
+    // Training Saddle of Gliding T528 lists, plus the 1,115 housing fixtures T871 moved from
+    // their Legacy coin price (the 16 wiki-priced fixtures are already in the 55).
     assert_eq!(
         decoded.len(),
-        813,
-        "the shipped listed ride, deed, wiki item, boombox and saddle count"
+        1_928,
+        "the shipped ride, deed, wiki item, boombox, saddle and housing fixture count"
     );
     assert!(
         store.len() < osfr_tools::soe::MAX_LOGICAL_MESSAGE / 2,
@@ -1203,6 +1359,11 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
     );
     let housing = listed_under(HOUSING);
     assert_eq!(housing.get(&11037), Some(&150), "a housing fixture");
+    assert_eq!(
+        housing.get(&218),
+        Some(&5),
+        "a T871 housing fixture at its scaled item Cost"
+    );
     assert_eq!(housing.get(&17192), Some(&100), "a lot deed");
     // Every bundle is under exactly one leaf category; the leaves cover the whole catalogue.
     let mut covered = BTreeSet::new();
