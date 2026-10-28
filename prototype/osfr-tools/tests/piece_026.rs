@@ -86,10 +86,7 @@ struct Lot {
 fn transform(x: f32, y: f32, z: f32) -> FixtureTransform {
     FixtureTransform {
         position: [x, y, z],
-        rotation: [1.0, 0.0, 0.0, 0.0],
-        tilt: [1.0, 0.0, 0.0, 0.0],
-        scale: 1.0,
-        tint_id: 0,
+        ..FixtureTransform::default()
     }
 }
 

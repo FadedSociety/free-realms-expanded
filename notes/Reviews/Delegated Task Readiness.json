@@ -267,7 +267,7 @@
           "registered_in_lib": false,
           "api_symbols": {
             "MAX_FIXTURE_MAGNITUDE": 0,
-            "QUATERNION_TOLERANCE": 0,
+            "FACING_TOLERANCE": 0,
             "MAX_SNAPSHOT_BYTES": 4,
             "SNAPSHOT_SCHEMA_VERSION": 0,
             "HOUSE_GUID_BASE": 0,

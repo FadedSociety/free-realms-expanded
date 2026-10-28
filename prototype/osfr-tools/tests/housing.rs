@@ -22,9 +22,9 @@
 //!   housing areas the player builds on.
 //!
 use osfr_tools::housing::{
-    self, FixtureInstance, FixtureItemLedger, FixturePlacement, FixtureTransform, Housing,
-    HousingError, PlacedFixture, PropertyDefinition, PropertyGrant, SaveFixtureCommand,
-    SavedFixture, HOUSE_GUID_BASE, MAX_FIXTURE_MAGNITUDE,
+    self, FixtureInstance, FixtureItemLedger, FixturePlacement, FixtureTransform, HOUSE_GUID_BASE,
+    Housing, HousingError, MAX_FIXTURE_MAGNITUDE, PlacedFixture, PropertyDefinition, PropertyGrant,
+    SaveFixtureCommand, SavedFixture,
 };
 use std::fs;
 use std::path::PathBuf;
@@ -68,10 +68,7 @@ impl Drop for Fixture {
 fn transform(x: f32, y: f32, z: f32) -> FixtureTransform {
     FixtureTransform {
         position: [x, y, z],
-        rotation: [1.0, 0.0, 0.0, 0.0],
-        tilt: [1.0, 0.0, 0.0, 0.0],
-        scale: 1.0,
-        tint_id: 0,
+        ..FixtureTransform::default()
     }
 }
 
@@ -306,6 +303,16 @@ fn placement_rejects_non_finite_and_out_of_range_transforms() {
             HousingError::NonUnitFacing,
         ),
         (
+            // T806 review finding 2: a unit tilt that disagrees with its rotation is the second
+            // source of truth, so the placement is refused instead of storing it.
+            "unit tilt that disagrees with the rotation",
+            FixtureTransform {
+                tilt: [1.0, 0.0, 0.0, 0.0],
+                ..transform(400.0, 4.0, 410.0)
+            },
+            HousingError::NonUnitFacing,
+        ),
+        (
             "rotation angle out of bounds",
             FixtureTransform {
                 rotation: [2.0e6, 0.0, 0.0, 0.0],
@@ -348,6 +355,7 @@ fn move_and_pickup_keep_ownership_and_release_the_snapshot() {
             placed.fixture_guid,
             FixtureTransform {
                 rotation: [0.0, 1.0, 0.0, 0.0],
+                tilt: FixtureTransform::facing([0.0, 1.0, 0.0, 0.0]),
                 ..transform(402.5, 4.0, 411.0)
             },
             &mut inventory,
@@ -690,6 +698,7 @@ fn a_restored_lot_keeps_its_ownership_and_accepts_an_edit_after_restart() {
             chair.fixture_guid,
             FixtureTransform {
                 rotation: [0.0, 1.0, 0.0, 0.0],
+                tilt: FixtureTransform::facing([0.0, 1.0, 0.0, 0.0]),
                 ..transform(402.0, 4.0, 411.0)
             },
             &mut inventory,
@@ -901,7 +910,7 @@ fn typed_fixture_view_matches_the_recovered_serialization_order() {
         transform: FixtureTransform {
             position: [1.0, 2.0, 3.0],
             rotation: [0.5, 0.5, 0.5, 0.5],
-            tilt: [1.0, 0.0, 0.0, 0.0],
+            tilt: FixtureTransform::facing([0.5, 0.5, 0.5, 0.5]),
             scale: 2.0,
             tint_id: 7,
         },

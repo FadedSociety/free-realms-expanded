@@ -41,7 +41,7 @@ use std::{
 /// RECONSTRUCTED local defensive bound, matching the existing `character_store` convention. This is
 /// not a recovered world or angle limit.
 pub const MAX_FIXTURE_MAGNITUDE: f32 = 1_000_000.0;
-/// RECONSTRUCTED tolerance for a stored unit facing vector.
+/// RECONSTRUCTED tolerance for the stored facing against the one the rotation implies.
 pub const FACING_TOLERANCE: f32 = 1e-3;
 /// RECONSTRUCTED snapshot bound, in the same spirit as `character_store::MAX_FILE_BYTES`.
 pub const MAX_SNAPSHOT_BYTES: usize = 1024 * 1024;
@@ -68,19 +68,36 @@ pub const PERMISSION_CAN_VISIT: i32 = 1;
 ///
 /// `rotation` is the client's own form, Euler angles in radians: yaw, pitch, roll, then 0. The
 /// client sends those lanes in 127/2 and a retail 127/28 carries them (1.5708, 3.1416, ...), never
-/// a quaternion. `tilt` is the facing they imply, `(sin yaw cos pitch, -sin pitch, cos yaw cos
-/// pitch, 0)`; all 2015 retail instances satisfy it (T806).
+/// a quaternion. It is the one source of the facing: `tilt` is its projection, and a stored pair
+/// that disagrees is refused (T806/F838).
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct FixtureTransform {
     pub position: [f32; 3],
+    /// The client's Euler lanes in radians; changing these changes the facing.
     pub rotation: [f32; 4],
+    /// `FixtureTransform::facing(rotation)`. Older snapshots persisted it separately, so load
+    /// normalizes it from the rotation and validation refuses a pair that disagrees.
     pub tilt: [f32; 4],
     pub scale: f32,
     pub tint_id: i32,
 }
 
 impl FixtureTransform {
+    /// The facing a client-form rotation (yaw, pitch, roll in radians) implies:
+    /// `(sin yaw cos pitch, -sin pitch, cos yaw cos pitch, 0)`. A 127/40 record carries it as
+    /// `tilt`, and its AddNpc as `rotation` (community-preserved `p2.pcap`: all 2,015 instances;
+    /// the client computes it itself in `sub_105CD30` through `sub_776970`).
+    pub fn facing(rotation: [f32; 4]) -> [f32; 4] {
+        let [yaw, pitch, ..] = rotation;
+        [
+            yaw.sin() * pitch.cos(),
+            0.0 - pitch.sin(),
+            yaw.cos() * pitch.cos(),
+            0.0,
+        ]
+    }
+
     pub fn validate(&self) -> Result<(), HousingError> {
         validate_transform(self)
     }
@@ -1416,16 +1433,18 @@ fn validate_transform(transform: &FixtureTransform) -> Result<(), HousingError> 
     {
         return Err(HousingError::TransformOutOfBounds);
     }
-    // The rotation lanes are angles, any finite value; only the facing they imply is a unit vector.
-    if !is_unit_vector(transform.tilt) {
+    // The rotation is the one source of the facing; a stored tilt that disagrees is refused with
+    // `NonUnitFacing` even when it is itself unit length.
+    let implied = FixtureTransform::facing(transform.rotation);
+    if transform
+        .tilt
+        .iter()
+        .zip(implied)
+        .any(|(stored, implied)| (stored - implied).abs() > FACING_TOLERANCE)
+    {
         return Err(HousingError::NonUnitFacing);
     }
     Ok(())
-}
-
-fn is_unit_vector(vector: [f32; 4]) -> bool {
-    let norm = vector.iter().map(|value| value * value).sum::<f32>();
-    (norm - 1.0).abs() <= FACING_TOLERANCE
 }
 
 /// Same-directory atomic replacement, matching the `character_store` contract: a synced temporary

@@ -479,9 +479,13 @@ fn item(instance_id: i32, definition_id: i32, count: u32) -> InventoryItem {
     }
 }
 
-fn enter(service: &mut HousingService, stock: &mut dyn FurnitureStock) {
-    service.handle(OWNER, &enter_frame(HOUSE), stock).unwrap();
+fn enter(
+    service: &mut HousingService,
+    stock: &mut dyn FurnitureStock,
+) -> housing_service::ServiceOutcome {
+    let outcome = service.handle(OWNER, &enter_frame(HOUSE), stock).unwrap();
     service.handle(OWNER, &edit_frame(true), stock).unwrap();
+    outcome
 }
 
 fn placed_guid(service: &HousingService) -> u64 {
@@ -1300,6 +1304,27 @@ fn a_lot_saved_with_the_old_guids_and_rotation_loads_in_the_current_form() {
     )
     .unwrap();
     assert_eq!(kept.state(), turned);
+}
+
+/// T806 review finding 2: a saved tilt can be a unit vector and still disagree with its rotation.
+/// The rotation is the one source, so load derives the tilt instead of trusting the stored pair.
+#[test]
+fn a_saved_unit_tilt_is_derived_from_its_rotation_on_load() {
+    let content = Content::new(vec![item(INSTANCE as i32, BLOCK_ITEM, 1)], &[BLOCK_ITEM]);
+    let mut inventory = content.inventory();
+    let mut service = service_with_lot();
+    enter(&mut service, &mut inventory);
+    place(&mut service, &mut inventory);
+    let mut state = service.state();
+    let rotation = [0.5, 0.5, 0.25, 0.0];
+    state.lots[0].fixtures[0].transform.rotation = rotation;
+    state.lots[0].fixtures[0].transform.tilt = [1.0, 0.0, 0.0, 0.0];
+
+    let restored =
+        HousingService::from_state(FixtureConfig::capture_defaults(), &state, inventory.state())
+            .unwrap();
+    let transform = &restored.lot(HOUSE).unwrap().fixtures[0].transform;
+    assert_eq!(transform.tilt, FixtureTransform::facing(rotation));
 }
 
 #[test]
@@ -2254,23 +2279,20 @@ fn leave_clears_session_selection_and_blocks_further_edits() {
 fn leaving_removes_every_fixture_actor_the_visit_spawned() {
     let mut service = service_with_lot();
     let mut stock = TestStock::new(vec![owned(INSTANCE, BLOCK_ITEM, 1)]);
-    enter(&mut service, &mut stock);
-    service.offer(OWNER, SELECTION, INSTANCE, &stock).unwrap();
-    service
-        .handle(
-            OWNER,
-            &place_frame(SELECTION, &block_transform(position(), ZERO_ROTATION, 1.0)),
-            &mut stock,
-        )
-        .unwrap();
-    let fixtures: Vec<u64> = service
-        .lot(HOUSE)
-        .unwrap()
-        .fixtures
-        .iter()
-        .map(|fixture| housing_service::fixture_actor_guid(fixture.fixture_guid))
-        .collect();
-    assert!(!fixtures.is_empty());
+    let entry = enter(&mut service, &mut stock);
+    let placed = place(&mut service, &mut stock);
+    // The removal set comes from the actors the visit actually spawned, not from re-deriving the
+    // fixture guids: a lot that spawned nothing would otherwise pass this test too.
+    let mut spawned = Vec::new();
+    for outcome in [&entry, &placed] {
+        for actor in &outcome.actors {
+            match actor {
+                housing_service::FixtureActor::Spawn(npc) => spawned.push(npc.actor_id),
+                other => panic!("entering and placing only spawn actors: {other:?}"),
+            }
+        }
+    }
+    assert!(!spawned.is_empty(), "the placement spawned its actor");
     let outcome = service.handle(OWNER, &leave_frame(), &mut stock).unwrap();
     let removed: Vec<u64> = outcome
         .actors
@@ -2281,8 +2303,8 @@ fn leaving_removes_every_fixture_actor_the_visit_spawned() {
         })
         .collect();
     assert_eq!(
-        removed, fixtures,
-        "one 35/3 per fixture actor, none left in the world"
+        removed, spawned,
+        "one 35/3 per actor the visit spawned, none left in the world"
     );
 }
 

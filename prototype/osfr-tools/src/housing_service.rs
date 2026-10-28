@@ -134,16 +134,13 @@ pub fn fixture_actor_guid(fixture_guid: u64) -> u64 {
     fixture_guid | FIXTURE_ACTOR_BIT
 }
 
-/// The facing a client-form rotation (yaw, pitch, roll in radians) implies. A 127/40 record carries
-/// it as `tilt`, and its AddNpc as `rotation` (community-preserved `p2.pcap`: all 2,015 instances).
-fn facing(rotation: [f32; 4]) -> [f32; 4] {
-    let [yaw, pitch, ..] = rotation;
-    [
-        yaw.sin() * pitch.cos(),
-        0.0 - pitch.sin(),
-        yaw.cos() * pitch.cos(),
-        0.0,
-    ]
+/// The 35/3 removals for every fixture the lot holds. The actor guid is derived from the fixture
+/// guid ([`fixture_actor_guid`]), so a leave and a pickup-all remove exactly the same actors.
+fn fixture_removals(lot: &LotSnapshot) -> Vec<FixtureActor> {
+    lot.fixtures
+        .iter()
+        .map(|fixture| FixtureActor::Remove(fixture_actor_guid(fixture.fixture_guid)))
+        .collect()
 }
 
 /// Client transform projection: two 16-byte groups and a final dword. `127/2` (place) sends an
@@ -1860,7 +1857,8 @@ impl HousingService {
     }
 
     /// Leaving removes every fixture's actor (35/3) the visit spawned, so none is left behind in the
-    /// zone the player returns to (T806 review finding 3).
+    /// zone the player returns to (T806 review finding 3). The removal timing is reconstructed (R):
+    /// a pickup's 35/3 is captured, the leave order is not.
     fn leave(&mut self, actor_guid: u64) -> Result<ServiceOutcome, ServiceError> {
         let house_guid = self
             .end_visit(actor_guid)
@@ -1868,12 +1866,7 @@ impl HousingService {
         let actors = self
             .housing
             .saved_fixtures(house_guid)
-            .map(|lot| {
-                lot.fixtures
-                    .iter()
-                    .map(|fixture| FixtureActor::Remove(fixture_actor_guid(fixture.fixture_guid)))
-                    .collect()
-            })
+            .map(|lot| fixture_removals(&lot))
             .unwrap_or_default();
         Ok(ServiceOutcome {
             zone_change: Some(HousingZoneChange::ReturnToPreviousZone {
@@ -2027,7 +2020,7 @@ impl HousingService {
         let mut ledger = self.derive_ledger(&lot, stock);
         let mut returns = Vec::with_capacity(lot.fixtures.len());
         let mut removed = Vec::with_capacity(lot.fixtures.len());
-        let mut actors = Vec::with_capacity(lot.fixtures.len());
+        let actors = fixture_removals(&lot);
         for fixture in &lot.fixtures {
             let outcome =
                 staged.pickup_fixture(actor_guid, house_guid, fixture.fixture_guid, &mut ledger)?;
@@ -2041,9 +2034,6 @@ impl HousingService {
             removed.push(HousingReply::FixtureRemove(FixtureRemove {
                 fixture_guid: fixture.fixture_guid,
             }));
-            actors.push(FixtureActor::Remove(fixture_actor_guid(
-                fixture.fixture_guid,
-            )));
         }
 
         // The live inventory performs a single staged batch so a later return cannot leave a
@@ -2345,7 +2335,7 @@ impl HousingService {
             position: [x, y, z, 1.0],
             rotation: placed.transform.rotation,
             // Derived, so a lot saved before T806 (which stored a wrong tilt) is sent right.
-            tilt: facing(placed.transform.rotation),
+            tilt: FixtureTransform::facing(placed.transform.rotation),
             npc_guid: fixture_actor_guid(placed.fixture_guid),
             tint_id: placed.transform.tint_id,
             unknown10: 0,
@@ -2424,7 +2414,7 @@ impl HousingService {
             model_id: row.model_id,
             scale: placed.transform.scale,
             position: [x, y, z, 1.0],
-            rotation: facing(placed.transform.rotation),
+            rotation: FixtureTransform::facing(placed.transform.rotation),
             tilt: placed.transform.rotation,
             has_tilt: 1,
             hide_nameplate: 1,
@@ -2490,12 +2480,11 @@ fn migrated_lot(mut lot: LotSnapshot) -> LotSnapshot {
         fixture.fixture_guid &= !(1 << 63);
         let transform = &mut fixture.transform;
         if transform.rotation == [1.0, 0.0, 0.0, 0.0] && transform.tilt == [1.0, 0.0, 0.0, 0.0] {
-            *transform = FixtureTransform {
-                rotation: [0.0; 4],
-                tilt: facing([0.0; 4]),
-                ..transform.clone()
-            };
+            transform.rotation = [0.0; 4];
         }
+        // The rotation is the one source; a stale unit tilt in an old or hand-edited save is
+        // corrected here, and validation refuses any new pair that disagrees.
+        transform.tilt = FixtureTransform::facing(transform.rotation);
     }
     lot
 }
@@ -2523,7 +2512,7 @@ fn housing_transform(
             transform.position[2],
         ],
         rotation: transform.rotation,
-        tilt: facing(transform.rotation),
+        tilt: FixtureTransform::facing(transform.rotation),
         scale: transform.scale,
         tint_id,
     })

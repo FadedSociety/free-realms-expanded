@@ -403,12 +403,24 @@ fn leaving_returns_to_the_world_pose() {
     inside.zone_id = 1;
     inside.position = [440.0, 5.0, 430.0];
     let out = game.handle_in_world(&LEAVE, &inside, 4_000).unwrap();
-    // T806 review finding 3: every actor the visit spawned is removed (35/3) before the zone change.
-    let removed: Vec<u64> = (out.replies.iter())
+    // T806 review finding 3: every actor the visit spawned is removed (35/3) before the zone change,
+    // and the bytes are the ones the client readers parse, not a re-derivation of the fixture guids.
+    let removed: Vec<&Vec<u8>> = (out.replies.iter())
         .filter(|r| r.starts_with(&[35, 0, 3, 0]))
-        .map(|r| u64::from_le_bytes(r[6..14].try_into().unwrap()))
         .collect();
-    assert_eq!(removed, spawned, "no fixture actor outlives the visit");
+    assert_eq!(
+        out.replies.len(),
+        spawned.len(),
+        "the leave sends only the removals"
+    );
+    assert_eq!(removed.len(), spawned.len(), "one 35/3 per spawned actor");
+    for (packet, actor) in removed.iter().zip(&spawned) {
+        assert_eq!(
+            **packet,
+            removal(*actor),
+            "the exact 35/3 the client reader 0x008d69f0 expects"
+        );
+    }
     let scene = out.scene_zoning.expect("leaving moves the client back");
     assert_eq!(&scene.position[..3], &character().position);
     assert_eq!(scene.id, 0);
@@ -548,6 +560,16 @@ fn actors(replies: &[Vec<u8>]) -> Vec<NpcSpawn> {
     let adds = replies.iter().filter(|r| r.starts_with(&[35, 0, 2, 0]));
     adds.map(|r| startup_world::parse_add_npc(r).unwrap())
         .collect()
+}
+
+/// The exact 35/3 a leave sends for one actor. Client readers `0x008d69f0` (u16 submode 1, then
+/// the u64 guid) and `0x008d6a60` (animate, delay, effect delay, composite effect id, duration)
+/// read these 31 bytes; the zero-effect form is the one pinned in `tests/piece_056.rs`.
+fn removal(guid: u64) -> Vec<u8> {
+    let mut bytes = vec![35, 0, 3, 0, 1, 0];
+    bytes.extend(guid.to_le_bytes());
+    bytes.extend([0; 17]);
+    bytes
 }
 
 /// Item ids the client is told about: 38/2 adds (payload: definition, tint, id) and 38/4 removals.
