@@ -1,7 +1,7 @@
 """Validate and replace ScriptsBase.bin only in a fresh run copy."""
 import hashlib
+import importlib.util
 import json
-import shutil
 from pathlib import Path
 
 MAX_JSON = 1024 * 1024
@@ -9,6 +9,7 @@ BASE = "UI/ScriptsBase.bin"
 LOG = "Logs/QuestOfferLuaProbe.log"
 HEADER = bytes.fromhex("1b4c75615100010404040800")
 SENTINEL = b"probe.scriptsbase.loaded"
+BRIDGE_SOURCE = Path(__file__).with_name("lua_bridge.lua")
 
 
 def digest(path):
@@ -20,6 +21,15 @@ def read_json(path):
     if path.stat().st_size > MAX_JSON:
         raise ValueError("Lua probe manifest exceeds size bound")
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def compose_probe_source(base, bridge):
+    """Append the repository's JSON bridge to the validated probe source."""
+    if not base or not bridge:
+        raise ValueError("Lua probe composition needs the probe and the bridge source")
+    if b"\r" in bridge or bridge.startswith(b"\xef\xbb\xbf") or not bridge.strip():
+        raise ValueError("Lua bridge source must be UTF-8 Lua without CR bytes or BOM")
+    return base.rstrip() + b"\n\n" + bridge.rstrip() + b"\n"
 
 
 def validate_lua_probe(package, original_client, lab):
@@ -86,6 +96,29 @@ def validate_lua_probe(package, original_client, lab):
             or manifest.get("syntax_source_sha256") != source_hash):
         raise ValueError("Lua 5.1 syntax-check provenance mismatch")
 
+    # The JSON bridge is repository code, appended to the client-derived probe source
+    # only in the disposable run copy. Parse the exact bytes that copy will receive.
+    bridge = BRIDGE_SOURCE.resolve()
+    if not bridge.is_file():
+        raise ValueError("Lua bridge source is missing")
+    bridge_bytes = bridge.read_bytes()
+    composed = compose_probe_source(source_bytes, bridge_bytes)
+    checker_path = (toolchain_path.parent / syntax.get("path", "")).resolve()
+    if (not checker_path.is_relative_to(toolchain_root) or not checker_path.is_file()
+            or digest(checker_path) != manifest.get("syntax_checker_sha256")):
+        raise ValueError("Lua 5.1 syntax checker file mismatch")
+    spec = importlib.util.spec_from_file_location("lua51_check", checker_path)
+    checker = importlib.util.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(checker)
+        composed_tokens = checker.check(composed.decode("utf-8"))
+    except Exception as error:
+        raise ValueError(f"Lua probe+bridge syntax check failed: {error}") from error
+    if not isinstance(composed_tokens, int) or composed_tokens <= 0:
+        raise ValueError("Lua probe+bridge syntax check returned no tokens")
+    composed_hash = hashlib.sha256(composed).hexdigest().upper()
+    bridge_hash = hashlib.sha256(bridge_bytes).hexdigest().upper()
+
     legacy = manifest.get("legacy_failed_bytecode", {})
     legacy_path = (package / legacy.get("path", "")).resolve()
     if (not legacy_path.is_relative_to(package) or not legacy_path.is_file()
@@ -99,6 +132,9 @@ def validate_lua_probe(package, original_client, lab):
         "original_sha256": manifest["original_scriptsbase_sha256"],
         "source_sha256": source_hash,
         "probe_source_sha256": manifest["probe_source_sha256"],
+        "run_source": composed,
+        "run_source_sha256": composed_hash,
+        "bridge_source_sha256": bridge_hash,
         "load_command": None,
         "proof": {
             "package": str(package),
@@ -107,6 +143,10 @@ def validate_lua_probe(package, original_client, lab):
             "scriptsbase_source_sha256": source_hash,
             "probe_source_sha256": manifest["probe_source_sha256"],
             "toolchain_sha256": manifest["toolchain_sha256"],
+            "bridge_source": "scripts/lua_bridge.lua",
+            "bridge_source_sha256": bridge_hash,
+            "run_source_sha256": composed_hash,
+            "run_syntax_token_count": composed_tokens,
             "load_command": None,
             "manual_load_required": False,
             "native_client_load_tested": False,
@@ -116,7 +156,7 @@ def validate_lua_probe(package, original_client, lab):
 
 
 def apply_lua_probe(validated, client, run, lab):
-    """Copy the source probe only into a new disposable run client."""
+    """Write the validated probe+bridge source only into a new disposable run client."""
     if validated is None:
         return None
     client, run, lab = Path(client).resolve(), Path(run).resolve(), Path(lab).resolve()
@@ -132,15 +172,19 @@ def apply_lua_probe(validated, client, run, lab):
     source = Path(validated["source"]).resolve()
     if digest(source) != validated["source_sha256"]:
         raise ValueError("Lua probe source changed after validation")
+    run_source = validated["run_source"]
+    if (not isinstance(run_source, bytes)
+            or hashlib.sha256(run_source).hexdigest().upper() != validated["run_source_sha256"]):
+        raise ValueError("Lua probe+bridge source changed after validation")
     if validated["target"] != BASE:
         raise ValueError("Lua probe target mismatch")
     log = (client / validated["log_relative_path"]).resolve()
     if not log.is_relative_to(client):
         raise ValueError("Lua probe log path escapes run client")
     log.unlink(missing_ok=True)
-    shutil.copy2(source, base)
+    base.write_bytes(run_source)
     base_after = digest(base)
-    if base_after != validated["source_sha256"]:
+    if base_after != validated["run_source_sha256"]:
         raise ValueError("Run-copy ScriptsBase source replacement hash mismatch")
 
     proof = dict(validated["proof"])
