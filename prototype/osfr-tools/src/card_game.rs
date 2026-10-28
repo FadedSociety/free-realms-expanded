@@ -30,6 +30,9 @@
 //! * Rows publish entry type 1 (the world tunnel); `server_type` (Legacy's 2, the client tunnel
 //!   `00be78c0`) stays in data for the launch slice.
 //! * The row's MiniGameData link (`minigame_id`) stays in data; no wire field is known to hold it.
+//! * T545: `type16_minigame_ids` lists every client `MiniGameData.txt` TYPE 16 row. The admin
+//!   `realm duel` credit refuses every other id, so a kart, derby or Treasure War row cannot
+//!   stand in for a card duel while the card service has no result path.
 
 use crate::activity_portal::{Activity, Kind};
 use crate::card_service::LaunchTickets;
@@ -53,6 +56,8 @@ pub const TREASURE_WAR_CATEGORY: u32 = 26;
 const MAX_FILE: u64 = 1 << 20;
 const MAX_ROWS: usize = 32;
 const MAX_IMAGE_NAME: usize = 64;
+/// T545: bound on the client's TYPE 16 id list (the client table has 124 such rows).
+const MAX_TYPE16_IDS: usize = 1024;
 
 /// One published row: the values of one 167/1/1 row (client reader `00be63e0`) plus provenance.
 #[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
@@ -100,6 +105,16 @@ pub struct Content {
     /// T765: present once a card service runs; until then every card row stays refused.
     #[serde(default)]
     launch: Option<Launch>,
+    /// T545: every client `MiniGameData.txt` row whose TYPE column is 16 (the card duels),
+    /// sorted. The developer `realm duel` credit refuses any other id; `type16_source`
+    /// below names the table, its hash and the column. A pre-T545 content tree has no list
+    /// (default empty), so [`Content::is_duel_row`] refuses every id there: fail closed.
+    #[serde(default)]
+    type16_minigame_ids: Vec<u32>,
+    /// T545: the one `client` provenance entry for `type16_minigame_ids`; `None` only in a
+    /// pre-T545 tree, which has no list either.
+    #[serde(default)]
+    type16_source: Option<Source>,
 }
 
 /// T765: how a Trading Card Game row launches (R values, bounded in `validate`).
@@ -314,6 +329,29 @@ impl Content {
         if self.rows.is_empty() || self.rows.len() > MAX_ROWS {
             return Err(invalid("card game content needs 1 to 32 rows"));
         }
+        if self.type16_minigame_ids.len() > MAX_TYPE16_IDS
+            || self
+                .type16_minigame_ids
+                .windows(2)
+                .any(|pair| pair[0] >= pair[1])
+            || self.type16_minigame_ids.contains(&0)
+        {
+            return Err(invalid(
+                "card TYPE 16 ids must be at most 1024 sorted unique nonzero ids",
+            ));
+        }
+        // A pre-T545 tree has neither field; otherwise the list and its one `client` source
+        // travel together, so a content edit cannot drop the provenance silently.
+        match (&self.type16_source, self.type16_minigame_ids.is_empty()) {
+            (None, true) => {}
+            (Some(source), false)
+                if source.kind == "client" && !source.evidence.trim().is_empty() => {}
+            _ => {
+                return Err(invalid(
+                    "card TYPE 16 ids need one client source and a non-empty list",
+                ));
+            }
+        }
         let mut ids = BTreeSet::new();
         for row in &self.rows {
             if row.id == 0 || !ids.insert(row.id) {
@@ -411,6 +449,12 @@ impl Content {
     /// The row behind activity `id`.
     pub fn row(&self, id: u32) -> Option<&Row> {
         self.rows.iter().find(|row| row.id == id)
+    }
+
+    /// T545: whether `minigame_id` is a client TYPE 16 row, the only kind a card duel
+    /// result may name. A pre-T545 tree without the list refuses every id.
+    pub fn is_duel_row(&self, minigame_id: u32) -> bool {
+        self.type16_minigame_ids.binary_search(&minigame_id).is_ok()
     }
 
     /// The catalogue rows (ids, names, image, difficulty); the rest of each wire row is read

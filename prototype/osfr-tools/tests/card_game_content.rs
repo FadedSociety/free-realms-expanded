@@ -159,6 +159,57 @@ fn every_row_carries_legacy_and_client_provenance() {
     }
 }
 
+/// T545: the whitelist is exactly the client table's TYPE column, so `is_duel_row` can never
+/// admit another activity's row. `MiniGameData.txt` header: `#ID^TYPE^...`.
+#[test]
+fn the_type16_list_is_the_client_type16_rows() {
+    let content = Content::load(&shipped_path()).unwrap();
+    let client_ids: Vec<u32> = client("Resources/MiniGameData.txt")
+        .lines()
+        .filter_map(|line| {
+            let cells: Vec<&str> = line.split('^').collect();
+            (cells.get(1) == Some(&"16")).then(|| cells[0].parse().unwrap())
+        })
+        .collect();
+    assert_eq!(client_ids.len(), 124, "the client table's TYPE 16 rows");
+    let shipped: Vec<u32> =
+        serde_json::from_value(shipped_value()["type16_minigame_ids"].clone()).unwrap();
+    assert_eq!(
+        shipped, client_ids,
+        "the whitelist must be the client TYPE 16 list"
+    );
+
+    for id in [504, 507, 668] {
+        assert!(content.is_duel_row(id), "MiniGameData {id} is TYPE 16");
+    }
+    for id in [0, 1, 18, 39, 727] {
+        assert!(!content.is_duel_row(id), "MiniGameData {id} is not TYPE 16");
+    }
+    let source = &shipped_value()["type16_source"];
+    assert_eq!(source["kind"], "client", "the list is client data");
+    assert!(
+        !source["evidence"].as_str().unwrap().trim().is_empty(),
+        "the client source names the table, its hash and the column"
+    );
+}
+
+/// A content tree from before T545 has neither field and must still load; the developer duel
+/// credit then refuses every id (fail closed) instead of refusing the whole card file.
+#[test]
+fn a_pre_t545_file_without_the_type16_list_loads_and_refuses_every_duel() {
+    let mut value = shipped_value();
+    let object = value.as_object_mut().unwrap();
+    object.remove("type16_minigame_ids");
+    object.remove("type16_source");
+    let content = load(&value).expect("a schema-1 card file from before T545 loads");
+    for id in [0, 18, 507, 668, u32::MAX] {
+        assert!(
+            !content.is_duel_row(id),
+            "MiniGameData {id} without the list"
+        );
+    }
+}
+
 #[test]
 fn malformed_files_are_refused() {
     assert!(
@@ -203,6 +254,45 @@ fn malformed_files_are_refused() {
         "no provenance"
     );
     assert!(broken(&|v| v["rows"] = json!([])).is_err(), "no rows");
+    assert!(
+        broken(&|v| v["type16_minigame_ids"] = json!([])).is_err(),
+        "a source without a list"
+    );
+    assert!(
+        broken(&|v| {
+            v.as_object_mut().unwrap().remove("type16_source");
+        })
+        .is_err(),
+        "a list without a source"
+    );
+    assert!(
+        broken(&|v| v["type16_source"]["kind"] = json!("reconstructed")).is_err(),
+        "the list needs client provenance"
+    );
+    assert!(
+        broken(&|v| v["type16_source"]["evidence"] = json!("")).is_err(),
+        "the client provenance needs evidence"
+    );
+    assert!(
+        broken(&|v| v["type16_minigame_ids"] = json!([387, 0])).is_err(),
+        "zero TYPE 16 id"
+    );
+    assert!(
+        broken(&|v| v["type16_minigame_ids"] = json!([387, 387])).is_err(),
+        "duplicate TYPE 16 id"
+    );
+    assert!(
+        broken(&|v| v["type16_minigame_ids"] = json!([388, 387])).is_err(),
+        "unsorted TYPE 16 ids"
+    );
+    assert!(
+        broken(&|v| v["type16_minigame_ids"] = json!((1..=1025).collect::<Vec<u32>>())).is_err(),
+        "oversized TYPE 16 list"
+    );
+    assert!(
+        broken(&|v| v["type16_source"] = json!([])).is_err(),
+        "no TYPE 16 provenance"
+    );
     assert!(
         broken(&|v| v["schema_version"] = json!(2)).is_err(),
         "version"

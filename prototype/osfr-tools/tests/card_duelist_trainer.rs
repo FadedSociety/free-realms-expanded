@@ -13,13 +13,13 @@
 //! 0x00aa1600 -> 0x00aa04d0` (count at 13, 28-byte rows, label at +8); 26/10 `0x00a36f80`
 //! (guid, choice).
 
-#[path = "support/npc_quest_chain.rs"]
-mod npc_quest_chain;
+#[path = "support/card_duelist.rs"]
+mod card_duelist;
 
-use npc_quest_chain::{
-    CHARACTER, Fixture, TALK_LABEL, active_job, assert_no_offer, character_at_for, content_dir,
-    content_position, interact, menu_option, npc_interact, npc_select, saved, seed_active_profile,
-    send,
+use card_duelist::{
+    BECOME_A_CARD_DUELIST, CARD_DUELIST, CHARACTER, Fixture, TALK_LABEL, active_job,
+    assert_no_offer, character_at_for, content_dir, content_position, interact, learn_card_duelist,
+    menu_option, npc_interact, npc_select, said, saved, seed_active_profile, send,
 };
 use osfr_tools::{
     account_store::AccountRole, character_store::CharacterState, chat, gameplay::Gameplay,
@@ -37,8 +37,6 @@ const DUELISTS: [(u64, &str); 4] = [
     (BRY, "lakeshore.json"),
     (GARRISON, "snowhill.json"),
 ];
-const CARD_DUELIST: i32 = 120;
-const BECOME_A_CARD_DUELIST: u32 = 392_269;
 const MINER: i32 = 14;
 
 /// Sanctuary-main@10f129e spawns (`FabledRealms.lua:3570,3585,3762,3852,3586,3850`) and
@@ -97,13 +95,6 @@ fn unlocked(game: &Gameplay) -> BTreeSet<i32> {
     game.state().profiles.expect("profiles").unlocked
 }
 
-fn said(outcome: &Outcome, text: &str) -> bool {
-    outcome
-        .replies
-        .iter()
-        .any(|reply| String::from_utf8_lossy(reply).contains(text))
-}
-
 /// Every option label of the 26/9 menu, in order (layout in the header).
 fn labels(outcome: &Outcome) -> Vec<u32> {
     let menu = outcome
@@ -123,12 +114,6 @@ fn assert_refused(game: &mut Gameplay, who: &CharacterState, packet: &[u8], now:
     let outcome = game.handle_in_world(packet, who, now);
     assert!(!outcome.is_ok_and(|outcome| outcome.changed), "{label}");
     assert_eq!(saved(game), before, "{label} changed the save");
-}
-
-fn learn(game: &mut Gameplay, who: &CharacterState, now: u64) -> Outcome {
-    let menu = interact(game, who, SAM, now);
-    let choice = menu_option(&menu, BECOME_A_CARD_DUELIST);
-    send(game, who, &npc_select(SAM, choice), now + 1)
 }
 
 #[test]
@@ -197,7 +182,7 @@ fn learning_card_duelist_unlocks_profile_120_once() {
     let before = game.state();
     assert!(!unlocked(&game).contains(&CARD_DUELIST));
 
-    let learned = learn(&mut game, &sam, 1_000);
+    let learned = learn_card_duelist(&mut game, &sam, 1_000);
     assert!(learned.changed && said(&learned, "You learned the Card Duelist job"));
     assert!(said(&learned, "starter outfit is unavailable"));
     let mut expected = before.profiles.clone().unwrap().unlocked;
@@ -211,7 +196,7 @@ fn learning_card_duelist_unlocks_profile_120_once() {
     );
 
     let learned_save = saved(&game);
-    let again = learn(&mut game, &sam, 2_000);
+    let again = learn_card_duelist(&mut game, &sam, 2_000);
     assert!(!again.changed && said(&again, "already know"));
     assert_eq!(
         saved(&game),
@@ -221,7 +206,7 @@ fn learning_card_duelist_unlocks_profile_120_once() {
 
     let mut game = fixture.reload_serialized(&game);
     assert_eq!(saved(&game), learned_save, "reload changed the save");
-    let again = learn(&mut game, &sam, 3_000);
+    let again = learn_card_duelist(&mut game, &sam, 3_000);
     assert!(!again.changed && said(&again, "already know"));
     assert_eq!(saved(&game), learned_save);
 }
@@ -279,7 +264,7 @@ fn card_duelist_refusals_change_nothing() {
     );
     assert!(!unlocked(&game).contains(&CARD_DUELIST));
     send(&mut game, &sam, &chat::local_request("realm exit"), 2_004);
-    let learned = learn(&mut game, &sam, 2_005);
+    let learned = learn_card_duelist(&mut game, &sam, 2_005);
     assert!(learned.changed && unlocked(&game).contains(&CARD_DUELIST));
 }
 
@@ -302,7 +287,7 @@ fn two_players_learn_independently() {
     assert!(!unlocked(&second).contains(&CARD_DUELIST));
 
     let first_save = saved(&first);
-    let learned = learn(&mut second, &two, 1_010);
+    let learned = learn_card_duelist(&mut second, &two, 1_010);
     assert!(learned.changed && unlocked(&second).contains(&CARD_DUELIST));
     assert_eq!(
         saved(&first),

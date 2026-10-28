@@ -274,4 +274,37 @@ impl Gameplay {
         out.replies.push(chat::system(&message));
         Ok(out)
     }
+
+    /// Developer `realm level <1-20>`: set the active job's saved XP to that level. Moved out of
+    /// the gameplay hub (T545): the command owns the rank write, its XP packets, the ability-bar
+    /// refresh and the job-level quest goals, and it stages on the caller's `Outcome`.
+    pub(super) fn developer_level(&mut self, level: &str, out: &mut Outcome) -> io::Result<()> {
+        let Ok(level) = level.parse::<u32>() else {
+            out.replies.push(chat::system("Usage: realm level <1-20>"));
+            return Ok(());
+        };
+        let level = level.clamp(1, 20);
+        let profile = self.profiles.as_ref().unwrap().active();
+        let before = self.job_level(profile);
+        let profiles = self.profiles.as_mut().unwrap();
+        let previous = profiles
+            .state()
+            .experience
+            .get(&profile)
+            .copied()
+            .unwrap_or(0);
+        out.changed |= profiles.set_experience((level - 1) * 100);
+        out.replies.extend(profiles.experience_packets(previous));
+        if self.abilities.as_ref().is_some_and(|abilities| {
+            abilities.unlocks_between(profile, before, level) || level < before
+        }) {
+            out.replies.extend(self.ability_activation_for(profile)?);
+        }
+        self.sync_player_level(out);
+        self.npc_quest_profiles_changed(out)?;
+        out.replies.push(chat::system(&format!(
+            "Job {profile} is now level {level}."
+        )));
+        Ok(())
+    }
 }

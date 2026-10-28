@@ -337,12 +337,7 @@ impl Fixture {
     /// reload must carry the serialized state, not just the character it was given.
     pub fn save_and_reload(&self, game: &Gameplay, character: &CharacterState) -> Gameplay {
         let path = self.path.join("character-save.json");
-        let snapshot = osfr_tools::game_store::Snapshot {
-            character: character.clone(),
-            gameplay: Some(game.state()),
-            pets: None,
-        };
-        osfr_tools::game_store::save(&path, &snapshot).expect("the character save writes");
+        self.saved_bytes(game, character);
         let loaded = osfr_tools::game_store::load_or_create(&path, character.clone())
             .expect("the character save loads");
         let reloaded = self.game_as(character.guid, loaded.gameplay);
@@ -352,6 +347,19 @@ impl Fixture {
             "the save round trip preserved the serialized state"
         );
         reloaded
+    }
+
+    /// The bytes `game_store::save` writes for `game` (the production character envelope), so a
+    /// refusal can be checked against the real save encoding instead of a `GameplayState` proxy.
+    pub fn saved_bytes(&self, game: &Gameplay, character: &CharacterState) -> Vec<u8> {
+        let path = self.path.join("character-save.json");
+        let snapshot = osfr_tools::game_store::Snapshot {
+            character: character.clone(),
+            gameplay: Some(game.state()),
+            pets: None,
+        };
+        osfr_tools::game_store::save(&path, &snapshot).expect("the character save writes");
+        fs::read(&path).expect("the character save reads")
     }
 }
 

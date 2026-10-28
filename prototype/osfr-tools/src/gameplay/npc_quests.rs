@@ -397,6 +397,36 @@ impl Gameplay {
         Ok(())
     }
 
+    /// T545 (R): developer `realm duel <minigame_id>`. The card game has no result path yet,
+    /// so this is the one native way to prove the Card Duelist chain: it credits one
+    /// `FinishMinigame` event for a client TYPE 16 row and pays nothing itself. Rewards stay
+    /// in the quest and are paid only by its own 49/14 turn-in.
+    ///
+    /// A non-TYPE 16 id (kart 18, derby 39, Treasure War 727, zero, an unknown row) is
+    /// refused without an event. The command is admin-only: `developer_command_denied`
+    /// runs before the realm dispatch, so no player or builder reaches this method.
+    pub(super) fn credit_card_duel(
+        &mut self,
+        minigame_id: u32,
+        out: &mut Outcome,
+    ) -> io::Result<String> {
+        if !self
+            .activities
+            .cards()
+            .is_some_and(|cards| cards.is_duel_row(minigame_id))
+        {
+            return Ok(format!(
+                "No card duel {minigame_id}: not a client TYPE 16 MiniGameData row; nothing was credited."
+            ));
+        }
+        self.npc_quest_event(
+            crate::quest_engine::QuestEvent::FinishMinigame { minigame_id },
+            out,
+        )?;
+        self.sync_job_level_objectives(out)?;
+        Ok(format!("Credited card duel {minigame_id}."))
+    }
+
     /// The result record of a run whose id-only credit already happened on the
     /// earlier 39/14 win message (Forging, Mining and Harvesting present the record
     /// only after the client's `FRServer_GameOver`). Sends only `MinigameResult`, so

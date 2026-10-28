@@ -2629,7 +2629,7 @@ impl Gameplay {
 
     /// Developer cheat console (Studio toolkit). Returns whether `command`
     /// was one of these: place, unplace, placements, mark, unmark, marks,
-    /// reload, level, heal, god, give, coins, battle, win, sim, fightlog.
+    /// reload, level, heal, god, give, coins, battle, win, duel, sim, fightlog.
     fn developer_cheat(
         &mut self,
         command: &str,
@@ -2750,32 +2750,7 @@ impl Gameplay {
                 };
                 say(out, text);
             }
-            ["level", n] => {
-                let Ok(level) = n.parse::<u32>() else {
-                    say(out, "Usage: realm level <1-20>".into());
-                    return Ok(true);
-                };
-                let level = level.clamp(1, 20);
-                let profile = self.profiles.as_ref().unwrap().active();
-                let before = self.job_level(profile);
-                let profiles = self.profiles.as_mut().unwrap();
-                let previous = profiles
-                    .state()
-                    .experience
-                    .get(&profile)
-                    .copied()
-                    .unwrap_or(0);
-                out.changed |= profiles.set_experience((level - 1) * 100);
-                out.replies.extend(profiles.experience_packets(previous));
-                if self.abilities.as_ref().is_some_and(|abilities| {
-                    abilities.unlocks_between(profile, before, level) || level < before
-                }) {
-                    out.replies.extend(self.ability_activation_for(profile)?);
-                }
-                self.sync_player_level(out);
-                self.npc_quest_profiles_changed(out)?;
-                say(out, format!("Job {profile} is now level {level}."));
-            }
+            ["level", n] => self.developer_level(n, out)?,
             ["heal"] => {
                 if let Some(encounter) = self.encounter.as_mut() {
                     out.replies.extend(encounter.heal_full());
@@ -2811,6 +2786,17 @@ impl Gameplay {
                 }
             }
             ["win"] => self.developer_win(now_ms, out)?,
+            ["duel", rest @ ..] => {
+                let id = match rest {
+                    [id] => id.parse::<u32>().ok().filter(|id| *id > 0),
+                    _ => None,
+                };
+                let text = match id {
+                    Some(id) => self.credit_card_duel(id, out)?,
+                    None => "Usage: realm duel <minigame_id>".to_owned(),
+                };
+                say(out, text);
+            }
             ["sim", rest @ ..] => {
                 let battle = rest
                     .first()
