@@ -181,7 +181,9 @@ pub struct RewardGrant {
 }
 
 /// (R) T787: an authored bound on one settled minigame result. Every unset field is
-/// unconstrained; a bound on a fact the producer does not report cannot be met.
+/// unconstrained; a requirement with no bound at all is refused (it would only flip the
+/// objective kind and could never credit), and a bound on a fact the producer does not
+/// report cannot be met.
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct MinigameRequirement {
@@ -205,8 +207,13 @@ pub(crate) const MAX_MINIGAME_PLACEMENT: u8 = crate::derby::MAX_DERBY_DRIVERS as
 
 impl MinigameRequirement {
     pub(crate) fn valid(&self) -> bool {
-        self.min_score
-            .is_none_or(|score| (1..=MAX_MINIGAME_SCORE).contains(&score))
+        (self.min_score.is_some()
+            || self.max_elapsed_seconds.is_some()
+            || self.max_placement.is_some()
+            || self.no_knockout)
+            && self
+                .min_score
+                .is_none_or(|score| (1..=MAX_MINIGAME_SCORE).contains(&score))
             && self
                 .max_elapsed_seconds
                 .is_none_or(|seconds| (1..=MAX_MINIGAME_ELAPSED_SECONDS).contains(&seconds))
@@ -1224,9 +1231,10 @@ fn validate_goal(
                 return Err(ContentError::InvalidRecord {
                     record: owner.to_owned(),
                     detail: format!(
-                        "goal.require bounds must be min_score 1..={MAX_MINIGAME_SCORE}, \
-                         max_elapsed_seconds 1..={MAX_MINIGAME_ELAPSED_SECONDS} and \
-                         max_placement 1..={MAX_MINIGAME_PLACEMENT}"
+                        "goal.require needs at least one bound, and bounds must be \
+                         min_score 1..={MAX_MINIGAME_SCORE}, max_elapsed_seconds \
+                         1..={MAX_MINIGAME_ELAPSED_SECONDS} and max_placement \
+                         1..={MAX_MINIGAME_PLACEMENT}"
                     ),
                 });
             }

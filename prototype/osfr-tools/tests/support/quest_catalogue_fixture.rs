@@ -114,7 +114,9 @@ fn fixture_visit_objective(position: [f64; 3], radius: f64) -> Value {
 /// One resolving target per graded kind: the item catalogue, recipe book, the
 /// recipe's `minigame_id`, battle set and local gather-drop list this fixture
 /// writes. The `finish_minigame` target is the recipe's game id so the craft
-/// producer is exercised through the production `RecipeCatalog` loader.
+/// producer is exercised through the production `RecipeCatalog` loader. The recipe
+/// is a blacksmith row: only forging keeps its score and timer server-side, so it is
+/// the craft producer a `require` may bound (F854).
 fn fixture_objectives() -> Value {
     let mut objectives = fixture_talk_objective();
     objectives
@@ -261,8 +263,8 @@ fn fixture_recipe_book() -> Value {
             "key": "fixture.recipe",
             "name": "Fixture Recipe",
             "recipe_id": FIXTURE_RECIPE,
-            "job": "chef",
-            "job_profile_id": 45,
+            "job": "blacksmith",
+            "job_profile_id": 16,
             "minigame_type_id": 1,
             "minigame_id": FIXTURE_MINIGAME,
             "ingredients": [{"definition_id": FIXTURE_ITEM, "count": 1}],

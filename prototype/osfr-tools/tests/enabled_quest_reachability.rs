@@ -65,6 +65,7 @@ mod quest_target_sets;
 
 use npc_quest_chain::{content_dir, read_json, reference_content};
 use osfr_tools::{
+    chess_service,
     quest_engine::{CharacterEligibility, QuestEngine},
     world::NpcVisibility,
 };
@@ -682,8 +683,29 @@ fn shipped_minigame_producers_are_pinned() {
     );
     assert!(catalogue.targets.reports(39, MinigameFact::Placement));
     assert!(!catalogue.targets.reports(39, MinigameFact::Elapsed));
-    assert!(catalogue.targets.reports(46, MinigameFact::Score));
-    assert!(!catalogue.targets.reports(46, MinigameFact::Placement));
+    // F854: the Chef (46) and Miner (77, 134-137) movies take their score and timer
+    // from the client, so no result fact is certified for them; forging (139) keeps
+    // both because its movie measures them server-side.
+    for client_reported in [46, 77, 134, 135, 136, 137] {
+        assert!(
+            !catalogue
+                .targets
+                .reports(client_reported, MinigameFact::Score),
+            "cooking/smelting id {client_reported} must not certify a client score"
+        );
+        assert!(
+            !catalogue
+                .targets
+                .reports(client_reported, MinigameFact::Elapsed),
+            "cooking/smelting id {client_reported} must not certify a client timer"
+        );
+    }
+    assert!(catalogue.targets.reports(139, MinigameFact::Score));
+    assert!(catalogue.targets.reports(139, MinigameFact::Elapsed));
+    assert!(!catalogue.targets.reports(139, MinigameFact::Placement));
+    // Chess settles with a zero score, so only its server-measured time is a fact.
+    assert!(catalogue.targets.reports(66, MinigameFact::Elapsed));
+    assert!(!catalogue.targets.reports(66, MinigameFact::Score));
     assert!(!catalogue.targets.reports(599, MinigameFact::Score));
 }
 
@@ -822,6 +844,25 @@ fn a_malformed_enabled_row_is_rejected_or_reported() {
 /// Rewrite one target field of one fixture quest in its scratch tree.
 fn patch_fixture_objective(scratch: &Scratch, quest: u32, kind: &str, field: &str, value: u64) {
     patch_fixture_field(scratch, quest, kind, field, json!(value));
+}
+
+/// Change the fixture recipe's job (and its matching profile) so the craft producer
+/// reports the facts of that job.
+fn patch_fixture_recipe_job(scratch: &Scratch, job: &str, profile: i32) {
+    let path = scratch.path().join("recipes.json");
+    let mut document = read_json(&path);
+    let record = document["records"]
+        .as_array_mut()
+        .expect("fixture recipe records")
+        .first_mut()
+        .expect("the fixture recipe exists");
+    record["job"] = json!(job);
+    record["job_profile_id"] = json!(profile);
+    fs::write(
+        &path,
+        serde_json::to_vec_pretty(&document).expect("fixture recipe JSON"),
+    )
+    .unwrap_or_else(|error| panic!("{}: {error}", path.display()));
 }
 
 fn patch_fixture_field(scratch: &Scratch, quest: u32, kind: &str, field: &str, value: Value) {
@@ -1258,6 +1299,55 @@ fn requirement_needs_a_fact_the_producer_reports() {
             && violations[0].contains("max_placement")
             && violations[0].contains("does not report"),
         "the craft producer cannot report a placement: {violations:?}"
+    );
+
+    // F854: the cooking and smelting movies take the score and the timer from the
+    // client, so neither id reports a result fact. The bound is refused instead of
+    // certifying a client number as a result; the same fixture was accepted above as
+    // a blacksmith recipe, so only the job patch can fail here.
+    let client_craft = fixture("requirement-client-craft", Defect::None);
+    patch_fixture_recipe_job(&client_craft, "chef", 45);
+    patch_fixture_field(
+        &client_craft,
+        FIXTURE_QUEST,
+        "finish_minigame",
+        "require",
+        json!({"min_score": 20000, "max_elapsed_seconds": 90}),
+    );
+    let catalogue = Catalogue::load(client_craft.path()).expect("the chef requirement loads");
+    let violations = catalogue.target_violations();
+    assert_eq!(violations.len(), 2, "{violations:?}");
+    for field in ["min_score", "max_elapsed_seconds"] {
+        assert!(
+            violations
+                .iter()
+                .any(|violation| violation.contains(field) && violation.contains("does not report")),
+            "a chef recipe must not certify {field}: {violations:?}"
+        );
+    }
+
+    // F854: a chess row settles with a zero score, so a `min_score` bound on its game
+    // id can never be met even though its elapsed time is real.
+    let chess = fixture("requirement-chess", Defect::None);
+    fs::copy(
+        content_dir().join(chess_service::CONTENT_FILE),
+        chess.path().join(chess_service::CONTENT_FILE),
+    )
+    .expect("the shipped chess content copies into the fixture");
+    patch_fixture_objective(&chess, FIXTURE_QUEST, "finish_minigame", "minigame_id", 66);
+    patch_fixture_field(
+        &chess,
+        FIXTURE_QUEST,
+        "finish_minigame",
+        "require",
+        json!({"min_score": 1}),
+    );
+    let catalogue = Catalogue::load(chess.path()).expect("the chess requirement loads");
+    let violations = catalogue.target_violations();
+    assert_eq!(violations.len(), 1, "{violations:?}");
+    assert!(
+        violations[0].contains("min_score") && violations[0].contains("minigame 66"),
+        "a chess row must not certify a score: {violations:?}"
     );
 
     // The derby's own producer reports placement, score and knock-outs, but not a

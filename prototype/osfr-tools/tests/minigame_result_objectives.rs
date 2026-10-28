@@ -164,22 +164,34 @@ fn patch_license_require(fixture: &npc_quest_chain::Fixture, require: Value) {
     });
 }
 
-/// The split loader owns the requirement bounds: a value outside them rejects the
-/// whole catalogue, while the documented upper bounds are accepted.
+/// The split loader owns the requirement bounds: a value outside them, or a
+/// requirement with no bound at all, rejects the whole catalogue, while the
+/// documented upper bounds are accepted.
 #[test]
 fn out_of_range_requirement_is_rejected_at_load() {
     let fixture = npc_quest_chain::Fixture::new();
     let mut game = Gameplay::load(fixture.path(), None).expect("the fixture content loads");
+    let before = serde_json::to_vec(&game.state()).expect("the game state serializes");
     for (name, require) in [
         ("zero-score", json!({"min_score": 0})),
         ("large-placement", json!({"max_placement": 9})),
         ("long-elapsed", json!({"max_elapsed_seconds": 86_401})),
+        // F854: an all-unset requirement would flip the objective kind while
+        // demanding no fact, so a producer that never emits a result could never
+        // credit it. The loader must refuse it instead of shipping an unreachable step.
+        ("empty", json!({})),
+        ("all-unset", json!({"no_knockout": false})),
     ] {
         patch_license_require(&fixture, require);
         assert!(
             game.bind_npc_quest_catalogue(&fixture.quest_catalogue(), CHARACTER)
                 .is_err(),
             "{name} must be rejected by the production split loader"
+        );
+        assert_eq!(
+            serde_json::to_vec(&game.state()).expect("the game state serializes"),
+            before,
+            "{name}: a refused catalogue must change nothing"
         );
     }
     patch_license_require(

@@ -14,24 +14,28 @@
 //!   |---|---|---|
 //!   | settled soccer (`Gameplay::tick_world` -> `npc_minigame_win`) | game id | `soccer.json` `games[].id` |
 //!   | chess result (`Gameplay::apply_chess` -> `npc_minigame_win`) | row id | `chess.json` `rows[].row_id` |
-//!   | craft win (`gameplay/crafting.rs` -> `npc_minigame_win`) | recipe game id | `recipes.json` `records[].minigame_id` |
+//!   | craft win (`gameplay/crafting.rs`; facts only for a Blacksmith recipe) | recipe game id | `recipes.json` `records[].minigame_id` |
 //!   | mining win (`Gameplay::apply_type8` -> `npc_minigame_win`) | 18 | `mining::MINING_GAME_ID` |
 //!   | harvesting win (`Gameplay::apply_type8` -> `npc_minigame_win`) | 111 | `Gameplay`'s `HARVESTING_GAME_ID` |
 //!   | paid fishing catch (`Gameplay::handle_fishing`) | spot game id | `fishing_spots.json` `spots[].game_id` |
 //!   | kart claim (`Gameplay::handle_kart_entry`/tick) | 31 | `kart_entry.json` `race.speedway` |
 //!   | finished derby (`Gameplay::pay_derby_completion`) | package game id | `derby_entry.json` `game_id` |
 //!
-//!   Chess sends the row id as the 39/18 game id through its `RunSpec`. A craft
+//!   Chess sends the row id as the 39/18 game id through its `RunSpec`; it reports
+//!   an elapsed time and no score (the results page always carries zero). A craft
 //!   win sends the selected recipe's `minigame_id`; a recipe without one falls
 //!   back to the job content's game id (cooking 46, smelting 77, forging 139,
 //!   each a private `const GAME` the content must match), and the shipped
-//!   `recipes.json` rows carry all three ids. A finished derby credits the
-//!   package's MiniGameData row (`DerbyGateway::game_id`, 39 "Wildwood Demo
-//!   Derby"), never its type id 11, which is MiniGameData row 11 (the Trading
-//!   Card Game). Craft, mining, harvesting, chess and soccer read their elapsed
-//!   seconds and score from the server-built 39/18; kart reports its own elapsed
-//!   time and no placement (a single-player time trial); the derby reports score,
-//!   placement and knock-outs; a paid fishing catch reports no result fact.
+//!   `recipes.json` rows carry all three ids. Only a Blacksmith recipe's movie
+//!   measures its score and timer server-side (forging); the Chef and Miner
+//!   movies take both from the client, so their ids report no result fact and a
+//!   `require` on them is refused. A finished derby credits the package's
+//!   MiniGameData row (`DerbyGateway::game_id`, 39 "Wildwood Demo Derby"), never
+//!   its type id 11, which is MiniGameData row 11 (the Trading Card Game). Mining,
+//!   harvesting, forging, chess and soccer read their elapsed seconds and score
+//!   from the server-built 39/18; kart reports its own elapsed time and no
+//!   placement (a single-player time trial); the derby reports score, placement
+//!   and knock-outs; a paid fishing catch reports no result fact.
 //! * `items`: `Inventory::load`'s merged `inventory.json` +
 //!   `item-catalogue.json` definitions. An absent catalogue is an empty set, so
 //!   a graded item target fails loudly instead of passing vacuously.
@@ -188,9 +192,11 @@ impl Targets {
 
         let chess = root.join(chess_service::CONTENT_FILE);
         if chess.is_file() {
-            // `run_spec` sends `row_id` as the game id; the loader validates it.
+            // `run_spec` sends `row_id` as the game id; the loader validates it. Chess
+            // settles with a server-measured elapsed time and a zero score, so it can
+            // never meet a `min_score` bound.
             for row in chess_service::ChessContent::load(&chess)?.rows.iter() {
-                targets.producer(row.row_id, SCORE_AND_ELAPSED);
+                targets.producer(row.row_id, [MinigameFact::Elapsed]);
             }
         }
         // `KartGateway::load` owns the file; the kart claim credits the authored
@@ -270,13 +276,17 @@ impl Targets {
             CraftingJob::Blacksmith.opening_recipe_id(),
             CraftingJob::Miner.opening_recipe_id(),
         ]);
-        // A selected recipe's minigame id is the 39/18 game id a craft win sends.
-        for minigame in recipes
-            .records
-            .iter()
-            .filter_map(|recipe| recipe.minigame_id)
-        {
-            targets.producer(minigame, SCORE_AND_ELAPSED);
+        // A selected recipe's minigame id is the 39/18 game id a craft win sends. Only
+        // the blacksmith movie keeps the score and timer server-side; the chef and
+        // miner movies take both from the client, so their ids report no result fact.
+        for recipe in &recipes.records {
+            let Some(minigame) = recipe.minigame_id else {
+                continue;
+            };
+            match recipe.job {
+                CraftingJob::Blacksmith => targets.producer(minigame, SCORE_AND_ELAPSED),
+                CraftingJob::Chef | CraftingJob::Miner => targets.producer(minigame, []),
+            }
         }
 
         // `DerbyGateway::load` owns the file; a finished match credits its

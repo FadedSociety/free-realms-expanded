@@ -378,6 +378,26 @@ impl Gameplay {
         replies: &[Vec<u8>],
         out: &mut Outcome,
     ) -> io::Result<()> {
+        self.npc_minigame_win_with(replies, true, out)
+    }
+
+    /// The same settle when the 39/18 score and timer came from the client
+    /// (cooking, smelting): only the game id is quest authority, so the result
+    /// event is never emitted.
+    pub(super) fn npc_minigame_win_id_only(
+        &mut self,
+        replies: &[Vec<u8>],
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        self.npc_minigame_win_with(replies, false, out)
+    }
+
+    fn npc_minigame_win_with(
+        &mut self,
+        replies: &[Vec<u8>],
+        report_facts: bool,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
         // Prefer the 39/18 result record when the same outcome also carries the
         // movie's 39/14 win message: only the record has the run's facts.
         let packet = winning_game_over(replies).or_else(|| winning_movie_message(replies));
@@ -385,7 +405,7 @@ impl Gameplay {
             let Some(id) = game_over_game_id(packet) else {
                 return Ok(());
             };
-            if packet.starts_with(&[39, 0, 18]) {
+            if report_facts && packet.starts_with(&[39, 0, 18]) {
                 self.credit_minigame(id, game_over_result(packet), out)?;
             } else {
                 self.npc_quest_event(

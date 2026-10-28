@@ -5,6 +5,20 @@
 //! matches, so a settle can never count one objective twice.
 use super::*;
 
+impl crate::quest_engine::MinigameResult {
+    /// (R) T787: a single-player time trial finished with the server-measured race
+    /// time. A kart race has no score, placement or knock-out fact.
+    pub(crate) fn finished_at(elapsed_seconds: Option<u32>) -> Self {
+        Self {
+            won: true,
+            elapsed_seconds,
+            score: None,
+            placement: None,
+            knocked_out: false,
+        }
+    }
+}
+
 impl Gameplay {
     /// Credit one settle at most once per objective. `result` carries only facts the
     /// server observed; a producer that has none sends the id-only event alone.

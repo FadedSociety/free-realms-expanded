@@ -224,21 +224,19 @@ impl Gameplay {
         // driver's. A missing result (a phase race) claims no fact, so no bound the
         // producer can report is met by accident; `knocked_out` stays conservative.
         let facts = derby.completion_result(character.guid);
-        self.credit_minigame(
-            minigame_id,
-            crate::quest_engine::MinigameResult {
+        let result = facts.map_or_else(
+            || crate::quest_engine::MinigameResult {
                 won: true,
                 elapsed_seconds: None,
-                // An out-of-range score is reported as absent rather than failing the
-                // event: the match has already settled and paid.
-                score: facts
-                    .map(|facts| facts.score)
-                    .filter(|score| *score <= crate::content::MAX_MINIGAME_SCORE),
-                placement: facts.map(|facts| facts.placement),
-                knocked_out: facts.is_none_or(|facts| facts.knocked_out),
+                score: None,
+                placement: None,
+                // No result row means no observed knock-out run; claiming none would
+                // let a `no_knockout` bound credit by accident.
+                knocked_out: true,
             },
-            out,
-        )?;
+            crate::derby::DerbyParticipantResult::quest_result,
+        );
+        self.credit_minigame(minigame_id, result, out)?;
         // T229: the same handover pays the derby's Station Cash kind, whatever the coin grant does.
         self.pay_earned_station_cash(crate::station_cash::EarnSource::DerbyMatch, out)?;
         let Some(grant) = grant else {

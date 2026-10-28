@@ -701,9 +701,12 @@ fn ordinary_entry_finishes_pays_exactly_once_and_returns_in_the_prior_job() {
         Some(31),
         "the stable speedway id is the quest completion identity"
     );
-    assert!(
-        paid.elapsed_seconds.is_some(),
-        "T787: a paid finish reports its own elapsed seconds"
+    assert_eq!(
+        paid.elapsed_seconds,
+        Some(9),
+        "T787/F854: the paid finish reports the whole two-lap race from the scheduled \
+         countdown-zero start (eight one-second gates plus the 1.45 s by which the test's \
+         green tick follows that start), never the last lap (0) or the best lap (4)"
     );
     assert_eq!((coins(&inventory), xp(&profiles)), (40, 60));
 

@@ -1986,13 +1986,7 @@ impl Gameplay {
             if let Some(minigame_id) = claim.minigame_id {
                 staged.credit_minigame(
                     minigame_id,
-                    crate::quest_engine::MinigameResult {
-                        won: true,
-                        elapsed_seconds: claim.elapsed_seconds,
-                        score: None,
-                        placement: None,
-                        knocked_out: false,
-                    },
+                    crate::quest_engine::MinigameResult::finished_at(claim.elapsed_seconds),
                     &mut out,
                 )?;
                 staged.npc_quest_profiles_changed(&mut out)?;
@@ -2574,13 +2568,7 @@ impl Gameplay {
             if let Some((minigame_id, elapsed_seconds)) = minigame {
                 self.credit_minigame(
                     minigame_id,
-                    crate::quest_engine::MinigameResult {
-                        won: true,
-                        elapsed_seconds,
-                        score: None,
-                        placement: None,
-                        knocked_out: false,
-                    },
+                    crate::quest_engine::MinigameResult::finished_at(elapsed_seconds),
                     &mut out,
                 )?;
                 self.npc_quest_profiles_changed(&mut out)?;

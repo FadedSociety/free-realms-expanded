@@ -785,6 +785,22 @@ pub struct DerbyParticipantResult {
     pub knocked_out: bool,
 }
 
+impl DerbyParticipantResult {
+    /// (R) T787: the quest result this participant's finished match reports. A derby
+    /// has no finish-time fact; the score is omitted when it is outside the minigame
+    /// sanity bound (a settled match must not fail its quest event), and only this
+    /// participant's own knock-out counts.
+    pub fn quest_result(self) -> crate::quest_engine::MinigameResult {
+        crate::quest_engine::MinigameResult {
+            won: true,
+            elapsed_seconds: None,
+            score: Some(self.score).filter(|score| *score <= crate::content::MAX_MINIGAME_SCORE),
+            placement: Some(self.placement),
+            knocked_out: self.knocked_out,
+        }
+    }
+}
+
 #[derive(Clone)]
 struct Driver {
     state: DerbyDriverState,
@@ -962,6 +978,11 @@ impl DerbyService {
     /// (R) T787: one connected participant's completed result, only at the Results
     /// phase. Placement follows the Results ordering by score (higher is better);
     /// tied scores share the better rank, so two leaders are both first.
+    ///
+    /// F854: the shipped demo package runs one human against inert NPC drivers, so
+    /// that match's placement is always 1 and its knock-out always false. These
+    /// facts only discriminate once a rival-bearing match is wired; no shipped quest
+    /// bounds them yet.
     pub fn participant_result(&self, key: ParticipantKey) -> Option<DerbyParticipantResult> {
         if self.phase != DerbyPhase::Results {
             return None;

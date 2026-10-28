@@ -478,7 +478,15 @@ impl Gameplay {
                 },
                 out,
             )?;
-            self.npc_minigame_win(&result.replies, out)?;
+            // T787/F854: only the blacksmith movie measures its score and timer
+            // server-side. The cooking and smelting movies take both from the client's
+            // own messages, so their runs credit the game id alone; a result fact must
+            // never certify a client number.
+            if job == CraftingJob::Blacksmith {
+                self.npc_minigame_win(&result.replies, out)?;
+            } else {
+                self.npc_minigame_win_id_only(&result.replies, out)?;
+            }
         } else {
             // T787: forging defers its winning 39/18 record to the client's
             // `FRServer_GameOver`; the win outcome already credited the id-only event,

@@ -1,8 +1,11 @@
-use osfr_tools::derby::{
-    DEMO_DERBY_TYPE_ID, DerbyAction, DerbyConfig, DerbyMessage, DerbyPhase, DerbyPickup,
-    DerbyPickupBody, DerbyRules, DerbyService, DerbyVehicleTemplate, ParticipantKey, PickupKind,
-    SUBTYPE_SPECS, VehicleCreate, VehicleHitReport, VehiclePose, VehicleState, decode_inner,
-    encode_inner,
+use osfr_tools::{
+    content::MinigameRequirement,
+    derby::{
+        DEMO_DERBY_TYPE_ID, DerbyAction, DerbyConfig, DerbyMessage, DerbyPhase, DerbyPickup,
+        DerbyPickupBody, DerbyRules, DerbyService, DerbyVehicleTemplate, ParticipantKey,
+        PickupKind, SUBTYPE_SPECS, VehicleCreate, VehicleHitReport, VehiclePose, VehicleState,
+        decode_inner, encode_inner,
+    },
 };
 
 const OWNER: ParticipantKey = ParticipantKey(0x1000_0000_0000_0001);
@@ -418,6 +421,41 @@ fn each_participant_gets_their_own_placement() {
     assert!(
         other.knocked_out,
         "the victim's own knock-out is not the reporter's"
+    );
+
+    // F854: the quest result is derived from this participant's own row, so the
+    // wiring cannot hard-code a clean run. A knocked-out run refuses `no_knockout`
+    // and a placement bound it did not reach; the winner meets both.
+    let owner_result = owner.quest_result();
+    assert_eq!(
+        (owner_result.score, owner_result.placement),
+        (Some(2), Some(1))
+    );
+    assert!(!owner_result.knocked_out);
+    assert!(owner_result.meets(&MinigameRequirement {
+        max_placement: Some(1),
+        no_knockout: true,
+        ..MinigameRequirement::default()
+    }));
+    let other_result = other.quest_result();
+    assert!(
+        other_result.knocked_out,
+        "the victim's knock-out must reach the quest result"
+    );
+    assert!(!other_result.meets(&MinigameRequirement {
+        no_knockout: true,
+        ..MinigameRequirement::default()
+    }));
+    assert!(!other_result.meets(&MinigameRequirement {
+        max_placement: Some(1),
+        ..MinigameRequirement::default()
+    }));
+    assert!(
+        other_result.meets(&MinigameRequirement {
+            max_placement: Some(2),
+            ..MinigameRequirement::default()
+        }),
+        "the second place is inside its own bound"
     );
 
     // Equal scores share the better rank instead of being ordered by damage.

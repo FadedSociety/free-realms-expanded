@@ -858,6 +858,56 @@ fn ordinary_harvest_nodes_advance_gather_twice_through_gameplay() {
     );
 }
 
+/// T787/F854: the cooking movie reports its score and timer itself, so a `min_score`
+/// objective on game 46 must not credit from the client's `FRServer_GameWon` value. The
+/// id-only objective on the same settle still credits: only the result facts are withheld.
+#[test]
+fn cooking_client_score_never_credits_a_result_bound() {
+    let mut game = game();
+    let recipe_id: u32 = 70;
+    install_many(
+        &mut game,
+        definition_many(
+            1,
+            vec![
+                (1, ObjectiveKind::FinishMinigame { minigame_id: 46 }, 1),
+                (
+                    2,
+                    ObjectiveKind::MinigameResult {
+                        minigame_id: 46,
+                        require: crate::content::MinigameRequirement {
+                            min_score: Some(1),
+                            ..Default::default()
+                        },
+                    },
+                    1,
+                ),
+            ],
+            false,
+        ),
+    );
+    select(&mut game, 45);
+    let character = station(&game, 2001);
+    for definition in [2862, 2875, 2884, 2900] {
+        game.inventory.grant(0, definition, 8).unwrap();
+    }
+    let mut start = vec![26, 0, 24, 0];
+    start.extend(recipe_id.to_le_bytes());
+    send(&mut game, &character, &start, 1_000);
+    assert!(game.cooking.as_ref().unwrap().active());
+    play_cooking(&mut game, &character, 2_000);
+    assert_eq!(
+        game.npc_quests
+            .as_ref()
+            .unwrap()
+            .progress(1)
+            .unwrap()
+            .counts,
+        vec![1, 0],
+        "the client's cooking score is not a quest result fact"
+    );
+}
+
 #[test]
 fn recipe_book_cooking_completes_twice_through_gameplay() {
     let mut game = game();
