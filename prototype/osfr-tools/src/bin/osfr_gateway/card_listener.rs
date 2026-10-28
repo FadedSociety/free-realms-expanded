@@ -268,6 +268,8 @@ impl Connection {
                     }
                     match redeemed {
                         // T808: the refused 81 is written; the client shows it, nothing follows.
+                        // (R) Closing after a refusal is server policy (one ticket guess per
+                        // connection), not a recovered client fact.
                         Some(Err(_)) => return Some("login_refused"),
                         Some(Ok(character)) if self.character.is_none() => {
                             self.character = Some(character);

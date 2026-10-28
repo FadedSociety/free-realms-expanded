@@ -319,7 +319,8 @@ pub fn login_results(success: bool, code: i32, account_id: i32, session_id: &str
 /// T808: the account id an accepted login's 81 carries for `character`. Never 0: the success
 /// handler (`10179530` -> `10068ac0`) stores no player for 0 and `10007ed0` then writes through a
 /// null player. Deterministic per character and positive; the account store's sequential guids
-/// (from 1) map to themselves up to `i32::MAX`.
+/// (from 1) map to themselves up to `i32::MAX`. (R) The formula is server policy, not a recovered
+/// client fact: the client needs only a non-zero player id, so another positive mapping would do.
 pub fn account_id(character: u64) -> i32 {
     (character.wrapping_sub(1) % i32::MAX as u64 + 1) as i32
 }
@@ -327,7 +328,9 @@ pub fn account_id(character: u64) -> i32 {
 /// 112 `NetworkCommand_Ping`: the client sends one at login and every 10 s after (`1037c490`), and
 /// a server copy resets its "no response" counter (execute `1018fe80` -> `10068dd0`), so the
 /// service echoes it. One header, since the class has no family level (writer `10190020` calls
-/// the header writer `1019de90` once; reader `1018ffe0`), then the spoof value.
+/// the header writer `1019de90` once; reader `1018ffe0`), then the spoof value. The check is the
+/// class id and the exact frame length: the version is read and discarded (the client fixes it at
+/// 1, `1018fe40`), and the echo writes 1, so a future version would be echoed, not refused.
 fn ping_echo(body: &[u8]) -> io::Result<Vec<u8>> {
     let mut reader = Reader::new(body);
     if reader.int()? != PING {
