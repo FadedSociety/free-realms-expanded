@@ -218,6 +218,33 @@ fn a_launch_block_names_the_lobby_within_bounds() {
     }
 }
 
+/// F824 (T813 review finding 7): only the client's root group 1 is a supported lobby. The
+/// client's event-3 handler sends its own Join for group 1 (`10371960`), so any other content
+/// group would be defined on the server but never entered.
+#[test]
+fn a_lobby_group_is_the_clients_root_group_only() {
+    let lobby = |group: i32| {
+        let mut content = launch_json(120_000);
+        content["launch"]["lobby"] = json!({"group_id": group, "lobby_type": 1, "role": 1});
+        load(&content, &format!("root-group-{group}"))
+    };
+    assert_eq!(
+        lobby(1)
+            .unwrap()
+            .launch()
+            .unwrap()
+            .lobby
+            .as_ref()
+            .unwrap()
+            .group_id,
+        1
+    );
+    for group in [0, 2, 291] {
+        let error = lobby(group).unwrap_err().to_string();
+        assert!(error.contains("group 1"), "group {group}: {error}");
+    }
+}
+
 /// T825: the starter collection lives in the lobby block (R ids), with sanity bounds.
 #[test]
 fn a_lobby_names_its_starter_collection_within_bounds() {

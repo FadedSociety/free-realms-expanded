@@ -129,7 +129,9 @@ pub struct Launch {
 #[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct Lobby {
-    /// The group id (`Lobby` GroupID), the key every lobby lookup uses (`101717d0`).
+    /// The group id (`Lobby` GroupID), the key every lobby lookup uses (`101717d0`). Only the
+    /// client's root group 1 is supported: the client's root Join is fixed at 1 (`10371960`), so
+    /// any other group would be defined but never entered (`validate`).
     pub group_id: i32,
     /// `eLobbyTypeID` (R).
     pub lobby_type: i32,
@@ -344,19 +346,20 @@ impl Content {
         {
             return Err(invalid("card launch asset list is 1 to 64 ASCII bytes"));
         }
-        // (R) sanity bounds: a positive group, a known role, a small type.
+        // (R) bounds: only the client's root group 1 until a second group is decoded (`10371960`
+        // joins group 1 itself), a known role, a small type.
         if self
             .launch
             .as_ref()
             .and_then(|l| l.lobby.as_ref())
             .is_some_and(|lobby| {
-                lobby.group_id < 1
+                lobby.group_id != 1
                     || !(1..=5).contains(&lobby.role)
                     || !(0..=255).contains(&lobby.lobby_type)
             })
         {
             return Err(invalid(
-                "card lobby needs a positive group, a role 1 to 5 and a type 0 to 255",
+                "card lobby needs the root group 1, a role 1 to 5 and a type 0 to 255",
             ));
         }
         // (R) bounds: distinct positive archetypes (at most 100, so one SendInstances stays

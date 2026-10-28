@@ -94,9 +94,13 @@ enum AnsweredKind {
     JoinRequest,
 }
 
-/// The listener the card content asks for, on the gateway's own address (loopback, or the
-/// private address `--allow-lan` admits). A port that cannot be bound is logged, not fatal.
-pub(super) fn open(options: &Options) -> io::Result<Option<CardListener>> {
+/// The card service settings the content asks for: the launch block's port and lobby, read from
+/// the same content directory the game server binds (`npc_content`). `None` when no content
+/// directory is named, the file has no launch block, or its port is 0 (the off switch). A launch
+/// block without a lobby still opens the service, with no lobby push after login.
+fn launch_settings(
+    options: &Options,
+) -> io::Result<Option<(u16, Option<osfr_tools::card_game::Lobby>)>> {
     let Some(dir) = options.content.as_deref() else {
         return Ok(None);
     };
@@ -106,7 +110,13 @@ pub(super) fn open(options: &Options) -> io::Result<Option<CardListener>> {
             .launch()
             .map(|launch| (launch.port, launch.lobby.clone()))
     });
-    let Some((port @ 1.., lobby)) = launch else {
+    Ok(launch.filter(|(port, _)| *port != 0))
+}
+
+/// The listener the card content asks for, on the gateway's own address (loopback, or the
+/// private address `--allow-lan` admits). A port that cannot be bound is logged, not fatal.
+pub(super) fn open(options: &Options) -> io::Result<Option<CardListener>> {
+    let Some((port, lobby)) = launch_settings(options)? else {
         return Ok(None);
     };
     Ok(match CardListener::bind(options.bind.ip(), port) {
@@ -246,8 +256,10 @@ impl Connection {
                 redeemed.ok()
             });
             match reply {
-                // ponytail: replies are a few dozen bytes, so a full send buffer means a dead
-                // peer; a write queue comes with the lobby's larger messages.
+                // F824 (T813 review): frames stay small (the largest is the 92 carrying the
+                // player's own 411 name, itself bounded by the 64 KiB frame limit), so a
+                // nonblocking write_all is used directly. A peer that cannot take a frame is
+                // closed as `write_failed` and must reconnect.
                 Ok(Some(frame)) => {
                     let redeemed = login.as_ref().map(|(redeemed, ..)| *redeemed);
                     self.log_answer(&body, login, host, port, events);
@@ -491,7 +503,8 @@ mod card_packets;
 pub(super) mod tests {
     use super::super::tests::test_support;
     use super::card_packets::{
-        ROUTING, frame, gateway_request, int, ping, read_results, session_login, text, ticket_in,
+        ROUTING, frame, gateway_request, headers, int, ping, read_results, session_login, text,
+        ticket_in,
     };
     use super::*;
     use std::time::Duration;
@@ -680,22 +693,53 @@ pub(super) mod tests {
         );
     }
 
-    /// T813: login -> lobby over the real socket: after the 81 come 94, 92 and 291, exactly the
-    /// bodies `lobby_entry` builds for this account, group and the 411's name, then one
-    /// `card_lobby` event with ids only. A refused login gets no lobby.
+    /// A listener opened through the production `open` path from a content directory whose
+    /// `card_game.json` is the shipped rows plus `launch`. `open` binds the content's port, so a
+    /// free port is probed first; another test taking it between probe and bind is retried.
+    fn open_with_launch(launch: Value) -> CardListener {
+        let scratch = test_support::Scratch::new("f824-card-lobby");
+        let content = scratch.path().join("content");
+        fs::create_dir_all(content.join("npcs")).unwrap();
+        fs::write(content.join("npc_spawns_extra.json"), b"{}").unwrap();
+        let shipped = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/card_game.json");
+        let cards: Value = serde_json::from_slice(&fs::read(shipped).unwrap()).unwrap();
+        let mut options = test_support::options(scratch.state());
+        options.content = Some(content.clone());
+        for _ in 0..8 {
+            let probe = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+            let port = probe.local_addr().unwrap().port();
+            drop(probe);
+            let mut cards = cards.clone();
+            let mut launch = launch.clone();
+            launch["port"] = json!(port);
+            cards["launch"] = launch;
+            fs::write(
+                content.join("card_game.json"),
+                serde_json::to_vec(&cards).unwrap(),
+            )
+            .unwrap();
+            if let Some(card) = open(&options).unwrap() {
+                return card;
+            }
+        }
+        panic!("no free port for the card service");
+    }
+
+    /// T813: login -> lobby over the real socket: after the 81 come 94, 92 and 291. F824 (T813
+    /// review findings 6 and 9): the listener comes from the production `open` path and the
+    /// content names the lobby's type and role, while the expected bytes are spelled out again
+    /// here in the readers' order, so this socket path is not checked against `lobby_entry`
+    /// itself. Then one `card_lobby` event with ids only. A refused login gets no lobby.
     #[test]
     fn a_card_login_enters_the_lobby_in_order() {
         if !test_support::bin_test_target("card") {
             return;
         }
-        let mut card = listener();
-        let lobby = osfr_tools::card_game::Lobby {
-            group_id: 1,
-            lobby_type: 1,
-            role: 1,
-            collection: Vec::new(),
-        };
-        card.lobby = Some(lobby.clone());
+        let mut card = open_with_launch(json!({
+            "ticket_ttl_ms": 60_000,
+            "lobby": {"group_id": 1, "lobby_type": 5, "role": 2},
+            "source": [{"kind":"reconstructed","evidence":"F824 test"}]
+        }));
         let mut refused = client(&card);
         log_in(&mut card, &mut refused, "", "77", refuse("", ""));
         let guid = 5041u64;
@@ -704,9 +748,42 @@ pub(super) mod tests {
         assert!(ok);
         let account = card_service::account_id(guid);
         let pushed: Vec<_> = (0..3).map(|_| answer(&mut card, &mut player, 3)).collect();
+        // 94 v1 (`101583f0`): headers, account, one `Lobby` (`10155710`): class 103 v3, five
+        // absent property sets, five empty role lists, containing group 0, group 1, type 5, no
+        // deck, tournament round 0, sub-state 0.
+        let lobby_object = [
+            &[0x01][..],
+            &[0x27, 0x06, 0x03],
+            &[0x01; 5],
+            &[0x00; 5],
+            &[0x00, 0x01, 0x05, 0x01, 0x00, 0x00],
+        ]
+        .concat();
+        let expected = [
+            [
+                &headers(&[0x2E, 0x05], 1)[..],
+                &int(account)[..],
+                &lobby_object,
+            ]
+            .concat(),
+            // 92 v4 (`10163b20`): headers, account, group 1, role 2, empty string, empty int
+            // list, the 411's name, a present empty `PropertySet` (23 v1), the trailing int.
+            [
+                &headers(&[0x2C, 0x05], 4)[..],
+                &int(account)[..],
+                &[0x01, 0x02],
+                &text(""),
+                &[0x00],
+                &text("Tester"),
+                &[0x00, 0x27, 0x01, 0x01, 0x00],
+                &[0x00],
+            ]
+            .concat(),
+            // 291 v1 (`1015e5f0`): headers, account, group 1.
+            [&headers(&[0x23, 0x12], 1)[..], &int(account)[..], &[0x01]].concat(),
+        ];
         assert_eq!(
-            pushed,
-            card_service::lobby_entry(account, &lobby, "Tester"),
+            pushed, expected,
             "AddGroups, Join, ChangeLobbyDisplay, in that order"
         );
         let classes: Vec<_> = pushed
@@ -958,6 +1035,74 @@ pub(super) mod tests {
             }
         }
         panic!("the oversized frame left the connection open");
+    }
+
+    /// F824 (T813 review finding 6): `open` reads the launch block through `npc_content` and
+    /// keeps its lobby. Port 0 keeps the service off; a launch without a lobby still opens it.
+    #[test]
+    fn the_card_listener_reads_the_launch_lobby_from_content() {
+        if !test_support::bin_test_target("card") {
+            return;
+        }
+        let scratch = test_support::Scratch::new("f824-card-open");
+        let content = scratch.path().join("content");
+        fs::create_dir_all(content.join("npcs")).unwrap();
+        fs::write(content.join("npc_spawns_extra.json"), b"{}").unwrap();
+        let shipped = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/card_game.json");
+        let mut cards: Value = serde_json::from_slice(&fs::read(shipped).unwrap()).unwrap();
+        let write = |cards: &Value| {
+            fs::write(
+                content.join("card_game.json"),
+                serde_json::to_vec(cards).unwrap(),
+            )
+            .unwrap();
+        };
+        cards["launch"] = json!({
+            "ticket_ttl_ms": 60_000,
+            "port": 17_782,
+            "lobby": {"group_id": 1, "lobby_type": 5, "role": 2},
+            "source": [{"kind":"reconstructed","evidence":"F824 test"}]
+        });
+        write(&cards);
+        let mut options = test_support::options(scratch.state());
+        options.content = Some(content.clone());
+        let (port, lobby) = launch_settings(&options)
+            .unwrap()
+            .expect("a launch block asks for the card service");
+        assert_eq!(port, 17_782);
+        assert_eq!(
+            lobby,
+            Some(osfr_tools::card_game::Lobby {
+                group_id: 1,
+                lobby_type: 5,
+                role: 2,
+                collection: Vec::new()
+            }),
+            "the listener gets the content's lobby, not a default"
+        );
+
+        // Port 0 is the off switch; the lobby stays in the file.
+        cards["launch"]["port"] = json!(0);
+        write(&cards);
+        assert_eq!(launch_settings(&options).unwrap(), None);
+
+        // A launch block without a lobby still opens the service; the login stops after its 81.
+        cards["launch"] = json!({
+            "ticket_ttl_ms": 60_000,
+            "port": 17_783,
+            "source": [{"kind":"reconstructed","evidence":"F824 test"}]
+        });
+        write(&cards);
+        assert_eq!(
+            launch_settings(&options).unwrap().map(|(port, _)| port),
+            Some(17_783)
+        );
+        assert_eq!(
+            launch_settings(&options)
+                .unwrap()
+                .and_then(|(_, lobby)| lobby),
+            None
+        );
     }
 
     /// No launch block, no card service: a login, whatever it names, is `unknown_ticket`.

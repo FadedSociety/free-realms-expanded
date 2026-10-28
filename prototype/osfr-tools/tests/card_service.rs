@@ -272,12 +272,8 @@ fn every_character_gets_a_non_zero_account_id() {
     }
 }
 
-/// T808: the client's ping (writer `10190020`: one header, then the spoof value) is echoed once
-/// logged in, byte for byte as the client's reader `1018ffe0` reads it; before login it is left
-/// to the caller.
-/// T813: the lobby bodies, spelled out field by field in the client readers' order (account 7,
-/// group 12, type 5, role 2, name "Tester"). Compact ids: 94 = `2E 05`, 92 = `2C 05`, 291 =
-/// `23 12`, Lobby 103 = `27 06`, PropertySet 23 = `27 01`.
+/// T813: the lobby bodies, spelled out in the client readers' order: 94 AddGroups (`101583f0`),
+/// 92 Join (`10163b20`), 291 ChangeLobbyDisplay (`1015e5f0`).
 #[test]
 fn the_lobby_bodies_match_the_client_readers() {
     let lobby = osfr_tools::card_game::Lobby {
@@ -433,6 +429,9 @@ fn the_client_status_and_join_request_decode() {
     assert_eq!(card_service::join_request(&join).unwrap(), (1, 3));
 }
 
+/// T808: the client's ping (writer `10190020`: one header, then the spoof value) is echoed once
+/// logged in, byte for byte as the client's reader `1018ffe0` reads it; before login it is left
+/// to the caller.
 #[test]
 fn a_ping_is_echoed_only_after_login() {
     // Compact 112 = `20 07`, version `01`, spoof 1234 = `22 4D`.
