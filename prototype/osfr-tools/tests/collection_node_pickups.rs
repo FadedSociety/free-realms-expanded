@@ -38,7 +38,7 @@ use osfr_tools::{
     startup_world::parse_add_npc,
     world::NpcVisibility,
 };
-use pickup_fixture::{PickupFixture, added, at, bundled, removed, snapshot};
+use pickup_fixture::{PickupFixture, added, at, bundled, removed, said, shipped_nodes, snapshot};
 use serde_json::{Value, json};
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -63,12 +63,6 @@ const FILLER: i32 = 1195;
 const ROLL_SEED: u64 = 7;
 const WATER_ITEM: i32 = 23_179;
 static NEXT: AtomicU64 = AtomicU64::new(0);
-
-fn shipped_nodes() -> GatheringNodes {
-    GatheringNodes::load(&bundled())
-        .expect("the shipped node tables load")
-        .expect("the shipped node tables are present")
-}
 
 /// The first draw of `seed` on `spawn_id`'s pool, computed on a probe loader (no request).
 fn seeded_item(seed: u64, spawn_id: u32) -> i32 {
@@ -144,18 +138,6 @@ fn raw_click(game: &mut Gameplay, target: u64, who: &CharacterState, now_ms: u64
 fn view(game: &mut Gameplay, who: &CharacterState) {
     game.update_npc_visibility(who)
         .expect("the NPC view update is served");
-}
-
-fn said(outcome: &Outcome, needle: &str) -> bool {
-    outcome.replies.iter().any(|packet| {
-        if !packet.starts_with(&[15, 0, 3, 0]) || packet.len() < 9 {
-            return false;
-        }
-        let length = u32::from_le_bytes(packet[4..8].try_into().unwrap()) as usize;
-        packet
-            .get(8..8 + length)
-            .is_some_and(|text| String::from_utf8_lossy(text).contains(needle))
-    })
 }
 
 /// Definition counts that a pickup could change; rentals are not stack rows.
@@ -310,9 +292,9 @@ fn a_jobless_player_gets_the_pinned_item_and_its_entry_through_the_real_click() 
         .filter(|packet| packet.starts_with(&[38, 0, 10, 0]));
     assert_eq!(add_entry_out.next(), Some(&add_entry(entry)));
     assert!(add_entry_out.next().is_none(), "two 38/10 packets");
-    assert!(!said(&out, "You need to be a"), "a job gate ran");
+    assert!(!said(&out.replies, "You need to be a"), "a job gate ran");
     assert!(
-        !said(&out, "You don't need that"),
+        !said(&out.replies, "You don't need that"),
         "the pickup fell through"
     );
     // The node hides for this player in the same click.
@@ -558,7 +540,10 @@ fn refusals_change_nothing() {
     let before = snapshot(&game);
     game.seed_collection_rolls(ROLL_SEED);
     let out = raw_click(&mut game, node.guid, &who, 1_000);
-    assert!(said(&out, "Your bag is full. Make room before gathering."));
+    assert!(said(
+        &out.replies,
+        "Your bag is full. Make room before gathering."
+    ));
     assert!(!out.changed);
     assert_eq!(snapshot(&game), before);
     assert!(
@@ -583,7 +568,7 @@ fn refusals_change_nothing() {
         let before = snapshot(&game);
         game.seed_collection_rolls(ROLL_SEED);
         let out = raw_click(&mut game, node.guid, &who, 1_000);
-        assert!(said(&out, "Move closer to use that."));
+        assert!(said(&out.replies, "Move closer to use that."));
         assert!(!out.changed);
         assert_eq!(snapshot(&game), before);
         assert!(!removed(&out.replies, node.guid));
@@ -608,7 +593,7 @@ fn refusals_change_nothing() {
     let before = snapshot(&game);
     game.seed_collection_rolls(ROLL_SEED);
     let out = raw_click(&mut game, node.guid, &who, 1_100);
-    assert!(said(&out, "Finish what you are doing first."));
+    assert!(said(&out.replies, "Finish what you are doing first."));
     assert!(!out.changed);
     assert_eq!(snapshot(&game), before);
 
@@ -619,7 +604,7 @@ fn refusals_change_nothing() {
     assert!(click(&mut game, node.guid, &who, 1_000).changed);
     let before = snapshot(&game);
     let out = raw_click(&mut game, node.guid, &who, 2_000);
-    assert!(said(&out, "That has already been gathered."));
+    assert!(said(&out.replies, "That has already been gathered."));
     assert!(!out.changed);
     assert_eq!(snapshot(&game), before);
 }
@@ -650,7 +635,7 @@ fn a_missing_collection_catalogue_refuses_before_any_grant() {
     view(&mut game, &who);
     let before = snapshot(&game);
     let out = raw_click(&mut game, node.guid, &who, 1_000);
-    assert!(said(&out, "You cannot gather that right now."));
+    assert!(said(&out.replies, "You cannot gather that right now."));
     assert!(!out.changed);
     assert_eq!(snapshot(&game), before);
     assert!(!removed(&out.replies, node.guid), "the node was hidden");
@@ -683,7 +668,7 @@ fn a_drop_without_a_catalogue_entry_refuses_before_any_grant() {
         catalogue().entry_for_item(9_999_999).is_none(),
         "the fixture item must not have an entry"
     );
-    assert!(said(&out, "You cannot gather that right now."));
+    assert!(said(&out.replies, "You cannot gather that right now."));
     assert!(!out.changed);
     assert_eq!(snapshot(&game), before);
     assert!(!removed(&out.replies, node.guid), "the node was hidden");
@@ -700,7 +685,7 @@ fn an_undefined_drop_refuses_before_any_grant() {
     view(&mut game, &who);
     let before = snapshot(&game);
     let out = raw_click(&mut game, node.guid, &who, 1_000);
-    assert!(said(&out, "You cannot gather that right now."));
+    assert!(said(&out.replies, "You cannot gather that right now."));
     assert!(!out.changed);
     assert_eq!(snapshot(&game), before);
     assert!(!removed(&out.replies, node.guid), "the node was hidden");
@@ -859,6 +844,39 @@ fn hiding_a_non_collect_node_keeps_the_water_companion_visible() {
     assert!(
         visibility.visible().contains(&companion),
         "the water companion is no longer tracked"
+    );
+}
+
+/// The shared actor readers match the client field layouts (35/2 `0x00921a10`: guid at
+/// `4..12`; 35/3 `0x008d69f0`: `u16` at `4..6`, guid at `6..14`). A loose any-window match
+/// would also accept a guid in another field, which a future 35/3 variant could carry.
+#[test]
+fn the_shared_actor_readers_read_the_client_guid_fields() {
+    let guid = 0x1122_3344_5566_7788_u64;
+
+    let mut add = vec![35, 0, 2, 0];
+    add.extend(guid.to_le_bytes());
+    assert!(added(&[add], guid), "the 35/2 guid at 4..12 was not read");
+    let mut shifted_add = vec![35, 0, 2, 0, 0, 0];
+    shifted_add.extend(guid.to_le_bytes());
+    assert!(
+        !added(&[shifted_add], guid),
+        "the 35/2 reader matched the guid outside 4..12"
+    );
+
+    let mut removal = vec![35, 0, 3, 0];
+    removal.extend(1_u16.to_le_bytes());
+    removal.extend(guid.to_le_bytes());
+    assert!(
+        removed(&[removal], guid),
+        "the 35/3 guid at 6..14 was not read"
+    );
+    let mut shifted_removal = vec![35, 0, 3, 0];
+    shifted_removal.extend(guid.to_le_bytes());
+    shifted_removal.extend([0; 17]);
+    assert!(
+        !removed(&[shifted_removal], guid),
+        "the 35/3 reader matched the guid outside 6..14"
     );
 }
 

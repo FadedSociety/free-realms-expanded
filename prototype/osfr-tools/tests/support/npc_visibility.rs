@@ -5,18 +5,16 @@
 //! heavy fixture. Test-only.
 #![allow(dead_code)]
 
+#[path = "node_content.rs"]
+pub mod node_content;
+
+pub use node_content::content_dir;
+
 use osfr_tools::{
     startup_world::{NpcSpawn, parse_add_npc},
     world::NpcVisibility,
 };
-use std::{
-    collections::BTreeSet,
-    path::{Path, PathBuf},
-};
-
-pub fn content_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
-}
+use std::collections::BTreeSet;
 
 /// A fresh open-world view from `position`: every actor `visibility` sends, as parsed 35/2
 /// AddNpc bodies (client reader `0x00921a10`).

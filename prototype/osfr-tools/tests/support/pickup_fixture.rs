@@ -11,6 +11,17 @@
 #[path = "../common/content_copy.rs"]
 mod content_copy;
 
+#[path = "node_content.rs"]
+mod node_content;
+
+#[path = "pickup_packets.rs"]
+mod pickup_packets;
+
+#[allow(unused_imports)]
+pub use node_content::shipped_nodes;
+#[allow(unused_imports)]
+pub use pickup_packets::{added, removed, said};
+
 use osfr_tools::{
     character_store::CharacterState,
     gameplay::{Gameplay, GameplayState},
@@ -25,7 +36,7 @@ use std::{
 static NEXT: AtomicU64 = AtomicU64::new(0);
 
 pub fn bundled() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
+    node_content::content_dir()
 }
 
 fn opening() -> PathBuf {
@@ -113,18 +124,4 @@ impl Drop for PickupFixture {
 /// What a refusal must leave alone: the save and the visibility revision.
 pub fn snapshot(game: &Gameplay) -> (GameplayState, u64) {
     (game.state(), game.npc_visibility_revision())
-}
-
-/// 35/2 AddNpc: the actor guid follows the four-byte header (reader `0x00921a10`).
-pub fn added(packets: &[Vec<u8>], guid: u64) -> bool {
-    packets.iter().any(|packet| {
-        packet.starts_with(&[35, 0, 2, 0]) && packet.get(4..12) == Some(&guid.to_le_bytes()[..])
-    })
-}
-
-/// 35/3 removal: a u16 flag at 4..6, then the actor guid at 6..14 (reader `0x008d69f0`).
-pub fn removed(packets: &[Vec<u8>], guid: u64) -> bool {
-    packets.iter().any(|packet| {
-        packet.starts_with(&[35, 0, 3, 0]) && packet.get(6..14) == Some(&guid.to_le_bytes()[..])
-    })
 }

@@ -355,8 +355,8 @@ fn two_players_are_independent() {
 /// The four T539 node types and their pools are pinned against the client's prop table:
 /// `Resources/Models.txt` maps 197 to `sh_shovel_01.adr`, 196 to `sh_pick_01.adr`, 84 to
 /// `sh_crate_01.adr` and 584 to `sg_papers_01.adr`, matching locale 70221/70227
-/// ("shovels"/"picks"). A transposed fork row would spawn the wrong prop and pass every
-/// other test.
+/// ("shovels"/"picks"); 84 is a crate, so `box-o-rocks` displays as Crate (F868). A
+/// transposed fork row would spawn the wrong prop and pass every other test.
 #[test]
 fn node_types_and_pools_pin_the_client_props() {
     let content = HarvestNodesContent::load_from(content_dir().join("quest_nodes.json"))
@@ -371,7 +371,7 @@ fn node_types_and_pools_pin_the_client_props() {
     for (key, name, model_id) in [
         ("smashing-hammers", "Shovel", 197),
         ("smashing-chisels", "Pick", 196),
-        ("box-o-rocks", "Rock", 84),
+        ("box-o-rocks", "Crate", 84),
         ("hastis-homework", "Hasti's Homework", 584),
     ] {
         let node_type = find(key);

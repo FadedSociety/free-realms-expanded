@@ -19,7 +19,7 @@
 mod npc_quest_chain;
 
 use npc_quest_chain::{
-    CHARACTER, Fixture, accept, character_at_for, click_from, coins, collect, content_dir,
+    CHARACTER, Fixture, accept, added, character_at_for, click_from, coins, collect, content_dir,
     content_position, counts, end_screen_reward, finish_quest, objective_update, offer,
     pending_turnin, pick, pickups, profile_xp, quest_status, release_end_screen, removed, said,
     saved, seed_active_profile, shipped_nodes, talk, zone_player,
@@ -69,13 +69,6 @@ fn node_named(name: &str) -> NodeActor {
         .find(|actor| actor.name == name)
         .unwrap_or_else(|| panic!("a {name} node is shipped"))
         .clone()
-}
-
-fn added(outcome: &Outcome, guid: u64) -> bool {
-    outcome.replies.iter().any(|packet| {
-        packet.starts_with(&[35, 0, 2, 0])
-            && packet.windows(8).any(|window| window == guid.to_le_bytes())
-    })
 }
 
 fn at(player: u64, npc: u64) -> osfr_tools::character_store::CharacterState {

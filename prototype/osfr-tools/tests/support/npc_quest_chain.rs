@@ -19,7 +19,12 @@ mod gateway_packets;
 #[path = "npc_visibility.rs"]
 mod npc_visibility;
 
+#[path = "pickup_packets.rs"]
+mod pickup_packets;
+
 pub use content_copy::{copy_missing, copy_tree};
+#[allow(unused_imports)]
+pub use npc_visibility::node_content::{pickups, shipped_nodes};
 #[allow(unused_imports)]
 pub use npc_visibility::{content_dir, seen_from};
 
@@ -30,7 +35,7 @@ use osfr_tools::{
     encounter::{FieldParticipant, SharedFieldAction, SharedFieldState},
     gameplay::{Gameplay, GameplayState, Outcome},
     gateway::Gateway,
-    harvest_nodes::{GatheringNodes, NodeActor},
+    harvest_nodes::NodeActor,
     inventory::InventoryItem,
     npc_interaction::{decode_dialogue_26_3, decode_quest_offer_49_1},
     quest_engine::{QuestProgress, QuestStatus},
@@ -1390,29 +1395,6 @@ pub fn objective_activated(outcome: &Outcome, quest: u32, objective: u32) -> boo
     })
 }
 
-/// The shipped quest-node tables (`data/content`), read through the production loader.
-pub fn shipped_nodes() -> GatheringNodes {
-    GatheringNodes::load(&content_dir())
-        .expect("the shipped node tables load")
-        .expect("the shipped node tables are present")
-}
-
-/// The placed pickups of one `quest_nodes.json` node type, in guid order.
-pub fn pickups(node_type: &str) -> Vec<NodeActor> {
-    let nodes = shipped_nodes();
-    let mut rows: Vec<NodeActor> = nodes
-        .actors()
-        .filter(|actor| {
-            nodes
-                .pickup_kind(actor.guid)
-                .is_some_and(|kind| kind == node_type)
-        })
-        .cloned()
-        .collect();
-    rows.sort_by_key(|actor| actor.guid);
-    rows
-}
-
 /// The client's click (26/8) on `guid` from `position`, after the location report and the
 /// pose-driven NPC view update that puts the actor in this character's visible set.
 pub fn click_from(
@@ -1438,29 +1420,27 @@ pub fn pick(game: &mut Gameplay, player: u64, node: &NodeActor, now: &mut u64) -
     clicked
 }
 
-/// Whether the outcome carries a 15/3 system chat line containing `needle`.
+/// Whether the outcome carries a 15/3 system chat line containing `needle` (reader
+/// `0x00b0f5f0`: a `u32` byte length at `4..8`, then the text).
 pub fn said(outcome: &Outcome, needle: &str) -> bool {
-    outcome.replies.iter().any(|packet| {
-        if !packet.starts_with(&[15, 0, 3, 0]) || packet.len() < 9 {
-            return false;
-        }
-        let length = u32::from_le_bytes(packet[4..8].try_into().unwrap()) as usize;
-        packet
-            .get(8..8 + length)
-            .is_some_and(|text| String::from_utf8_lossy(text).contains(needle))
-    })
+    pickup_packets::said(&outcome.replies, needle)
 }
 
-/// 35/3 removal of `guid`: the four-byte header, then the actor guid.
+/// Whether the outcome carries the 35/2 `AddNpc` of `guid` (reader `0x00921a10`: the guid
+/// follows the four-byte header).
+pub fn added(outcome: &Outcome, guid: u64) -> bool {
+    pickup_packets::added(&outcome.replies, guid)
+}
+
+/// Whether the outcome carries the 35/3 removal of `guid`: the four-byte header, a `u16` at
+/// `4..6`, then the guid at `6..14` (reader `0x008d69f0`, base `0x008d6830`).
 pub fn removed(outcome: &Outcome, guid: u64) -> bool {
-    outcome.replies.iter().any(|packet| {
-        packet.starts_with(&[35, 0, 3, 0])
-            && packet.windows(8).any(|window| window == guid.to_le_bytes())
-    })
+    pickup_packets::removed(&outcome.replies, guid)
 }
 
 /// Pick every spawn of one node type, asserting the counted 49/9 update and, on the last
-/// pickup, the 49/10 complete and the next objective's 49/8.
+/// pickup, the 49/10 complete and the next objective's 49/8. Only the target objective's
+/// counter may move; a pickup that credits any other step fails here.
 pub fn collect(
     game: &mut Gameplay,
     player: u64,
@@ -1477,6 +1457,7 @@ pub fn collect(
         quantity as usize,
         "{node_type} must ship one spawn per required pickup"
     );
+    let mut expected = counts(game, quest);
     for (index, node) in nodes.iter().enumerate() {
         let current = index as u32 + 1;
         let clicked = pick(game, player, node, now);
@@ -1492,7 +1473,12 @@ pub fn collect(
             objective_update(&clicked, quest, objective, current),
             "{node_type} pickup {current} must send the counted 49/9 update"
         );
-        assert_eq!(counts(game, quest)[objective as usize - 1], current);
+        expected[objective as usize - 1] = current;
+        assert_eq!(
+            counts(game, quest),
+            expected,
+            "{node_type} pickup {current} changed an objective counter other than {objective}"
+        );
         if current == quantity {
             assert!(
                 objective_complete(&clicked, quest, objective),

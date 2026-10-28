@@ -82,7 +82,7 @@
     },
     {
       "key": "box-o-rocks",
-      "name": "Rock",
+      "name": "Crate",
       "model_id": 84,
       "scale": 1.0,
       "composite_effect_id": 5386,
@@ -93,7 +93,7 @@
       "source_tag": "legacy-data",
       "source_tags": {
         "key": "legacy-data Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeTypes.json key box-o-rocks",
-        "name": "legacy-data as above, Name Rock; the row has no NameId, so name id 0 (R)",
+        "name": "legacy-data as above, Name Rock; the row has no NameId, so name id 0 (R). F868: client Resources/Models.txt row 84 is sh_crate_01.adr and the 3000343 goal (NameId 70289) is about crates full of rocks, so the shipped display name is Crate.",
         "model_id": "legacy-data as above, ModelId 84; client Resources/Models.txt row 84 maps it to sh_crate_01.adr (the locale goal says 'crates full of rocks')",
         "scale": "legacy-data as above, Scale 1.0",
         "composite_effect_id": "legacy-data as above, CompositeEffectId 5386",
