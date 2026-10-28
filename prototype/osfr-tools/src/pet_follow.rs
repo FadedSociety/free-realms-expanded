@@ -522,10 +522,11 @@ enum Advance {
 }
 
 /// One movement toward `target` at `speed` m/s: the single place the ground height, the 6 m
-/// climb limit and the T490 walk check are applied. `look_past_target` extends the walk check a
-/// `sample_m` beyond a target the pet is reaching within one step: T827 trails a moving owner at
-/// the pet's own pace, so the pet catches the trailing point every tick and a per-tick target
-/// step would otherwise creep down a cliff the heightfield smears over one cell.
+/// climb limit and the T490 walk check are applied. The check covers both the point this step
+/// lands on and, with `look_past_target`, one `sample_m` beyond a target the pet reaches within
+/// one step: T827 trails a moving owner at the pet's own pace, so the pet catches the trailing
+/// point every tick and a per-tick target step would otherwise creep down a cliff the heightfield
+/// smears over one cell.
 fn advance(
     config: &FollowConfig,
     p: &mut PetPose,
@@ -580,17 +581,22 @@ fn advance(
     let checked = gridded
         || stepped.is_some_and(|y| y.is_finite())
         || ground(from[0], from[2]).is_some_and(|y| y.is_finite());
-    if checked
-        && (x != from[0] || z != from[2])
-        && !walkable(
+    // F858 (review F850): the endpoint of this step is checked as well as the lookahead. The
+    // lookahead alone skipped the point the pet actually moves to, so a hole or a dip narrower
+    // than `sample_m` at that point (a fine height grid, or a narrow trench) was stepped onto.
+    let reachable = |to| {
+        walkable(
             ground,
             from,
-            [check_x, y, check_z],
+            to,
             config.step_up_m,
             config.step_down_m,
             config.sample_m,
         )
-    {
+    };
+    let step_end = [x, y, z];
+    let ahead = [check_x, y, check_z];
+    if checked && (x != from[0] || z != from[2]) && (!reachable(step_end) || !reachable(ahead)) {
         let since = *p.blocked_since_ms.get_or_insert(now);
         if now.saturating_sub(since) >= config.warp_far_ms {
             return Advance::Warp;

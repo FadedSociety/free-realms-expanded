@@ -21,7 +21,7 @@ use care::{OWNER, dog, pets_json, send};
 use npc_quest_chain::{CHARACTER, character_at_for};
 use osfr_tools::{
     gameplay::Gameplay,
-    pet_follow::{FollowConfig, MoveKind, OwnerPose, spawn, step, walkable},
+    pet_follow::{FollowConfig, MoveKind, OwnerPose, go_to, spawn, step, walkable},
     pets::{PetBusy, PetContent, PetRequest, PetService},
     terrain::Terrain,
 };
@@ -147,6 +147,53 @@ fn unknown_ground_is_not_walkable() {
         3.0,
         0.5
     ));
+}
+
+/// F858 (review F850): the point the next step lands on is checked, not only the lookahead, so
+/// a hole narrower than `sample_m` at that point is refused even when the lookahead is on ground.
+#[test]
+fn a_step_endpoint_over_a_hole_is_refused() {
+    let cfg = follow();
+    let owner = [0.0, 0.0, 0.0];
+    let pet = go_to(spawn(&cfg, owner), [12.0, 0.0, 0.0], owner);
+    // Ground everywhere except the endpoint of the pet's first 50 ms step at `pace` (5 m/s).
+    let hole = |x: f32, z: f32| {
+        if (x - 2.25).abs() < 1e-3 && z.abs() < 1e-3 {
+            None
+        } else {
+            Some(0.0)
+        }
+    };
+    let (still, _) = step(
+        &cfg,
+        pace(),
+        OwnerPose {
+            position: owner,
+            at_ms: 100,
+        },
+        pet,
+        hole,
+        true,
+        false,
+    );
+    assert_eq!(still.position, pet.position, "the first tick has no time");
+    let (next, frame) = step(
+        &cfg,
+        pace(),
+        OwnerPose {
+            position: owner,
+            at_ms: 150,
+        },
+        still,
+        hole,
+        true,
+        false,
+    );
+    assert_eq!(
+        next.position, pet.position,
+        "a hole at the step endpoint is not walkable"
+    );
+    assert_eq!(frame, None, "a refused step sends nothing");
 }
 
 #[test]
@@ -686,9 +733,9 @@ fn a_clicked_spot_is_walked_to_through_the_world_tick() {
     );
 }
 
-/// T490/F850: the production tick is 20 Hz, so a 2 m/s follow step is 0.1 m and the walk check
-/// must look a `sample_m` ahead. Before the fix the heightfield's one-cell interpolation let the
-/// pet creep down a 4 m cliff 0.8 m per tick.
+/// T490/F850: the production tick is 20 Hz, so a follow step is a fraction of `sample_m` (0.25 m
+/// at the shipped 5 m/s pace) and the walk check must look a `sample_m` ahead. Before the fix the
+/// heightfield's one-cell interpolation let the pet creep down a 4 m cliff 0.8 m per tick.
 #[test]
 fn a_fifty_millisecond_follow_step_does_not_walk_down_a_cliff() {
     let grid = terrain::surface([-20.0, -20.0], [20.0, 20.0], 0.5, |x, _| {
@@ -732,6 +779,65 @@ fn a_fifty_millisecond_follow_step_does_not_walk_down_a_cliff() {
     assert!(
         landed[0] < 0.0,
         "the warp lands on the low side: {landed:?}"
+    );
+}
+
+/// F858 (review F850): a dip narrower than `sample_m` at the point the next 20 Hz step lands on.
+/// With a 0.25 m grid the pet's first 0.25 m step lands on the dip while its 0.5 m lookahead is
+/// back on flat ground, so checking only the lookahead walked the pet 4 m down.
+#[test]
+fn a_fifty_millisecond_step_does_not_walk_into_a_narrow_dip() {
+    let grid = terrain::surface([-20.0, -20.0], [20.0, 20.0], 0.25, |x, z| {
+        if (x - 2.25).abs() < 0.01 && z.abs() < 0.01 {
+            -4.0
+        } else {
+            0.0
+        }
+    });
+    let (_fixture, mut game, who) = world_with(grid, [0.0, 0.0, 0.0]);
+    let spawn = game.pet_view(who.guid).expect("the pet is out").position;
+    assert_eq!(spawn, [2.0, 0.0, 0.0], "the pet spawns beside its owner");
+    let reply = game
+        .handle_in_world(&can_go([12.0, 0.0, 0.0, 0.0]), &who, 2_000)
+        .unwrap();
+    assert!(
+        reply
+            .replies
+            .contains(&can_go_reply([12.0, 0.0, 0.0, 0.0], true)),
+        "the click's 0.5 m samples pass the dip: {:?}",
+        reply.replies
+    );
+    for t in (2_050..7_000).step_by(50) {
+        game.pet_tick(&who, t);
+        let position = game.pet_view(who.guid).expect("the pet is out").position;
+        assert!(
+            position[1] > -0.1,
+            "{t} ms: the 4 m dip at the step endpoint was walked into: {position:?}"
+        );
+        assert_eq!(
+            position, spawn,
+            "{t} ms: a refused step moves the pet nowhere"
+        );
+    }
+    // After warp_far_ms of refused steps the pet goes to its owner instead.
+    let warped = (7_000..8_000)
+        .step_by(50)
+        .find(|&t| {
+            game.pet_tick(&who, t).is_some_and(|out| {
+                out.replies
+                    .iter()
+                    .any(|packet| packet.starts_with(&[125, 0]))
+            })
+        })
+        .expect("a blocked pet warps after warp_far_ms");
+    assert!(
+        warped >= 2_100 + follow().warp_far_ms,
+        "the warp waits warp_far_ms after the first refused step: {warped} ms"
+    );
+    assert_eq!(
+        game.pet_view(who.guid).expect("the pet is out").position,
+        spawn,
+        "{warped} ms: the warp lands beside the owner"
     );
 }
 
