@@ -1,10 +1,10 @@
 # Quest Offer Reference
 
-the owner supplied screenshots (2026-10-14) from an archived gameplay video showing the original quest offer for "Introduce Yourself". A cropped copy, without the chat panel, is in `lab/evidence/user-screens/original-quest-offer-introduce-yourself.png`. Player chat in the source is not recorded.
+The owner supplied screenshots (2026-10-14) from an archived gameplay video showing the original quest offer for "Introduce Yourself". A cropped copy, without the chat panel, is in `lab/evidence/user-screens/original-quest-offer-introduce-yourself.png`. Player chat in the source is not recorded.
 
 ## What the original shows
 
-- **Giver in the example: Merigold**, at Highroad Junction (locale 103722; rows 80/401 are her greeting). the owner pulled this screenshot as a random UI example. Several quests share the title "Introduce Yourself", so it does not show that our Samantha → 3000021 link is wrong. Givers stay as they are.
+- **Giver in the example: Merigold**, at Highroad Junction (locale 103722; rows 80/401 are her greeting). The owner pulled this screenshot as a random UI example. Several quests share the title "Introduce Yourself", so it does not show that our Samantha → 3000021 link is wrong. Givers stay as they are.
 - **Speech bubble body:** locale 104097, "You meet the coolest people here at Highroad Junction!<BR><BR><font color='#D9781A'>Raina Rush</font> is a famous Kart D…". Rich text with orange highlight markup.
 - **Quest card:** scroll icon, title locale 94247 ("Introduce Yourself"), "Show Details" (39576) with an expand chevron.
 - **Buttons:** green "Yes, I accept!" (71313) and tan "No! I decline." (71314). They are compact, roughly the width of the bubble.
@@ -13,14 +13,14 @@ the owner supplied screenshots (2026-10-14) from an archived gameplay video show
 ## Differences from our build (run 053834)
 
 - We send 26/3 with the NPC name as the body and one close choice.
-- The close choice renders over a large "GOAL" banner graphic. the owner noted that the "Goodbye" button fills about a quarter of the screen, so its background-set/image DWORDs (choice row DWORDs 4–5, `009f5ae0`) select a big banner style instead of a plain choice button.
+- The close choice renders over a large "GOAL" banner graphic. The owner noted that the "Goodbye" button fills about a quarter of the screen, so its background-set/image DWORDs (choice row DWORDs 4–5, `009f5ae0`) select a big banner style instead of a plain choice button.
 - Our quest 3000021 has `title_string_id` 4206471822, which isn't a locale row. 94247 is one "Introduce Yourself" title row; others may share the name, so the correct row depends on the quest's context.
 
 ## To do
 
 - Quest offers go through 49/1 with body text, title and icon, and accept/decline handled by 49/2.
 - Audit quest title and text ids against locale, fixing ids that are not real rows. Do not change givers based on this example.
-- Disambiguate same-named rows by location context (the owner): if the giver is in one area and a candidate's text names another area (for example Highroad Junction), it is almost never the right row. Read how a place is mentioned. "Here at X" or "welcome to X" places the speaker in X. "Have you heard of X", "head to X", "visit X" or "find Y in X" point elsewhere and are evidence against X. Flag giver/area contradictions, based on "here" mentions only, for review rather than editing them.
+- Disambiguate same-named rows by location context (The owner): if the giver is in one area and a candidate's text names another area (for example Highroad Junction), it is almost never the right row. Read how a place is mentioned. "Here at X" or "welcome to X" places the speaker in X. "Have you heard of X", "head to X", "visit X" or "find Y in X" point elsewhere and are evidence against X. Flag giver/area contradictions, based on "here" mentions only, for review rather than editing them.
 - Find the plain choice-button background set for dialogue so buttons render at normal size.
 - Show NPC greeting text in the dialogue body.
 

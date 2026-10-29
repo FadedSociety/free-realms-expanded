@@ -118,7 +118,7 @@ Lead tooling: `project/scripts/native_hook.py` attaches Frida (installed into th
 
 ## Runs 224000 and 230409: end text, step dialog, talk quests, dialog camera
 
-- **49/13 dwords** (from `ShowQuestEndScreen` disassembly): offset 6 u64 = **NPC actor GUID**, looked up in the actor table (`00984960`) for the dialog camera, `[*player*]` expansion and animation; 14 = reply/QuestData id; 18 = end-text locale id (`ExpandTextWithRoleArrayToIString` `0097c1e0`); 22 = NPC animation id when > 0. Run 224000 showed the end text (Ricky, Ranger Ricardo) with a literal `[*player*]` while offset 6 still held the quest id. The gameplay layer now writes the turn-in NPC's runtime GUID there. Run 230409: the camera zooms on Ricky with the card to his left, matching the original (the owner's MMODEN reference shot).
+- **49/13 dwords** (from `ShowQuestEndScreen` disassembly): offset 6 u64 = **NPC actor GUID**, looked up in the actor table (`00984960`) for the dialog camera, `[*player*]` expansion and animation; 14 = reply/QuestData id; 18 = end-text locale id (`ExpandTextWithRoleArrayToIString` `0097c1e0`); 22 = NPC animation id when > 0. Run 224000 showed the end text (Ricky, Ranger Ricardo) with a literal `[*player*]` while offset 6 still held the quest id. The gameplay layer now writes the turn-in NPC's runtime GUID there. Run 230409: the camera zooms on Ricky with the card to his left, matching the original (The owner's MMODEN reference shot).
 - **Dialog camera:** Frida set `dialog_camera` hooks `008d2ba0` (switch to `ControllerDialog`), the camera's target pair. 26/3 and 49/1 sent (0,0), so the camera framed the player. The targets come from 26/3 dwords 2–3 (`ShowDialogFromPacket` reads object +0x18/+0x1c) and from the 49/1 u64 after the reward bundle (the packet's last 14 bytes start with it; dispatcher `00c7cea2` passes object +0xe0/+0xe4). `set_dialog_camera_target` fills both with the NPC GUID. **Not yet verified natively** (the battery fell to 10%).
 - Step dialog: Shakey said 94258 (`dialogue_string_id` on the talk objective). The text is longer than the bubble.
 - Talk quests: `scripts/quest_talk_objectives.py` added talk objectives to 9 quests. Chef: Ranger Requisition (Auguste Frydaze → Ranger Ricardo) completed natively with the original offer and end text.
@@ -129,8 +129,8 @@ Lead tooling: `project/scripts/native_hook.py` attaches Frida (installed into th
 
 - The camera frames the NPC for 26/3 (Samantha, Ricky, Shakey), 49/1 (Samantha's offer) and 49/13 (Ricky). `[*player*]` now expands ("…today, Capo Indigocauldron"). Frida camera targets: 0x2_18711abd and 0x2_363e7ffe.
 - Greetings: `greeting_string_id` on NPC records replaces the Merigold special case. Samantha uses 24940 (guide hash 1591220599). Only 2 of 1,199 placed NPCs have a greeting quote in the guides. `scripts/locale_id_map.py` writes `lab/reports/locale-id-map.json` (86,004 hash → id pairs).
-- The "Queensfields Bushel 20m" arrows are `ScreenDirectionIndicatorDataSource` rows: Text, Subtext, IconId, ScreenAngle, Distance, Color, CharacterGuid, IsPc. They point at spawned actors, so they hold no location data. the owner's notes: red = enemy encounter, green = NPC / Active Quest, pink = resources.
-- **Overworld combat is encounter-based (the owner's research):** a red crossed-swords marker → a battle menu with a difficulty choice → the minigame start screen (MiniGame type 4 = COMBAT; difficulties 3/4/5 show 4199–4201 "Requires a level 5/9/13 combat job") → the fight runs in place. Legacy places 10 `sg_spawner_*` objects, e.g. "Hooligan Brawling Club!" 4156 (73 m from Jones; hooligans 4157–4161 stand around it) and "Frostfang Snarler" 3592. Free-roaming aggro enemies (the unwired `enemies.rs`) do not match this; the plan is to reuse the encounter engine's minigame flow (114 details with `launch`, 17 minigame, rules/combat flags, objective, game over) in place, without the zone change.
+- The "Queensfields Bushel 20m" arrows are `ScreenDirectionIndicatorDataSource` rows: Text, Subtext, IconId, ScreenAngle, Distance, Color, CharacterGuid, IsPc. They point at spawned actors, so they hold no location data. The owner's notes: red = enemy encounter, green = NPC / Active Quest, pink = resources.
+- **Overworld combat is encounter-based (The owner's research):** a red crossed-swords marker → a battle menu with a difficulty choice → the minigame start screen (MiniGame type 4 = COMBAT; difficulties 3/4/5 show 4199–4201 "Requires a level 5/9/13 combat job") → the fight runs in place. Legacy places 10 `sg_spawner_*` objects, e.g. "Hooligan Brawling Club!" 4156 (73 m from Jones; hooligans 4157–4161 stand around it) and "Frostfang Snarler" 3592. Free-roaming aggro enemies (the unwired `enemies.rs`) do not match this; the plan is to reuse the encounter engine's minigame flow (114 details with `launch`, 17 minigame, rules/combat flags, objective, game over) in place, without the zone change.
 
 ## Runs 001154–010757: overworld field enemies and the first combat quest
 
@@ -138,7 +138,7 @@ Lead tooling: `project/scripts/native_hook.py` attaches Frida (installed into th
 - Interaction: the X key sends 26/19 (select) then 26/8; field-enemy 26/8/26/10 now go to the encounter (Attack menu 103) instead of `npc_interaction`. Combat needs a combat job (switch with the job arrow; Medic deals 75).
 - **Run 010757:** the dev offer (v0) and accept spawned the Hooligans. Kills sent 49/9 1/4 → 4/4 and 49/10. Jones's turn-in choice opened the end screen with the original end text ("You're back? I had my doubts…"), and "Brawler: Delinquent Dilemma Quest Completed!" followed. All four Hooligans despawned when the quest completed. Regression test: `quest_gated_field_enemies_spawn_fight_and_respawn`.
 - Dev tools: `realm offer <quest> vN` marks the quest offered and its accept skips prerequisite, level and job checks (`dev_mark_offered`). Use **v0** (dialog plus offer): v1 leaves the HUD hidden after accept, so X only selects targets. Field enemies are teleport targets (by GUID; "Hooligan" is ambiguous).
-- Balance: 220 HP / 8 damage ×4 still knocks out a level-1 Medic once per fight. the owner's video reference: a level-3 Medic vs Hooligan Bullies took 83 (124 crit) and dealt 127.
+- Balance: 220 HP / 8 damage ×4 still knocks out a level-1 Medic once per fight. The owner's video reference: a level-3 Medic vs Hooligan Bullies took 83 (124 crit) and dealt 127.
 - **Issues found:**
   1. ~~Relaunch gave an empty character list~~ **Not a bug:** run 010409's own client-80 shows the list; the 'empty' view was behind the Esc menu while input went to the focused live-log window. The login traffic matches the good run byte for byte in size.
   2. Carlos Brazenfist is not a teleport or spawn target in zone 0, even though his NPC record has a position.
@@ -164,9 +164,9 @@ Lead tooling: `project/scripts/native_hook.py` attaches Frida (installed into th
   - The **Ninja: Stolen Away** objective is not yet wired to kill id 930096.
   - The live log steals focus under Windows Terminal; the workaround is to stop the viewer.
 
-## Runs 034140–040443: instanced battles (the owner's correction)
+## Runs 034140–040443: instanced battles (The owner's correction)
 
-the owner's correction (field notes 2026-10-15): there is no tent. The marker is the walking Troll Summoner with crossed swords, Go teleports to a closed arena, and the summoner flees, turns, and summons 2–3 small trolls in a smoke puff.
+The owner's correction (field notes 2026-10-15): there is no tent. The marker is the walking Troll Summoner with crossed swords, Go teleports to a closed arena, and the summoner flees, turns, and summons 2–3 small trolls in a smoke puff.
 
 - **Code:**
   - The in-place battle (`RunningBattle`, `start_battle`, `finish_battle`) is removed.
@@ -177,7 +177,7 @@ the owner's correction (field notes 2026-10-15): there is no tent. The marker is
   - `sg_random_encounter_clearing`, zone id 9600 (R), sky `sky_wilds24.xml`, spawn (136, −0.5, 155).
   - **Verified:** Go → arena loads (forest clearing ringed by rock walls), "Troll Summoner" boss bar, combat on. A loss shows "TRY AGAIN!" with Opponents Defeated 2 and Goals 0/1 (the goal counts only the summoner). Closing returns the player to zone 0 at the summoner.
 - **Summons:** minions with `summon_below_percent` are dormant until the summoner falls below 75/50/25% (2 Troll Scoutlings 42038/182, then 3 mixed, then 2 Troll Ragelings 42040/166). Each wave sends the summon cast, 35/16 PlayCompositeEffect 16337 (`PFX_bones_yellow_troll-spawn`, layout from the community catalogue), AddNpc and HP. Run 034140: wave 1 fired at 675/900 and both scoutlings were killed server-side.
-- **the owner's play test (run 040443), problems:**
+- **The owner's play test (run 040443), problems:**
   1. The troll loops one animation and never runs away. The summon used `com_cast_special_01` (1131), which `troll_shaman.adr` does not have. It also stood casting from 12 m, so it was never hit (900/900 at the end) and never fled.
   2. Trolls "phase in and out of reality but still hit you".
   3. The hit reach is far too long ("four troll lengths").
@@ -190,8 +190,8 @@ the owner's correction (field notes 2026-10-15): there is no tent. The marker is
 Fights were recorded with `um win record` and inspected as `um video contact` sheets plus single frames (game-automation skill).
 
 - **The ranged caster is removed.** It was an invention with no evidence. Its cast replayed every 2.5 s from 7–12 m with no projectile, so it looked like hits from far away, and the troll was never hit, so it never ran. Following the owner's suggestion, the summoner now uses the opening cave's proven melee chase.
-- **Summoner cycle (the owner's design plus the lead's refinements, R):**
-  - While its summoned minions stand, it fights with them in melee and is **shielded** (hits do 0 damage; key 1 prefers an unshielded target). the owner: "you kill those, then keep attacking the summoner".
+- **Summoner cycle (The owner's design plus the lead's refinements, R):**
+  - While its summoned minions stand, it fights with them in melee and is **shielded** (hits do 0 damage; key 1 prefers an unshielded target). The owner: "you kill those, then keep attacking the summoner".
   - Alone, it **runs only while the player is within 10 m** (3.5 m/s, slower than the player), for 4 s of running, then **rests 3 s** with com_stunned (1401) and no attacks. That rest is the damage window.
 - **"Phasing out of reality" fixed.** The flee kept a fixed height and slid along a 25 m leash into the slopes at the clearing's edge, so the client drew it under the terrain (run 053415). The runner now takes the player's ground height and stays within 12 m of its spawn. Run 055357 shows it on the clearing floor throughout.
 - **Minions:** two per wave at 75/50/25%, AddNpc scale 0.65 (bytes 33..37), com_spawn (1404). The summon cast is com_cast_02 (1112); troll_shaman.adr has no com_cast_special_*. Run 061819 confirms small "Troll Scoutling" minions beside the summoner.
@@ -209,7 +209,7 @@ Fights were recorded with `um win record` and inspected as `um video contact` sh
   - First Aid heals 250 on a 15 s cooldown.
   - Refusals use 36/1 with 285 (energy), 287 (not ready) or 288 (no target).
   - Not yet seen on screen: the green 35/35 heal number.
-- **Level locks (the owner):** every job skill carries `min_level`. A locked skill is an empty bar entry that keeps its position, and is refused by the server. A level-up that unlocks a skill re-sends the bar. Battle wins now give 50 job XP (R). Before this, battles levelled nothing.
+- **Level locks (The owner):** every job skill carries `min_level`. A locked skill is an empty bar entry that keeps its position, and is refused by the server. A level-up that unlocks a skill re-sends the bar. Battle wins now give 50 job XP (R). Before this, battles levelled nothing.
 - **Start-screen picture:** MiniGameInfo.IconId reaches the UI (`ii://` image id), but this build's `MinigameStartScreen.gfx` has no icon clip, so no IconId changes the picture. The squirrel is placeholder art that is hidden when the reward preview list is non-empty. IconId stays at 4543 (the right id).
 - **Prize list (run 130004):** the third MiniGameInfo reward bundle ("preview", record +0x188) carries type-1 Item entries in this order: hidden, icon, tint, name, quantity, item id, param, empty string, colour, members-only. Result: **"Prizes: Win the game and you could win one of these prizes!"** with four icons and names, and the squirrel gone. The prizes are a reconstruction modelled on the wiki's Medic prize wheel.
 - **Loot wheel (run 131959):** after a win the client opens the wheel by itself. It spins only after **39/45** `MiniGameLootWheelSetItemToLandOn` (header plus one reward bundle). The wheel lands on the preview entry with the same name id. The client answers **39/46** when the spin stops.

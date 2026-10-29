@@ -897,7 +897,7 @@ region/chat on entry uses the dungeon's place name id, not the region id.
 ## 10. Structure
 
 - **Graph-first queries run** on codebase-memory project
-  `C-Users-the owner-Documents-Projects-CartoonMMO-autopilot-int`:
+  `C-Users-<user>-Documents-Projects-CartoonMMO-autopilot-int`:
   `search_graph` for "zone id scene name region area teleport" returned 917 related
   symbols, including `piece_076.REGION_AREAS`, `piece_077.WarpRegistry.zone_teleport`,
   `dev_teleport`, `world`, `client_areas`, `zone_transition`, `EncounterEngine.field_teleport_targets`,

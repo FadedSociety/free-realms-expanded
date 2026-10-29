@@ -543,7 +543,7 @@ fn a_new_pet_starts_below_full_and_the_start_level_is_bounded() {
     assert!(loads(|doc| doc["need_policy"]["initial"] = 100.0.into()).is_ok());
 }
 
-/// the owner, native 2026-10-27: nobody could tell the bars fall. Over three minutes of play the
+/// The owner, native 2026-10-27: nobody could tell the bars fall. Over three minutes of play the
 /// summoned pet's live 53/3 must show every bar a few points lower, and the bars never leave
 /// 0..=100 however long the pet stays out.
 #[test]

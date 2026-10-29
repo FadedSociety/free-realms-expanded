@@ -1,4 +1,4 @@
-"""Re-prioritise unmapped shards toward gameplay systems (the owner's goals: minigames, NPCs, pets, housing, dungeons,
+"""Re-prioritise unmapped shards toward gameplay systems (The owner's goals: minigames, NPCs, pets, housing, dungeons,
 quests, purchasing ...) and the functions they call. Order only: nothing is skipped or removed.
 
 score(shard) = 10 * (gameplay fns + 2 * network fns + dependency fns) / n - 6 * (render/library fns) / n

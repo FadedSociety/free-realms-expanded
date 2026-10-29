@@ -138,7 +138,7 @@ These are detached Queensfields combat patches outside the protected inner-town 
                                     T z~1049..1128
 ```
 
-The troll population is placed off the referral corridor. The file does not make friendly village trolls hostile, scale down these full-size shamans, or reuse the battle summoner's skittish cycle. the owner's field-note observations about small summoned trolls and short melee reach remain requirements for battle 96, which W102 does not modify.
+The troll population is placed off the referral corridor. The file does not make friendly village trolls hostile, scale down these full-size shamans, or reuse the battle summoner's skittish cycle. The owner's field-note observations about small summoned trolls and short melee reach remain requirements for battle 96, which W102 does not modify.
 
 ## Provenance and limits
 

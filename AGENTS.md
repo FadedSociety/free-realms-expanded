@@ -2,7 +2,7 @@
 
 ## Context
 
-the owner's current goal is to revive Free Realms into a fully playable game, with Rust as the preferred implementation language. The supplied inputs are `%USERPROFILE%\Downloads\OSFR.Server.zip` and `%USERPROFILE%\Downloads\OSFR.Client.zip`. FusionFall and Toontown remain secondary design references; they do not replace the Free Realms restoration target. The folder name CartoonMMO remains provisional.
+The owner's current goal is to revive Free Realms into a fully playable game, with Rust as the preferred implementation language. The supplied inputs are `%USERPROFILE%\Downloads\OSFR.Server.zip` and `%USERPROFILE%\Downloads\OSFR.Client.zip`. FusionFall and Toontown remain secondary design references; they do not replace the Free Realms restoration target. The folder name CartoonMMO remains provisional.
 
 Decompilation recovers managed C# and inferred native pseudocode. Rust requires deliberate reimplementation and behavioral verification. Do not call recovered files, a successful transport handshake, or a walking emulator a complete game.
 
@@ -29,15 +29,15 @@ Use the installed skills when relevant. Keep explanations clear and concise. Com
 
 ## Explicit worker instructions, October 8
 
-the owner explicitly selected RTK, Ponytail, Caveman and relevant game skills for all workers. Read `%USERPROFILE%\.codex\RTK.md` and the selected `SKILL.md` files under `%USERPROFILE%\.codex\skills`. RTK requires normal commands first, not blindly prefixing every command. Ponytail means reuse the smallest working implementation without removing requested functionality or validation. Caveman means concise communication; persisted research and verification notes remain clear and complete.
+The owner explicitly selected RTK, Ponytail, Caveman and relevant game skills for all workers. Read `%USERPROFILE%\.codex\RTK.md` and the selected `SKILL.md` files under `%USERPROFILE%\.codex\skills`. RTK requires normal commands first, not blindly prefixing every command. Ponytail means reuse the smallest working implementation without removing requested functionality or validation. Caveman means concise communication; persisted research and verification notes remain clear and complete.
 
 Use game-recon, game-research-websearch, reverse-engineering and asset-pipeline where the task needs them. Use game-automation for native acceptance; only the lead controls the shared game window. Other installed game skills apply when their actual workflow is needed. Do not publish, send external messages or manipulate unrelated games merely to exercise skills.
 
-Delegated workers follow [[notes/Design/MMO Worker Contract.md]] and the scoped ownership in [[notes/MMO Work Queue.md]]. A final response ends the worker turn: report final only after concrete artifacts/tests, or an explained blocker. Put ongoing progress in commentary. The lead interrupts finished children and reviews their evidence before integration. the owner changed the limit on October9 to **at most five active subagents total**, superseding the historical100 request. Workers must not spawn descendants; the lead fills a freed slot only after reviewing its completed work. Keep checks bounded and report progress while the lead continues integration.
+Delegated workers follow [[notes/Design/MMO Worker Contract.md]] and the scoped ownership in [[notes/MMO Work Queue.md]]. A final response ends the worker turn: report final only after concrete artifacts/tests, or an explained blocker. Put ongoing progress in commentary. The lead interrupts finished children and reviews their evidence before integration. The owner changed the limit on October9 to **at most five active subagents total**, superseding the historical100 request. Workers must not spawn descendants; the lead fills a freed slot only after reviewing its completed work. Keep checks bounded and report progress while the lead continues integration.
 
 ## Lead and worker change, October 10
 
-the owner's Codex weekly limit was reached; Claude Code is now the lead. DeepSeek V4.1 Flash workers (max effort) run as separate `codex exec` processes through the local Codex Router, dispatched by `scripts/native_map/dispatch.py`. the owner raised the target to up to 100 concurrent workers; actual concurrency is bounded by free RAM (~650 MB per worker with all MCP tools kept on). Workers still never spawn workers. The native function map pipeline and its quality gates are described in [[notes/Native Map/Native Map]] and `scripts/native_map/`.
+The owner's Codex weekly limit was reached; Claude Code is now the lead. DeepSeek V4.1 Flash workers (max effort) run as separate `codex exec` processes through the local Codex Router, dispatched by `scripts/native_map/dispatch.py`. The owner raised the target to up to 100 concurrent workers; actual concurrency is bounded by free RAM (~650 MB per worker with all MCP tools kept on). Workers still never spawn workers. The native function map pipeline and its quality gates are described in [[notes/Native Map/Native Map]] and `scripts/native_map/`.
 
 ## Lead and worker change, October 16
 

@@ -25,7 +25,7 @@ Record schema (one JSON object per line, one per target function):
 import csv, json, re, sqlite3, sys
 from pathlib import Path
 
-LAB = Path(r"%USERPROFILE%\Documents\Projects\CartoonMMO\lab")
+LAB = Path.home() / "Documents/Projects/CartoonMMO/lab"
 NOTES = LAB.parent / "project" / "notes"
 CTX = LAB / "native-map" / "context"
 WIKI = LAB / "references" / "freerealms-wiki" / "wiki.sqlite"

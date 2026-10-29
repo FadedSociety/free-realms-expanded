@@ -9,7 +9,7 @@ Community emulator opcodes are third-party reconstructions, not original server 
 import csv, re, sys
 from pathlib import Path
 
-ROOT = Path(r"%USERPROFILE%\Documents\Projects\CartoonMMO")
+ROOT = Path.home() / "Documents/Projects/CartoonMMO"
 LAB, NOTES = ROOT / "lab", ROOT / "project" / "notes"
 OUT = LAB / "native-map" / "context"
 EMULATORS = ["Sanctuary", "FreeRealms-Legacy", "OpenSourceFreeRealms"]

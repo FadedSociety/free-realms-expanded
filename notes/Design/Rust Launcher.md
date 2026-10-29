@@ -510,7 +510,7 @@ owns their integration updates. No native game client was launched.
 Reference before: `lab/reports/rust-launcher-20261015/launcher.png` and
 `settings.png`; project direction: `docs/images/banner.png` and
 `lab/runs/banner/prompt-v6.md:1-16`. Applied redesign-skill's scan, diagnosis and
-targeted fix sequence in the existing egui/eframe stack. the owner's Build Plan
+targeted fix sequence in the existing egui/eframe stack. The owner's Build Plan
 rule 5 takes precedence over generic advice to reduce saturation or ornaments.
 
 | Audit area | Before | W86c result / evidence |

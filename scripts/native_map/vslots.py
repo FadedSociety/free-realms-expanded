@@ -11,7 +11,7 @@ import argparse, json, sqlite3, struct
 from collections import defaultdict
 from pathlib import Path
 
-PE = Path(r"%USERPROFILE%\Documents\Projects\CartoonMMO\lab\working\OSFR.Client\OSFR Client\FreeRealms.exe")
+PE = Path.home() / "Documents/Projects/CartoonMMO/lab/working/OSFR.Client/OSFR Client/FreeRealms.exe"
 
 
 def sections(data):

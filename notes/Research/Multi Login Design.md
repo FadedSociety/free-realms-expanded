@@ -10,15 +10,15 @@ plan: Build Plan 1.2
 
 Design only. No code, saves, native processes, manifests, launcher files or release binaries were changed. Claude owns integration and native acceptance. This note specifies ten simultaneous accounts; it does not claim ten-player gameplay or historical authentication fidelity.
 
-## Decision update 2026-10-15: key pairs, not passwords (the owner)
+## Decision update 2026-10-15: key pairs, not passwords (The owner)
 
-**This supersedes the password, Argon2 and credential-broker sections below.** the owner's point: anyone can host a private server from our code. A malicious host can change their server to log passwords as players type them, and people reuse passwords. Hashing on the server does not help, because the server sees the password before hashing it. So **no password ever goes to a server**:
+**This supersedes the password, Argon2 and credential-broker sections below.** The owner's point: anyone can host a private server from our code. A malicious host can change their server to log passwords as players type them, and people reuse passwords. Hashing on the server does not help, because the server sees the password before hashing it. So **no password ever goes to a server**:
 
 - **Enrolment.** The launcher generates an **Ed25519 key pair per server** (unlinkable across servers). The private key never leaves the player's device; it is stored in the player's profile with OS-only permissions, and an optional local passphrase can come later. The server stores only the **public key**, bound to the account. Sign-up needs an invite code or admin approval (R).
 - **Login.** The broker sends a random single-use 32-byte challenge, bound to the server identity and an expiry. The launcher signs `"osfr-login-v1" || server_id || challenge || account handle`. The server verifies the signature against the stored public key and issues the same 60-second one-use Session token as designed below. A signature is fresh on every login, so a captured exchange cannot be replayed.
 - **What a malicious host learns:** a public key that is useless anywhere else. It never learns a reusable secret.
 - **Recovery.** The launcher exports an encrypted backup file and recovery code. Failing that, an admin re-binds the account to a new public key after verifying the player out of band.
-- **Crates:** `ed25519-dalek` (signatures), `getrandom` (challenges, tokens, keys), `subtle` (constant-time compares). **Argon2 is dropped.** There is no password database and no slow hashing, so the two-worker hash pool and password lockouts are unnecessary; per-IP and per-account rate limits stay. the owner approved these crates on 2026-10-15.
+- **Crates:** `ed25519-dalek` (signatures), `getrandom` (challenges, tokens, keys), `subtle` (constant-time compares). **Argon2 is dropped.** There is no password database and no slow hashing, so the two-worker hash pool and password lockouts are unnecessary; per-IP and per-account rate limits stay. The owner approved these crates on 2026-10-15.
 - Everything else in this design stands: the peer session table, the one-use gateway grant, separate account/character id maps, the bounds, and Session/Fingerprint (the native client still only sees a short-lived token).
 
 ## Decision (original W76 text)

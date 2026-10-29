@@ -39,7 +39,7 @@ The solo3lap course, fixed boost drops,3m curtain tolerance and50/25 balance are
 
 ## Canonical next drive prepared
 
-the owner requested a fresh launch for human testing. New canonical run`client-baseline-20261010T030742Z` is open in the world with live capture and an1800-second harness bound. User input was detected while dismissing News; lead refreshed and stopped UI input so the owner retains control. Enter `realm race` in chat to load the original start menu. Canonical save was preserved rather than reset. No new acceptance claim yet.
+The owner requested a fresh launch for human testing. New canonical run`client-baseline-20261010T030742Z` is open in the world with live capture and an1800-second harness bound. User input was detected while dismissing News; lead refreshed and stopped UI input so the owner retains control. Enter `realm race` in chat to load the original start menu. Canonical save was preserved rather than reset. No new acceptance claim yet.
 
 Canonical v14 run `client-baseline-20261010T023328Z` is open at the original Wildwood Go menu. The race clock has not started. Content fingerprint is canonical`d626af55dd0d4c0d63ee731b8fe614ed93296030f649bc3edd4ec85ef1826631`, with the37 original captured pickup positions. Initial coins309, job48XP0; expected once-only reconstructed finish banks are359/25. Harness bound1800seconds; race bound600seconds starts after one Go click. Live capture is enabled. This is a prepared test, not a finished race receipt; its save must not be reset before post-win reload.
 

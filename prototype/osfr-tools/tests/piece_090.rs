@@ -63,7 +63,7 @@ fn name_data() -> NameData {
         first_name_id: 7,
         last_name_prefix_id: 0,
         last_name_suffix_id: 0,
-        first_name: "the owner".into(),
+        first_name: "Alice".into(),
         last_name: String::new(),
     }
 }
@@ -100,12 +100,12 @@ fn create_invite_and_role_requests_parse_with_the_recovered_layout() {
     let mut invite = Vec::new();
     push_guid(&mut invite, 0x11);
     push_guid(&mut invite, 0x22);
-    push_string(&mut invite, "the owner");
+    push_string(&mut invite, "Alice");
     assert_eq!(
         ClientGuildRequest::Invite {
             player_guid: 0x11,
             guild_guid: 0x22,
-            player_name: "the owner".into(),
+            player_name: "Alice".into(),
         },
         parse_client_request(&request(3, &invite)).unwrap()
     );
@@ -193,7 +193,7 @@ fn malformed_requests_are_refused() {
     let mut invite = Vec::new();
     push_guid(&mut invite, 0x11);
     push_guid(&mut invite, 0x22);
-    push_string(&mut invite, "the owner");
+    push_string(&mut invite, "Alice");
     let good = request(3, &invite);
     assert!(matches!(
         parse_client_request(&good).unwrap(),
@@ -295,7 +295,7 @@ fn replies_encode_the_recovered_field_order() {
     for value in [7i32, 0, 0] {
         expected.extend_from_slice(&value.to_le_bytes());
     }
-    push_string(&mut expected, "the owner");
+    push_string(&mut expected, "Alice");
     push_string(&mut expected, "");
     for value in [GuildRole::Officer.id(), MEMBER_UPDATE_PROMOTED, 3, 0, 48, 9] {
         expected.extend_from_slice(&value.to_le_bytes());

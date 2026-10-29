@@ -1,6 +1,6 @@
 # Native starting quest and cave run073831
 
-2026-10-08 UTC. Independently reconstructed ended native run `client-baseline-20261008T073831Z`. This is **partial quest/zone/state proof and failed visible combat acceptance**. the owner reported stationary enemies, absent attack animations and long-range hits. The run ends in loss, not dungeon completion. It predates the subsequent movement/animation patch.
+2026-10-08 UTC. Independently reconstructed ended native run `client-baseline-20261008T073831Z`. This is **partial quest/zone/state proof and failed visible combat acceptance**. The owner reported stationary enemies, absent attack animations and long-range hits. The run ends in loss, not dungeon completion. It predates the subsequent movement/animation patch.
 
 ## Transport and restart state
 

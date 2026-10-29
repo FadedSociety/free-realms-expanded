@@ -196,7 +196,7 @@ mod tests {
         fs::create_dir_all(&dir).unwrap();
         let stock = HashSet::from([locale_hash(FIRST_WORLD_TEXT_ID)]);
         let mut pool = TextPool::load(&dir).unwrap();
-        let hunt = pool.add("Find Bob!", Some("the owner"), Some(&stock)).unwrap();
+        let hunt = pool.add("Find Bob!", Some("alice"), Some(&stock)).unwrap();
         assert_eq!(hunt, FIRST_WORLD_TEXT_ID + 1, "skips an id whose hash is a stock row");
         assert_eq!(pool.add("  Find Bob! ", None, Some(&stock)).unwrap(), hunt, "same text, same id");
         let other = pool.add("Bob is hiding near the bridge.", None, None).unwrap();
@@ -204,7 +204,7 @@ mod tests {
         assert!(pool.add("two\nlines", None, None).is_err());
         let reloaded = TextPool::load(&dir).unwrap();
         assert_eq!(reloaded.get(hunt), Some("Find Bob!"));
-        assert_eq!(reloaded.entries[0].author.as_deref(), Some("the owner"));
+        assert_eq!(reloaded.entries[0].author.as_deref(), Some("alice"));
         fs::remove_dir_all(&dir).unwrap();
     }
 

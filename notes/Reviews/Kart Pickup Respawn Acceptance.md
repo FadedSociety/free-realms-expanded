@@ -16,7 +16,7 @@ Mixed item acceptance is **not complete**: grants S18(4)115.203, S23(boost)117.5
 
 Exact finalized proof: `../lab/reports/kart-shield-corrected-probe-20261009/client-baseline-20261010T035338Z/shield-receipt.json` and `applications.json`. `native-expiry-final-green.log` preserves the successful native assertion. Item diversity remains limited to fixed shields/boosts; no random historical drop odds or missile/mine world hits are claimed.
 
-the owner's canonical v14 race completed normally, paid once and returned to the overworld. [[Kart Human Completion]] records the finalized race and native paid reload. This review tracks the remaining box feedback separately.
+The owner's canonical v14 race completed normally, paid once and returned to the overworld. [[Kart Human Completion]] records the finalized race and native paid reload. This review tracks the remaining box feedback separately.
 
 ## V17 toolbar repair source gate and native acceptance
 

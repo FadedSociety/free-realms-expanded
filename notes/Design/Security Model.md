@@ -13,7 +13,7 @@ Evidence inspected on 2026-10-16 UTC (2026-10-15 in America/Denver). Unless pref
 
 > **Update 2026-10-15 (lead, the owner's decision):** L2's credential mechanism is now **Ed25519 challenge-response with per-server key pairs**, held by the launcher. Servers store only public keys, so no password goes to any server, including malicious private hosts. Argon2 is dropped. See [[Research/Multi Login Design]].
 
-## Decisions (the owner, 2026-10-16)
+## Decisions (The owner, 2026-10-16)
 
 1. **Admin and builder commands by role on the shared server.** On an exposed (VPN) gateway, `--dev-tools` stays refused (L5), but role-checked `realm` commands work for builder and admin accounts without it: the role comes from the server's account store at character binding (W120), every refusal is logged, players get no cheats, and admin-only commands stay admin-only. Studio stays loopback-only and off during exposed play. This completes L5 ("remote builder/admin actions need a separate server-owned account role check") so the host can run `realm role`, placement and the scavenger hunt on playtest night.
 2. **The key-pair login broker may listen on the VPN address.** AUTH2 sends no secret (a signature over a server-bound one-time challenge; one-use 60 s tokens; non-enumerating fixed replies; per-IP and per-account failure limits), and the VPN encrypts the link. So `osfr-login --auth-bind <vpn-ip>:<port>` is allowed together with `--allow-lan`, and the launcher accepts a private-network broker endpoint. Bare internet stays closed: a public address is still refused.

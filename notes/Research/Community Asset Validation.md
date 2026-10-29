@@ -1,6 +1,6 @@
 # Community asset validation
 
-the owner required community tools and archive research before additional custom format work. The earlier Rust pack implementation preceded that search; this session corrected the workflow and independently checked its output. The project instructions now require the search and a local compatibility check before implementing another reader.
+The owner required community tools and archive research before additional custom format work. The earlier Rust pack implementation preceded that search; this session corrected the workflow and independently checked its output. The project instructions now require the search and a local compatibility check before implementing another reader.
 
 ## Packs and historical research
 

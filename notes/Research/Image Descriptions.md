@@ -1,6 +1,6 @@
 # Image Descriptions
 
-Visual descriptions of the client's pictures, so art can be found by what it shows rather than by file name (the owner's request, 2026-10-15).
+Visual descriptions of the client's pictures, so art can be found by what it shows rather than by file name (The owner's request, 2026-10-15).
 
 - **Coverage:** 13,313 images.
   - 552 UI pictures. Names start with `ui`/`hud`/`loading`/`emblem`/`portrait`/`enc`/`minigame`/`notification`, or contain `_notification`/`loading`.

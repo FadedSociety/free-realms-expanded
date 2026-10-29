@@ -1,6 +1,6 @@
 # Kart human completion — October 9, 2026
 
-the owner completed the canonical v14 race in the original client and reported that it concluded correctly and returned him to the overworld. His remaining findings are excessive box density, no box regeneration, and boost-only contents.
+The owner completed the canonical v14 race in the original client and reported that it concluded correctly and returned him to the overworld. His remaining findings are excessive box density, no box regeneration, and boost-only contents.
 
 The lead independently audited run `client-baseline-20261010T030742Z`. The captured progress transitions are 0, 1, 2, 3 completed laps, with a limit of 3. The final progress and exactly one ordinary reward bundle occur at 270.047 seconds. The bundle contains 50 coins and 25 XP. The native UI emits `26/42` at 272.922 seconds, followed by the FabledRealms scene response. This proves the normal UI exit path exercised by this run; the alternative `39/7` score-screen path was not exercised.
 

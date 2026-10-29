@@ -102,7 +102,7 @@ impl CombatScale {
         self.tier_ratio.powi(self.tier(level) - 1)
     }
 
-    /// Final-era scaling (the owner chose the final era, 2026-10-15): health grows
+    /// Final-era scaling (The owner chose the final era, 2026-10-15): health grows
     /// x`tier_ratio` every four levels (videos: Medic 10 = 2081, Ninja/Archer/
     /// Medic 14 = 3309-3639, Archer 16 = 4476-4883, level 20 = 7116-9821) from
     /// the level-1 base 500 the HUD frames show (Damage Scale.md Q3).

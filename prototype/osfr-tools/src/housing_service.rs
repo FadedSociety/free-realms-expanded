@@ -322,7 +322,7 @@ pub struct StarterKit {
 }
 
 impl StarterKit {
-    /// Free issuance (the owner, 2026-10-20: starter items sell back for 0 coins), so every copy of
+    /// Free issuance (The owner, 2026-10-20: starter items sell back for 0 coins), so every copy of
     /// these items resells for 0, as F228 does for job starter outfits.
     pub fn items(&self) -> [i32; 2] {
         [self.item_id, self.placed_item_id]

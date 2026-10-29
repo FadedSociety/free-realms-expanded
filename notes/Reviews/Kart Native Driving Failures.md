@@ -24,7 +24,7 @@ Lead private replay of the finalized nativeC17/C22/C19 route first failed becaus
 
 Lead accepted the lower-edge correction: one pure race-window helper refuses clock values beforeGo for refill, use and pickup, and refuses expired races. Pre-Go pickup still consumes one observation budget entry as before; queue/actor/movement state stays unchanged. Focused service55passed/0failed/1ignored; pickup6plus1module check pass. Lead's8 private end-to-end checks now pass, including the actual captured10.603-second refill and both existing whole-race payout/reload checks. Full gate, release and fresh native refill/Alt verification follow in v14.
 
-the owner tested the original client in `client-baseline-20261010T005751Z` (UTC run name). Handling and jumping worked. The lap display stayed at 1/3, full boost icons did not activate with Ctrl or Alt, and mystery boxes did not appear to be collected. These are open acceptance failures, not a completed race.
+The owner tested the original client in `client-baseline-20261010T005751Z` (UTC run name). Handling and jumping worked. The lap display stayed at 1/3, full boost icons did not activate with Ctrl or Alt, and mystery boxes did not appear to be collected. These are open acceptance failures, not a completed race.
 
 ## Capture evidence
 
@@ -40,7 +40,7 @@ Evidence: `../lab/reports/kart-human-driving-20261009/`, including the direct au
 
 ## Reference video
 
-Installed `bradautomates/claude-video` skill `watch` at `%USERPROFILE%/.codex/skills/watch`. Source: https://www.youtube.com/watch?v=T1d_tPxlNrk — *Free Realms kart racing! (HQ)*, uploaded May 21, 2009, duration 446 seconds. Metadata lists no captions. All 20 initial sampled frames have been viewed locally. the owner selected local WhisperX; its isolated installation and model warm-up are in progress. The initial visual pass used no transcription and no cloud upload.
+Installed `bradautomates/claude-video` skill `watch` at `%USERPROFILE%/.codex/skills/watch`. Source: https://www.youtube.com/watch?v=T1d_tPxlNrk — *Free Realms kart racing! (HQ)*, uploaded May 21, 2009, duration 446 seconds. Metadata lists no captions. All 20 initial sampled frames have been viewed locally. The owner selected local WhisperX; its isolated installation and model warm-up are in progress. The initial visual pass used no transcription and no cloud upload.
 
 ### Observed visual reference (2009)
 

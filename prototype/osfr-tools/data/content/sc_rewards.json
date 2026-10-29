@@ -29,7 +29,7 @@
   "source": [
     {
       "kind": "reconstructed",
-      "evidence": "(R) Chess pays Station Cash only for a game that reached a result through play (the owner 2026-10-24: rewards gated on real completion): a win, a draw, or a loss after at least chess_min_plies plies (half-moves, both sides, default 20, sane bound 0..=400, live-tunable). An instant resign pays nothing, neither the chess amount nor the daily bonus. The ply threshold is a local economy choice, not a recovered client value."
+      "evidence": "(R) Chess pays Station Cash only for a game that reached a result through play (The owner 2026-10-24: rewards gated on real completion): a win, a draw, or a loss after at least chess_min_plies plies (half-moves, both sides, default 20, sane bound 0..=400, live-tunable). An instant resign pays nothing, neither the chess amount nor the daily bonus. The ply threshold is a local economy choice, not a recovered client value."
     },
     {
       "kind": "reconstructed",

@@ -11,9 +11,9 @@ import argparse, ctypes, json, os, random, signal, sqlite3, subprocess, sys, tim
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-CODEX = r"%USERPROFILE%\AppData\Local\Programs\OpenAI\Codex\bin\codex.exe"
-PROJECT = r"%USERPROFILE%\Documents\Projects\CartoonMMO\project"
-LAB = r"%USERPROFILE%\Documents\Projects\CartoonMMO\lab"
+CODEX = os.path.expanduser(r"~\AppData\Local\Programs\OpenAI\Codex\bin\codex.exe")
+PROJECT = os.path.expanduser(r"~\Documents\Projects\CartoonMMO\project")
+LAB = os.path.expanduser(r"~\Documents\Projects\CartoonMMO\lab")
 MODEL, EFFORT = "deepseek/deepseek-v4.1-flash", "max"
 # Worker tool set, trimmed from measured usage (2026-10-10): shell + apply_patch + web search are what
 # workers use; REA's MCP only reports status here (its PE path is a full Ghidra import, already done
@@ -78,10 +78,10 @@ def free_mb():
 def fill(template, **kw):
     for k, v in kw.items():
         template = template.replace("{" + k + "}", str(v))
-    return template
+    return template.replace("%USERPROFILE%", os.path.expanduser("~"))
 
 
-USAGE_LOG = Path("%USERPROFILE%/.codex/codex-router/usage-events.jsonl")
+USAGE_LOG = Path.home() / ".codex/codex-router/usage-events.jsonl"
 PRICE = {"cached": 0.003, "miss": 0.15, "out": 0.6}  # USD per 1M tokens, DeepSeek Flash off-peak; peak is 2x
 
 

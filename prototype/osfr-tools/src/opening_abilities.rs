@@ -92,7 +92,7 @@ pub struct JobAbility {
     #[serde(default)]
     pub energy_cost: i32,
     pub cooldown_ms: u64,
-    /// Job level that unlocks it (the owner: every job skill is level-locked;
+    /// Job level that unlocks it (The owner: every job skill is level-locked;
     /// Medic First Aid 1, Target Vitals 5, Vitamins 10, Shock Paddles 15).
     /// Required in authored content: omission must not unlock a later skill.
     /// Weapon abilities are level 1.

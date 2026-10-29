@@ -2,13 +2,13 @@
 
 ## Current concurrency, October 10
 
-Claude Code is the lead. the owner asked for up to 100 DeepSeek workers; the dispatcher (`project/scripts/native_map/dispatch.py`) launches them as separate `codex exec` processes and stops adding workers when free memory drops below its floor. Each worker owns exactly the output paths its prompt names. Workers never dispatch other workers. The October 9 five-worker section below is history.
+Claude Code is the lead. The owner asked for up to 100 DeepSeek workers; the dispatcher (`project/scripts/native_map/dispatch.py`) launches them as separate `codex exec` processes and stops adding workers when free memory drops below its floor. Each worker owns exactly the output paths its prompt names. Workers never dispatch other workers. The October 9 five-worker section below is history.
 
 ## Current concurrency, October9
 
-the owner explicitly reduced the limit to **five active subagents total**. This overrides the earlier100 request recorded below. Only the lead dispatches/replaces workers; no descendant spawning. Stop each completed child, review its concrete output, then reuse the freed slot. Prefer focused checks and bounded commands; the lead continues useful integration work while workers run.
+The owner explicitly reduced the limit to **five active subagents total**. This overrides the earlier100 request recorded below. Only the lead dispatches/replaces workers; no descendant spawning. Stop each completed child, review its concrete output, then reuse the freed slot. Prefer focused checks and bounded commands; the lead continues useful integration work while workers run.
 
-the owner requested 100 DeepSeek workers, broad MMO restoration, test-first development, decompilation instructions and verification. Model selection is DeepSeek V4.1 Flash with max reasoning through the configured `crack_builder` role. The lead owns shared integration and the native client. This contract does not establish historical fidelity or gameplay completion.
+The owner requested 100 DeepSeek workers, broad MMO restoration, test-first development, decompilation instructions and verification. Model selection is DeepSeek V4.1 Flash with max reasoning through the configured `crack_builder` role. The lead owns shared integration and the native client. This contract does not establish historical fidelity or gameplay completion.
 
 ## Required working method
 

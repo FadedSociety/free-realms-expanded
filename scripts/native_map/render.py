@@ -9,7 +9,7 @@ Also writes <run>/native-map.tsv (every function, one row) for tooling.
 import argparse, collections, csv, json, re, sqlite3, time
 from pathlib import Path
 
-VAULT = Path(r"%USERPROFILE%\Documents\Projects\CartoonMMO\project\notes")
+VAULT = Path.home() / "Documents/Projects/CartoonMMO/project/notes"
 ORDER = ["confirmed", "likely", "speculative", "unknown"]
 MARK = {"confirmed": "✅", "likely": "🟢", "speculative": "🟡", "unknown": "⚪"}
 

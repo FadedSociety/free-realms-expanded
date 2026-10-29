@@ -24,4 +24,4 @@ Video extraction command uses installed FFmpeg with `-sseof -10 -frames:v1 -vf s
 
 ## Follow-up013155
 
-Fresh restart preserved completed count/materials and offered instance46000005. the owner manually played all six rounds and reported that Cooking works well. The final013155 snapshot contains all six round statistics, score4700, phasePlaying, no final GameStats, completed1. Client exited0 before final confirmation persisted. This is human playtest feedback with partial protocol completion, not a new stew award or stage13 completion. Continue a fresh instance through the actual final confirmation and turn-in.
+Fresh restart preserved completed count/materials and offered instance46000005. The owner manually played all six rounds and reported that Cooking works well. The final013155 snapshot contains all six round statistics, score4700, phasePlaying, no final GameStats, completed1. Client exited0 before final confirmation persisted. This is human playtest feedback with partial protocol completion, not a new stew award or stage13 completion. Continue a fresh instance through the actual final confirmation and turn-in.

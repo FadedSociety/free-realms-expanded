@@ -202,7 +202,7 @@ struct Actor {
     #[serde(default)]
     stages: Vec<u32>,
     /// Summoned minion: absent until the encounter's summoner drops below
-    /// this percentage of its health, then appears in a puff (the owner's field
+    /// this percentage of its health, then appears in a puff (The owner's field
     /// notes on the Troll Summoner). Not counted toward the goal.
     #[serde(default)]
     summon_below_percent: Option<u32>,
@@ -448,7 +448,7 @@ struct FieldActor {
     region: Option<String>,
     #[serde(default)]
     zone_id: u32,
-    /// The enemy exists only while one of these quests is active (the owner's
+    /// The enemy exists only while one of these quests is active (The owner's
     /// field notes: overworld enemies belong to active quests, like the
     /// opening's stage-gated wolves). Empty means always present.
     #[serde(default)]

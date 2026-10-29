@@ -1,6 +1,6 @@
 # World Builder
 
-the owner's direction (2026-10-15): build the world **from inside the running game**. A builder places an NPC, gives it a new quest, links quests, and sends a quest to everyone online. Example: an admin scavenger hunt. The admin places an NPC, posts hint photos, and the first players to find it get goodies. Everything persists past a server restart.
+The owner's direction (2026-10-15): build the world **from inside the running game**. A builder places an NPC, gives it a new quest, links quests, and sends a quest to everyone online. Example: an admin scavenger hunt. The admin places an NPC, posts hint photos, and the first players to find it get goodies. Everything persists past a server restart.
 
 Several builders walking the world could build it out together. Later, public sandbox instances would let open-source contributors fill the content gaps (quests, NPCs, items), "like Roblox Studio or Unity". Only trusted people can change or delete things.
 

@@ -7,7 +7,7 @@ use super::*;
 mod field_content;
 
 /// A battle marker's walk (R): four points WANDER_RADIUS around its home at
-/// walking pace, pausing at each (the owner: the Troll Summoner "just walks
+/// walking pace, pausing at each (The owner: the Troll Summoner "just walks
 /// around"). Height stays at home: the server has no terrain heights.
 #[derive(Clone, Copy, Debug)]
 pub(super) struct Wander {

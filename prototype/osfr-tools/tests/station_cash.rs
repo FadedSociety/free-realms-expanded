@@ -702,7 +702,7 @@ fn a_wiki_priced_clothing_item_lists_at_a_quarter_and_buying_it_grants_it() {
     let scale = shop.sc_catalogue().config().sc_price_scale;
     assert_eq!(
         scale, 0.25,
-        "the owner: the Marketplace sells at 1/4 of the live price"
+        "The owner: the Marketplace sells at 1/4 of the live price"
     );
     let price = (DOG_EARS_WIKI_SC * scale).round() as u32;
     for item in DOG_EARS {

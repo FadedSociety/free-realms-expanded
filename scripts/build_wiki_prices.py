@@ -30,7 +30,7 @@ from pathlib import Path
 
 sys.dont_write_bytecode = True
 PROJECT = Path(__file__).resolve().parents[1]
-LAB = Path("%USERPROFILE%/Documents/Projects/CartoonMMO/lab")
+LAB = Path.home() / "Documents/Projects/CartoonMMO/lab"
 STORES = PROJECT / "prototype/osfr-tools/data/content/stores.json"
 VENDORS = PROJECT / "prototype/osfr-tools/data/content/vendors.json"
 INPUTS = {

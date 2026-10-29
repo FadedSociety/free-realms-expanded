@@ -45,7 +45,7 @@ readiness check do not establish faster or correct game restoration.
 
 ## Local Laya
 
-- the owner prefers https://huggingface.co/convaiinnovations/laya over Jev.
+- The owner prefers https://huggingface.co/convaiinnovations/laya over Jev.
 - Upstream runtime source: https://github.com/NandhaKishorM/laya, Apache2.0,
   commit `1adc59f7e371deb601fcfa18a14e25db238addcc`.
 - Isolated runtime in `../../../lab/tools/laya-env`; pinned English model
@@ -82,7 +82,7 @@ code into Rust or replace native acceptance.
 
 ## Native-map triage evaluation, October 10
 
-the owner asked for Laya to be tested as a native-map triage aid with explicit criteria.
+The owner asked for Laya to be tested as a native-map triage aid with explicit criteria.
 Ground truth: accepted, review-undisputed confirmed/likely labels from the native-map
 pilot. Two balanced tasks, Ghidra pseudocode cut at whole lines to the 300-token state
 budget, each run normally and with A/B swapped. Script and per-case rows:
@@ -108,7 +108,7 @@ disabled for native-map workers to save ~230 MB RAM each.
 
 ## Jev Router (TypeSafe, via OpenRouter), October 12
 
-the owner asked for Jev to be run on the same triage test as Laya. Same functions and expected answers (Laya's saved rows),
+The owner asked for Jev to be run on the same triage test as Laya. Same functions and expected answers (Laya's saved rows),
 same task wording and A/B criteria, each run normally and swapped; pseudocode cut at whole lines to ~1200 characters
 (~300 tokens, Laya's budget; code re-read from the current DB, which includes the no-return fix). Requests went through
 the Codex Router (metered). Script and per-case rows: `../../../lab/reports/jev-native-map-20261012/`

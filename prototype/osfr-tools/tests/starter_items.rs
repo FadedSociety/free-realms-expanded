@@ -395,7 +395,7 @@ fn a_regranted_starter_weapon_sells_for_zero_and_a_normal_item_keeps_its_price()
     assert_eq!(count_definition(&inventory_of(&gateway), STARTER_BOW), 0);
 
     // Reselect the job while it is already active: ensure_outfit re-grants the weapon, and the
-    // fresh copy is still worth 0. The re-grant itself is unchanged (the owner, 2026-10-20).
+    // fresh copy is still worth 0. The re-grant itself is unchanged (The owner, 2026-10-20).
     switch_to_archer(&mut gateway);
     assert_eq!(count_definition(&inventory_of(&gateway), STARTER_BOW), 1);
     let regranted = instance_of(&inventory_of(&gateway), STARTER_BOW);

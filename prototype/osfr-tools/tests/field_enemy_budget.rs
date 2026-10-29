@@ -1,5 +1,5 @@
 //! T398: the shipped starter field enemies stay inside the reconstructed (R)
-//! final-era budget. Bounds only (the owner: tunable over locked); the numbers come
+//! final-era budget. Bounds only (The owner: tunable over locked); the numbers come
 //! from `data/content/field_enemies.json` (each row) and `combat_scale.json`
 //! (player health, tier factors, enemy scales).
 //!

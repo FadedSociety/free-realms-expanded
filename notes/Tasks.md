@@ -7,7 +7,7 @@ Active target (2026-10-15): **playtest night**, about 10 players together on our
 ## Next
 
 - [x] **Studio toolkit** ([[Design/Studio Toolkit]]). All nine tabs are native-verified. The bot client is verified against the live gateway, though never alongside a native client. Terrain, the Map tab, marks, the NPC placer and behaviour presets are built; the placed NPCs and names are native-verified (run 20261016T011257Z). Remaining: bridge and building heights. Continued in [[Design/World Builder]] and Build Plan 3.3.
-- [ ] **OSFR "Mounts and Pets" update (the owner, 2026-10-15, later):**
+- [ ] **OSFR "Mounts and Pets" update (The owner, 2026-10-15, later):**
   - Map the community OSFR server's new content into ours: pets with navmesh, world events (Werewolves vs Vampires dance-off), more mounts, collection nodes (158) and collection coins (118) with community placements, Mystery Cake scaling, game-time sync, and portrait refresh.
   - **Check the OSFR repo's license first.** Treat code as reference only, as with Legacy (AGPL). Placement data may be reusable with credit.
 - [x] Install REA and Ablation with pinned provenance; test local Laya on the PC and record compatibility/accuracy limits in [[Research/REA Ablation and Local Laya]].

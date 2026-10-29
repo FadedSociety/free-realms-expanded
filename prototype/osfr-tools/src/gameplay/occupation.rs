@@ -64,7 +64,7 @@ pub(super) struct Gates {
 }
 
 impl Occupation {
-    /// (R) Reconstructed rules. the owner, 2026-10-19: a kart race blocks starting another activity
+    /// (R) Reconstructed rules. The owner, 2026-10-19: a kart race blocks starting another activity
     /// and a derby blocks warpstone travel, like every other minigame (the old hand-written
     /// lists had left both open).
     ///

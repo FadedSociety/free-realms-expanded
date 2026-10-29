@@ -6,8 +6,8 @@ October 8, 2026. Tooling milestone; game acceptance remains at the existing Quee
 
 - Installed and enabled `codex-on-crack@codex-on-crack`, version `2.2.2+codex.20261002`, source commit `9dee6ca9aaa73e0008123eff872871e88b94a12a`. All 71 installed source files matched the pinned checkout.
 - Installed Codex Router `0.6.0`, source commit `444a72809d1609020516e14438c2075c5f4bda8c`, at `%USERPROFILE%\.codex\tools\codex-router`. Its Windows scheduled task and authenticated loopback health checks pass.
-- the owner entered the DeepSeek credential through the router's hidden local prompt. Credential contents were not read into chat or added to this project.
-- the owner chose DeepSeek V4.1 Flash, then requested max reasoning. The selected route is `deepseek/deepseek-v4.1-flash`; both the router's per-model effort and the generated `crack_builder` role use `max`.
+- The owner entered the DeepSeek credential through the router's hidden local prompt. Credential contents were not read into chat or added to this project.
+- The owner chose DeepSeek V4.1 Flash, then requested max reasoning. The selected route is `deepseek/deepseek-v4.1-flash`; both the router's per-model effort and the generated `crack_builder` role use `max`.
 - The lead remains `gpt-6-astra`; its reasoning setting is preserved. The role permits scoped implementation/tests, with evidence returned to the lead for review. No global crack policy was installed.
 - Router doctor: 88 checks, zero failures. Warnings concern other providers/local models that are not configured. Crack doctor: `static-ready`, configured role in sync, zero problems.
 

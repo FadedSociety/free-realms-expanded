@@ -23,7 +23,7 @@ Private evidence: `../../../lab/reports/kart-weapons-probe-v18-20261009/`.
 
 ## Native diagnostic
 
-The v18 test failed. the owner tried left-click and Ctrl: 17 C33/19 item-use requests
+The v18 test failed. The owner tried left-click and Ctrl: 17 C33/19 item-use requests
 reached the server, but no S33/20 activation or weapon actor frames were returned.
 The validated wire audit found direct C33/6 poses while saved `weapon_pose` remained
 null. Binary session dispatch handles reliable gameplay only; direct one-byte

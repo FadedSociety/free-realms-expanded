@@ -1,6 +1,6 @@
 # Project brief
 
-the owner wants to revive Free Realms into something playable in its entirety. The game has personal significance from childhood. The preservation target takes priority over the earlier idea of a game inspired by FusionFall, Toontown Online, and Free Realms.
+The owner wants to revive Free Realms into something playable in its entirety. The game has personal significance from childhood. The preservation target takes priority over the earlier idea of a game inspired by FusionFall, Toontown Online, and Free Realms.
 
 ## Direction
 

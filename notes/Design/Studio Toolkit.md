@@ -1,6 +1,6 @@
 # Studio Toolkit
 
-the owner's direction (2026-10-15): decompiled functions do not give us dungeon bosses, enemy behaviour or content, so most systems are built new. Build them "in an intuitive and intelligent way", and build a **toolkit** so one engineer, or anyone who clones the repo, can move fast: hot-swap values, place NPCs, inspect anything, test without fighting the client UI. Inspirations he named: ForgeLight tools, Unity/Blender hooks, Roblox Studio, and a latitude/longitude-style location system.
+The owner's direction (2026-10-15): decompiled functions do not give us dungeon bosses, enemy behaviour or content, so most systems are built new. Build them "in an intuitive and intelligent way", and build a **toolkit** so one engineer, or anyone who clones the repo, can move fast: hot-swap values, place NPCs, inspect anything, test without fighting the client UI. Inspirations he named: ForgeLight tools, Unity/Blender hooks, Roblox Studio, and a latitude/longitude-style location system.
 
 ## Shape
 

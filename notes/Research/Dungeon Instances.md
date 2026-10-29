@@ -671,7 +671,7 @@ decompile 008e4ae0   # 31 zone transition reader
 Supporting reads: `009beb70` (HandleMiniGameStart) and `009b0db0` (41/6 exit). The results/lifecycle
 readers 39/17, 39/18, 39/47, 39/19, 26/42, 41/2, 41/106 and 41/133 are pinned by the existing
 accepted notes and tests cited above; this run re-decompiled the entry, goal, wheel, boss and POI
-readers. The graph server project `C-Users-the owner-Documents-Projects-CartoonMMO-autopilot-int` was queried
+readers. The graph server project `C-Users-<user>-Documents-Projects-CartoonMMO-autopilot-int` was queried
 for dungeon instance/entry and field-battle symbols; `trace_path` rejected the method names it was
 given, so the callers were taken from direct source reads and the existing test notes.
 

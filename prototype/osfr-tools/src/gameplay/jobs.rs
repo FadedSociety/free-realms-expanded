@@ -68,7 +68,7 @@ impl Gameplay {
     }
 
     /// (R) A job never stays bare: when a job with a completely empty outfit
-    /// becomes active, it gets its starter outfit (the owner, 2026-10-15). Fixes
+    /// becomes active, it gets its starter outfit (The owner, 2026-10-15). Fixes
     /// saves whose job was unlocked by a path that granted no clothes.
     pub(super) fn ensure_outfit(&mut self, job: i32, out: &mut Outcome) -> io::Result<()> {
         if self
@@ -110,7 +110,7 @@ impl Gameplay {
     }
 
     /// (R) Leaving a race puts the player back in the job they had before it;
-    /// Kart Driver stays only when chosen or required (the owner, 2026-10-15).
+    /// Kart Driver stays only when chosen or required (The owner, 2026-10-15).
     /// The 38/21 activation is serialized from the repaired outfit, not from the
     /// inventory before `ensure_outfit` (client reader `0x0091b080`).
     pub(super) fn restore_job(&mut self, job: i32, guid: u64, out: &mut Outcome) -> io::Result<()> {

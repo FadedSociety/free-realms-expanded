@@ -509,7 +509,7 @@ impl EncounterEngine {
     }
 
     /// The encounter's summoner while any of its summoned minions stands
-    /// (the owner: "you kill those, then keep attacking the summoner") (R).
+    /// (The owner: "you kill those, then keep attacking the summoner") (R).
     pub(super) fn shielded(&self, guid: u64) -> bool {
         let (Some(d), Some(active)) = (self.dungeon(), self.state.active.as_ref()) else {
             return false;

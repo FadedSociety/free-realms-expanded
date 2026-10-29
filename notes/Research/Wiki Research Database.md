@@ -2,7 +2,7 @@
 
 Status: collected, indexed and verified, 2026-10-08 06:41 UTC.
 
-the owner requested a dedicated Scrapling crawler and SQLite database with sqlite-vec for restoration research. The database and raw community text stay outside Git at `%USERPROFILE%\Documents\Projects\CartoonMMO\lab\references\freerealms-wiki\wiki.sqlite`. They are research evidence, not authoritative original server definitions.
+The owner requested a dedicated Scrapling crawler and SQLite database with sqlite-vec for restoration research. The database and raw community text stay outside Git at `%USERPROFILE%\Documents\Projects\CartoonMMO\lab\references\freerealms-wiki\wiki.sqlite`. They are research evidence, not authoritative original server definitions.
 
 ## Acquisition
 

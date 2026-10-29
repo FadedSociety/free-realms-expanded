@@ -183,7 +183,7 @@ at most 20; basic damage 1..100,000; base health 100..100,000), not pinned tests
 
 | # | Change | Number and source |
 |---|---|---|
-| A1 | `profile_stats` basic bases x3.72 | Medic 75 -> **279**, Archer 80 -> 298, Ninja and Brawler 100 -> 372, Warrior 110 -> 409, Wizard 130 -> 484. Medic 279 = wiki Incision tier 1; others keep the existing ratio to Medic (the owner's job identity, (R)). Keeping the `1.75^(tier-1)` formula gives 279 / 488 / 854 / 1495 / 2617 against live 279 / 488 / 853 / 1492 / 2609 (max +0.3%). Per-job live-faithful alternative: every job 279, since live first attacks are identical across jobs. |
+| A1 | `profile_stats` basic bases x3.72 | Medic 75 -> **279**, Archer 80 -> 298, Ninja and Brawler 100 -> 372, Warrior 110 -> 409, Wizard 130 -> 484. Medic 279 = wiki Incision tier 1; others keep the existing ratio to Medic (The owner's job identity, (R)). Keeping the `1.75^(tier-1)` formula gives 279 / 488 / 854 / 1495 / 2617 against live 279 / 488 / 853 / 1492 / 2609 (max +0.3%). Per-job live-faithful alternative: every job 279, since live first attacks are identical across jobs. |
 | A2 | Enemy `max_health` x3.72 | Keeps every time-to-kill. Rewrite the baselines in the six data files above (249 rows) with a script that records the factor in each file's provenance, or apply one multiplier at the three load points `field_content.rs:160`, `:289` and the `encounters.json` loader `encounter.rs:913`. Worst case 1020 x level factor 5.36 x 3.72 = 20.3k, inside the 100,000 bound. |
 | A3 | Triage multiplier | Keep 3.2 (live 3.186, result 893 vs 889). |
 | B-free | Heals | Keep 250 / 254 (already live-scale at level 1). |

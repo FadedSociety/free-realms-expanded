@@ -58,7 +58,7 @@ The ratchet ceilings in `tests/spine_rules.ceilings` only go down. After every g
 
 ## 4. Build order from here
 
-the owner, 2026-10-18: feature briefs keep flowing alongside the deletion phase. They are not held back, and the integrator's conflict requeue handles the overlaps.
+The owner, 2026-10-18: feature briefs keep flowing alongside the deletion phase. They are not held back, and the integrator's conflict requeue handles the overlaps.
 
 1. **Deletion phase** (restructure plan `lab/autopilot/restructure/plan.md`, one commit per step, pins first). The ratchet ceilings fall as each step lands. Briefs D001–D005 (S1, S3, S4, S5, S6) are queued. `D` ids sort ahead of the fix queue, and the Sol lane reviews them.
    - **Phase A:** S1 encounter dead code, S3 `KeyedBuckets`, S4 delete `joined`, S5 reward snapshot. S2 (delete the template fallback) waits on the owner.
@@ -68,7 +68,7 @@ the owner, 2026-10-18: feature briefs keep flowing alongside the deletion phase.
      - F150 GUID collision (queued).
      - A kart race rewrites the character save on every 50 ms tick (queued as a fix brief).
      - `realm reload all` applies half a reload and then reports "Nothing changed" (open).
-2. **Dormancy** (the owner's charter: only active activities and populated instances tick).
+2. **Dormancy** (The owner's charter: only active activities and populated instances tick).
    - Full design: `lab/autopilot/restructure/dormancy-design.md`, from a 53-agent map of every per-tick path. Nothing was measured; costs are estimates.
    - **The rule:** a session or instance ticks only when a pure, read-only check of its own live state says something is armed. The check is derived on every call and never cached, because handlers and the shared-field tick arm work without sending a message.
    - **Slice 1 (L004, done):** a shared field nobody is in ticks once more to settle (dropping departed casters' DoTs and kill credits), then sleeps until someone enters. Test `dormant_fields::an_empty_field_settles_once_then_sleeps_until_someone_enters`, canaried both ways.

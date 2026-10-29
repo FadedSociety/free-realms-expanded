@@ -20,7 +20,7 @@ Database: $NM_DB, else the path in lab/native-map/ACTIVE.
 import csv, json, os, re, sqlite3, sys
 from pathlib import Path
 
-LAB = Path(r"%USERPROFILE%\Documents\Projects\CartoonMMO\lab")
+LAB = Path.home() / "Documents/Projects/CartoonMMO/lab"
 _active = LAB / "native-map" / "ACTIVE"  # lead-maintained pointer to the current run's database
 DB = os.environ.get("NM_DB") or (_active.read_text().strip() if _active.exists() else str(LAB / "native-map" / "run" / "map.sqlite"))
 CTX = LAB / "native-map" / "context"

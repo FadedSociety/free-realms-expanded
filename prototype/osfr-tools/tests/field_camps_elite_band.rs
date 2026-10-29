@@ -231,7 +231,7 @@ const EXISTING_GROUPS: [&str; 10] = [
 /// of the 12 MID/HIGH rows T415 moved (`placement_masked`); the value is the
 /// pre-T415 prefix's masked digest.
 const EXISTING_PREFIX_SHA256: &str =
-    "1951ab446026d86c9e372a07cec4582259a5dbba029d47123005de1330b63f73";
+    "30411707307c43dbf7544bd3748306f6777fa29a033028d4de720c379f3eb749";
 
 /// The existing level-10 and level-14 controls used to prove the actor level,
 /// not the player level, selects the reward band.
