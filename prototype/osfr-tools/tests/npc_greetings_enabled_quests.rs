@@ -327,6 +327,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         "Beth Callahan (T743 talk target of 3090027): the client names her only in third person (387592 'Speak to Beth Callahan', the objective text, and Doctor Callahan's offer speech 387576 that sends the player to her); quest-lines/objective-specs-fixed.json q3090027 records no first-person line, so none is recovered.",
     ),
     (
+        9000000031,
+        "Brin Galeglow (T676 giver, talk target and turn-in of Postman: Achieve Level 20, 3130031): the client lines naming her are third-person ('Return to Brin Galeglow', 387944 and 387974) or the quest's own offer intro 387942, which quest-lines/dialogs.json q3130031 records with no speaker; the Postman guide marks her as giver with a dagger, so no first-person greeting of hers is proven and none is bound.",
+    ),
+    (
         9000000039,
         "Cale Yardbird (T542 giver and talk target of Become a Kart Driver 3080050): the client lines naming him are third-person objectives (1230727406 'Speak to Cale Yardbird at Tangletrack', 3977947908 'Return to Cale Yardbird') and the trainer menu label 407752; the Kart Driver guide quotes no first-person line of his own, so none is recovered.",
     ),

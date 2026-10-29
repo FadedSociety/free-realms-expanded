@@ -1618,11 +1618,58 @@
     },
     {
       "id": 3130031,
+      "job": 4,
       "title_string_id": 387943,
       "giver_npc_id": 9000000031,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "profile_id": 4,
+          "level": 20,
+          "text_string_id": 387969,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387969 'Reach level 20 as a postman.' (lab/reports/locale-id-to-text.json) is this quest's objective line; quest-lines/objective-specs-fixed.json q3130031 objective 0 gives job_level profile 4 level 20 (status settled, no NPC target). Intro 387942 and the wait line 387944 both name level 20."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T676: one authoritative job_level objective at profile 4 (Postman), level 20, completed from the server's own Profiles::rank curve (T361), never from a Talk or a client claim; job_level is objective #0 as quest_engine requires for an ordered quest. Same shape as Postman level 10 (T663) and Chef level 10 (T672)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000031,
+          "text_string_id": 387974,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387974 'Return to Brin Galeglow in Shrouded Glade' (lab/reports/locale-id-to-text.json) is the return step; 387944 says the same ('Return to Brin Galeglow at that time')."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T676: Brin Galeglow 9000000031 is the giver and a drawn row (npcs/shrouded_glade.json, placement legacy_data), so the Talk can run; the final Talk to a named objective target opens the 49/13 end screen at her."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T676: no source gives this quest a reward (quest-lines/quests.json q3130031 rewards empty, rewards_missing). Fifteen coins are the T361/T663 level-gate payout, paid once by the 49/14 turn-in; no item and no job XP, like Postman level 10 (3130017)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1638,7 +1685,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T676: the level gate is the one job_level objective (T361) plus the return Talk; ContentDb v1 has no other free-text objective field"
         },
         {
           "kind": "reconstructed",
@@ -1646,11 +1693,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+          "evidence": "(R) T676: no prerequisite. The guide order puts Always On Time (3130030, deliver target unplaced) and Mile High Mail (3130029, needs the Shrouded Glade mail-sorting minigame) first, but both are disabled stubs and would make this quest unreachable (enabled_quest_reachability). quest-lines/quests.json q3130031 gives no previous or next link."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T676 enabled (live 'unsure' but final): Brin Galeglow offers it, the Postman rank-20 goal and her Talk complete it, and she takes it in. job gate 4 keeps it Postman-only like 3130017. The guide marks Brin as giver with a dagger (placement uncertain); the NPC row lists the quest in quest_ids_given. Reward is ours (see the reward row)."
         },
         {
           "kind": "reconstructed",
@@ -1660,7 +1707,7 @@
       "description_string_id": 387944,
       "intro_text_string_id": 387942,
       "end_text_string_id": 387945,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3130032,
