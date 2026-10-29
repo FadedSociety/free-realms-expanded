@@ -1441,10 +1441,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -1467,13 +1463,50 @@
     },
     {
       "id": 3030024,
+      "job": 43,
+      "min_level": 5,
       "title_string_id": 72507,
       "giver_npc_id": 9000000428,
       "prerequisite_quest_ids": [
-        3030023
+        3030021
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000009,
+          "text_string_id": 72522,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "locale 72522 'Look for a treasure hunter in Briarwood that may be willing to buy that silver dust you looted.' (lab/reports/locale-id-to-text.json); quest-lines/quests.json q3030024 objective 2 names Andrew 9000000009, the Briarwood treasure hunter (npcs/briarwood.json, Legacy spawn)."
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md row Andrew: Brawler: Finding a Buyer 'sends the player to him'; Brawler.md M6 (Missing Wallet) has Andrew say he would buy the dust but lost his wallet, so the Talk at Andrew is the last step and he hands the quest in."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T669: the client text never names the buyer (quest-lines/quests.json q3030024 open); Andrew is chosen from the guide and the M6-M8 chain. Client lines 100068 and 100073 (Brawler.md:247) send the silver-dust seller to Sorin in Snowhill instead; that branch is not built. Objective id 1 is a server binding."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "43": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T669: the retail payout is unknown (quest-lines/quests.json q3030024 rewards [] and no client reward line). Five coins and 25 Brawler (profile 43) XP follow the T252 small-quest rung and T724's Brawler: IOU! (same band), paid once by the quest grant key; no item, so no free sellable gear."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1505,17 +1538,17 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T669: the guide orders Splendid Silver (3030023) before this quest, but that quest and its chain stay disabled, so keeping it would leave the quest unreachable (tests/enabled_quest_reachability.rs). The prerequisite is the nearest enabled ancestor, Brawler: Achieve Level 5 (3030021, T660, the same gate Splendid Silver waits on), so Petra offers the rank goal first and this quest after it; min_level 5 (guide band 'level 5 to 10', the same gate as T724's 3030027) stays as the rank guard. A playtest entry, not the retail order; restore [3030023] when that chain is built."
         }
       ],
       "description_string_id": 72508,
       "intro_text_string_id": 72506,
       "end_text_string_id": 72509,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3030025,

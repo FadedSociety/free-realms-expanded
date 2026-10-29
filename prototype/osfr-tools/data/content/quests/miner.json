@@ -1668,13 +1668,68 @@
     },
     {
       "id": 3100024,
+      "job": 14,
+      "min_level": 20,
       "title_string_id": 78173,
       "giver_npc_id": 9000000203,
       "prerequisite_quest_ids": [
         3100023
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "zone_id": 0,
+          "position": [
+            -880.8658,
+            -82.09491,
+            2473.277
+          ],
+          "radius": 8.0,
+          "text_string_id": 78177,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "locale 78177 'Visit Pinkelug at the Mother Lode quarry in Briarwood.'; lab/references/quest-lines/objective-specs.json q3100024 objective 0 (visit_position, radius 8) at Pinkelug's own row position (npcs/briarwood.json 9000000169)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T669: the position is Pinkelug's drawn spawn, so standing beside her is the visit; objective id 1 is a server binding, not a recovered retail id."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000169,
+          "text_string_id": 78178,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "locale 78178 'Talk to Pinkelug' and the end text 78175; Pinkelug is 9000000169 (npcs/briarwood.json, Legacy spawn, NameId 23210 = 'Pinkelug'). quest-lines/quests.json q3100024 objective 2."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T669: the final Talk is the hand-in, so Pinkelug is the turn-in NPC (npcs/briarwood.json quests_accepted); the retail hand-in NPC is not stated."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "14": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T669: the retail payout is unknown (quest-lines/quests.json q3100024 rewards 'unknown'). Five coins and 25 Miner (profile 14) XP follow the T202 two-objective rung (Chef 3050004) and the T252 small-quest rung; no item, so no free sellable gear."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1687,10 +1742,6 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) quest id 3100024 is a stable batch content key; no numeric server quest id is given"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
         },
         {
           "kind": "reconstructed",
@@ -1707,12 +1758,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T669: prerequisite 3100023 (Reach Level 20, enabled by T660) is kept, so Silverray offers the rank goal first and this quest after it; min_level 20 ('Reach Level 20 as a Miner, then return to Silverray', Miner.md row 22) stays as the rank guard. The wiki marks the quest members only; the server's quest content has no membership gate, so it is not enforced (R). Biggest is Best and Mother Lode Lift stay disabled: no server mining game yields gold ore 2743 or moonstone 2747."
         }
       ],
       "description_string_id": 78174,
       "intro_text_string_id": 78172,
       "end_text_string_id": 78175,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3100025,

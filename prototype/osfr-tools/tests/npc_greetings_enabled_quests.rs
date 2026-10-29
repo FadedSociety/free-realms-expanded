@@ -351,6 +351,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         "Honey (T500 talk target of 3000310): NPCs - Sanctuary.md:47 quotes only a farm location and harvesting objectives (841702301, 2418103113, 623626341) and the interview mention (2478429130); her reply 390820 is the quest-step dialogue of 3000310 goal 2, not a greeting. Her chef quest intros are disabled quests.",
     ),
     (
+        9000000133,
+        "Lucca De'Flor (T669 talk target and turn-in of 3050026): NPCs - Snowhill.md:78 quotes only third-person lines about him (his cafe, the review), and 72539, his one first-person line, is the end text of The Food Reviewer, a quest-step line rather than a greeting; binding it moves the Snowhill bound-row pins in the region greeting tests, which this quest-data change does not touch, so he stays unbound.",
+    ),
+    (
         9000000140,
         "Manager Landon (T409): his client lines are third person (402947, 402841, 416471, 402687); the first-person substitute plea 418984 is the Snowy Scrimmage offer intro, whose speaker the Soccer Star guide leaves unnamed (1591815111), so no uncontested greeting of his own is recovered.",
     ),
@@ -361,6 +365,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
     (
         9000000164,
         "Osgood (T723 giver of Wizard: Reach Level 10, Helping a Friend and Reach Level 15; talk target of both gates): NPCs - Sanctuary.md:60 quotes only his role, the wand build and his level-10 and level-15 blocks; his first-person lines 387662, 387665, 387666, 387669 and 37310 are the offers and end texts of those three quests, whose speaker the guide leaves unnamed, and a quest line is not a standing greeting, so none is bound.",
+    ),
+    (
+        9000000169,
+        "Pinkelug (T669 talk target and turn-in of 3100024): NPCs - Briarwood.md:110 quotes no line of hers (it lists her quests and the 12-topaz ask, client 1777039956), and the lines that name her are Silverray's third-person send-off (78172, 78174, 78179) and the objective 78178; the end text 78175 is the quest-step line, so no first-person greeting of her own is recovered.",
     ),
     (
         9000000173,

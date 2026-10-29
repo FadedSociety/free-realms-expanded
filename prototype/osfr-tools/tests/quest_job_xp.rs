@@ -1004,7 +1004,7 @@ fn content_overflow_is_rejected_at_load() {
 fn configured_job_xp_and_job_gates_match_the_task_table() {
     let content = content_dir();
     // (file, quest id, giver, prerequisites, reward coins, job gate, profile, XP)
-    let expected: [(&str, u32, u64, &[u32], u32, Option<i32>, i32, u32); 28] = [
+    let expected: [(&str, u32, u64, &[u32], u32, Option<i32>, i32, u32); 30] = [
         (
             "adventurer.json",
             INTRODUCE_YOURSELF,
@@ -1074,6 +1074,18 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             Some(CHEF),
             CHEF,
             20,
+        ),
+        // T669: Chef: The Food Reviewer (M8), band 3 gate (min_level 10 replaces the disabled
+        // 3050025 prerequisite); the guide's reward cell is unknown, so the small-quest rung.
+        (
+            "chef.json",
+            3_050_026,
+            9_000_000_061,
+            &[],
+            5,
+            Some(CHEF),
+            CHEF,
+            25,
         ),
         (
             "kart_driver.json",
@@ -1281,6 +1293,18 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             BRAWLER,
             25,
         ),
+        // T669: Brawler: Finding a Buyer (M5) behind the same band gate and T660's Achieve Level 5;
+        // Petra offers it and the guide's reward cell is unknown, so the small-quest rung.
+        (
+            "brawler.json",
+            3_030_024,
+            9_000_000_428,
+            &[3_030_021],
+            5,
+            Some(BRAWLER),
+            BRAWLER,
+            25,
+        ),
         // T334: the second Miner chapter, after T300's playable 3100002. 5 coins
         // and 15 Miner XP mirror the first rung; the guide's reward cell is unknown
         // and no item is granted.
@@ -1315,7 +1339,8 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
     // Cobblestone Brawler records and T331's hand-off are added with their own tags,
     // T334 adds the second Miner chapter behind T300's practice test, T377 adds
     // the two chapter records after E4, T411 adds the third Miner chapter, T726 adds
-    // Petal Oceanmist's sponsorship quest and T732 adds the two Wildwood referrals.
+    // Petal Oceanmist's sponsorship quest, T732 adds the two Wildwood referrals and T669 adds
+    // Finding a Buyer and The Food Reviewer.
     // A later task's decision tag counts only for the record that task decided, so a
     // new quest cannot satisfy the table by carrying someone else's tag.
     let has_decision = |quest_id: u32, source: &Value| {
@@ -1328,6 +1353,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             3_030_004 | 3_030_005 => "(R) T252:",
             3_030_009 => "(R) T331:",
             3_030_027 => "(R) T724:",
+            3_030_024 | 3_050_026 => "(R) T669:",
             3_100_003 => "(R) T334:",
             3_100_004 => "(R) T411:",
             3_080_007 | 3_080_009 => "(R) T732:",

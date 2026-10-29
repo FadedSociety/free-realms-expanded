@@ -1855,7 +1855,23 @@
       "quests_given_text": [
         "Brawler: Finding a Buyer (sends the player to him), Brawler: Missing Wallet, Brawler: Missing Money, Brawler: IOU!. His wife asks for Joey in Lost Little Joey (client 1914515088)."
       ],
-      "quests_accepted": [],
+      "quests_accepted": [
+        {
+          "quest_id": 3030024,
+          "title": "Brawler: Finding a Buyer",
+          "title_string_id": 72507,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "locale 72522 sends the player to look for a Briarwood treasure hunter; notes/Build Guides/Content/NPCs/NPCs - Briarwood.md names Andrew as the one Brawler: Finding a Buyer sends the player to."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T669: the Talk at Andrew completes the quest, so he is the turn-in NPC; the next quest, Missing Wallet, is his."
+            }
+          ]
+        }
+      ],
       "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
@@ -51126,7 +51142,23 @@
       "quests_given_text": [
         "Miner: Biggest is Best, Miner: Speed Smelting (no live client title), Miner: Mother Lode Lift; asks 12 topaz (client 1777039956)."
       ],
-      "quests_accepted": [],
+      "quests_accepted": [
+        {
+          "quest_id": 3100024,
+          "title": "Miner: Growing Up So Quickly",
+          "title_string_id": 78173,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "locale 78177/78178 ('Visit Pinkelug', 'Talk to Pinkelug') and the end text 78175 close the quest at Pinkelug, who gives Biggest is Best next."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T669: the final Talk is the hand-in, so the turn-in NPC is Pinkelug rather than the giver Silverray."
+            }
+          ]
+        }
+      ],
       "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",

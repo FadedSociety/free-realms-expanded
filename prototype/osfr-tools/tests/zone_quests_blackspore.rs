@@ -21,8 +21,8 @@ mod quest_records;
 
 use npc_quest_chain::{
     ADVENTURER, CHARACTER, Fixture, ZoneQuest, ZoneQuests, assert_no_offer,
-    assert_packet_changes_nothing, coins, counts, objective_complete, pending_turnin, profile_xp,
-    quest_end_reply, quest_reply, quest_status, realm_level, talk, zone_player,
+    assert_packet_changes_nothing, coins, counts, objective_complete, offer, pending_turnin,
+    profile_xp, quest_end_reply, quest_reply, quest_status, realm_level, talk, zone_player,
     zone_player_with_quests,
 };
 use osfr_tools::{gameplay::Gameplay, quest_engine::QuestStatus};
@@ -46,6 +46,9 @@ const GATES: [(u32, u64, i32); 4] = [
     (BRAWLER_5, PETRA, BRAWLER),
     (NINJA_5, CHLOE, NINJA),
 ];
+/// A gate's follow-up the same giver offers once the gate is paid (T669: Growing Up and
+/// Finding a Buyer list their gate as the prerequisite).
+const FOLLOW_UPS: [(u32, u32); 2] = [(MINER_20, 3_100_024), (BRAWLER_5, 3_030_024)];
 /// Both givers' rows are in `blackspore_swamp.json`; Petra's drawn body is her
 /// `npc_spawns_extra.json` spawn, whose runtime guid is her content key.
 const MAP: ZoneQuests = ZoneQuests {
@@ -149,7 +152,12 @@ fn each_gate_is_offered_waits_for_the_rank_and_is_paid_once() {
             now + 5,
             "a replayed 49/2",
         );
-        assert_no_offer(&mut game, &at_giver, giver, &mut now, "the giver after");
+        match FOLLOW_UPS.iter().find(|(gate, _)| *gate == id) {
+            Some(&(_, next)) => {
+                offer(&mut game, &at_giver, giver, next, now);
+            }
+            None => assert_no_offer(&mut game, &at_giver, giver, &mut now, "the giver after"),
+        }
     }
 }
 

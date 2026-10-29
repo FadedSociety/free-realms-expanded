@@ -1544,10 +1544,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -1570,13 +1566,48 @@
     },
     {
       "id": 3050026,
+      "job": 45,
+      "min_level": 10,
       "title_string_id": 72537,
       "giver_npc_id": 9000000061,
-      "prerequisite_quest_ids": [
-        3050025
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000133,
+          "text_string_id": 72538,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "locale 72536 (Yumtumlot) and 72538 (the description) send the player to Chef Lucca De'Flor in Snowhill; Lucca is 9000000133 (npcs/snowhill.json, drawn by his npc_spawns_extra.json body, NameId 23788). quest-lines/quests.json q3050026 objective 1."
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md row Lucca De'Flor: 'Reviews the food in Chef: The Food Reviewer'; locale 72539 is his line ('It's time you showed me your skills'), so the Talk at Lucca ends the quest and he gives Double Dog Dare (3050027)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T669: the answer has no quest_objective line (intro dialog 72536 only), so one Talk at Lucca is inferred; description 72538 doubles as the goal text, as T661 and T727 did. Locale 140262/140263 ('Have Your Food Reviewed') may be a later cooking variant; not built. Objective id 1 is a server binding."
+            }
+          ]
+        }
       ],
-      "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "45": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T669: the retail payout is unknown (quest-lines/quests.json q3050026 rewards []). Five coins and 25 Chef (profile 45) XP follow the other enabled Chef quest with a job gate (3050004); no item, so no free sellable gear."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1608,17 +1639,17 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T669: prerequisite 3050025 (Surprise Me!, cook Rainleaf Wrapped Dumplings for a score of 20,000) is disabled because the dumpling recipe has no server id, so it is dropped and replaced by the band gate: job 45 with min_level 10 (Chef.md band 3, 'level 10 to 15'). A playtest entry, not the retail order; restore [3050025] when that quest can run."
         }
       ],
       "description_string_id": 72538,
       "intro_text_string_id": 72536,
       "end_text_string_id": 72539,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3050027,

@@ -23135,7 +23135,23 @@
       "quests_given_text": [
         "Chef: Double Dog Dare, Chef: Reach Level 15 (wiki calls it \"Chef: Achieve Level 15\"), sends to Glerga (Chef: Glerga). Reviews the food in Chef: The Food Reviewer. Town quests Lucca's New Creation and Helping the Local Chef (wiki; the latter repeatable). Appears in Snowhill Secret Society."
       ],
-      "quests_accepted": [],
+      "quests_accepted": [
+        {
+          "quest_id": 3050026,
+          "title": "Chef: The Food Reviewer",
+          "title_string_id": 72537,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "locale 72538 sends the player to Lucca De'Flor and 72539 is his reply; notes/Build Guides/Content/NPCs/NPCs - Snowhill.md says Lucca reviews the food in Chef: The Food Reviewer."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T669: the Talk at Lucca completes the quest, so he is the turn-in NPC rather than the giver Yumtumlot; Double Dog Dare (3050027) is then his."
+            }
+          ]
+        }
+      ],
       "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
