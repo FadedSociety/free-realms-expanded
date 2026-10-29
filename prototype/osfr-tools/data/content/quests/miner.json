@@ -1524,11 +1524,42 @@
     },
     {
       "id": 3100023,
+      "job": 14,
       "title_string_id": 387467,
       "giver_npc_id": 9000000203,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "profile_id": 14,
+          "level": 20,
+          "text_string_id": 387526,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387526 'Reach Level 20 as a Miner, then return to Silverray.' (quest-lines/objective-specs-fixed.json q3100023: job_level profile 14 level 20); locale 387468 description, 387469 end text"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T660: the goal is the server rank gate (job_level, T361): it completes from the server's own Profiles::rank curve, never from a client claim; the client only shows its objective counter. Profile and level come from the client text, the same as the enabled Chef and Warrior gates."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T660: no reward is recorded for Miner: Reach Level 20 in the client text, the wiki or the quest-lines answer (quest-lines/quests.json q3100023, rewards empty); 15 coins is the T361 gate-quest payout, paid once by the 49/14 turn-in. No item and no job XP, so the pinned quest_job_xp table is untouched."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1561,11 +1592,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T660: enabled from the lab quest-lines answer quest-lines/quests.json q3100023; the answer rates it live \"unsure\" and lab/references/quest-lines/flags.tsv flags neither its title 387467 nor its goal 387526, so the whole record is (R); the guide predecessor Miner: Smelting Secrets (disabled) is not stored as a prerequisite; the hand-in is the giver, Silverray (a drawn legacy_data row)."
         }
       ],
       "description_string_id": 387468,
-      "end_text_string_id": 387469,
-      "enabled": false
+      "end_text_string_id": 387469
     },
     {
       "id": 3100024,

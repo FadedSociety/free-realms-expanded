@@ -1259,11 +1259,58 @@
     },
     {
       "id": 3030021,
+      "job": 43,
       "title_string_id": 387359,
       "giver_npc_id": 9000000428,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "profile_id": 43,
+          "level": 5,
+          "text_string_id": 387363,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387363 'Reach level 5 as a brawler, then return to Petra.' (quest-lines/objective-specs-fixed.json q3030021: job_level profile 43 level 5, settled); locale 387358 offer, 387360 description, 387361 end text"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T660: the goal is the server rank gate (job_level, T361): it completes from the server's own Profiles::rank curve, never from a client claim; the client only shows its objective counter. Profile and level come from the client text, the same as the enabled Chef and Warrior gates."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000428,
+          "text_string_id": 387366,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387366 'Return to Petra' (quest-lines/objective-specs-fixed.json q3030021 objective 1: talk_to_npc 9000000428)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T660: Petra is drawn by her npc_spawns_extra.json row (content key 9000000428), so the final Talk to the named target opens the 49/13 end screen at her."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T660: no reward is recorded for Brawler: Achieve Level 5 in the client text, the wiki or the quest-lines answer (quest-lines/quests.json q3030021, rewards empty); 15 coins is the T361 gate-quest payout, paid once by the 49/14 turn-in. No item and no job XP, so the pinned quest_job_xp table is untouched."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1304,12 +1351,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T660: enabled from the lab quest-lines answer quest-lines/quests.json q3030021 (final, live yes); the guide predecessor Brawler: Prey on the Cray (disabled) is not stored as a prerequisite."
         }
       ],
       "description_string_id": 387360,
       "intro_text_string_id": 387358,
-      "end_text_string_id": 387361,
-      "enabled": false
+      "end_text_string_id": 387361
     },
     {
       "id": 3030022,

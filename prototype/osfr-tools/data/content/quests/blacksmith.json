@@ -1300,11 +1300,42 @@
     },
     {
       "id": 3020024,
+      "job": 16,
       "title_string_id": 387563,
       "giver_npc_id": 9000000203,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "profile_id": 16,
+          "level": 20,
+          "text_string_id": 387564,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387564 'Your blacksmithing career will continue once you have reached level 20 as a Blacksmith. Return to Silverray at that time.' (quest-lines/objective-specs-fixed.json q3020024: job_level profile 16 level 20, settled); locale 387562 offer, 387565 end text"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T660: the goal is the server rank gate (job_level, T361): it completes from the server's own Profiles::rank curve, never from a client claim; the client only shows its objective counter. Profile and level come from the client text, the same as the enabled Chef and Warrior gates."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T660: no reward is recorded for Blacksmith: Reach Level 20 in the client text, the wiki or the quest-lines answer (quest-lines/quests.json q3020024, rewards empty); 15 coins is the T361 gate-quest payout, paid once by the 49/14 turn-in. No item and no job XP, so the pinned quest_job_xp table is untouched."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1341,12 +1372,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T660: enabled from the lab quest-lines answer quest-lines/quests.json q3020024 (final, live yes); the guide order (previous Blacksmith: Scythes of Stalking, disabled) is not stored as a prerequisite, so the gate waits only for rank 20 of the active Blacksmith; the hand-in is the giver, Silverray (a drawn legacy_data row)."
         }
       ],
       "description_string_id": 387564,
       "intro_text_string_id": 387562,
-      "end_text_string_id": 387565,
-      "enabled": false
+      "end_text_string_id": 387565
     },
     {
       "id": 3020025,

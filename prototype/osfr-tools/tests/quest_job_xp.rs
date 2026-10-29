@@ -1435,6 +1435,11 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             if (file, id) == ("chef.json", 3_050_020) {
                 continue;
             }
+            // T660: Brawler: Achieve Level 5 is the same kind of level gate (job gate 43, coins
+            // only, no XP); tests/zone_quests_blackspore.rs covers it.
+            if (file, id) == ("brawler.json", 3_030_021) {
+                continue;
+            }
             for reward in record["rewards"].as_array().into_iter().flatten() {
                 assert_eq!(
                     reward["job_xp"],
