@@ -259,6 +259,51 @@ def reference_document(ps3, shared_ids, corrections, held, added, baseline_gap):
             "reconstruction_only_ids": only_ours, "baseline_gap": baseline_gap, "extras": ps3_extras(ps3)}
 
 
+# T877: the release item table, built from the original table alone (no Legacy or Sanctuary input).
+# Positional columns of `item-table.json`; src/inventory_item_table.rs encodes the same wire row from them.
+# One row is [id, [RELEASE_INTS..., flags], model, texture, tint alias]; `flags` has one bit per RELEASE_FLAGS.
+RELEASE_TABLE = PROJECT / "prototype/osfr-tools/data/release/item-table.json"
+RELEASE_INVENTORY = PROJECT / "prototype/osfr-tools/data/release/inventory.json"
+RELEASE_INTS = ("NameId", "DescriptionId", "IconData.Id", "IconData.TintId", "Cost", "Class", "ProfileOverride",
+                "Slot", "GenderUsage", "Type", "CategoryId", "WeaponTrailEffectId", "CompositeEffectId",
+                "PowerRating", "MinProfileRank", "Rarity", "ActivatableAbilityId", "PassiveAbilityId",
+                "MaxStackSize", "MemberDiscount", "Unknown36", "Unknown37")
+RELEASE_FLAGS = ("NoTrade", "NoSale", "MembersOnly", "NonMiniGame", "SingleUse", "IsTintable", "ForceDisablePreview")
+RELEASE_TEXTS = ("ModelName", "TextureAlias", "TintAlias")
+
+
+def wield_by_class(inventory):
+    """Wield type per item class from the captured rows (rows without a `source` tag) of the release inventory.
+
+    The original table has no wield column (the class table that maps it is Sanctuary's, not shipped): a class
+    no captured row shows is left out and reads as 0 (R). Captured rows of one class must agree."""
+    seen = {}
+    for row in inventory["definitions"]:
+        if "source" not in row and seen.setdefault(row["class_id"], row["wield_type"]) != row["wield_type"]:
+            raise ValueError("captured rows disagree on a class's wield type")
+    return {str(k): v for k, v in sorted(seen.items()) if v}
+
+
+def release_table(ps3, wield):
+    """The release table document. Every wire field the original table names comes from its row; the rest of the
+    wire row (tint, resell value, VIP and race-set requirements, stats, abilities) stays at the zero defaults (R).
+    `wire_sha256` hashes the established encoder's bytes for every row, so the Rust encoder is checked against it."""
+    rows, wire = [], hashlib.sha256()
+    for item_id in sorted(ps3):
+        row = legacy_row({"Id": item_id})
+        for key, value in ps3_values(ps3[item_id]).items():
+            put(row, key, value)
+        raw = encoder(row)
+        assert decode(raw) == row
+        wire.update(raw)
+        now = flat(row)
+        flags = sum(int(now[key]) << bit for bit, key in enumerate(RELEASE_FLAGS))
+        rows.append([item_id, [now[key] for key in RELEASE_INTS] + [flags], *(now[key] for key in RELEASE_TEXTS)])
+    return {"schema_version": 1, "source": {"table": PS3_PROVENANCE, "sha256": PS3_SHA256},
+            "columns": [*RELEASE_INTS, "Flags", *RELEASE_TEXTS], "flags": list(RELEASE_FLAGS),
+            "wield_by_class": wield, "wire_sha256": wire.hexdigest(), "rows": rows}
+
+
 def differences(before, after):
     a, b = flat(before), flat(after)
     return {k: {"captured": a.get(k), "candidate": b.get(k)}
@@ -336,6 +381,19 @@ def ps3_self_check():
     assert candidates[4][0]["Unknown38"] == 0, "PARAM3 is not named by the client table"
     assert ps3_extras(ps3)["rows"] == [[4, 880, 5.0, 0, 0, 0, 0]]
     assert baseline_differences({3: candidates[3][0]}, ps3)["rows_differing_on_corrected_fields"] == 1
+    table = release_table(ps3, {"9": 4})
+    assert [r[0] for r in table["rows"]] == [1, 2, 3, 4] and table["wire_sha256"]
+    ints = dict(zip(RELEASE_INTS, table["rows"][0][1]))
+    assert ints["Cost"] == 15 and ints["Slot"] == 9 and table["rows"][0][2] == "a.adr"
+    assert table["rows"][3][1][-1] == 1 << RELEASE_FLAGS.index("NoSale"), "flags are one bit per name"
+    assert wield_by_class({"definitions": [{"class_id": 9, "wield_type": 4}, {"class_id": 2, "wield_type": 0},
+                                           {"class_id": 7, "wield_type": 5, "source": "legacy"}]}) == {"9": 4}
+    try:
+        wield_by_class({"definitions": [{"class_id": 9, "wield_type": 4}, {"class_id": 9, "wield_type": 5}]})
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("captured rows that disagree on a wield type were accepted")
     for bad in ("\n".join([head, line(1), line(1)]), "\n".join([head, "1^2"]), "#ID\n1"):
         try:
             ps3_table(bad)
@@ -391,6 +449,8 @@ def main():
     parser.add_argument("--client-items", type=Path, default=LAB / "working/OSFR.Client/OSFR Client/Resources/CharacterCreate/ItemDefinitions.txt")
     parser.add_argument("--ps3-items", type=Path, default=LAB / "references/fr-bundle-20261028/itemdefinitions_ps3.txt")
     parser.add_argument("--reference-out", type=Path, default=REFERENCE, help="committed record of the original-table pass")
+    parser.add_argument("--release-table", type=Path, nargs="?", const=RELEASE_TABLE,
+                        help="write only the committed release item table (original table alone) and stop")
     parser.add_argument("--self-check", action="store_true")
     parser.add_argument("--out", type=Path, default=OUTPUT, help="private report folder (default: the W84 folder)")
     args = parser.parse_args()
@@ -398,14 +458,20 @@ def main():
         self_check()
         return
     inputs = {}
-    read_input(Path(__file__), inputs, "generator")
-    inventory = json.loads(read_input(args.inventory, inputs, "inventory"))
-    legacy = json.loads(read_input(args.legacy, inputs, "legacy"))
-    client_text = read_input(args.client_items, inputs, "client_items").decode("utf-8-sig")
     ps3_text = read_input(args.ps3_items, inputs, "ps3_items")
     if inputs["ps3_items"]["sha256"] != PS3_SHA256:
         raise ValueError("original item table is not the pinned file")
     ps3 = ps3_table(ps3_text.decode("utf-8-sig"))
+    if args.release_table:
+        wield = wield_by_class(json.loads(RELEASE_INVENTORY.read_text(encoding="utf-8")))
+        text = json.dumps(release_table(ps3, wield), separators=(",", ":"), sort_keys=True) + "\n"
+        args.release_table.write_bytes(text.encode())
+        print(f"release item table: {len(ps3)} rows, {len(text.encode())} bytes")
+        return
+    read_input(Path(__file__), inputs, "generator")
+    inventory = json.loads(read_input(args.inventory, inputs, "inventory"))
+    legacy = json.loads(read_input(args.legacy, inputs, "legacy"))
+    client_text = read_input(args.client_items, inputs, "client_items").decode("utf-8-sig")
     class_path = LAB / "references/Sanctuary/src/Resources/ItemClasses.txt"
     classes = read_input(class_path, inputs, "classes").decode("utf-8-sig")
     wield_types = {int(c[0]): int(c[3]) for c in

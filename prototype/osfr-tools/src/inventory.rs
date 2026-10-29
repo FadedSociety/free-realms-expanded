@@ -20,6 +20,8 @@ use std::{
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
+#[path = "inventory_item_table.rs"]
+mod item_table;
 #[path = "inventory_v2_fixes.rs"]
 mod v2_fixes;
 
@@ -280,7 +282,19 @@ fn catalogue_definitions<'de, D: serde::Deserializer<'de>>(
     deserializer.deserialize_seq(Rows)
 }
 
+type CatalogueLoader = fn(File) -> io::Result<BTreeMap<i32, Definition>>;
+
 fn load_catalogue(file: File) -> io::Result<BTreeMap<i32, Definition>> {
+    let bytes = read_catalogue_file(file)?;
+    let catalogue: Catalogue = serde_json::from_slice(&bytes).map_err(invalid)?;
+    if catalogue.schema_version != 1 {
+        return Err(invalid("unsupported item catalogue"));
+    }
+    Ok(catalogue.definitions)
+}
+
+/// A catalogue or item table file's bytes, bounded by `MAX_CATALOGUE_FILE`.
+fn read_catalogue_file(file: File) -> io::Result<Vec<u8>> {
     let metadata = file.metadata()?;
     if !metadata.is_file() || metadata.len() > MAX_CATALOGUE_FILE {
         return Err(invalid(
@@ -294,11 +308,7 @@ fn load_catalogue(file: File) -> io::Result<BTreeMap<i32, Definition>> {
     if bytes.len() as u64 > MAX_CATALOGUE_FILE {
         return Err(invalid("item catalogue exceeds 128 MiB"));
     }
-    let catalogue: Catalogue = serde_json::from_slice(&bytes).map_err(invalid)?;
-    if catalogue.schema_version != 1 {
-        return Err(invalid("unsupported item catalogue"));
-    }
-    Ok(catalogue.definitions)
+    Ok(bytes)
 }
 
 #[derive(Deserialize)]
@@ -385,7 +395,7 @@ pub struct Inventory {
 /// or per purchase cost seconds and ~50 MiB each. The key includes each file's
 /// size and modification time, so edited content is parsed again.
 fn shared_content(directory: &Path) -> io::Result<Arc<Content>> {
-    type Key = (PathBuf, Option<[u8; 32]>, Option<(u64, SystemTime)>);
+    type Key = (PathBuf, Option<[u8; 32]>, [Option<(u64, SystemTime)>; 2]);
     static CACHE: OnceLock<Mutex<HashMap<Key, Arc<Content>>>> = OnceLock::new();
     // inventory.json (~2 MB) is keyed by its content: a same-size rewrite inside
     // one timestamp tick must not return the old definitions. The ~50 MB
@@ -397,10 +407,16 @@ fn shared_content(directory: &Path) -> io::Result<Arc<Content>> {
         .filter(|m| m.len() <= MAX_HASHED)
         .and_then(|_| fs::read(&inventory).ok())
         .map(|bytes| <[u8; 32]>::from(Sha256::digest(&bytes)));
-    let stamp = fs::metadata(directory.join("item-catalogue.json"))
-        .ok()
-        .and_then(|m| Some((m.len(), m.modified().ok()?)));
-    let key = (directory.to_path_buf(), digest, stamp);
+    let stamp = |name| {
+        fs::metadata(directory.join(name))
+            .ok()
+            .and_then(|m| Some((m.len(), m.modified().ok()?)))
+    };
+    let key = (
+        directory.to_path_buf(),
+        digest,
+        [stamp("item-catalogue.json"), stamp("item-table.json")],
+    );
     let cache = CACHE.get_or_init(Default::default);
     if let Some(content) = cache.lock().unwrap_or_else(|e| e.into_inner()).get(&key) {
         return Ok(content.clone());
@@ -472,15 +488,24 @@ impl Inventory {
             }
         }
         let captured_definition_ids = definitions.keys().copied().collect();
-        // Fixed operator-selected content path; remote item IDs never become paths.
-        match File::open(directory.join("item-catalogue.json")) {
-            Ok(file) => {
-                for (id, definition) in load_catalogue(file)? {
-                    definitions.entry(id).or_insert(definition);
+        // Fixed operator-selected content paths; remote item IDs never become paths. Order is
+        // precedence (T877): the lab catalogue fills what `inventory.json` lacks, then the release
+        // table fills what both lack, so a lab package keeps its richer rows.
+        for (name, load) in [
+            ("item-catalogue.json", load_catalogue as CatalogueLoader),
+            ("item-table.json", |file| {
+                item_table::load(&read_catalogue_file(file)?)
+            }),
+        ] {
+            match File::open(directory.join(name)) {
+                Ok(file) => {
+                    for (id, definition) in load(file)? {
+                        definitions.entry(id).or_insert(definition);
+                    }
                 }
+                Err(error) if error.kind() == io::ErrorKind::NotFound => {}
+                Err(error) => return Err(error),
             }
-            Err(error) if error.kind() == io::ErrorKind::NotFound => {}
-            Err(error) => return Err(error),
         }
         let mut profiles = BTreeMap::new();
         for profile in manifest.profiles {
