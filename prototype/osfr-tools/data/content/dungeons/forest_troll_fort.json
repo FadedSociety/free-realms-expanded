@@ -294,6 +294,20 @@
               }
             ]
           },
+          "position": {
+            "value": [
+              -431.5,
+              -0.1,
+              1346.3
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "Video archive placement index (2026-10-29): the Forest Troll Fort entrance solved at x=-431.5 z=1346.3, error 2.8 m, 12 sightings in 5 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
+              }
+            ]
+          },
           "source": [
             {
               "kind": "wiki",

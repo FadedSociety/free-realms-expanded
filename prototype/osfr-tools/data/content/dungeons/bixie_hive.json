@@ -254,6 +254,24 @@
               }
             ]
           },
+          "position": {
+            "value": [
+              -1355.0,
+              -32.68,
+              234.8
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "Video archive placement index (2026-10-29): the Bixie Hive entrance solved at x=-1355.0 z=234.8, error 4.7 m, 5 sightings in 2 videos (ring), confidence medium; height sampled from the zone-0 terrain grid."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) medium-confidence solve (fewer sightings or videos than a high-confidence row)"
+              }
+            ]
+          },
           "source": [
             {
               "kind": "wiki",

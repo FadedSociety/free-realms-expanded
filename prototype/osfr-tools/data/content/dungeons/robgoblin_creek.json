@@ -226,6 +226,20 @@
               }
             ]
           },
+          "position": {
+            "value": [
+              -172.5,
+              15.375,
+              979.5
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "Video archive placement index (2026-10-29): the Robgoblin Fishmonger initiator solved at x=-172.5 z=979.5, error 2.9 m, 5 sightings in 3 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
+              }
+            ]
+          },
           "source": [
             {
               "kind": "wiki",

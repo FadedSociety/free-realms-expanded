@@ -294,6 +294,20 @@
               }
             ]
           },
+          "position": {
+            "value": [
+              -2386.9,
+              -23.355,
+              1239.0
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "Video archive placement index (2026-10-29): the Bone Bog Cemetery entrance solved at x=-2386.9 z=1239.0, error 4.5 m, 14 sightings in 6 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
+              }
+            ]
+          },
           "source": [
             {
               "kind": "wiki",

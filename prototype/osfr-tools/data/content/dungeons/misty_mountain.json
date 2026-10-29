@@ -266,6 +266,20 @@
               }
             ]
           },
+          "position": {
+            "value": [
+              160.5,
+              44.95,
+              1072.5
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "Video archive placement index (2026-10-29): the Misty Mountain entrance solved at x=160.5 z=1072.5, error 3.8 m, 10 sightings in 7 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
+              }
+            ]
+          },
           "source": [
             {
               "kind": "wiki",

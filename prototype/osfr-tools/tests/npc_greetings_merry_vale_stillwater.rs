@@ -434,6 +434,25 @@ const MERK_LEGACY_FIELDS: [&str; 12] = [
     "source",
 ];
 
+/// T878: the fields a video-archive move rewrites on a reconstructed row (position and the
+/// placement class that labels it). `content_npc_placement.rs` and `video_placement_index.rs`
+/// pin the values.
+const VIDEO_INDEX_FIELDS: [&str; 6] = [
+    "position",
+    "position_reason",
+    "placement",
+    "placement_source",
+    "placement_confidence",
+    "placement_candidates",
+];
+
+/// T878: a `poi_anchor`/`unanchored` row moved to a video-archive position, nothing else changed.
+fn is_video_index_move(old: &Value, new: &Value) -> bool {
+    matches!(old["placement"].as_str(), Some("poi_anchor" | "unanchored"))
+        && new["placement"] == "video_index"
+        && without_fields(old, &VIDEO_INDEX_FIELDS) == without_fields(new, &VIDEO_INDEX_FIELDS)
+}
+
 /// `row` with `fields` and their `field_sources` evidence removed.
 fn without_fields(row: &Value, fields: &[&str]) -> Value {
     let mut row = row.clone();
@@ -565,7 +584,10 @@ fn is_quest_binding_change_between(path: &str, old: &Value, new: &Value) -> bool
     changed_rows_are(old, new, false, |old, new| {
         let quest_old = without_fields(old, &QUEST_BINDING_FIELDS);
         let quest_new = without_fields(new, &QUEST_BINDING_FIELDS);
-        if quest_old == quest_new || is_reference_spawn_row(old, new) {
+        if quest_old == quest_new
+            || is_reference_spawn_row(old, new)
+            || is_video_index_move(old, new)
+        {
             return true;
         }
         path.ends_with("/shrouded_glade.json")

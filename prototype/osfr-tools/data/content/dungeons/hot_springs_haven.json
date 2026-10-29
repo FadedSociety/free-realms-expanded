@@ -282,6 +282,20 @@
               }
             ]
           },
+          "position": {
+            "value": [
+              264.1,
+              59.667,
+              159.9
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "Video archive placement index (2026-10-29): the Hot Springs Haven entrance solved at x=264.1 z=159.9, error 3.2 m, 8 sightings in 7 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
+              }
+            ]
+          },
           "source": [
             {
               "kind": "wiki",

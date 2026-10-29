@@ -266,6 +266,24 @@
               }
             ]
           },
+          "position": {
+            "value": [
+              -727.4,
+              9.436,
+              -1122.9
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "Video archive placement index (2026-10-29): the Prince of Low Tide initiator solved at x=-727.4 z=-1122.9, error 3.4 m, 6 sightings in 5 videos (ring), confidence high; height sampled from the zone-0 terrain grid."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) the initiator roams the beaches; the solved point is where its sightings cluster"
+              }
+            ]
+          },
           "source": [
             {
               "kind": "wiki",

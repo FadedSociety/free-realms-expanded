@@ -6656,9 +6656,9 @@
       ],
       "services_reason": null,
       "position": [
-        -753.736404,
-        -0.00576,
-        843.164718
+        -1094.5,
+        -38.95,
+        -430.5
       ],
       "position_w": null,
       "rotation": [
@@ -6667,93 +6667,12 @@
         0.0,
         0.5247163101332083
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 40,
-          "poi_name": "Checkers & Chess",
-          "match_score": 18
-        },
-        {
-          "poi_id": 41,
-          "poi_name": "Checkers & Chess",
-          "match_score": 18
-        },
-        {
-          "poi_id": 42,
-          "poi_name": "Checkers & Chess",
-          "match_score": 18
-        },
-        {
-          "poi_id": 43,
-          "poi_name": "Checkers & Chess",
-          "match_score": 18
-        },
-        {
-          "poi_id": 44,
-          "poi_name": "Checkers & Chess",
-          "match_score": 18
-        },
-        {
-          "poi_id": 45,
-          "poi_name": "Checkers & Chess",
-          "match_score": 18
-        },
-        {
-          "poi_id": 46,
-          "poi_name": "Checkers & Chess",
-          "match_score": 18
-        },
-        {
-          "poi_id": 47,
-          "poi_name": "Checkers & Chess",
-          "match_score": 18
-        },
-        {
-          "poi_id": 48,
-          "poi_name": "Checkers & Chess",
-          "match_score": 18
-        },
-        {
-          "poi_id": 49,
-          "poi_name": "Checkers & Chess",
-          "match_score": 18
-        },
-        {
-          "poi_id": 50,
-          "poi_name": "Checkers & Chess",
-          "match_score": 18
-        },
-        {
-          "poi_id": 51,
-          "poi_name": "Checkers & Chess",
-          "match_score": 18
-        },
-        {
-          "poi_id": 115,
-          "poi_name": "Checkers & Chess",
-          "match_score": 18
-        },
-        {
-          "poi_id": 116,
-          "poi_name": "Checkers & Chess",
-          "match_score": 18
-        },
-        {
-          "poi_id": 118,
-          "poi_name": "Checkers & Chess",
-          "match_score": 18
-        },
-        {
-          "poi_id": 122,
-          "poi_name": "Checkers & Chess",
-          "match_score": 18
-        }
-      ],
+      "placement": "video_index",
+      "placement_source": "video_archive_index",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 40 by longest normalized whole-name score 18; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "Video archive placement index (2026-10-29): Duana solved at x=-1094.5 z=-430.5, error 2.9 m, 25 sightings in 12 videos (dots), confidence high; height sampled from the zone-0 terrain grid. Replaces the reconstructed offset position [-753.736404, -0.00576, 843.164718].",
       "source": [
         {
           "kind": "client",
@@ -7131,12 +7050,8 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=40 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=40 NameId=382885 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Duana solved at x=-1094.5 z=-430.5, error 2.9 m, 25 sightings in 12 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_reason": [
@@ -28134,9 +28049,9 @@
       ],
       "services_reason": null,
       "position": [
-        85.333775,
-        42.0,
-        1015.606637
+        -1031.0,
+        -30.505,
+        -550.3
       ],
       "position_w": null,
       "rotation": [
@@ -28145,78 +28060,12 @@
         0.0,
         0.3153223623952687
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 11,
-          "poi_name": "Cooking Table",
-          "match_score": 13
-        },
-        {
-          "poi_id": 94,
-          "poi_name": "Cooking Table",
-          "match_score": 13
-        },
-        {
-          "poi_id": 95,
-          "poi_name": "Cooking Table",
-          "match_score": 13
-        },
-        {
-          "poi_id": 96,
-          "poi_name": "Cooking Table",
-          "match_score": 13
-        },
-        {
-          "poi_id": 97,
-          "poi_name": "Cooking Table",
-          "match_score": 13
-        },
-        {
-          "poi_id": 98,
-          "poi_name": "Cooking Table",
-          "match_score": 13
-        },
-        {
-          "poi_id": 99,
-          "poi_name": "Cooking Table",
-          "match_score": 13
-        },
-        {
-          "poi_id": 100,
-          "poi_name": "Cooking Table",
-          "match_score": 13
-        },
-        {
-          "poi_id": 101,
-          "poi_name": "Cooking Table",
-          "match_score": 13
-        },
-        {
-          "poi_id": 102,
-          "poi_name": "Cooking Table",
-          "match_score": 13
-        },
-        {
-          "poi_id": 103,
-          "poi_name": "Cooking Table",
-          "match_score": 13
-        },
-        {
-          "poi_id": 114,
-          "poi_name": "Cooking Table",
-          "match_score": 13
-        },
-        {
-          "poi_id": 14,
-          "poi_name": "Merry Vale",
-          "match_score": 10
-        }
-      ],
+      "placement": "video_index",
+      "placement_source": "video_archive_index",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 11 by longest normalized whole-name score 13; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "Video archive placement index (2026-10-29): Sous-Chef Elden solved at x=-1031.0 z=-550.3, error 3.0 m, 8 sightings in 6 videos (ring), confidence high; height sampled from the zone-0 terrain grid. Replaces the reconstructed offset position [85.333775, 42.0, 1015.606637].",
       "source": [
         {
           "kind": "client",
@@ -28586,12 +28435,8 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=11 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=11 NameId=2061 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Sous-Chef Elden solved at x=-1031.0 z=-550.3, error 3.0 m, 8 sightings in 6 videos (ring), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_reason": [

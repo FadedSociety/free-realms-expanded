@@ -258,6 +258,20 @@
               }
             ]
           },
+          "position": {
+            "value": [
+              -901.9,
+              1.23,
+              235.2
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "Video archive placement index (2026-10-29): the Darvon's Descent entrance solved at x=-901.9 z=235.2, error 2.9 m, 14 sightings in 6 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
+              }
+            ]
+          },
           "source": [
             {
               "kind": "wiki",

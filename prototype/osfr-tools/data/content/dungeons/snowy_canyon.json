@@ -286,6 +286,20 @@
               }
             ]
           },
+          "position": {
+            "value": [
+              421.0,
+              85.22,
+              645.2
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "Video archive placement index (2026-10-29): the Snowy Canyon entrance solved at x=421.0 z=645.2, error 3.3 m, 4 sightings in 2 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
+              }
+            ]
+          },
           "source": [
             {
               "kind": "wiki",

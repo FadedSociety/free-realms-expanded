@@ -278,6 +278,24 @@
               }
             ]
           },
+          "position": {
+            "value": [
+              -2114.2,
+              -57.09,
+              280.0
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "Video archive placement index (2026-10-29): the Sheep Watch entrance solved at x=-2114.2 z=280.0, error 6.3 m, 7 sightings in 5 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) the T319 field-battle marker stands 70 m from this point; the two placements are not reconciled"
+              }
+            ]
+          },
           "source": [
             {
               "kind": "wiki",

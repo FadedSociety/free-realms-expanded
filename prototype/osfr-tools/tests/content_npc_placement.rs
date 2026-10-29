@@ -72,10 +72,36 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
             assert!(
                 matches!(
                     placement,
-                    "captured" | "legacy_data" | "reference_data" | "poi_anchor" | "unanchored"
+                    "captured"
+                        | "legacy_data"
+                        | "reference_data"
+                        | "video_index"
+                        | "poi_anchor"
+                        | "unanchored"
                 ),
                 "{owner}: unknown placement class {placement:?}"
             );
+            if placement == "video_index" {
+                // T878: a position solved from the video archive; the tag carries the counts.
+                assert_eq!(source, "video_archive_index", "{owner}: unexpected source");
+                assert!(
+                    npc["placement_candidates"]
+                        .as_array()
+                        .is_some_and(Vec::is_empty),
+                    "{owner}: video row has POI candidates"
+                );
+                assert!(
+                    npc["field_sources"]["position"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .any(|tag| tag["kind"] == "video"
+                            && tag["evidence"]
+                                .as_str()
+                                .is_some_and(|text| text.contains("placement index (2026-10-29)"))),
+                    "{owner}: position lacks the video index tag"
+                );
+            }
             if placement == "unanchored" {
                 assert!(
                     matches!(

@@ -262,6 +262,20 @@
               }
             ]
           },
+          "position": {
+            "value": [
+              -172.4,
+              -39.395,
+              -1198.1
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "Video archive placement index (2026-10-29): the Snatching Snapper initiator solved at x=-172.4 z=-1198.1, error 4.6 m, 10 sightings in 6 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
+              }
+            ]
+          },
           "source": [
             {
               "kind": "wiki",

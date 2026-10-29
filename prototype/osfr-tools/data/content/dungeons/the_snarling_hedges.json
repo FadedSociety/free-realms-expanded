@@ -286,6 +286,20 @@
               }
             ]
           },
+          "position": {
+            "value": [
+              -900.4,
+              -50.0,
+              1836.9
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "Video archive placement index (2026-10-29): the The Snarling Hedges entrance solved at x=-900.4 z=1836.9, error 2.8 m, 9 sightings in 6 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
+              }
+            ]
+          },
           "source": [
             {
               "kind": "wiki",

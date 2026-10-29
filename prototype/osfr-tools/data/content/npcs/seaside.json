@@ -4067,9 +4067,9 @@
       ],
       "services_reason": null,
       "position": [
-        -639.830849,
-        9.31,
-        -1037.531513
+        -486.6,
+        -13.971,
+        -1199.8
       ],
       "position_w": null,
       "rotation": [
@@ -4078,18 +4078,12 @@
         0.0,
         0.5148188449699553
       ],
-      "placement": "unanchored",
-      "placement_source": "reconstructed_zone_center",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 13,
-          "poi_name": "Seaside",
-          "match_score": 0
-        }
-      ],
+      "placement": "video_index",
+      "placement_source": "video_archive_index",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 13. This is not a recovered NPC transform.",
+      "position_reason": "Video archive placement index (2026-10-29): Bandy Randi solved at x=-486.6 z=-1199.8, error 4.0 m, 4 sightings in 3 videos (dot+rings), confidence high; height sampled from the zone-0 terrain grid. Replaces the reconstructed offset position [-639.830849, 9.31, -1037.531513].",
       "source": [
         {
           "kind": "client",
@@ -4555,12 +4549,8 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 13 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Bandy Randi solved at x=-486.6 z=-1199.8, error 4.0 m, 4 sightings in 3 videos (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_reason": [
@@ -19359,9 +19349,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -636.924632,
-        9.31,
-        -1048.864914
+        -550.6,
+        -46.195,
+        -1321.5
       ],
       "position_w": null,
       "rotation": [
@@ -19370,18 +19360,12 @@
         0.0,
         0.5148188449699553
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "medium",
-      "placement_candidates": [
-        {
-          "poi_id": 13,
-          "poi_name": "Seaside",
-          "match_score": 7
-        }
-      ],
+      "placement": "video_index",
+      "placement_source": "video_archive_index",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 13 by longest normalized whole-name score 7; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "Video archive placement index (2026-10-29): Foreman Moser solved at x=-550.6 z=-1321.5, error 3.8 m, 28 sightings in 9 videos (dots), confidence high; height sampled from the zone-0 terrain grid. Replaces the reconstructed offset position [-636.924632, 9.31, -1048.864914].",
       "source": [
         {
           "kind": "client",
@@ -19659,12 +19643,8 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=13 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=13 NameId=3501 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Foreman Moser solved at x=-550.6 z=-1321.5, error 3.8 m, 28 sightings in 9 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_reason": [
@@ -31554,9 +31534,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -629.132951,
-        9.31,
-        -1046.049493
+        -547.0,
+        -6.81,
+        -1171.1
       ],
       "position_w": null,
       "rotation": [
@@ -31565,18 +31545,12 @@
         0.0,
         0.5148188449699553
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "medium",
-      "placement_candidates": [
-        {
-          "poi_id": 13,
-          "poi_name": "Seaside",
-          "match_score": 7
-        }
-      ],
+      "placement": "video_index",
+      "placement_source": "video_archive_index",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 13 by longest normalized whole-name score 7; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "Video archive placement index (2026-10-29): Munchi Elwood solved at x=-547.0 z=-1171.1, error 5.3 m, 22 sightings in 17 videos (dots), confidence high; height sampled from the zone-0 terrain grid. Replaces the reconstructed offset position [-629.132951, 9.31, -1046.049493].",
       "source": [
         {
           "kind": "client",
@@ -31930,12 +31904,8 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=13 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=13 NameId=3501 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Munchi Elwood solved at x=-547.0 z=-1171.1, error 5.3 m, 22 sightings in 17 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_reason": [

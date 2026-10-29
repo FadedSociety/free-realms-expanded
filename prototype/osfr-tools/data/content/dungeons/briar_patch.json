@@ -286,6 +286,20 @@
               }
             ]
           },
+          "position": {
+            "value": [
+              -406.9,
+              -54.823,
+              2094.4
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "Video archive placement index (2026-10-29): the Briar Patch entrance solved at x=-406.9 z=2094.4, error 3.9 m, 10 sightings in 6 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
+              }
+            ]
+          },
           "source": [
             {
               "kind": "wiki",

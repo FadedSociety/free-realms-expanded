@@ -15860,9 +15860,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -72.632986,
-        38.789,
-        -451.320446
+        35.8,
+        24.7,
+        -416.8
       ],
       "position_w": null,
       "rotation": [
@@ -15871,18 +15871,12 @@
         0.0,
         0.9487625005288153
       ],
-      "placement": "unanchored",
-      "placement_source": "reconstructed_zone_center",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 12,
-          "poi_name": "Wugachug",
-          "match_score": 0
-        }
-      ],
+      "placement": "video_index",
+      "placement_source": "video_archive_index",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 12. This is not a recovered NPC transform.",
+      "position_reason": "Video archive placement index (2026-10-29): Sparkolot solved at x=35.8 z=-416.8, error 2.7 m, 9 sightings in 6 videos (ring), confidence high; height sampled from the zone-0 terrain grid. Replaces the reconstructed offset position [-72.632986, 38.789, -451.320446].",
       "source": [
         {
           "kind": "client",
@@ -16164,12 +16158,8 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 12 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Sparkolot solved at x=35.8 z=-416.8, error 2.7 m, 9 sightings in 6 videos (ring), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_reason": [

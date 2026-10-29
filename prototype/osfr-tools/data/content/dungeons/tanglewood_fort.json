@@ -258,6 +258,20 @@
               }
             ]
           },
+          "position": {
+            "value": [
+              -358.1,
+              -83.095,
+              2404.1
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "Video archive placement index (2026-10-29): the Tanglewood Fort entrance solved at x=-358.1 z=2404.1, error 2.4 m, 45 sightings in 18 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
+              }
+            ]
+          },
           "source": [
             {
               "kind": "wiki",

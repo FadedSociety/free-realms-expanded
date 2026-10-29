@@ -258,6 +258,20 @@
               }
             ]
           },
+          "position": {
+            "value": [
+              -2590.3,
+              -7.186,
+              1022.5
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "Video archive placement index (2026-10-29): the Haunted Mines entrance solved at x=-2590.3 z=1022.5, error 4.1 m, 7 sightings in 3 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
+              }
+            ]
+          },
           "source": [
             {
               "kind": "wiki",

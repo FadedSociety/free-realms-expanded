@@ -3174,9 +3174,9 @@
       ],
       "services_reason": null,
       "position": [
-        57.264378,
-        30.987,
-        366.242883
+        230.5,
+        25.319,
+        430.5
       ],
       "position_w": null,
       "rotation": [
@@ -3185,18 +3185,12 @@
         0.0,
         0.7361040327419306
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "medium",
-      "placement_candidates": [
-        {
-          "poi_id": 3,
-          "poi_name": "Snowhill",
-          "match_score": 8
-        }
-      ],
+      "placement": "video_index",
+      "placement_source": "video_archive_index",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 3 by longest normalized whole-name score 8; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "Video archive placement index (2026-10-29): Boomi McBam solved at x=230.5 z=430.5, error 4.0 m, 5 sightings in 3 videos (dot+rings), confidence high; height sampled from the zone-0 terrain grid. Replaces the reconstructed offset position [57.264378, 30.987, 366.242883].",
       "source": [
         {
           "kind": "client",
@@ -3486,12 +3480,8 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=3 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=3 NameId=3961 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Boomi McBam solved at x=230.5 z=430.5, error 4.0 m, 5 sightings in 3 videos (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_reason": [
@@ -15641,9 +15631,9 @@
       ],
       "services_reason": null,
       "position": [
-        47.314903,
-        30.987,
-        356.678675
+        130.4,
+        74.518,
+        226.2
       ],
       "position_w": null,
       "rotation": [
@@ -15652,18 +15642,12 @@
         0.0,
         0.7361040327419306
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "medium",
-      "placement_candidates": [
-        {
-          "poi_id": 3,
-          "poi_name": "Snowhill",
-          "match_score": 8
-        }
-      ],
+      "placement": "video_index",
+      "placement_source": "video_archive_index",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 3 by longest normalized whole-name score 8; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "Video archive placement index (2026-10-29): Foreman Hetfield solved at x=130.4 z=226.2, error 3.6 m, 10 sightings in 6 videos (dots), confidence high; height sampled from the zone-0 terrain grid. Replaces the reconstructed offset position [47.314903, 30.987, 356.678675].",
       "source": [
         {
           "kind": "client",
@@ -16041,12 +16025,8 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=3 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=3 NameId=3961 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Foreman Hetfield solved at x=130.4 z=226.2, error 3.6 m, 10 sightings in 6 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_reason": [

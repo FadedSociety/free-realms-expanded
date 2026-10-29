@@ -3443,9 +3443,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2141.422358,
-        -32.948,
-        1036.449496
+        -2459.6,
+        -26.224,
+        1164.6
       ],
       "position_w": null,
       "rotation": [
@@ -3454,18 +3454,12 @@
         0.0,
         0.9372984296888399
       ],
-      "placement": "unanchored",
-      "placement_source": "reconstructed_zone_center",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 16,
-          "poi_name": "Blackspore",
-          "match_score": 0
-        }
-      ],
+      "placement": "video_index",
+      "placement_source": "video_archive_index",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform.",
+      "position_reason": "Video archive placement index (2026-10-29): Burke solved at x=-2459.6 z=1164.6, error 3.6 m, 7 sightings in 3 videos (ring), confidence high; height sampled from the zone-0 terrain grid. Replaces the reconstructed offset position [-2141.422358, -32.948, 1036.449496].",
       "source": [
         {
           "kind": "client",
@@ -3747,12 +3741,8 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 16 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Burke solved at x=-2459.6 z=1164.6, error 3.6 m, 7 sightings in 3 videos (ring), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_reason": [
@@ -11983,9 +11973,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2134.890622,
-        -32.948,
-        1044.616883
+        -1379.4,
+        -27.12,
+        318.8
       ],
       "position_w": null,
       "rotation": [
@@ -11994,18 +11984,12 @@
         0.0,
         0.9372984296888399
       ],
-      "placement": "unanchored",
-      "placement_source": "reconstructed_zone_center",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 16,
-          "poi_name": "Blackspore",
-          "match_score": 0
-        }
-      ],
+      "placement": "video_index",
+      "placement_source": "video_archive_index",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform.",
+      "position_reason": "Video archive placement index (2026-10-29): Finn solved at x=-1379.4 z=318.8, error 3.0 m, 16 sightings in 10 videos (dots), confidence high; height sampled from the zone-0 terrain grid. Replaces the reconstructed offset position [-2134.890622, -32.948, 1044.616883].",
       "source": [
         {
           "kind": "video",
@@ -12207,12 +12191,8 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 16 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Finn solved at x=-1379.4 z=318.8, error 3.0 m, 16 sightings in 10 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_reason": [
@@ -13812,9 +13792,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2137.076696,
-        -32.948,
-        1035.795395
+        -2331.3,
+        -32.33,
+        1234.6
       ],
       "position_w": null,
       "rotation": [
@@ -13823,18 +13803,12 @@
         0.0,
         0.9372984296888399
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "medium",
-      "placement_candidates": [
-        {
-          "poi_id": 16,
-          "poi_name": "Blackspore",
-          "match_score": 10
-        }
-      ],
+      "placement": "video_index",
+      "placement_source": "video_archive_index",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "Video archive placement index (2026-10-29): Grave Elemental solved at x=-2331.3 z=1234.6, error 7.3 m, 18 sightings in 10 videos (dot+rings), confidence high; height sampled from the zone-0 terrain grid. Replaces the reconstructed offset position [-2137.076696, -32.948, 1035.795395].",
       "source": [
         {
           "kind": "client",
@@ -14124,12 +14098,8 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=16 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=16 NameId=3500 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Grave Elemental solved at x=-2331.3 z=1234.6, error 7.3 m, 18 sightings in 10 videos (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_reason": [
@@ -36352,9 +36322,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2132.306408,
-        -32.948,
-        1045.118142
+        -2305.8,
+        -30.212,
+        1079.9
       ],
       "position_w": null,
       "rotation": [
@@ -36363,18 +36333,12 @@
         0.0,
         0.9372984296888399
       ],
-      "placement": "unanchored",
-      "placement_source": "reconstructed_zone_center",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 16,
-          "poi_name": "Blackspore",
-          "match_score": 0
-        }
-      ],
+      "placement": "video_index",
+      "placement_source": "video_archive_index",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform.",
+      "position_reason": "Video archive placement index (2026-10-29): Tormented Spirit solved at x=-2305.8 z=1079.9, error 3.8 m, 11 sightings in 4 videos (dots), confidence high; height sampled from the zone-0 terrain grid. Replaces the reconstructed offset position [-2132.306408, -32.948, 1045.118142].",
       "source": [
         {
           "kind": "client",
@@ -36664,12 +36628,8 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 16 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Tormented Spirit solved at x=-2305.8 z=1079.9, error 3.8 m, 11 sightings in 4 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_reason": [

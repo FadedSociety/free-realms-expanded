@@ -260,8 +260,8 @@ fn shipped_npc_rows_cover_1193_of_1209() {
             let z = position[2].as_f64().expect("z") as f32;
             let place = table.place_at(0, x, z).is_some();
             let region = table.region_at(0, x, z);
-            // Data membership for the two note counts: the banner-region shapes (892)
-            // and their union with the region 1 fallback sphere (953).
+            // Data membership for the two note counts: the banner-region shapes (893 after T878 moved twelve rows)
+            // and their union with the region 1 fallback sphere (954).
             let in_recovered_shape = table
                 .regions()
                 .iter()
@@ -288,10 +288,10 @@ fn shipped_npc_rows_cover_1193_of_1209() {
     // music/ambience area families and the client-row regions cover 1,193 rows, of which every one is in a place.
     assert_eq!(in_place, 1193, "rows in a first-party place group");
     assert_eq!(
-        in_recovered_region, 892,
+        in_recovered_region, 893,
         "rows in the banner regions 2..=10"
     );
-    assert_eq!(in_any_region, 953, "rows in a region (including region 1)");
+    assert_eq!(in_any_region, 954, "rows in a region (including region 1)");
     assert_eq!(covered, 1193, "rows in a place or a region");
 }
 
