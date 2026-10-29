@@ -75,6 +75,16 @@ impl RawQuest {
         (coins as u32, xp as u32)
     }
 
+    /// The level of the quest's `job_level` goal (the rank a level gate waits for).
+    pub fn job_level_goal(&self) -> u32 {
+        let goal = self
+            .objectives
+            .iter()
+            .find(|goal| goal["kind"] == "job_level")
+            .unwrap_or_else(|| panic!("quest {} has a rank goal", self.id));
+        as_u32(&goal["level"]).expect("a rank goal has a level")
+    }
+
     /// The 49/13 star word: every profile's job XP summed, the way production's
     /// `encode_quest_reward_bundle` builds the bundle. [`Self::reward_totals`] is one
     /// profile's share; a multi-profile record has a larger star word.

@@ -371,6 +371,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         "Valerie: only third-person tutorial and objective text; the untied Welcome window 3453817544 is not attributed to her, so no first-person line is recovered.",
     ),
     (
+        9000000230,
+        "Vicki (T671 talk target of Archer: Archer Departure 3010012): NPCs - Farnum Farmstead.md:70 quotes only third-person role text (3322747327 'practicing her aim', 837247663); her first-person lines 77652 and 77655 are the offer and end text of her own quest No Arrows, No Work (3010013), which stays disabled, and the Archer guide leaves them out of any greeting row, so no uncontested greeting line is recovered.",
+    ),
+    (
         9000000357,
         "Jace Wildwheel (T666 giver of 3060030): NPCs - Wilds.md:153 quotes only a third-person description of him and no line of his own; his first-person text is the Stunt Double intro 393356 (a QuestOffer proof, but tests/npc_greetings_lakeshore_wilds.rs pins every unlisted Wilds row unbound) and the progress line 394473.",
     ),

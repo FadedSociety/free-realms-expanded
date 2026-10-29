@@ -4,10 +4,39 @@
     {
       "id": 3160001,
       "title_string_id": 442278,
-      "giver_npc_id": 9000000550,
+      "giver_npc_id": 9000000324,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000324,
+          "text_string_id": 442263,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 442263 'Speak to Fizzlesticks near Lakeshore' (lab/reports/locale-id-to-text.json); Fizzlesticks is npc 9000000324 (name 20517), the Wizard trainer and a drawn legacy_data row in npcs/wilds.json."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T671: one talk_to_npc step at the trainer, as T542 did for Become a Wizard (3160035): the giver is the trainer, so one Talk to him completes the step and opens the end screen there."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T671: quest-lines/quests.json q3160001 states no reward. Five coins and no job XP follow Become a Wizard (3160035, T542): a player who is not a Wizard yet must not be blocked or paid XP for a profile they have not learned."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -27,26 +56,23 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
         },
         {
           "kind": "reconstructed",
           "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
         },
         {
+          "kind": "client",
+          "evidence": "Global.Text 442278 title, 442263 objective, 442248 'Learn how to advance your skill as a Wizard by speaking with Fizzlesticks near Lakeshore' (49/1 description); the client's Being a Better <job> set 442268-442282 (quest-lines/quests.json q3160001, live 'yes')."
+        },
+        {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T671: the record's giver 9000000550 is an unresolved guide id (npcs_unresolved.json names no NPC for it). Fizzlesticks is the giver: the wiki lists Being a Better Wizard among his quests (his npcs/wilds.json quests_given_text) and the client sends the player to him. No job gate: the video shows the quest held by a player on another job. He offers it after his Wizard-gated line, as the last entry of his list."
         }
       ],
-      "enabled": false
+      "description_string_id": 442248,
+      "enabled": true
     },
     {
       "id": 3160003,

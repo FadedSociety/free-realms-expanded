@@ -1076,11 +1076,58 @@
     },
     {
       "id": 3020019,
+      "job": 16,
       "title_string_id": 387559,
       "giver_npc_id": 9000000405,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "profile_id": 16,
+          "level": 15,
+          "text_string_id": 387560,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387560 'Your mining career will continue once you have reached level 15 as a Blacksmith. Return to Mili Ironcall at that time.' (lab/reports/locale-id-to-text.json); Blacksmith is profile 16 (the shipped Blacksmith steps 3020003 and 3020005 pay profile 16)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T671: one authoritative job_level objective at profile 16, level 15, judged from the server's own Profiles::rank curve (T361); job_level is objective #0 as quest_engine requires for an ordered quest."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000405,
+          "text_string_id": 387560,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387560: the return to Mili Ironcall, npc 9000000405 (name 77427), who is the giver; a drawn legacy_data row in npcs/greenwood_forest.json that already lists 3020019."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T671: the final Talk to the named target opens the 49/13 end screen at Mili."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T671: quest-lines/quests.json q3020019 states no reward ('rewards_missing'). 15 coins, no item and no job XP mirror the shipped level-gate payout (Warrior W5 3150005, Chef 3050020, Wizard 3160024); the number is ours and lives in data."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1096,10 +1143,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -1108,17 +1151,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 387558 (progress line: not skilled enough yet, come back at level 15), 387559 title, 387560 objective and 49/1 description, 387561 completion line and 49/13 end text (quest-lines/quests.json q3020019, live 'yes': unflagged client strings)."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T671: no prerequisite, as the answer states none. The guide's predecessor Breaking Bank (3020018) and the rest of Mili's Southvale chain (3020015-3020017) are disabled, so a Blacksmith meets the gate at Mili directly. Job gate 16 keeps it Blacksmith-only like 3020003 and 3020005."
         }
       ],
       "description_string_id": 387560,
       "intro_text_string_id": 387558,
       "end_text_string_id": 387561,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3020020,

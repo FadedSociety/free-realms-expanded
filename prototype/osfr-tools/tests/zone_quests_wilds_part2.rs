@@ -47,9 +47,11 @@ const WIZARD_5: u32 = 3_160_010;
 /// Each quest's prerequisite: the last enabled quest before it in its line.
 const CHEF_5: u32 = 3_050_020;
 /// The wizard first-chapter quests Fizzlesticks offers before Reach Level 5, so a Talk at him
-/// offers nothing else: Become a Wizard (3160035) and the three Robgoblin Camp quests.
-const WIZARD_OPENING: [(u32, &[u32]); 4] = [
+/// offers nothing else: Become a Wizard (3160035), the three Robgoblin Camp quests and the
+/// ungated Being a Better Wizard (3160001, T671).
+const WIZARD_OPENING: [(u32, &[u32]); 5] = [
     (3_160_035, &[1]),
+    (3_160_001, &[1]),
     (3_160_003, &[1, 1]),
     (3_160_004, &[1, 1]),
     (3_160_005, &[1, 1]),
@@ -83,15 +85,6 @@ fn wizard(fixture: &Fixture, active: i32) -> Gameplay {
     zone_player_with_quests(fixture, CHARACTER, active, &unlocked, &WIZARD_OPENING)
 }
 
-fn goal_level(id: u32) -> u32 {
-    let goals = &shipped_quest(id).objectives;
-    let goal = goals
-        .iter()
-        .find(|goal| goal["kind"] == "job_level")
-        .expect("a rank goal");
-    quest_records::as_u32(&goal["level"]).unwrap()
-}
-
 #[test]
 fn glerga_chef_level_twenty_is_offered_walked_and_paid_once() {
     let record = shipped_quest(CHEF_20);
@@ -115,7 +108,7 @@ fn glerga_chef_level_twenty_is_offered_walked_and_paid_once() {
     assert_eq!(quest_status(&game, CHEF_20), QuestStatus::Active);
 
     // One rank short never credits it; the gate rank does.
-    let gate = goal_level(CHEF_20);
+    let gate = shipped_quest(CHEF_20).job_level_goal();
     realm_level(&mut game, &glerga, gate - 1, now + 20);
     assert_eq!(counts(&game, CHEF_20), [0, 0], "one rank short");
     let reached = realm_level(&mut game, &glerga, gate, now + 30);
@@ -159,7 +152,12 @@ fn fizzlesticks_wizard_level_five_runs_in_the_clients_order() {
 
     // Natali comes first: the rank goal is not open yet, and Fizzlesticks has nothing to take in.
     now += 10;
-    realm_level(&mut game, &fizzlesticks, goal_level(WIZARD_5), now);
+    realm_level(
+        &mut game,
+        &fizzlesticks,
+        shipped_quest(WIZARD_5).job_level_goal(),
+        now,
+    );
     assert_eq!(
         counts(&game, WIZARD_5),
         [0, 0, 0],
@@ -219,7 +217,7 @@ fn a_new_wizard_levels_up_after_natali_and_progress_survives_a_reconnect() {
     assert_eq!(quest_status(&game, WIZARD_5), QuestStatus::Active);
     assert_eq!(counts(&game, WIZARD_5), [1, 0, 0]);
     now += 10;
-    let gate = goal_level(WIZARD_5);
+    let gate = shipped_quest(WIZARD_5).job_level_goal();
     realm_level(&mut game, &natali, gate - 1, now);
     assert_eq!(counts(&game, WIZARD_5), [1, 0, 0], "one rank short");
     let reached = realm_level(&mut game, &natali, gate, now + 10);
@@ -255,7 +253,7 @@ fn natali_before_the_offer_the_wrong_job_and_a_missing_prerequisite_change_nothi
     let unfinished = {
         let mut state = fixture.game_as(CHARACTER, None).state();
         seed_active_profile(&mut state, WIZARD, &[ADVENTURER, WIZARD]);
-        for (id, counters) in &WIZARD_OPENING[..2] {
+        for (id, counters) in &WIZARD_OPENING[..3] {
             seed_quest(&mut state, *id, QuestStatus::Completed, counters);
         }
         seed_quest(&mut state, 3_160_004, QuestStatus::Active, &[0, 0]);

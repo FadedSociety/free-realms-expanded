@@ -221,8 +221,12 @@ pub fn assert_enabled_archer_chapter_records() {
         .iter()
         .filter(|record| record["enabled"].as_bool().unwrap_or(false))
         // T542 enables the ungated Become an Archer (3010035): the Jobs-window record,
-        // not part of the Path/Oath chapter shape this check pins.
-        .filter(|record| record["id"].as_u64() != Some(u64::from(BECOME_A_ARCHER)))
+        // not part of the Path/Oath chapter shape this check pins. T671 enables Hilforn's
+        // Archer 5 and Archer Departure (tests/zone_quests_greenwood_round2.rs).
+        .filter(|record| {
+            ![u64::from(BECOME_A_ARCHER), 3_010_009, 3_010_012]
+                .contains(&record["id"].as_u64().unwrap())
+        })
         .collect();
     let enabled_ids: Vec<u64> = enabled
         .iter()

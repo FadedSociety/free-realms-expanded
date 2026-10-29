@@ -848,6 +848,7 @@ fn enabled_wizard_chapter_records_are_complete_and_drawable() {
                 3_160_019,
                 3_160_024,
                 u64::from(BECOME_A_WIZARD),
+                u64::from(BEING_A_BETTER_WIZARD),
             ]
             .contains(&record["id"].as_u64().unwrap())
         })

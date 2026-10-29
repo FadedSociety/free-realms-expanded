@@ -522,11 +522,60 @@
     },
     {
       "id": 3010009,
+      "job": 35,
       "title_string_id": 387302,
       "giver_npc_id": 9000000106,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3010006
+      ],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "profile_id": 35,
+          "level": 5,
+          "text_string_id": 387306,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387306 'Reach level 5 as an Archer, then return to Hilforn.' and 387308 (journal goal) are the level-gate strings of this quest (lab/reports/locale-id-to-text.json); lab/references/quest-lines/objective-specs.json q3010009 gives job_level profile 35 level 5 (spec_complete)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T671: one authoritative job_level objective at profile 35 (Archer), level 5, judged from the server's own Profiles::rank curve (T361), never from a client claim; job_level is objective #0 as quest_engine requires for an ordered quest. Matches the shipped level gates (Chef 3050020, Wizard 3160024, Ninja 3110013)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000106,
+          "text_string_id": 387306,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387306 and 387303 ('Return to Hilforn at that time'): the hand-in is Hilforn, npc 9000000106, who is the giver (npcs/greenwood_forest.json, legacy_data, drawn)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T671: the final Talk to the named target opens the 49/13 end screen at Hilforn. The intro text 387301 also sends the player to Eddie Eagle Eyes for work while levelling; that errand (Contract: All Around Win, 3010010) stays disabled and is not a step of this gate."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T671: no client, wiki or repo source names a reward for this gate (quest-lines/quests.json q3010009 'rewards_missing'). 15 coins, no item and no job XP mirror the shipped level-gate payout (Warrior W5 3150005, Chef 3050020, Wizard 3160024, Ninja 3110013); the number is ours and lives in data."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -546,10 +595,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -558,17 +603,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 387301 (offer: go see Eddie Eagle Eyes, return at level 5), 387302 title, 387303 wait text and 49/1 description, 387304 completion line and 49/13 end text, 387311 level-gate refusal line (quest-lines/quests.json q3010009, dialog ids; live 'unsure': no client flag on any cited string)."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T671: prerequisite is 3010006 (Oath of Honor, whose last step is the report to Hilforn): the guide's rows 5 and 6 (3010007, 3010008) between them are disabled, so the gate follows the last enabled step the way Ninja 3110013 follows 3110004. Re-point it when 3010007/3010008 are wired. Job gate 35 keeps the offer Archer-only, like 3010003 and 3010006. Hilforn (9000000106) is drawn (npcs/greenwood_forest.json legacy_data) and already lists 3010009."
         }
       ],
       "description_string_id": 387303,
       "intro_text_string_id": 387301,
       "end_text_string_id": 387304,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3010010,
@@ -726,13 +775,71 @@
     },
     {
       "id": 3010012,
+      "job": 35,
       "title_string_id": 77597,
       "giver_npc_id": 9000000106,
       "prerequisite_quest_ids": [
-        3010011
+        3010009
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "zone_id": 0,
+          "position": [
+            -2161.46,
+            -31.96,
+            371.82
+          ],
+          "radius": 15.0,
+          "text_string_id": 77598,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 77598 'Hilforn wants you to travel to Farnum Farmstead to see if you can find Vicki, another archer recruit.' and 18735 'Farnum Farmstead' (lab/reports/locale-id-to-text.json); lab/references/quest-lines/objective-specs.json q3010012 gives the visit geometry."
+            },
+            {
+              "kind": "client",
+              "evidence": "The point is point of interest 23 (name 382813) in data/content/startup/snapshot.json world.points_of_interest, the client's own POI row for the farmstead."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T671: radius 15 m (the spec drafted 8): the POI is a map marker, not a measured standing spot, and the check is a 3D sphere, so the wider tunable radius keeps it reachable on uneven ground."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000230,
+          "text_string_id": 77598,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 77598 ends 'to see if you can find Vicki'; Vicki is npc 9000000230 (name 77630), a drawn legacy_data row in npcs/farnum_farmstead.json and the giver of the next step, No Arrows, No Work (3010013, quest-lines/quests.json q3010013 giver)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T671: 'find Vicki' is read as the hand-in Talk to Vicki after the visit, so the player does not walk back north; the objective spec had only the visit. If the original paid out on arrival at Hilforn, re-point this step."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 10,
+          "items": [],
+          "job_xp": {
+            "35": 20
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T671: quest-lines/quests.json q3010012 states no reward ('none confirmed'). 10 coins and 20 Archer (profile 35) XP follow the shipped Archer step ladder (Oath of Honor 3010006, T194); the numbers are ours and live in data."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -752,10 +859,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -764,16 +867,19 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 77597 title, 77598 objective and 49/1 description (quest-lines/quests.json q3010012, live 'yes', confidence 0.55: client hint tags only, no offer or completion line found). The old intro id 77596 is the Miner quest Arrowheads for Lugabow, so it is removed."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T671: prerequisite is 3010009 (Archer: Achieve Level 5): the guide's predecessor 3010011 (Pondblaster Payback, a defeat quest) is disabled, so this step follows the last enabled link of the Hilforn chain. Re-point it when 3010011 is wired. Job gate 35: an Archer quest paying Archer XP, like 3010006."
         }
       ],
       "description_string_id": 77598,
-      "intro_text_string_id": 77596,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3010013,
