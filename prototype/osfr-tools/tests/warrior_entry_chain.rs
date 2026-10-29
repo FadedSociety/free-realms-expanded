@@ -63,6 +63,8 @@ const W3: u32 = 3_150_003;
 const W4: u32 = 3_150_004;
 const W5: u32 = 3_150_005;
 const W16: u32 = 3_150_016;
+/// T672: Warrior: Distracted, Tumbolina's Merry Vale quest (tests/zone_quests_merry_vale_round2.rs).
+const DISTRACTED: u32 = 3_150_008;
 const W1_TITLE: u32 = 22_526;
 const W4_TITLE: u32 = 22_580;
 const W4_DESCRIPTION: u32 = 22_581;
@@ -881,6 +883,8 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
         // T542 enables the ungated Become a Warrior (3150025): the Jobs-window record, not
         // part of the W1/W4 dialogue-record shape below.
         .filter(|row| row["id"].as_u64() != Some(u64::from(BECOME_A_WARRIOR)))
+        // T672 enables Tumbolina's Distracted, which has its own shape and suite.
+        .filter(|row| row["id"].as_u64() != Some(u64::from(DISTRACTED)))
         .collect();
     assert_eq!(
         enabled
@@ -990,7 +994,7 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
     // generated content already carried.
     for record in records {
         let id = record["id"].as_u64().unwrap();
-        if [W1, W4, W5, W16, BECOME_A_WARRIOR].contains(&(id as u32)) {
+        if [W1, W4, W5, W16, BECOME_A_WARRIOR, DISTRACTED].contains(&(id as u32)) {
             continue;
         }
         assert_eq!(record["enabled"].as_bool(), Some(false), "quest {id}");

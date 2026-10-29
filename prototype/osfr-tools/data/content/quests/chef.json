@@ -1285,11 +1285,60 @@
     },
     {
       "id": 3050023,
+      "job": 45,
       "title_string_id": 387255,
       "giver_npc_id": 9000000044,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3050020
+      ],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "profile_id": 45,
+          "level": 10,
+          "text_string_id": 387273,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387273 (lab/reports/locale-id-to-text.json) is the level-gate objective text for Chef level 10; lab/references/quest-lines/objective-specs-fixed.json q3050023 objective 0 gives job_level profile 45 level 10 (status settled)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T672: one authoritative job_level objective at profile 45, level 10, completed from the server's own Profiles::rank curve (T361), never from a Talk or a client claim; job_level is objective #0 as quest_engine requires for an ordered quest."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000044,
+          "text_string_id": 387273,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387273 (lab/reports/locale-id-to-text.json): 'Reach Level 10 as a Chef, then return to Chef Jarvie.' (the return to Chef Jarvie, npc 9000000044, who is the giver); Global.Text 387256 'Return to Chef Jarvie at that time.'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T672: talk target npc 9000000044 is a drawn row (npcs/merry_vale.json, placement legacy_data), so the Talk can run; the final Talk to a named objective target opens the 49/13 end screen at that NPC. Same shape as T723 (Chef level 5) and T667 (Chef level 20)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T672: the level-gate payout is 15 coins, paid once by the 49/14 turn-in, with no item and no job XP: the same reconstructed gate pay as Chef level 5 (T723) and level 20 (T667), Warrior W5 (T361) and Postman level 10 (T663). The answer for this quest records no reward (quest-lines/quests.json q3050023: none evidenced), so the number is ours and lives in data."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1309,39 +1358,67 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 387254 Jarvie's intro (come back at level 10), 387255 title, 387256 description, 387257 end text (lab/reports/locale-id-to-text.json; quest-lines/quests.json q3050023 live 'yes', status final; quest-lines/dialogs.json offer 387254, complete 387257)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T672 enabled: Chef Jarvie offers it, the Chef rank-10 goal and his Talk complete it, and he takes it in. job gate 45 keeps the quest Chef-only like the enabled 3050004, 3050020 and 3050031. Prerequisite 3050020 (Chef: Reach Level 5), the last enabled quest before it: the line order puts Chef: Learning to Crave the Flave (3050021) and Chef: Roasted Mysteries (3050022) in between, but those are disabled stubs, so a prerequisite on them would make this quest unreachable; the same call T667 made for Chef: Reach Level 20. The parallel client set 387274-387277 ('Chef: Level 10') is not bound: the critics left open whether it is a separate quest."
         }
       ],
       "description_string_id": 387256,
       "intro_text_string_id": 387254,
       "end_text_string_id": 387257,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3050024,
+      "job": 45,
       "title_string_id": 72106,
       "giver_npc_id": 9000000044,
       "prerequisite_quest_ids": [
         3050023
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000061,
+          "text_string_id": 72107,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 72107 (lab/reports/locale-id-to-text.json): 'Travel to Wugachug and learn more about cooking from Cook Yumtumlot,' (trailing comma as shipped); 72105 sends the player to Cook Yumtumlot in Wugachug; 72108 is her reply ('Jarvie sent you, did he?'), which she speaks as the completion line; her name is Global.Text 41248."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T672: the objective is one talk_to_npc at Cook Yumtumlot 9000000061 (npcs/wugachug.json, placement legacy_data), not the spec's visit_position (needs_placement: its radius 8.0 is unsourced); arriving and speaking to her is the one step the text names, and her Talk is the turn-in. Quest-lines/quests.json q3050024 leaves the turn-in NPC open; the completion line 72108 is hers, so she takes it in (R)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "45": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T672: five coins and 25 Chef (profile 45) job XP, the rung Cooking 101 (3050004, T202) and the Chef talk-step quests use (the W110 five-coin fallback plus the T202 small-quest XP). The answer for this quest records no reward (quest-lines/quests.json q3050024: none evidenced), so the numbers are ours and live in data."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1361,10 +1438,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -1373,17 +1446,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 72105 Jarvie's offer, 72106 title, 72107 objective and description, 72108 Cook Yumtumlot's completion line (lab/reports/locale-id-to-text.json; quest-lines/quests.json q3050024 live 'yes', status final; the title is npc_dialog-tagged, corroborated by the wiki Chef page listing Jarvie's Chugawhat? after the level-10 quest)."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T672 enabled: Chef Jarvie offers it after Chef: Reach Level 10 (3050023, enabled by the same task), and one Talk at Cook Yumtumlot completes and takes it in. job gate 45 keeps it Chef-only. Cook Yumtumlot's next offer, Chef: Surprise Me! (3050025), stays disabled."
         }
       ],
       "description_string_id": 72107,
       "intro_text_string_id": 72105,
       "end_text_string_id": 72108,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3050025,

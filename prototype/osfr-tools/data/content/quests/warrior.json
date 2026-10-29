@@ -483,13 +483,61 @@
     },
     {
       "id": 3150008,
+      "job": 32,
       "title_string_id": 71036,
       "giver_npc_id": 9000000222,
       "prerequisite_quest_ids": [
-        3150007
+        3150005
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000030,
+          "text_string_id": 71047,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 71047 'Talk to Braldan Stoneaxe' and 71037 'get her tools back from Braldan Stoneaxe in Merry Vale' (lab/reports/locale-id-to-text.json); Braldan's name is Global.Text 40550 and his greeting 71067 ('Tumbolina wants her tools')."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T672: talk target npc 9000000030 is a drawn row (npcs/merry_vale.json, placement legacy_data). The spec's first objective, a visit_position at Braldan (needs_placement), is the same place as this Talk, so it is dropped: one step per place the text names."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000222,
+          "text_string_id": 71050,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 71050 'Return to Tumbolina with her tools.' (untagged, matched by wording; 71049 'Return to Tumbolina' is the other candidate); Tumbolina's name is Global.Text 70891 and 71038 is her completion line."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T672: the return is one talk_to_npc at the giver Tumbolina 9000000222 (npcs/merry_vale.json, placement legacy_data); the final Talk to a named objective target opens the 49/13 end screen at that NPC. The tools are not an item: the text asks only for the Talk with Braldan, so no collect objective exists."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "32": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T672: five coins and 25 Warrior (profile 32) job XP, the rung the shipped Warrior step quests Dewey (3150001) and Steele (3150004) pay (T257: the W110 five-coin fallback plus the T202 small-quest XP). The answer records no reward (quest-lines/quests.json q3150008: unknown), and the end text 71038 hints at a weapon from Tumbolina that no source names, so no item is granted; the numbers are ours and live in data."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -509,10 +557,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -521,17 +565,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 71035 Tumbolina's offer, 71036 title, 71037 description, 71038 her end line (lab/reports/locale-id-to-text.json; quest-lines/quests.json q3150008 status final, live 'unsure': the title is ui-tagged with a class-label FLAG, no quest_title binds it, but the wiki Warrior page lists it under Tumbolina and nothing marks it not live)."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T672 enabled: Tumbolina offers it, the Talk at Braldan Stoneaxe then the Talk back at Tumbolina complete it. job gate 32 keeps it Warrior-only like the enabled Warrior chapter. Prerequisite re-pointed from 3150007 (Warrior: You Deserve Better, a disabled stub: its Roadhouse weapon-crate pickup has no server mechanic) to 3150005 (Warrior: Achieve Level 5), the last enabled quest before it, so the quest is reachable; Tumbolina's offer text 71035 does not depend on the skipped quest. Warrior: Too Distracted to Work (3150009) stays disabled."
         }
       ],
       "description_string_id": 71037,
       "intro_text_string_id": 71035,
       "end_text_string_id": 71038,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3150009,

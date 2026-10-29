@@ -331,6 +331,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         "Cale Yardbird (T542 giver and talk target of Become a Kart Driver 3080050): the client lines naming him are third-person objectives (1230727406 'Speak to Cale Yardbird at Tangletrack', 3977947908 'Return to Cale Yardbird') and the trainer menu label 407752; the Kart Driver guide quotes no first-person line of his own, so none is recovered.",
     ),
     (
+        9000000061,
+        "Cook Yumtumlot (T672 talk target and turn-in of Chef: Chugawhat?, 3050024): her one first-person line in that quest, 72108 ('Jarvie sent you, did he?'), is the quest's end text and is shown by the 49/13 end screen; the other lines naming her are third-person (72107 the objective, 72156 and 72219 'Find Cook Yumtumlot in Wugachug'); quest-lines/dialogs.json q3050024 records no greeting and no offer for her, so none is bound and a Wugachug region greeting pin does not move.",
+    ),
+    (
         9000000069,
         "Derp Axemaker (T729 giver of 3100012 and 3100013): the only first-person lines of his enabled quests are their offer intros 387452 and 77415, and quest-lines/dialogs.json leaves both speakers unattributed; binding a QuestOffer greeting moves the Snowhill bound-row pins in the region greeting tests, which this quest-data change does not touch, so he stays unbound. His disabled quests carry other first-person intros, but a disabled quest offers no proof and is not a greeting source.",
     ),

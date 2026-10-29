@@ -1430,10 +1430,12 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             if listed.contains(&(file, id)) {
                 continue;
             }
-            // T723/T667: Chef: Reach Level 5 and Reach Level 20 are level gates (job gate 45,
-            // coins only, no XP); tests/zone_quests_sanctuary_round3.rs and
-            // tests/zone_quests_wilds_part2.rs cover them.
-            if file == "chef.json" && [3_050_020, 3_050_031].contains(&id) {
+            // T723/T667/T672: Chef: Reach Level 5, 10 and 20 are level gates (job gate 45,
+            // coins only, no XP); tests/zone_quests_sanctuary_round3.rs,
+            // tests/zone_quests_merry_vale_round2.rs and tests/zone_quests_wilds_part2.rs cover
+            // them. T672 also enables Chef: Chugawhat? (3050024, job gate 45, 25 Chef XP),
+            // covered by tests/zone_quests_merry_vale_round2.rs.
+            if file == "chef.json" && [3_050_020, 3_050_023, 3_050_024, 3_050_031].contains(&id) {
                 continue;
             }
             // T660: Brawler: Achieve Level 5 is the same kind of level gate (job gate 43, coins
