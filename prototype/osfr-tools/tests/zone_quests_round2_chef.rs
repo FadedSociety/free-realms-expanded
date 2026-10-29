@@ -246,9 +246,10 @@ fn progress_survives_a_reconnect_and_players_are_independent() {
     assert_eq!(quest_status(&a, GAVIN_GONE_MISSING), QuestStatus::Completed);
 }
 
-/// The other 13 rows of the four matched lists, less the two already enabled (3000021, 3030008)
-/// and the Brawler 3030011 that `card_duelist_and_brawler_quests_stay_disabled` guards. Each
-/// check fails when its blocker lifts, so the next builder re-checks the row before wiring it.
+/// The other 12 rows of the four matched lists, less the two already enabled (3000021, 3030008),
+/// 3000011 (wired by T730, `zone_quests_farnum_farmstead`) and the Brawler 3030011 that
+/// `card_duelist_and_brawler_quests_stay_disabled` guards. Each check fails when its blocker
+/// lifts, so the next builder re-checks the row before wiring it.
 #[test]
 fn the_other_round_two_rows_stay_off_with_a_blocker() {
     let off = |id: u32| {
@@ -258,7 +259,7 @@ fn the_other_round_two_rows_stay_off_with_a_blocker() {
     };
     // Opening-arc records behind a disabled predecessor (the tutorial arc runs in its own stage
     // engine; a second copy would double an opening stage).
-    for id in [3_000_011, 3_000_015] {
+    for id in [3_000_015] {
         let blocked = off(id)
             .prerequisite_quest_ids
             .iter()

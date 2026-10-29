@@ -795,16 +795,34 @@
       "prerequisite_quest_ids": [
         3000009
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "model_id": 920001,
+          "count": 1,
+          "text_string_id": 5100268,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 5100268 'Defeat the Gloam Creature'; the opening's own stage 910008 goal 91000802 binds the same text to defeat definition 920001, required 1 (tests/fixtures/quests/opening.json). Global.Text 4420083 is the quest description ('one last Gloam Creature'), which gives the count (quest-lines/quests.json q3000010; quest-lines/objective-specs-fixed.json q3000010)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T730: count 1 from 'one last'. `defeat` goals carry the enemy definition id in `model_id` (the loader maps it to KillActorKind). 920001 'Gloam Creature' (enemies.json) had no overworld actor, so field_enemies.json gains one quest-gated spawn present only while this quest is active. Objective id 1 is a local authored key."
+            }
+          ]
+        }
+      ],
       "rewards": [
         {
-          "coins": 5,
+          "coins": 20,
           "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "reconstructed",
-              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+              "evidence": "(R) T730: quest-lines/quests.json q3000010 cites no reward. The opening's own stage 910008 'One More Gloam' pays 20 coins (tests/fixtures/quests/opening.json), so the regional quest pays the same. No job XP: the record has no job gate and no source names one."
             }
           ]
         }
@@ -824,10 +842,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -840,13 +854,13 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W110: DISABLED: Exact Gloam Creature has no field_enemies definition; opening enemy exists only in separate stage; predecessor blocked."
+          "evidence": "(R) T730: enabled after 3000009 as the guide orders it (A9 then A10); Pappy Farnum (9000000165) is drawn at Farnum Farmstead and already lists this quest. The progress line is not bound: the only reminder line (5100284) is tagged to a different quest (quest-lines/dialogs.json q3000010)."
         }
       ],
       "description_string_id": 4420083,
       "intro_text_string_id": 4420081,
       "end_text_string_id": 4420084,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000011,
@@ -868,19 +882,24 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            },
+            {
+              "kind": "client",
+              "evidence": "Global.Text 4420095 'Talk to Bartle' (quest-lines/quests.json q3000011; quest-lines/objective-specs-fixed.json q3000011). Bartle (9000000021) is drawn in Cobblestone Village (npcs/cobblestone_village.json) and his greeting is 4420092, the quest's completion line."
             }
-          ]
+          ],
+          "text_string_id": 4420095
         }
       ],
       "rewards": [
         {
-          "coins": 5,
+          "coins": 10,
           "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "reconstructed",
-              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+              "evidence": "(R) T730: quest-lines/quests.json q3000011 cites no reward (its 20 coins and 50 Brawler XP cover this quest and Pull the Plug together, notes/Tasks.md:104). The opening's own stage 910009 'Where's the Help?' pays 10 coins (tests/fixtures/quests/opening.json), so the regional quest pays the same. No job XP: no job gate and no source."
             }
           ]
         }
@@ -916,13 +935,13 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W110: DISABLED: Predecessor 3000010 blocked. Both Pappy and Bartle do spawn; corrected absent giver alias from guide A11."
+          "evidence": "(R) T730: enabled after 3000010. The offer is Pappy's (4420089, intro) and the quest completes on the Talk to Bartle, whose own line 4420092 is the end text; Pappy's row now lists the quest. No progress line exists (quest-lines/dialogs.json q3000011)."
         }
       ],
       "description_string_id": 4420091,
       "intro_text_string_id": 4420089,
       "end_text_string_id": 4420092,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000012,

@@ -2489,6 +2489,38 @@
           "evidence": "(R) level 13, health 200, damage 10, respawn 120 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3160031 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
         }
       ]
+    },
+    {
+      "guid": 5064655448674664466,
+      "definition_id": 920001,
+      "model_id": 3933,
+      "name_id": 5101961,
+      "name": "Gloam Creature",
+      "texture_alias": "",
+      "position": [
+        -2192.0,
+        -31.0,
+        346.0
+      ],
+      "max_health": 100,
+      "damage": 8,
+      "boss": false,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "quest_ids": [
+        3000010
+      ],
+      "level": 4,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "enemies.json definition 920001 'Gloam Creature' (model 3933, locale 5101961 'Gloam Creature'); quest q3000010 objective 'one last Gloam Creature roaming nearby' (Global.Text 4420083; quest-lines/quests.json q3000010)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T730: the spot is about 19 m from Pappy Farnum, whose quest asks for it, and 32 m from the Sheep Watch marker (battle 12350), on the standable ground that the T103 disc rule samples (the opening stage 910008's own Gloam Creature placement, encounters.json guid 5715144128442925075, sits 21 m from that marker and so could not be reused). Level 4 (the top of the starter bands: a level 5 band sits 21 m from low-level battle 12350's marker, inside the 40 m clearance), health 100, damage 8, respawn 60 s and aggro 8.0 m are the local balance on the field ladder T699 used, not the opening's scripted 300/35. Present only while quest 3000010 is active. The GUID is a fresh actor id, not the opening actor's. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest, so it cannot be farmed."
+        }
+      ]
     }
   ]
 }

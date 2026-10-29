@@ -381,8 +381,8 @@ fn the_actor_and_group_counts_stay_inside_the_loader_bounds() {
     let groups = field["spawn_groups"].as_array().unwrap();
     assert_eq!(
         enemies.len(),
-        49,
-        "12 starter + 4 quest-gated + 8 mid-level + 4 high-level + 6 elite actors + 15 T699 quest targets"
+        50,
+        "12 starter + 4 quest-gated + 8 mid-level + 4 high-level + 6 elite actors + 15 T699 and 1 T730 quest targets"
     );
     assert_eq!(
         groups.len(),

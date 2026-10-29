@@ -245,6 +245,8 @@ const LEVEL_TWENTY_WOLF: u64 = 131000110156;
 const ELITE_RESPAWN_MS: u64 = 180_000;
 /// T699 appended this many quest-gated quest-target actors after the elite six.
 const T699_ACTORS: usize = 15;
+/// T730 appended one more (the Gloam Creature of One More Gloam).
+const T730_ACTORS: usize = 1;
 
 fn shipped_field() -> Value {
     serde_json::from_slice(&fs::read(content_path()).unwrap()).unwrap()
@@ -403,14 +405,14 @@ fn six_elite_camps_load_with_levels_fifteen_to_twenty() {
 
     assert_eq!(
         enemies.len(),
-        49,
-        "28 pre-T332 + 6 elite actors + 15 T699 quest targets"
+        49 + T730_ACTORS,
+        "28 pre-T332 + 6 elite actors + 15 T699 and 1 T730 quest targets"
     );
     assert_eq!(groups.len(), 13, "10 pre-T332 + 3 elite groups");
     assert_eq!(
         engine.field_guids().len(),
-        49,
-        "the live field vector grows from 28 to 34 + 15 T699 quest targets"
+        49 + T730_ACTORS,
+        "the live field vector grows from 28 to 34 + 15 T699 and 1 T730 quest targets"
     );
     assert_eq!(
         &engine.field_guids()[..EXISTING_ACTORS.len()],
@@ -898,7 +900,7 @@ fn the_existing_camps_and_wolf_quest_are_unchanged() {
     let groups = field["spawn_groups"].as_array().unwrap();
     assert_eq!(
         enemies.len(),
-        EXISTING_ACTORS.len() + ELITE.len() + T699_ACTORS
+        EXISTING_ACTORS.len() + ELITE.len() + T699_ACTORS + T730_ACTORS
     );
     assert_eq!(groups.len(), EXISTING_GROUPS.len() + CAMPS.len());
     assert_eq!(
@@ -1016,8 +1018,8 @@ fn the_existing_camps_and_wolf_quest_are_unchanged() {
     );
     assert_eq!(
         rewards["definition_overrides"].as_array().unwrap().len(),
-        1 + T699_ACTORS,
-        "the wolf definition override plus one 0/0 override per T699 quest target"
+        1 + T699_ACTORS + T730_ACTORS,
+        "the wolf definition override plus one 0/0 override per T699 and T730 quest target"
     );
 }
 

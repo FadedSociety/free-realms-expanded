@@ -5477,7 +5477,8 @@
       ],
       "quest_ids_given": [
         3000005,
-        3000010
+        3000010,
+        3000011
       ],
       "quests_given_text": [
         "The Last Best Hope (turn-in; 3 coins, 3caQP-As968/00424), Saving Farnum's Farm (offer and turn-in; 4 coins, /00526), Farming 101 (offers it: \"Go talk to Mae Farnum\", /00526), One More Gloam (\"Before you leave to find the Queen, Pappy Farnum asked for your help defeating one last Gloam Creature\", 1632941585; the request 157225278 is a † match), Where's the Help? (sends the player to Bartle, 2810438267). Also the giver of the BBQ-invitation errand, title not found: \"Pappy Farnum wants to have some old friends over for a BBQ, but since their mailbox was stolen by hooligans ... Deliver the invitations personally.\" (660366901; objective \"Deliver the BBQ invitations to Pappy Farnum's guests.\" 3991845361). Receiver of food baskets (\"Deliver a food basket to Pappy Farnum.\" 1176729407; the Chef basket round names \"Pappy Farnum at Farnum's Farmstead\", 1273056963) and one of four guests a cook asks about for the Queen's party (984519267, 334490405). Objectives \"Talk to Pappy Farnum\" / \"Return to Pappy Farnum\" (456125280, 1048585713, 1517746564, 2427301939, 1705842179, 2441435923) and \"What has Pappy Farnum asked you to do? Well get to it.\" (2428241805) are unplaced. Video: an \"Active Quest!\" label naming Pappy follows an Adventurer 4 player through Snowhill and a beach (oGuD65aK9Yg/00092 to /00364); the quest title is not on screen."
