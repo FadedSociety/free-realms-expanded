@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "source": "Client MiniGameData.txt row 8 (TYPE 22, NAME_ID 409962, DESCRIPTION_ID 409969, ICON_ID 20985, empty PRELOAD_FILE); ActivityCategories.txt row 17 (Wheels) and the calendar's dailyWheelId 8 in ScriptsBase.lua; the wheel movie game_wheel.gfx is the client's own (Assets_008). The reset at UTC midnight and one spin a day are (R); see src/daily_wheel.rs.",
+  "activity_id": 8,
+  "minigame_id": 8,
+  "type_id": 22,
+  "name_id": 409962,
+  "description_id": 409969,
+  "icon_id": 20985,
+  "movie": "game_wheel.gfx"
+}

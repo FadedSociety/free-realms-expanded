@@ -49,6 +49,7 @@ mod collection_pickup;
 mod content_presence;
 mod content_reload;
 mod crafting;
+mod daily_wheel;
 mod dance_off;
 mod derby_rows;
 mod derby_session;
@@ -88,6 +89,8 @@ mod quest_use;
 mod rides;
 /// Station Cash earned by server-verified activity completions (T229).
 mod sc_earnings;
+/// Test and offline-fixture clock and shuffle seams; the gateway never calls them.
+mod seeds;
 mod startup_health;
 mod style_card_use;
 use self::npc::{dialogue_packet, quest_offer_packet_with};
@@ -173,6 +176,9 @@ pub struct GameplayState {
     /// byte-identical.
     #[serde(default, skip_serializing_if = "BTreeSet::is_empty")]
     pub upgraded_rides: BTreeSet<i32>,
+    /// T560: the UTC day index of the last paid daily-wheel spin; absent until one is paid.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_spin_day: Option<u64>,
 }
 
 /// Opt-in Harvesting candidate bound by this gateway integration: Farnum's
@@ -236,6 +242,8 @@ pub struct Gameplay {
     chess: Option<ChessService>,
     /// T765: the session's Trading Card Game launches (type-16 runs and one-time tickets).
     card_launches: Option<crate::card_game::Launches>,
+    /// T560: the daily wheel (`gameplay/daily_wheel.rs`); only its day stamp is saved.
+    daily_wheel: crate::daily_wheel::DailyWheel,
     /// Last answered 167/1/4 refresh: a 4-byte request returns up to ~6.7 KB,
     /// so refreshes are answered at most once per `PORTAL_REFRESH_MS` (R).
     portal_refreshed_ms: Option<u64>,
@@ -637,6 +645,7 @@ impl Gameplay {
         let mut warp = piece_077::WarpRegistry::curated();
         let saved_derby = state.as_ref().and_then(|s| s.derby.clone());
         let saved_chess = state.as_ref().and_then(|s| s.chess);
+        let saved_wheel_day = state.as_ref().and_then(|s| s.last_spin_day);
         let saved_sc_wallet = state.as_ref().and_then(|s| s.sc_wallet.clone());
         let saved_housing = state.as_ref().and_then(|s| s.housing.clone());
         let saved_item_bar = state.as_ref().and_then(|s| s.item_bar.clone());
@@ -988,6 +997,7 @@ impl Gameplay {
         let card_launches = (activities.cards().and_then(|cards| cards.launch()))
             .map(crate::card_game::Launches::new)
             .transpose()?;
+        let daily_wheel = crate::daily_wheel::DailyWheel::load(npc_content, saved_wheel_day)?;
         let mut npc_interaction = if crate::content::npc_shop_enabled(npc_content) {
             Some(NpcInteraction::load(
                 &npc_content.join("npcs"),
@@ -1196,6 +1206,7 @@ impl Gameplay {
             soccer: None,
             chess,
             card_launches,
+            daily_wheel,
             portal_refreshed_ms: None,
             kart_entry,
             derby,
@@ -1391,6 +1402,7 @@ impl Gameplay {
             upgraded_rides: self.mounts.as_ref().map_or_else(BTreeSet::new, |mounts| {
                 mounts.saved_upgrades(self.inventory.state())
             }),
+            last_spin_day: self.daily_wheel.last_spin_day(),
         };
         content_presence::restore_skipped(&mut state, &self.dormant);
         state
@@ -1708,6 +1720,7 @@ impl Gameplay {
             self.sync_tracked_target(character, &mut out);
             self.append_warp_definitions(character, &mut out);
             self.append_activity_list(&mut out);
+            self.append_daily_wheel(&mut out);
             self.append_item_bar(character.guid, now_ms, &mut out)?;
             self.enter_world(character, now_ms, &mut out);
             self.sync_client_objectives(&mut out);
@@ -2085,6 +2098,9 @@ impl Gameplay {
             return Ok(out);
         }
         if let Some(out) = self.handle_card_game(inner, character, now_ms)? {
+            return Ok(out);
+        }
+        if let Some(out) = self.handle_daily_wheel(inner)? {
             return Ok(out);
         }
         if let Some(out) = self.handle_chess(inner, character, now_ms)? {
@@ -3251,22 +3267,6 @@ impl Gameplay {
             }
         }
         Ok(Some(out))
-    }
-
-    /// (R) Deterministic chess replies for tests and offline fixtures. The
-    /// gateway loads tables from OS entropy and never calls this.
-    pub fn seed_chess(&mut self, seed: u64) {
-        if let Some(chess) = &mut self.chess {
-            chess.reseed(seed);
-        }
-    }
-
-    /// (R) A fixed UTC day for the chess reward ledger in tests and offline
-    /// fixtures. The gateway follows the wall clock and never calls this.
-    pub fn seed_chess_day(&mut self, day: u64) {
-        if let Some(chess) = &mut self.chess {
-            chess.set_day(day);
-        }
     }
 
     /// T022: chess movie and lifecycle packets while this character's chess run exists.

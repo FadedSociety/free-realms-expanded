@@ -20,6 +20,7 @@ pub mod combat;
 pub mod consumable_effects;
 pub mod content;
 pub mod cooking;
+pub mod daily_wheel;
 pub mod derby;
 pub mod derby_gateway;
 pub mod dev_teleport;

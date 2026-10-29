@@ -882,6 +882,9 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     // subtype is understood and refused without a reply or a guild change.
     result.push(("guilds", words(129, 0xffff, &[u32::MAX; 2])));
     result.push(("class_selection", words(26, 13, &[u32::MAX])));
+    // T560: the daily wheel's start (26/11, no body), and a forged one with trailing bytes.
+    result.push(("gameplay.handle_in_world", words(26, 11, &[])));
+    result.push(("gameplay.handle_in_world", words(26, 11, &[u32::MAX])));
     result.push(("encounter_exit", words(41, 109, &[u32::MAX; 2])));
     for sub in [5, 6, 7, 14] {
         let mut p = vec![39, 0, sub];

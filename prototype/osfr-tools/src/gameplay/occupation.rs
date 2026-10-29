@@ -43,6 +43,8 @@ occupations!(
     Housing,
     // T488: a pet grooming session (53/20 kind 3 until kind 4), a timed activity.
     Groom,
+    // T560: the daily wheel's movie is open (Flash window over the world).
+    Wheel,
 );
 
 /// What an occupation blocks while it is active.
@@ -89,6 +91,10 @@ impl Occupation {
             // packets, and a dismissed or wet pet already ends it with kind 4) and travel, riding
             // and movement open; zoning and water end it.
             Groom => (true, false, false, false, false),
+            // T560 (R): the open wheel movie closes the start gate (no craft, gather, fight or other
+            // minigame begins under it) and warpstone travel, like the other Flash movies; riding,
+            // pets and movement stay open because the wheel is a window, not a scene.
+            Wheel => (true, true, false, false, false),
         };
         Gates {
             start,
@@ -127,6 +133,7 @@ impl Gameplay {
             Occupation::FieldEngaged => self.field_engaged,
             Occupation::Housing => self.housing.as_ref().is_some_and(|h| h.in_house()),
             Occupation::Groom => self.pets.is_grooming(),
+            Occupation::Wheel => self.daily_wheel.is_active(),
         }
     }
 
@@ -165,14 +172,14 @@ mod tests {
             members(|g| g.start),
             [
                 Forging, Smelting, Cooking, Mining, Harvesting, Chess, CardGame, Encounter, Derby,
-                Fishing, Soccer, Kart, Housing, Groom
+                Fishing, Soccer, Kart, Housing, Groom, Wheel
             ]
         );
         assert_eq!(
             members(|g| g.warp),
             [
                 Forging, Smelting, Cooking, Mining, Harvesting, Chess, CardGame, Encounter, Derby,
-                Fishing, Soccer, Kart, Housing
+                Fishing, Soccer, Kart, Housing, Wheel
             ]
         );
         assert_eq!(
@@ -207,7 +214,7 @@ mod tests {
             members(|g| g.style_card),
             [
                 Forging, Smelting, Cooking, Mining, Harvesting, Chess, CardGame, Encounter, Derby,
-                Fishing, Soccer, Kart, Groom
+                Fishing, Soccer, Kart, Groom, Wheel
             ]
         );
     }
