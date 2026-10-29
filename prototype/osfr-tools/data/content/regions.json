@@ -12,6 +12,7 @@
     4428,
     7262,
     18140,
+    18535,
     18735,
     18899,
     20776,
@@ -71,11 +72,16 @@
       "parent_zone": 0,
       "shapes": [
         {
-          "shape": "rect",
-          "x1": -2820,
-          "z1": 820,
-          "x2": -1680,
-          "z2": 1700
+          "shape": "sphere",
+          "x": -1832,
+          "z": 1054,
+          "r": 240
+        },
+        {
+          "shape": "sphere",
+          "x": -2195,
+          "z": 1189,
+          "r": 480
         }
       ],
       "source": [
@@ -88,8 +94,12 @@
           "evidence": "ScriptsBase.lua:11642-11664 NotificationHandler:LoadingZone maps zone id 2 to \"blackspore_notification\" (+ .swf)"
         },
         {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 307-315: T876 region 2 extent = the background music/ambience areas of its places (blackspore) and their child areas (a child's Enable forwards to its parent, 0x00bed0c0); 2 shapes (rows in data/reference/area_definitions.json)"
+        },
+        {
           "kind": "reconstructed",
-          "evidence": "(R) T749 section 3.1 recovered nine-region AreaDefinitions table (src/restoration/piece_076.rs REGION_AREAS, community FabledRealms.json); region 2 id/name match the first-party banner table"
+          "evidence": "(R) T876 ties region 2 to those places by the table's own region_id (the client area names carry no banner property); the banner text and art stay as before"
         }
       ]
     },
@@ -102,9 +112,207 @@
       "shapes": [
         {
           "shape": "sphere",
-          "x": -540,
-          "z": 2240,
-          "r": 700
+          "x": -789,
+          "z": 1580,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -772,
+          "z": 1666,
+          "r": 251
+        },
+        {
+          "shape": "sphere",
+          "x": -996,
+          "z": 1900,
+          "r": 165
+        },
+        {
+          "shape": "sphere",
+          "x": -427,
+          "z": 1969,
+          "r": 233
+        },
+        {
+          "shape": "sphere",
+          "x": -763,
+          "z": 2186,
+          "r": 240
+        },
+        {
+          "shape": "sphere",
+          "x": -656,
+          "z": 1963,
+          "r": 120
+        },
+        {
+          "shape": "sphere",
+          "x": -518,
+          "z": 2189,
+          "r": 90
+        },
+        {
+          "shape": "sphere",
+          "x": -1085,
+          "z": 2169,
+          "r": 150
+        },
+        {
+          "shape": "sphere",
+          "x": -1035,
+          "z": 2377,
+          "r": 217
+        },
+        {
+          "shape": "sphere",
+          "x": -800,
+          "z": 2575,
+          "r": 130
+        },
+        {
+          "shape": "sphere",
+          "x": -145,
+          "z": 2257,
+          "r": 150
+        },
+        {
+          "shape": "sphere",
+          "x": -267,
+          "z": 2290,
+          "r": 150
+        },
+        {
+          "shape": "sphere",
+          "x": -338,
+          "z": 2325,
+          "r": 150
+        },
+        {
+          "shape": "sphere",
+          "x": -462,
+          "z": 2416,
+          "r": 150
+        },
+        {
+          "shape": "sphere",
+          "x": -543,
+          "z": 2488,
+          "r": 150
+        },
+        {
+          "shape": "sphere",
+          "x": -590,
+          "z": 2629,
+          "r": 140
+        },
+        {
+          "shape": "sphere",
+          "x": -281,
+          "z": 2504,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -197,
+          "z": 2498,
+          "r": 57
+        },
+        {
+          "shape": "sphere",
+          "x": -321,
+          "z": 2612,
+          "r": 100
+        },
+        {
+          "shape": "sphere",
+          "x": -66,
+          "z": 2706,
+          "r": 100
+        },
+        {
+          "shape": "sphere",
+          "x": -227,
+          "z": 2559,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -201,
+          "z": 2574,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -176,
+          "z": 2586,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -158,
+          "z": 2607,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -152,
+          "z": 2637,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -151,
+          "z": 2652,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 54,
+          "z": 2827,
+          "r": 130
+        },
+        {
+          "shape": "sphere",
+          "x": -781,
+          "z": 1948,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -741,
+          "z": 2455,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -756,
+          "z": 1531,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -709,
+          "z": 1500,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -262,
+          "z": 2455,
+          "r": 25
+        },
+        {
+          "shape": "sphere",
+          "x": -334,
+          "z": 2493,
+          "r": 25
+        },
+        {
+          "shape": "sphere",
+          "x": -297,
+          "z": 2478,
+          "r": 26
         }
       ],
       "source": [
@@ -117,8 +325,12 @@
           "evidence": "ScriptsBase.lua:11642-11664 NotificationHandler:LoadingZone maps zone id 3 to \"briarwood_notification\" (+ .swf)"
         },
         {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 217-3410: T876 region 3 extent = the background music/ambience areas of its places (briarheart, briarwood) and their child areas (a child's Enable forwards to its parent, 0x00bed0c0); 34 shapes (rows in data/reference/area_definitions.json)"
+        },
+        {
           "kind": "reconstructed",
-          "evidence": "(R) T749 section 3.1 recovered nine-region AreaDefinitions table (src/restoration/piece_076.rs REGION_AREAS, community FabledRealms.json); region 3 id/name match the first-party banner table"
+          "evidence": "(R) T876 ties region 3 to those places by the table's own region_id (the client area names carry no banner property); the banner text and art stay as before"
         }
       ]
     },
@@ -146,8 +358,12 @@
           "evidence": "ScriptsBase.lua:11642-11664 NotificationHandler:LoadingZone maps zone id 4 to \"merryvale_notification\" (+ .swf)"
         },
         {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 1820-1820: T876 region 4 extent = the background music/ambience areas of its places (merryvale) and their child areas (a child's Enable forwards to its parent, 0x00bed0c0); 1 shapes (rows in data/reference/area_definitions.json)"
+        },
+        {
           "kind": "reconstructed",
-          "evidence": "(R) T749 section 3.1 recovered nine-region AreaDefinitions table (src/restoration/piece_076.rs REGION_AREAS, community FabledRealms.json); region 4 id/name match the first-party banner table"
+          "evidence": "(R) T876 ties region 4 to those places by the table's own region_id (the client area names carry no banner property); the banner text and art stay as before"
         }
       ]
     },
@@ -159,11 +375,222 @@
       "parent_zone": 0,
       "shapes": [
         {
+          "shape": "sphere",
+          "x": -1470,
+          "z": 131,
+          "r": 188
+        },
+        {
+          "shape": "sphere",
+          "x": -1488,
+          "z": 460,
+          "r": 188
+        },
+        {
+          "shape": "sphere",
+          "x": -1185,
+          "z": 305,
+          "r": 66
+        },
+        {
+          "shape": "sphere",
+          "x": -1191,
+          "z": 524,
+          "r": 68
+        },
+        {
+          "shape": "sphere",
+          "x": -863,
+          "z": 318,
+          "r": 29
+        },
+        {
+          "shape": "sphere",
+          "x": -903,
+          "z": 330,
+          "r": 65
+        },
+        {
+          "shape": "sphere",
+          "x": -916,
+          "z": 402,
+          "r": 18
+        },
+        {
+          "shape": "sphere",
+          "x": -903,
+          "z": 240,
+          "r": 49
+        },
+        {
+          "shape": "sphere",
+          "x": -881,
+          "z": 288,
+          "r": 11
+        },
+        {
+          "shape": "sphere",
+          "x": -1010,
+          "z": 304,
+          "r": 67
+        },
+        {
+          "shape": "sphere",
+          "x": -968,
+          "z": 367,
+          "r": 23
+        },
+        {
+          "shape": "sphere",
+          "x": -1017,
+          "z": 378,
+          "r": 23
+        },
+        {
+          "shape": "sphere",
+          "x": -1060,
+          "z": 359,
+          "r": 23
+        },
+        {
+          "shape": "sphere",
+          "x": -1087,
+          "z": 318,
+          "r": 23
+        },
+        {
+          "shape": "sphere",
+          "x": -1079,
+          "z": 268,
+          "r": 23
+        },
+        {
+          "shape": "sphere",
+          "x": -1043,
+          "z": 233,
+          "r": 23
+        },
+        {
+          "shape": "sphere",
+          "x": -995,
+          "z": 227,
+          "r": 23
+        },
+        {
+          "shape": "sphere",
+          "x": -952,
+          "z": 252,
+          "r": 23
+        },
+        {
           "shape": "rect",
-          "x1": -1540,
-          "z1": 130,
-          "x2": -860,
-          "z2": 490
+          "x1": -1177,
+          "z1": 151,
+          "x2": -894,
+          "z2": 484
+        },
+        {
+          "shape": "sphere",
+          "x": -1164,
+          "z": 221,
+          "r": 67
+        },
+        {
+          "shape": "sphere",
+          "x": -1166,
+          "z": 377,
+          "r": 67
+        },
+        {
+          "shape": "sphere",
+          "x": -1219,
+          "z": 347,
+          "r": 34
+        },
+        {
+          "shape": "sphere",
+          "x": -1212,
+          "z": 265,
+          "r": 34
+        },
+        {
+          "shape": "sphere",
+          "x": -892,
+          "z": 250,
+          "r": 34
+        },
+        {
+          "shape": "sphere",
+          "x": -905,
+          "z": 304,
+          "r": 26
+        },
+        {
+          "shape": "sphere",
+          "x": -910,
+          "z": 342,
+          "r": 26
+        },
+        {
+          "shape": "sphere",
+          "x": -902,
+          "z": 393,
+          "r": 26
+        },
+        {
+          "shape": "sphere",
+          "x": -943,
+          "z": 282,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1315,
+          "z": 307,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1351,
+          "z": 304,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1236,
+          "z": 378,
+          "r": 100
+        },
+        {
+          "shape": "sphere",
+          "x": -1222,
+          "z": 205,
+          "r": 100
+        },
+        {
+          "shape": "sphere",
+          "x": -1282,
+          "z": 304,
+          "r": 47
+        },
+        {
+          "shape": "rect",
+          "x1": -1177,
+          "z1": 151,
+          "x2": -894,
+          "z2": 484
+        },
+        {
+          "shape": "sphere",
+          "x": -1156,
+          "z": 304,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1309,
+          "z": 309,
+          "r": 12
         }
       ],
       "source": [
@@ -176,8 +603,12 @@
           "evidence": "ScriptsBase.lua:11642-11664 NotificationHandler:LoadingZone maps zone id 5 to \"sanctuary_notification\" (+ .swf)"
         },
         {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 241-996: T876 region 5 extent = the background music/ambience areas of its places (memorial_caverns, queensfields, sanctuary) and their child areas (a child's Enable forwards to its parent, 0x00bed0c0); 36 shapes (rows in data/reference/area_definitions.json)"
+        },
+        {
           "kind": "reconstructed",
-          "evidence": "(R) T749 section 3.1 recovered nine-region AreaDefinitions table (src/restoration/piece_076.rs REGION_AREAS, community FabledRealms.json); region 5 id/name match the first-party banner table"
+          "evidence": "(R) T876 ties region 5 to those places by the table's own region_id (the client area names carry no banner property); the banner text and art stay as before"
         }
       ]
     },
@@ -206,8 +637,12 @@
           "evidence": "ScriptsBase.lua:11642-11664 NotificationHandler:LoadingZone maps zone id 6 to \"seaside_notification\" (+ .swf)"
         },
         {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 1717-1717: T876 region 6 extent = the background music/ambience areas of its places (seaside) and their child areas (a child's Enable forwards to its parent, 0x00bed0c0); 1 shapes (rows in data/reference/area_definitions.json)"
+        },
+        {
           "kind": "reconstructed",
-          "evidence": "(R) T749 section 3.1 recovered nine-region AreaDefinitions table (src/restoration/piece_076.rs REGION_AREAS, community FabledRealms.json); region 6 id/name match the first-party banner table"
+          "evidence": "(R) T876 ties region 6 to those places by the table's own region_id (the client area names carry no banner property); the banner text and art stay as before"
         }
       ]
     },
@@ -235,8 +670,12 @@
           "evidence": "ScriptsBase.lua:11642-11664 NotificationHandler:LoadingZone maps zone id 7 to \"shroudedglade_notification\" (+ .swf)"
         },
         {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 1823-1823: T876 region 7 extent = the background music/ambience areas of its places (shrouded_glade) and their child areas (a child's Enable forwards to its parent, 0x00bed0c0); 1 shapes (rows in data/reference/area_definitions.json)"
+        },
+        {
           "kind": "reconstructed",
-          "evidence": "(R) T749 section 3.1 recovered nine-region AreaDefinitions table (src/restoration/piece_076.rs REGION_AREAS, community FabledRealms.json); region 7 id/name match the first-party banner table"
+          "evidence": "(R) T876 ties region 7 to those places by the table's own region_id (the client area names carry no banner property); the banner text and art stay as before"
         }
       ]
     },
@@ -249,9 +688,177 @@
       "shapes": [
         {
           "shape": "sphere",
-          "x": 380,
-          "z": 400,
-          "r": 350
+          "x": 156,
+          "z": 390,
+          "r": 135
+        },
+        {
+          "shape": "sphere",
+          "x": 286,
+          "z": 234,
+          "r": 54
+        },
+        {
+          "shape": "sphere",
+          "x": 386,
+          "z": 351,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 448,
+          "z": 483,
+          "r": 105
+        },
+        {
+          "shape": "sphere",
+          "x": 102,
+          "z": 137,
+          "r": 157
+        },
+        {
+          "shape": "sphere",
+          "x": 251,
+          "z": 762,
+          "r": 266
+        },
+        {
+          "shape": "sphere",
+          "x": 33,
+          "z": 509,
+          "r": 112
+        },
+        {
+          "shape": "sphere",
+          "x": 42,
+          "z": -79,
+          "r": 181
+        },
+        {
+          "shape": "sphere",
+          "x": 684,
+          "z": 444,
+          "r": 186
+        },
+        {
+          "shape": "sphere",
+          "x": 353,
+          "z": 24,
+          "r": 177
+        },
+        {
+          "shape": "sphere",
+          "x": 617,
+          "z": 781,
+          "r": 274
+        },
+        {
+          "shape": "sphere",
+          "x": 732,
+          "z": 78,
+          "r": 256
+        },
+        {
+          "shape": "sphere",
+          "x": 376,
+          "z": 221,
+          "r": 61
+        },
+        {
+          "shape": "sphere",
+          "x": 462,
+          "z": 306,
+          "r": 155
+        },
+        {
+          "shape": "sphere",
+          "x": 64,
+          "z": 259,
+          "r": 49
+        },
+        {
+          "shape": "sphere",
+          "x": 55,
+          "z": 332,
+          "r": 51
+        },
+        {
+          "shape": "sphere",
+          "x": 20,
+          "z": 391,
+          "r": 37
+        },
+        {
+          "shape": "sphere",
+          "x": 331,
+          "z": 333,
+          "r": 64
+        },
+        {
+          "shape": "sphere",
+          "x": 305,
+          "z": 460,
+          "r": 135
+        },
+        {
+          "shape": "sphere",
+          "x": 273,
+          "z": 291,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 245,
+          "z": 281,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 217,
+          "z": 279,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 221,
+          "z": 255,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 217,
+          "z": 225,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 227,
+          "z": 197,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 252,
+          "z": 182,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 287,
+          "z": 176,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 317,
+          "z": 181,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 336,
+          "z": 201,
+          "r": 20
         }
       ],
       "source": [
@@ -264,8 +871,12 @@
           "evidence": "ScriptsBase.lua:11642-11664 NotificationHandler:LoadingZone maps zone id 8 to \"snowhill_notification\" (+ .swf)"
         },
         {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 1-614: T876 region 8 extent = the background music/ambience areas of its places (snowhill) and their child areas (a child's Enable forwards to its parent, 0x00bed0c0); 29 shapes (rows in data/reference/area_definitions.json)"
+        },
+        {
           "kind": "reconstructed",
-          "evidence": "(R) T749 section 3.1 recovered nine-region AreaDefinitions table (src/restoration/piece_076.rs REGION_AREAS, community FabledRealms.json); region 8 id/name match the first-party banner table"
+          "evidence": "(R) T876 ties region 8 to those places by the table's own region_id (the client area names carry no banner property); the banner text and art stay as before"
         }
       ]
     },
@@ -280,7 +891,7 @@
           "shape": "sphere",
           "x": 66,
           "z": -396,
-          "r": 165
+          "r": 150
         }
       ],
       "source": [
@@ -293,8 +904,12 @@
           "evidence": "ScriptsBase.lua:11642-11664 NotificationHandler:LoadingZone maps zone id 9 to \"wugachug_notification\" (+ .swf)"
         },
         {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 235-235: T876 region 9 extent = the background music/ambience areas of its places (wugachug) and their child areas (a child's Enable forwards to its parent, 0x00bed0c0); 1 shapes (rows in data/reference/area_definitions.json)"
+        },
+        {
           "kind": "reconstructed",
-          "evidence": "(R) T749 section 3.1 recovered nine-region AreaDefinitions table (src/restoration/piece_076.rs REGION_AREAS, community FabledRealms.json); region 9 id/name match the first-party banner table"
+          "evidence": "(R) T876 ties region 9 to those places by the table's own region_id (the client area names carry no banner property); the banner text and art stay as before"
         }
       ]
     },
@@ -310,6 +925,12 @@
           "x": 711,
           "z": 2143,
           "r": 765
+        },
+        {
+          "shape": "sphere",
+          "x": 448,
+          "z": 1815,
+          "r": 1000
         }
       ],
       "source": [
@@ -322,8 +943,12 @@
           "evidence": "ScriptsBase.lua:11642-11664 NotificationHandler:LoadingZone maps zone id 10 to \"sunstone_notification\" (+ .swf)"
         },
         {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 3512-3517: T876 region 10 extent = the background music/ambience areas of its places (sunstone_valley) and their child areas (a child's Enable forwards to its parent, 0x00bed0c0); 2 shapes (rows in data/reference/area_definitions.json)"
+        },
+        {
           "kind": "reconstructed",
-          "evidence": "(R) T749 section 3.1 recovered nine-region AreaDefinitions table (src/restoration/piece_076.rs REGION_AREAS, community FabledRealms.json); region 10 id/name match the first-party banner table"
+          "evidence": "(R) T876 ties region 10 to those places by the table's own region_id (the client area names carry no banner property); the banner text and art stay as before"
         }
       ]
     }
@@ -629,6 +1254,12 @@
           "x": -2432,
           "z": 1276,
           "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -2195,
+          "z": 1189,
+          "r": 480
         }
       ],
       "source": [
@@ -643,6 +1274,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T749 section 3.2 groups these rows as place blackspore under client region 2, and section 3.4 gives it priority 50"
+        },
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 315-315: T876 adds the background music/ambience areas of the place and their child areas (a child's Enable forwards to its parent, 0x00bed0c0) to the group; 1 shapes (rows in data/reference/area_definitions.json)"
         }
       ]
     },
@@ -664,6 +1299,36 @@
           "x": -22,
           "z": 2809,
           "r": 25
+        },
+        {
+          "shape": "sphere",
+          "x": -201,
+          "z": 2574,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -176,
+          "z": 2586,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -158,
+          "z": 2607,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -152,
+          "z": 2637,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -151,
+          "z": 2652,
+          "r": 20
         }
       ],
       "source": [
@@ -678,6 +1343,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T749 section 3.2 groups these rows as place briarheart under client region 3, and section 3.4 gives it priority 30"
+        },
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 1806-1810: T876 adds the background music/ambience areas of the place and their child areas (a child's Enable forwards to its parent, 0x00bed0c0) to the group; 5 shapes (rows in data/reference/area_definitions.json)"
         }
       ]
     },
@@ -1011,6 +1680,132 @@
           "x": -1040,
           "z": 1408,
           "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -996,
+          "z": 1900,
+          "r": 165
+        },
+        {
+          "shape": "sphere",
+          "x": -763,
+          "z": 2186,
+          "r": 240
+        },
+        {
+          "shape": "sphere",
+          "x": -656,
+          "z": 1963,
+          "r": 120
+        },
+        {
+          "shape": "sphere",
+          "x": -518,
+          "z": 2189,
+          "r": 90
+        },
+        {
+          "shape": "sphere",
+          "x": -1035,
+          "z": 2377,
+          "r": 217
+        },
+        {
+          "shape": "sphere",
+          "x": -800,
+          "z": 2575,
+          "r": 130
+        },
+        {
+          "shape": "sphere",
+          "x": -267,
+          "z": 2290,
+          "r": 150
+        },
+        {
+          "shape": "sphere",
+          "x": -338,
+          "z": 2325,
+          "r": 150
+        },
+        {
+          "shape": "sphere",
+          "x": -462,
+          "z": 2416,
+          "r": 150
+        },
+        {
+          "shape": "sphere",
+          "x": -543,
+          "z": 2488,
+          "r": 150
+        },
+        {
+          "shape": "sphere",
+          "x": -590,
+          "z": 2629,
+          "r": 140
+        },
+        {
+          "shape": "sphere",
+          "x": -197,
+          "z": 2498,
+          "r": 57
+        },
+        {
+          "shape": "sphere",
+          "x": -321,
+          "z": 2612,
+          "r": 100
+        },
+        {
+          "shape": "sphere",
+          "x": 54,
+          "z": 2827,
+          "r": 130
+        },
+        {
+          "shape": "sphere",
+          "x": -781,
+          "z": 1948,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -741,
+          "z": 2455,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -756,
+          "z": 1531,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -709,
+          "z": 1500,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -262,
+          "z": 2455,
+          "r": 25
+        },
+        {
+          "shape": "sphere",
+          "x": -334,
+          "z": 2493,
+          "r": 25
+        },
+        {
+          "shape": "sphere",
+          "x": -297,
+          "z": 2478,
+          "r": 26
         }
       ],
       "source": [
@@ -1025,6 +1820,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T749 section 3.2 groups these rows as place briarwood under client region 3, and section 3.4 gives it priority 50"
+        },
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 352-3410: T876 adds the background music/ambience areas of the place and their child areas (a child's Enable forwards to its parent, 0x00bed0c0) to the group; 21 shapes (rows in data/reference/area_definitions.json)"
         }
       ]
     },
@@ -1724,6 +2523,90 @@
           "x": -1010,
           "z": 301,
           "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -903,
+          "z": 330,
+          "r": 65
+        },
+        {
+          "shape": "sphere",
+          "x": -916,
+          "z": 402,
+          "r": 18
+        },
+        {
+          "shape": "sphere",
+          "x": -903,
+          "z": 240,
+          "r": 49
+        },
+        {
+          "shape": "sphere",
+          "x": -881,
+          "z": 288,
+          "r": 11
+        },
+        {
+          "shape": "sphere",
+          "x": -1010,
+          "z": 304,
+          "r": 67
+        },
+        {
+          "shape": "sphere",
+          "x": -968,
+          "z": 367,
+          "r": 23
+        },
+        {
+          "shape": "sphere",
+          "x": -1017,
+          "z": 378,
+          "r": 23
+        },
+        {
+          "shape": "sphere",
+          "x": -1060,
+          "z": 359,
+          "r": 23
+        },
+        {
+          "shape": "sphere",
+          "x": -1087,
+          "z": 318,
+          "r": 23
+        },
+        {
+          "shape": "sphere",
+          "x": -1079,
+          "z": 268,
+          "r": 23
+        },
+        {
+          "shape": "sphere",
+          "x": -1043,
+          "z": 233,
+          "r": 23
+        },
+        {
+          "shape": "sphere",
+          "x": -995,
+          "z": 227,
+          "r": 23
+        },
+        {
+          "shape": "sphere",
+          "x": -952,
+          "z": 252,
+          "r": 23
+        },
+        {
+          "shape": "sphere",
+          "x": -943,
+          "z": 282,
+          "r": 20
         }
       ],
       "source": [
@@ -1738,6 +2621,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T749 section 3.2 groups these rows as place memorial_caverns under client region 5, and section 3.4 gives it priority 30"
+        },
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 522-827: T876 adds the background music/ambience areas of the place and their child areas (a child's Enable forwards to its parent, 0x00bed0c0) to the group; 14 shapes (rows in data/reference/area_definitions.json)"
         }
       ]
     },
@@ -2140,6 +3027,101 @@
       ]
     },
     {
+      "id": "pixie_nursery",
+      "name": "Pixie Nursery",
+      "name_string_id": 18535,
+      "region_id": 1,
+      "priority": 30,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": -356,
+          "z": -695,
+          "r": 136
+        },
+        {
+          "shape": "sphere",
+          "x": -421,
+          "z": -740,
+          "r": 70
+        },
+        {
+          "shape": "sphere",
+          "x": -349,
+          "z": -742,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -319,
+          "z": -787,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -259,
+          "z": -678,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -288,
+          "z": -614,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -406,
+          "z": -675,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -259,
+          "z": -352,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -310,
+          "z": -453,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -213,
+          "z": -529,
+          "r": 120
+        },
+        {
+          "shape": "sphere",
+          "x": -327,
+          "z": -597,
+          "r": 25
+        },
+        {
+          "shape": "sphere",
+          "x": -258,
+          "z": -707,
+          "r": 25
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 232-2451: top-level always-on positive-radius sphere rows named pixienursery*; 12 shapes (rows in data/reference/area_definitions.json)"
+        },
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.18535 = \"Pixie Nursery\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T876 adds the place: client area Pixie_Nursery (id 90) carries its own Music(Background), the locale names it, and no banner region contains it, so it belongs to the default region 1 at the named-place priority 30"
+        }
+      ]
+    },
+    {
       "id": "queensfields",
       "name": "Queensfields",
       "name_string_id": 7262,
@@ -2408,6 +3390,104 @@
           "x": -1500,
           "z": 489,
           "r": 4
+        },
+        {
+          "shape": "sphere",
+          "x": -1488,
+          "z": 460,
+          "r": 188
+        },
+        {
+          "shape": "rect",
+          "x1": -1177,
+          "z1": 151,
+          "x2": -894,
+          "z2": 484
+        },
+        {
+          "shape": "sphere",
+          "x": -1164,
+          "z": 221,
+          "r": 67
+        },
+        {
+          "shape": "sphere",
+          "x": -1166,
+          "z": 377,
+          "r": 67
+        },
+        {
+          "shape": "sphere",
+          "x": -1219,
+          "z": 347,
+          "r": 34
+        },
+        {
+          "shape": "sphere",
+          "x": -1212,
+          "z": 265,
+          "r": 34
+        },
+        {
+          "shape": "sphere",
+          "x": -892,
+          "z": 250,
+          "r": 34
+        },
+        {
+          "shape": "sphere",
+          "x": -905,
+          "z": 304,
+          "r": 26
+        },
+        {
+          "shape": "sphere",
+          "x": -910,
+          "z": 342,
+          "r": 26
+        },
+        {
+          "shape": "sphere",
+          "x": -902,
+          "z": 393,
+          "r": 26
+        },
+        {
+          "shape": "sphere",
+          "x": -1351,
+          "z": 304,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1236,
+          "z": 378,
+          "r": 100
+        },
+        {
+          "shape": "sphere",
+          "x": -1222,
+          "z": 205,
+          "r": 100
+        },
+        {
+          "shape": "sphere",
+          "x": -1282,
+          "z": 304,
+          "r": 47
+        },
+        {
+          "shape": "rect",
+          "x1": -1177,
+          "z1": 151,
+          "x2": -894,
+          "z2": 484
+        },
+        {
+          "shape": "sphere",
+          "x": -1156,
+          "z": 304,
+          "r": 30
         }
       ],
       "source": [
@@ -2422,6 +3502,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T749 section 3.2 groups these rows as place sanctuary under client region 5, and section 3.4 gives it priority 50"
+        },
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 255-995: T876 adds the background music/ambience areas of the place and their child areas (a child's Enable forwards to its parent, 0x00bed0c0) to the group; 16 shapes (rows in data/reference/area_definitions.json)"
         }
       ]
     },
@@ -2611,6 +3695,13 @@
           "x": -656,
           "z": -1374,
           "r": 5
+        },
+        {
+          "shape": "rect",
+          "x1": -1162,
+          "z1": -1343,
+          "x2": 37,
+          "z2": -993
         }
       ],
       "source": [
@@ -2625,6 +3716,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T749 section 3.2 groups these rows as place seaside under client region 6, and section 3.4 gives it priority 50"
+        },
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 1717-1717: T876 adds the background music/ambience areas of the place and their child areas (a child's Enable forwards to its parent, 0x00bed0c0) to the group; 1 shapes (rows in data/reference/area_definitions.json)"
         }
       ]
     },
@@ -2933,6 +4028,162 @@
           "x": 61,
           "z": 506,
           "r": 4
+        },
+        {
+          "shape": "sphere",
+          "x": 386,
+          "z": 351,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 448,
+          "z": 483,
+          "r": 105
+        },
+        {
+          "shape": "sphere",
+          "x": 102,
+          "z": 137,
+          "r": 157
+        },
+        {
+          "shape": "sphere",
+          "x": 251,
+          "z": 762,
+          "r": 266
+        },
+        {
+          "shape": "sphere",
+          "x": 33,
+          "z": 509,
+          "r": 112
+        },
+        {
+          "shape": "sphere",
+          "x": 42,
+          "z": -79,
+          "r": 181
+        },
+        {
+          "shape": "sphere",
+          "x": 684,
+          "z": 444,
+          "r": 186
+        },
+        {
+          "shape": "sphere",
+          "x": 353,
+          "z": 24,
+          "r": 177
+        },
+        {
+          "shape": "sphere",
+          "x": 617,
+          "z": 781,
+          "r": 274
+        },
+        {
+          "shape": "sphere",
+          "x": 732,
+          "z": 78,
+          "r": 256
+        },
+        {
+          "shape": "sphere",
+          "x": 376,
+          "z": 221,
+          "r": 61
+        },
+        {
+          "shape": "sphere",
+          "x": 462,
+          "z": 306,
+          "r": 155
+        },
+        {
+          "shape": "sphere",
+          "x": 55,
+          "z": 332,
+          "r": 51
+        },
+        {
+          "shape": "sphere",
+          "x": 20,
+          "z": 391,
+          "r": 37
+        },
+        {
+          "shape": "sphere",
+          "x": 331,
+          "z": 333,
+          "r": 64
+        },
+        {
+          "shape": "sphere",
+          "x": 305,
+          "z": 460,
+          "r": 135
+        },
+        {
+          "shape": "sphere",
+          "x": 273,
+          "z": 291,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 245,
+          "z": 281,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 217,
+          "z": 279,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 221,
+          "z": 255,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 217,
+          "z": 225,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 227,
+          "z": 197,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 252,
+          "z": 182,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 287,
+          "z": 176,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 317,
+          "z": 181,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 336,
+          "z": 201,
+          "r": 20
         }
       ],
       "source": [
@@ -2947,6 +4198,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T749 section 3.2 groups these rows as place snowhill under client region 8, and section 3.4 gives it priority 50"
+        },
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 177-614: T876 adds the background music/ambience areas of the place and their child areas (a child's Enable forwards to its parent, 0x00bed0c0) to the group; 26 shapes (rows in data/reference/area_definitions.json)"
         }
       ]
     },
@@ -4250,6 +5505,138 @@
           "x": -1776,
           "z": -171,
           "r": 5
+        },
+        {
+          "shape": "sphere",
+          "x": -390,
+          "z": -628,
+          "r": 400
+        },
+        {
+          "shape": "sphere",
+          "x": -1224,
+          "z": -431,
+          "r": 673
+        },
+        {
+          "shape": "sphere",
+          "x": -2071,
+          "z": -436,
+          "r": 400
+        },
+        {
+          "shape": "sphere",
+          "x": -1892,
+          "z": 804,
+          "r": 33
+        },
+        {
+          "shape": "sphere",
+          "x": -1853,
+          "z": 739,
+          "r": 53
+        },
+        {
+          "shape": "sphere",
+          "x": -1077,
+          "z": 1083,
+          "r": 471
+        },
+        {
+          "shape": "sphere",
+          "x": -707,
+          "z": 726,
+          "r": 255
+        },
+        {
+          "shape": "sphere",
+          "x": -261,
+          "z": 1070,
+          "r": 552
+        },
+        {
+          "shape": "sphere",
+          "x": -1897,
+          "z": 202,
+          "r": 455
+        },
+        {
+          "shape": "sphere",
+          "x": -1583,
+          "z": 667,
+          "r": 167
+        },
+        {
+          "shape": "sphere",
+          "x": -1769,
+          "z": 684,
+          "r": 81
+        },
+        {
+          "shape": "sphere",
+          "x": -2036,
+          "z": 644,
+          "r": 136
+        },
+        {
+          "shape": "sphere",
+          "x": -1874,
+          "z": 628,
+          "r": 37
+        },
+        {
+          "shape": "sphere",
+          "x": -1060,
+          "z": 572,
+          "r": 102
+        },
+        {
+          "shape": "sphere",
+          "x": -1282,
+          "z": 657,
+          "r": 142
+        },
+        {
+          "shape": "sphere",
+          "x": -1491,
+          "z": 873,
+          "r": 173
+        },
+        {
+          "shape": "sphere",
+          "x": -1509,
+          "z": 1156,
+          "r": 166
+        },
+        {
+          "shape": "sphere",
+          "x": -1378,
+          "z": 1487,
+          "r": 232
+        },
+        {
+          "shape": "sphere",
+          "x": -665,
+          "z": 418,
+          "r": 93
+        },
+        {
+          "shape": "sphere",
+          "x": -741,
+          "z": 73,
+          "r": 193
+        },
+        {
+          "shape": "sphere",
+          "x": -1121,
+          "z": 1582,
+          "r": 120
+        },
+        {
+          "shape": "sphere",
+          "x": -1876,
+          "z": -842,
+          "r": 200
         }
       ],
       "source": [
@@ -4264,6 +5651,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T749 section 3.2 groups these rows as place wilds under client region 1, and section 3.4 gives it priority 10"
+        },
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 240-3411: T876 adds the background music/ambience areas of the place and their child areas (a child's Enable forwards to its parent, 0x00bed0c0) to the group; 22 shapes (rows in data/reference/area_definitions.json)"
         }
       ]
     },

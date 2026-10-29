@@ -31,7 +31,7 @@ pub const CONTENT_FILE: &str = "regions.json";
 const DEFAULT_REGION_ID: u32 = 1;
 
 /// (R) Caps keep one malformed file from making the lookup unbounded. The shipped
-/// table is 1 zone, 10 regions, 19 places and 590 shapes.
+/// table is 1 zone, 10 regions, 20 places and 816 shapes.
 const MAX_ZONES: usize = 16;
 const MAX_PLACES: usize = 256;
 const MAX_SHAPES: usize = 4096;
@@ -92,8 +92,9 @@ pub struct Region {
     pub banner_swf: Option<String>,
     /// Zone the region belongs to; this slice's regions are world zone 0.
     pub parent_zone: u32,
-    /// Coarse banner bounds: the recovered nine-region shapes for 2..=10 and the
-    /// client Newbiezone sphere for region 1 (section 3.4 steps 2 and 3). x/z only (R).
+    /// Banner bounds: for 2..=10 the client music/ambience areas of the region's places and
+    /// their child areas, for region 1 the client Newbiezone sphere (section 3.4 steps 2
+    /// and 3; `scripts/build_region_areas.py`, T876). x/z only (R).
     shapes: Vec<Shape>,
     /// Sum of the shape areas, computed at load; the tie-break after region id.
     #[serde(skip)]
@@ -117,8 +118,8 @@ pub struct Place {
     /// banner region groups 50, named places 30, Wilds 10, Sunstone 5); ties then use
     /// the smaller group area, then the smaller [`Self::id`].
     pub priority: u16,
-    /// Client area group bounds (top-level, always-on, positive-radius spheres),
-    /// projected to x/z (R).
+    /// Client area group bounds (top-level, always-on, positive-radius spheres, plus the
+    /// place's music/ambience areas with their child areas), projected to x/z (R).
     shapes: Vec<Shape>,
     /// Sum of the shape areas, computed at load; the section 3.4 tie-break.
     #[serde(skip)]
@@ -435,7 +436,7 @@ impl RegionTable {
         {
             return Some((place.region_id, Some(place)));
         }
-        // Step 2: the recovered nine banner-region shapes (ids 2..=10), smallest first.
+        // Step 2: the banner-region shapes (ids 2..=10), smallest first.
         for region in &self.content.regions {
             if region.id != DEFAULT_REGION_ID && region.contains(x, z) {
                 return Some((region.id, None));
@@ -468,7 +469,7 @@ impl RegionTable {
 
 impl Region {
     /// Whether `(x, z)` is inside this region's coarse shapes (2D, R). The table's
-    /// classifier uses this; tests pin the recovered nine-region row count with it.
+    /// classifier uses this; tests count the NPC rows each region covers with it.
     pub fn contains(&self, x: f32, z: f32) -> bool {
         self.shapes.iter().any(|shape| shape.contains(x, z))
     }

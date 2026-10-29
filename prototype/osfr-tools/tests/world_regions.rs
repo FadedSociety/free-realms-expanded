@@ -1,6 +1,6 @@
 //! T753: the world zone/region/place table (`data/content/regions.json`) loads through
 //! the live `Gameplay::load` path, classifies the T749 section 3.4 sample points, covers
-//! 1,091 of the 1,209 shipped NPC rows, and refuses malformed tables without changing
+//! 1,193 of the 1,209 shipped NPC rows, and refuses malformed tables without changing
 //! anything.
 //!
 //! The live table belongs to `world::NpcVisibility` (the NPC content owner `Gameplay::load`
@@ -8,10 +8,11 @@
 //! `regions.json` — comes from the bundled `data/content`. The coverage count is computed
 //! from the shipped `npcs/*.json` rows, not from a copy of the bounds.
 //!
-//! The region bounds are recovered (R): nine-region shapes from `piece_076::REGION_AREAS`
-//! and the client `FabledRealmsAreas.xml` place groups, projected to x/z. Client region ids,
-//! banner movies and locale ids come from `ScriptsBase.lua:11642-11664` and the client
-//! locale export; see `notes/Autopilot/T753.md`.
+//! The region and place bounds are client rows of `FabledRealmsAreas.xml` (pinned in
+//! `data/reference/area_definitions.json` by `scripts/build_region_areas.py`), projected to
+//! x/z; T876 replaced the community nine-region estimates. Client region ids, banner movies
+//! and locale ids come from `ScriptsBase.lua:11642-11664` and the client locale export; see
+//! `notes/Autopilot/T753.md` and `notes/Autopilot/T876.md`.
 
 #[path = "support/json.rs"]
 mod json;
@@ -109,7 +110,7 @@ fn client_name_ids_are_exactly_the_ids_the_rows_use() {
         listed, used,
         "the loader's locale allowlist must be exactly the ids its rows name"
     );
-    assert_eq!(listed.len(), 17);
+    assert_eq!(listed.len(), 18);
 }
 
 #[test]
@@ -119,7 +120,7 @@ fn live_gameplay_load_classifies_section_3_4_points() {
         .region_table()
         .expect("regions.json is loaded through Gameplay::load");
     assert_eq!(table.regions().len(), 10);
-    assert_eq!(table.places().len(), 19);
+    assert_eq!(table.places().len(), 20);
     assert_eq!(
         table.region(1).unwrap().banner_swf,
         None,
@@ -140,14 +141,23 @@ fn live_gameplay_load_classifies_section_3_4_points() {
         ((156.0, 390.0), (Some(8), Some("snowhill"))),
         ((-1832.0, 1054.0), (Some(2), Some("blackspore"))),
         ((-751.0, 765.0), (Some(1), Some("lakeshore"))),
-        ((-1600.0, -600.0), (None, None)), // Greenwood Forest has no client bounds (R)
+        // T876: Greenwood Forest has no area of its own; the Wilds music bed's child TheWild_Bed_3 (area 99,
+        // sphere (-1224, -431) r673) covers it, so it is the Wilds place in the default region.
+        ((-1600.0, -600.0), (Some(1), Some("wilds"))),
         ((-1040.0, -404.0), (Some(4), Some("merryvale"))),
         ((96.0, 1190.0), (Some(7), Some("shrouded_glade"))),
         ((711.0, 2143.0), (Some(10), Some("sunstone_valley"))),
-        ((-2700.0, 1600.0), (Some(2), None)), // recovered Blackspore rect, outside its group
+        // T876: the Blackspore region is the client bed (area 545) plus its child 546 (sphere (-2195, 1189)
+        // r480). The old community rectangle also took this corner; the client rows do not.
+        ((-2700.0, 1600.0), (None, None)),
+        ((-2195.0, 1189.0), (Some(2), Some("blackspore"))),
+        // Child beds extend the places: SnowHill_Bed_4 (area 78, sphere (251, 762) r266) was in no region before.
+        ((251.0, 762.0), (Some(8), Some("snowhill"))),
         // Section 3.4 priority: the banner region group (50) wins over the named
         // child place (30) where they overlap.
         ((-1403.0, 267.0), (Some(5), Some("sanctuary"))),
+        // T876: a place the client defines and the table lacked (area Pixie_Nursery, id 90).
+        ((-356.0, -695.0), (Some(1), Some("pixie_nursery"))),
         ((9000.0, 9000.0), (None, None)),
     ];
     for ((x, z), expected) in samples {
@@ -185,28 +195,31 @@ fn shipped_place_group_counts_match_the_research_table() {
         })
         .collect::<BTreeMap<_, _>>();
     let expected = BTreeMap::from([
-        ("blackspore", 49),
-        ("briarheart", 2),
-        ("briarwood", 54),
+        ("blackspore", 50),
+        ("briarheart", 7),
+        ("briarwood", 75),
         ("crossroads", 17),
         ("farnum_farmstead", 6),
         ("highroad_junction", 51),
         ("lakeshore", 18),
-        ("memorial_caverns", 7),
+        ("memorial_caverns", 21),
         ("merryvale", 57),
         ("newbiezone", 1),
+        ("pixie_nursery", 12),
         ("queensfields", 4),
-        ("sanctuary", 36),
-        ("seaside", 30),
+        ("sanctuary", 52),
+        ("seaside", 31),
         ("shrouded_glade", 19),
-        ("snowhill", 27),
+        ("snowhill", 53),
         ("stillwater_crossing", 51),
         ("sunstone_valley", 9),
-        ("wilds", 148),
+        ("wilds", 170),
         ("wugachug", 4),
     ]);
     assert_eq!(counts, expected, "per-group client sphere counts");
-    assert_eq!(counts.values().sum::<usize>(), 590, "grouped spheres");
+    // T876: 602 top-level spheres (590 grouped by T753 plus the 12 Pixie Nursery rows) and 106 rows of the
+    // places' music/ambience area families (children extend their parent: client Enable 0x00bed0c0).
+    assert_eq!(counts.values().sum::<usize>(), 708, "grouped shapes");
     let region_shapes = document["regions"]
         .as_array()
         .expect("regions")
@@ -214,7 +227,8 @@ fn shipped_place_group_counts_match_the_research_table() {
         .skip(1)
         .map(|region| region["shapes"].as_array().expect("shapes").len())
         .sum::<usize>();
-    assert_eq!(region_shapes, 9, "recovered nine-region shapes");
+    // T876: regions 2..=10 are the area families of their places (client rows, no estimated shape left).
+    assert_eq!(region_shapes, 107, "banner region shapes");
 
     // The live owner loads the same 19 rows through Gameplay::load.
     let live = gameplay();
@@ -226,7 +240,7 @@ fn shipped_place_group_counts_match_the_research_table() {
 }
 
 #[test]
-fn shipped_npc_rows_cover_1091_of_1209() {
+fn shipped_npc_rows_cover_1193_of_1209() {
     let game = gameplay();
     let table = game.region_table().expect("live region table");
     let npc_dir = npc_greetings::content_dir().join("npcs");
@@ -246,8 +260,8 @@ fn shipped_npc_rows_cover_1091_of_1209() {
             let z = position[2].as_f64().expect("z") as f32;
             let place = table.place_at(0, x, z).is_some();
             let region = table.region_at(0, x, z);
-            // Data membership for the two note counts: the recovered nine shapes
-            // (844) and their union with the region 1 fallback sphere (905).
+            // Data membership for the two note counts: the banner-region shapes (892)
+            // and their union with the region 1 fallback sphere (953).
             let in_recovered_shape = table
                 .regions()
                 .iter()
@@ -270,13 +284,15 @@ fn shipped_npc_rows_cover_1091_of_1209() {
     }
 
     assert_eq!(total, 1209, "shipped NPC rows");
-    assert_eq!(in_place, 981, "rows in a first-party place group");
+    // T876 (was 981 / 844 / 905 / 1091 with the T753 grouping and the community region shapes): the places'
+    // music/ambience area families and the client-row regions cover 1,193 rows, of which every one is in a place.
+    assert_eq!(in_place, 1193, "rows in a first-party place group");
     assert_eq!(
-        in_recovered_region, 844,
-        "rows in the recovered nine regions"
+        in_recovered_region, 892,
+        "rows in the banner regions 2..=10"
     );
-    assert_eq!(in_any_region, 905, "rows in a region (including region 1)");
-    assert_eq!(covered, 1091, "rows in a place or a region");
+    assert_eq!(in_any_region, 953, "rows in a region (including region 1)");
+    assert_eq!(covered, 1193, "rows in a place or a region");
 }
 
 #[test]
@@ -415,6 +431,10 @@ fn section_3_4_priority_area_and_id_tie_breaks_are_applied() {
     let regions = |r3: Value, r10: Value, fallback: Value| {
         load_mutated(&shipped, |value| {
             value["places"] = json!([]);
+            // Park every region far away so only the three under test can match.
+            for region in value["regions"].as_array_mut().unwrap() {
+                region["shapes"] = json!([{"shape": "sphere", "x": 15000, "z": 15000, "r": 1}]);
+            }
             value["regions"][0]["shapes"] = json!([fallback]);
             value["regions"][2]["shapes"] = json!([r3]);
             value["regions"][9]["shapes"] = json!([r10]);
@@ -439,4 +459,160 @@ fn section_3_4_priority_area_and_id_tie_breaks_are_applied() {
         at_origin(0, 0, 1000),
     );
     assert_eq!(point(&fallback_region, 0.0, 0.0), (Some(1), None));
+}
+
+fn pinned_zones() -> Vec<Value> {
+    let path = npc_greetings::content_dir().join("../reference/area_definitions.json");
+    json::read(&path)["zones"]
+        .as_array()
+        .expect("zones")
+        .clone()
+}
+
+fn world_rows() -> Vec<Value> {
+    let zones = pinned_zones();
+    let world = zones.iter().find(|zone| zone["zone"] == "FabledRealms");
+    world.expect("FabledRealms zone")["rows"]
+        .as_array()
+        .unwrap()
+        .clone()
+}
+
+fn area<'a>(rows: &'a [Value], id: u64, name: &str) -> &'a Value {
+    let row = rows.iter().find(|row| row["id"] == id).expect("area id");
+    assert_eq!(row["name"], name, "area {id}");
+    row
+}
+
+/// Whether a table shape is exactly this client row (sphere centre/radius, or box corners as a rect).
+fn is_row(shape: &Value, row: &Value) -> bool {
+    let same = |a: &str, b: &str| shape[a].as_f64() == row[b].as_f64();
+    match shape["shape"].as_str().unwrap() {
+        "sphere" => row["shape"] == "sphere" && same("x", "x") && same("z", "z") && same("r", "r"),
+        _ => {
+            let (x, z) = (["x1", "x2"], ["z1", "z2"]);
+            row["shape"] == "box" && x.iter().all(|k| same(k, k)) && z.iter().all(|k| same(k, k))
+        }
+    }
+}
+
+/// Every shape of every region and place that is not a client row, as "owner: shape" (the
+/// Sanctuary-style reconstructed shapes would be listed here).
+fn shapes_without_a_client_row(document: &Value, rows: &[Value]) -> Vec<String> {
+    let mut found = Vec::new();
+    for key in ["regions", "places"] {
+        for owner in document[key].as_array().unwrap() {
+            for shape in owner["shapes"].as_array().unwrap() {
+                if !rows.iter().any(|row| is_row(shape, row)) {
+                    found.push(format!("{}: {shape}", owner["id"]));
+                }
+            }
+        }
+    }
+    found
+}
+
+#[test]
+fn pinned_client_area_rows_carry_their_provenance() {
+    let zones = pinned_zones();
+    // The packs of this build: 130 zone files, 2,376 rows (the community bundle's 2,323 is an older build).
+    assert_eq!(zones.len(), 130);
+    let mut total = 0;
+    for zone in &zones {
+        let rows = zone["rows"].as_array().unwrap();
+        total += rows.len();
+        let name = zone["zone"].as_str().unwrap();
+        assert_eq!(zone["file"], format!("{name}Areas.xml"));
+        assert!(zone["pack"].as_str().unwrap().ends_with(".pack"), "{name}");
+        assert!(zone["entry"].is_u64(), "{name}");
+        assert_eq!(zone["crc32"].as_str().unwrap().len(), 8, "{name}");
+        assert!(
+            rows.iter().all(|row| row["line"].as_u64().unwrap() > 0),
+            "{name}"
+        );
+    }
+    assert_eq!(total, 2376);
+    // The world zone's area ids are unique (one zone, ss_cray_caves, reuses seven ids in the client itself).
+    let world = world_rows();
+    let ids = world.iter().map(|row| row["id"].as_u64().unwrap());
+    assert_eq!(ids.collect::<BTreeSet<_>>().len(), 1279);
+    assert_eq!(world.len(), 1279);
+}
+
+#[test]
+fn region_and_place_shapes_are_client_rows_except_where_listed() {
+    let document = shipped();
+    let rows = world_rows();
+    assert_eq!(
+        shapes_without_a_client_row(&document, &rows),
+        Vec::<String>::new(),
+        "every shape of the table is a pinned FabledRealms row"
+    );
+    // The region extents are the places' music/ambience families, no longer the community estimates.
+    for region in document["regions"].as_array().unwrap().iter().skip(1) {
+        let kinds = region["source"].as_array().unwrap();
+        let text = |row: &Value| row["evidence"].as_str().unwrap().to_owned();
+        assert!(
+            kinds
+                .iter()
+                .any(|tag| tag["kind"] == "client" && text(tag).contains("T876"))
+        );
+        assert!(
+            !kinds
+                .iter()
+                .any(|tag| text(tag).contains("T749 section 3.1")),
+            "region {}",
+            region["id"]
+        );
+    }
+
+    // Sampled replaced shapes, pinned against the client rows by area id.
+    let owner = |key: &str, id: Value| {
+        document[key]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["id"] == id)
+            .unwrap()
+            .clone()
+    };
+    let has = |owner: &Value, row: &Value| {
+        owner["shapes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|s| is_row(s, row))
+    };
+    let snowhill_bed = area(&rows, 3, "Snowhill_Bed_1");
+    let snowhill_child = area(&rows, 78, "SnowHill_Bed_4");
+    let blackspore_child = area(&rows, 546, "BlackSpore_Swamp_Bed_2");
+    let brewery = area(&rows, 91, "TheWild_WaguChugBrewery");
+    let seaside_box = area(&rows, 2250, "Seaside_area_1");
+    for row in [snowhill_bed, snowhill_child] {
+        assert!(
+            has(&owner("regions", json!(8)), row) && has(&owner("places", json!("snowhill")), row)
+        );
+    }
+    assert!(has(&owner("regions", json!(2)), blackspore_child));
+    assert!(has(&owner("places", json!("blackspore")), blackspore_child));
+    assert_eq!(
+        owner("regions", json!(9))["shapes"]
+            .as_array()
+            .unwrap()
+            .len(),
+        1
+    );
+    assert!(
+        has(&owner("regions", json!(9)), brewery),
+        "Wugachug is the client brewery area, radius 150 not 165"
+    );
+    assert!(
+        has(&owner("regions", json!(6)), seaside_box),
+        "Seaside stays the client box"
+    );
+
+    // Canary: a shape nudged off its client row is reported (the check is not vacuous).
+    let mut broken = document.clone();
+    broken["regions"][7]["shapes"][0]["r"] = json!(136);
+    assert_eq!(shapes_without_a_client_row(&broken, &rows).len(), 1);
 }
