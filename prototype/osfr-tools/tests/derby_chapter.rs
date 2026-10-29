@@ -27,12 +27,14 @@
 
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
+#[path = "support/quest_records.rs"]
+mod quest_records;
 
 use npc_quest_chain::{
-    accept, active_job, assert_no_offer, assert_packet_changes_nothing, coins, content_dir, counts,
-    finish_quest, has_family, menu_option, npc_interact, npc_select, objective_activated,
-    objective_complete, objective_update, offer, pending_turnin, profile_xp, quest_end_reply,
-    quest_reply, quest_status, release_end_screen, saved, select_job, send, talk,
+    ZoneQuest, ZoneQuests, accept, active_job, assert_no_offer, assert_packet_changes_nothing,
+    coins, content_dir, counts, finish_quest, has_family, menu_option, npc_interact, npc_select,
+    objective_activated, objective_complete, objective_update, offer, pending_turnin, profile_xp,
+    quest_end_reply, quest_reply, quest_status, release_end_screen, saved, select_job, send, talk,
 };
 use osfr_tools::{
     character_store::CharacterState,
@@ -46,6 +48,7 @@ use osfr_tools::{
     npc_interaction::NpcInteraction,
     quest_engine::QuestStatus,
 };
+use quest_records::shipped_quest;
 use serde_json::{Value, json};
 use std::{
     collections::BTreeMap,
@@ -1316,4 +1319,173 @@ fn forged_requests_and_gated_refusals_change_nothing() {
         before,
         "an already-playing entry changed state"
     );
+}
+
+// ---- T666: "Demo Derby: Stunt Double" (3060030), Jace Wildwheel's first Wildwood quest ----
+//
+// One `finish_minigame` goal on the derby package (game 39), the same server-observed finish
+// 3060005 uses, and a Talk hand-in at the giver. The reward, text ids and end text are read from
+// `data/content/quests/demo_derby_driver.json`, so retuning the record keeps these tests.
+
+/// Jace Wildwheel, a Wilds `legacy_data` row that lists 3060030 in `quest_ids_given`.
+const JACE: u64 = 9_000_000_357;
+const STUNT_DOUBLE: u32 = 3_060_030;
+
+/// Jace is a `wilds.json` row that spawns as its own content key.
+const MAP: ZoneQuests = ZoneQuests {
+    default_file: "wilds.json",
+    files: &[],
+    runtime: &[],
+};
+
+/// The shipped record mapped to the card ids, end text and reward words the runner pins.
+fn stunt_double() -> ZoneQuest {
+    ZoneQuest::from_record(
+        shipped_quest(STUNT_DOUBLE),
+        JACE,
+        JACE,
+        DEMO_DERBY_DRIVER_PROFILE,
+    )
+}
+
+/// Learn the job, then take Jace's offer and accept it. Returns Jace's position.
+fn accept_stunt_double(fixture: &Fixture, game: &mut Gameplay, now: &mut u64) -> CharacterState {
+    learn_and_activate(fixture, game, now);
+    *now += 10;
+    MAP.accept(game, CHARACTER, &stunt_double(), now);
+    assert_eq!(counts(game, STUNT_DOUBLE), vec![0]);
+    MAP.at(CHARACTER, JACE)
+}
+
+#[test]
+fn stunt_double_is_credited_by_a_finished_derby_and_paid_from_data() {
+    let fixture = Fixture::new(CHARACTER);
+    let mut game = fixture.game();
+    let mut now = NOW;
+    let quest = stunt_double();
+    assert!(
+        quest.coins > 0 && quest.profile_xp > 0,
+        "the record pays something"
+    );
+
+    let jace = accept_stunt_double(&fixture, &mut game, &mut now);
+
+    // Before the match: a Talk, an early 49/14 and a repeat 49/2 change nothing.
+    assert_no_offer(&mut game, &jace, JACE, &mut now, "Jace mid-quest");
+    now += 10;
+    assert_packet_changes_nothing(
+        &mut game,
+        &jace,
+        &quest_end_reply(STUNT_DOUBLE),
+        now,
+        "an early 49/14",
+    );
+    now += 10;
+    assert_packet_changes_nothing(
+        &mut game,
+        &jace,
+        &quest_reply(STUNT_DOUBLE, true),
+        now,
+        "a repeat 49/2",
+    );
+
+    // One finished match credits the goal once; it opens no end screen by itself.
+    let finished = play_to_results(&fixture, &mut game, MAD_JACK, &mut now);
+    assert_eq!(counts(&game, STUNT_DOUBLE), vec![1]);
+    assert!(objective_update(&finished.results, STUNT_DOUBLE, 1, 1));
+    assert!(objective_complete(&finished.results, STUNT_DOUBLE, 1));
+    assert_eq!(pending_turnin(&game), None);
+    assert!(
+        !finished
+            .results
+            .replies
+            .iter()
+            .any(|packet| has_family(packet, 49, 13, None)),
+        "the finish alone opens no end screen"
+    );
+    close_match(&fixture, &mut game, now);
+
+    // The finished goal survives a save and reload; the hand-in then pays exactly the record.
+    let mut game = save_and_reload(&fixture, &game);
+    assert_eq!(quest_status(&game, STUNT_DOUBLE), QuestStatus::Active);
+    assert_eq!(counts(&game, STUNT_DOUBLE), vec![1]);
+    let (coins_before, xp_before) = (coins(&game), profile_xp(&game, DEMO_DERBY_DRIVER_PROFILE));
+    now += 100;
+    MAP.talk(&mut game, CHARACTER, JACE, now);
+    now += 10;
+    MAP.pay_held_turnin(
+        &mut game,
+        CHARACTER,
+        &quest,
+        DEMO_DERBY_DRIVER_PROFILE,
+        &mut now,
+    );
+    assert_eq!(coins(&game), coins_before + quest.coins);
+    assert_eq!(
+        profile_xp(&game, DEMO_DERBY_DRIVER_PROFILE),
+        xp_before + quest.profile_xp
+    );
+
+    // A replayed hand-in or accept pays nothing more.
+    now += 10;
+    assert_packet_changes_nothing(
+        &mut game,
+        &jace,
+        &quest_end_reply(STUNT_DOUBLE),
+        now,
+        "a replayed 49/14",
+    );
+    now += 10;
+    assert_packet_changes_nothing(
+        &mut game,
+        &jace,
+        &quest_reply(STUNT_DOUBLE, true),
+        now,
+        "a replayed 49/2",
+    );
+}
+
+#[test]
+fn stunt_double_is_offered_only_to_an_active_derby_driver() {
+    let fixture = Fixture::new(CHARACTER);
+    let mut game = fixture.game();
+    let mut now = NOW;
+    assert!(!unlocked(&game, DEMO_DERBY_DRIVER_PROFILE));
+    let jace = fixture.character(JACE);
+    assert_no_offer(&mut game, &jace, JACE, &mut now, "Jace, not a derby driver");
+    now += 10;
+    assert_packet_changes_nothing(
+        &mut game,
+        &jace,
+        &quest_reply(STUNT_DOUBLE, true),
+        now,
+        "a forged 49/2 for Stunt Double",
+    );
+}
+
+#[test]
+fn a_cancelled_match_does_not_credit_stunt_double() {
+    let fixture = Fixture::new(CHARACTER);
+    let mut game = fixture.game();
+    let mut now = NOW;
+    let jace = accept_stunt_double(&fixture, &mut game, &mut now);
+    let instance = start_match(&fixture, &mut game, MAD_JACK, &mut now);
+    run_to_running(&fixture, &mut game, instance, &mut now);
+    let (coins_before, xp_before) = (coins(&game), profile_xp(&game, DEMO_DERBY_DRIVER_PROFILE));
+
+    now += 1_000;
+    let quit = send(
+        &mut game,
+        &fixture.character(MAD_JACK),
+        &quit_request(instance),
+        now,
+    );
+    assert!(quit.changed);
+    assert!(!game.derby_active());
+    assert_eq!(counts(&game, STUNT_DOUBLE), vec![0]);
+    assert_eq!(pending_turnin(&game), None);
+    assert_eq!(coins(&game), coins_before, "cancelling pays nothing");
+    assert_eq!(profile_xp(&game, DEMO_DERBY_DRIVER_PROFILE), xp_before);
+    // Jace still has nothing to hand in.
+    assert_no_offer(&mut game, &jace, JACE, &mut now, "Jace after a cancel");
 }

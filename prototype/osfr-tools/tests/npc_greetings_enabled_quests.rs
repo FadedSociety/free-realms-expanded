@@ -371,6 +371,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         "Valerie: only third-person tutorial and objective text; the untied Welcome window 3453817544 is not attributed to her, so no first-person line is recovered.",
     ),
     (
+        9000000357,
+        "Jace Wildwheel (T666 giver of 3060030): NPCs - Wilds.md:153 quotes only a third-person description of him and no line of his own; his first-person text is the Stunt Double intro 393356 (a QuestOffer proof, but tests/npc_greetings_lakeshore_wilds.rs pins every unlisted Wilds row unbound) and the progress line 394473.",
+    ),
+    (
         9000000391,
         "Mad Jack (T542 giver and talk target of Become a Demo Derby Driver 3060047): the client lines naming him are third-person objectives (379927456 'Speak with Mad Jack at the Wildwood Speedway to learn how to become a Demo Derby Driver', 1574840783 'Talk to Mad Jack to learn about Demolition Derby Driver') and the trainer menu label 412342; the Demolition Derby Driver guide quotes no first-person line of his own, so none is recovered.",
     ),

@@ -1429,11 +1429,49 @@
     },
     {
       "id": 3060030,
+      "job": 49,
       "title_string_id": 403471,
+      "intro_text_string_id": 393356,
       "giver_npc_id": 9000000357,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "minigame_id": 39,
+          "count": 1,
+          "text_string_id": 394472,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 394472 'Jace Whildwheel wants to see what you can do in the arena. Knock out a bunch of cars for him.' (the client's own spelling of the surname) is the goal line. quest-lines/quests.json q3060030 (status final, live yes, confidence 0.4)."
+            },
+            {
+              "kind": "client",
+              "evidence": "Resources/MiniGameData.txt row 39 '39^11^37938' is TYPE 11 'Wildwood Demo Derby' (Global.Text 37938); it is derby_entry.json game_id 39, the id pay_derby_completion credits to finish_minigame (DerbyGateway::game_id), as for 3060005."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T666: the client text gives no knockout count or score target (quest-lines/quests.json q3060030 open: kill count and point threshold are not in client text), and the server's derby reports a finished match, not per-car kills. One finished Wildwood derby is the goal, the T369 License to Drive choice (a finish, not a win); the finish credit comes only from the server's Results phase."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 20,
+          "items": [],
+          "job_xp": {
+            "49": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T666: no reward in any source (quest-lines/quests.json q3060030 rewards empty). 20 coins and 25 Demo Derby Driver (profile 49) job XP are the T202/T369 chapter-step rung 3060005 pays for the same shape (finish one derby, then hand in). The flat per-match completion payout is separate and unchanged."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1449,10 +1487,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -1461,10 +1495,26 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T666: Global.Text 393356 reads as Jace Wildwheel's stunt-double offer, but dialog-state q3060030 leaves the offer null because the client tags it to hint Sir Horace; bound as the intro on text fit alone. Title 403471 is client text. The progress line 394473 has no engine slot (no per-quest wait line exists), so it is unbound."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T666: no talk objective. The return to Jace is unconfirmed (quest-lines/quests.json q3060030: 394101 and 394103 are tagged to other quests), so the single finish goal completes and the hand-in is a Talk at the giver, the named-target turn-in the T361 level gate uses. No end text is recovered, so none is bound."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T666: job gate 49 (Demo Derby Driver), as 3060004 and 3060005: the line is offered only to an unlocked, active derby driver, which also guarantees the profile-49 XP can be paid. No prerequisite: the guide puts Not One, But a Few (3060029, an unresolved giver) before it, and that record is disabled."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "data/content/npcs/wilds.json Jace Wildwheel (9000000357) is a legacy_data row (FreeRealms-Legacy FabledRealms.lua:1764, Npcs.json Id=3021, NameId 394255) that already lists 3060030 in quest_ids_given, so the giver is a drawn actor. The arena gates in derby_gates.json are other NPCs; the match is entered there."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T666: enabled."
         }
       ],
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3060031,
