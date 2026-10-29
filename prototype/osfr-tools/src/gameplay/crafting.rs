@@ -580,28 +580,10 @@ impl Gameplay {
         consumes: Vec<(i32, u32)>,
         out: &mut Outcome,
     ) -> io::Result<()> {
-        for (definition, mut remaining) in consumes {
-            let stacks: Vec<_> = self
-                .inventory
-                .state()
-                .items
-                .iter()
-                .filter(|item| item.definition_id == definition && item.rental.is_none())
-                .map(|item| (item.id, item.count))
-                .collect();
-            for (id, available) in stacks {
-                if remaining == 0 {
-                    break;
-                }
-                let quantity = available.min(remaining);
-                let consumed = self.inventory.consume(id, quantity)?;
-                out.changed |= consumed.changed;
-                out.replies.extend(consumed.replies);
-                remaining -= quantity;
-            }
-            if remaining != 0 {
-                return Err(invalid("crafting material consumption incomplete"));
-            }
+        for (definition, quantity) in consumes {
+            let consumed = self.inventory.consume_definition(definition, quantity)?;
+            out.changed |= consumed.changed;
+            out.replies.extend(consumed.replies);
         }
         Ok(())
     }

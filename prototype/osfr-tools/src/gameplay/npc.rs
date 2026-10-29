@@ -1265,6 +1265,9 @@ impl Gameplay {
             .npc_quests
             .as_ref()
             .and_then(|engine| engine.conversation_for_talk(key));
+        // T786: a delivery step takes its items and credits itself in one transaction; a
+        // shortfall leaves one chat line and everything else to the Talk below.
+        self.take_delivery(key, out)?;
         if let Some(engine) = &mut self.npc_quests {
             let quest =
                 engine.on_event(crate::quest_engine::QuestEvent::TalkToNpc { npc_id: key })?;

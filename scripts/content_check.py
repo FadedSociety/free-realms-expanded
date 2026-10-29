@@ -1363,6 +1363,7 @@ class Checker:
             "equip_item": ("definition_id", None), "visit_position": ("zone_id", None),
             "interact_actor": ("actor_guid", None), "complete_dungeon": ("encounter_id", None),
             "client_reported": ("client_id", None), "job_level": ("profile_id", None),
+            "deliver_item": ("npc_id", "quantity"),
             "use_ability": ("ability_id", "count"), "use_item": ("item_id", "count"),
             "any_of": (None, "count"),
         }
@@ -1402,6 +1403,10 @@ class Checker:
                     error(field + "." + key, target, "invalid quest objective target")
             if count and not positive(goal.get(count)):
                 error(field + "." + count, goal.get(count), "objective count must be 1..1000000")
+            if goal["kind"] == "deliver_item":
+                item = goal.get("item_id")
+                if not (type(item) is int and 1 <= item <= 0x7fffffff):
+                    error(field + ".item_id", item, "deliver_item item must be a positive i32")
             if goal["kind"] == "collect_node" and not (
                     type(goal.get("quantity")) is int and 1 <= goal["quantity"] <= 100):
                 error(field + ".quantity", goal.get("quantity"),

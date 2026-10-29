@@ -487,6 +487,26 @@ fn authorized_consumption_updates_or_deletes_and_clears_equipment() {
 }
 
 #[test]
+fn definition_consumption_skips_rentals_and_is_all_or_nothing() {
+    let f = Fixture::new();
+    let mut inventory = f.inventory();
+    let previous = inventory.state().clone();
+    // Definition 101 is held only as a rental stack, and definition 100 only twice over.
+    for (definition, quantity) in [(101, 1), (100, 3), (999, 1)] {
+        assert!(inventory.consume_definition(definition, quantity).is_err());
+        assert_eq!(inventory.state(), &previous);
+    }
+    let taken = inventory.consume_definition(100, 2).unwrap();
+    assert!(taken.changed);
+    assert_eq!(
+        taken.replies,
+        vec![command(38, 6, &[3, 1]), command(38, 4, &[7])]
+    );
+    assert_eq!(inventory.state().equipment[0].item_id, 0);
+    assert_eq!(inventory.state().items.len(), 1, "the rental stack stays");
+}
+
+#[test]
 fn definition_request_is_bounded_and_returns_verified_definition() {
     let f = Fixture::new();
     let mut inventory = f.inventory();

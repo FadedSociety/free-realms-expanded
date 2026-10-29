@@ -140,6 +140,20 @@ fn an_any_of_talk_objective_pins_its_first_alternative() {
     );
 }
 
+/// T786: a delivery step is worked at its NPC, so the "Take Me There" pin follows the hand-in
+/// NPC the same way a Talk target does.
+#[test]
+fn a_delivery_objective_points_at_its_npc() {
+    assert_eq!(
+        locate_kind(ObjectiveKind::DeliverItem {
+            npc_id: NPC,
+            item_id: 7_676,
+            quantity: 1,
+        }),
+        Some(pin(4, NPC, 0, [-1909.5, -44.4, 462.8]))
+    );
+}
+
 #[test]
 fn reach_poi_and_visit_position_use_their_own_geometry() {
     assert_eq!(

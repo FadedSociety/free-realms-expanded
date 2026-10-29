@@ -9,15 +9,17 @@
 //! prerequisite ids, objective target fields, the authored title id and the
 //! authored NPC `quest_giver` role.
 //!
-//! Resolved objective kinds: `talk_to_npc`, `interact_actor`, `reach_poi`,
-//! `defeat`, `collect_item`, `equip_item`, `craft_recipe`, `complete_dungeon`,
-//! `finish_minigame`, `gather_resource`, `collect_node`, `job_level`,
-//! `perform_pet_trick`, `use_ability`, `use_item` and `any_of`. An `any_of` has
+//! Resolved objective kinds: `talk_to_npc`, `deliver_item`, `interact_actor`,
+//! `reach_poi`, `defeat`, `collect_item`, `equip_item`, `craft_recipe`,
+//! `complete_dungeon`, `finish_minigame`, `gather_resource`, `collect_node`,
+//! `job_level`, `perform_pet_trick`, `use_ability`, `use_item` and `any_of`. An `any_of` has
 //! no target of its own: every alternative is graded as its leaf kind (T790).
 //! The item, recipe, dungeon, minigame, gather, quest-pickup, pet-trick, ability,
 //! enemy and single-use consumable kinds additionally resolve their target ids in the id sets owned by
 //! `tests/support/quest_target_sets.rs`, which names the owning loader and every
-//! `FinishMinigame` emitter. A
+//! `FinishMinigame` emitter. A `deliver_item` step resolves its NPC in the production draw
+//! set and its `item_id` in the catalogue set, so a hand-over cannot name an item no
+//! player can hold. A
 //! `collect_node` node type must have at least one placed spawn in
 //! `quest_nodes.json` (`harvest_nodes::GatheringNodes::load`, T503). A `job_level`
 //! profile must be declared by the loaded profile content (`Targets::profiles`);
@@ -235,8 +237,9 @@ impl Catalogue {
     /// Objective kinds whose target this gate resolves. Everything else is only
     /// bounded by the split loader; the target test prints the gap.
     fn unchecked_objective_kinds(&self) -> BTreeSet<&str> {
-        const CHECKED: [&str; 16] = [
+        const CHECKED: [&str; 17] = [
             "talk_to_npc",
+            "deliver_item",
             "interact_actor",
             "reach_poi",
             "defeat",
@@ -297,11 +300,21 @@ impl Catalogue {
     /// Unreachable enabled records are skipped, as the reachability rule says.
     fn target_violations(&self) -> Vec<String> {
         let mut violations = Vec::new();
+        // One hand-over event credits every open step with the same NPC, item and units, so two
+        // enabled steps may not share an NPC and item (T786 review: no double credit per item).
+        let mut handed_over = BTreeSet::new();
         for quest in self.reachable_enabled() {
             for (index, goal) in quest.objectives.iter().enumerate() {
                 let objective = goal["id"].as_u64().unwrap_or(0);
                 let owner = format!("quest {} objective {objective} (#{index})", quest.id);
                 self.objective_violations(&mut violations, &owner, goal, false);
+                if goal["kind"] == "deliver_item"
+                    && !handed_over.insert((goal["npc_id"].as_u64(), goal["item_id"].as_i64()))
+                {
+                    violations.push(format!(
+                        "{owner}: another enabled deliver_item step already takes this item from this NPC"
+                    ));
+                }
             }
         }
         violations
@@ -318,6 +331,25 @@ impl Catalogue {
     ) {
         match goal["kind"].as_str().unwrap_or_default() {
             "talk_to_npc" => {
+                self.target_violation(violations, owner, goal["npc_id"].as_u64());
+            }
+            "deliver_item" => {
+                let item = goal["item_id"]
+                    .as_i64()
+                    .and_then(|id| i32::try_from(id).ok())
+                    .unwrap_or(0);
+                if item <= 0
+                    || !(1..=MAX_OBJECTIVE_COUNT).contains(&goal["quantity"].as_u64().unwrap_or(0))
+                {
+                    violations.push(format!(
+                        "{owner}: deliver_item target and quantity must be positive"
+                    ));
+                }
+                if item > 0 && !self.targets.items.contains(&item) {
+                    violations.push(format!(
+                        "{owner} (deliver_item): item {item} is not defined by the shipped item catalogue"
+                    ));
+                }
                 self.target_violation(violations, owner, goal["npc_id"].as_u64());
             }
             "interact_actor" => {
@@ -980,7 +1012,7 @@ fn graded_target_kinds_fail_on_a_scratch_tree() {
     );
 
     // Canary C: drop the fixture item's definition row (keeping the catalogue and
-    // the recipe row); both item target kinds that pointed at it must fail
+    // the recipe row); all three item target kinds that pointed at it must fail
     // instead of passing because a catalogue file merely exists.
     let item = fixture("canary-item", Defect::None);
     let catalogue_path = item.path().join("item-catalogue.json");
@@ -1002,8 +1034,8 @@ fn graded_target_kinds_fail_on_a_scratch_tree() {
     .unwrap_or_else(|error| panic!("{}: {error}", catalogue_path.display()));
     let catalogue = Catalogue::load(item.path()).expect("the fixture loads without the item row");
     let violations = catalogue.target_violations();
-    assert_eq!(violations.len(), 2, "{violations:?}");
-    for kind in ["collect_item", "equip_item"] {
+    assert_eq!(violations.len(), 3, "{violations:?}");
+    for kind in ["collect_item", "equip_item", "deliver_item"] {
         assert!(
             violations.iter().any(|violation| {
                 violation.contains(&format!("quest {FIXTURE_QUEST}"))
@@ -1384,6 +1416,86 @@ fn requirement_needs_a_fact_the_producer_reports() {
     assert!(
         violations[0].contains("max_elapsed_seconds") && violations[0].contains("minigame 39"),
         "the derby reports no elapsed time: {violations:?}"
+    );
+}
+
+/// T786: a `deliver_item` step's item must be a shipped item definition, so a hand-over can
+/// never name an item no player can hold. The clean fixture's own delivery step resolves; the
+/// canary patches only its item id, so the quest stays reachable and only this gate can report it.
+#[test]
+fn unknown_delivery_item_is_rejected_at_load() {
+    let clean = fixture("deliver-clean", Defect::None);
+    let catalogue = Catalogue::load(clean.path()).expect("the clean fixture loads");
+    assert!(
+        catalogue.target_violations().is_empty(),
+        "the clean delivery target must resolve: {:?}",
+        catalogue.target_violations()
+    );
+
+    let unknown = fixture("deliver-unknown", Defect::None);
+    patch_fixture_objective(&unknown, FIXTURE_QUEST, "deliver_item", "item_id", 999_999);
+    let catalogue =
+        Catalogue::load(unknown.path()).expect("the altered delivery quest still loads");
+    assert!(
+        catalogue
+            .reachable_enabled()
+            .iter()
+            .any(|quest| quest.id == FIXTURE_QUEST),
+        "the altered quest must stay reachable"
+    );
+    let violations = catalogue.target_violations();
+    assert_eq!(violations.len(), 1, "{violations:?}");
+    assert!(
+        violations[0].contains(&format!("quest {FIXTURE_QUEST} objective 14 (#12)"))
+            && violations[0].contains("deliver_item")
+            && violations[0].contains("999999"),
+        "the unknown delivery item was not reported: {violations:?}"
+    );
+
+    // The production split loader's own bound is the refusal, not the audit's.
+    let zero = fixture("deliver-zero", Defect::None);
+    patch_fixture_objective(&zero, FIXTURE_QUEST, "deliver_item", "item_id", 0);
+    assert!(
+        Catalogue::load(zero.path()).is_err(),
+        "from_split_content must reject a zero delivery item"
+    );
+}
+
+/// T786 review finding 3: a second enabled delivery of the same item to the same NPC would be
+/// credited by the first hand-over too, so the audit refuses it. The canary appends a copy of the
+/// fixture's own delivery step to its quest.
+#[test]
+fn duplicate_delivery_target_is_rejected() {
+    let scratch = fixture("deliver-duplicate", Defect::None);
+    let path = scratch.path().join("quests/fixture.json");
+    let mut document = read_json(&path);
+    let objectives = document["records"]
+        .as_array_mut()
+        .expect("fixture records")
+        .iter_mut()
+        .find(|record| as_u32(&record["id"]) == Some(FIXTURE_QUEST))
+        .expect("the fixture quest exists")["objectives"]
+        .as_array_mut()
+        .expect("fixture objectives");
+    let mut copy = objectives
+        .iter()
+        .find(|goal| goal["kind"] == "deliver_item")
+        .expect("the fixture quest has a delivery step")
+        .clone();
+    copy["id"] = json!(15);
+    objectives.push(copy);
+    fs::write(
+        &path,
+        serde_json::to_vec_pretty(&document).expect("fixture JSON"),
+    )
+    .unwrap_or_else(|error| panic!("{}: {error}", path.display()));
+
+    let catalogue = Catalogue::load(scratch.path()).expect("the altered fixture loads");
+    let violations = catalogue.target_violations();
+    assert_eq!(violations.len(), 1, "{violations:?}");
+    assert!(
+        violations[0].contains("objective 15") && violations[0].contains("already takes"),
+        "{violations:?}"
     );
 }
 

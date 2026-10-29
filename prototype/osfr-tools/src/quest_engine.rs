@@ -294,6 +294,14 @@ pub enum ObjectiveKind {
     TalkToNpc {
         npc_id: u64,
     },
+    /// (R) T786: the Talk step hands `quantity` of `item_id` to `npc_id`. The objective's
+    /// `required` is 1: the hand-over is one event, while `quantity` is how many units the
+    /// bag must give up (`gameplay/quest_delivery.rs`).
+    DeliverItem {
+        npc_id: u64,
+        item_id: i32,
+        quantity: u32,
+    },
     KillActorKind {
         actor_kind_id: u32,
     },
@@ -378,7 +386,8 @@ pub enum ObjectiveKind {
 }
 
 impl ObjectiveKind {
-    /// Every NPC a Talk to this objective finishes on. An `any_of` over talk targets
+    /// Every NPC a Talk to this objective finishes on: its talk target or delivery NPC.
+    /// An `any_of` over talk targets
     /// finishes on any of its leaves; every other kind names none. Cheap and allocation-free
     /// because the marker path calls it per candidate NPC.
     pub(crate) fn talk_targets(&self) -> impl Iterator<Item = u64> + '_ {
@@ -387,13 +396,13 @@ impl ObjectiveKind {
             leaf => std::slice::from_ref(leaf),
         };
         leaves.iter().filter_map(|kind| match kind {
-            Self::TalkToNpc { npc_id } => Some(*npc_id),
+            Self::TalkToNpc { npc_id } | Self::DeliverItem { npc_id, .. } => Some(*npc_id),
             _ => None,
         })
     }
 
-    /// Whether a Talk to `npc_id` finishes this objective: its one talk target, or any
-    /// talk alternative of an `any_of`.
+    /// Whether a Talk to `npc_id` finishes this objective: its one talk target or delivery
+    /// NPC, or any talk alternative of an `any_of`.
     pub(crate) fn talks_to(&self, npc_id: u64) -> bool {
         self.talk_targets().any(|target| target == npc_id)
     }
@@ -768,6 +777,13 @@ impl MinigameResult {
 pub enum QuestEvent {
     TalkToNpc {
         npc_id: u64,
+    },
+    /// (R) T786: the server handed this Talk step its `quantity` units of `item_id`. Only
+    /// `gameplay/quest_delivery.rs` builds it, after staging the consume.
+    DeliverItem {
+        npc_id: u64,
+        item_id: i32,
+        quantity: u32,
     },
     KillActorKind {
         actor_kind_id: u32,
@@ -2692,6 +2708,23 @@ fn definition_from_content(
                     return Err(invalid("complete_after_dialogue requires a conversation"));
                 }
             }
+            ContentGoal::DeliverItem {
+                npc_id,
+                item_id,
+                quantity,
+                source,
+                ..
+            } => {
+                if *npc_id == 0
+                    || *item_id <= 0
+                    || !(1..=MAX_COUNT).contains(quantity)
+                    || source.is_empty()
+                {
+                    return Err(invalid(
+                        "deliver_item objective requires a positive NPC and item, quantity 1..=MAX_COUNT and provenance",
+                    ));
+                }
+            }
             ContentGoal::InteractActor {
                 actor_guid, source, ..
             } => {
@@ -2809,6 +2842,22 @@ fn definition_from_content(
                 required: 1,
                 description: format!("Objective {}", id),
                 kind: ObjectiveKind::TalkToNpc { npc_id: *npc_id },
+            },
+            ContentGoal::DeliverItem {
+                id,
+                npc_id,
+                item_id,
+                quantity,
+                ..
+            } => QuestObjective {
+                id: *id,
+                required: 1,
+                description: format!("Objective {}", id),
+                kind: ObjectiveKind::DeliverItem {
+                    npc_id: *npc_id,
+                    item_id: *item_id,
+                    quantity: *quantity,
+                },
             },
             ContentGoal::CollectItem {
                 id,
@@ -3264,6 +3313,11 @@ fn validate_state(
 fn valid_objective_kind(kind: &ObjectiveKind) -> bool {
     match kind {
         ObjectiveKind::TalkToNpc { npc_id } | ObjectiveKind::InteractNpc { npc_id } => *npc_id != 0,
+        ObjectiveKind::DeliverItem {
+            npc_id,
+            item_id,
+            quantity,
+        } => *npc_id != 0 && *item_id > 0 && (1..=MAX_COUNT).contains(quantity),
         ObjectiveKind::KillActorKind { actor_kind_id } => *actor_kind_id != 0,
         ObjectiveKind::CollectItem { item_id } | ObjectiveKind::UseItem { item_id } => *item_id > 0,
         ObjectiveKind::EnterArea { .. } => true,
@@ -3338,6 +3392,11 @@ fn valid_objective_kind(kind: &ObjectiveKind) -> bool {
 fn validate_event(event: &QuestEvent) -> io::Result<()> {
     let valid = match event {
         QuestEvent::TalkToNpc { npc_id } | QuestEvent::InteractNpc { npc_id } => *npc_id != 0,
+        QuestEvent::DeliverItem {
+            npc_id,
+            item_id,
+            quantity,
+        } => *npc_id != 0 && *item_id > 0 && (1..=MAX_COUNT).contains(quantity),
         QuestEvent::KillActorKind {
             actor_kind_id,
             count,
@@ -3416,6 +3475,18 @@ fn event_matches(kind: &ObjectiveKind, event: &QuestEvent) -> u32 {
         (ObjectiveKind::TalkToNpc { npc_id: a }, QuestEvent::TalkToNpc { npc_id: b }) if a == b => {
             1
         }
+        (
+            ObjectiveKind::DeliverItem {
+                npc_id: a,
+                item_id: c,
+                quantity: e,
+            },
+            QuestEvent::DeliverItem {
+                npc_id: b,
+                item_id: d,
+                quantity: f,
+            },
+        ) if a == b && c == d && e == f => 1,
         (
             ObjectiveKind::KillActorKind { actor_kind_id: a },
             QuestEvent::KillActorKind {
@@ -3600,6 +3671,28 @@ impl QuestEngine {
                         ObjectiveKind::CollectNode { node_type: kind } if kind == node_type)
                 })
         })
+    }
+
+    /// (R) T786: the hand-over the active step of this NPC's quest waits on, as
+    /// `(item definition id, units)`. `current_objectives` limits an ordered quest to its
+    /// open step, so a later delivery cannot be read early. A disabled quest is skipped, so
+    /// it never takes items. An event matches an objective by NPC, item and units, so two open
+    /// steps that differ in units are credited one at a time; the reachability audit refuses
+    /// two enabled steps that share NPC and item.
+    pub fn pending_delivery(&self, npc_id: u64) -> Option<(i32, u32)> {
+        self.state
+            .quests
+            .keys()
+            .filter(|quest_id| self.is_enabled(**quest_id))
+            .flat_map(|quest_id| self.current_objectives(*quest_id))
+            .find_map(|objective| match &objective.kind {
+                ObjectiveKind::DeliverItem {
+                    npc_id: target,
+                    item_id,
+                    quantity,
+                } if *target == npc_id => Some((*item_id, *quantity)),
+                _ => None,
+            })
     }
 }
 

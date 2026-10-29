@@ -37,8 +37,9 @@
 //!   placement (a single-player time trial); the derby reports score, placement
 //!   and knock-outs; a paid fishing catch reports no result fact.
 //! * `items`: `Inventory::load`'s merged `inventory.json` +
-//!   `item-catalogue.json` definitions. An absent catalogue is an empty set, so
-//!   a graded item target fails loudly instead of passing vacuously.
+//!   `item-catalogue.json` definitions. A `collect_item`, `equip_item` or
+//!   `deliver_item` target must be one of them. An absent catalogue is an empty
+//!   set, so a graded item target fails loudly instead of passing vacuously.
 //! * `recipes`: `RecipeCatalog::load_runtime`'s stable `recipe_id` rows plus the
 //!   three `CraftingJob::opening_recipe_id` fallbacks `Gameplay::apply_craft`
 //!   emits when the learned recipe has no stable id.

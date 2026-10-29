@@ -79,6 +79,8 @@ mod power_up_use;
 mod profile_outfit;
 /// Progress-driven achievement observation over authoritative gameplay state.
 mod progression;
+/// T786: a Talk step that hands items over, atomically with the quest credit.
+mod quest_delivery;
 mod quest_pickups;
 /// T789: an accepted job-ability cast or a spent single-use item credits a `use_*` objective.
 mod quest_use;

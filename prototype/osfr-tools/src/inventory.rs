@@ -1317,6 +1317,45 @@ impl Inventory {
         Ok(outcome)
     }
 
+    /// Server-authorized consumption of `quantity` units of one definition across its
+    /// non-rental stacks (a rental can be used but never spent), or nothing: a bag that holds
+    /// fewer units changes not at all. Each emptied stack keeps `consume`'s own replies.
+    pub fn consume_definition(
+        &mut self,
+        definition_id: i32,
+        quantity: u32,
+    ) -> io::Result<InventoryOutcome> {
+        let mut staged = self.clone();
+        let stacks: Vec<_> = staged
+            .state
+            .items
+            .iter()
+            .filter(|item| item.definition_id == definition_id && item.rental.is_none())
+            .map(|item| (item.id, item.count))
+            .collect();
+        let mut outcome = InventoryOutcome {
+            replies: Vec::new(),
+            changed: false,
+            granted: Vec::new(),
+        };
+        let mut remaining = quantity;
+        for (id, available) in stacks {
+            if remaining == 0 {
+                break;
+            }
+            let take = available.min(remaining);
+            let consumed = staged.consume(id, take)?;
+            outcome.changed |= consumed.changed;
+            outcome.replies.extend(consumed.replies);
+            remaining -= take;
+        }
+        if remaining != 0 {
+            return Err(invalid("the bag holds fewer units than were consumed"));
+        }
+        *self = staged;
+        Ok(outcome)
+    }
+
     /// Pure lookup/encoding: no I/O or mutation. W87's 00a3da40 writer and
     /// 008d7980 reader carry family, subtype, ID, blob length and blob.
     /// (R) Cap at one ID, require an empty request blob and ignore unknown IDs.

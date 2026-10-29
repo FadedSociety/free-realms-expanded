@@ -1219,7 +1219,21 @@
       "prerequisite_quest_ids": [
         3020020
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "deliver_item",
+          "id": 3,
+          "npc_id": 9000000203,
+          "item_id": 30480,
+          "quantity": 1,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T786: quest-lines/objective-specs-fixed.json q3020021 objectives[2] (locale:100017, hand the wand to NPC 9000000203; status needs_server, rule locale:100018); the wand item 30480 is that record's objectives[1] evidence (client item 'Tempest Woven Wand', repo prototype/osfr-tools/data/reference/weapons.json:44434-44467). Quantity 1 is the singular 'A Tempest Woven Wand' of locale:100015 (R)."
+            }
+          ]
+        }
+      ],
       "rewards": [],
       "source": [
         {
@@ -1240,7 +1254,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) ContentDb v1 has no free-text objective field; only the delivery step (objectives[2] of the objective spec) is wired by T786, the other steps wait for the id pass"
         },
         {
           "kind": "reconstructed",

@@ -300,7 +300,9 @@ pub struct Places<'a> {
 /// as the journal text does. Never a guess (R).
 pub fn locate(quest_id: u32, objective: &QuestObjective, places: &Places) -> Option<Pin> {
     let (guid, zone_id, position) = match &objective.kind {
-        ObjectiveKind::TalkToNpc { npc_id } | ObjectiveKind::InteractNpc { npc_id } => {
+        ObjectiveKind::TalkToNpc { npc_id }
+        | ObjectiveKind::InteractNpc { npc_id }
+        | ObjectiveKind::DeliverItem { npc_id, .. } => {
             (*npc_id, OPEN_WORLD_ZONE, (places.npc)(*npc_id)?)
         }
         ObjectiveKind::KillActorKind { actor_kind_id } => {

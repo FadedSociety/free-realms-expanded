@@ -328,6 +328,16 @@ pub enum ContentGoal {
         complete_after_dialogue: bool,
         source: Vec<SourceTag>,
     },
+    /// (R) T786: the Talk step hands `quantity` of `item_id` to one NPC. The server takes
+    /// them from the bag in the same transaction that credits the step
+    /// (`gameplay/quest_delivery.rs`).
+    DeliverItem {
+        id: u32,
+        npc_id: u64,
+        item_id: i32,
+        quantity: u32,
+        source: Vec<SourceTag>,
+    },
     CollectItem {
         id: u32,
         item_id: i32,
@@ -462,6 +472,7 @@ impl ContentGoal {
         match self {
             Self::Defeat { id, .. }
             | Self::TalkToNpc { id, .. }
+            | Self::DeliverItem { id, .. }
             | Self::CollectItem { id, .. }
             | Self::ReachPoi { id, .. }
             | Self::VisitZone { id, .. }
@@ -1063,6 +1074,7 @@ fn check_goal_sources(owner: &str, goal: &ContentGoal) -> Result<(), ContentErro
     let (id, source) = match goal {
         ContentGoal::Defeat { id, source, .. }
         | ContentGoal::TalkToNpc { id, source, .. }
+        | ContentGoal::DeliverItem { id, source, .. }
         | ContentGoal::CollectItem { id, source, .. }
         | ContentGoal::ReachPoi { id, source, .. }
         | ContentGoal::VisitZone { id, source, .. }
@@ -1150,6 +1162,35 @@ fn validate_goal(
             item_id,
             items.contains(&item_id.to_string()),
         ),
+        ContentGoal::DeliverItem {
+            npc_id,
+            item_id,
+            quantity,
+            ..
+        } => {
+            reference(
+                owner,
+                "goal.npc_id",
+                npc_id,
+                npcs.contains(&npc_id.to_string()),
+            )?;
+            reference(
+                owner,
+                "goal.item_id",
+                item_id,
+                items.contains(&item_id.to_string()),
+            )?;
+            if !(1..=crate::quest_engine::MAX_COUNT).contains(quantity) {
+                return Err(ContentError::InvalidRecord {
+                    record: owner.to_owned(),
+                    detail: format!(
+                        "goal.quantity must be 1..={}",
+                        crate::quest_engine::MAX_COUNT
+                    ),
+                });
+            }
+            Ok(())
+        }
         ContentGoal::ReachPoi { poi_id, .. } => reference(
             owner,
             "goal.poi_id",

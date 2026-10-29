@@ -203,6 +203,15 @@ fn fixture_objectives() -> Value {
                 ],
                 "source": fixture_source(),
             }),
+            // T786: one Talk step that hands the fixture item over.
+            json!({
+                "kind": "deliver_item",
+                "id": 14,
+                "npc_id": FIXTURE_TARGET,
+                "item_id": FIXTURE_ITEM,
+                "quantity": 1,
+                "source": fixture_source(),
+            }),
         ]);
     objectives
 }
