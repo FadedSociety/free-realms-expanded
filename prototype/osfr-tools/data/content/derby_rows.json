@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "rows": [
+    {
+      "game_id": 604,
+      "npcs": [
+        9000000391,
+        9000000289,
+        9500000731,
+        9000000183
+      ],
+      "rules": null,
+      "pickups": null,
+      "completion_reward_coins": null,
+      "completion_reward_xp": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 604 '604^11^393294^394459^9870^1^0^^0^0^0^^0^' is TYPE 11, NAME_ID 393294 with description id 394459; Demo Derby quest 3060008 names finish_minigame 604 and 394459 is its goal text."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) NPC assignment: derby_gates.json lists the four arena drivers 9000000391, 9000000289, 9500000731 and 9000000183, but which arena each driver runs is not recovered, so every gate may enter row 604. Unset fields inherit derby_entry.json: the same vehicle, rules, pickups and 25 coin / 10 Demo Derby Driver XP completion reward as the default row 39."
+        }
+      ]
+    }
+  ]
+}

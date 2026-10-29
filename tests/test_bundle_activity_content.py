@@ -52,6 +52,18 @@ class ActivityContentGateTest(unittest.TestCase):
         finally:
             path.write_bytes(original)
 
+    def test_derby_rows_are_checked_against_gates_and_table(self):
+        self.refuse(
+            "derby_rows.json",
+            lambda value: value["rows"][0].update(npcs=[9000000295]),
+            "row 604 is invalid",
+        )
+        self.refuse(
+            "derby_minigames.json",
+            lambda value: value["records"][1].update(game_type_id=3),
+            "row 604 is invalid",
+        )
+
     def test_reviewed_bindings_are_refused(self):
         bundle_common.check_activity_content(self.bundle)
 

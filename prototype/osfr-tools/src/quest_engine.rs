@@ -3659,6 +3659,21 @@ impl QuestEngine {
             .collect()
     }
 
+    /// The game ids of the open `finish_minigame` objectives across this character's active
+    /// quests, in quest order. `current_objectives` already keeps an ordered quest to its open
+    /// step, so a later step cannot choose a hosted row early.
+    pub fn open_finish_minigame_ids(&self) -> Vec<u32> {
+        self.state
+            .quests
+            .keys()
+            .flat_map(|quest_id| self.current_objectives(*quest_id))
+            .filter_map(|objective| match &objective.kind {
+                ObjectiveKind::FinishMinigame { minigame_id } => Some(*minigame_id),
+                _ => None,
+            })
+            .collect()
+    }
+
     /// T503: whether picking up `node_type` would credit an open objective now. Reuses
     /// `current_objectives`, so an ordered quest accepts only its own open step: a pickup
     /// is admitted only while a quest is actually on its collect step.

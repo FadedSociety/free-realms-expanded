@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 39,
+      "game_type_id": 11,
+      "name_string_id": 37938,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 39 '39^11^37938^37938^9869^1^0^^0^0^0^^0^' is TYPE 11 and NAME_ID 37938 (Wildwood Demo Derby). T791 lists only the rows the derby package hosts; this file is not the complete client MiniGameData table."
+        }
+      ]
+    },
+    {
+      "id": 604,
+      "game_type_id": 11,
+      "name_string_id": 393294,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 604 '604^11^393294^394459^9870^1^0^^0^0^0^^0^' is TYPE 11 and NAME_ID 393294 with description id 394459. T791 lists only the rows the derby package hosts; this file is not the complete client MiniGameData table."
+        }
+      ]
+    }
+  ]
+}

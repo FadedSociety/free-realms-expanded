@@ -77,6 +77,8 @@ ACTIVITY_CONTENT = (
     "kart_gates.json",  # kart_gateway.rs: (R) NPC menu gates and reward cooldown
     "derby_entry.json",  # derby_gateway.rs: (R) derby vehicle, rules and completion reward
     "derby_gates.json",  # derby_gateway.rs: (R) four arena driver menu gates
+    "derby_rows.json",  # derby_gateway.rs: extra hosted MiniGameData rows (T791)
+    "derby_minigames.json",  # content.rs read_minigame_rows: TYPE-11 proof for those rows
     "mining.json",  # mining.rs: Mining18 board
     "harvesting.json",  # harvesting.rs: Harvesting111 board
     "fishing_spots.json",  # fishing_service.rs: guide NPCs and fish items
@@ -94,6 +96,8 @@ ACTIVITY_MAX_BYTES = {
     "kart_gates.json": 16 * 1024,
     "derby_entry.json": 512 * 1024,
     "derby_gates.json": 16 * 1024,
+    "derby_rows.json": 64 * 1024,
+    "derby_minigames.json": 64 * 1024,
     "mining.json": 1024 * 1024,
     "harvesting.json": 1024 * 1024,
     "fishing_spots.json": 64 * 1024,
@@ -444,6 +448,36 @@ def _check_derby_content(entry, gates) -> list[int]:
     return npcs
 
 
+def _check_derby_rows(rows, minigames, gate_npcs) -> None:
+    """Check the extra derby rows against the gates and the TYPE-11 table (T791)."""
+    records = minigames.get("records") if isinstance(minigames, dict) else None
+    hosted = rows.get("rows") if isinstance(rows, dict) else None
+    if (
+        not isinstance(records, list)
+        or minigames.get("schema_version") != 1
+        or any(not isinstance(r, dict) for r in records)
+        or not isinstance(hosted, list)
+        or rows.get("schema_version") != 1
+        or len(hosted) > 32
+        or any(not isinstance(r, dict) or not _is_int(r.get("game_id")) for r in hosted)
+        or len({r["game_id"] for r in hosted}) != len(hosted)
+    ):
+        raise ValueError("content/derby_rows.json or derby_minigames.json is invalid")
+    derby_ids = {r.get("id") for r in records if r.get("game_type_id") == 11}
+    for row in hosted:
+        npcs = row.get("npcs")
+        if (
+            row["game_id"] not in derby_ids
+            or row["game_id"] == 39
+            or not isinstance(npcs, list)
+            or not 1 <= len(npcs) <= 16
+            or not set(npcs) <= set(gate_npcs)
+        ):
+            raise ValueError(f"content/derby_rows.json row {row['game_id']} is invalid")
+    if 39 not in derby_ids:
+        raise ValueError("content/derby_minigames.json does not list the default row 39")
+
+
 def _is_shape_code(code: int) -> bool:
     """The shared engine's recovered `ServerGrid.buildMap` grammar.
 
@@ -743,6 +777,11 @@ def check_activity_content(bundle: Path) -> str:
     derby_gates = _check_derby_content(
         read_json(content / "derby_entry.json"),
         read_json(content / "derby_gates.json"),
+    )
+    _check_derby_rows(
+        read_json(content / "derby_rows.json"),
+        read_json(content / "derby_minigames.json"),
+        derby_gates,
     )
     _check_board("mining.json", read_json(content / "mining.json"), 18, 14)
     _check_board(

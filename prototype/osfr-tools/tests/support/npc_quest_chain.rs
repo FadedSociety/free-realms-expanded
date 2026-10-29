@@ -37,7 +37,7 @@ use osfr_tools::{
     gateway::Gateway,
     harvest_nodes::NodeActor,
     inventory::InventoryItem,
-    npc_interaction::{decode_dialogue_26_3, decode_quest_offer_49_1},
+    npc_interaction::{NpcInteraction, decode_dialogue_26_3, decode_quest_offer_49_1},
     quest_engine::{QuestProgress, QuestStatus},
     startup_world::{NpcSpawn, parse_add_npc},
 };
@@ -459,6 +459,19 @@ pub fn character_at_for(guid: u64, zone_id: u32, position: [f32; 3]) -> Characte
     }
 }
 
+/// The production NPC table's zone and position for `npc_id`. Shared by suites that must stand a
+/// character on a shipped gate before driving the real 26/8 menu.
+pub fn npc_location(npc_id: u64) -> (u32, [f32; 3]) {
+    let interaction = NpcInteraction::load(
+        &content_dir().join("npcs"),
+        &content_dir().join("stores.json"),
+    )
+    .expect("the shipped NPC content loads");
+    interaction
+        .location(npc_id)
+        .unwrap_or_else(|| panic!("NPC {npc_id} is a positioned spawn"))
+}
+
 pub fn character_at(zone_id: u32, position: [f32; 3]) -> CharacterState {
     character_at_for(CHARACTER, zone_id, position)
 }
@@ -673,21 +686,25 @@ pub fn objective_complete_packet(quest_id: u32, objective_id: u32, progress: f32
     packet
 }
 
-/// The selected option id for `label` in one 26/9 interaction menu body.
-/// Dispatcher `0x00aa2360` -> `0x00aa2220` -> `0x00aa1600` (guid at 4, flag
-/// at 12) -> list reader `0x00aa04d0` (count at 13) -> row reader `0x00a9dca0`
-/// (seven dwords, 28-byte rows from 17; label at +8). `multiplayer.rs` shares it.
-pub fn menu_option_bytes(packet: &[u8], label: u32) -> i32 {
+/// The selected option id for `label` in one 26/9 interaction menu body, or
+/// `None` when the menu does not offer it. Dispatcher `0x00aa2360` ->
+/// `0x00aa2220` -> `0x00aa1600` (guid at 4, flag at 12) -> list reader
+/// `0x00aa04d0` (count at 13) -> row reader `0x00a9dca0` (seven dwords,
+/// 28-byte rows from 17; label at +8). `multiplayer.rs` shares it.
+pub fn menu_option_opt(packet: &[u8], label: u32) -> Option<i32> {
     let count = i32::from_le_bytes(packet[13..17].try_into().unwrap());
     assert!(count > 0, "the interaction menu has no options");
-    (0..count)
-        .find_map(|index| {
-            let offset = 17 + usize::try_from(index).unwrap() * 28;
-            let id = i32::from_le_bytes(packet[offset..offset + 4].try_into().unwrap());
-            let string_id = u32::from_le_bytes(packet[offset + 8..offset + 12].try_into().unwrap());
-            (string_id == label).then_some(id)
-        })
-        .unwrap_or_else(|| panic!("menu label {label} is absent"))
+    (0..count).find_map(|index| {
+        let offset = 17 + usize::try_from(index).unwrap() * 28;
+        let id = i32::from_le_bytes(packet[offset..offset + 4].try_into().unwrap());
+        let string_id = u32::from_le_bytes(packet[offset + 8..offset + 12].try_into().unwrap());
+        (string_id == label).then_some(id)
+    })
+}
+
+/// The selected option id for `label`; the menu must offer it.
+pub fn menu_option_bytes(packet: &[u8], label: u32) -> i32 {
+    menu_option_opt(packet, label).unwrap_or_else(|| panic!("menu label {label} is absent"))
 }
 
 pub fn menu_option(outcome: &Outcome, label: u32) -> i32 {

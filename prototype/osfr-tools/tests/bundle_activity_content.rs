@@ -37,6 +37,8 @@ const FILES: &[&str] = &[
     "kart_gates.json",
     "derby_entry.json",
     "derby_gates.json",
+    "derby_rows.json",
+    "derby_minigames.json",
     "mining.json",
     "harvesting.json",
     "fishing_spots.json",
@@ -170,6 +172,15 @@ fn bundled_activity_content_loads_without_lab() {
         &[9000000391u64, 9000000289, 9500000731, 9000000183][..]
     );
     assert_eq!(derby.menu_string_id(), 3053);
+    assert_eq!(
+        derby
+            .rows()
+            .iter()
+            .map(|row| row.game_id())
+            .collect::<Vec<_>>(),
+        [39, 604],
+        "the bundle hosts the default derby row and the T791 extra row"
+    );
     let package: Value =
         serde_json::from_slice(&fs::read(directory.join("derby_entry.json")).unwrap()).unwrap();
     assert!(

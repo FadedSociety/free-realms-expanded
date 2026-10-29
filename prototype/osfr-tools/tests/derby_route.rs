@@ -7,6 +7,10 @@
 //! server-observed match reaches its results phase; contacts, damage and score never change the
 //! amount, and the paid-match ledger pays each instance once.
 
+#[path = "support/derby_play.rs"]
+mod derby_play;
+
+use derby_play::{countdown_for, hit_for, phase_for, register_for, start_request};
 use osfr_tools::{
     character_store::CharacterState,
     derby::{
@@ -337,28 +341,12 @@ fn span(kind: &str, offset: usize, profile_id: i32, bytes: &[u8]) -> serde_json:
     })
 }
 
-fn start_request(instance: i32) -> Vec<u8> {
-    let mut bytes = vec![39, 0, 5];
-    bytes.extend(instance.to_le_bytes());
-    bytes.extend((-1_i32).to_le_bytes());
-    bytes.extend((-1_i32).to_le_bytes());
-    bytes
-}
-
 fn quit_request(instance: i32) -> Vec<u8> {
     let mut bytes = vec![39, 0, 6];
     bytes.extend(instance.to_le_bytes());
     bytes.extend((-1_i32).to_le_bytes());
     bytes.extend((-1_i32).to_le_bytes());
     bytes
-}
-
-fn register_for(key: ParticipantKey) -> Vec<u8> {
-    encode_inner(&DerbyMessage::RegisterPlayer {
-        key,
-        unknown_key: 0,
-    })
-    .unwrap()
 }
 
 fn register() -> Vec<u8> {
@@ -410,16 +398,8 @@ fn npc_choice(choice: i32) -> Vec<u8> {
     bytes
 }
 
-fn phase_for(key: ParticipantKey, phase: i32) -> Vec<u8> {
-    encode_inner(&DerbyMessage::PlayerPhase { key, phase }).unwrap()
-}
-
 fn phase(phase: i32) -> Vec<u8> {
     phase_for(OWNER, phase)
-}
-
-fn countdown_for(key: ParticipantKey, count: u32) -> Vec<u8> {
-    encode_inner(&DerbyMessage::CountdownStatus { key, count }).unwrap()
 }
 
 fn countdown(count: u32) -> Vec<u8> {
@@ -515,15 +495,6 @@ fn run_to_running(
     let npc = register_and_npc(game, character, base);
     acknowledge_readiness(game, character, base);
     npc
-}
-
-fn hit_for(reporter: ParticipantKey, npc: ParticipantKey, impact: f32) -> Vec<u8> {
-    encode_inner(&DerbyMessage::VehicleHit(VehicleHitReport {
-        reporter,
-        other: npc,
-        impact_bits: impact.to_bits(),
-    }))
-    .unwrap()
 }
 
 fn hit(npc: ParticipantKey, impact: f32) -> Vec<u8> {

@@ -5,6 +5,13 @@
 //! NPC lists the derby only when named in `derby_gates.json`. Entry, phase acknowledgements and the
 //! results hold use the existing native type-11 lifecycle.
 //!
+//! T791 hosts more than the default MiniGameData row. `derby_rows.json` adds rows that inherit every
+//! unset field (vehicle, rules, pickups, rewards) from `derby_entry.json`. `derby_minigames.json`
+//! lists the MiniGameData rows the package hosts (read by the content layer's
+//! `read_minigame_rows`, so it has the same provenance and unique-id rules as any minigame table)
+//! and proves each hosted id, the default row included, is TYPE 11 before the world loads. A missing
+//! `derby_rows.json` still means the one default row.
+//!
 //! T219 pays a flat completion reward: the server-observed match reaching its results phase with
 //! this character still in it. Every collision is a client `34/16` report, so the payout is
 //! deliberately independent of contacts, damage and score; only finishing matters, and farming
@@ -16,9 +23,11 @@
 
 use crate::{
     character_store::CharacterState,
+    content::{MinigameRow, SourceTag, check_sources, read_minigame_rows},
     derby::{
-        DEMO_DERBY_LOBBY_NAME_ID, DerbyAction, DerbyError, DerbyParticipantResult, DerbyPhase,
-        DerbyPickup, DerbyRules, DerbyService, DerbyVehicleTemplate, ParticipantKey,
+        DEMO_DERBY_LOBBY_NAME_ID, DEMO_DERBY_TYPE_ID, DerbyAction, DerbyError,
+        DerbyParticipantResult, DerbyPhase, DerbyPickup, DerbyRules, DerbyService,
+        DerbyVehicleTemplate, ParticipantKey,
     },
     rewards::{RewardDisplay, RewardGrant},
 };
@@ -44,8 +53,13 @@ const MAX_CONTENT_BYTES: usize = 512 * 1024;
 const MAX_GATES_BYTES: usize = 16 * 1024;
 /// (R) Upper bound on each completion reward, so content cannot mint unlimited coins or XP.
 pub const MAX_COMPLETION_REWARD: u32 = 10_000;
+/// (R) Sanity bound on the extra MiniGameData rows one world may host.
+pub const MAX_DERBY_ROWS: usize = 32;
 /// Save-size bound on the paid-match ledger; the newest rows are kept.
 pub const MAX_PAID_MATCHES: usize = 32;
+const MAX_ROWS_BYTES: usize = 64 * 1024;
+/// The hosted-row proof beside `derby_entry.json`; see the module docs.
+pub const MINIGAMES_FILE: &str = "derby_minigames.json";
 const ACTIVE_STATUS_MASK: u32 = (1 << crate::derby::DERBY_ACTIVE_STATUS_BIT) | 1;
 
 /// One opt-in derby package. `vehicle`, `rules` and `pickups` are the service's existing typed
@@ -73,6 +87,51 @@ pub struct DerbyGatewayContent {
     pub reward: Option<serde_json::Value>,
 }
 
+/// One extra hosted row in `derby_rows.json`. Every unset field inherits `derby_entry.json`; a
+/// row can therefore play exactly like the default package without restating it.
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct DerbyRowContent {
+    game_id: i32,
+    npcs: Vec<u64>,
+    #[serde(default)]
+    rules: Option<DerbyRules>,
+    #[serde(default)]
+    pickups: Option<Vec<DerbyPickup>>,
+    #[serde(default)]
+    completion_reward_coins: Option<u32>,
+    #[serde(default)]
+    completion_reward_xp: Option<u32>,
+    source: Vec<SourceTag>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct DerbyRowsFile {
+    schema_version: u32,
+    rows: Vec<DerbyRowContent>,
+}
+
+/// One row this gateway hosts: the effective package (the default package with the row's
+/// overrides applied) and the NPCs whose menu may enter it.
+#[derive(Clone, Debug)]
+pub struct DerbyRow {
+    package: Arc<DerbyGatewayContent>,
+    npcs: Vec<u64>,
+}
+
+impl DerbyRow {
+    /// The MiniGameData id the 39/16 offer names and a finished match credits.
+    pub fn game_id(&self) -> i32 {
+        self.package.game_id
+    }
+
+    /// The effective package; inheritance was resolved at load.
+    pub fn package(&self) -> &DerbyGatewayContent {
+        &self.package
+    }
+}
+
 /// (R) NPCs whose menu offers the derby. NPC existence is checked by `NpcInteraction`.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -97,10 +156,12 @@ pub struct DerbyGatewayState {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_paid_unix: Option<u64>,
     /// Finished (paid and credited) match instances, oldest first, at most the newest
-    /// `MAX_PAID_MATCHES`; a zero-reward package records its finishes too. The save belongs
-    /// to one character, so (this ledger, instance id) is the (character, match) key and another
-    /// character's identical instance id is a different match. `next_instance` resumes above the
-    /// newest row, so a pruned id is never reissued to a character that was paid for it.
+    /// `MAX_PAID_MATCHES`; a zero-reward package records its finishes too. The row it was played in
+    /// is deliberately absent: instance ids are per match, so one ledger covers every hosted row.
+    /// The save belongs to one character, so (this ledger, instance id) is the (character, match)
+    /// key and another character's identical instance id is a different match. `next_instance`
+    /// resumes above the newest row, so a pruned id is never reissued to a character that was paid
+    /// for it.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub paid_matches: Vec<i32>,
 }
@@ -133,6 +194,8 @@ impl DerbyEntryDenied {
 pub struct DerbyGateway {
     content: Arc<DerbyGatewayContent>,
     gates: Option<Arc<DerbyGates>>,
+    /// The default package's row first, then `derby_rows.json` in file order.
+    rows: Vec<DerbyRow>,
     service: Option<DerbyService>,
     owner: Option<ParticipantKey>,
     next_instance: u32,
@@ -189,6 +252,99 @@ fn load_gates(directory: &Path) -> io::Result<Option<DerbyGates>> {
     Ok(Some(gates))
 }
 
+fn load_rows(directory: &Path) -> io::Result<Vec<DerbyRowContent>> {
+    let path = directory.join("derby_rows.json");
+    let Some(bytes) = read_regular_limited(&path, MAX_ROWS_BYTES, "derby rows")? else {
+        return Ok(Vec::new());
+    };
+    let rows: DerbyRowsFile = serde_json::from_slice(&bytes).map_err(invalid)?;
+    if rows.schema_version != 1 || rows.rows.len() > MAX_DERBY_ROWS {
+        return Err(invalid("invalid derby rows file"));
+    }
+    Ok(rows.rows)
+}
+
+fn load_minigames(directory: &Path) -> io::Result<Option<Vec<MinigameRow>>> {
+    if !directory.join(MINIGAMES_FILE).exists() {
+        return Ok(None);
+    }
+    read_minigame_rows(directory, MINIGAMES_FILE)
+        .map(Some)
+        .map_err(|error| invalid(error.to_string()))
+}
+
+/// Refuse a hosted id the MiniGameData table does not list as a demolition-derby (TYPE 11) row.
+fn require_derby_row(minigames: &[MinigameRow], game_id: i32, owner: &str) -> io::Result<()> {
+    minigames
+        .iter()
+        .any(|entry| {
+            i64::from(entry.id) == i64::from(game_id)
+                && entry.game_type_id == DEMO_DERBY_TYPE_ID as u32
+        })
+        .then_some(())
+        .ok_or_else(|| {
+            invalid(format!(
+                "{owner} {game_id} is not a {MINIGAMES_FILE} type-11 row"
+            ))
+        })
+}
+
+/// Resolve one extra row over the default package and enforce every bounds check. The caller has
+/// already rejected a duplicate or non-positive id.
+fn resolve_row(
+    row: DerbyRowContent,
+    default: &DerbyGatewayContent,
+    gate_npcs: &[u64],
+    minigames: Option<&[MinigameRow]>,
+) -> io::Result<DerbyRow> {
+    if row.npcs.is_empty() || row.npcs.len() > MAX_DERBY_GATES {
+        return Err(invalid(format!(
+            "derby row {} needs one to {MAX_DERBY_GATES} NPCs",
+            row.game_id
+        )));
+    }
+    let mut seen = BTreeSet::new();
+    for npc in &row.npcs {
+        if *npc == 0 || !seen.insert(*npc) {
+            return Err(invalid(format!(
+                "derby row {} lists NPC {npc} twice or as zero",
+                row.game_id
+            )));
+        }
+        if !gate_npcs.contains(npc) {
+            return Err(invalid(format!(
+                "derby row {} lists NPC {npc} outside derby_gates.json",
+                row.game_id
+            )));
+        }
+    }
+    if let Some(minigames) = minigames {
+        require_derby_row(minigames, row.game_id, "derby row")?;
+    }
+    check_sources(&format!("derby row {}", row.game_id), &row.source)
+        .map_err(|error| invalid(error.to_string()))?;
+    let package = DerbyGatewayContent {
+        schema_version: default.schema_version,
+        game_id: row.game_id,
+        vehicle: default.vehicle.clone(),
+        rules: row.rules.unwrap_or_else(|| default.rules.clone()),
+        pickups: row.pickups.unwrap_or_else(|| default.pickups.clone()),
+        completion_reward_coins: row
+            .completion_reward_coins
+            .unwrap_or(default.completion_reward_coins),
+        completion_reward_xp: row
+            .completion_reward_xp
+            .unwrap_or(default.completion_reward_xp),
+        reward: None,
+    };
+    validate_content(&package)
+        .map_err(|error| invalid(format!("derby row {}: {error}", row.game_id)))?;
+    Ok(DerbyRow {
+        package: Arc::new(package),
+        npcs: row.npcs,
+    })
+}
+
 impl DerbyGateway {
     /// Load the content package, its optional NPC gate list and this character's completion
     /// ledger. Absent content leaves the route disabled; malformed present content or ledger
@@ -200,7 +356,9 @@ impl DerbyGateway {
         };
         let content: DerbyGatewayContent =
             serde_json::from_slice(&bytes).map_err(|error| invalid(error.to_string()))?;
-        let mut gateway = Self::new(content, load_gates(directory)?)?;
+        let rows = load_rows(directory)?;
+        let minigames = load_minigames(directory)?;
+        let mut gateway = Self::build(content, load_gates(directory)?, rows, minigames.as_deref())?;
         gateway.restore_ledger(saved)?;
         Ok(Some(gateway))
     }
@@ -229,8 +387,21 @@ impl DerbyGateway {
     }
 
     /// Build a gateway from typed content. This is also the strict content validator used by tests
-    /// and by interactive content reloads.
+    /// and by interactive content reloads. It hosts the default row only.
     pub fn new(content: DerbyGatewayContent, gates: Option<DerbyGates>) -> io::Result<Self> {
+        Self::build(content, gates, Vec::new(), None)
+    }
+
+    /// Validate the default package and its gates, resolve every extra row, and host them in file
+    /// order behind the default row. A world that lists extra rows without `derby_minigames.json`
+    /// is refused: an untyped row could credit a non-derby MiniGameData id. When the table is
+    /// present the default row must be listed in it too.
+    fn build(
+        content: DerbyGatewayContent,
+        gates: Option<DerbyGates>,
+        rows: Vec<DerbyRowContent>,
+        minigames: Option<&[MinigameRow]>,
+    ) -> io::Result<Self> {
         validate_content(&content)?;
         if let Some(gates) = &gates {
             if gates.schema_version != 1
@@ -242,15 +413,65 @@ impl DerbyGateway {
                 return Err(invalid("invalid derby gate list"));
             }
         }
+        if !rows.is_empty() && minigames.is_none() {
+            return Err(invalid(format!(
+                "derby rows require {MINIGAMES_FILE} to prove their MiniGameData type"
+            )));
+        }
+        if let Some(minigames) = minigames {
+            require_derby_row(minigames, content.game_id, "derby default row")?;
+        }
+        let gate_npcs = gates
+            .as_ref()
+            .map(|gates| gates.npcs.clone())
+            .unwrap_or_default();
+        let mut game_ids = BTreeSet::from([content.game_id]);
+        let mut hosted = Vec::with_capacity(rows.len() + 1);
+        for row in rows {
+            if row.game_id <= 0 {
+                return Err(invalid(format!(
+                    "invalid derby row game id {}",
+                    row.game_id
+                )));
+            }
+            if !game_ids.insert(row.game_id) {
+                return Err(invalid(format!(
+                    "duplicate derby row game id {}",
+                    row.game_id
+                )));
+            }
+            hosted.push(resolve_row(row, &content, &gate_npcs, minigames)?);
+        }
+        let content = Arc::new(content);
+        hosted.insert(
+            0,
+            DerbyRow {
+                package: Arc::clone(&content),
+                npcs: gate_npcs,
+            },
+        );
         Ok(Self {
-            content: Arc::new(content),
+            content,
             gates: gates.map(Arc::new),
+            rows: hosted,
             service: None,
             owner: None,
             next_instance: FIRST_DERBY_INSTANCE,
             previous_job: None,
             paid_matches: Vec::new(),
         })
+    }
+
+    /// Every hosted row, the default package first and extras in file order.
+    pub fn rows(&self) -> &[DerbyRow] {
+        &self.rows
+    }
+
+    /// Rows `npc_id` may enter, in row order. A non-gate NPC yields nothing.
+    pub fn rows_for(&self, npc_id: u64) -> impl Iterator<Item = &DerbyRow> {
+        self.rows
+            .iter()
+            .filter(move |row| row.npcs.contains(&npc_id))
     }
 
     /// NPC content keys whose menu may list the derby.
@@ -306,18 +527,38 @@ impl DerbyGateway {
         Ok(())
     }
 
-    /// Start a fresh solo derby and return the native 39/16 offer. The client answers with 39/5.
+    /// Start the default row of a fresh solo derby and return the native 39/16 offer.
     pub fn begin(&mut self, character: &CharacterState) -> io::Result<Vec<u8>> {
         self.begin_at(character, 0)
     }
 
     pub fn begin_at(&mut self, character: &CharacterState, now_ms: u64) -> io::Result<Vec<u8>> {
+        self.begin_row(character, now_ms, None)
+    }
+
+    /// Start the named hosted row (`None` is the default row) and return its native 39/16 offer.
+    /// The 39/16 game id, the running match and the completion credit all come from this package.
+    pub fn begin_row(
+        &mut self,
+        character: &CharacterState,
+        now_ms: u64,
+        game_id: Option<i32>,
+    ) -> io::Result<Vec<u8>> {
         if self.active() {
             return Err(invalid("derby is already active"));
         }
         if character.guid == 0 {
             return Err(invalid("derby entry requires an authenticated character"));
         }
+        let package = match game_id {
+            Some(id) => self.rows.iter().find(|row| row.game_id() == id),
+            None => self.rows.first(),
+        }
+        .map(|row| Arc::clone(&row.package))
+        .ok_or_else(|| match game_id {
+            Some(id) => invalid(format!("derby row {id} is not hosted")),
+            None => invalid("derby has no hosted row"),
+        })?;
         let instance = self.next_instance;
         if instance > i32::MAX as u32 {
             return Err(invalid("derby instance overflow"));
@@ -325,11 +566,11 @@ impl DerbyGateway {
         let owner = ParticipantKey(character.guid);
         let mut service = DerbyService::new(
             instance as i32,
-            self.content.game_id,
+            package.game_id,
             owner,
-            self.content.vehicle.clone(),
-            self.content.rules.clone(),
-            self.content.pickups.clone(),
+            package.vehicle.clone(),
+            package.rules.clone(),
+            package.pickups.clone(),
         )
         .map_err(|error| invalid(error.to_string()))?;
         service.set_lobby_deadline(now_ms);
@@ -474,18 +715,19 @@ impl DerbyGateway {
         self.service.as_ref()?.participant_result(key)
     }
 
-    /// The one flat completion grant this package pays. It never carries items and never derives
+    /// The flat completion grant the entered row pays. It never carries items and never derives
     /// from a contact report, a score or a match duration; `display` is the ordinary reward toast.
     /// (R) The amounts are content, not recovered retail values. `None` for a 0 coin / 0 XP
     /// package, which pays nothing and sends no toast.
     pub fn completion_grant(&self, guid: u64) -> Option<RewardGrant> {
-        let job_xp = match self.content.completion_reward_xp {
-            0 if self.content.completion_reward_coins == 0 => return None,
+        let content = self.active_package();
+        let job_xp = match content.completion_reward_xp {
+            0 if content.completion_reward_coins == 0 => return None,
             0 => BTreeMap::new(),
             xp => BTreeMap::from([(DEMO_DERBY_DRIVER_PROFILE, xp)]),
         };
         Some(RewardGrant {
-            coins: self.content.completion_reward_coins,
+            coins: content.completion_reward_coins,
             items: Vec::new(),
             job_xp,
             sc: 0,
@@ -500,11 +742,25 @@ impl DerbyGateway {
         })
     }
 
-    /// The package's own MiniGameData row (`derby_entry.json` `game_id`, client row 39 "Wildwood
-    /// Demo Derby" in the shipped file): the game id the 39/16 offer names and the id a finished
-    /// match credits to `finish_minigame`. `validate_content` keeps it positive.
+    /// The entered row's MiniGameData id (`derby_entry.json` is the default row; a live match uses
+    /// the row it started). This is the game id the 39/16 offer names and the id a finished match
+    /// credits to `finish_minigame`. `validate_content` keeps every row positive.
     pub fn game_id(&self) -> u32 {
-        self.content.game_id as u32
+        self.service
+            .as_ref()
+            .map_or(self.content.game_id, DerbyService::game_id) as u32
+    }
+
+    /// The entered row's effective package; the default package when no match is live.
+    fn active_package(&self) -> &DerbyGatewayContent {
+        self.service
+            .as_ref()
+            .and_then(|service| {
+                self.rows
+                    .iter()
+                    .find(|row| row.game_id() == service.game_id())
+            })
+            .map_or(self.content.as_ref(), DerbyRow::package)
     }
 
     /// The ledger to persist; `None` keeps a save with no finished match byte-identical.

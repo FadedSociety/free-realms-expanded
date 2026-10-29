@@ -690,8 +690,9 @@ fn every_talk_target_and_visit_point_resolves() {
 /// can send (the producer table in `tests/support/quest_target_sets.rs`).
 /// Pinning the shipped set makes a lost or unmodelled producer fail here instead
 /// of silently certifying or rejecting a quest target. Derby 39 is the shipped
-/// package's MiniGameData row ("Wildwood Demo Derby") that a finished match
-/// credits; 11 (its type id, MiniGameData row 11 the Trading Card Game) is not.
+/// default package's MiniGameData row ("Wildwood Demo Derby") and 604 is the
+/// first `derby_rows.json` row ("Break 'er In"); 11 (the derby type id,
+/// MiniGameData row 11 the Trading Card Game) is not.
 #[test]
 fn shipped_minigame_producers_are_pinned() {
     let catalogue = Catalogue::load(&content_dir()).expect("the shipped split catalogue loads");
@@ -704,7 +705,7 @@ fn shipped_minigame_producers_are_pinned() {
             .collect::<Vec<_>>(),
         vec![
             18, 20, 31, 39, 42, 43, 44, 46, 66, 67, 77, 111, 134, 135, 136, 137, 139, 596, 597,
-            598, 599, 600, 601,
+            598, 599, 600, 601, 604,
         ],
         "the finish_minigame producer set changed; update the producer table and this pin"
     );
@@ -1080,11 +1081,13 @@ fn graded_target_kinds_fail_on_a_scratch_tree() {
         "the target report order must be deterministic"
     );
 
-    // Canary F: a finished derby credits the package's `game_id`, not the
-    // derby type id 11 (MiniGameData row 11 is the Trading Card Game).
+    // Canary F: a finished derby credits the row it entered, not the derby type
+    // id 11 (MiniGameData row 11 is the Trading Card Game). The producer table
+    // loads the shipped package through `DerbyGateway::load`, so the fixture
+    // carries the real `derby_entry.json` rather than a bare game id.
     let derby = fixture("canary-derby", Defect::None);
     let derby_path = derby.path().join("derby_entry.json");
-    fs::write(&derby_path, br#"{"schema_version":1,"game_id":39}"#)
+    fs::copy(content_dir().join("derby_entry.json"), &derby_path)
         .unwrap_or_else(|error| panic!("{}: {error}", derby_path.display()));
     patch_fixture_objective(&derby, FIXTURE_QUEST, "finish_minigame", "minigame_id", 39);
     let catalogue = Catalogue::load(derby.path()).expect("the derby-content quest loads");
@@ -1383,10 +1386,12 @@ fn requirement_needs_a_fact_the_producer_reports() {
     );
 
     // The derby's own producer reports placement, score and knock-outs, but not a
-    // finish time (its elapsed fact is never claimed).
+    // finish time (its elapsed fact is never claimed). The producer table loads the
+    // shipped package through `DerbyGateway::load`, so the fixture carries the real
+    // `derby_entry.json` rather than a bare game id.
     let derby = fixture("requirement-derby", Defect::None);
     let path = derby.path().join("derby_entry.json");
-    fs::write(&path, br#"{"schema_version":1,"game_id":39}"#)
+    fs::copy(content_dir().join("derby_entry.json"), &path)
         .unwrap_or_else(|error| panic!("{}: {error}", path.display()));
     patch_fixture_objective(&derby, FIXTURE_QUEST, "finish_minigame", "minigame_id", 39);
     patch_fixture_field(

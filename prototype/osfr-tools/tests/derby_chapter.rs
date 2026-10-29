@@ -30,6 +30,10 @@ mod npc_quest_chain;
 #[path = "support/quest_records.rs"]
 mod quest_records;
 
+#[path = "support/derby_play.rs"]
+mod derby_play;
+
+use derby_play::{countdown_for, hit_for, phase_for, register_for, start_request};
 use npc_quest_chain::{
     ZoneQuest, ZoneQuests, accept, active_job, assert_no_offer, assert_packet_changes_nothing,
     coins, content_dir, counts, finish_quest, has_family, menu_option, npc_interact, npc_select,
@@ -39,10 +43,7 @@ use npc_quest_chain::{
 };
 use osfr_tools::{
     character_store::CharacterState,
-    derby::{
-        DerbyMessage, DerbyPhase, ParticipantKey, VehicleHitReport, VehiclePose, decode_inner,
-        encode_inner,
-    },
+    derby::{DerbyMessage, DerbyPhase, ParticipantKey, VehiclePose, decode_inner, encode_inner},
     derby_gateway::DEMO_DERBY_DRIVER_PROFILE,
     game_store,
     gameplay::{Gameplay, GameplayState, Outcome},
@@ -291,36 +292,12 @@ fn patch_license_require(fixture: &Fixture, count: u32, require: Value) {
         });
 }
 
-fn start_request(instance: i32) -> Vec<u8> {
-    let mut bytes = vec![39, 0, 5];
-    bytes.extend(instance.to_le_bytes());
-    bytes.extend((-1_i32).to_le_bytes());
-    bytes.extend((-1_i32).to_le_bytes());
-    bytes
-}
-
 fn quit_request(instance: i32) -> Vec<u8> {
     let mut bytes = vec![39, 0, 6];
     bytes.extend(instance.to_le_bytes());
     bytes.extend((-1_i32).to_le_bytes());
     bytes.extend((-1_i32).to_le_bytes());
     bytes
-}
-
-fn register_for(key: ParticipantKey) -> Vec<u8> {
-    encode_inner(&DerbyMessage::RegisterPlayer {
-        key,
-        unknown_key: 0,
-    })
-    .unwrap()
-}
-
-fn phase_for(key: ParticipantKey, phase: i32) -> Vec<u8> {
-    encode_inner(&DerbyMessage::PlayerPhase { key, phase }).unwrap()
-}
-
-fn countdown_for(key: ParticipantKey, count: u32) -> Vec<u8> {
-    encode_inner(&DerbyMessage::CountdownStatus { key, count }).unwrap()
 }
 
 fn pose_for(key: ParticipantKey, position: [f32; 3]) -> Vec<u8> {
@@ -350,15 +327,6 @@ fn pose_for(key: ParticipantKey, position: [f32; 3]) -> Vec<u8> {
         controls_bits: [0; 3],
         flags: [0; 4],
         sequence: 1,
-    }))
-    .unwrap()
-}
-
-fn hit_for(reporter: ParticipantKey, other: ParticipantKey, impact: f32) -> Vec<u8> {
-    encode_inner(&DerbyMessage::VehicleHit(VehicleHitReport {
-        reporter,
-        other,
-        impact_bits: impact.to_bits(),
     }))
     .unwrap()
 }

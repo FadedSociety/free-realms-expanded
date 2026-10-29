@@ -872,8 +872,9 @@ impl Gameplay {
                     let busy = self.activity_busy();
                     match self.derby.as_ref().map(|derby| derby.admit(key, busy)) {
                         Some(Ok(())) => {
+                            let row = self.derby_row_for(key);
                             out = self.commit_if_changed(|staged| {
-                                staged.begin_derby(character, now_ms)
+                                staged.begin_derby(character, now_ms, row)
                             })?;
                             // The dialog camera closes before the native 39/16 offer.
                             out.replies.insert(0, END_DIALOG_26_4.to_vec());

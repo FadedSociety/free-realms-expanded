@@ -769,6 +769,18 @@ fn unique_ids(
     Ok(seen)
 }
 
+/// A flat MiniGameData table that a feature keeps beside its own content (the derby's hosted
+/// rows, T791). It has the versioned loader, per-row provenance and unique-id rules of the
+/// `minigames.json` table `ContentDb::load` reads.
+pub(crate) fn read_minigame_rows(dir: &Path, file: &str) -> Result<Vec<MinigameRow>, ContentError> {
+    let rows: Vec<MinigameRow> = read_records(dir, file)?;
+    for row in &rows {
+        check_sources(&format!("minigame {}", row.id), &row.source)?;
+    }
+    unique_ids("minigame", rows.iter().map(|row| row.id.to_string()))?;
+    Ok(rows)
+}
+
 pub(crate) fn check_sources(record: &str, sources: &[SourceTag]) -> Result<(), ContentError> {
     if sources.is_empty() {
         return Err(ContentError::InvalidProvenance {

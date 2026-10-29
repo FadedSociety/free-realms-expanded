@@ -19,7 +19,7 @@
 //!   | harvesting win (`Gameplay::apply_type8` -> `npc_minigame_win`) | 111 | `Gameplay`'s `HARVESTING_GAME_ID` |
 //!   | paid fishing catch (`Gameplay::handle_fishing`) | spot game id | `fishing_spots.json` `spots[].game_id` |
 //!   | kart claim (`Gameplay::handle_kart_entry`/tick) | 31 | `kart_entry.json` `race.speedway` |
-//!   | finished derby (`Gameplay::pay_derby_completion`) | package game id | `derby_entry.json` `game_id` |
+//!   | finished derby (`Gameplay::pay_derby_completion`) | entered row id | `DerbyGateway::rows` (`derby_entry.json` default + `derby_rows.json`) |
 //!
 //!   Chess sends the row id as the 39/18 game id through its `RunSpec`; it reports
 //!   an elapsed time and no score (the results page always carries zero). A craft
@@ -29,9 +29,10 @@
 //!   `recipes.json` rows carry all three ids. Only a Blacksmith recipe's movie
 //!   measures its score and timer server-side (forging); the Chef and Miner
 //!   movies take both from the client, so their ids report no result fact and a
-//!   `require` on them is refused. A finished derby credits the package's
-//!   MiniGameData row (`DerbyGateway::game_id`, 39 "Wildwood Demo Derby"), never
-//!   its type id 11, which is MiniGameData row 11 (the Trading Card Game). Mining,
+//!   `require` on them is refused. A finished derby credits the entered row's
+//!   MiniGameData id (`DerbyGateway::game_id`): the default row 39 "Wildwood Demo
+//!   Derby" or an extra `derby_rows.json` row, never its type id 11, which is
+//!   MiniGameData row 11 (the Trading Card Game). Mining,
 //!   harvesting, forging, chess and soccer read their elapsed seconds and score
 //!   from the server-built 39/18; kart reports its own elapsed time and no
 //!   placement (a single-player time trial); the derby reports score, placement
@@ -73,6 +74,7 @@
 use super::quest_records::as_u32;
 use osfr_tools::{
     activity_portal, chess_service,
+    derby_gateway::DerbyGateway,
     harvest_nodes::GatheringNodes,
     harvesting,
     inventory::Inventory,
@@ -290,12 +292,13 @@ impl Targets {
             }
         }
 
-        // `DerbyGateway::load` owns the file; a finished match credits its
-        // `game_id` whatever the flat payout and reports its own driver's result.
-        for game in read_ids(root, "derby_entry.json", |document| {
-            as_u32(&document["game_id"]).into_iter().collect()
-        }) {
-            targets.producer(game, DERBY_FACTS);
+        // `DerbyGateway::load` owns the default package and every extra
+        // `derby_rows.json` row; a finished match credits whichever row the
+        // player entered and reports that row's driver result.
+        if let Some(derby) = DerbyGateway::load(root, None)? {
+            for row in derby.rows() {
+                targets.producer(row.game_id() as u32, DERBY_FACTS);
+            }
         }
 
         // T503: the loader owns `quest_nodes.json`; only placed pickups count, so a

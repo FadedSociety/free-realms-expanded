@@ -50,6 +50,7 @@ mod content_presence;
 mod content_reload;
 mod crafting;
 mod dance_off;
+mod derby_rows;
 mod derby_session;
 mod encounter_rewards;
 mod field_battle;

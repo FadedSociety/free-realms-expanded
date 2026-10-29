@@ -95,12 +95,14 @@ impl Gameplay {
         Ok(out)
     }
 
-    /// (R) Switch to Demo Derby Driver and open the native type-11 offer. The caller has already
-    /// checked the NPC gate and that no other activity is running.
+    /// (R) Switch to Demo Derby Driver and open the native type-11 offer for `row` (the gameplay
+    /// selection, `None` for the default package). The caller has already checked the NPC gate and
+    /// that no other activity is running.
     pub(super) fn begin_derby(
         &mut self,
         character: &CharacterState,
         now_ms: u64,
+        row: Option<i32>,
     ) -> io::Result<Outcome> {
         let mut out = Outcome::default();
         let profiles = self
@@ -134,7 +136,7 @@ impl Gameplay {
             &mut out,
         )?;
         let derby = self.derby.as_mut().unwrap();
-        let offer = derby.begin_at(character, now_ms)?;
+        let offer = derby.begin_row(character, now_ms, row)?;
         derby.set_previous_job(previous_job);
         out.replies.push(offer);
         out.changed = true;
@@ -203,7 +205,7 @@ impl Gameplay {
     /// `reward_snapshot()` and adopted by `adopt_reward_state` (the shared minigame reward path).
     ///
     /// The same once-per-instance handover emits the quest event: a finished derby is a
-    /// server-observed `FinishMinigame` credit for the package's game id (`DerbyGateway::game_id`,
+    /// server-observed `FinishMinigame` credit for the entered row's game id (`DerbyGateway::game_id`,
     /// the MiniGameData row the 39/16 offer names) whether the flat payout fits, is refused or is
     /// tuned to zero. A payout the wallet or job progress cannot represent is a player-local
     /// refusal: one system line, the consumed ledger and the quest credit stay committed, and the

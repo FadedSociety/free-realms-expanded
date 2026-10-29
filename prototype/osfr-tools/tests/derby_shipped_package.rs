@@ -16,12 +16,13 @@
 //! 39/16 offer -> 39/5 Go -> 34/6 register -> phase/countdown acknowledgements -> 34/16 contacts ->
 //! results payout -> 26/42 close. No test calls a copy of the feature.
 
+#[path = "support/derby_play.rs"]
+mod derby_play;
+
+use derby_play::{countdown_for, hit_for, phase_for, register_for, start_request};
 use osfr_tools::{
     character_store::CharacterState,
-    derby::{
-        DerbyMessage, DerbyPhase, ParticipantKey, VehicleHitReport, VehiclePose, decode_inner,
-        encode_inner,
-    },
+    derby::{DerbyMessage, DerbyPhase, ParticipantKey, VehiclePose, decode_inner, encode_inner},
     derby_gateway::{DEMO_DERBY_DRIVER_PROFILE, DerbyGates, DerbyGateway, DerbyGatewayContent},
     game_store::Snapshot,
     gameplay::{Gameplay, GameplayState},
@@ -281,30 +282,6 @@ fn offer_instance(replies: &[Vec<u8>]) -> i32 {
         .expect("the derby offer")
 }
 
-fn start_request(instance: i32) -> Vec<u8> {
-    let mut bytes = vec![39, 0, 5];
-    bytes.extend(instance.to_le_bytes());
-    bytes.extend((-1_i32).to_le_bytes());
-    bytes.extend((-1_i32).to_le_bytes());
-    bytes
-}
-
-fn register_for(key: ParticipantKey) -> Vec<u8> {
-    encode_inner(&DerbyMessage::RegisterPlayer {
-        key,
-        unknown_key: 0,
-    })
-    .unwrap()
-}
-
-fn phase_for(key: ParticipantKey, phase: i32) -> Vec<u8> {
-    encode_inner(&DerbyMessage::PlayerPhase { key, phase }).unwrap()
-}
-
-fn countdown_for(key: ParticipantKey, count: u32) -> Vec<u8> {
-    encode_inner(&DerbyMessage::CountdownStatus { key, count }).unwrap()
-}
-
 fn pose(key: ParticipantKey, position: [f32; 3]) -> Vec<u8> {
     encode_inner(&DerbyMessage::VehiclePose(VehiclePose {
         key,
@@ -332,15 +309,6 @@ fn pose(key: ParticipantKey, position: [f32; 3]) -> Vec<u8> {
         controls_bits: [0; 3],
         flags: [0; 4],
         sequence: 1,
-    }))
-    .unwrap()
-}
-
-fn hit_for(reporter: ParticipantKey, other: ParticipantKey, impact: f32) -> Vec<u8> {
-    encode_inner(&DerbyMessage::VehicleHit(VehicleHitReport {
-        reporter,
-        other,
-        impact_bits: impact.to_bits(),
     }))
     .unwrap()
 }
