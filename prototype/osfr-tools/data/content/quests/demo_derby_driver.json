@@ -833,9 +833,70 @@
       "id": 3060016,
       "title_string_id": 403459,
       "giver_npc_id": 9000000495,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "job": 49,
+      "prerequisite_quest_ids": [
+        3060013
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "minigame_id": 39,
+          "count": 1,
+          "text_string_id": 394466,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 394466 'Prove yourself to Kanan by scoring points during a Thunder Falls derby.' (quest-lines/quests.json q3060016 objective; quest-lines/objective-specs.json q3060016, spec_complete). Resources/MiniGameData.txt row 611 'Seeking a Sponsor' is the dedicated TYPE-11 derby row with DESC_ID 394466."
+            },
+            {
+              "kind": "client",
+              "evidence": "Resources/MiniGameData.txt row 39 '39^11^37938' is TYPE 11 'Wildwood Demo Derby'; it is derby_entry.json game_id 39, the id pay_derby_completion credits to finish_minigame (DerbyGateway::game_id), as for 3060005 and 3060030."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T674: the server runs no dedicated row-611 package, so the goal is one finished Wildwood derby (the T369 License to Drive and T666 Stunt Double choice, a finish and not a win). The client text gives no score target ('scoring points' only), so no require bound is set; the finish credit comes only from the server's Results phase."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000124,
+          "text_string_id": 394080,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 394080 'Speak to Kanan at Stillwater Crossing' (quest-lines/quests.json q3060016 objective; quest-lines/objective-specs.json q3060016). Progress line 394293 sends the player to Kanan."
+            },
+            {
+              "kind": "legacy-data",
+              "evidence": "data/content/npcs/stillwater_crossing.json Kanan (9000000124) is placement=legacy_data (FreeRealms-Legacy@9e08202 src/Scripts/Zone/FabledRealms.lua:1713, Npcs.json Id=2970, name 116843), so the Talk target is a spawned server actor (quest-lines/wiring/zone-quests-matched/thunder-falls.json names her the resolved target)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T674: objective ids 1 and 2 and the Talk event binding are local authored keys. Kanan's row carries the quests_accepted binding, so she is the formal turn-in as Tucker is for 3060013."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 20,
+          "items": [],
+          "job_xp": {
+            "49": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T674: quest-lines/quests.json q3060016 cites no coin, XP or item amount (the sponsorship is a relationship, repo:notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md:158). 20 coins and 25 Demo Derby Driver (profile 49) job XP are what 3060005 pays for the same shape (finish one derby, then a Talk); the flat per-match completion payout is separate and unchanged."
+            }
+          ]
+        }
+      ],
+      "description_string_id": 394466,
+      "intro_text_string_id": 393344,
       "source": [
         {
           "kind": "client",
@@ -851,22 +912,18 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
-          "kind": "reconstructed",
-          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+          "kind": "client",
+          "evidence": "Global.Text 403459 'Demo Derby: Seeking a Sponsor' (title), 393344 (offer, intro_text_string_id: Tucker names the sponsor in Stillwater Crossing) and 394466 (the first goal, also description_string_id as 3060011 does); quest-lines/dialogs.json q3060016 (final, confidence 0.5, live 'yes'). The progress line 394293 has no per-quest engine slot, and no completion line is attested, so end_text_string_id stays unset."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T674: prerequisite 3060013 (Tucker's Troubles) is the nearest enabled earlier row of the guide's Series 2 order (row 13 follows rows 10-12; rows 11 and 12, Curious Crash and Arena Revenge, are disabled stubs, so they cannot be prerequisites). Derby Driver (49) offer gate follows the enabled siblings."
         }
       ],
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3060017,

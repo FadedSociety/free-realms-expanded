@@ -7496,8 +7496,24 @@
       "quests_given_text": [
         "Demo Derby: Seeking a Sponsor (hand-in; Tucker Thunderjolt of Thunder Falls sends the player: 880667942), then, by inference, Demo Derby: A Lukewarm Welcome, Demo Derby: Defeating Diggs and Demo Derby: Think of the Kittens (charity-derby fliers around the town: 2706224773, 3634961039). Uniform pick-up: \"You'll need to see Kanan at Stillwater Crossing to pick it up.\" (2308551674, 2712739880). Candidate offer text: \"I'm looking to replace a member of the Paws 'n Claws Crashing Crew\" (186107631, speaker not named)."
       ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "quests_accepted": [
+        {
+          "quest_id": 3060016,
+          "title": "Demo Derby: Seeking a Sponsor",
+          "title_string_id": 403459,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 394080 'Speak to Kanan at Stillwater Crossing' (quest-lines/quests.json q3060016 objective) and title 403459 'Demo Derby: Seeking a Sponsor'."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T674: the quest's last goal is the Talk to Kanan, so the turn-in NPC is Kanan rather than the giver Tucker Thunderjolt (as T741 does for 3060013); the QuestEngine loader reads this row for turnin_npc_id."
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": "Demo Derby: Seeking a Sponsor (3060016) is handed in here; the guide isolates no other hand-in for this NPC.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [

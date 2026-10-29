@@ -37,6 +37,7 @@ use osfr_tools::{
 const CRASH: u64 = 9_000_000_289;
 const RULES_OF_THE_ROAD: u32 = 3_060_004;
 const LICENSE_TO_DRIVE: u32 = 3_060_005;
+const SEEKING_A_SPONSOR: u32 = 3_060_016;
 const DERBY_DRIVER: i32 = 49;
 const ADVENTURER: i32 = 1;
 
@@ -159,13 +160,18 @@ fn each_quest_is_offered_by_crash_ended_by_its_npc_and_pays_once() {
             "a duplicate 49/14",
         );
         now += 200;
-        assert_no_offer(
-            &mut game,
-            &target,
-            case.target,
-            &mut now,
-            "the target after",
-        );
+        // Tucker is also the giver of Seeking a Sponsor (T674), which follows Tucker's Troubles.
+        if case.quest == TUCKER.quest {
+            offer(&mut game, &target, case.target, SEEKING_A_SPONSOR, now);
+        } else {
+            assert_no_offer(
+                &mut game,
+                &target,
+                case.target,
+                &mut now,
+                "the target after",
+            );
+        }
     }
 }
 

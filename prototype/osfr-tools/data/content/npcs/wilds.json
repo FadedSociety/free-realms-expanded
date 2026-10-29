@@ -43789,7 +43789,8 @@
       ],
       "quest_ids_given": [
         3060014,
-        3060015
+        3060015,
+        3060016
       ],
       "quests_given_text": [
         "Demo Derby: Curious Crash (inferred), Demo Derby: Arena Revenge (inferred), Demo Derby: Seeking a Sponsor (sends the player to Kanan in Stillwater Crossing, 880667942)."

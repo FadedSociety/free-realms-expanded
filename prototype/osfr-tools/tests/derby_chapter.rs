@@ -34,7 +34,8 @@ use npc_quest_chain::{
     ZoneQuest, ZoneQuests, accept, active_job, assert_no_offer, assert_packet_changes_nothing,
     coins, content_dir, counts, finish_quest, has_family, menu_option, npc_interact, npc_select,
     objective_activated, objective_complete, objective_update, offer, pending_turnin, profile_xp,
-    quest_end_reply, quest_reply, quest_status, release_end_screen, saved, select_job, send, talk,
+    quest_end_reply, quest_reply, quest_status, release_end_screen, saved, seed_quest, select_job,
+    send, talk,
 };
 use osfr_tools::{
     character_store::CharacterState,
@@ -46,7 +47,7 @@ use osfr_tools::{
     game_store,
     gameplay::{Gameplay, GameplayState, Outcome},
     npc_interaction::NpcInteraction,
-    quest_engine::QuestStatus,
+    quest_engine::{CharacterEligibility, QuestEngine, QuestStatus},
 };
 use quest_records::shipped_quest;
 use serde_json::{Value, json};
@@ -1331,10 +1332,11 @@ fn forged_requests_and_gated_refusals_change_nothing() {
 const JACE: u64 = 9_000_000_357;
 const STUNT_DOUBLE: u32 = 3_060_030;
 
-/// Jace is a `wilds.json` row that spawns as its own content key.
+/// Jace and Tucker are `wilds.json` rows that spawn as their own content key; Kanan's row
+/// lives in `stillwater_crossing.json`.
 const MAP: ZoneQuests = ZoneQuests {
     default_file: "wilds.json",
-    files: &[],
+    files: &[(KANAN, "stillwater_crossing.json")],
     runtime: &[],
 };
 
@@ -1488,4 +1490,194 @@ fn a_cancelled_match_does_not_credit_stunt_double() {
     assert_eq!(profile_xp(&game, DEMO_DERBY_DRIVER_PROFILE), xp_before);
     // Jace still has nothing to hand in.
     assert_no_offer(&mut game, &jace, JACE, &mut now, "Jace after a cancel");
+}
+
+// ---- T674: "Demo Derby: Seeking a Sponsor" (3060016), Tucker Thunderjolt's Series 2 finale ----
+//
+// A finished derby (game 39, as above), then a Talk to Kanan in Stillwater Crossing, whose row
+// carries the `quests_accepted` binding that makes her the formal turn-in. It follows Tucker's
+// Troubles (3060013). Card ids and the reward are read from the shipped record.
+
+/// Tucker Thunderjolt (giver, a Wilds `legacy_data` row) and Kanan (Stillwater Crossing).
+const TUCKER: u64 = 9_000_000_495;
+const KANAN: u64 = 9_000_000_124;
+const TUCKERS_TROUBLES: u32 = 3_060_013;
+const SEEKING_A_SPONSOR: u32 = 3_060_016;
+
+fn sponsor() -> ZoneQuest {
+    ZoneQuest::from_record(
+        shipped_quest(SEEKING_A_SPONSOR),
+        TUCKER,
+        KANAN,
+        DEMO_DERBY_DRIVER_PROFILE,
+    )
+}
+
+/// An active derby driver (learned through Mad Jack) who has finished Tucker's Troubles.
+fn sponsor_candidate(fixture: &Fixture, now: &mut u64) -> Gameplay {
+    let mut game = fixture.game();
+    learn_and_activate(fixture, &mut game, now);
+    let mut state = game.state();
+    seed_quest(&mut state, TUCKERS_TROUBLES, QuestStatus::Completed, &[1]);
+    fixture.game_from(state)
+}
+
+#[test]
+fn seeking_a_sponsor_is_a_finished_derby_then_kanan_and_pays_from_data() {
+    let fixture = Fixture::new(CHARACTER);
+    let mut now = NOW;
+    let mut game = sponsor_candidate(&fixture, &mut now);
+    let quest = sponsor();
+    assert!(
+        quest.coins > 0 && quest.profile_xp > 0,
+        "the record pays something"
+    );
+    MAP.accept(&mut game, CHARACTER, &quest, &mut now);
+    assert_eq!(counts(&game, SEEKING_A_SPONSOR), vec![0, 0]);
+
+    // Kanan first, an early 49/14 and a repeat 49/2 credit nothing: the derby comes first.
+    let kanan = MAP.at(CHARACTER, KANAN);
+    let before = saved(&game);
+    MAP.talk(&mut game, CHARACTER, KANAN, now);
+    now += 10;
+    assert_eq!(counts(&game, SEEKING_A_SPONSOR), vec![0, 0]);
+    assert_eq!(pending_turnin(&game), None);
+    assert_eq!(saved(&game), before, "Kanan's Talk before the derby");
+    assert_packet_changes_nothing(
+        &mut game,
+        &kanan,
+        &quest_end_reply(SEEKING_A_SPONSOR),
+        now,
+        "an early 49/14",
+    );
+    now += 10;
+    assert_packet_changes_nothing(
+        &mut game,
+        &MAP.at(CHARACTER, TUCKER),
+        &quest_reply(SEEKING_A_SPONSOR, true),
+        now,
+        "a repeat 49/2",
+    );
+
+    // One finished match credits the derby goal once; it opens no end screen by itself.
+    let finished = play_to_results(&fixture, &mut game, MAD_JACK, &mut now);
+    assert_eq!(counts(&game, SEEKING_A_SPONSOR), vec![1, 0]);
+    assert!(objective_update(&finished.results, SEEKING_A_SPONSOR, 1, 1));
+    assert!(objective_complete(&finished.results, SEEKING_A_SPONSOR, 1));
+    assert!(objective_activated(&finished.results, SEEKING_A_SPONSOR, 2));
+    assert_eq!(pending_turnin(&game), None);
+    close_match(&fixture, &mut game, now);
+
+    // The derby goal survives a save and reload; Kanan's Talk holds the end screen and the
+    // hand-in pays exactly the record.
+    let mut game = save_and_reload(&fixture, &game);
+    assert_eq!(counts(&game, SEEKING_A_SPONSOR), vec![1, 0]);
+    let (coins_before, xp_before) = (coins(&game), profile_xp(&game, DEMO_DERBY_DRIVER_PROFILE));
+    now += 100;
+    MAP.turn_in(
+        &mut game,
+        CHARACTER,
+        &quest,
+        DEMO_DERBY_DRIVER_PROFILE,
+        &mut now,
+    );
+    assert_eq!(coins(&game), coins_before + quest.coins);
+    assert_eq!(
+        profile_xp(&game, DEMO_DERBY_DRIVER_PROFILE),
+        xp_before + quest.profile_xp
+    );
+    assert_eq!(
+        quest_status(&game, SEEKING_A_SPONSOR),
+        QuestStatus::Completed
+    );
+
+    // A replayed hand-in or accept pays nothing more.
+    now += 10;
+    assert_packet_changes_nothing(
+        &mut game,
+        &kanan,
+        &quest_end_reply(SEEKING_A_SPONSOR),
+        now,
+        "a replayed 49/14",
+    );
+    now += 10;
+    assert_packet_changes_nothing(
+        &mut game,
+        &MAP.at(CHARACTER, TUCKER),
+        &quest_reply(SEEKING_A_SPONSOR, true),
+        now,
+        "a replayed 49/2",
+    );
+}
+
+#[test]
+fn seeking_a_sponsor_is_offered_only_after_tuckers_troubles_to_a_derby_driver() {
+    let fixture = Fixture::new(CHARACTER);
+    let mut now = NOW;
+    let tucker = MAP.at(CHARACTER, TUCKER);
+
+    // Not a derby driver, even with Tucker's Troubles done.
+    let mut state = fixture.game().state();
+    seed_quest(&mut state, TUCKERS_TROUBLES, QuestStatus::Completed, &[1]);
+    let mut game = fixture.game_from(state);
+    assert_no_offer(&mut game, &tucker, TUCKER, &mut now, "Tucker, no derby job");
+    now += 10;
+    assert_packet_changes_nothing(
+        &mut game,
+        &tucker,
+        &quest_reply(SEEKING_A_SPONSOR, true),
+        now,
+        "a forged 49/2 without the derby job",
+    );
+
+    // The derby job without Tucker's Troubles.
+    let mut game = fixture.game();
+    learn_and_activate(&fixture, &mut game, &mut now);
+    assert_no_offer(&mut game, &tucker, TUCKER, &mut now, "Tucker, before Betty");
+    now += 10;
+    assert_packet_changes_nothing(
+        &mut game,
+        &tucker,
+        &quest_reply(SEEKING_A_SPONSOR, true),
+        now,
+        "a forged 49/2 before Tucker's Troubles",
+    );
+
+    // Positive control: with both, Tucker offers it.
+    let mut game = sponsor_candidate(&fixture, &mut now);
+    now += 10;
+    offer(&mut game, &tucker, TUCKER, SEEKING_A_SPONSOR, now);
+}
+
+#[test]
+fn a_cancelled_match_does_not_credit_seeking_a_sponsor_and_kanan_is_the_turn_in() {
+    let fixture = Fixture::new(CHARACTER);
+    let mut now = NOW;
+    let mut game = sponsor_candidate(&fixture, &mut now);
+    MAP.accept(&mut game, CHARACTER, &sponsor(), &mut now);
+    let instance = start_match(&fixture, &mut game, MAD_JACK, &mut now);
+    run_to_running(&fixture, &mut game, instance, &mut now);
+
+    now += 1_000;
+    let quit = send(
+        &mut game,
+        &fixture.character(MAD_JACK),
+        &quit_request(instance),
+        now,
+    );
+    assert!(quit.changed);
+    assert_eq!(counts(&game, SEEKING_A_SPONSOR), vec![0, 0]);
+    assert_eq!(pending_turnin(&game), None);
+
+    // The loader binds Tucker as giver and Kanan's `quests_accepted` row as the turn-in.
+    let engine = QuestEngine::from_split_content(
+        &content_dir(),
+        CHARACTER,
+        CharacterEligibility::default(),
+        None,
+    )
+    .expect("the shipped split catalogue loads");
+    assert!(engine.is_enabled(SEEKING_A_SPONSOR));
+    assert_eq!(engine.giver_npc_id(SEEKING_A_SPONSOR), Some(TUCKER));
+    assert_eq!(engine.turnin_npc_id(SEEKING_A_SPONSOR), Some(KANAN));
 }
