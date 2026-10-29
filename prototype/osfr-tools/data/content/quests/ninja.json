@@ -508,11 +508,44 @@
     },
     {
       "id": 3110007,
+      "job": 2,
       "title_string_id": 387201,
       "giver_npc_id": 9000000047,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3110004
+      ],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "profile_id": 2,
+          "level": 5,
+          "text_string_id": 387217,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "locale 387217 'Achieve level 5, then return to Chloe.' (the level-gate wait line); 387219 is the alternate goal string of the same gate; quest-lines/objective-specs-fixed.json q3110007 objective 0 (job_level profile 2 level 5, settled) and quest-lines/quests.json q3110007 (final, live: yes, unflagged client strings)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T668: the client line holds a level gate and a return to Chloe (the spec splits it into job_level then talk_to_npc Chloe). One authoritative job_level objective at profile 2 (Ninja), level 5, like Ninja: Achieve Level 10 (3110013, T662) and Warrior W5 (3150005, T361); the server judges it from Profiles::rank. The return to Chloe is the turn-in at the giver, because the engine opens the turn-in at the giver when the last objective completes and rejects a job_level goal after the first ordered step (F576)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T668: no client, wiki or repo source names a reward for this gate (quest-lines/quests.json q3110007 open: no coins, XP or item rewards found). 15 coins, no item and no job XP mirror the Warrior W5 and Ninja Achieve Level 10 level-gate payout (3150005, 3110013)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -532,29 +565,28 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T668: prerequisite is 3110004 (Silence is Golden... and Deadly), the entry line's last enabled step, which ends with the return to Chloe. The guide gives C3 only a level condition and its Chloe predecessors (Strike from the Shadows 3110005, Handle with Care 3110006) are still disabled, so the gate follows the entry line the way Achieve Level 10 (3110013) does. Re-point it when those are wired."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T668: job gate 2 keeps the offer Ninja-only. Chloe (9000000047) is drawn (npcs/blackspore_swamp.json legacy_data) and already lists 3110007 in quest_ids_given. Intro 387200 is her 'come back when you are more experienced' line, which reads as the gate's offer text; end text 387203 is the answer's completion line."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T668: enabled from quest-lines/quests.json q3110007 (live: yes, confidence 0.6, no video or live source confirms C3 was live; the answers' only critic note is the unconfirmed server-side level trigger, which the existing job_level goal supplies)."
         }
       ],
       "description_string_id": 387202,
       "intro_text_string_id": 387200,
-      "end_text_string_id": 387203,
-      "enabled": false
+      "end_text_string_id": 387203
     },
     {
       "id": 3110008,

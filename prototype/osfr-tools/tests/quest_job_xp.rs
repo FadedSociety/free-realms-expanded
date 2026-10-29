@@ -1441,9 +1441,10 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             if (file, id) == ("brawler.json", 3_030_021) {
                 continue;
             }
-            // T662: Ninja: Achieve Level 10 is a level gate (job gate 2, coins only, no XP);
-            // tests/zone_quests_lakeshore.rs covers it.
-            if (file, id) == ("ninja.json", 3_110_013) {
+            // T662/T668: Ninja: Achieve Level 10 and Achieve Level 5 are level gates (job gate 2,
+            // coins only, no XP); tests/zone_quests_lakeshore.rs and zone_quests_blackspore.rs
+            // cover them.
+            if file == "ninja.json" && [3_110_007, 3_110_013].contains(&id) {
                 continue;
             }
             for reward in record["rewards"].as_array().into_iter().flatten() {

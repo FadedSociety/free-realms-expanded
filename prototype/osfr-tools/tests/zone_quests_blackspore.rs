@@ -2,7 +2,8 @@
 //! today, enabled in `data/content/quests/{blacksmith,miner,brawler}.json`: Silverray's
 //! "Blacksmith: Reach Level 20" (3020024) and "Miner: Reach Level 20" (3100023, live "unsure",
 //! so (R)), and Petra's "Brawler: Achieve Level 5" (3030021, a rank gate then a Talk back at
-//! her). The other Blackspore rows stay disabled (notes/Autopilot/T660.md lists each blocker).
+//! her). T668 adds Chloe's "Ninja: Achieve Level 5" (3110007, behind the stealth referral 3110004).
+//! The other Blackspore rows stay disabled (notes/Autopilot/T660.md and T668.md list each blocker).
 //!
 //! Every test drives the production in-world router through `tests/support/npc_quest_chain.rs`:
 //! the 26/8 -> 26/10 -> 26/6 offer (49/1, decoded with the production reader), the 49/2 accept,
@@ -22,23 +23,28 @@ use npc_quest_chain::{
     ADVENTURER, CHARACTER, Fixture, ZoneQuest, ZoneQuests, assert_no_offer,
     assert_packet_changes_nothing, coins, counts, objective_complete, pending_turnin, profile_xp,
     quest_end_reply, quest_reply, quest_status, realm_level, talk, zone_player,
+    zone_player_with_quests,
 };
-use osfr_tools::quest_engine::QuestStatus;
+use osfr_tools::{gameplay::Gameplay, quest_engine::QuestStatus};
 use quest_records::{RawQuest, as_u32, shipped_quest};
 
 const SILVERRAY: u64 = 9_000_000_203;
 const PETRA: u64 = 9_000_000_428;
+const CHLOE: u64 = 9_000_000_047;
 const BLACKSMITH: i32 = 16;
 const MINER: i32 = 14;
 const BRAWLER: i32 = 43;
+const NINJA: i32 = 2;
 const BLACKSMITH_20: u32 = 3_020_024;
 const MINER_20: u32 = 3_100_023;
 const BRAWLER_5: u32 = 3_030_021;
+const NINJA_5: u32 = 3_110_007;
 /// Quest, giver (also the hand-in) and the job whose active rank it gates.
-const GATES: [(u32, u64, i32); 3] = [
+const GATES: [(u32, u64, i32); 4] = [
     (BLACKSMITH_20, SILVERRAY, BLACKSMITH),
     (MINER_20, SILVERRAY, MINER),
     (BRAWLER_5, PETRA, BRAWLER),
+    (NINJA_5, CHLOE, NINJA),
 ];
 /// Both givers' rows are in `blackspore_swamp.json`; Petra's drawn body is her
 /// `npc_spawns_extra.json` spawn, whose runtime guid is her content key.
@@ -48,6 +54,17 @@ const MAP: ZoneQuests = ZoneQuests {
     runtime: &[],
 };
 const OTHER: u64 = CHARACTER + 1;
+
+/// A player on `job` who finished the record's shipped prerequisites, so its offer gate is open.
+fn player(fixture: &Fixture, guid: u64, job: i32, id: u32) -> Gameplay {
+    let done: Vec<(u32, Vec<u32>)> = shipped_quest(id)
+        .prerequisite_quest_ids
+        .iter()
+        .map(|&pre| (pre, vec![1; shipped_quest(pre).objectives.len()]))
+        .collect();
+    let done: Vec<(u32, &[u32])> = done.iter().map(|(id, n)| (*id, n.as_slice())).collect();
+    zone_player_with_quests(fixture, guid, job, &[ADVENTURER], &done)
+}
 
 /// The rank the record's first goal asks for, from the data.
 fn gate(record: &RawQuest) -> u32 {
@@ -77,7 +94,7 @@ fn walk_record(id: u32, giver: u64, job: i32) -> ZoneQuest {
 fn each_gate_is_offered_waits_for_the_rank_and_is_paid_once() {
     for (id, giver, job) in GATES {
         let fixture = Fixture::new();
-        let mut game = zone_player(&fixture, CHARACTER, job);
+        let mut game = player(&fixture, CHARACTER, job, id);
         let quest = walk_record(id, giver, job);
         let level = gate(shipped_quest(id));
         let (at_giver, at_turnin) = (MAP.at(CHARACTER, giver), MAP.at(CHARACTER, quest.turnin));
@@ -227,4 +244,32 @@ fn petra_holds_the_rank_goal_before_her_talk_and_progress_survives_a_reconnect()
     // The second player shares nothing with the first one's progress.
     assert_eq!(quest_status(&other, BRAWLER_5), QuestStatus::Active);
     assert_eq!(counts(&other, BRAWLER_5), [0, 0]);
+}
+
+#[test]
+fn chloes_level_five_gate_waits_for_the_stealth_referral() {
+    let fixture = Fixture::new();
+    let chloe = MAP.at(CHARACTER, CHLOE);
+    let mut now = 1_000;
+    // A Ninja who has not finished the entry line is offered nothing and cannot forge the accept.
+    let mut early = zone_player(&fixture, CHARACTER, NINJA);
+    assert_no_offer(
+        &mut early,
+        &chloe,
+        CHLOE,
+        &mut now,
+        "Chloe before the referral",
+    );
+    assert_packet_changes_nothing(
+        &mut early,
+        &chloe,
+        &quest_reply(NINJA_5, true),
+        now,
+        "a forged 49/2 before the referral",
+    );
+    // Once the referral is done she offers the gate.
+    let mut ready = player(&fixture, CHARACTER, NINJA, NINJA_5);
+    let quest = walk_record(NINJA_5, CHLOE, NINJA);
+    MAP.accept(&mut ready, CHARACTER, &quest, &mut now);
+    assert_eq!(quest_status(&ready, NINJA_5), QuestStatus::Active);
 }
