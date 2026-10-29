@@ -62,7 +62,7 @@ const ADVENTURER: i32 = 1;
 const BRAWLER: i32 = 43;
 const SOCCER_STAR: i32 = 52;
 const SCRIMMAGE: u32 = 3_140_004;
-/// The next record stays disabled; Landon gives it but it is never offered.
+/// The next record (T665 enabled it): Landon offers it only once the scrimmage is done.
 const MEETING_THE_TEAM: u32 = 3_140_005;
 /// MiniGameData row 43, client locale 37945 "Snowhill Soccer".
 const SNOWHILL_SOCCER: u32 = 43;
@@ -556,7 +556,7 @@ fn the_snowy_scrimmage_is_offered_only_to_a_soccer_star() {
             .quests
             .get(&MEETING_THE_TEAM)
             .is_none(),
-        "the disabled next record is never offered"
+        "the next record is not offered while the scrimmage is open"
     );
 }
 
@@ -637,13 +637,15 @@ fn a_snowhill_soccer_win_advances_the_quest_and_pays_once() {
         "a 49/14 after the reconnect",
     );
     player.send(&select_job(SOCCER_STAR));
-    let mut now = player.stamp();
-    assert_no_offer(
+    // T665: the finished scrimmage is never re-offered; Landon now offers the next record
+    // (Meeting The Team), and an offer pays and changes nothing else.
+    let now = player.stamp();
+    offer(
         &mut player.game,
         &player.character,
         LANDON,
-        &mut now,
-        "after the turn-in",
+        MEETING_THE_TEAM,
+        now,
     );
     assert_eq!(coins(&player.game), coins_after);
     assert_eq!(profile_xp(&player.game, SOCCER_STAR), xp_after);

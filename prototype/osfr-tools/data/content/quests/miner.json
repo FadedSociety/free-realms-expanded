@@ -516,11 +516,58 @@
     },
     {
       "id": 3100006,
+      "job": 14,
       "title_string_id": 387445,
       "giver_npc_id": 9000000472,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "profile_id": 14,
+          "level": 5,
+          "text_string_id": 387495,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387495 'Level up to 5 as a miner.' (lab/reports/locale-id-to-text.json; tracker label 387494 'Miner: Level 5'); Miner.md row 5 quotes the level-5 gate (client 2043045806)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T361/T665: the server judges the level itself (Profiles::rank on profile 14); a Talk goal cannot. Fixed spec lab/references/quest-lines/objective-specs-fixed.json q3100006 objective 0 (job_level, profile 14, level 5, settled)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000472,
+          "text_string_id": 387493,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387493 'Reach Level 5 as a Miner, then return to Sorin.' (lab/reports/locale-id-to-text.json). Sorin is the legacy_data spawn of fork definition 3607 (FreeRealms-Legacy FabledRealms.lua:2349, NameId 5456)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T665: the return to Sorin is its own ordered Talk goal, as the fixed spec lab/references/quest-lines/objective-specs-fixed.json q3100006 objective 1 (talk_to_npc 9000000472, needs_placement, answered by Sorin's drawn row) has it; it completes the quest and holds the 49/13 at Sorin."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T665: the guide's reward cell is unknown and the answer lab/references/quest-lines/quests.json q3100006 records none. 15 coins is the T361 level-gate payout rung (warrior 3150005); no item and no job XP, so no pinned XP table moves."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -540,10 +587,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -552,17 +595,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "T665 text ids (client locale): title 387445 'Miner: Reach Level 5', intro 387444, description 387446, end 387447, goal 387493; the answer names 387505 ('Head back to Sorin to continue your mining career!') as the progress line, which has no field in the quest record (unbound)."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T665: job gate 14 (Miner), like 3100002-3100004; Sorin's row 9000000472 is now a legacy_data spawn (fork definition 3607), so the giver is drawn. live 'yes' in lab/references/quest-lines/quests.json q3100006. No prerequisite is added: the guide's row 4 (Gem Appraisal, 3100005) is disabled today, and a prerequisite on it would make this gate unreachable (R)."
         }
       ],
       "description_string_id": 387446,
       "intro_text_string_id": 387444,
       "end_text_string_id": 387447,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3100007,

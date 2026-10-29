@@ -153,9 +153,11 @@ pub fn reference_npcs_row(source: &str, ref_id: u64) -> Value {
         .clone()
 }
 
-/// A client name in the form two locale strings compare under.
+/// A client name in the form two locale strings compare under (the locale text keeps
+/// `&quot;` where a row's name has a plain quote, as in Coach "Golden Leg" Eddie).
 pub fn normalize_name(name: &str) -> String {
-    name.chars()
+    name.replace("&quot;", "")
+        .chars()
         .filter(|ch| ch.is_ascii_alphanumeric())
         .map(|ch| ch.to_ascii_lowercase())
         .collect()

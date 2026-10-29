@@ -1392,10 +1392,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -1418,13 +1414,48 @@
     },
     {
       "id": 3110023,
+      "job": 2,
       "title_string_id": 78905,
       "giver_npc_id": 9000000151,
-      "prerequisite_quest_ids": [
-        3110022
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "reach_poi",
+          "id": 1,
+          "poi_id": 73,
+          "zone_id": 0,
+          "position": [
+            385.37256,
+            117.92403,
+            -16.92501
+          ],
+          "radius": 20.0,
+          "text_string_id": 78906,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 78906 'Michi was ambushed by ice trolls while speaking to her friend, Patterwings. Head into the Howling Hills to retrieve the stolen medicine.' (lab/reports/locale-id-to-text.json); Ninja.md row F5. Fixed spec lab/references/quest-lines/objective-specs-fixed.json q3110023 objective 0: reach_poi, poi_id 73, settled."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T665: POI 73 'Howling Hills' (NameId 6488) is a row of the captured client startup table (startup snapshot world.points_of_interest id 73, opcode 57; position [385.37256, 117.92403, -16.92501], heading -0.64806, teleport location 210087). FreeRealms-Legacy PointOfInterests.json:981-994 lists the same row with x 387.37256; the captured table wins. The shipped height grid (zone 0) is 117.9 m at that x/z, so the point is standable ground. The 20 m radius is a tunable choice (R). The medicine retrieval inside the dungeon and Patterwings' hut are not modelled (the server has no Howling Hills encounter), so reaching the area is the goal; no item is granted."
+            }
+          ]
+        }
       ],
-      "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T665: no reward line in the client for this quest (fixed spec q3110023: rewards remain empty); 15 coins is the T361 level-gate payout rung, no item and no job XP."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1444,10 +1475,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -1456,25 +1483,78 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "T665 text ids (client locale): title 78905 'Ninja: Ice Troll Rampage', intro 78904, description/goal 78906, end 78907 (Michi: 'You did it! Patterwings is going to be okay.')."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T665: job gate 2 (client 1191913618 'As a Ninja, head into the Howling Hills'). The guide's predecessor The Masterless Ninja (3110022) is a timed minigame the server lacks and stays disabled, so its prerequisite is dropped or this quest could never be offered. live 'yes' in lab/references/quest-lines/quests.json q3110023. The hand-in is the 49/13 at the giver Michi once the area is reached."
         }
       ],
       "description_string_id": 78906,
       "intro_text_string_id": 78904,
       "end_text_string_id": 78907,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3110024,
+      "job": 2,
       "title_string_id": 387213,
       "giver_npc_id": 9000000151,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3110023
+      ],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "profile_id": 2,
+          "level": 20,
+          "text_string_id": 387235,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387235 'Achieve level 20, then return to Michi.' (lab/reports/locale-id-to-text.json); Ninja.md row F6 quotes it (client 3996692610)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T361/T665: one authoritative job_level goal on the Ninja profile (2). Fixed spec lab/references/quest-lines/objective-specs-fixed.json q3110024 objective 0 (job_level, profile 2, level 20, settled)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000151,
+          "text_string_id": 387239,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387239 'Return to Michi for further instructions and training.' (lab/reports/locale-id-to-text.json). Michi 9000000151 is drawn in snowhill.json."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T665: the return to Michi is its own ordered Talk goal (fixed spec q3110024 objective 1, talk_to_npc 9000000151, settled); it completes the quest and holds the 49/13 at Michi."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T665: no reward line in the client, wiki or articles (answer lab/references/quest-lines/quests.json q3110024: 'none found'; Ninja.md row F6 'unknown'). 15 coins is the T361 level-gate payout rung; no item, no job XP."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1506,16 +1586,20 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "T665 text ids (client locale): title 387213 'Ninja: Achieve Level 20', description 387214, end 387215 (Michi's 'Wow! It's been ages since I've seen a ninja with your skill!'), goal 387235."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T665: job gate 2 (Ninja) so a non-Ninja is never offered a goal only a Ninja rank can finish. live 'unsure' in lab/references/quest-lines/quests.json q3110024 (no flagged line in lab/references/quest-lines/flags.tsv). Prerequisite 3110023 (Ice Troll Rampage) is the guide's order (Ninja.md F5 then F6); the answer calls it an order-only link, so it is a reconstructed gate (R)."
         }
       ],
       "description_string_id": 387214,
       "end_text_string_id": 387215,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3110025,

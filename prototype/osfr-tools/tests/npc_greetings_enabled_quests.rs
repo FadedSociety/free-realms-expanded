@@ -343,6 +343,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         "Derp Axemaker (T729 giver of 3100012 and 3100013): the only first-person lines of his enabled quests are their offer intros 387452 and 77415, and quest-lines/dialogs.json leaves both speakers unattributed; binding a QuestOffer greeting moves the Snowhill bound-row pins in the region greeting tests, which this quest-data change does not touch, so he stays unbound. His disabled quests carry other first-person intros, but a disabled quest offers no proof and is not a greeting source.",
     ),
     (
+        9000000053,
+        "Coach Eddie (T665 turn-in of 3140005): Soccer Star.md:41 quotes only third-person lines about him and his name variants; 402576 is the quest's end text spoken at the hand-in, not a stand-alone greeting, so no uncontested first-person line is recovered.",
+    ),
+    (
         9000000070,
         "Diggy (T466 Touring Seaside talk target): NPCs - Seaside.md:45 quotes only third-person cooking objectives and other speakers' referrals (428610, 21340, 384277, 100280); locale 93435 ('finest seafood') has no speaker in any guide row, and 93429 is the quest-step goal text, so no first-person line of his own is proven.",
     ),
@@ -423,6 +427,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         "Blorple (T502 giver of 3000390): NPCs - Merry Vale.md:169 names him as the giver of Misplaced Mugwopp but quotes only the third-person referral 2817473271; NPCs - Greenwood Forest.md:63 quotes only a location (2490543637, 3536286642). His first-person intro 46210 is a QuestOffer candidate, but npc_greetings_job_hubs.rs pins every unlisted greenwood_forest.json row unbound; 46618 is the objective and 46252 is the end text of 3000390 goal 1.",
     ),
     (
+        9000000472,
+        "Sorin (T665 giver of 3100006): Miner.md:43 quotes only his level-5 gate lines (387444 is the 49/1 offer intro, 387446 and 387493 the description and goal, 387505 the progress line), all quest text rather than a stand-alone greeting; binding the intro would repeat the offer card on every click.",
+    ),
+    (
         9500000289,
         "Bollylog: only third-person arrow-delivery objectives and one unattributed recruit greeting; no individual first-person line exists.",
     ),
@@ -495,8 +503,16 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         "Blammo (T732 giver and talk target of 3080009): NPCs - Wilds.md:148 and Kart Driver.md row 7 quote only the third-person Exploder's League role; his line 394486 is the quest offer, not a greeting.",
     ),
     (
+        9500000870,
+        "Bigs McKicker (T665 talk target of 3140005): Soccer Star.md:49 quotes only the three recipient names and the jersey objectives (402680, 402682, 402684, all third person); no first-person line of his own.",
+    ),
+    (
         9500000874,
         "Blazing Star (T498 giver of 3000332): NPCs - Wilds.md:77 quotes no line of hers ('See Flax', standing spot not stated); her first-person text is the quest intro 389950, a QuestOffer proof, but tests/npc_greetings_lakeshore_wilds.rs pins every unlisted Wilds row unbound.",
+    ),
+    (
+        9500000877,
+        "Bobo Flamefoot (T665 talk target of 3140005): Soccer Star.md:49 quotes only the three recipient names and the jersey objectives (402680, 402682, 402684, all third person); no first-person line of his own.",
     ),
     (
         9500000882,
@@ -509,6 +525,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
     (
         9500000900,
         "Funnel Bindweed (T498 talk target of 3000332): NPCs - Wilds.md:73 quotes only drink-ingredient objectives (1396874048, 811508545, 2607838681) and a porch location; his reply 389970 is the quest-step dialogue of 3000332 goal 2, not a greeting.",
+    ),
+    (
+        9500000903,
+        "Goalster Deedee (T665 talk target of 3140005): Soccer Star.md:49 quotes only the three recipient names and the jersey objectives (402680, 402682, 402684, all third person); no first-person line of her own.",
     ),
     (
         9500000925,

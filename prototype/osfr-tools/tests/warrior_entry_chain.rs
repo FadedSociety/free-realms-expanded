@@ -65,6 +65,8 @@ const W5: u32 = 3_150_005;
 const W16: u32 = 3_150_016;
 /// T672: Warrior: Distracted, Tumbolina's Merry Vale quest (tests/zone_quests_merry_vale_round2.rs).
 const DISTRACTED: u32 = 3_150_008;
+/// T665 enabled "You Deserve Better" (job gate, two talks, Tumbolina hand-in); `tests/zone_quests_snowhill_dartmoor.rs` owns its shape.
+const W7: u32 = 3_150_007;
 const W1_TITLE: u32 = 22_526;
 const W4_TITLE: u32 = 22_580;
 const W4_DESCRIPTION: u32 = 22_581;
@@ -865,7 +867,7 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
         );
     }
 
-    // ---- record table: W1, W4 and the W5 level gate are enabled; the rest stay hollow --
+    // ---- record table: W1, W4, the W5 level gate and (T665) W7 are enabled; the rest stay hollow --
     let document = read_json(&content_dir().join("quests/warrior.json"));
     let records = document["records"].as_array().unwrap();
     let ids: Vec<u64> = records
@@ -892,11 +894,18 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
             .map(|row| row["id"].as_u64().unwrap())
             .collect::<Vec<_>>(),
         // T723 enables the level-15 gate W16 next to the W5 gate.
-        vec![u64::from(W1), u64::from(W4), u64::from(W5), u64::from(W16)]
+        // T665 enables W7 (You Deserve Better).
+        vec![
+            u64::from(W1),
+            u64::from(W4),
+            u64::from(W5),
+            u64::from(W7),
+            u64::from(W16)
+        ]
     );
     for record in &enabled {
-        if [W5, W16].contains(&(record["id"].as_u64().unwrap() as u32)) {
-            continue; // the level gates have their own shape (W16: tests/zone_quests_sanctuary_round3.rs)
+        if [W5, W7, W16].contains(&(record["id"].as_u64().unwrap() as u32)) {
+            continue; // the level gates have their own shape (W16: tests/zone_quests_sanctuary_round3.rs; W7: tests/zone_quests_snowhill_dartmoor.rs)
         }
         assert_eq!(record["job"].as_i64(), Some(i64::from(WARRIOR)));
         assert!(
@@ -994,7 +1003,7 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
     // generated content already carried.
     for record in records {
         let id = record["id"].as_u64().unwrap();
-        if [W1, W4, W5, W16, BECOME_A_WARRIOR, DISTRACTED].contains(&(id as u32)) {
+        if [W1, W4, W5, W7, W16, BECOME_A_WARRIOR, DISTRACTED].contains(&(id as u32)) {
             continue;
         }
         assert_eq!(record["enabled"].as_bool(), Some(false), "quest {id}");

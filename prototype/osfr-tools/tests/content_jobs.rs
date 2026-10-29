@@ -1,6 +1,10 @@
+#[path = "support/referenced_pois.rs"]
+mod referenced_pois;
+
 use osfr_tools::content;
 
 use content::ContentDb;
+use referenced_pois::referenced_pois;
 use serde_json::{Value, json};
 use std::{
     collections::{BTreeMap, HashSet},
@@ -148,7 +152,7 @@ fn job_batch_loads_and_npc_references_resolve_or_are_declared() {
         &scratch.join("quests.json"),
         &json!({"schema_version": 1, "records": quest_records}),
     );
-    write_json(&scratch.join("pois.json"), &empty_file());
+    write_json(&scratch.join("pois.json"), &referenced_pois(&quest_records));
     write_json(
         &scratch.join("items.json"),
         &referenced_items(&quest_records),

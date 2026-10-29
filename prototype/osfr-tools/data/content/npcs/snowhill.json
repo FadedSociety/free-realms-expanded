@@ -37235,11 +37235,11 @@
       ],
       "name": "Sorin",
       "name_reason": null,
-      "name_string_id": 1542928294,
+      "name_string_id": 5456,
       "name_string_ids": [
         {
-          "table": "ucdt",
-          "id": 1542928294
+          "table": "client_locale",
+          "id": 5456
         }
       ],
       "name_string_id_reason": null,
@@ -37371,29 +37371,23 @@
       ],
       "services_reason": null,
       "position": [
-        408.869396,
-        47.112,
-        347.923558
+        468.0244,
+        47.11174,
+        341.206
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        -0.5576068075579965,
+        -0.11971220728891936,
         0.0,
-        0.8301052030706586
+        0.9928086358538663
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
       "placement_confidence": "medium",
-      "placement_candidates": [
-        {
-          "poi_id": 30,
-          "poi_name": "Singing Crystal Mines",
-          "match_score": 21
-        }
-      ],
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 30 by longest normalized whole-name score 21; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Legacy built-content spawn bound to this existing regional key: matched by the spawn's client name (talk_spawns.py) (R). Coordinates and heading copied from ../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2349; src/Resources/Npcs.json Id=3607 (ModelId=382, ModelFileName=dwarf_miner_m.adr, NameId=5456). Chosen among the four same-name spawns by zone (the Snowhill one; the others are Seaside and Greenwood Forest), as lab/references/quest-lines/wiring/talk-spawns.json row 9000000472 lists them. Same row in Lxzxrus-Free-Realms-Server@37ef175 FabledRealms.lua:2186 and Sanctuary-main-20261019 FabledRealms.lua:2215. It sits in the Singing Crystal Mines cluster (y 47.11, beside Brody, Spruce and Tennin) where the Miner guide places Sorin. Not a captured retail transform, collision proof or native appearance verification.",
       "source": [
         {
           "kind": "client",
@@ -37410,6 +37404,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2349; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3607 (ModelId=382, ModelFileName=dwarf_miner_m.adr, NameId=5456). NameId resolves in the client locale to 'Sorin'."
         }
       ],
       "field_sources": {
@@ -37497,30 +37495,14 @@
         ],
         "name_string_id": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Singing Crystal Mines and the forge, row 44; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Singing Crystal Mines and the forge, row 44; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Singing Crystal Mines and the forge, row 44; source cell: [client][video][wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2349; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3607 (ModelId=382, ModelFileName=dwarf_miner_m.adr, NameId=5456). NameId resolves in the client locale to 'Sorin'."
           }
         ],
         "name_string_ids": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Singing Crystal Mines and the forge, row 44; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Singing Crystal Mines and the forge, row 44; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Singing Crystal Mines and the forge, row 44; source cell: [client][video][wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2349; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3607 (ModelId=382, ModelFileName=dwarf_miner_m.adr, NameId=5456). NameId resolves in the client locale to 'Sorin'."
           }
         ],
         "name_string_id_reason": [
@@ -37867,18 +37849,14 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=30 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=30 NameId=4806 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2349; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3607 (ModelId=382, ModelFileName=dwarf_miner_m.adr, NameId=5456). NameId resolves in the client locale to 'Sorin'."
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2349; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3607 (ModelId=382, ModelFileName=dwarf_miner_m.adr, NameId=5456). NameId resolves in the client locale to 'Sorin'."
           }
         ],
         "position_w": [
@@ -37889,36 +37867,32 @@
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=30 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=30 NameId=4806 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2349; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3607 (ModelId=382, ModelFileName=dwarf_miner_m.adr, NameId=5456). NameId resolves in the client locale to 'Sorin'."
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2349; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3607 (ModelId=382, ModelFileName=dwarf_miner_m.adr, NameId=5456). NameId resolves in the client locale to 'Sorin'."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2349; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3607 (ModelId=382, ModelFileName=dwarf_miner_m.adr, NameId=5456). NameId resolves in the client locale to 'Sorin'."
           }
         ],
         "placement_confidence": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) medium measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2349; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3607 (ModelId=382, ModelFileName=dwarf_miner_m.adr, NameId=5456). NameId resolves in the client locale to 'Sorin'."
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2349; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3607 (ModelId=382, ModelFileName=dwarf_miner_m.adr, NameId=5456). NameId resolves in the client locale to 'Sorin'."
           }
         ],
         "capture_match": [
@@ -37926,8 +37900,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2349; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3607 (ModelId=382, ModelFileName=dwarf_miner_m.adr, NameId=5456). NameId resolves in the client locale to 'Sorin'."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2349; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3607 (ModelId=382, ModelFileName=dwarf_miner_m.adr, NameId=5456). NameId resolves in the client locale to 'Sorin'."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2349; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3607 (ModelId=382, ModelFileName=dwarf_miner_m.adr, NameId=5456). NameId resolves in the client locale to 'Sorin'."
+          }
         ]
-      }
+      },
+      "heading": -0.24,
+      "model_id": 382,
+      "model_file_name": "dwarf_miner_m.adr"
     },
     {
       "npc_id": 9500000772,

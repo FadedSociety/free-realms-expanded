@@ -240,7 +240,7 @@ fn shipped_place_group_counts_match_the_research_table() {
 }
 
 #[test]
-fn shipped_npc_rows_cover_1193_of_1209() {
+fn shipped_npc_rows_cover_1192_of_1209() {
     let game = gameplay();
     let table = game.region_table().expect("live region table");
     let npc_dir = npc_greetings::content_dir().join("npcs");
@@ -286,13 +286,15 @@ fn shipped_npc_rows_cover_1193_of_1209() {
     assert_eq!(total, 1209, "shipped NPC rows");
     // T876 (was 981 / 844 / 905 / 1091 with the T753 grouping and the community region shapes): the places'
     // music/ambience area families and the client-row regions cover 1,193 rows, of which every one is in a place.
-    assert_eq!(in_place, 1193, "rows in a first-party place group");
+    // T665 moved Sorin and Coach Eddie onto drawn Legacy spawns; one of the two landed outside every
+    // place and region, which took each count down by one (1,193 / 893 / 954 / 1,193 before).
+    assert_eq!(in_place, 1192, "rows in a first-party place group");
     assert_eq!(
-        in_recovered_region, 893,
+        in_recovered_region, 892,
         "rows in the banner regions 2..=10"
     );
-    assert_eq!(in_any_region, 954, "rows in a region (including region 1)");
-    assert_eq!(covered, 1193, "rows in a place or a region");
+    assert_eq!(in_any_region, 953, "rows in a region (including region 1)");
+    assert_eq!(covered, 1192, "rows in a place or a region");
 }
 
 #[test]

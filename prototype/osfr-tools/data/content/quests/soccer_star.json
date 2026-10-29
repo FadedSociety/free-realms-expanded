@@ -261,11 +261,93 @@
     },
     {
       "id": 3140005,
+      "job": 52,
       "title_string_id": 402574,
       "giver_npc_id": 9000000140,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3140004
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000870,
+          "text_string_id": 402680,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 402680 'Deliver jersey to Bigs McKicker' (lab/reports/locale-id-to-text.json); Soccer Star.md Arc 1 row 2. Bigs McKicker is the legacy_data spawn of fork definition 4283 (FreeRealms-Legacy FabledRealms.lua:2949, NameId 401725)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T665: the jersey item is not modelled; each delivery is a Talk to the recipient (answer lab/references/quest-lines/quests.json q3140005 objective 1, kind deliver). The order Bigs, Bobo, Deedee is the answer's order; the original order is unknown."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000877,
+          "text_string_id": 402682,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 402682 'Deliver jersey to Bobo Flamefoot' (lab/reports/locale-id-to-text.json); Soccer Star.md Arc 1 row 2. Bobo Flamefoot is the legacy_data spawn of fork definition 4279 (FreeRealms-Legacy FabledRealms.lua:2945, NameId 401726)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T665: the jersey item is not modelled; each delivery is a Talk to the recipient (answer lab/references/quest-lines/quests.json q3140005 objective 2, kind deliver). The order Bigs, Bobo, Deedee is the answer's order; the original order is unknown."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9500000903,
+          "text_string_id": 402684,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 402684 'Deliver jersey to Goalster Deedee' (lab/reports/locale-id-to-text.json); Soccer Star.md Arc 1 row 2. Goalster Deedee is the legacy_data spawn of fork definition 4280 (FreeRealms-Legacy FabledRealms.lua:2946, NameId 401729)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T665: the jersey item is not modelled; each delivery is a Talk to the recipient (answer lab/references/quest-lines/quests.json q3140005 objective 3, kind deliver). The order Bigs, Bobo, Deedee is the answer's order; the original order is unknown."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "npc_id": 9000000053,
+          "text_string_id": 406652,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 406652 'Meet Coach \"Golden Leg\" Eddie' (lab/reports/locale-id-to-text.json); the offer 402573 ends 'Go meet your teammates and Coach \"Golden Leg\" Eddie' and the end text 402576 is Eddie's own voice ('Did Landon say you'll get rich and famous with this team?'). Eddie 9000000053 is the legacy_data spawn of fork definition 4282 (FreeRealms-Legacy FabledRealms.lua:2948, NameId 401743, human_m_coach_eddie.agr)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T665: the answer lab/references/quest-lines/quests.json q3140005 leaves this goal out ('no confirmed objective id'); it is added as the last ordered Talk so the 49/13 opens at Eddie, whose voice the end text is, instead of at the third recipient. The Soccer Star guide lists the same line as an objective of this quest (client 3941717381)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "52": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T665: no reward is evidenced (answer lab/references/quest-lines/quests.json q3140005; the jerseys are consumed, not a reward). 5 coins and 25 Soccer Star (profile 52) XP repeat the Warrior follow-up rung (T257/T202); no item."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -281,10 +363,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -293,17 +371,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "T665 text ids (client locale): title 402574, intro 402573, description 402575, end 402576 (Coach Eddie's voice, so the hand-in is Eddie); the answer's progress line 402681 has no field (unbound)."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T665: job gate 52 (Soccer Star) and prerequisite 3140004 (Snowy Scrimmage): the answer's line.previous and Eddie's 'mysterious stranger' line (402576) place it right after the scrimmage; the guide order is a reading, not a server prerequisite (R). Landon 9000000140 is the giver, Eddie 9000000053 the hand-in; live 'unsure' in lab/references/quest-lines/quests.json q3140005."
         }
       ],
       "description_string_id": 402575,
       "intro_text_string_id": 402573,
       "end_text_string_id": 402576,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3140006,

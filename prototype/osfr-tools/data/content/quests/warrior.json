@@ -431,13 +431,61 @@
     },
     {
       "id": 3150007,
+      "job": 32,
       "title_string_id": 70995,
       "giver_npc_id": 9000000208,
       "prerequisite_quest_ids": [
         3150005
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000488,
+          "text_string_id": 70996,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 70996 'Speak with Terrence at The Roadhouse and see about retrieving a weapon from the weapon crates stored there.'; Warrior.md row W7. Terrence 9000000488 is the legacy_data spawn of fork definition 3333 (FreeRealms-Legacy FabledRealms.lua:2076, NameId 71252)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T665: the crate pickup is not modelled; the talk to Terrence is the step (answer lab/references/quest-lines/quests.json q3150007 objective 1, kind talk)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000222,
+          "text_string_id": 71001,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 71001 'Speak with Tumbolina'; Tumbolina 9000000222 is the legacy_data spawn of fork definition 2200 (FabledRealms.lua:952, NameId 70891). Her line 70997 is the quest's end text."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T665: the hand-in is Tumbolina, not the giver Steele, so her row carries the quests_accepted entry (the Call the Crew / Jones pattern)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "32": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T665: the reward is an unnamed substitute from Tumbolina (locale 70997 'I suppose I should at least reward you'; answer lab/references/quest-lines/quests.json q3150007); no item id is recorded, so no item is granted. 5 coins and 25 Warrior (profile 32) XP repeat the T257 rung of 3150001/3150004."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -457,10 +505,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -469,17 +513,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "T665 text ids (client locale): title 70995, intro 70994 (Steele), description 70996, end 70997 (Tumbolina); the answer's progress line 71003 has no field (unbound)."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T665: job gate 32 (Warrior), prerequisite 3150005 unchanged (Warrior.md row W7 'After W5'); live 'yes' in lab/references/quest-lines/quests.json q3150007."
         }
       ],
       "description_string_id": 70996,
       "intro_text_string_id": 70994,
       "end_text_string_id": 70997,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3150008,

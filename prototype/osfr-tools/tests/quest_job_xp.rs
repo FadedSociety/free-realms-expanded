@@ -1481,6 +1481,11 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             if file == "ninja.json" && [3_110_007, 3_110_013].contains(&id) {
                 continue;
             }
+            // T665: the Ninja gates Ice Troll Rampage (3110023) and Achieve Level 20 (3110024)
+            // carry job gate 2 and pay coins only; tests/zone_quests_snowhill_dartmoor.rs covers them.
+            if file == "ninja.json" && [3_110_023, 3_110_024].contains(&id) {
+                continue;
+            }
             for reward in record["rewards"].as_array().into_iter().flatten() {
                 assert_eq!(
                     reward["job_xp"],

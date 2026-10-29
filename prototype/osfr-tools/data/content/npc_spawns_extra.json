@@ -48229,28 +48229,6 @@
       "position_w": null
     },
     {
-      "spawn_guid": 100000004282,
-      "legacy_npc_id": 4282,
-      "model_id": 1456,
-      "model_file_name": "human_m_coach_eddie.agr",
-      "name": "Coach &quot;Golden Leg&quot; Eddie",
-      "name_string_id": 401743,
-      "position": [
-        -126.0453,
-        11.60774,
-        445.9265
-      ],
-      "heading": -2.740464,
-      "capture_match": null,
-      "source": [
-        {
-          "kind": "legacy-data",
-          "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2948; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4282 (ModelId=1456, ModelFileName=human_m_coach_eddie.agr, NameId=401743)."
-        }
-      ],
-      "position_w": null
-    },
-    {
       "spawn_guid": 100000004284,
       "legacy_npc_id": 4284,
       "model_id": 1085,

@@ -30442,8 +30442,24 @@
       "quests_given_text": [
         "Warrior: Distracted (her tools are with Braldan Stoneaxe, 162586625); Warrior: Too Distracted to Work (weapons crate in the Den of Secrets, 2811794577); sends the player after Aster (857744776, Warrior: Knocking Some Sense In); target of Warrior's weapon pickup (Warrior: You Deserve Better); love-potion test subject (\"Test on Tumbolina\", 934442070) and cotton-candy hand-in (4129793011)."
       ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "quests_accepted": [
+        {
+          "quest_id": 3150007,
+          "title": "Warrior: You Deserve Better",
+          "title_string_id": 70995,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 2, row W7: Steele sends the player to Terrence and then to Tumbolina; locale 71001 'Speak with Tumbolina' and 70997 (her reward line)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T665: the last goal is the Talk to Tumbolina, so the normal turn-in NPC is Tumbolina rather than the giver Steele."
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": "T665: the last goal of Warrior: You Deserve Better is the Talk to Tumbolina (her line 70997 is the end text); the hand-in NPC is Tumbolina, not the giver Steele (R).",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [
@@ -30798,13 +30814,13 @@
         "quests_accepted": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+            "evidence": "(R) T665 binds the You Deserve Better hand-in to Tumbolina (final goal 71001)."
           }
         ],
         "quests_accepted_reason": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+            "evidence": "(R) T665 binds the You Deserve Better hand-in to Tumbolina (final goal 71001)."
           }
         ],
         "vendor_stock": [

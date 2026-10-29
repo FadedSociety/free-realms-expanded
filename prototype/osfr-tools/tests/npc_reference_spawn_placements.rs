@@ -69,8 +69,8 @@ fn placed_rows_match_the_cited_spawn_and_the_loader_draws_them() {
     let rows = placed_by_this_brief();
     assert_eq!(
         rows.len(),
-        16,
-        "the brief places 16 rows; a row lost its reference-spawn marker"
+        17,
+        "16 earlier rows plus Coach Eddie from T665; a row lost its reference-spawn marker"
     );
     let locale = npc_greetings::locale_id_to_text();
     let models = models::read_models();

@@ -547,9 +547,10 @@ const NAME_BINDING_FIELDS: [&str; 2] = ["name_string_id", "name_string_id_reason
 
 /// T698 (`data/content/npcs/*.json`): either the row's own `poi_anchor`/`unanchored`
 /// -> `legacy_data` placement change, or a later name-only binding of the spawn `NameId`
-/// on a row T698 already placed. In both cases the row's identity, zone, quest and
-/// greeting fields stay put; the placement values are pinned by
-/// `content_npc_placement.rs`, `content_npc_spawns.rs` and
+/// on a row T698 already placed. In both cases the row's identity, zone, roles, quest list and
+/// greeting fields stay put (T665: a placement may arrive together with the row's own
+/// `quests_accepted` hand-in binding, which the quest-binding guard allows on its own). The
+/// placement values are pinned by `content_npc_placement.rs`, `content_npc_spawns.rs` and
 /// `npc_reference_spawn_placements.rs`.
 fn is_reference_spawn_row(old: &Value, new: &Value) -> bool {
     let marked = new["position_reason"]
@@ -567,8 +568,7 @@ fn is_reference_spawn_row(old: &Value, new: &Value) -> bool {
         && old["zone"] == new["zone"]
         && old["zone_id"] == new["zone_id"]
         && old["roles"] == new["roles"]
-        && old["quest_ids_given"] == new["quest_ids_given"]
-        && old["quests_accepted"] == new["quests_accepted"];
+        && old["quest_ids_given"] == new["quest_ids_given"];
     newly_placed
         || (old["placement"] == "legacy_data"
             && old["placement_source"] == "legacy_data_spawn"
