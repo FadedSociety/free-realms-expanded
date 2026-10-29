@@ -1372,6 +1372,123 @@
       "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3072 (Necro Wart Zombie); item 4072 ActivatableAbilityId 3072 (Legacy@9e08202 ClientItemDefinitions Id 4072 NameId 1231 DescriptionId 3118 SingleUse true); model 71 necrowartzombie_01.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3118: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
     },
     {
+      "definition": 7966,
+      "name_id": 9392,
+      "description_id": 30110,
+      "cooldown_ms": 60000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 7966
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Cakes ItemId 7966 (Shrouded Glade Birthday Cake); item 7966 (Legacy@9e08202 ClientItemDefinitions Id 7966 NameId 9392 DescriptionId 30110 SingleUse false); placed by placed_cakes.json row 7966, whose item_cooldown_ms is the recast (R, T556)."
+    },
+    {
+      "definition": 7967,
+      "name_id": 9393,
+      "description_id": 30111,
+      "cooldown_ms": 60000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 7967
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Cakes ItemId 7967 (Seaside Birthday Cake); item 7967 (Legacy@9e08202 ClientItemDefinitions Id 7967 NameId 9393 DescriptionId 30111 SingleUse false); placed by placed_cakes.json row 7967, whose item_cooldown_ms is the recast (R, T556)."
+    },
+    {
+      "definition": 7968,
+      "name_id": 9394,
+      "description_id": 30112,
+      "cooldown_ms": 60000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 7968
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Cakes ItemId 7968 (Snowhill Birthday Cake); item 7968 (Legacy@9e08202 ClientItemDefinitions Id 7968 NameId 9394 DescriptionId 30112 SingleUse false); placed by placed_cakes.json row 7968, whose item_cooldown_ms is the recast (R, T556)."
+    },
+    {
+      "definition": 7969,
+      "name_id": 9395,
+      "description_id": 30113,
+      "cooldown_ms": 60000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 7969
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Cakes ItemId 7969 (Merry Vale Birthday Cake); item 7969 (Legacy@9e08202 ClientItemDefinitions Id 7969 NameId 9395 DescriptionId 30113 SingleUse false); placed by placed_cakes.json row 7969, whose item_cooldown_ms is the recast (R, T556)."
+    },
+    {
+      "definition": 7970,
+      "name_id": 9396,
+      "description_id": 30114,
+      "cooldown_ms": 60000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 7970
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Cakes ItemId 7970 (Sanctuary Birthday Cake); item 7970 (Legacy@9e08202 ClientItemDefinitions Id 7970 NameId 9396 DescriptionId 30114 SingleUse false); placed by placed_cakes.json row 7970, whose item_cooldown_ms is the recast (R, T556)."
+    },
+    {
+      "definition": 7971,
+      "name_id": 9397,
+      "description_id": 30115,
+      "cooldown_ms": 60000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 7971
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Cakes ItemId 7971 (Wugachug Birthday Cake); item 7971 (Legacy@9e08202 ClientItemDefinitions Id 7971 NameId 9397 DescriptionId 30115 SingleUse false); placed by placed_cakes.json row 7971, whose item_cooldown_ms is the recast (R, T556)."
+    },
+    {
+      "definition": 7972,
+      "name_id": 9398,
+      "description_id": 30116,
+      "cooldown_ms": 60000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 7972
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Cakes ItemId 7972 (Blackspore Swamp Birthday Cake); item 7972 (Legacy@9e08202 ClientItemDefinitions Id 7972 NameId 9398 DescriptionId 30116 SingleUse false); placed by placed_cakes.json row 7972, whose item_cooldown_ms is the recast (R, T556)."
+    },
+    {
+      "definition": 7973,
+      "name_id": 9399,
+      "description_id": 30117,
+      "cooldown_ms": 60000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 7973
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Cakes ItemId 7973 (Briarwood Birthday Cake); item 7973 (Legacy@9e08202 ClientItemDefinitions Id 7973 NameId 9399 DescriptionId 30117 SingleUse false); placed by placed_cakes.json row 7973, whose item_cooldown_ms is the recast (R, T556)."
+    },
+    {
+      "definition": 7974,
+      "name_id": 30109,
+      "description_id": 30118,
+      "cooldown_ms": 60000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 7974
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Cakes ItemId 7974 (Boss Birthday Cake); item 7974 (Legacy@9e08202 ClientItemDefinitions Id 7974 NameId 30109 DescriptionId 30118 SingleUse false); placed by placed_cakes.json row 7974, whose item_cooldown_ms is the recast (R, T556)."
+    },
+    {
       "definition": 15958,
       "name_id": 272,
       "description_id": 2710,

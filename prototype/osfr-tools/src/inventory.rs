@@ -1812,7 +1812,7 @@ fn write_attachment(bytes: &mut Vec<u8>, definition: &Definition, tint: i32, slo
 /// a word the client reads but the server leaves 0, and the wield type. `attachment` `None` clears
 /// `slot`: item 0 selects the client's removal branch (`0092f540` case 6 -> `sub_96B970`) and the
 /// empty model, texture and tint alias match the player's own unequip broadcast
-/// (`gameplay::item_change_packet`). The caller owns the actor guid and the profile, so a pet can
+/// (`gameplay::item_requests::item_change_packet`). The caller owns the actor guid and the profile, so a pet can
 /// send its own actor and active profile.
 pub fn equip_change_packet(
     actor_guid: u64,

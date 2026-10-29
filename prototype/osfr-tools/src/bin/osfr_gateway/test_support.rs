@@ -3,6 +3,10 @@
 //! option field or handshake step is added once instead of in every test copy. Test-only;
 //! production never includes this file.
 use super::*;
+use osfr_tools::item_bar::use_wire::{
+    ActionBarSlotUpdate, Target, decode_slot_update, encode_client_request_start_ability,
+};
+use osfr_tools::players::PlayerPresentation;
 use osfr_tools::{game_store::Snapshot, gameplay::GameplayState};
 
 #[path = "../../../tests/common/item_catalogue.rs"]
@@ -397,4 +401,316 @@ pub fn bin_test_target(tag: &str) -> bool {
         .as_bytes(),
     );
     false
+}
+
+// T461/T557: one owner in the open world with an item on bar slot 0, and any number of viewers.
+
+/// The owner's character id in a [`Rig`].
+pub const OWNER: u32 = 461;
+
+pub fn sender(max_queued_bytes: usize) -> ReliableSender {
+    ReliableSender::new(
+        Codec::new(CRC_SEED, 3, true, MAX_MESSAGE).unwrap(),
+        SenderConfig {
+            // Roomy, so an AddNpc is one datagram the drain below can read back.
+            datagram_limit: 4096,
+            window: 32,
+            max_message: MAX_MESSAGE,
+            max_queued_bytes,
+            retry_ms: 250,
+            max_retries: 40,
+        },
+    )
+    .unwrap()
+}
+
+pub fn msg(main: u16, sub: u16, fields: &[i32]) -> Vec<u8> {
+    let mut bytes = [main.to_le_bytes(), sub.to_le_bytes()].concat();
+    fields.iter().for_each(|f| bytes.extend(f.to_le_bytes()));
+    bytes
+}
+
+/// The item bar's slot 0 as the owner's client is told it, from a drained batch.
+pub fn slot_zero(messages: &[Vec<u8>]) -> ActionBarSlotUpdate {
+    let updates = messages.iter().filter_map(|m| m.get(7..));
+    let mut updates = updates.filter_map(decode_slot_update);
+    updates.find(|s| s.bar == 2 && s.slot == 0).unwrap()
+}
+
+pub struct Rig {
+    pub options: Options,
+    pub scene: Scene,
+    _scratch: Scratch,
+    pub instance: i32,
+    /// The options of each full `player`, for `send_as`.
+    players: BTreeMap<SessionKey, Options>,
+}
+
+impl Rig {
+    /// The owner has entered the open world holding `item`, bound to bar slot 0, with the boombox
+    /// and ride catalogues (T461).
+    pub fn new(tag: &str, item: i32) -> Option<Self> {
+        Self::with_files(tag, item, &["boomboxes.json", "mounts.json"])
+    }
+
+    /// As `new`, with the bundled content `files` copied into the content directory (T557).
+    pub fn with_files(tag: &str, item: i32, files: &[&str]) -> Option<Self> {
+        let scratch = Scratch::new(tag);
+        let mut options = options(scratch.state());
+        if !bin_test_target("t461") || !fixtures_present(&options) {
+            eprintln!("skip {tag}: not the binary's own target, or no lab fixtures");
+            return None;
+        }
+        let content = vendor_content(&scratch);
+        let shipped = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
+        for file in files {
+            fs::copy(shipped.join(file), content.join(file)).unwrap();
+        }
+        options.content = Some(content);
+        options.dev_tools = true;
+        let mut scene = Scene::new(&options, OWNER);
+        scene.session.sender = sender(32 * 1024 * 1024);
+        scene.send(&options, &[13, 0], 1_000).unwrap();
+        scene.send(&options, &[10, 0], 1_001).unwrap();
+        assert!(scene.session.gateway.is_world_loaded());
+        // The server registers a session's key at accept; the scene does not.
+        let (id, peer) = (scene.session.id, scene.session.peer);
+        let connection_id = scene.session.request.id;
+        let key = SessionKey {
+            peer,
+            connection_id,
+        };
+        scene.world.session_keys.insert(id, key);
+        let mut rig = Self {
+            options,
+            scene,
+            _scratch: scratch,
+            instance: 0,
+            players: BTreeMap::new(),
+        };
+        rig.give(item);
+        rig.instance = rig.instance_of(item);
+        rig.drain_owner(1_500);
+        rig.exchange(&msg(42, 6, &[0, rig.instance]), 2_000);
+        Some(rig)
+    }
+
+    pub fn give(&mut self, item: i32) {
+        let command = osfr_tools::chat::local_request(&format!("realm give {item}"));
+        self.scene.send(&self.options, &command, 1_100).unwrap();
+    }
+
+    pub fn instance_of(&self, item: i32) -> i32 {
+        let state = self.scene.session.gateway.snapshot().gameplay.unwrap();
+        let held = state.inventory.items.iter();
+        held.filter(|i| i.definition_id == item).last().unwrap().id
+    }
+
+    pub fn exchange(&mut self, inner: &[u8], now: u64) -> Vec<Vec<u8>> {
+        self.scene.exchange(&self.options, inner, now)
+    }
+
+    pub fn drain_owner(&mut self, now: u64) -> Vec<Vec<u8>> {
+        super::super::f120_fishing_hour_reconnect::drain_replies(&mut self.scene.session, now)
+    }
+
+    /// 36/10 on the item bar, slot 0, aimed at the player: the owner's replies.
+    pub fn press(&mut self, now: u64) -> Vec<Vec<u8>> {
+        let target = Target::Guid(self.scene.session.character_guid);
+        let packet = encode_client_request_start_ability(2, 0, target);
+        self.scene.send(&self.options, &packet, now).unwrap();
+        self.drain_owner(now)
+    }
+
+    /// The bar as the owner's client sees it now (a no-op rebind answers with the bar).
+    pub fn bar(&mut self, now: u64) -> ActionBarSlotUpdate {
+        let rebind = msg(42, 6, &[0, self.instance]);
+        slot_zero(&self.exchange(&rebind, now))
+    }
+
+    /// A second session in the open world `dx` metres east of the owner.
+    pub fn viewer(&mut self, id: u32, dx: f32) -> SessionKey {
+        self.viewer_as(id, dx, 0).0
+    }
+
+    /// As `viewer`, wearing player model `model` (the boxes dance models 1, 2, 60 and 61).
+    /// Also returns the AddPc/movement messages the registry built for the join, which the
+    /// real gateway delivers after `join_player`.
+    pub fn viewer_as(
+        &mut self,
+        id: u32,
+        dx: f32,
+        model: i32,
+    ) -> (SessionKey, Vec<osfr_tools::players::OutboundMessage>) {
+        let mut session = enter(&self.options, id);
+        session.sender = sender(32 * 1024 * 1024);
+        let me = self
+            .scene
+            .world
+            .players
+            .get(self.scene.session.id)
+            .unwrap()
+            .clone();
+        let mut look = PlayerPresentation::default();
+        look.character_guid = 7_000_000_000 + u64::from(id);
+        look.model = model;
+        let at = [me.position[0] + dx, me.position[1], me.position[2]];
+        let world = &mut self.scene.world;
+        let account = 8_000_000_000 + u64::from(id);
+        let (character, zone) = (look.character_guid, me.zone);
+        let joined = world
+            .players
+            .join_with_presentation(session.id, account, character, zone, at, 0.0, look);
+        let joined = joined.unwrap();
+        world.joined.insert(session.id);
+        let key = SessionKey {
+            peer: session.peer,
+            connection_id: session.request.id,
+        };
+        world.session_keys.insert(session.id, key);
+        self.scene.sessions.insert(key, session);
+        (key, joined)
+    }
+
+    pub fn drain(&mut self, key: SessionKey, now: u64) -> Vec<Vec<u8>> {
+        super::super::f120_fishing_hour_reconnect::drain_replies(
+            self.scene.sessions.get_mut(&key).unwrap(),
+            now,
+        )
+    }
+
+    /// `key`'s player now shows the temporary model `model`, keeping its base model, as a
+    /// live transform's AddPc snapshot does (`PlayerPresentation::set_visual`).
+    pub fn transform(&mut self, key: SessionKey, model: i32) {
+        let id = self.scene.sessions[&key].id;
+        let players = &mut self.scene.world.players;
+        let mut look = players.get(id).unwrap().presentation.clone();
+        look.set_visual(osfr_tools::consumable_effects::Visual {
+            temporary_model: model,
+            scale: 1.0,
+            auras: Vec::new(),
+        });
+        players.set_presentation(id, look).unwrap();
+    }
+
+    /// The owner is the scene's own session, so it joins the session map for a tick or for
+    /// another player's request, as every session is in the real loop; `unlist_owner` takes it back.
+    fn list_owner(&mut self) -> SessionKey {
+        let stand_in = enter(&self.options, 9_999);
+        let owner = std::mem::replace(&mut self.scene.session, stand_in);
+        let key = SessionKey {
+            peer: owner.peer,
+            connection_id: owner.request.id,
+        };
+        self.scene.sessions.insert(key, owner);
+        key
+    }
+
+    fn unlist_owner(&mut self, key: SessionKey) {
+        self.scene.session = self.scene.sessions.remove(&key).unwrap();
+    }
+
+    /// T557: a second full player, character `guid` (not the owner's 1), logged in and in the
+    /// world through the real messages and then `dx` metres east of the owner. The nearer
+    /// `viewer` is only a registry row; this one has a gameplay and can act (`send_as`).
+    pub fn player(&mut self, id: u32, guid: u64, dx: f32) -> SessionKey {
+        let scratch = self._scratch.path().to_path_buf();
+        let mut options = options(scratch.join(format!("character-{guid}.json")));
+        options.reference = super::super::t199_world_notice::reference(&scratch, guid);
+        options.content = self.options.content.clone();
+        options.dev_tools = true;
+        let mut session = session(&options, id, 24_000 + id, 1400);
+        session.sender = sender(32 * 1024 * 1024);
+        let key = SessionKey {
+            peer: session.peer,
+            connection_id: session.request.id,
+        };
+        let world = &mut self.scene.world;
+        world.session_keys.insert(session.id, key);
+        let login = super::super::t199_world_notice::login(guid);
+        for (message, now) in [
+            (login, 1_002),
+            (wrap(&[13, 0]), 1_003),
+            (wrap(&[10, 0]), 1_004),
+        ] {
+            let (membership, sessions) = (&mut self.scene.membership, &mut self.scene.sessions);
+            session
+                .dispatch_message(&message, &options, now, world, membership, sessions, None)
+                .unwrap();
+        }
+        let at = world.players.get(self.scene.session.id).unwrap().clone();
+        let to = [at.position[0] + dx, at.position[1], at.position[2]];
+        let moved = world
+            .players
+            .update_pose_with_state(session.id, at.zone, to, 0.0, 0, 0);
+        moved.unwrap();
+        self.scene.sessions.insert(key, session);
+        self.players.insert(key, options);
+        key
+    }
+
+    /// One client application message from a `player`, through `Session::dispatch_message`.
+    pub fn send_as(&mut self, key: SessionKey, inner: &[u8], now: u64) -> Result<(), String> {
+        let owner = self.list_owner();
+        let mut session = self.scene.sessions.remove(&key).unwrap();
+        let scene = &mut self.scene;
+        let result = session.dispatch_message(
+            &wrap(inner),
+            &self.players[&key],
+            now,
+            &mut scene.world,
+            &mut scene.membership,
+            &mut scene.sessions,
+            None,
+        );
+        self.scene.sessions.insert(key, session);
+        self.unlist_owner(owner);
+        result.map_err(|error| error.to_string())
+    }
+
+    /// One server tick.
+    pub fn tick(&mut self, now: u64) {
+        let key = self.list_owner();
+        let (world, sessions) = (&mut self.scene.world, &mut self.scene.sessions);
+        super::super::boombox_routing::tick(world, sessions, now);
+        super::super::cake_routing::tick(world, sessions, now);
+        self.unlist_owner(key);
+    }
+
+    pub fn move_viewer(&mut self, key: SessionKey, dx: f32) {
+        let players = &self.scene.world.players;
+        let me = players.get(self.scene.session.id).unwrap().clone();
+        let id = self.scene.sessions[&key].id;
+        let at = [me.position[0] + dx, me.position[1], me.position[2]];
+        let players = &mut self.scene.world.players;
+        players
+            .update_pose_with_state(id, me.zone, at, 0.0, 0, 0)
+            .unwrap();
+    }
+
+    /// The live consumable effects of a `player` (session-only state, never saved).
+    pub fn effects(&self, key: SessionKey) -> osfr_tools::consumable_effects::EffectStack {
+        let gameplay = self.scene.sessions[&key].gateway.gameplay().unwrap();
+        gameplay.consumable_effects().clone()
+    }
+
+    /// Everything the save holds about the box's owner, byte for byte.
+    pub fn saved(&self) -> Vec<u8> {
+        let state = self.scene.session.gateway.snapshot().gameplay.unwrap();
+        serde_json::to_vec(&(&state.inventory, &state.item_bar)).unwrap()
+    }
+
+    /// The character's whole saved gameplay state, byte for byte.
+    pub fn saved_state(&self) -> Vec<u8> {
+        let state = self.scene.session.gateway.snapshot().gameplay.unwrap();
+        serde_json::to_vec(&state).unwrap()
+    }
+
+    pub fn count(&self, item: i32) -> Option<u32> {
+        let state = self.scene.session.gateway.snapshot().gameplay.unwrap();
+        let held = state.inventory.items.iter();
+        held.filter(|i| i.definition_id == item)
+            .map(|i| i.count)
+            .last()
+    }
 }

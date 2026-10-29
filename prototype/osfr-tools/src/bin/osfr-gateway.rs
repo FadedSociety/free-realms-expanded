@@ -49,10 +49,12 @@ mod group_arena;
 mod house_visits;
 use delivery::{
     chat_error_delivery, field_packet, field_packets_for, field_recipient_matches, queue_delivery,
-    refresh_public_look, rider_event, trade_deliveries, wrap_application,
+    refresh_public_look, refresh_trade_player, rider_event, trade_deliveries, wrap_application,
 };
 #[path = "osfr_gateway/boombox_routing.rs"]
 mod boombox_routing;
+#[path = "osfr_gateway/cake_routing.rs"]
+mod cake_routing;
 #[path = "osfr_gateway/card_listener.rs"]
 mod card_listener;
 #[path = "osfr_gateway/client_area_routing.rs"]
@@ -544,6 +546,8 @@ struct SharedWorld {
     world_events: osfr_tools::world_events::WorldEvents,
     /// T461: the boxes pressed from the item bar; session-only.
     boomboxes: osfr_tools::boombox::Boomboxes,
+    /// T557: the placed cakes; session-only.
+    cakes: cake_routing::Cakes,
 }
 
 /// Live chat identity for one session. Zone, position and group are derived from the player
@@ -625,6 +629,7 @@ impl SharedWorld {
             security: Arc::default(),
             world_events: Default::default(),
             boomboxes: Default::default(),
+            cakes: Default::default(),
         }
     }
 
@@ -1694,6 +1699,7 @@ impl Session {
         let admin_move = outcome.admin_move.take();
         let world_event = outcome.world_event.take();
         let boombox = outcome.boombox.take();
+        let cake = outcome.shared_cake.take();
         let house_broadcast = outcome.house_broadcast.take();
         let staged = std::mem::take(&mut outcome.moderation);
         // T008: the jump body is built from this request's final pose; fan it out
@@ -1714,6 +1720,9 @@ impl Session {
             delivery::post_commit(self, sessions, world, broadcast, jump)?;
             if let Some(definition) = boombox {
                 boombox_routing::place(self, sessions, world, now_ms, definition);
+            }
+            if let Some(action) = cake {
+                cake_routing::apply(self, sessions, world, now_ms, action);
             }
             house_visits::fan_out(sessions, self.character_guid, house_broadcast);
             if let Some(request) = admin_move {
@@ -2525,33 +2534,6 @@ impl Session {
 
 /// (R) Longest a pose-only change waits before it is written (crash loss bound).
 const POSITION_SAVE_MS: u64 = 5_000;
-
-/// (W163) Keep the trade service's copy of this character's inventory current. A character
-/// whose inventory does not validate is not tradable: it is unregistered, which also ends a
-/// trade it is in.
-fn refresh_trade_player(
-    world: &mut SharedWorld,
-    session: SessionId,
-    gateway: &Gateway,
-) -> Vec<Delivery> {
-    let Some(player) = world.players.get(session).cloned() else {
-        return Vec::new();
-    };
-    let guid = player.character_guid;
-    match gateway.trade_inventory() {
-        Some(inventory) => {
-            if world.trades.inventory(guid).is_some() {
-                // A snapshot that fails the service's checks keeps the previous one (R).
-                let _ = world.trades.sync_inventory(guid, inventory);
-            } else {
-                let _ = world.trades.register_player(&player, inventory);
-            }
-            // A battle or dungeon run ends a trade and blocks a new one.
-            trade_deliveries(world.trades.set_away(guid, gateway.in_encounter()))
-        }
-        None => trade_deliveries(world.trades.unregister_player(guid)),
-    }
-}
 
 /// One side of a trade journal: a character save path and the complete snapshot to write.
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -3380,6 +3362,7 @@ impl Server {
         world.client_areas = client_area_routing::load(&options)?;
         world_event_routing::schedule(&mut world, &options);
         world.boomboxes = boombox_routing::load(&options)?;
+        world.cakes = cake_routing::load(&options)?;
         if let Some(path) = &options.security_log {
             // Logging is best effort: an unusable file disables it, never the server.
             match SecurityLog::open(path) {
@@ -3801,6 +3784,7 @@ impl Server {
             client_area_routing::season_tick(&mut self.world, &mut self.sessions, unix_ms);
             world_event_routing::tick(&mut self.world, &mut self.sessions, now_ms, unix_ms);
             boombox_routing::tick(&mut self.world, &mut self.sessions, now_ms);
+            cake_routing::tick(&mut self.world, &mut self.sessions, now_ms);
         }
         let keys = self.sessions.keys().copied().collect::<Vec<_>>();
         for key in keys {

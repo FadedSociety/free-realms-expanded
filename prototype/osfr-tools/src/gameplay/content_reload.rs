@@ -178,6 +178,7 @@ mod tests {
             }),
             world_event: Some(crate::world_events::WorldEventCommand::Start("show".into())),
             boombox: Some(878),
+            shared_cake: Some(crate::placed_cakes::Action::Click { guid: 6 }),
             house_broadcast: Some(crate::housing_service::HouseBroadcast {
                 house_guid: 12,
                 lot: crate::housing::LotSnapshot {
@@ -252,6 +253,10 @@ mod tests {
         );
         assert_eq!(live.boombox, Some(878));
         assert_eq!(
+            live.shared_cake,
+            Some(crate::placed_cakes::Action::Click { guid: 6 })
+        );
+        assert_eq!(
             live.house_broadcast
                 .as_ref()
                 .map(|b| (b.house_guid, &b.packets)),
@@ -268,8 +273,9 @@ mod tests {
             live.broadcast.is_some()
                 && live.admin_move.is_some()
                 && live.world_event.is_some()
-                && live.boombox.is_some(),
-            "an empty outcome wiped the notice, the move, the world event or the boombox"
+                && live.boombox.is_some()
+                && live.shared_cake.is_some(),
+            "an empty outcome wiped the notice, the move, the world event, the boombox or the cake"
         );
         assert_eq!(live.replies, vec![vec![1], vec![3]]);
     }

@@ -144,9 +144,25 @@ impl Gameplay {
                 out.absorb(applied);
             }
         }
+        // T557: a cake is placed by the host after the commit; this press spent nothing.
+        out.shared_cake = reply
+            .place
+            .map(|row| crate::placed_cakes::Action::Place { row });
         // T789: only a single-use item that was actually spent credits a `use_item` objective.
         self.emit_item_use(reply.used_definition, &mut out)?;
         Ok(Some(out))
+    }
+
+    /// T557: the host could not place the cake `definition` a press named (the world holds its
+    /// cap of cakes). The press never happened: its recast is taken back, and the player gets the
+    /// bar's refusal and the bar as it stands.
+    pub fn refuse_cake_place(&mut self, definition: i32, now_ms: u64) -> io::Result<Vec<Vec<u8>>> {
+        let mut replies = vec![crate::abilities::unsupported_cast_failure()];
+        replies.extend(
+            self.item_bar
+                .cancel_use(definition, &self.inventory, now_ms)?,
+        );
+        Ok(replies)
     }
 
     /// T461: the catalogue row of a boombox definition a press named, for the host to place. The
@@ -249,6 +265,38 @@ mod tests {
             placed.boombox,
             Some(TOTEM),
             "no recast was stamped by the refusal"
+        );
+    }
+
+    /// T557: a player in a live activity does not click a cake (silently), and the same click
+    /// reaches the registry once the player is free.
+    #[test]
+    fn a_busy_player_does_not_click_a_cake() {
+        let reference = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../../lab/references/rust-opening-cooking-original-assets");
+        let mut game = Gameplay::load(&reference, None).unwrap();
+        game.initialize_world(&who(), 0).unwrap();
+        let directory = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+        let spots = crate::fishing_service::FishingSpots::load(&directory)
+            .unwrap()
+            .unwrap();
+        let rewards = game.reward_snapshot();
+        game.fishing
+            .enter(&spots, REED, 1, 0, who().position, false, 1, rewards)
+            .unwrap();
+        let guid = crate::placed_cakes::GUID_TAG | 1;
+        let click = crate::npc_interaction::NpcInteractRequest {
+            target: guid,
+            trailing_flag: false,
+        }
+        .encode();
+        let busy = game.handle_in_world(&click, &who(), 1_000).unwrap();
+        assert!(busy.shared_cake.is_none() && busy.replies.is_empty() && !busy.changed);
+        game.fishing.reset_all();
+        let free = game.handle_in_world(&click, &who(), 1_001).unwrap();
+        assert_eq!(
+            free.shared_cake,
+            Some(crate::placed_cakes::Action::Click { guid })
         );
     }
 

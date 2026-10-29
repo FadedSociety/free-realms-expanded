@@ -57,6 +57,22 @@ const SHOT_INTERVAL_MS: std::ops::RangeInclusive<u64> = 10_000..=20_000;
 const MAX_SHOT_MS: u64 = 10_000;
 /// 'CAKE' in the high word of every cake guid; the low word counts cakes.
 pub const GUID_TAG: u64 = 0x4341_4b45_0000_0000;
+const GUID_TAG_MASK: u64 = 0xffff_ffff_0000_0000;
+
+/// What a session asks of the shared registry. The host applies it after the commit (T557):
+/// `Place` at the placer's registry pose, `Click` for the clicker's.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Action {
+    /// The placer pressed the cake item `row` (a [`Row::item_id`]).
+    Place { row: i32 },
+    /// The player clicked the actor `guid`; only a live cake answers.
+    Click { guid: u64 },
+}
+
+/// Whether `guid` is in the cake range ('CAKE' in the high word), live or not.
+pub fn is_cake(guid: u64) -> bool {
+    guid & GUID_TAG_MASK == GUID_TAG
+}
 
 /// What one click does, resolved from the client's own ability tables.
 #[derive(Clone, Copy, Debug, PartialEq, Deserialize)]
@@ -266,7 +282,7 @@ struct Cake {
 }
 
 /// The live cakes of one server. Session-only: nothing here is saved.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct PlacedCakes {
     live: Vec<Cake>,
     next: u32,
@@ -427,17 +443,19 @@ impl PlacedCakes {
     }
 
     /// Despawns cakes whose lifetime is over (each exactly once: the cake leaves the registry
-    /// with its removal) and advances every boss cake's ambient animation. Nothing allocates
-    /// while nothing is due.
-    pub fn tick(&mut self, now_ms: u64) -> Vec<(ZoneInstance, Vec<Vec<u8>>)> {
+    /// with its removal) and advances every boss cake's ambient animation. Each entry is the
+    /// cake's instance and position (the caller sends to the sessions near it) and its packets.
+    /// Nothing allocates while nothing is due.
+    pub fn tick(&mut self, now_ms: u64) -> Vec<(ZoneInstance, [f32; 3], Vec<Vec<u8>>)> {
         let mut out = Vec::new();
         self.live.retain_mut(|cake| {
             if now_ms >= cake.ends_ms {
-                out.push((cake.instance, vec![encode_remove_gracefully(cake.guid, 0)]));
+                let removal = vec![encode_remove_gracefully(cake.guid, 0)];
+                out.push((cake.instance, cake.position, removal));
                 return false;
             }
             if let Some(packet) = cake.step_one_shot(now_ms) {
-                out.push((cake.instance, vec![packet]));
+                out.push((cake.instance, cake.position, vec![packet]));
             }
             true
         });

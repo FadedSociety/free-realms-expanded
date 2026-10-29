@@ -34,13 +34,18 @@
 //!   shared by every slot and by 42/15. Both are tunable in `consumables.json` (see [`Effects`]).
 //! * (R) OSFR MinCooldownMs: an accepted use always stamps at least 3 s, for every row and every
 //!   38/25 refresh.
+//! * T557: a `placed_cake` row is never spent: a press stamps the cake row's own recast
+//!   (`placed_cakes.json` `item_cooldown_ms`, which wins over the row's `cooldown_ms`) and hands the
+//!   cake back in [`Reply::place`] for the host to put in the world, under the same open-world,
+//!   not-mounted, not-busy gate as a boombox. The host may still refuse (the registry is full);
+//!   it then calls [`ItemBar::cancel_use`] to take the recast back.
 //! * A use consumes exactly one item when the row is single-use. A refusal changes nothing and
 //!   sends 36/1 (bar use) or a chat line. Using at full health is allowed. A bound stack that
 //!   empties unbinds its slot. A transform row is refused while a transform is live.
 //! * Cooldowns and the pending 42/16 confirmation live in memory only; a relog resets them.
 //! * 42/15 only works for the instance the last 42/16 confirmed, once.
 
-use crate::{abilities, boombox, chat, consumable_effects, inventory::Inventory};
+use crate::{abilities, boombox, chat, consumable_effects, inventory::Inventory, placed_cakes};
 use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -79,8 +84,9 @@ pub struct Effect {
     pub source: String,
 }
 
-/// The four row effects. A heal is applied by the caller to health; the other three become a
-/// [`consumable_effects::Spec`] that the caller applies through the shared effect stack.
+/// The five row effects. A heal is applied by the caller to health; the aura, transform and scale
+/// become a [`consumable_effects::Spec`] that the caller applies through the shared effect stack;
+/// a placed cake is put in the world by the host (T557).
 #[derive(Clone, Copy, Debug, PartialEq, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum EffectKind {
@@ -104,6 +110,11 @@ pub enum EffectKind {
         duration_ms: u64,
         icon_id: i32,
     },
+    /// The cake row of `placed_cakes.json` this item places; it must be the item's own definition
+    /// (the host refunds a refused place by definition). Never single-use.
+    PlacedCake {
+        row: i32,
+    },
 }
 
 impl Effect {
@@ -116,6 +127,7 @@ impl Effect {
             && self.cooldown_ms <= MAX_COOLDOWN_MS
             && match self.effect {
                 EffectKind::Heal { percent } => (1..=100).contains(&percent),
+                EffectKind::PlacedCake { row } => row == self.definition && !self.single_use,
                 EffectKind::Aura {
                     composite_effect_id,
                     duration_ms,
@@ -161,7 +173,7 @@ impl Effect {
     /// The effect-stack spec for a non-heal row; `None` for a heal.
     pub fn spec(&self) -> Option<consumable_effects::Spec> {
         let (kind, duration_ms, icon_id) = match self.effect {
-            EffectKind::Heal { .. } => return None,
+            EffectKind::Heal { .. } | EffectKind::PlacedCake { .. } => return None,
             EffectKind::Aura {
                 composite_effect_id,
                 duration_ms,
@@ -290,28 +302,51 @@ impl Effects {
             return Err(invalid("consumables.json exceeds 256 KiB"));
         }
         let version: FileVersion = serde_json::from_slice(&bytes).map_err(invalid)?;
-        match version.schema_version {
+        let rows = match version.schema_version {
             1 => {
                 let parsed: LegacyFile = serde_json::from_slice(&bytes).map_err(invalid)?;
                 if parsed.schema_version != 1 {
                     return Err(invalid("unsupported consumables.json version"));
                 }
-                let rows = parsed
+                parsed
                     .consumables
                     .into_iter()
                     .map(Effect::from_legacy)
-                    .collect::<io::Result<Vec<_>>>()?;
-                Self::new(rows)
+                    .collect::<io::Result<Vec<_>>>()?
             }
             2 => {
                 let parsed: EffectFile = serde_json::from_slice(&bytes).map_err(invalid)?;
                 if parsed.schema_version != 2 {
                     return Err(invalid("unsupported consumables.json version"));
                 }
-                Self::new(parsed.consumables)
+                parsed.consumables
             }
-            _ => Err(invalid("unsupported consumables.json version")),
+            _ => return Err(invalid("unsupported consumables.json version")),
+        };
+        Self::new(Self::with_cake_recasts(rows, directory)?)
+    }
+
+    /// T557: each `placed_cake` row must name a row of `placed_cakes.json` (the content directory's),
+    /// and that row's `item_cooldown_ms` is the item's recast. The catalogue is read only when a
+    /// row needs it.
+    fn with_cake_recasts(mut rows: Vec<Effect>, directory: &Path) -> io::Result<Vec<Effect>> {
+        if !rows
+            .iter()
+            .any(|row| matches!(row.effect, EffectKind::PlacedCake { .. }))
+        {
+            return Ok(rows);
         }
+        let cakes = placed_cakes::Catalogue::load(directory)?;
+        for row in &mut rows {
+            if let EffectKind::PlacedCake { row: cake } = row.effect {
+                let cake = cakes
+                    .get(cake)
+                    .ok_or_else(|| invalid("placed_cake names a cake row that does not exist"))?;
+                row.cooldown_ms = u32::try_from(cake.item_cooldown_ms)
+                    .map_err(|_| invalid("cake recast out of range"))?;
+            }
+        }
+        Ok(rows)
     }
 
     pub fn get(&self, definition: i32) -> Option<&Effect> {
@@ -348,7 +383,8 @@ impl Effect {
 pub struct Player {
     pub guid: u64,
     pub alive: bool,
-    /// Not mounted, not busy and in the open world: a boombox press is refused otherwise.
+    /// Not mounted, not busy and in the open world: a boombox or placed-cake press is refused
+    /// otherwise.
     pub can_place_box: bool,
     /// An encounter engine tracks this player's health, so a heal row may be used. Without one the
     /// player counts as alive but a heal row is refused (R).
@@ -370,6 +406,9 @@ pub struct Reply {
     pub heal_percent: u32,
     pub boombox: Option<i32>,
     pub effect: Option<consumable_effects::Spec>,
+    /// T557: the cake row (a `placed_cakes.json` `item_id`) the host must now place. The item is
+    /// not spent and the recast is stamped; a host that cannot place calls [`ItemBar::cancel_use`].
+    pub place: Option<i32>,
     /// T789: the definition of a single-use item actually spent, for a `use_item` objective.
     /// It is the same `Use.spent` flag that sets `changed`; a boombox press and every refusal
     /// leave it `None`.
@@ -382,6 +421,7 @@ struct Use {
     replies: Vec<Vec<u8>>,
     heal_percent: u32,
     effect: Option<consumable_effects::Spec>,
+    place: Option<i32>,
     spent: bool,
     definition: i32,
 }
@@ -545,6 +585,19 @@ impl ItemBar {
         Ok(None)
     }
 
+    /// T557: the host could not place the cake a press named, so that press never happened: take
+    /// back its recast and answer with the bar as it stands. The press passed the recast check
+    /// first, so any older stamp had expired and dropping it is the same as before.
+    pub fn cancel_use(
+        &mut self,
+        definition: i32,
+        inventory: &Inventory,
+        now_ms: u64,
+    ) -> io::Result<Vec<Vec<u8>>> {
+        self.last_used.remove(&definition);
+        self.refresh(inventory, now_ms)
+    }
+
     /// 38/25 for all four slots: bound slots with quantity and recast, the rest empty. Stale
     /// bindings (stack gone) are dropped first.
     pub fn refresh(&mut self, inventory: &Inventory, now_ms: u64) -> io::Result<Vec<Vec<u8>>> {
@@ -655,6 +708,7 @@ impl ItemBar {
                     changed: used.spent,
                     heal_percent: used.heal_percent,
                     effect: used.effect,
+                    place: used.place,
                     used_definition: used.spent.then_some(used.definition),
                     ..Reply::default()
                 })
@@ -706,6 +760,7 @@ impl ItemBar {
                     changed: used.spent,
                     heal_percent: used.heal_percent,
                     effect: used.effect,
+                    place: used.place,
                     used_definition: used.spent.then_some(used.definition),
                     ..Reply::default()
                 })
@@ -735,6 +790,10 @@ impl ItemBar {
         let spent = effect.single_use;
         let heal_percent = effect.heal_percent();
         let spec = effect.spec();
+        let place = match effect.effect {
+            EffectKind::PlacedCake { row } => Some(row),
+            _ => None,
+        };
         let replies = if spent {
             inventory
                 .consume(id, 1)
@@ -748,6 +807,7 @@ impl ItemBar {
             replies,
             heal_percent,
             effect: spec,
+            place,
             spent,
             definition,
         })
@@ -785,6 +845,9 @@ impl ItemBar {
             return Ok(());
         };
         if matches!(effect.effect, EffectKind::Heal { .. }) && !player.can_heal {
+            return Err(Refusal::NotUsable);
+        }
+        if matches!(effect.effect, EffectKind::PlacedCake { .. }) && !player.can_place_box {
             return Err(Refusal::NotUsable);
         }
         if let Some(spec) = effect.spec() {

@@ -114,13 +114,11 @@ mod tests {
     use super::super::tests::f161_pet_adoption_persist::{
         ADOPTION_ITEM, grant_certificate, grant_certificate_for, pet_wire,
     };
-    use super::super::tests::test_support::{self, Scene, Scratch, bin_test_target};
+    use super::super::tests::test_support::{self, OWNER, Rig, Scene, Scratch, sender};
     use super::*;
     use osfr_tools::item_bar::use_wire::{
-        ActionBarSlotUpdate, NEVER_CAST_SENTINEL, Target, decode_slot_update,
-        encode_client_request_start_ability,
+        ActionBarSlotUpdate, NEVER_CAST_SENTINEL, Target, encode_client_request_start_ability,
     };
-    use osfr_tools::players::PlayerPresentation;
 
     const RAINBOW: i32 = 1913; // the one shipped row with a song
     const TOTEM: i32 = 8185; // no song
@@ -128,32 +126,9 @@ mod tests {
     const RROLL_MODEL: i32 = 1941; // human_m_realmsroll.adr
     const RROLL_DANCE: i32 = 3541; // emo_dance_rroll_01
     const WOLF_ITEM: i32 = 14289; // a ride item (bundled `mounts.json`, Wolf 993)
-    const OWNER: u32 = 461;
     /// The high word of every box guid.
     const BOX_TAG: u64 = 0x424f_4f4d;
     const DURATION: u64 = 180_000;
-
-    fn sender(max_queued_bytes: usize) -> ReliableSender {
-        ReliableSender::new(
-            Codec::new(CRC_SEED, 3, true, MAX_MESSAGE).unwrap(),
-            SenderConfig {
-                // Roomy, so an AddNpc is one datagram the drain below can read back.
-                datagram_limit: 4096,
-                window: 32,
-                max_message: MAX_MESSAGE,
-                max_queued_bytes,
-                retry_ms: 250,
-                max_retries: 40,
-            },
-        )
-        .unwrap()
-    }
-
-    fn msg(main: u16, sub: u16, fields: &[i32]) -> Vec<u8> {
-        let mut bytes = [main.to_le_bytes(), sub.to_le_bytes()].concat();
-        fields.iter().for_each(|f| bytes.extend(f.to_le_bytes()));
-        bytes
-    }
 
     /// The box's packets in a drained batch, as inner packets: AddNpc (35/2), poof (35/16),
     /// song (35/41), song stop (35/42) and removal (35/3), each naming a box guid.
@@ -190,208 +165,11 @@ mod tests {
             .count()
     }
 
-    /// The item bar's slot 0 as the owner's client is told it, from a drained batch.
-    fn slot_zero(messages: &[Vec<u8>]) -> ActionBarSlotUpdate {
-        let updates = messages.iter().filter_map(|m| m.get(7..));
-        let mut updates = updates.filter_map(decode_slot_update);
-        updates.find(|s| s.bar == 2 && s.slot == 0).unwrap()
-    }
-
     /// When the slot was last used, as the client would work it out at `now`; `None` while the
     /// slot is ready (the server shows no cast age then).
     fn last_use(slot: &ActionBarSlotUpdate, now: u64) -> Option<i64> {
         let used = slot.cast_age_ms != NEVER_CAST_SENTINEL;
         used.then(|| now as i64 - i64::from(slot.cast_age_ms))
-    }
-
-    struct Rig {
-        options: Options,
-        scene: Scene,
-        _scratch: Scratch,
-        instance: i32,
-    }
-
-    impl Rig {
-        /// The owner has entered the open world holding `item`, bound to bar slot 0.
-        fn new(tag: &str, item: i32) -> Option<Self> {
-            let scratch = Scratch::new(tag);
-            let mut options = test_support::options(scratch.state());
-            if !bin_test_target("t461") || !test_support::fixtures_present(&options) {
-                eprintln!("skip {tag}: not the binary's own target, or no lab fixtures");
-                return None;
-            }
-            let content = test_support::vendor_content(&scratch);
-            let shipped = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
-            for file in ["boomboxes.json", "mounts.json"] {
-                fs::copy(shipped.join(file), content.join(file)).unwrap();
-            }
-            options.content = Some(content);
-            options.dev_tools = true;
-            let mut scene = Scene::new(&options, OWNER);
-            scene.session.sender = sender(32 * 1024 * 1024);
-            scene.send(&options, &[13, 0], 1_000).unwrap();
-            scene.send(&options, &[10, 0], 1_001).unwrap();
-            assert!(scene.session.gateway.is_world_loaded());
-            // The server registers a session's key at accept; the scene does not.
-            let (id, peer) = (scene.session.id, scene.session.peer);
-            let connection_id = scene.session.request.id;
-            let key = SessionKey {
-                peer,
-                connection_id,
-            };
-            scene.world.session_keys.insert(id, key);
-            let mut rig = Self {
-                options,
-                scene,
-                _scratch: scratch,
-                instance: 0,
-            };
-            rig.give(item);
-            rig.instance = rig.instance_of(item);
-            rig.drain_owner(1_500);
-            rig.exchange(&msg(42, 6, &[0, rig.instance]), 2_000);
-            Some(rig)
-        }
-
-        fn give(&mut self, item: i32) {
-            let command = osfr_tools::chat::local_request(&format!("realm give {item}"));
-            self.scene.send(&self.options, &command, 1_100).unwrap();
-        }
-
-        fn instance_of(&self, item: i32) -> i32 {
-            let state = self.scene.session.gateway.snapshot().gameplay.unwrap();
-            let held = state.inventory.items.iter();
-            held.filter(|i| i.definition_id == item).last().unwrap().id
-        }
-
-        fn exchange(&mut self, inner: &[u8], now: u64) -> Vec<Vec<u8>> {
-            self.scene.exchange(&self.options, inner, now)
-        }
-
-        fn drain_owner(&mut self, now: u64) -> Vec<Vec<u8>> {
-            drain_replies(&mut self.scene.session, now)
-        }
-
-        /// 36/10 on the item bar, slot 0, aimed at the player: the owner's replies.
-        fn press(&mut self, now: u64) -> Vec<Vec<u8>> {
-            let target = Target::Guid(self.scene.session.character_guid);
-            let packet = encode_client_request_start_ability(2, 0, target);
-            self.scene.send(&self.options, &packet, now).unwrap();
-            self.drain_owner(now)
-        }
-
-        /// The bar as the owner's client sees it now (a no-op rebind answers with the bar).
-        fn bar(&mut self, now: u64) -> ActionBarSlotUpdate {
-            let rebind = msg(42, 6, &[0, self.instance]);
-            slot_zero(&self.exchange(&rebind, now))
-        }
-
-        /// A second session in the open world `dx` metres east of the owner.
-        fn viewer(&mut self, id: u32, dx: f32) -> SessionKey {
-            self.viewer_as(id, dx, 0).0
-        }
-
-        /// As `viewer`, wearing player model `model` (the boxes dance models 1, 2, 60 and 61).
-        /// Also returns the AddPc/movement messages the registry built for the join, which the
-        /// real gateway delivers after `join_player`.
-        fn viewer_as(
-            &mut self,
-            id: u32,
-            dx: f32,
-            model: i32,
-        ) -> (SessionKey, Vec<osfr_tools::players::OutboundMessage>) {
-            let mut session = test_support::enter(&self.options, id);
-            session.sender = sender(32 * 1024 * 1024);
-            let me = self
-                .scene
-                .world
-                .players
-                .get(self.scene.session.id)
-                .unwrap()
-                .clone();
-            let mut look = PlayerPresentation::default();
-            look.character_guid = 7_000_000_000 + u64::from(id);
-            look.model = model;
-            let at = [me.position[0] + dx, me.position[1], me.position[2]];
-            let world = &mut self.scene.world;
-            let account = 8_000_000_000 + u64::from(id);
-            let (character, zone) = (look.character_guid, me.zone);
-            let joined = world
-                .players
-                .join_with_presentation(session.id, account, character, zone, at, 0.0, look);
-            let joined = joined.unwrap();
-            world.joined.insert(session.id);
-            let key = SessionKey {
-                peer: session.peer,
-                connection_id: session.request.id,
-            };
-            world.session_keys.insert(session.id, key);
-            self.scene.sessions.insert(key, session);
-            (key, joined)
-        }
-
-        fn drain(&mut self, key: SessionKey, now: u64) -> Vec<Vec<u8>> {
-            drain_replies(self.scene.sessions.get_mut(&key).unwrap(), now)
-        }
-
-        /// `key`'s player now shows the temporary model `model`, keeping its base model, as a
-        /// live transform's AddPc snapshot does (`PlayerPresentation::set_visual`).
-        fn transform(&mut self, key: SessionKey, model: i32) {
-            let id = self.scene.sessions[&key].id;
-            let players = &mut self.scene.world.players;
-            let mut look = players.get(id).unwrap().presentation.clone();
-            look.set_visual(osfr_tools::consumable_effects::Visual {
-                temporary_model: model,
-                scale: 1.0,
-                auras: Vec::new(),
-            });
-            players.set_presentation(id, look).unwrap();
-        }
-
-        /// One server tick. The owner is the scene's own session, so it joins the session map
-        /// for the tick, as every session is in the real loop.
-        fn tick(&mut self, now: u64) {
-            let stand_in = test_support::enter(&self.options, 9_999);
-            let owner = std::mem::replace(&mut self.scene.session, stand_in);
-            let key = SessionKey {
-                peer: owner.peer,
-                connection_id: owner.request.id,
-            };
-            self.scene.sessions.insert(key, owner);
-            tick(&mut self.scene.world, &mut self.scene.sessions, now);
-            self.scene.session = self.scene.sessions.remove(&key).unwrap();
-        }
-
-        fn move_viewer(&mut self, key: SessionKey, dx: f32) {
-            let players = &self.scene.world.players;
-            let me = players.get(self.scene.session.id).unwrap().clone();
-            let id = self.scene.sessions[&key].id;
-            let at = [me.position[0] + dx, me.position[1], me.position[2]];
-            let players = &mut self.scene.world.players;
-            players
-                .update_pose_with_state(id, me.zone, at, 0.0, 0, 0)
-                .unwrap();
-        }
-
-        /// Everything the save holds about the box's owner, byte for byte.
-        fn saved(&self) -> Vec<u8> {
-            let state = self.scene.session.gateway.snapshot().gameplay.unwrap();
-            serde_json::to_vec(&(&state.inventory, &state.item_bar)).unwrap()
-        }
-
-        /// The character's whole saved gameplay state, byte for byte.
-        fn saved_state(&self) -> Vec<u8> {
-            let state = self.scene.session.gateway.snapshot().gameplay.unwrap();
-            serde_json::to_vec(&state).unwrap()
-        }
-
-        fn count(&self, item: i32) -> Option<u32> {
-            let state = self.scene.session.gateway.snapshot().gameplay.unwrap();
-            let held = state.inventory.items.iter();
-            held.filter(|i| i.definition_id == item)
-                .map(|i| i.count)
-                .last()
-        }
     }
 
     #[test]

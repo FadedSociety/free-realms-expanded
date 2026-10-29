@@ -150,6 +150,8 @@ pub struct GatewayOutcome {
     pub world_event: Option<crate::world_events::WorldEventCommand>,
     /// T461: a boombox press the host places once after the commit, like `admin_move`.
     pub boombox: Option<i32>,
+    /// T557: a cake press or click the host answers from the shared registry after the commit.
+    pub shared_cake: Option<crate::placed_cakes::Action>,
     /// T872: an owner's lot edit the host sends to the lot's visitors after the commit.
     pub house_broadcast: Option<crate::housing_service::HouseBroadcast>,
     /// L042: role-gated moderation commands; the host runs them after the commit.
@@ -1702,6 +1704,7 @@ impl Gateway {
                             && result.zoning.is_none()
                             && result.scene_zoning.is_none()
                             && result.shared_field.is_none()
+                            && result.shared_cake.is_none()
                         {
                             // Known handlers may legitimately reply later (the
                             // social router runs after this); decided from the
@@ -1728,6 +1731,7 @@ impl Gateway {
                         outcome.admin_move = result.admin_move.or(outcome.admin_move.take());
                         outcome.world_event = result.world_event.or(outcome.world_event.take());
                         outcome.boombox = result.boombox.or(outcome.boombox.take());
+                        outcome.shared_cake = result.shared_cake.or(outcome.shared_cake.take());
                         outcome.house_broadcast = crate::housing_service::HouseBroadcast::merge(
                             outcome.house_broadcast.take(),
                             result.house_broadcast,

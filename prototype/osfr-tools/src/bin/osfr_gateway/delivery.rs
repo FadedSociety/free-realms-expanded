@@ -16,6 +16,33 @@ pub(super) fn trade_deliveries(messages: Vec<TradeMessage>) -> Vec<Delivery> {
         .collect()
 }
 
+/// (W163) Keep the trade service's copy of this character's inventory current. A character
+/// whose inventory does not validate is not tradable: it is unregistered, which also ends a
+/// trade it is in.
+pub(super) fn refresh_trade_player(
+    world: &mut SharedWorld,
+    session: SessionId,
+    gateway: &Gateway,
+) -> Vec<Delivery> {
+    let Some(player) = world.players.get(session).cloned() else {
+        return Vec::new();
+    };
+    let guid = player.character_guid;
+    match gateway.trade_inventory() {
+        Some(inventory) => {
+            if world.trades.inventory(guid).is_some() {
+                // A snapshot that fails the service's checks keeps the previous one (R).
+                let _ = world.trades.sync_inventory(guid, inventory);
+            } else {
+                let _ = world.trades.register_player(&player, inventory);
+            }
+            // A battle or dungeon run ends a trade and blocks a new one.
+            trade_deliveries(world.trades.set_away(guid, gateway.in_encounter()))
+        }
+        None => trade_deliveries(world.trades.unregister_player(guid)),
+    }
+}
+
 /// Queue one delivery: on the current session, or on the recipient's own session when it is
 /// still connected (a recipient that left is skipped).
 pub(super) fn queue_delivery(

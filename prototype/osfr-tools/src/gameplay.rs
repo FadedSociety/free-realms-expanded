@@ -364,6 +364,8 @@ pub struct Outcome {
     pub world_event: Option<crate::world_events::WorldEventCommand>,
     /// T461: the definition of a boombox the host places once after a successful commit.
     pub boombox: Option<i32>,
+    /// T557: a cake press or click the host answers from the shared registry after the commit.
+    pub shared_cake: Option<crate::placed_cakes::Action>,
     /// T872: an owner's lot edit the host sends to the lot's visitors after the commit.
     pub house_broadcast: Option<crate::housing_service::HouseBroadcast>,
 }
@@ -388,6 +390,7 @@ impl Outcome {
             admin_move,
             world_event,
             boombox,
+            shared_cake,
             house_broadcast,
         } = other;
         self.dev_command_denied |= dev_command_denied;
@@ -404,6 +407,7 @@ impl Outcome {
         self.admin_move = admin_move.or(self.admin_move.take());
         self.world_event = world_event.or(self.world_event.take());
         self.boombox = boombox.or(self.boombox.take());
+        self.shared_cake = shared_cake.or(self.shared_cake.take());
         self.house_broadcast = crate::housing_service::HouseBroadcast::merge(
             self.house_broadcast.take(),
             house_broadcast,
@@ -442,27 +446,6 @@ fn current_unix_seconds() -> u64 {
         .duration_since(UNIX_EPOCH)
         .unwrap_or_default()
         .as_secs()
-}
-
-/// (R) 35/6 EquipItemChange a neighbour needs after an active-job equip or
-/// unequip. Inventory content names its own player guid in the packet, so the
-/// broadcast names the authenticated character instead. An empty model is the
-/// client's removal path (`0092f460` case 6).
-fn item_change_packet(inner: &[u8], guid: u64, replies: &[Vec<u8>]) -> Option<Vec<u8>> {
-    if inner.len() == 12 && inner.starts_with(&[42, 0, 2, 0]) {
-        let slot = i32::from_le_bytes(inner[4..8].try_into().ok()?);
-        let profile = i32::from_le_bytes(inner[8..12].try_into().ok()?);
-        // The inventory owns the one 35/6 encoder; an empty attachment clears the slot.
-        return Some(crate::inventory::equip_change_packet(
-            guid, 0, None, slot, profile,
-        ));
-    }
-    let packet = replies
-        .iter()
-        .find(|packet| packet.starts_with(&[35, 0, 6, 0]))?;
-    let mut packet = packet.clone();
-    packet.get_mut(4..12)?.copy_from_slice(&guid.to_le_bytes());
-    Some(packet)
 }
 
 fn npc_event(value: serde_json::Value) {
@@ -1367,7 +1350,7 @@ impl Gameplay {
             .zip(target_profile)
             .is_some_and(|(active, target)| active != target);
         let packet = (changed && target_profile.is_some() && !inactive)
-            .then(|| item_change_packet(inner, guid, replies))
+            .then(|| item_requests::item_change_packet(inner, guid, replies))
             .flatten();
         (inactive, packet)
     }

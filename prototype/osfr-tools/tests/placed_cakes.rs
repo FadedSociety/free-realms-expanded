@@ -307,7 +307,7 @@ fn the_cake_despawns_exactly_once_at_sixty_seconds() {
     // The one-shot animation may fire on the way; the removal is the only 35/3.
     let mut removals = Vec::new();
     for now in (FIRST..FIRST + 59_000).step_by(500) {
-        for (_, packets) in cakes.tick(now) {
+        for (_, _, packets) in cakes.tick(now) {
             assert_eq!(packets::count(&packets, 35, 3), 0, "removed early at {now}");
         }
     }
@@ -324,7 +324,7 @@ fn the_cake_despawns_exactly_once_at_sixty_seconds() {
             cakes
                 .tick(now)
                 .into_iter()
-                .flat_map(|(instance, packets)| packets.into_iter().map(move |p| (instance, p))),
+                .flat_map(|(instance, _, packets)| packets.into_iter().map(move |p| (instance, p))),
         );
     }
     let removed: Vec<_> = removals
@@ -359,7 +359,7 @@ fn the_boss_cake_plays_its_one_shot_every_ten_to_twenty_seconds() {
             regional.tick(now).is_empty(),
             "a regional cake has no one-shot"
         );
-        for (instance, packets) in cakes.tick(now) {
+        for (instance, _, packets) in cakes.tick(now) {
             assert_eq!(instance, HERE);
             for packet in packets {
                 if packet == animation(guid, 2001, true) {

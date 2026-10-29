@@ -9,6 +9,8 @@ use osfr_tools::{
     gameplay::{Gameplay, Outcome},
     inventory::InventoryItem,
     item_bar::use_wire,
+    npc_interaction::NpcInteractRequest,
+    placed_cakes::Action,
 };
 use std::path::PathBuf;
 
@@ -16,6 +18,7 @@ const POTION: i32 = 11002; // Small Health Potion, in the captured catalogue
 const HAT_LIKE: i32 = 1; // placeholder instance id that is not a potion (see `plain_item`)
 const VEAL: i32 = 2982; // Electric Veal Meat, an aura row in data/content/consumables.json
 const BERRIES: i32 = 4042; // Bark Berries, a transform row
+const CAKE: i32 = 7974; // Boss Birthday Cake, a placed_cake row (T557)
 
 fn reference() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -478,4 +481,100 @@ fn bark_berries_transforms_and_a_live_transform_refuses_the_treat() {
         .handle_in_world(&cast(2, 0, 1), &who(), 1_800_001)
         .unwrap();
     assert!(again.changed && count(&game, BERRIES) == 0);
+}
+
+/// T557: a cake press is placed, not spent; the recast is the cake row's 60 s and a refusal (in
+/// recast, away from the open world) changes nothing and asks for nothing to be placed.
+#[test]
+fn a_cake_press_asks_for_a_place_spends_nothing_and_recasts_for_sixty_seconds() {
+    let (mut game, ids) = game_with(&[(CAKE, 1)]);
+    game.handle_in_world(&msg(42, 6, &[0, ids[0]]), &who(), 500)
+        .unwrap();
+    let before = snapshot(&game);
+    // Away from the open world the press is refused and stamps nothing.
+    let away = CharacterState {
+        zone_id: 5,
+        ..who()
+    };
+    let refused = game.handle_in_world(&cast(2, 0, 1), &away, 1_000).unwrap();
+    assert!(failed(&refused) && refused.shared_cake.is_none() && !refused.changed);
+    assert_eq!(snapshot(&game), before);
+
+    let placed = game.handle_in_world(&cast(2, 0, 1), &who(), 1_000).unwrap();
+    assert_eq!(placed.shared_cake, Some(Action::Place { row: CAKE }));
+    assert!(!placed.changed, "nothing is spent, so nothing is saved");
+    assert_eq!(count(&game, CAKE), 1);
+    assert_eq!(slot(&placed, 0).unwrap().total_refresh_time, 60_000);
+    assert!(
+        placed.replies.iter().all(|p| !p.starts_with(&[35, 0])),
+        "the host shows the cake; the item bar sends no actor packet"
+    );
+
+    // Inside the 60 s recast: refused, nothing placed, nothing changed.
+    let before = snapshot(&game);
+    let again = game
+        .handle_in_world(&cast(2, 0, 1), &who(), 60_999)
+        .unwrap();
+    assert!(failed(&again) && again.shared_cake.is_none());
+    assert_eq!(snapshot(&game), before);
+    // Canary: on the boundary it places again, and still spends nothing.
+    let later = game
+        .handle_in_world(&cast(2, 0, 1), &who(), 61_000)
+        .unwrap();
+    assert_eq!(later.shared_cake, Some(Action::Place { row: CAKE }));
+    assert_eq!(count(&game, CAKE), 1);
+}
+
+/// T557: the host's refusal (the world is at its cap) takes the stamp back, so the next press
+/// works at once, and the player gets the bar's refusal and the bar.
+#[test]
+fn a_cake_the_world_cannot_take_gives_its_recast_back() {
+    let (mut game, ids) = game_with(&[(CAKE, 1)]);
+    game.handle_in_world(&msg(42, 6, &[0, ids[0]]), &who(), 500)
+        .unwrap();
+    let ready = snapshot(&game);
+    game.handle_in_world(&cast(2, 0, 1), &who(), 1_000).unwrap();
+    let replies = game.refuse_cake_place(CAKE, 1_100).unwrap();
+    assert!(
+        replies[0].starts_with(&[36, 0, 1, 0]),
+        "the bar's refusal first"
+    );
+    let bar = replies
+        .iter()
+        .filter_map(|p| use_wire::decode_slot_update(p))
+        .find(|u| u.slot == 0)
+        .unwrap();
+    assert_eq!(
+        bar.cast_age_ms,
+        use_wire::NEVER_CAST_SENTINEL,
+        "no recast shown"
+    );
+    assert_eq!(snapshot(&game), ready);
+    let next = game.handle_in_world(&cast(2, 0, 1), &who(), 1_200).unwrap();
+    assert_eq!(next.shared_cake, Some(Action::Place { row: CAKE }));
+}
+
+/// T557: a click on a cake guid is the shared registry's: gameplay answers nothing itself. A
+/// guid that is no cake falls through to the NPC router as before.
+#[test]
+fn a_click_on_a_cake_guid_is_handed_to_the_registry_and_changes_nothing() {
+    let (mut game, _) = game_with(&[]);
+    let click = |target: u64| {
+        NpcInteractRequest {
+            target,
+            trailing_flag: false,
+        }
+        .encode()
+    };
+    let cake = 0x4341_4b45_0000_0001_u64;
+    let before = (game.state(), game.consumable_effects().clone());
+    let out = game.handle_in_world(&click(cake), &who(), 1_000).unwrap();
+    assert_eq!(out.shared_cake, Some(Action::Click { guid: cake }));
+    assert!(out.replies.is_empty() && out.nearby.is_empty() && !out.changed);
+    assert_eq!((game.state(), game.consumable_effects().clone()), before);
+    // Canary: one bit off the cake range is an unknown actor and reaches no registry.
+    let other = game
+        .handle_in_world(&click(0x4341_4b46_0000_0001), &who(), 1_001)
+        .unwrap();
+    assert!(other.shared_cake.is_none());
 }

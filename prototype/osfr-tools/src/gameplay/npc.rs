@@ -641,6 +641,16 @@ impl Gameplay {
         Ok(None)
     }
 
+    /// T557: a click on a placed cake. A busy player does not click it; like every refused cake
+    /// click it is silent (R).
+    fn cake_click(&self, guid: u64) -> Outcome {
+        Outcome {
+            shared_cake: (!self.activity_busy())
+                .then_some(crate::placed_cakes::Action::Click { guid }),
+            ..Outcome::default()
+        }
+    }
+
     fn npc_interact_26_8(
         &mut self,
         inner: &[u8],
@@ -650,6 +660,10 @@ impl Gameplay {
             let request = npc_interaction::decode_npc_interact_26_8(inner)
                 .map_err(|_| invalid("invalid NPC interaction request"))?;
             let Some(key) = self.content_npc_key(request.target) else {
+                // T557: a placed cake is the shared registry's to answer, after the commit.
+                if crate::placed_cakes::is_cake(request.target) {
+                    return Ok(Some(self.cake_click(request.target)));
+                }
                 // T538: a click on an actor this router does not own (a player menu or a
                 // world-event actor such as the Voting Box) marks the next 26/6 as that
                 // route's; the open menu itself stays, as the T773 suite pins.

@@ -9,6 +9,11 @@ Sanctuary's Consumables.json AbilityId to the item whose ActivatableAbilityId
 is that ability. Rows are dropped, with the reason printed, when the item is in
 an exclusion section, when the two item definitions disagree, when the ability
 is an OSFR synthetic (>= 900000), or when a client asset check fails.
+
+T557: every item of ``placed_cakes.json`` (the birthday cakes, Sanctuary's Cakes
+section) is a ``placed_cake`` row instead: the item is placed, never spent, and
+the cake row's own ``item_cooldown_ms`` is its recast. The other Cakes items
+stay excluded.
 """
 
 import argparse
@@ -44,6 +49,7 @@ def parse_args():
         "composites",
         "images",
         "locale",
+        "placed-cakes",
         "output",
     ):
         parser.add_argument("--" + name, type=Path, required=True)
@@ -237,6 +243,24 @@ def transform_row(item, ability, transform, locale, models, composites, images):
     }
 
 
+def cake_row(item, cake, comment):
+    source = (
+        f"Sanctuary-main@{SANCTUARY_REV} Consumables.json Cakes ItemId {item['Id']} ({comment}); "
+        f"item {item['Id']} (Legacy@{LEGACY_REV} ClientItemDefinitions {item_fields(item)}); "
+        f"placed by placed_cakes.json row {item['Id']}, whose item_cooldown_ms is the recast "
+        f"(R, T556)."
+    )
+    return {
+        "definition": item["Id"],
+        "name_id": item["NameId"],
+        "description_id": item["DescriptionId"],
+        "cooldown_ms": cake["item_cooldown_ms"],
+        "single_use": False,
+        "effect": {"placed_cake": {"row": item["Id"]}},
+        "source": source,
+    }
+
+
 def validate(rows, exclusions):
     definitions = [row["definition"] for row in rows]
     if not rows or len(rows) > MAX_EFFECT_ROWS:
@@ -284,6 +308,7 @@ def main():
             f"expected {BUFF_ICON_FILE!r}"
         )
 
+    cakes = {row["item_id"]: row for row in load_json(args.placed_cakes)["cakes"]}
     exclusions = {}
     for section in EXCLUSION_SECTIONS:
         for row in sanctuary.get(section, []):
@@ -394,9 +419,19 @@ def main():
                 transform_row(item, ability, transform, locale, models, composites, images)
             )
 
+    comments = {row["ItemId"]: row.get("Comment", "") for row in sanctuary["Cakes"]}
+    for definition, cake in cakes.items():
+        item = sanctuary_items.get(definition)
+        if item is None or definition not in comments:
+            raise SystemExit(f"T557: cake {definition} is not a Sanctuary Cakes item")
+        problem = legacy_check(item, legacy_items) or locale_check(item, locale)
+        if problem:
+            raise SystemExit(f"T557: cake item {definition}: {problem}")
+        rows.append(cake_row(item, cake, comments[definition]))
+
     generated = sorted(rows[2:], key=lambda row: row["definition"])
     rows = rows[:2] + generated
-    validate(rows, exclusions)
+    validate(rows, {item: why for item, why in exclusions.items() if item not in cakes})
 
     document = {"schema_version": 2, "consumables": rows}
     text = json.dumps(document, indent=2, ensure_ascii=True) + "\n"
@@ -405,7 +440,7 @@ def main():
         raise SystemExit(f"T511: consumables.json is {len(encoded)} bytes, over {MAX_FILE_BYTES}")
     args.output.write_bytes(encoded)
 
-    counts = {"heal": 0, "aura": 0, "transform": 0}
+    counts = {"heal": 0, "aura": 0, "transform": 0, "placed_cake": 0}
     for row in rows:
         counts[next(iter(row["effect"]))] += 1
     print()
@@ -419,7 +454,8 @@ def main():
     print(f"excluded item ids: {len(exclusions)} "
           f"({', '.join(f'{name}={len(sanctuary.get(name, []))}' for name in EXCLUSION_SECTIONS)})")
     print(f"kept: heal={counts['heal']}, aura={counts['aura']}, "
-          f"transform={counts['transform']}, total={len(rows)}")
+          f"transform={counts['transform']}, placed_cake={counts['placed_cake']}, "
+          f"total={len(rows)}")
     print(f"dropped: {dropped}")
     print(f"wrote: {args.output} ({len(encoded)} bytes)")
 

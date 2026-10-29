@@ -11,10 +11,8 @@ const POTIONS: [i32; 2] = [2173, 11002];
 /// Every definition the content rules exclude. `900000..` (the OSFR synthetic abilities) is
 /// checked separately.
 const EXCLUDED: [&[i32]; 4] = [
-    // Cakes
-    &[
-        7966, 7967, 7968, 7969, 7970, 7971, 7972, 7973, 7974, 17597, 69819, 48100,
-    ],
+    // Cakes (the birthday cakes 7966..=7974 are placed_cake rows since T557, checked below)
+    &[17597, 69819, 48100],
     // RandomTransformFoods
     &[69828, 48104],
     // Boomboxes
@@ -38,7 +36,7 @@ fn the_shipped_rows_load_through_the_real_loader_with_their_client_checked_value
     let effects = Effects::load(&directory).expect("consumables.json parses");
     let rows = effects.rows();
     assert!(
-        (90..=100).contains(&rows.len()),
+        (90..=110).contains(&rows.len()),
         "{} consumable rows, outside the content bounds",
         rows.len()
     );
@@ -94,19 +92,30 @@ fn the_shipped_rows_load_through_the_real_loader_with_their_client_checked_value
     assert_eq!((berries.name_id, berries.description_id), (1201, 2772));
     assert_eq!(berries.cooldown_ms, 1_800_000);
 
-    // The retained joins: 23 food items and 69 transformation items after the exclusions.
-    let (mut heals, mut auras, mut transforms) = (0, 0, 0);
+    // The retained joins: 23 food items and 69 transformation items after the exclusions, and
+    // the nine birthday cakes (T557).
+    let (mut heals, mut auras, mut transforms, mut cakes) = (0, 0, 0, 0);
     for row in rows {
         match row.effect {
             EffectKind::Heal { .. } => heals += 1,
             EffectKind::Aura { .. } => auras += 1,
             EffectKind::Transform { .. } => transforms += 1,
             EffectKind::Scale { .. } => {}
+            EffectKind::PlacedCake { .. } => cakes += 1,
         }
     }
     assert_eq!(heals, 2);
     assert_eq!(auras, 23);
     assert_eq!(transforms, 69);
+    assert_eq!(cakes, 9);
+
+    // The boss cake: never spent, its recast is the cake row's (placed_cakes.json), and its row
+    // is its own definition.
+    let boss = effects.get(7974).expect("Boss Birthday Cake");
+    assert!(matches!(boss.effect, EffectKind::PlacedCake { row: 7974 }));
+    assert_eq!((boss.name_id, boss.description_id), (30109, 30118));
+    assert_eq!(boss.cooldown_ms, 60_000);
+    assert!(!boss.single_use);
 
     // No excluded item and no OSFR synthetic ability id is present.
     for group in EXCLUDED {
