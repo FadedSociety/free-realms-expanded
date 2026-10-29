@@ -842,11 +842,44 @@
     },
     {
       "id": 3110013,
+      "job": 2,
       "title_string_id": 387205,
       "giver_npc_id": 9000000223,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3110004
+      ],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "profile_id": 2,
+          "level": 10,
+          "text_string_id": 387223,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "locale 387223 'Achieve level 10, then return to Ty.' (the level-gate wait line); 387225 and 387206 are the goal and journal strings of the same gate; quest-lines/quests.json q3110013 objectives 0-2, all unflagged client text."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T662: the three client objective strings are one level gate, so one authoritative job_level objective at profile 2 (Ninja), level 10, like Warrior W5 (3150005, T361). The server judges it from Profiles::rank. The return-to-Ty talk is the turn-in at the giver: the engine opens the turn-in at the giver when the last objective completes, and it rejects a job_level goal after the first ordered step (F576)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T662: no client, wiki or repo source names a reward for this gate (quest-lines/quests.json q3110013 open: no coins, XP or item rewards found). 15 coins, no item and no job XP mirror the Warrior W5 level-gate payout (3150005, T361)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -866,28 +899,28 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T662: prerequisite is 3110004 (Silence is Golden... and Deadly), the last enabled step of the Ninja entry line. The guide's real predecessor (B5, Return to the Mentor, 3110012) and the Chloe chain 3110005-3110011 are still disabled, so the gate skips them the way 3110004 skips the disabled 3110003. Re-point it when those are wired."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T662: job gate 2 keeps the offer Ninja-only, like 3110001 and 3110004. Ty (9000000223) is drawn (npcs/lakeshore.json legacy_data) and already lists 3110013 in quest_ids_given."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T662: enabled from quest-lines/quests.json q3110013 (live: yes, unflagged client strings); end text 387207 is the answer's completion line. The offer line was not located, so intro_text_string_id stays unset."
         }
       ],
       "description_string_id": 387206,
       "end_text_string_id": 387207,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3110014,
