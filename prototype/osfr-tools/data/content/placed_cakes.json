@@ -1,0 +1,290 @@
+{
+  "schema_version": 1,
+  "max_live": 64,
+  "cakes": [
+    {
+      "item_id": 7974,
+      "name_id": 30109,
+      "model_id": 2090,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        16372,
+        16441
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "one_shot": {
+        "animation_id": 2001,
+        "animation_ms": 3000,
+        "min_interval_ms": 10000,
+        "max_interval_ms": 20000
+      },
+      "outcomes": [
+        {
+          "effect": {
+            "transform": {
+              "model_id": 2055,
+              "poof_effect_id": 21
+            }
+          },
+          "duration_ms": 1800000
+        },
+        {
+          "effect": {
+            "transform": {
+              "model_id": 1944,
+              "poof_effect_id": 21
+            }
+          },
+          "duration_ms": 1800000
+        },
+        {
+          "effect": {
+            "transform": {
+              "model_id": 1702,
+              "poof_effect_id": 21
+            }
+          },
+          "duration_ms": 1800000
+        }
+      ],
+      "source": "Sanctuary-main@10f129e Consumables.json Cakes row 7974 (Boss Birthday Cake), outcomes resolved inline from its Transformations/FoodEffects (abilities 4370/4371/4372 = models 2055 stoneheart_m, 1944 snowmanboss, 1702 pumpkinprince_m_boss); client rows checked: Models.txt 2090 mkt_cakes_boss_birthday_01.adr, ClientLocaleDefinitions 30109, itemdefinitions 7974 (name id, ability id), ActorCompositeEffectDefinitions 16372, 16441, Cursors.txt 5 cursor_talk; the 60 s lifetime and 5 s click window are Sanctuary's defaults (R); buff icon 3843 icon_status_changeform_32.dds (R, the consumables.json convention); one-shot animation 2001 amb_oneshot_01 (AnimationTypes.xml), every 10-20 s for 3 s (Sanctuary CakeItemDefinition defaults, R); (R) the roll is OSFR's: the item's own ActivatableAbilityId is 286 (Cakenstein, model 22), kept off the roll until the owner decides"
+    },
+    {
+      "item_id": 7966,
+      "name_id": 9392,
+      "model_id": 2082,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 15009
+            }
+          },
+          "duration_ms": 1800000
+        }
+      ],
+      "source": "Sanctuary-main@10f129e Consumables.json Cakes row 7966 (Shrouded Glade), outcomes resolved inline from its Transformations/FoodEffects (FoodEffects 278 = 15009 WFX_magic-glow_red_skel_loop_rare, 1800000 ms); client rows checked: Models.txt 2082 mkt_cake_shroudedglade_01.adr, ClientLocaleDefinitions 9392, itemdefinitions 7966 (name id, ability id), ActorCompositeEffectDefinitions 21, Cursors.txt 5 cursor_talk; the 60 s lifetime and 5 s click window are Sanctuary's defaults (R); buff icon 3843 icon_status_changeform_32.dds (R, the consumables.json convention)"
+    },
+    {
+      "item_id": 7967,
+      "name_id": 9393,
+      "model_id": 2083,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "transform": {
+              "model_id": 750,
+              "poof_effect_id": 21
+            }
+          },
+          "duration_ms": 1800000
+        },
+        {
+          "effect": {
+            "transform": {
+              "model_id": 749,
+              "poof_effect_id": 21
+            }
+          },
+          "duration_ms": 1800000
+        }
+      ],
+      "source": "Sanctuary-main@10f129e Consumables.json Cakes row 7967 (Seaside), outcomes resolved inline from its Transformations/FoodEffects (abilities 900100/900101 = models 750 birds_seagull, 749 birds_parrot); client rows checked: Models.txt 2083 mkt_cakes_seaside_01.adr, ClientLocaleDefinitions 9393, itemdefinitions 7967 (name id, ability id), ActorCompositeEffectDefinitions 21, Cursors.txt 5 cursor_talk; the 60 s lifetime and 5 s click window are Sanctuary's defaults (R); buff icon 3843 icon_status_changeform_32.dds (R, the consumables.json convention); (R) Sanctuary's synthetic ability ids 900100/900101 are not client ids, the two models are"
+    },
+    {
+      "item_id": 7968,
+      "name_id": 9394,
+      "model_id": 2084,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "transform": {
+              "model_id": 2001,
+              "poof_effect_id": 21
+            }
+          },
+          "duration_ms": 1800000
+        }
+      ],
+      "source": "Sanctuary-main@10f129e Consumables.json Cakes row 7968 (Snowhill), outcomes resolved inline from its Transformations/FoodEffects (ability 280 = model 2001 babypenguin_m); client rows checked: Models.txt 2084 mkt_cakes_snowhill_01.adr, ClientLocaleDefinitions 9394, itemdefinitions 7968 (name id, ability id), ActorCompositeEffectDefinitions 21, Cursors.txt 5 cursor_talk; the 60 s lifetime and 5 s click window are Sanctuary's defaults (R); buff icon 3843 icon_status_changeform_32.dds (R, the consumables.json convention)"
+    },
+    {
+      "item_id": 7969,
+      "name_id": 9395,
+      "model_id": 2085,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 15110
+            }
+          },
+          "duration_ms": 1800000
+        }
+      ],
+      "source": "Sanctuary-main@10f129e Consumables.json Cakes row 7969 (Merry Vale), outcomes resolved inline from its Transformations/FoodEffects (FoodEffects 281 = 15110 WFX_star-ring_rainbow_skel_loop, 1800000 ms); client rows checked: Models.txt 2085 mkt_cake_merryvale_01.adr, ClientLocaleDefinitions 9395, itemdefinitions 7969 (name id, ability id), ActorCompositeEffectDefinitions 21, Cursors.txt 5 cursor_talk; the 60 s lifetime and 5 s click window are Sanctuary's defaults (R); buff icon 3843 icon_status_changeform_32.dds (R, the consumables.json convention)"
+    },
+    {
+      "item_id": 7970,
+      "name_id": 9396,
+      "model_id": 2086,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "transform": {
+              "model_id": 210,
+              "poof_effect_id": 21
+            }
+          },
+          "duration_ms": 1800000
+        }
+      ],
+      "source": "Sanctuary-main@10f129e Consumables.json Cakes row 7970 (Sanctuary), outcomes resolved inline from its Transformations/FoodEffects (ability 282 = model 210 bixie_f_gatherer); client rows checked: Models.txt 2086 mkt_cakes_sanctuary_01.adr, ClientLocaleDefinitions 9396, itemdefinitions 7970 (name id, ability id), ActorCompositeEffectDefinitions 21, Cursors.txt 5 cursor_talk; the 60 s lifetime and 5 s click window are Sanctuary's defaults (R); buff icon 3843 icon_status_changeform_32.dds (R, the consumables.json convention)"
+    },
+    {
+      "item_id": 7971,
+      "name_id": 9397,
+      "model_id": 2087,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "transform": {
+              "model_id": 221,
+              "poof_effect_id": 21
+            }
+          },
+          "duration_ms": 1800000
+        }
+      ],
+      "source": "Sanctuary-main@10f129e Consumables.json Cakes row 7971 (Wugachug), outcomes resolved inline from its Transformations/FoodEffects (ability 283 = model 221 chugawug_m_02); client rows checked: Models.txt 2087 mkt_cakes_wugachug_01.adr, ClientLocaleDefinitions 9397, itemdefinitions 7971 (name id, ability id), ActorCompositeEffectDefinitions 21, Cursors.txt 5 cursor_talk; the 60 s lifetime and 5 s click window are Sanctuary's defaults (R); buff icon 3843 icon_status_changeform_32.dds (R, the consumables.json convention)"
+    },
+    {
+      "item_id": 7972,
+      "name_id": 9398,
+      "model_id": 2088,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "transform": {
+              "model_id": 767,
+              "poof_effect_id": 21
+            }
+          },
+          "duration_ms": 1800000
+        }
+      ],
+      "source": "Sanctuary-main@10f129e Consumables.json Cakes row 7972 (Blackspore), outcomes resolved inline from its Transformations/FoodEffects (ability 284 = model 767 graveelemental_m_skullwgraves); client rows checked: Models.txt 2088 mkt_cakes_blackspore_01.adr, ClientLocaleDefinitions 9398, itemdefinitions 7972 (name id, ability id), ActorCompositeEffectDefinitions 21, Cursors.txt 5 cursor_talk; the 60 s lifetime and 5 s click window are Sanctuary's defaults (R); buff icon 3843 icon_status_changeform_32.dds (R, the consumables.json convention)"
+    },
+    {
+      "item_id": 7973,
+      "name_id": 9399,
+      "model_id": 2089,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "transform": {
+              "model_id": 121,
+              "poof_effect_id": 21
+            }
+          },
+          "duration_ms": 1800000
+        }
+      ],
+      "source": "Sanctuary-main@10f129e Consumables.json Cakes row 7973 (Briarwood), outcomes resolved inline from its Transformations/FoodEffects (ability 285 = model 121 shroomgiant); client rows checked: Models.txt 2089 mkt_cakes_briarwood_01.adr, ClientLocaleDefinitions 9399, itemdefinitions 7973 (name id, ability id), ActorCompositeEffectDefinitions 21, Cursors.txt 5 cursor_talk; the 60 s lifetime and 5 s click window are Sanctuary's defaults (R); buff icon 3843 icon_status_changeform_32.dds (R, the consumables.json convention)"
+    }
+  ]
+}

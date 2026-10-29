@@ -82,6 +82,7 @@ pub mod opening_world;
 pub mod pathing;
 pub mod pet_follow;
 pub mod pets;
+pub mod placed_cakes;
 pub mod player_radial;
 pub mod players;
 pub mod power_ups;
