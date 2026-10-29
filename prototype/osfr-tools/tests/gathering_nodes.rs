@@ -5,6 +5,11 @@
 //! (out of range, busy, hidden, forged ids, wrong job, full bag) change no state. The board is
 //! the synthetic W140 one, the node content is the repository's `data/content`.
 
+#[path = "support/json.rs"]
+mod json;
+#[path = "support/node_content.rs"]
+mod node_content;
+
 use osfr_tools::{
     account_store::AccountRole,
     character_store::CharacterState,
@@ -22,6 +27,7 @@ use osfr_tools::{
         Type8Output, Type8Phase, Type8Run, lifecycle::RECONSTRUCTED_MINER_XP_PER_WIN,
     },
     npc_interaction::NpcInteractRequest,
+    startup_world::parse_add_npc,
 };
 use serde_json::{Value, json};
 use std::{
@@ -36,6 +42,13 @@ const PLAYABLE: usize = 8;
 const BOTTOM: usize = TOP + PLAYABLE - 1;
 /// Manifest-defined stand-ins that exist in the private campaign inventory.
 const OUTPUTS: [i32; 4] = [2739, 879, 65834, 2436];
+/// T553: the regional Harvesting games the farm plots start, with disjoint manifest-defined
+/// stand-ins for their produce (the real bundle definitions are not all in the private campaign).
+const REGION_OUTPUTS: [(i32, [i32; 4]); 3] = [
+    (109, [2875, 2876, 2877, 2880]),
+    (115, [2882, 2884, 2886, 2887]),
+    (117, [2889, 1194, 1196, 3941]),
+];
 const VALUES: [u16; 4] = [601, 602, 603, 604];
 const FILLER: i32 = 1195;
 const COPPER_RECIPE: i32 = 4;
@@ -48,6 +61,10 @@ struct Game {
     json_key: &'static str,
     profile: i32,
     goals: usize,
+    /// The produce definitions the game pays, in goal order.
+    outputs: [i32; 4],
+    /// T553: the Harvesting game a farm plot of this name starts; `None` for every other node.
+    region: Option<i32>,
 }
 
 const MINING: Game = Game {
@@ -55,14 +72,28 @@ const MINING: Game = Game {
     json_key: "mining",
     profile: MINER_PROFILE_ID,
     goals: 1,
+    outputs: OUTPUTS,
+    region: None,
 };
 const HARVEST: Game = Game {
     node: "Mushrooms",
     json_key: "harvesting",
     profile: CHEF_PROFILE_ID,
     goals: 4,
+    outputs: OUTPUTS,
+    region: None,
 };
-const GAMES: [Game; 2] = [MINING, HARVEST];
+/// T553: a Queensfields farm plot. The Lakesfield and Perry's Pastures plots are covered by
+/// `each_farm_plot_starts_its_own_region_game_and_pays_its_own_produce`.
+const PLOT: Game = Game {
+    node: "Harvesting",
+    json_key: "harvesting",
+    profile: CHEF_PROFILE_ID,
+    goals: 4,
+    outputs: REGION_OUTPUTS[0].1,
+    region: Some(REGION_OUTPUTS[0].0),
+};
+const GAMES: [Game; 3] = [MINING, HARVEST, PLOT];
 
 fn board(goals: usize) -> Type8BoardSpec {
     let values = &VALUES[..goals];
@@ -175,11 +206,26 @@ impl Fixture {
             "schema_version": 1, "game_id": MINING_GAME_ID, "profile_id": MINER_PROFILE_ID,
             "name_id": 7910, "description_id": 7911, "icon_id": 909, "spec": board(1),
         });
+        let spec = board(4);
+        let games: Vec<Value> = REGION_OUTPUTS
+            .iter()
+            .map(|(id, outputs)| {
+                let region = harvesting::region(*id).unwrap();
+                json!({
+                    "game_id": id, "name_id": region.name_id,
+                    "description_id": region.description_id, "icon_id": region.icon_id,
+                    "selectable": spec.selectable, "tiles": spec.tiles, "goals": spec.goals,
+                    "outputs": VALUES.iter().zip(outputs).map(|(value, definition_id)| json!({
+                        "value": value, "definition_id": definition_id, "cluster_quantity": 1,
+                    })).collect::<Vec<_>>(),
+                })
+            })
+            .collect();
         let harvest = json!({
             "schema_version": 1, "game_id": 111, "profile_id": CHEF_PROFILE_ID,
             "name_id": 100834, "description_id": 94150, "icon_id": 908,
             "preload_file": FARMING_PRELOAD_FILE, "launch_movie": FARMING_LAUNCH_MOVIE,
-            "spec": board(4),
+            "games": games, "spec": spec,
         });
         for (file, content) in [
             (mining::CONTENT_FILE, mining),
@@ -189,9 +235,21 @@ impl Fixture {
         }
         let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
         let nodes = GatheringNodes::load(&content).unwrap().unwrap();
-        let mut named = nodes.actors().filter(|actor| actor.name == game.node);
-        let node = named.next().expect("node content for the game").clone();
-        let other = named.next().expect("two nodes").clone();
+        let named: Vec<_> = nodes
+            .actors()
+            .filter(|actor| actor.name == game.node)
+            .collect();
+        // A plot is the one of the game's own region; any other node of the name is the spare.
+        let node = (*named
+            .iter()
+            .find(|actor| game.region.is_none() || nodes.game_id(actor.guid) == game.region)
+            .expect("node content for the game"))
+        .clone();
+        let other = (*named
+            .iter()
+            .find(|actor| actor.guid != node.guid)
+            .expect("two nodes"))
+        .clone();
         Self {
             game,
             directory,
@@ -255,6 +313,15 @@ impl Fixture {
         gateway.set_dev_tools(true);
         gateway.set_role(AccountRole::Admin);
         gateway
+    }
+
+    /// A campaign whose `harvesting.json` predates T553: no `games`, so no plot game is offered.
+    fn without_plot_games(self) -> Self {
+        let path = self.directory.join(harvesting::CONTENT_FILE);
+        let mut content = json::read(&path);
+        content.as_object_mut().unwrap().remove("games").unwrap();
+        json::write_pretty(&path, &content);
+        self
     }
 
     fn with_shipped_mining(self) -> Self {
@@ -409,7 +476,7 @@ fn count(gateway: &Gateway, definition: i32) -> u32 {
 }
 
 fn ore(gateway: &Gateway, game: Game) -> Vec<u32> {
-    OUTPUTS[..game.goals]
+    game.outputs[..game.goals]
         .iter()
         .map(|d| count(gateway, *d))
         .collect()
@@ -801,6 +868,42 @@ fn a_player_standing_at_a_node_is_sent_its_actor_and_not_a_far_ones() {
     }
 }
 
+/// T553: a farm plot's AddNpc carries its terrain object id and does not replace the terrain
+/// (client `00968c80` then adopts the terrain's own plot, so it draws once); every other node
+/// sends no terrain id.
+#[test]
+fn a_farm_plot_binds_to_its_terrain_object_and_other_nodes_do_not() {
+    let file = json::read(&node_content::content_dir().join("harvest_nodes.json"));
+    for game in GAMES {
+        let fixture = Fixture::new(game);
+        let (_, sent) = fixture.open(fixture.state(true, true), &fixture.node, 2.0);
+        let guid = fixture.node.guid;
+        let spawn = sent
+            .iter()
+            .flat_map(inners)
+            .filter(|p| p.starts_with(&[35, 0, 2, 0]) && has_guid(p, guid))
+            .filter_map(|p| parse_add_npc(p).ok())
+            .find(|spawn| spawn.actor_id == guid)
+            .expect("the node's AddNpc");
+        let row = file["spawns"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["id"] == guid & 0xffff_ffff);
+        let expected = row
+            .and_then(|row| row["terrain_object_id"].as_i64())
+            .unwrap_or(0);
+        assert_eq!(
+            i64::from(spawn.terrain_object_id),
+            expected,
+            "{}",
+            game.node
+        );
+        assert_eq!(spawn.replace_terrain_object, 0, "{}", game.node);
+        assert_eq!(expected != 0, game.region.is_some(), "{}", game.node);
+    }
+}
+
 #[test]
 fn quit_and_reconnect_before_a_win_pay_nothing_and_the_node_stays() {
     for game in GAMES {
@@ -1168,16 +1271,102 @@ fn node_content_is_bounded_and_unique() {
     // 12 + 2 mushroom nodes (pool maxima), 4 copper veins, 5 quest-only tin-ore pickups
     // (T503, `quest_nodes.json`), 21 T539 quest pickups (5 hammers, 5 chisels, 3 rocks,
     // 8 homework pages), 166 placed collection nodes (T524, the 34 pool maxima) and the
-    // 8 Snowhill copper veins T547 places from the 17 recovered rows.
-    assert_eq!(actors.len(), 218);
+    // 8 Snowhill copper veins T547 places from the 17 recovered rows and the 13 T553 farm
+    // plots (every recovered plot is active).
+    assert_eq!(actors.len(), 231);
     let mut ids: Vec<_> = actors.iter().map(|a| a.guid).collect();
     ids.sort();
     ids.dedup();
-    assert_eq!(ids.len(), 218);
+    assert_eq!(ids.len(), 231);
     assert!(
         actors
             .iter()
             .all(|a| a.position.iter().all(|v| v.is_finite()))
     );
     assert!(nodes.is_node(actors[0].guid) && !nodes.is_node(0));
+}
+
+/// The game a started run advertises: the 39/16 info packet's header game id, then its name and
+/// description ids (`mining.rs` `info_packet`).
+fn started_game(outcome: &GatewayOutcome) -> (i32, i32, i32) {
+    let info = inners(outcome)
+        .into_iter()
+        .find(|packet| packet.starts_with(&[39, 0, 16]))
+        .expect("a 39/16 info packet");
+    let at = |offset: usize| i32::from_le_bytes(info[offset..offset + 4].try_into().unwrap());
+    (at(11), at(15), at(23))
+}
+
+fn mushroom() -> NodeActor {
+    node_content::shipped_nodes()
+        .actors()
+        .find(|actor| actor.name == "Mushrooms")
+        .expect("a mushroom node")
+        .clone()
+}
+
+#[test]
+fn each_farm_plot_starts_its_own_region_game_and_pays_its_own_produce() {
+    for (region, outputs) in REGION_OUTPUTS {
+        let game = Game {
+            outputs,
+            region: Some(region),
+            ..PLOT
+        };
+        let fixture = Fixture::new(game);
+        let mut gateway = fixture.ready();
+        tick(&mut gateway, 1_500);
+        let started = click(&mut gateway, fixture.node.guid, 2_000);
+        let named = harvesting::region(region).unwrap();
+        assert_eq!(
+            started_game(&started),
+            (region, named.name_id, named.description_id),
+            "plot of game {region}"
+        );
+        let id = active(&gateway, game).expect("the plot's run is offered") as i32;
+        win(&mut gateway, game, id, 2_100);
+        assert_eq!(ore(&gateway, game), vec![1; 4], "game {region} produce");
+        assert_eq!(ore(&gateway, HARVEST), vec![0; 4], "game 111's produce");
+        assert_eq!(
+            xp(&gateway, game),
+            u64::from(RECONSTRUCTED_CHEF_XP_PER_WIN),
+            "game {region} (R) XP"
+        );
+        send(&mut gateway, &CLOSE, 3_100);
+
+        // The same Chef then clicks a mushroom: the engine is back on game 111, whose produce is
+        // paid, and the run ids go on counting from the plot's.
+        let saved = gateway.snapshot().gameplay.unwrap();
+        let mut again = fixture.gateway_at(saved, &mushroom(), 2.0);
+        let started = click(&mut again, mushroom().guid, 4_000);
+        assert_eq!(started_game(&started), (111, 100834, 94150));
+        assert_eq!(active(&again, HARVEST), Some(i64::from(id) + 1));
+        win(&mut again, HARVEST, id + 1, 4_100);
+        assert_eq!(ore(&again, HARVEST), vec![1; 4], "game 111 produce");
+        assert_eq!(ore(&again, game), vec![1; 4], "the region's produce stays");
+    }
+}
+
+#[test]
+fn a_campaign_without_plot_games_refuses_the_plot_and_keeps_the_mushrooms() {
+    let fixture = Fixture::new(PLOT).without_plot_games();
+    let mut gateway = fixture.ready();
+    let before = gateway.snapshot();
+    let before_bytes = serde_json::to_vec(&before).unwrap();
+    let refused = click(&mut gateway, fixture.node.guid, 2_000);
+    assert_eq!(
+        chat_text(&refused).trim_end(),
+        "Gathering is not available in this campaign."
+    );
+    assert!(!refused.gameplay_changed, "the refusal saved");
+    assert_eq!(gateway.snapshot(), before);
+    assert_eq!(
+        serde_json::to_vec(&gateway.snapshot()).unwrap(),
+        before_bytes
+    );
+    assert!(active(&gateway, PLOT).is_none());
+
+    let mut again = fixture.gateway_at(fixture.state(true, true), &mushroom(), 2.0);
+    let started = click(&mut again, mushroom().guid, 2_000);
+    assert_eq!(started_game(&started).0, 111);
 }

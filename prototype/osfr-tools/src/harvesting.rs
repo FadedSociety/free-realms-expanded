@@ -1248,6 +1248,50 @@ fn validate_tile_kinds(spec: &Type8BoardSpec) -> Result<(), HarvestError> {
     validate_tile_kinds_parts(&spec.selectable, &spec.collectable, &tiles)
 }
 
+/// The Harvest gameplay load gate: the engine binds Chef and the farming assets, and every game it
+/// offers (T553: the file's own and its `games`) is a recovered region whose values are
+/// registered, whose shape clears the border and whose reward items the loaded inventory
+/// defines. The shared engine stays permissive so the Mining contract is unchanged; see
+/// `notes/Research/Harvesting Runtime Tile Guard.md`.
+pub(crate) fn validate_engine(
+    engine: &crate::mining::Type8Engine,
+    inventory: &crate::inventory::Inventory,
+) -> Result<(), String> {
+    if engine.profile_id() != CHEF_PROFILE_ID {
+        return Err("harvesting content does not bind the Chef job".into());
+    }
+    if engine.preload_file() != FARMING_PRELOAD_FILE
+        || engine.launch_movie() != FARMING_LAUNCH_MOVIE
+    {
+        return Err("harvesting content does not bind the farming assets".into());
+    }
+    for (game, spec) in engine.games() {
+        if region(game).is_none() {
+            return Err(format!("harvesting content offers unknown game {game}"));
+        }
+        let tiles: Vec<(u16, u16)> = spec
+            .tiles
+            .iter()
+            .map(|kind| (kind.value, kind.category))
+            .collect();
+        validate_tile_kinds_parts(&spec.selectable, &spec.collectable, &tiles)
+            .map_err(|error| format!("harvesting tile registration: {error}"))?;
+        // A playable cell on shape row 0 or column 0 could never fall under the original
+        // loops, so an unpadded persisted document is refused before any offer.
+        validate_border(&spec.shape, spec.width, spec.height)
+            .map_err(|error| format!("harvesting border gate: {error}"))?;
+        for output in &spec.outputs {
+            if !inventory.has_definition(output.definition_id) {
+                return Err(format!(
+                    "harvesting reward definition {} is not in the loaded inventory",
+                    output.definition_id
+                ));
+            }
+        }
+    }
+    Ok(())
+}
+
 /// Slice form of the registration check, so the optional Harvest gameplay load gate can
 /// validate the shared engine's parsed spec without a second parser.
 pub(crate) fn validate_tile_kinds_parts(

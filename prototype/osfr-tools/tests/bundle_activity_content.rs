@@ -47,7 +47,7 @@ const FILES: &[&str] = &[
 ];
 
 /// The reviewed activity bytes; F130 restored Mining18's serialized outputs, T221 added the
-/// Wildwood and Sandstorm kart gates.
+/// Wildwood and Sandstorm kart gates, T553 added the regional Harvesting games.
 const FROZEN_SHA256: &[(&str, &str)] = &[
     (
         "encounters.json",
@@ -83,7 +83,7 @@ const FROZEN_SHA256: &[(&str, &str)] = &[
     ),
     (
         "harvesting.json",
-        "bfe6897fe00aac118b0c9c92c8528e91cc4ef713e1e3b0fdd61f1690e8e42532",
+        "edc3435a5a0a49c41f2aebfddc60c11a81d4b51f75660639aaf5e235b61051bc",
     ),
 ];
 

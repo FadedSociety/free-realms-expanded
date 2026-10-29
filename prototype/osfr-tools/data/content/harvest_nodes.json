@@ -120,6 +120,28 @@
         "cursor_id": "legacy_reference_unverified_client_cursor",
         "placement_y_offset": "legacy_reference_policy_R"
       }
+    },
+    {
+      "key": "farm-plot",
+      "name": "Harvesting",
+      "model_id": 274,
+      "scale": 1.0,
+      "composite_effect_id": 0,
+      "interact_range": 12,
+      "cursor_id": 18,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "name": "client MiniGameData rows 109, 115 and 117 (type 8) name the plots 'Queensfields/Perry's Pastures/Lakesfield Harvesting' (NAME_ID 100833, 100836, 100837); the node itself is called Harvesting",
+        "model_id": "client Resources/Models.txt 274 = sg_farming_node_common_01.adr ('Farming Node DPO - Common'); Sanctuary-main-20261019 src/Resources/Npcs.json ModelId 274 on all 13 plot rows",
+        "scale": "Sanctuary-main-20261019 src/Resources/Npcs.json Scale 1 on all 13 plot rows (the captured template's own value)",
+        "composite_effect_id": "0: the plot rows carry no CompositeEffectId, so the plot does not sparkle like a mushroom",
+        "cursor_id": "client Resources/Cursors.txt 18 = cursor_interaction_harvesting.cur; Sanctuary-main-20261019 src/Resources/Npcs.json CursorId 18. Loaded only: the AddNpc crosswalk (reader 00921a10) has no cursor field",
+        "interact_range": "(R) 12, same as the mushroom type; the server-side node reach",
+        "placement_y_offset": "0.0: the recovered spawn heights already sit on the terrain",
+        "drop_table": "empty: the Harvesting board (harvesting.json) pays the region's produce"
+      }
     }
   ],
   "pools": [
@@ -149,6 +171,51 @@
         "node_type": "legacy_pool_table",
         "max_active_nodes": "legacy_reference_policy_R",
         "respawn_seconds": "legacy_reference_policy_R"
+      }
+    },
+    {
+      "key": "queensfields",
+      "zone_definition_id": 0,
+      "node_type": "farm-plot",
+      "max_active_nodes": 1,
+      "respawn_seconds": 60,
+      "game_id": 109,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "game_id": "client MiniGameData row 109 (type 8) = Queensfields Harvesting; harvesting.rs REGIONS 109",
+        "placement": "1 spawnNpcWithGuid rows of plot model 274 near Queensfields in Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua (the open world, zone_definition_id 0)",
+        "max_active_nodes": "(R) every recovered plot is active; no recovered cap",
+        "respawn_seconds": "(R) 60, same as the mushroom pool; no recovered timer"
+      }
+    },
+    {
+      "key": "perrys-pastures",
+      "zone_definition_id": 0,
+      "node_type": "farm-plot",
+      "max_active_nodes": 6,
+      "respawn_seconds": 60,
+      "game_id": 115,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "game_id": "client MiniGameData row 115 (type 8) = Perry's Pastures Harvesting; harvesting.rs REGIONS 115",
+        "placement": "6 spawnNpcWithGuid rows of plot model 274 near Perry's Pastures in Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua (the open world, zone_definition_id 0)",
+        "max_active_nodes": "(R) every recovered plot is active; no recovered cap",
+        "respawn_seconds": "(R) 60, same as the mushroom pool; no recovered timer"
+      }
+    },
+    {
+      "key": "lakesfield",
+      "zone_definition_id": 0,
+      "node_type": "farm-plot",
+      "max_active_nodes": 6,
+      "respawn_seconds": 60,
+      "game_id": 117,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "game_id": "client MiniGameData row 117 (type 8) = Lakesfield Harvesting; harvesting.rs REGIONS 117",
+        "placement": "6 spawnNpcWithGuid rows of plot model 274 near Lakesfield in Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua (the open world, zone_definition_id 0)",
+        "max_active_nodes": "(R) every recovered plot is active; no recovered cap",
+        "respawn_seconds": "(R) 60, same as the mushroom pool; no recovered timer"
       }
     }
   ],
@@ -1595,6 +1662,227 @@
         "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
         "position": "legacy_spawn_Position",
         "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 33213,
+      "pool_key": "queensfields",
+      "zone_definition_id": 0,
+      "position": [
+        -1502.6562,
+        -34.931175,
+        401.24432
+      ],
+      "heading": 1.89757871,
+      "terrain_object_id": 1254769517,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:3504 spawnNpcWithGuid(33213, 100000033213, -1502.6562, -34.931175, 401.24432, 1.89757871); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33213 (ModelId 274, CursorId 18, ReplaceTerrainObject false)",
+        "terrain_object_id": "Sanctuary-main-20261019 src/Resources/Npcs.json Id=33213 TerrainObjectId 1254769517. Sent in the AddNpc with replace_terrain_object 0: client 00968c80 adopts the terrain object as the actor instead of building model 274, so the plot draws once. (R) packet-field wiring by name and behaviour, native check pending"
+      }
+    },
+    {
+      "id": 33484,
+      "pool_key": "lakesfield",
+      "zone_definition_id": 0,
+      "position": [
+        -809.9808,
+        5.1704764,
+        926.39276
+      ],
+      "heading": 1.60369401,
+      "terrain_object_id": 1254791344,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:3706 spawnNpcWithGuid(33484, 100000033484, -809.9808, 5.1704764, 926.39276, 1.60369401); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33484 (ModelId 274, CursorId 18, ReplaceTerrainObject false)",
+        "terrain_object_id": "Sanctuary-main-20261019 src/Resources/Npcs.json Id=33484 TerrainObjectId 1254791344. Sent in the AddNpc with replace_terrain_object 0: client 00968c80 adopts the terrain object as the actor instead of building model 274, so the plot draws once. (R) packet-field wiring by name and behaviour, native check pending"
+      }
+    },
+    {
+      "id": 33507,
+      "pool_key": "lakesfield",
+      "zone_definition_id": 0,
+      "position": [
+        -798.0514,
+        5.2278156,
+        930.9101
+      ],
+      "heading": -1.57079633,
+      "terrain_object_id": 1254791343,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:3729 spawnNpcWithGuid(33507, 100000033507, -798.0514, 5.2278156, 930.9101, -1.57079633); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33507 (ModelId 274, CursorId 18, ReplaceTerrainObject false)",
+        "terrain_object_id": "Sanctuary-main-20261019 src/Resources/Npcs.json Id=33507 TerrainObjectId 1254791343. Sent in the AddNpc with replace_terrain_object 0: client 00968c80 adopts the terrain object as the actor instead of building model 274, so the plot draws once. (R) packet-field wiring by name and behaviour, native check pending"
+      }
+    },
+    {
+      "id": 33525,
+      "pool_key": "lakesfield",
+      "zone_definition_id": 0,
+      "position": [
+        -787.91156,
+        5.2204785,
+        947.3208
+      ],
+      "heading": 1.57079633,
+      "terrain_object_id": 1254791351,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:3747 spawnNpcWithGuid(33525, 100000033525, -787.91156, 5.2204785, 947.3208, 1.57079633); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33525 (ModelId 274, CursorId 18, ReplaceTerrainObject false)",
+        "terrain_object_id": "Sanctuary-main-20261019 src/Resources/Npcs.json Id=33525 TerrainObjectId 1254791351. Sent in the AddNpc with replace_terrain_object 0: client 00968c80 adopts the terrain object as the actor instead of building model 274, so the plot draws once. (R) packet-field wiring by name and behaviour, native check pending"
+      }
+    },
+    {
+      "id": 33551,
+      "pool_key": "lakesfield",
+      "zone_definition_id": 0,
+      "position": [
+        -753.2666,
+        7.8718424,
+        954.5572
+      ],
+      "heading": -1.57079633,
+      "terrain_object_id": 1254791541,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:3773 spawnNpcWithGuid(33551, 100000033551, -753.2666, 7.8718424, 954.5572, -1.57079633); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33551 (ModelId 274, CursorId 18, ReplaceTerrainObject false)",
+        "terrain_object_id": "Sanctuary-main-20261019 src/Resources/Npcs.json Id=33551 TerrainObjectId 1254791541. Sent in the AddNpc with replace_terrain_object 0: client 00968c80 adopts the terrain object as the actor instead of building model 274, so the plot draws once. (R) packet-field wiring by name and behaviour, native check pending"
+      }
+    },
+    {
+      "id": 33552,
+      "pool_key": "lakesfield",
+      "zone_definition_id": 0,
+      "position": [
+        -766.5537,
+        7.796844,
+        949.86523
+      ],
+      "heading": 1.57961662,
+      "terrain_object_id": 1254791540,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:3774 spawnNpcWithGuid(33552, 100000033552, -766.5537, 7.796844, 949.86523, 1.57961662); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33552 (ModelId 274, CursorId 18, ReplaceTerrainObject false)",
+        "terrain_object_id": "Sanctuary-main-20261019 src/Resources/Npcs.json Id=33552 TerrainObjectId 1254791540. Sent in the AddNpc with replace_terrain_object 0: client 00968c80 adopts the terrain object as the actor instead of building model 274, so the plot draws once. (R) packet-field wiring by name and behaviour, native check pending"
+      }
+    },
+    {
+      "id": 33559,
+      "pool_key": "lakesfield",
+      "zone_definition_id": 0,
+      "position": [
+        -765.1059,
+        7.821848,
+        963.0318
+      ],
+      "heading": -1.57079633,
+      "terrain_object_id": 1254791564,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:3781 spawnNpcWithGuid(33559, 100000033559, -765.1059, 7.821848, 963.0318, -1.57079633); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33559 (ModelId 274, CursorId 18, ReplaceTerrainObject false)",
+        "terrain_object_id": "Sanctuary-main-20261019 src/Resources/Npcs.json Id=33559 TerrainObjectId 1254791564. Sent in the AddNpc with replace_terrain_object 0: client 00968c80 adopts the terrain object as the actor instead of building model 274, so the plot draws once. (R) packet-field wiring by name and behaviour, native check pending"
+      }
+    },
+    {
+      "id": 33851,
+      "pool_key": "perrys-pastures",
+      "zone_definition_id": 0,
+      "position": [
+        -58.946976,
+        10.999996,
+        237.3758
+      ],
+      "heading": -1.57079633,
+      "terrain_object_id": 1254789946,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:4010 spawnNpcWithGuid(33851, 100000033851, -58.946976, 10.999996, 237.3758, -1.57079633); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33851 (ModelId 274, CursorId 18, ReplaceTerrainObject false)",
+        "terrain_object_id": "Sanctuary-main-20261019 src/Resources/Npcs.json Id=33851 TerrainObjectId 1254789946. Sent in the AddNpc with replace_terrain_object 0: client 00968c80 adopts the terrain object as the actor instead of building model 274, so the plot draws once. (R) packet-field wiring by name and behaviour, native check pending"
+      }
+    },
+    {
+      "id": 33883,
+      "pool_key": "perrys-pastures",
+      "zone_definition_id": 0,
+      "position": [
+        -51.375954,
+        11.002682,
+        213.8115
+      ],
+      "heading": -1.57079633,
+      "terrain_object_id": 1254789945,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:4042 spawnNpcWithGuid(33883, 100000033883, -51.375954, 11.002682, 213.8115, -1.57079633); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33883 (ModelId 274, CursorId 18, ReplaceTerrainObject false)",
+        "terrain_object_id": "Sanctuary-main-20261019 src/Resources/Npcs.json Id=33883 TerrainObjectId 1254789945. Sent in the AddNpc with replace_terrain_object 0: client 00968c80 adopts the terrain object as the actor instead of building model 274, so the plot draws once. (R) packet-field wiring by name and behaviour, native check pending"
+      }
+    },
+    {
+      "id": 33907,
+      "pool_key": "perrys-pastures",
+      "zone_definition_id": 0,
+      "position": [
+        -77.27421,
+        10.998888,
+        225.47823
+      ],
+      "heading": -1.57079633,
+      "terrain_object_id": 1254789833,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:4066 spawnNpcWithGuid(33907, 100000033907, -77.27421, 10.998888, 225.47823, -1.57079633); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33907 (ModelId 274, CursorId 18, ReplaceTerrainObject false)",
+        "terrain_object_id": "Sanctuary-main-20261019 src/Resources/Npcs.json Id=33907 TerrainObjectId 1254789833. Sent in the AddNpc with replace_terrain_object 0: client 00968c80 adopts the terrain object as the actor instead of building model 274, so the plot draws once. (R) packet-field wiring by name and behaviour, native check pending"
+      }
+    },
+    {
+      "id": 33918,
+      "pool_key": "perrys-pastures",
+      "zone_definition_id": 0,
+      "position": [
+        -80.50133,
+        10.962984,
+        215.41075
+      ],
+      "heading": -1.57079633,
+      "terrain_object_id": 1254789834,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:4076 spawnNpcWithGuid(33918, 100000033918, -80.50133, 10.962984, 215.41075, -1.57079633); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33918 (ModelId 274, CursorId 18, ReplaceTerrainObject false)",
+        "terrain_object_id": "Sanctuary-main-20261019 src/Resources/Npcs.json Id=33918 TerrainObjectId 1254789834. Sent in the AddNpc with replace_terrain_object 0: client 00968c80 adopts the terrain object as the actor instead of building model 274, so the plot draws once. (R) packet-field wiring by name and behaviour, native check pending"
+      }
+    },
+    {
+      "id": 33927,
+      "pool_key": "perrys-pastures",
+      "zone_definition_id": 0,
+      "position": [
+        -91.32564,
+        10.991994,
+        231.24033
+      ],
+      "heading": -1.57079633,
+      "terrain_object_id": 1254789830,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:4085 spawnNpcWithGuid(33927, 100000033927, -91.32564, 10.991994, 231.24033, -1.57079633); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33927 (ModelId 274, CursorId 18, ReplaceTerrainObject false)",
+        "terrain_object_id": "Sanctuary-main-20261019 src/Resources/Npcs.json Id=33927 TerrainObjectId 1254789830. Sent in the AddNpc with replace_terrain_object 0: client 00968c80 adopts the terrain object as the actor instead of building model 274, so the plot draws once. (R) packet-field wiring by name and behaviour, native check pending"
+      }
+    },
+    {
+      "id": 33941,
+      "pool_key": "perrys-pastures",
+      "zone_definition_id": 0,
+      "position": [
+        -91.77587,
+        10.384476,
+        210.14299
+      ],
+      "heading": -1.57079633,
+      "terrain_object_id": 1254789831,
+      "source_tag": "Sanctuary-main-20261019",
+      "source_tags": {
+        "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:4099 spawnNpcWithGuid(33941, 100000033941, -91.77587, 10.384476, 210.14299, -1.57079633); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33941 (ModelId 274, CursorId 18, ReplaceTerrainObject false)",
+        "terrain_object_id": "Sanctuary-main-20261019 src/Resources/Npcs.json Id=33941 TerrainObjectId 1254789831. Sent in the AddNpc with replace_terrain_object 0: client 00968c80 adopts the terrain object as the actor instead of building model 274, so the plot draws once. (R) packet-field wiring by name and behaviour, native check pending"
       }
     }
   ]

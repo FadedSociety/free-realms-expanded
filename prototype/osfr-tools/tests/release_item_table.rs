@@ -74,7 +74,7 @@ const CONSUMERS: [(&str, &[&str], usize, usize, usize); 4] = [
         "recipes.json",
         &["definition_id", "recipe_item_definition_id"],
         104,
-        37,
+        38,
         104,
     ),
     (

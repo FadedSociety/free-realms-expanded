@@ -7,6 +7,266 @@
   "icon_id": 908,
   "preload_file": "FarmingAssets.txt",
   "launch_movie": "game_farming.gfx",
+  "games": [
+    {
+      "game_id": 109,
+      "name_id": 100833,
+      "description_id": 94149,
+      "icon_id": 908,
+      "selectable": [
+        401,
+        410,
+        415,
+        407
+      ],
+      "tiles": [
+        {
+          "value": 401,
+          "category": 400,
+          "icon_id": 1
+        },
+        {
+          "value": 410,
+          "category": 400,
+          "icon_id": 10
+        },
+        {
+          "value": 415,
+          "category": 400,
+          "icon_id": 15
+        },
+        {
+          "value": 407,
+          "category": 400,
+          "icon_id": 7
+        }
+      ],
+      "goals": [
+        {
+          "index": 0,
+          "value": 401,
+          "quota": 15,
+          "per_reward": 5,
+          "icon_id": 706
+        },
+        {
+          "index": 1,
+          "value": 410,
+          "quota": 15,
+          "per_reward": 5,
+          "icon_id": 710
+        },
+        {
+          "index": 2,
+          "value": 415,
+          "quota": 15,
+          "per_reward": 5,
+          "icon_id": 667
+        },
+        {
+          "index": 3,
+          "value": 407,
+          "quota": 15,
+          "per_reward": 5,
+          "icon_id": 707
+        }
+      ],
+      "outputs": [
+        {
+          "value": 401,
+          "definition_id": 2875,
+          "cluster_quantity": 1
+        },
+        {
+          "value": 410,
+          "definition_id": 2884,
+          "cluster_quantity": 1
+        },
+        {
+          "value": 415,
+          "definition_id": 2889,
+          "cluster_quantity": 1
+        },
+        {
+          "value": 407,
+          "definition_id": 2881,
+          "cluster_quantity": 1
+        }
+      ]
+    },
+    {
+      "game_id": 115,
+      "name_id": 100836,
+      "description_id": 94152,
+      "icon_id": 908,
+      "selectable": [
+        402,
+        413,
+        412,
+        403
+      ],
+      "tiles": [
+        {
+          "value": 402,
+          "category": 400,
+          "icon_id": 2
+        },
+        {
+          "value": 413,
+          "category": 400,
+          "icon_id": 13
+        },
+        {
+          "value": 412,
+          "category": 400,
+          "icon_id": 12
+        },
+        {
+          "value": 403,
+          "category": 400,
+          "icon_id": 3
+        }
+      ],
+      "goals": [
+        {
+          "index": 0,
+          "value": 402,
+          "quota": 15,
+          "per_reward": 5,
+          "icon_id": 711
+        },
+        {
+          "index": 1,
+          "value": 413,
+          "quota": 15,
+          "per_reward": 5,
+          "icon_id": 713
+        },
+        {
+          "index": 2,
+          "value": 412,
+          "quota": 15,
+          "per_reward": 5,
+          "icon_id": 714
+        },
+        {
+          "index": 3,
+          "value": 403,
+          "quota": 15,
+          "per_reward": 5,
+          "icon_id": 712
+        }
+      ],
+      "outputs": [
+        {
+          "value": 402,
+          "definition_id": 2876,
+          "cluster_quantity": 1
+        },
+        {
+          "value": 413,
+          "definition_id": 2887,
+          "cluster_quantity": 1
+        },
+        {
+          "value": 412,
+          "definition_id": 2886,
+          "cluster_quantity": 1
+        },
+        {
+          "value": 403,
+          "definition_id": 2877,
+          "cluster_quantity": 1
+        }
+      ]
+    },
+    {
+      "game_id": 117,
+      "name_id": 100837,
+      "description_id": 94153,
+      "icon_id": 908,
+      "selectable": [
+        408,
+        406,
+        410,
+        401
+      ],
+      "tiles": [
+        {
+          "value": 408,
+          "category": 400,
+          "icon_id": 8
+        },
+        {
+          "value": 406,
+          "category": 400,
+          "icon_id": 6
+        },
+        {
+          "value": 410,
+          "category": 400,
+          "icon_id": 10
+        },
+        {
+          "value": 401,
+          "category": 400,
+          "icon_id": 1
+        }
+      ],
+      "goals": [
+        {
+          "index": 0,
+          "value": 408,
+          "quota": 15,
+          "per_reward": 5,
+          "icon_id": 709
+        },
+        {
+          "index": 1,
+          "value": 406,
+          "quota": 15,
+          "per_reward": 5,
+          "icon_id": 716
+        },
+        {
+          "index": 2,
+          "value": 410,
+          "quota": 15,
+          "per_reward": 5,
+          "icon_id": 710
+        },
+        {
+          "index": 3,
+          "value": 401,
+          "quota": 15,
+          "per_reward": 5,
+          "icon_id": 706
+        }
+      ],
+      "outputs": [
+        {
+          "value": 408,
+          "definition_id": 2882,
+          "cluster_quantity": 1
+        },
+        {
+          "value": 406,
+          "definition_id": 2880,
+          "cluster_quantity": 1
+        },
+        {
+          "value": 410,
+          "definition_id": 2884,
+          "cluster_quantity": 1
+        },
+        {
+          "value": 401,
+          "definition_id": 2875,
+          "cluster_quantity": 1
+        }
+      ]
+    }
+  ],
   "spec": {
     "width": 11,
     "height": 11,

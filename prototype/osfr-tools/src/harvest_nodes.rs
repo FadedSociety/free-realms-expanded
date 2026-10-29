@@ -16,9 +16,15 @@
 //! and quest actors keep the captured template fields. Every kind draws its type's `scale` and
 //! optional `texture_alias` (T547). Node actors send no heading: static actors keep the
 //! template facing, so a spawn row's `heading` is loaded content only.
+//!
+//! T553: a harvest pool may name the MiniGameData Harvesting game its nodes start (`game_id`,
+//! a `harvesting::REGIONS` id; the farm plots of Queensfields 109, Perry's Pastures 115 and
+//! Lakesfield 117). The mushrooms name none and start the engine's own game 111. A plot sends its
+//! `terrain_object_id` in the AddNpc with `replace_terrain_object` 0, which binds the actor to the
+//! terrain's own plot instead of drawing a second model (client `00968c80`, see `NodePresentation`).
 
 use crate::{
-    harvesting::CHEF_PROFILE_ID,
+    harvesting::{CHEF_PROFILE_ID, region},
     inventory::Inventory,
     mining::{MINER_PROFILE_ID, Type8BoardSpec},
     npc_notifications::{self, Notification},
@@ -171,6 +177,12 @@ pub struct HarvestNodePool {
     pub node_type: String,
     pub max_active_nodes: u32,
     pub respawn_seconds: u32,
+    /// T553: the MiniGameData Harvesting game a click on this pool's nodes starts (a
+    /// `harvesting::REGIONS` id; the file's own game when absent). Only the Chef harvest file
+    /// may name one. The engine must offer the game (`harvesting.json` `games`) or a click is
+    /// refused as unavailable.
+    #[serde(default)]
+    pub game_id: Option<i32>,
     /// Sanctuary keeps the loot table on the pool, Legacy on the type. T524's collection
     /// clicks roll this table (the import keeps the type tables empty); W171's Type8 payout
     /// still owns the gather reward.
@@ -190,13 +202,18 @@ pub struct HarvestNodeSpawn {
     pub position: [f32; 3],
     /// Recovered facing, kept as content. Not drawn: see the module doc.
     pub heading: f32,
+    /// T553: the client terrain object this actor is bound to (Sanctuary `TerrainObjectId`),
+    /// sent as the AddNpc `terrain_object_id` (see `NodePresentation::terrain_object_id`).
+    #[serde(default)]
+    pub terrain_object_id: Option<i32>,
     #[serde(default)]
     pub source_tag: Option<String>,
     #[serde(default)]
     pub source_tags: BTreeMap<String, String>,
 }
 
-/// Which Type8 game a node starts. (R) Mushroom nodes start Harvesting111 (Chef), ore nodes Mining18.
+/// Which Type8 engine a node starts. (R) Mushroom nodes start Harvesting111 (Chef), ore nodes
+/// Mining18; a pool's `game_id` picks another Harvesting game on the same engine (T553).
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Gather {
     Mining,
@@ -284,6 +301,14 @@ pub struct NodePresentation {
     pub texture_alias: Option<String>,
     /// T555: the type's notifications, sent after the node's 35/2.
     pub notifications: Vec<Notification>,
+    /// T553: AddNpc `terrain_object_id` (the farm plots; `replace_terrain_object` stays 0).
+    /// Client `00968c80` (ProxiedCharacter init) looks the id up in the zone's terrain table; found
+    /// and not replacing, the proxied character adopts the terrain object as its actor and builds
+    /// no model of its own, so the plot draws once. Not found at creation, `00973200`
+    /// (ProxiedCharacter::Process) retries the lookup until the zone has loaded. (R) the packet
+    /// fields behind `00968c80`'s arguments are matched by name and behaviour, not traced
+    /// instruction by instruction; native check pending.
+    pub terrain_object_id: Option<i32>,
 }
 
 pub enum NodeChange {
@@ -317,6 +342,8 @@ enum SiteKind {
 struct Site {
     actor: NodeActor,
     kind: SiteKind,
+    /// T553: the Harvesting game this node starts (`None`: the file's own).
+    game_id: Option<i32>,
     /// Server-side admission reach, from the node type; every kind uses it. The integer
     /// AddNpc `interact_range` a collect node sends is a different consumer of the same content
     /// row, so the two are not interchangeable.
@@ -443,6 +470,11 @@ impl GatheringNodes {
 
     pub fn is_node(&self, guid: u64) -> bool {
         self.sites.contains_key(&guid)
+    }
+
+    /// T553: the Harvesting game a click on node `guid` starts; `None` is the engine's own game.
+    pub fn game_id(&self, guid: u64) -> Option<i32> {
+        self.sites.get(&guid)?.game_id
     }
 
     /// T524: whether this guid is a sparkling collection node.
@@ -689,6 +721,12 @@ fn add_sites(
         {
             return Err(bad("node range or respawn out of bounds"));
         }
+        // T553: only the Chef harvest file starts regional games, and only ones the client names.
+        if pool.game_id.is_some_and(|game| {
+            region(game).is_none() || !matches!(source, NodeSource::Gather(Gather::Harvesting))
+        }) {
+            return Err(bad("a node pool names a game it cannot start"));
+        }
         // T547: a model scale or alias the client cannot draw is refused at load, not sent.
         if !node_type.scale.is_finite()
             || node_type.scale <= 0.0
@@ -770,15 +808,18 @@ fn add_sites(
             }
             let guid = node_guid(tag, spawn.id);
             let [x, y, z] = spawn.position;
+            let mut presentation = presentation.clone();
+            presentation.terrain_object_id = spawn.terrain_object_id;
             let site = Site {
                 actor: NodeActor {
                     guid,
                     name: node_type.name.clone(),
                     model_id: node_type.model_id,
                     position: [x, y + node_type.placement_y_offset, z],
-                    presentation: presentation.clone(),
+                    presentation,
                 },
                 kind: kind.clone(),
+                game_id: pool.game_id,
                 range: f64::from(node_type.interact_range),
                 respawn_ms: u64::from(pool.respawn_seconds) * 1000,
             };
@@ -848,6 +889,9 @@ fn node_spawn(node: &NodeActor, interactable: bool) -> NpcSpawn {
     }
     if let Some(alias) = &node.presentation.texture_alias {
         spawn.texture_alias.clone_from(alias);
+    }
+    if let Some(terrain) = node.presentation.terrain_object_id {
+        spawn.terrain_object_id = terrain;
     }
     spawn.is_interactable = u8::from(interactable);
     spawn

@@ -1036,39 +1036,7 @@ impl Gameplay {
                 harvesting::FIRST_INSTANCE_ID,
                 harvesting,
             )?;
-            if engine.profile_id() != harvesting::CHEF_PROFILE_ID {
-                return Err(invalid("harvesting content does not bind the Chef job"));
-            }
-            if engine.preload_file() != harvesting::FARMING_PRELOAD_FILE
-                || engine.launch_movie() != harvesting::FARMING_LAUNCH_MOVIE
-            {
-                return Err(invalid(
-                    "harvesting content does not bind the farming assets",
-                ));
-            }
-            // Runtime registration gate: the shared engine stays permissive so the Mining
-            // contract is unchanged, but an optional Harvest campaign must register every value
-            // it can spawn before any offer. See notes/Research/Harvesting Runtime Tile Guard.md.
-            let spec = engine.spec();
-            let tiles: Vec<(u16, u16)> = spec
-                .tiles
-                .iter()
-                .map(|kind| (kind.value, kind.category))
-                .collect();
-            harvesting::validate_tile_kinds_parts(&spec.selectable, &spec.collectable, &tiles)
-                .map_err(|error| invalid(format!("harvesting tile registration: {error}")))?;
-            // Border gate: a playable cell on shape row 0 or column 0 could never fall under the
-            // original loops, so an unpadded persisted document is refused before any offer.
-            harvesting::validate_border(&spec.shape, spec.width, spec.height)
-                .map_err(|error| invalid(format!("harvesting border gate: {error}")))?;
-            for output in &engine.spec().outputs {
-                if !inventory.has_definition(output.definition_id) {
-                    return Err(invalid(format!(
-                        "harvesting reward definition {} is not in the loaded inventory",
-                        output.definition_id
-                    )));
-                }
-            }
+            harvesting::validate_engine(&engine, &inventory).map_err(invalid)?;
             Some(engine)
         } else {
             dormant.harvesting = harvesting;
@@ -2453,12 +2421,13 @@ impl Gameplay {
                 return Ok(Some(out));
             }
         };
-        let Some(engine) = self.type8(gather) else {
+        let game = nodes.game_id(target);
+        let Some(spec) = self.type8(gather).and_then(|e| e.spec_for(game)) else {
             out.replies
                 .push(chat::system("Gathering is not available in this campaign."));
             return Ok(Some(out));
         };
-        if !payout_fits(&self.inventory, engine.spec()) {
+        if !payout_fits(&self.inventory, spec) {
             out.replies.push(chat::system(
                 "Your bag is full. Make room before gathering.",
             ));
@@ -2466,7 +2435,7 @@ impl Gameplay {
         }
         let mut staged = self.clone();
         staged.gathering_nodes.as_mut().unwrap().begin(target);
-        staged.begin_gather(gather, now_ms, &mut out)?;
+        staged.begin_gather(gather, game, now_ms, &mut out)?;
         *self = staged;
         Ok(Some(out))
     }

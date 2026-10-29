@@ -34,7 +34,7 @@
 //! [`Type8State`] before committing replies or any reward transaction.
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::HashSet,
+    collections::{BTreeMap, HashSet},
     fs,
     io::{self, Read},
     path::{Path, PathBuf},
@@ -252,7 +252,48 @@ struct Content {
     /// file without this key behaves exactly like the pre-powerup engine.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     powerup_definitions: Vec<Type8PowerupDefinition>,
+    /// T553 (R): further games that share this file's movie, board shape and tuning and differ
+    /// only in the produce they ask for (the regional Harvesting games). Empty for Mining and
+    /// for every older file.
+    #[serde(default)]
+    games: Vec<GameVariant>,
     spec: Type8BoardSpec,
+}
+
+/// T553: what one extra game of a content file replaces: its client name, description and icon
+/// ids and the produce-dependent parts of the board. Everything else comes from the file.
+#[derive(Clone, Debug, Deserialize)]
+struct GameVariant {
+    game_id: i32,
+    name_id: i32,
+    description_id: i32,
+    icon_id: i32,
+    selectable: Vec<u16>,
+    tiles: Vec<Type8Kind>,
+    goals: Vec<Type8Goal>,
+    outputs: Vec<Type8Output>,
+}
+
+impl Content {
+    /// The content of one extra game: this file's with the variant's rows swapped in.
+    fn variant(&self, game: GameVariant) -> io::Result<Self> {
+        let mut content = self.clone();
+        content.games.clear();
+        content.game_id = game.game_id;
+        content.name_id = game.name_id;
+        content.description_id = game.description_id;
+        content.icon_id = game.icon_id;
+        content.spec.selectable = game.selectable;
+        content.spec.tiles = game.tiles;
+        content.spec.goals = game.goals;
+        content.spec.outputs = game.outputs;
+        // A saved run of one game must stay valid under every other game's content.
+        if content.spec.goals.len() != self.spec.goals.len() {
+            return Err(invalid("game variant changes the goal count"));
+        }
+        validate_spec(&content.spec)?;
+        Ok(content)
+    }
 }
 
 /// RECONSTRUCTED per-powerup authoring row. The original table lived in the
@@ -284,7 +325,12 @@ struct Bounds {
 
 #[derive(Clone, Debug)]
 pub struct Type8Engine {
+    /// The game the engine is set to: its file's own until [`Self::begin_game`] picks another.
     content: Arc<Content>,
+    /// Every game the file offers, the file's own first (T553).
+    games: Arc<BTreeMap<i32, Arc<Content>>>,
+    /// The file's own game id, which a start with no game named selects.
+    home: i32,
     game_id: i32,
     first_instance_id: i32,
     bounds: Bounds,
@@ -322,6 +368,13 @@ impl Type8Engine {
         validate_asset_name(&content.launch_movie, "launch movie")?;
         let bounds = validate_spec(&content.spec)?;
         validate_powerup_definitions(&content)?;
+        let mut games = BTreeMap::new();
+        for game in content.games.clone() {
+            if game.game_id == game_id || games.contains_key(&game.game_id) {
+                return Err(invalid("duplicate game id in mining content"));
+            }
+            games.insert(game.game_id, Arc::new(content.variant(game)?));
+        }
         let state = state.unwrap_or(Type8State {
             version: 1,
             next_instance_id: first_instance_id,
@@ -337,8 +390,12 @@ impl Type8Engine {
         if let Some(run) = &state.active {
             validate_run(run, &content.spec, bounds)?;
         }
+        let content = Arc::new(content);
+        games.insert(game_id, content.clone());
         Ok(Self {
-            content: Arc::new(content),
+            content,
+            games: Arc::new(games),
+            home: game_id,
             game_id,
             first_instance_id,
             bounds,
@@ -372,6 +429,38 @@ impl Type8Engine {
 
     pub fn active(&self) -> bool {
         self.state.active.is_some()
+    }
+
+    /// The game the engine is currently set to (the one a paid run belongs to).
+    pub fn game_id(&self) -> i32 {
+        self.game_id
+    }
+
+    /// T553: every game this file offers and its board, in id order.
+    pub fn games(&self) -> impl Iterator<Item = (i32, &Type8BoardSpec)> {
+        self.games.iter().map(|(id, content)| (*id, &content.spec))
+    }
+
+    /// T553: the board of `game` (`None` is the file's own game); `None` when not offered.
+    pub fn spec_for(&self, game: Option<i32>) -> Option<&Type8BoardSpec> {
+        Some(&self.games.get(&game.unwrap_or(self.home))?.spec)
+    }
+
+    /// T553: [`Self::begin`] on `game` (`None` is the file's own game), set while the engine is
+    /// idle. A refusal changes nothing: the switch is made on a copy.
+    pub fn begin_game(&mut self, game: Option<i32>, profile: i32) -> io::Result<Type8Outcome> {
+        let id = game.unwrap_or(self.home);
+        let content = self
+            .games
+            .get(&id)
+            .ok_or_else(|| invalid("game is not offered by this content"))?
+            .clone();
+        let mut next = self.clone();
+        next.content = content;
+        next.game_id = id;
+        let out = next.begin(profile)?;
+        *self = next;
+        Ok(out)
     }
 
     /// Test-only board seeding so a powerup fixture does not depend on the RNG

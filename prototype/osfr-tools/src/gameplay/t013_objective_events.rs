@@ -1601,7 +1601,10 @@ fn a_failed_begin_leaves_no_clock_or_engine_state() {
     // The absent-engine path refuses before touching the clock as well.
     game.mining = None;
     let mut out = Outcome::default();
-    assert!(game.begin_gather(Gather::Mining, 1_000, &mut out).is_err());
+    assert!(
+        game.begin_gather(Gather::Mining, None, 1_000, &mut out)
+            .is_err()
+    );
     assert_eq!(game.type8_tick_ms, None);
 }
 

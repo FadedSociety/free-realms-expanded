@@ -140,7 +140,7 @@ impl Gameplay {
             )));
             return Ok(());
         }
-        self.begin_gather(gather, now_ms, out)?;
+        self.begin_gather(gather, None, now_ms, out)?;
         out.replies.push(chat::system(&format!(
             "{} test started; type realm exit to cancel.",
             gather.name()
@@ -148,19 +148,21 @@ impl Gameplay {
         Ok(())
     }
 
-    /// Begins one gather game on the caller's staged clone. The engine starts
-    /// first; only then is the shared clock stamped and the outcome applied. A
-    /// failed begin therefore leaves no clock or engine state behind.
+    /// Begins one gather game on the caller's staged clone: `game` is the node's Harvesting
+    /// game, `None` the engine's own. The engine starts first; only then is the shared clock
+    /// stamped and the outcome applied. A failed begin therefore leaves no clock or engine
+    /// state behind.
     pub(super) fn begin_gather(
         &mut self,
         gather: Gather,
+        game: Option<i32>,
         now_ms: u64,
         out: &mut Outcome,
     ) -> io::Result<()> {
         let Some(engine) = self.type8_mut(gather) else {
             return Err(invalid("gathering content is not loaded"));
         };
-        let result = engine.begin(gather.job())?;
+        let result = engine.begin_game(game, gather.job())?;
         self.type8_tick_ms = Some(now_ms);
         self.apply_type8(gather, result, out)
     }
@@ -528,9 +530,11 @@ impl Gameplay {
         if let Some(transaction) = result.transaction {
             let grant = match gather {
                 Gather::Mining => crate::mining::lifecycle::reward_grant(Some(&transaction), 0)?,
+                // T553: the run's own region, not always the file's.
                 Gather::Harvesting => crate::harvesting::lifecycle::reward_grant(
                     Some(&transaction),
-                    HARVESTING_GAME_ID,
+                    self.type8(gather)
+                        .map_or(HARVESTING_GAME_ID, Type8Engine::game_id),
                     0,
                 )?,
             };

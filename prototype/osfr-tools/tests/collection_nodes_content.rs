@@ -245,7 +245,9 @@ fn legacy_mushroom_and_mining_files_still_load_with_the_new_fields_defaulted() {
             harvest.pools.len(),
             harvest.spawns.len()
         ),
-        (2, 2, 76)
+        // T553: the two mushroom types, their two pools and 76 spawns, plus the farm-plot
+        // type, its three regional pools and 13 plots.
+        (3, 5, 89)
     );
     assert!(harvest.gaps.drop_items_without_entry.is_empty());
     assert!(
@@ -254,7 +256,8 @@ fn legacy_mushroom_and_mining_files_still_load_with_the_new_fields_defaulted() {
             .iter()
             .all(|row| row.extra_composite_effect_ids.is_empty()
                 && row.sub_text_name_id.is_none()
-                && !row.drop_table.is_empty())
+                // The plots are paid by the Harvesting board, not a node table.
+                && row.drop_table.is_empty() == (row.key == "farm-plot"))
     );
     assert!(harvest.pools.iter().all(|pool| pool.drop_table.is_empty()));
 
@@ -377,10 +380,11 @@ fn the_gathering_loader_reads_collection_nodes() {
         .unwrap()
         .expect("mushroom nodes");
     assert!(harvest.actors().all(|actor| {
+        // The mushrooms sparkle; the plots (model 274, T553) send effect 0.
         actor
             .presentation
             .composite_effect_id
-            .is_some_and(|id| id != 0)
+            .is_some_and(|id| (id != 0) == (actor.model_id != 274))
             && actor.presentation.interact_range.is_none()
             && actor.presentation.sub_text_name_id.is_none()
             && actor.presentation.extra_composite_effect_id.is_none()

@@ -97,6 +97,10 @@ const DROPPED_DEFINITION_IDS: [i64; 9] = [
 /// Quest 1617's reward item, added from the same tagged catalogue.
 const QUEST_REWARD_DEFINITION_ID: i64 = 1843;
 
+/// The Queensfields Harvesting produce item (T553: `harvesting.json` game 109 pays it), added
+/// from the same tagged catalogue.
+const HARVESTING_REWARD_DEFINITION_ID: i64 = 2881;
+
 /// The community catalogue's full source tags (NOTICE; upload-policy rule 6). The release keeps
 /// them on the supplement blocks, the six rows and quest 1617's reward row.
 const COMMUNITY_REPOSITORY: &str = "https://github.com/raisingkaines/FreeRealms-Legacy";
@@ -671,11 +675,14 @@ fn export_release_content() {
         );
         *row = rebuilt;
     }
-    definitions.push(catalogue_definition(&catalogue, QUEST_REWARD_DEFINITION_ID));
+    for id in [QUEST_REWARD_DEFINITION_ID, HARVESTING_REWARD_DEFINITION_ID] {
+        definitions.push(catalogue_definition(&catalogue, id));
+    }
     inventory["definitions"] = Value::Array(definitions);
     inventory["provenance"]["reconstructed_definitions"] = json!({
         "ids": RECONSTRUCTED_DEFINITION_IDS,
         "quest_reward_id": QUEST_REWARD_DEFINITION_ID,
+        "harvesting_reward_id": HARVESTING_REWARD_DEFINITION_ID,
         "dropped_community_variant_ids": DROPPED_DEFINITION_IDS,
         "source": {
             "repository": COMMUNITY_REPOSITORY,
@@ -712,7 +719,7 @@ fn export_release_content() {
     spans.sort_by_key(|span| span["offset"].as_u64().unwrap());
     inventory["spans"] = Value::Array(spans);
     inventory["provenance"]["release"] = json!(
-        "T853/F860 overlay: 1,695 item definitions (1,703 captured rows less nine unused community hammer variants, six supplement rows kept with their community source tags, plus quest 1617's tagged reward item 1843) and 16 job slot tables; default_state is the fresh character typed in data/content/startup/self_data.json (0 coins, no owned items, the empty equipment slot rows), the capture inventory and 7-item starter kit are gone, and the spans were recomputed from that serialized self. T846 moves the kit to start-quest rewards (R)."
+        "T853/F860 overlay: 1,696 item definitions (1,703 captured rows less nine unused community hammer variants, six supplement rows kept with their community source tags, plus quest 1617's tagged reward item 1843 and the Queensfields Harvesting produce item 2881) and 16 job slot tables; default_state is the fresh character typed in data/content/startup/self_data.json (0 coins, no owned items, the empty equipment slot rows), the capture inventory and 7-item starter kit are gone, and the spans were recomputed from that serialized self. T846 moves the kit to start-quest rewards (R)."
     );
     json::write_pretty(&release.join("inventory.json"), &inventory);
 
@@ -927,6 +934,10 @@ fn the_release_overlay_is_publishable() {
         inventory["provenance"]["reconstructed_definitions"]["quest_reward_id"],
         QUEST_REWARD_DEFINITION_ID
     );
+    assert_eq!(
+        inventory["provenance"]["reconstructed_definitions"]["harvesting_reward_id"],
+        HARVESTING_REWARD_DEFINITION_ID
+    );
     let definitions = inventory["definitions"].as_array().unwrap();
     let ids: Vec<i64> = definitions
         .iter()
@@ -935,7 +946,7 @@ fn the_release_overlay_is_publishable() {
     for id in RECONSTRUCTED_DEFINITION_IDS
         .iter()
         .copied()
-        .chain([QUEST_REWARD_DEFINITION_ID])
+        .chain([QUEST_REWARD_DEFINITION_ID, HARVESTING_REWARD_DEFINITION_ID])
     {
         let row = definitions
             .iter()

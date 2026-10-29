@@ -42,9 +42,10 @@ fn loaded_harvest_nodes_have_valid_references_and_finite_spawns() {
         .filter_map(|line| line.split('^').next()?.parse().ok())
         .collect();
 
-    assert_eq!(content.node_types.len(), 2);
-    assert_eq!(content.pools.len(), 2);
-    assert_eq!(content.spawns.len(), 76);
+    // Mushrooms and rare mushrooms (2 pools, 76 spawns), then T553's farm plot (3 pools, 13).
+    assert_eq!(content.node_types.len(), 3);
+    assert_eq!(content.pools.len(), 5);
+    assert_eq!(content.spawns.len(), 89);
 
     let type_keys: HashSet<&str> = content
         .node_types
