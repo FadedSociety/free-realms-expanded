@@ -411,6 +411,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         "Hrugagu: only third-person arrow-delivery objectives; the three recipient replies cannot be assigned to one recruit.",
     ),
     (
+        9500000360,
+        "Natali (T667 talk target of Wizard: Reach Level 5, 3160010): NPCs - Lakeshore.md:42 gives her only a third-person role line (the study wizard who needs help with this and that, 240185916) and the names of her four repeatable contracts; 387678 'Meet Natali' is the quest's objective text, not a line she speaks, so no first-person greeting of her own is recovered.",
+    ),
+    (
         9500000443,
         "Barin Battlerock (T500 talk target of 3000310): NPCs - Sanctuary.md:76 gives only a role and a video location, 'Interview target in Looking for Lavender'; his reply 390822 is the quest-step dialogue of 3000310 goal 3, not a greeting, and 390802 is the objective.",
     ),

@@ -146,6 +146,18 @@ fn save_reload(fixture: &Fixture, game: &Gameplay, character: &CharacterState) -
     )
 }
 
+/// T667: with the chapter done, Fizzlesticks' next offer is Wizard: Reach Level 5 (3160010,
+/// its prerequisite is this chapter's last quest) and never the finished record. Only a pending
+/// offer changes; coins, XP and the finished quest stay as they were.
+fn assert_next_offer_is_reach_level_five(
+    game: &mut Gameplay,
+    character: &CharacterState,
+    now: u64,
+) {
+    offer(game, character, FIZZLESTICKS, 3_160_010, now);
+    assert_eq!(quest_status(game, STICKY), QuestStatus::Completed);
+}
+
 /// A real conversation that must leave the quest, menu and save untouched.
 fn assert_talk_changes_nothing(
     game: &mut Gameplay,
@@ -322,13 +334,7 @@ fn nurble_then_fizzlesticks_completes_and_pays_once() {
         now + 2,
         "replayed accept",
     );
-    assert_talk_changes_nothing(
-        &mut game,
-        &character,
-        FIZZLESTICKS,
-        now + 3,
-        "talk after completion",
-    );
+    assert_next_offer_is_reach_level_five(&mut game, &character, now + 3);
     assert_eq!(coins(&game), coins_before + REWARD_COINS);
     assert_eq!(profile_xp(&game, WIZARD), xp_before + REWARD_XP);
 }
@@ -561,13 +567,7 @@ fn refusals_and_objective_order_change_nothing() {
         now + 2,
         "replayed accept after completion",
     );
-    assert_talk_changes_nothing(
-        &mut game,
-        &character,
-        FIZZLESTICKS,
-        now + 3,
-        "post-completion talk",
-    );
+    assert_next_offer_is_reach_level_five(&mut game, &character, now + 3);
     assert_eq!(coins(&game), paid_coins);
     assert_eq!(profile_xp(&game, WIZARD), paid_xp);
     assert_eq!(quest_status(&game, STICKY), QuestStatus::Completed);

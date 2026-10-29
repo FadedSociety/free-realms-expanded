@@ -568,11 +568,76 @@
     },
     {
       "id": 3160010,
+      "job": 12,
       "title_string_id": 387659,
       "giver_npc_id": 9000000324,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3160005
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000360,
+          "text_string_id": 387678,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387678 'Meet Natali' (lab/reports/locale-id-to-text.json); lab/references/quest-lines/objective-specs-fixed.json q3160010 objective 0 gives talk_to_npc 9500000360."
+            },
+            {
+              "kind": "legacy-data",
+              "evidence": "Natali 9500000360 stands at Sanctuary-main-20261019@10f129e FabledRealms.lua:3767 (Npcs.json Id=33545), drawn by npc_spawns_extra.json spawn_guid 9500000360 whose content_key is the row; quest-lines/wiring/placements/lakeshore.json carries the same position and heading."
+            }
+          ]
+        },
+        {
+          "kind": "job_level",
+          "id": 2,
+          "profile_id": 12,
+          "level": 5,
+          "text_string_id": 387680,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387680 'Reach level 5 as a wizard' (lab/reports/locale-id-to-text.json); objective-specs-fixed.json q3160010 objective 1 gives job_level profile 12 level 5 (status settled; profile 12 is Wizard in jobs.json)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T667: the server's authoritative job_level objective (T361); it completes from the Wizard rank curve, never from a Talk or a client claim. It is the second step, so the engine credits it when Natali's Talk opens it (an already rank-5 Wizard completes it at once) and on every later rank change (T743)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9000000324,
+          "text_string_id": 387677,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387677 'Reach level 5 as a wizard, then return to Fizzlesticks.' (lab/reports/locale-id-to-text.json); objective-specs-fixed.json q3160010 objective 2 gives talk_to_npc 9000000324 (status settled)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T667: Fizzlesticks 9000000324 is the giver and a drawn legacy_data row (npcs/wilds.json); the final Talk to a named objective target opens the 49/13 end screen at him, which is the client's 'return' step."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T667: the level-gate payout is 15 coins, paid once by the 49/14 turn-in, with no item and no job XP: the same reconstructed gate pay as Chef level 5 (T723), Warrior W5 (T361) and Postman level 10 (T663). The answer for this quest records no reward (quest-lines/quests.json: none evidenced), so the number is ours and lives in data."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -592,10 +657,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -604,17 +665,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 387658 (Fizzlesticks' intro: practise on Natali, come back at level 5), 387659 title, 387660 description, 387661 end text (lab/reports/locale-id-to-text.json; quest-lines/quests.json q3160010 live 'yes'; quest-lines/dialogs.json q3160010 lists no complete line, so the 387661 end text stays the T+2 backfill)."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T667 enabled: Fizzlesticks offers it, Natali's Talk, the Wizard rank-5 goal and his return Talk complete it, in the client's order. Prerequisite 3160005 (Sticky Spell Book), the last enabled quest before it: the line order puts Lightning Bolt! (3160006) to Student Profits (3160009) in between, but those are disabled stubs, so a prerequisite on 3160009 would make this quest unreachable; the same call T743 made for Medic: Achieve Level 20. Without one Fizzlesticks would offer it during the opening chapter."
         }
       ],
       "description_string_id": 387660,
       "intro_text_string_id": 387658,
       "end_text_string_id": 387661,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3160011,

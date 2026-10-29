@@ -1699,11 +1699,60 @@
     },
     {
       "id": 3050031,
+      "job": 45,
       "title_string_id": 387263,
       "giver_npc_id": 9000000332,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3050020
+      ],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "profile_id": 45,
+          "level": 20,
+          "text_string_id": 387264,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387264 (lab/reports/locale-id-to-text.json) is the level-gate objective text for Chef level 20; lab/references/quest-lines/objective-specs-fixed.json q3050031 objective 0 gives job_level profile 45 level 20 (status settled)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T667: one authoritative job_level objective at profile 45, level 20, completed from the server's own Profiles::rank curve (T361), never from a Talk or a client claim; job_level is objective #0 as the fixed spec orders it."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000332,
+          "text_string_id": 387264,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387264 (lab/reports/locale-id-to-text.json): 'Your cooking career will continue once you have reached level 20 as a Chef. Return to Glerga at that time.' (the return to Glerga, npc 9000000332, who is the giver)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T667: talk target npc 9000000332 is a drawn row (npcs/wilds.json, placement legacy_data), so the Talk can run; the spec's needs_placement part is lifted by that row. The final Talk to a named objective target opens the 49/13 end screen at that NPC."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T667: the level-gate payout is 15 coins, paid once by the 49/14 turn-in, with no item and no job XP: the same reconstructed gate pay as Chef level 5 (T723), Warrior W5 (T361) and Postman level 10 (T663). The answer for this quest records no reward (quest-lines/quests.json: none evidenced), so the number is ours and lives in data."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1727,10 +1776,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -1739,17 +1784,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 387262 (Glerga's intro: come back at level 20), 387263 title, 387264 description and objectives, 387265 end text (lab/reports/locale-id-to-text.json; quest-lines/quests.json q3050031 live 'unsure', not flagged in quest-lines/flags.tsv; quest-lines/dialogs.json q3050031 offer null)."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T667 enabled: Glerga offers it, the Chef rank-20 goal and her Talk complete it, and she takes it in. job gate 45 keeps the quest Chef-only like the enabled 3050004 and 3050020. Prerequisite 3050020 (Chef: Reach Level 5), the last enabled quest before it: the line order puts Chef: Family Style! (3050030) and the quests before it in between, but those are disabled stubs, so a prerequisite on 3050030 would make this quest unreachable; the same call T743 made for Medic: Achieve Level 20."
         }
       ],
       "description_string_id": 387264,
       "intro_text_string_id": 387262,
       "end_text_string_id": 387265,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3050032,

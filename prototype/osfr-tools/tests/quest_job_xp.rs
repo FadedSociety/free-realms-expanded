@@ -1430,9 +1430,10 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             if listed.contains(&(file, id)) {
                 continue;
             }
-            // T723: Chef: Reach Level 5 is a level gate (job gate 45, coins only, no XP);
-            // tests/zone_quests_sanctuary_round3.rs covers it.
-            if (file, id) == ("chef.json", 3_050_020) {
+            // T723/T667: Chef: Reach Level 5 and Reach Level 20 are level gates (job gate 45,
+            // coins only, no XP); tests/zone_quests_sanctuary_round3.rs and
+            // tests/zone_quests_wilds_part2.rs cover them.
+            if file == "chef.json" && [3_050_020, 3_050_031].contains(&id) {
                 continue;
             }
             // T660: Brawler: Achieve Level 5 is the same kind of level gate (job gate 43, coins

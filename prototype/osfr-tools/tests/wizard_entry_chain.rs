@@ -838,11 +838,18 @@ fn enabled_wizard_chapter_records_are_complete_and_drawable() {
         .iter()
         .filter(|record| record["enabled"].as_bool().unwrap_or(false))
         // T723 enables Osgood's level gates and Helping a Friend (tests/zone_quests_sanctuary_round3.rs);
-        // this test covers Fizzlesticks' Robgoblin Camp chapter. T542's Become a Wizard
-        // (3160035) is the Jobs-window record, not part of that chapter shape.
+        // T667 enables Reach Level 5 (tests/zone_quests_wilds_part2.rs); this test covers
+        // Fizzlesticks' Robgoblin Camp chapter. T542's Become a Wizard (3160035) is the
+        // Jobs-window record, not part of that chapter shape.
         .filter(|record| {
-            ![3_160_017, 3_160_019, 3_160_024, u64::from(BECOME_A_WIZARD)]
-                .contains(&record["id"].as_u64().unwrap())
+            ![
+                3_160_010,
+                3_160_017,
+                3_160_019,
+                3_160_024,
+                u64::from(BECOME_A_WIZARD),
+            ]
+            .contains(&record["id"].as_u64().unwrap())
         })
         .collect();
     assert_eq!(
