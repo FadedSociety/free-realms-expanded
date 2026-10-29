@@ -375,13 +375,45 @@
     },
     {
       "id": 3050007,
+      "job": 45,
       "title_string_id": 94291,
       "giver_npc_id": 9000000467,
       "prerequisite_quest_ids": [
-        3050006
+        3050034
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000120,
+          "text_string_id": 94292,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 94292 'Search for Jonelle on the road north of Cobblestone Village, leading to Sanctuary.' (lab/reports/locale-id-to-text.json); Jonelle is npc 9000000120 in npcs/cobblestone_village.json (legacy_data spawn)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T670: the search ends with Jonelle's Talk (not a position visit): Global.Text 94293, the end text backfilled on this record, is Jonelle's own greeting line (quest-lines/dialogs.json q3050007 other_lines names her as speaker; no completion line exists), so she holds the end screen like the other find-the-NPC quests (3030008, 3050016)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "45": 20
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T670: pays the Chef one-talk referral rung of T202 (Chef: Ranger Requisition 3050011): zero coins and 20 Chef (profile 45) job XP, in data and tunable. quest-lines/quests.json records no reward for this quest."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -401,29 +433,25 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) source explicitly says after row C1; mapped that page label to the preceding batch content key"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T670: enabled from quest-lines/quests.json q3050007 (live yes) and quest-lines/wiring/zone-quests-matched/cobblestone-village.json; Simone (9000000467) and Jonelle (9000000120) are drawn legacy_data rows."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T670: prerequisite 3050034 (Become a Chef, the enabled stand-in for the guide's first Simone quest 3050006, whose goal no source recovers and whose locale family also appears NOT LIVE) replaces the disabled 3050006; job 45 gate follows the other Chef trainer-series quests."
         }
       ],
       "description_string_id": 94292,
       "intro_text_string_id": 94290,
       "end_text_string_id": 94293,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3050008,
@@ -881,13 +909,43 @@
     },
     {
       "id": 3050016,
+      "job": 45,
       "title_string_id": 116493,
       "giver_npc_id": 9000000103,
-      "prerequisite_quest_ids": [
-        3050015
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000096,
+          "text_string_id": 116494,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 116494 'Search for him on the road heading south out of Stillwater Crossing.' (lab/reports/locale-id-to-text.json); Gavin Greenpetal is npc 9000000096 in npcs/stillwater_crossing.json (legacy_data spawn)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T670: finding Gavin is his Talk: Global.Text 116495, this quest's end text, is his reply (quest-lines/dialogs.json q3050016 complete line, speaker Gavin), so he holds the end screen."
+            }
+          ]
+        }
       ],
-      "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "45": 20
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T670: pays the Chef one-talk referral rung of T202 (Chef: Ranger Requisition 3050011): zero coins and 20 Chef (profile 45) job XP, in data and tunable. quest-lines/quests.json records no reward for this quest."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -907,29 +965,25 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) source explicitly says after row S1; mapped that page label to the preceding batch content key"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T670: enabled from quest-lines/quests.json q3050016 (live yes) and quest-lines/wiring/zone-quests-matched/stillwater-crossing.json; Helena (9000000103) and Gavin Greenpetal (9000000096) are drawn legacy_data rows."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T670: no prerequisite: the line's first quest 3050015 (Stillwater Inn) stays disabled (it needs a recovered cooking-table click), so this record opens the series like Chef: Ranger Requisition 3050011 does for series 2; the job 45 gate keeps it Chef-only."
         }
       ],
       "description_string_id": 116494,
       "intro_text_string_id": 116492,
       "end_text_string_id": 116495,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3050017,

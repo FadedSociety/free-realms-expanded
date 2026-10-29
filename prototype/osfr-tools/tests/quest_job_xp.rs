@@ -1438,6 +1438,12 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             if file == "chef.json" && [3_050_020, 3_050_023, 3_050_024, 3_050_031].contains(&id) {
                 continue;
             }
+            // T670: Chef: Delivery Derailed and Gavin Gone Missing are one-talk referrals on the
+            // Ranger Requisition rung (job gate 45, 20 Chef XP, no coins);
+            // tests/zone_quests_round2_chef.rs covers them.
+            if file == "chef.json" && [3_050_007, 3_050_016].contains(&id) {
+                continue;
+            }
             // T660: Brawler: Achieve Level 5 is the same kind of level gate (job gate 43, coins
             // only, no XP); tests/zone_quests_blackspore.rs covers it.
             if (file, id) == ("brawler.json", 3_030_021) {

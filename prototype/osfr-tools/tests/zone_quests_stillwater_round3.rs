@@ -48,9 +48,8 @@ const TARGET: u64 = 9_500_000_786;
 /// 3000020's intro 104097.
 const CLIENT_INTRO: u32 = 116_460;
 
-/// The other four round-3 quests, each still disabled in its job file.
+/// The other four round-3 quests; three are still disabled in their job files (T670 enabled the Chef one).
 const BRAWLER_QUEST: u32 = 3_030_016;
-const CHEF_QUEST: u32 = 3_050_016;
 const FISHER_ENTRY: u32 = 3_070_001;
 const FISHER_ADVANCE: u32 = 3_070_002;
 /// The fisherman follow-up's giver: not an `npcs/*.json` row (the guide calls it a
@@ -250,10 +249,10 @@ fn the_four_round_three_quests_without_a_runnable_chain_stay_disabled() {
     assert!(entry.enabled, "T542 enables Become a Fisherman");
     assert_eq!(entry.giver_npc_id, 9_000_000_181);
 
-    // The other three stay disabled, each with the blocker named by its record.
+    // T670 enabled Chef: Gavin Gone Missing (3050016, `tests/zone_quests_round2_chef.rs`). The
+    // other two stay disabled, each with the blocker named by its record.
     for (id, prerequisite) in [
         (BRAWLER_QUEST, Some(3_030_015)),
-        (CHEF_QUEST, Some(3_050_015)),
         (FISHER_ADVANCE, Some(FISHER_ENTRY)),
     ] {
         let shipped = record(id);
@@ -266,9 +265,9 @@ fn the_four_round_three_quests_without_a_runnable_chain_stay_disabled() {
                 shipped.prerequisite_quest_ids.contains(&prerequisite),
                 "quest {id} keeps its authored prerequisite {prerequisite}"
             );
-            // The two job chains are also cut upstream; the fisherman follow-up's own
+            // The Brawler chain is also cut upstream; the fisherman follow-up's own
             // `enabled: false` is its blocker, since T542 enabled 3070001.
-            if [BRAWLER_QUEST, CHEF_QUEST].contains(&id) {
+            if id == BRAWLER_QUEST {
                 assert!(
                     !record(prerequisite).enabled,
                     "quest {id} is unreachable while its prerequisite {prerequisite} is disabled"
