@@ -1420,13 +1420,78 @@
     },
     {
       "id": 3100021,
+      "job": 14,
       "title_string_id": 77747,
       "giver_npc_id": 9000000203,
       "prerequisite_quest_ids": [
         3100020
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000059,
+          "text_string_id": 77751,
+          "dialogue_string_id": 77759,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 77751 (lab/reports/locale-id-to-text.json): 'Talk to Ramberry at Quagmire Quarry to learn more about the problem.'; Ramberry is Global.Text 77757, row npcs/blackspore_swamp.json 9500000059 (legacy_data, Quagmire Quarry)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T677: Ramberry's explanation, Global.Text 77759 (quest-lines/dialogs.json q3100021 progress line, speaker Ramberry), is shown when this first Talk credits the step; the client does not say which of the two Ramberry steps carries it."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000059,
+          "text_string_id": 77753,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 77753 (lab/reports/locale-id-to-text.json): 'Find out from Ramberry what his letter of complaint was about.'; the client keeps this as its own step after 77751 (77752 and 77755 are unflagged short duplicates)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T677: kept as a second Talk at Ramberry in the client's order (quest-lines/objective-specs.json q3100021 objective 1); one click credits one step, so the second click is the second goal."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9000000203,
+          "text_string_id": 77754,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 77754 (lab/reports/locale-id-to-text.json): 'Return to Silverray at Quagmire Quarry'; Silverray is Global.Text 77706, row npcs/blackspore_swamp.json 9000000203."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T677: the spec's go/return step is a Talk at Silverray, the giver, so the Talk opens the 49/13 end screen with end text 77749 (the same pattern as Chef 3050023)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "14": 20
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T677: five coins and 20 Miner (profile 14) job XP, the 20 XP that the shipped three-goal Miner step 3100004 (talk, gather, talk) pays; the answer records no reward (quest-lines/quests.json q3100021: none evidenced), so the numbers are ours and live in data."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1446,10 +1511,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -1458,17 +1519,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 77746 Silverray's offer, 77747 title, 77748 description, 77749 end text, 77751/77753/77754 goals (lab/reports/locale-id-to-text.json; quest-lines/quests.json q3100021 live 'yes', status final, unflagged client text)."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T677 enabled: Silverray offers it after Miner 3100020 (which sends the player to him) and takes it in; Miner-only (job 14). The next quest Miner: Smelting Secrets (3100022) stays disabled."
         }
       ],
       "description_string_id": 77748,
       "intro_text_string_id": 77746,
       "end_text_string_id": 77749,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3100022,

@@ -395,6 +395,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         "Tucker Thunderjolt (T727 talk target of 3060013): NPCs - Wilds.md:184 gives only a role ('Crash Davis's teammate'), the location 'Outside of Thunder Falls' (1929354201, 2909963659) and the sponsor referral 880667942; 394016 is the quest objective and 402845 the journal-style completion line, and no first-person line of his own is recovered.",
     ),
     (
+        9500000059,
+        "Ramberry (T677 talk target of both middle steps of Miner: Minor Mix-Up, 3100021): the only first-person line is 77759, the quest's explanation shown by the first Talk step (quest-lines/dialogs.json q3100021 progress line); the other lines naming Ramberry are third-person objectives (77751, 77753); no offer or greeting is recorded, so none is bound and a Blackspore region greeting pin does not move.",
+    ),
+    (
         9500000164,
         "Linx Redline (T732 giver of 3080007): NPCs - Briarwood.md:122/133 and Kart Driver.md row 5 quote only third-person race objectives and the T.R. hand-off; his own line 101178 is the quest offer and 101170 the progress reminder, not a greeting.",
     ),
