@@ -21,6 +21,7 @@ use crate::{
     harvesting::CHEF_PROFILE_ID,
     inventory::Inventory,
     mining::{MINER_PROFILE_ID, Type8BoardSpec},
+    npc_notifications::{self, Notification},
     power_ups::{Rng, pick_weighted},
     startup_world::NpcSpawn,
     world::{NpcVisibility, content_spawn_template},
@@ -128,6 +129,10 @@ pub struct HarvestNodeType {
     /// textures; at most [`MAX_TEXTURE_ALIAS`] bytes.
     #[serde(default)]
     pub texture_alias: Option<String>,
+    /// T555: the minimap and overhead notifications each drawn node of this type shows (35/10,
+    /// `npc_notifications.rs`). Empty sends none.
+    #[serde(default)]
+    pub notifications: Vec<Notification>,
     pub composite_effect_id: u32,
     /// Sanctuary adds these on top of the main effect (sparkling water). T524 draws the one
     /// extra effect as a tag-4 invisible companion, for collection nodes only.
@@ -277,6 +282,8 @@ pub struct NodePresentation {
     /// AddNpc `texture_alias` (after `disposition`): the type's recolour alias, when it
     /// declares one.
     pub texture_alias: Option<String>,
+    /// T555: the type's notifications, sent after the node's 35/2.
+    pub notifications: Vec<Notification>,
 }
 
 pub enum NodeChange {
@@ -699,6 +706,14 @@ fn add_sites(
         {
             return Err(bad("node texture alias out of bounds"));
         }
+        if node_type.notifications.len() > npc_notifications::MAX_ENTRIES
+            || node_type
+                .notifications
+                .iter()
+                .any(|notification| notification.validate().is_some())
+        {
+            return Err(bad("node notification out of bounds"));
+        }
         let kind = match source {
             NodeSource::Gather(gather) => SiteKind::Gather(gather),
             NodeSource::Pickup => SiteKind::Pickup(pool.node_type.clone()),
@@ -739,6 +754,9 @@ fn add_sites(
         };
         presentation.scale = Some(node_type.scale);
         presentation.texture_alias = texture_alias;
+        presentation
+            .notifications
+            .clone_from(&node_type.notifications);
         let rows: Vec<_> = content
             .spawns
             .iter()
@@ -783,6 +801,10 @@ pub fn apply_node_changes(visibility: &mut NpcVisibility, changes: Vec<NodeChang
                     node.name.clone(),
                     node.position,
                 );
+                if !node.presentation.notifications.is_empty() {
+                    visibility
+                        .set_notifications(node.guid, node.presentation.notifications.clone());
+                }
                 if let Some(companion) = companion_actor(&node) {
                     visibility.add_prepared_actor(
                         node_spawn(&companion, false),

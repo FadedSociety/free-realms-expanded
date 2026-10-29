@@ -5,6 +5,7 @@
 
 use crate::{
     content::{ContentDb, Dungeon, NpcSpawn as ContentNpcSpawn, Rotation, Zone},
+    npc_notifications::{self, Notification},
     startup_messages::{self, ZoneDetails},
     startup_world::{self, NpcSpawn},
     zone_transition::{self, ZoneTransition},
@@ -72,6 +73,26 @@ struct VisibleNpc {
     /// year. A table loaded for play ([`NpcVisibility::load_in_season`]) hides the row while
     /// the season is inactive at the view clock.
     season: Option<String>,
+    /// T555: minimap/overhead notifications sent right after this actor's 35/2.
+    notifications: Vec<Notification>,
+}
+
+impl VisibleNpc {
+    /// What a viewer is sent to learn about this actor: its unframed 35/2, then its 35/10 when
+    /// it has notifications (the client skips a 35/10 guid it has not spawned, `00984960`).
+    fn draw_packets(&self) -> io::Result<Vec<Vec<u8>>> {
+        let mut packets = vec![unframe_tunnel(&startup_world::build_add_npc(&self.spawn))?];
+        let rows: Vec<_> = self
+            .notifications
+            .iter()
+            .map(|notification| (self.spawn.actor_id, *notification))
+            .collect();
+        // A row set `encode_add` refuses (too many) is dropped, never sent truncated.
+        if !rows.is_empty() {
+            packets.extend(npc_notifications::encode_add(&rows));
+        }
+        Ok(packets)
+    }
 }
 
 #[derive(Clone, Default)]
@@ -188,6 +209,9 @@ struct ExtraNpc {
     /// dance, for the whole server, from [`boombox_props`].
     #[serde(default)]
     boombox_item_id: Option<i32>,
+    /// T555: the minimap and overhead notifications this actor shows (warpstones).
+    #[serde(default)]
+    notifications: Vec<Notification>,
 }
 
 impl ExtraNpc {
@@ -218,8 +242,10 @@ impl ExtraNpc {
             Some("scale outside 0.1..=10.0")
         } else if self.sub_text_name_string_id.is_some_and(|id| id <= 0) {
             Some("sub text id is not positive")
+        } else if self.notifications.len() > npc_notifications::MAX_ENTRIES {
+            Some("too many notifications")
         } else {
-            None
+            self.notifications.iter().find_map(Notification::validate)
         }
     }
 }
@@ -324,7 +350,7 @@ impl NpcVisibility {
         }
         for npc in passive {
             if next.contains(&npc.spawn.actor_id) && !known.contains(&npc.spawn.actor_id) {
-                packets.push(unframe_tunnel(&startup_world::build_add_npc(&npc.spawn))?);
+                packets.extend(npc.draw_packets()?);
             }
         }
         Ok((next, packets))
@@ -437,6 +463,7 @@ impl NpcVisibility {
                     position,
                     heading: heading.filter(|value| value.is_finite()),
                     season: None,
+                    notifications: Vec::new(),
                 });
         }
         if anchors.is_empty() {
@@ -502,6 +529,7 @@ impl NpcVisibility {
                     position: npc.position,
                     heading: npc.heading.filter(|value| value.is_finite()),
                     season: npc.season,
+                    notifications: npc.notifications,
                 });
         }
         let placements = content_dir.join("npc_placements.json");
@@ -646,6 +674,7 @@ impl NpcVisibility {
             heading: Some(placement.heading).filter(|value| value.is_finite()),
             // T491: placed and battle actors are never seasonal.
             season: None,
+            notifications: Vec::new(),
         });
         npcs.sort_by_key(|npc| npc.spawn.actor_id);
         self.placed.insert(placement.guid);
@@ -735,8 +764,21 @@ impl NpcVisibility {
             heading: None,
             // T491: placed and battle actors are never seasonal.
             season: None,
+            notifications: Vec::new(),
         });
         npcs.sort_by_key(|npc| npc.spawn.actor_id);
+    }
+
+    /// T555: give a drawn static actor (a harvest node) its notifications; the next view sends
+    /// them after its 35/2. Content validated them at load ([`Notification::validate`]).
+    pub(crate) fn set_notifications(&mut self, actor_id: u64, notifications: Vec<Notification>) {
+        self.revision = self.revision.wrapping_add(1);
+        let npcs = Arc::make_mut(&mut self.by_zone)
+            .entry(OPEN_WORLD_ZONE)
+            .or_default();
+        if let Some(npc) = npcs.iter_mut().find(|npc| npc.spawn.actor_id == actor_id) {
+            npc.notifications = notifications;
+        }
     }
 
     /// (R) Station models (`crafting_stations.json`) carry the station radius as
@@ -965,8 +1007,7 @@ impl NpcVisibility {
         }
         for (_, npc) in candidates.into_iter().take(NPC_VISIBILITY_LIMIT) {
             if !self.visible.contains(&npc.spawn.actor_id) {
-                let framed = startup_world::build_add_npc(&npc.spawn);
-                packets.push(unframe_tunnel(&framed)?);
+                packets.extend(npc.draw_packets()?);
             }
         }
         self.visible = next;

@@ -64076,6 +64076,14 @@
       "model_file_name": "sg_warpstone_01.adr",
       "name": "Sanctuary Warpstone",
       "name_string_id": 20831,
+      "notifications": [
+        {
+          "kind": 6,
+          "image_id": 3,
+          "state": 3,
+          "name_id": 20831
+        }
+      ],
       "position": [
         -1418.3218,
         -27.002932,
@@ -64095,6 +64103,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) spawn_guid 100000033167 is the Lua capture guid (100000000000 + Npcs.json Id), not a captured actor id; legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) notifications: Sanctuary-main row NotificationType 6, IconId 3, NameId = the stone's own name id. Client handler 00932100 keys the icon on the second value after the type (gate 00932157) and Sanctuary's IconState is 0, so the icon id is sent in both slots; client NotificationImages.txt #ID 3 has a minimap layer"
         }
       ],
       "position_w": null
@@ -64106,6 +64118,14 @@
       "model_file_name": "sg_warpstone_01.adr",
       "name": "Lakeshore Warpstone",
       "name_string_id": 41298,
+      "notifications": [
+        {
+          "kind": 6,
+          "image_id": 3,
+          "state": 3,
+          "name_id": 41298
+        }
+      ],
       "position": [
         -721.7169,
         9.560479,
@@ -64125,6 +64145,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) spawn_guid 100000033558 is the Lua capture guid (100000000000 + Npcs.json Id), not a captured actor id; legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) notifications: Sanctuary-main row NotificationType 6, IconId 3, NameId = the stone's own name id. Client handler 00932100 keys the icon on the second value after the type (gate 00932157) and Sanctuary's IconState is 0, so the icon id is sent in both slots; client NotificationImages.txt #ID 3 has a minimap layer"
         }
       ],
       "position_w": null
@@ -64136,6 +64160,14 @@
       "model_file_name": "sg_warpstone_01.adr",
       "name": "Snowhill Warpstone",
       "name_string_id": 20830,
+      "notifications": [
+        {
+          "kind": 6,
+          "image_id": 3,
+          "state": 3,
+          "name_id": 20830
+        }
+      ],
       "position": [
         50.92852,
         32.425617,
@@ -64155,6 +64187,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) spawn_guid 100000033602 is the Lua capture guid (100000000000 + Npcs.json Id), not a captured actor id; legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) notifications: Sanctuary-main row NotificationType 6, IconId 3, NameId = the stone's own name id. Client handler 00932100 keys the icon on the second value after the type (gate 00932157) and Sanctuary's IconState is 0, so the icon id is sent in both slots; client NotificationImages.txt #ID 3 has a minimap layer"
         }
       ],
       "position_w": null

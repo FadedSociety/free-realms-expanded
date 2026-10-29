@@ -529,6 +529,8 @@ fn extra_spawn_display_fields_out_of_bounds_refuse_the_load() {
         json!({"scale": 10.5}),
         json!({"sub_text_name_string_id": 0}),
         json!({"sub_text_name_string_id": -3}),
+        json!({"notifications": [{"image_id": 0, "name_id": 1}]}),
+        json!({"notifications": [{"image_id": 3, "name_id": 1, "kind": 999}]}),
     ];
     for (index, fields) in cases.into_iter().enumerate() {
         let dir = extras_content(

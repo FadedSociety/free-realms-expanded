@@ -3,21 +3,25 @@
 //! change is made once. Test-only.
 //!
 //! 35/10 `PlayerUpdatePacketAddNotifications`: u16 35, u16 10, i32 count, then 39-byte rows from
-//! offset 8 (u64 guid at 0, image id at 17, name string id at 25; reader `008db310`). 35/11
+//! offset 8 (u64 guid at 0, kind at 9, state at 13, image id at 17, name string id at 25, sub-text
+//! id at 29; reader `008db310`). 35/11
 //! `RemoveNotifications`: the same header, then 16-byte rows (u64 guid first; reader
 //! `008db550`). A 35/2 AddNpc is read by `startup_world::parse_add_npc` (reader `00921a10`).
 #![allow(dead_code)]
 
 use osfr_tools::startup_world::parse_add_npc;
 
-/// One row of a 35/10: where its packet sat in the batch, the actor, its marker image and the
-/// name string id the row carries.
+/// One row of a 35/10: where its packet sat in the batch, the actor, its kind, overhead state,
+/// marker image, the name string id and the sub-text id the row carries.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Marker {
     pub index: usize,
     pub guid: u64,
+    pub kind: i32,
+    pub state: i32,
     pub image: i32,
     pub name: i32,
+    pub subtext: i32,
 }
 
 fn word(bytes: &[u8], at: usize) -> i32 {
@@ -37,8 +41,11 @@ pub fn markers(packets: &[Vec<u8>]) -> (Vec<Marker>, Vec<u64>) {
             shown.extend(rows(39).map(|at| Marker {
                 index,
                 guid: guid(packet, at),
+                kind: word(packet, at + 9),
+                state: word(packet, at + 13),
                 image: word(packet, at + 17),
                 name: word(packet, at + 25),
+                subtext: word(packet, at + 29),
             }));
         } else if packet.starts_with(&[35, 0, 11, 0]) {
             cleared.extend(rows(16).map(|at| guid(packet, at)));

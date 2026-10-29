@@ -28,6 +28,15 @@
       "cursor_id": 20,
       "placement_y_offset": 0.0,
       "texture_alias": "Copper",
+      "notifications": [
+        {
+          "kind": 6,
+          "image_id": 340,
+          "state": 340,
+          "name_id": 7228,
+          "subtext_id": -1
+        }
+      ],
       "drop_table": [],
       "source_tag": "Sanctuary-main-20261019",
       "source_tags": {
@@ -35,6 +44,7 @@
         "model_id": "client Resources/Models.txt 4019 = sg_mining_node_snowhillcopper_01.adr; Sanctuary-main-20261019 src/Resources/Npcs.json ModelId 4019",
         "scale": "Sanctuary-main-20261019 src/Resources/Npcs.json Scale 0.5 on all 17 copper templates",
         "texture_alias": "Sanctuary-main-20261019 src/Resources/Npcs.json TextureAlias 'Copper'",
+        "notifications": "(R) Sanctuary-main-20261019 src/Resources/Npcs.json copper rows: NotificationType 6, IconId 340, IconState 0, NameId 7228, ReferenceId -1. Client handler 00932100 skips a notification whose second value after the type is 0 (gate 00932157), so the icon id 340 is sent in both slots; client NotificationImages.txt #ID 340 exists (one layer, no minimap flag)",
         "cursor_id": "client Resources/Cursors.txt 20 = cursor_interaction_mining.cur; Sanctuary-main-20261019 src/Resources/Npcs.json CursorId 20. Loaded only: the AddNpc crosswalk (reader 00921a10) has no cursor field, so it is not sent.",
         "interact_range": "(R) 12, same as the existing copper-vein type; the server-side node reach",
         "placement_y_offset": "0.0: the recovered spawn heights already sit on the terrain",

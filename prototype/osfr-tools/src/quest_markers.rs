@@ -14,7 +14,10 @@
 //! Both handlers look the guid up in the client's actor table (`00984960`) and skip a guid it
 //! has not spawned, so a caller must send the NPC's spawn first.
 
-use crate::quest_engine::{QuestEngine, QuestStatus};
+use crate::{
+    npc_notifications::{self, Notification},
+    quest_engine::{QuestEngine, QuestStatus},
+};
 use serde::Deserialize;
 use std::{
     fs,
@@ -28,8 +31,7 @@ pub const CONTENT_FILE: &str = "quest_markers.json";
 const MAX_FILE: u64 = 64 * 1024;
 /// `NotificationImages.txt` keys are small; this bounds a typo, not the table.
 const MAX_IMAGE_ID: i32 = 10_000;
-/// (R) One packet never carries more entries; the encoders refuse instead of truncating the count.
-pub const MAX_ENTRIES: usize = 256;
+pub use crate::npc_notifications::MAX_ENTRIES;
 
 /// What an NPC shows above its head.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -101,35 +103,27 @@ fn invalid(error: impl ToString) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, error.to_string())
 }
 
-fn put_i32(bytes: &mut Vec<u8>, value: i32) {
-    bytes.extend(value.to_le_bytes());
-}
-
 /// 35/10 `PlayerUpdatePacketAddNotifications` for `(actor guid, image id, name string id)` rows.
-/// The guids are runtime actor guids, not content keys. Each row is a non-compact
-/// notification in the `008db310` order, with type and the unknown words 0 and no sub-text (R):
-/// guid, compact false, type, a, image, c, name, e, f false, g, trailing false.
+/// The guids are runtime actor guids, not content keys. Each row is a plain notification (kind,
+/// state and sub-text 0, overhead icon shown, trailing byte 0) in the `008db310` order (R);
 /// `None` for more than [`MAX_ENTRIES`] rows.
 pub fn encode_add_notifications(entries: &[(u64, i32, i32)]) -> Option<Vec<u8>> {
-    if entries.len() > MAX_ENTRIES {
-        return None;
-    }
-    let mut bytes = vec![35, 0, 10, 0];
-    put_i32(&mut bytes, entries.len() as i32);
-    for &(guid, image_id, name_id) in entries {
-        bytes.extend(guid.to_le_bytes());
-        bytes.push(0); // compact
-        put_i32(&mut bytes, 0); // type
-        put_i32(&mut bytes, 0); // a
-        put_i32(&mut bytes, image_id);
-        put_i32(&mut bytes, 0); // c
-        put_i32(&mut bytes, name_id);
-        put_i32(&mut bytes, 0); // e
-        bytes.push(0); // f
-        put_i32(&mut bytes, 0); // g
-        bytes.push(0); // trailing
-    }
-    Some(bytes)
+    let rows: Vec<_> = entries
+        .iter()
+        .map(|&(guid, image_id, name_id)| {
+            let marker = Notification {
+                kind: 0,
+                image_id,
+                state: 0,
+                name_id,
+                subtext_id: 0,
+                hide_overhead: false,
+                enabled: false,
+            };
+            (guid, marker)
+        })
+        .collect();
+    npc_notifications::encode_add(&rows)
 }
 
 /// 35/11 `PlayerUpdatePacketRemoveNotifications` for runtime actor guids: an i32 count, then per
@@ -139,7 +133,7 @@ pub fn encode_remove_notifications(guids: &[u64]) -> Option<Vec<u8>> {
         return None;
     }
     let mut bytes = vec![35, 0, 11, 0];
-    put_i32(&mut bytes, guids.len() as i32);
+    bytes.extend((guids.len() as i32).to_le_bytes());
     for guid in guids {
         bytes.extend(guid.to_le_bytes());
         bytes.extend([0; 8]);
