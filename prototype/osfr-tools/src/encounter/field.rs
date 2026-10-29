@@ -130,6 +130,15 @@ impl EncounterEngine {
             .collect()
     }
 
+    /// T879: each battle spawner with its combat marker, for the non-shared view
+    /// (`NpcVisibility::add_battle_spawners`); the shared view sends it in `initialization`.
+    pub fn battle_markers(&self) -> Vec<(u64, Notification)> {
+        self.battles
+            .iter()
+            .filter_map(|b| Some((b.spawner.guid, b.marker?)))
+            .collect()
+    }
+
     /// A field battle is playable only when every previewed prize can be
     /// granted: the definition resolves and its quantity fits one stack.
     /// Cave encounters have no `battles` row and are not subject to this check.
@@ -345,6 +354,8 @@ impl EncounterEngine {
             let f = &self.field_sim.enemies[*i];
             out.replies.push(self.spawn(&f.actor, f.state.position, 0));
             out.replies
+                .extend(field_marker::packet(f.actor.guid, f.marker));
+            out.replies
                 .push(enemy_hp(f.actor.guid, f.state.health, f.actor.max_health));
         }
         if !shown.is_empty() {
@@ -372,6 +383,7 @@ impl EncounterEngine {
         for f in &self.field_sim.enemies {
             if f.present && f.state.health > 0 {
                 packets.push(self.spawn(&f.actor, f.state.position, 0));
+                packets.extend(field_marker::packet(f.actor.guid, f.marker));
                 packets.push(enemy_hp(f.actor.guid, f.state.health, f.actor.max_health));
                 alive.push(f.actor.guid);
             }
@@ -692,6 +704,8 @@ impl EncounterEngine {
                 continue;
             }
             out.replies.push(self.spawn(&f.actor, f.state.position, 0));
+            out.replies
+                .extend(field_marker::packet(f.actor.guid, f.marker));
             out.replies
                 .push(enemy_hp(f.actor.guid, f.state.health, f.actor.max_health));
             out.replies.push(relevance(&[f.actor.guid], false));

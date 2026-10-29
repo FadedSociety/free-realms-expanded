@@ -1,5 +1,12 @@
 {
   "schema_version": 1,
+  "combat_marker": {
+    "kind": 3,
+    "image_id": 24,
+    "name_id": 425259,
+    "subtext_id": -1,
+    "hide_overhead": true
+  },
   "battles": [
     {
       "id": 96,

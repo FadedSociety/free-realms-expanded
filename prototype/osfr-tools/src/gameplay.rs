@@ -956,10 +956,7 @@ impl Gameplay {
             if battles.is_file() {
                 engine.load_field_battles(&battles)?;
                 if let Some(visibility) = npc_visibility.as_mut() {
-                    for (guid, name, name_id, model_id, position, icon) in engine.battle_spawners()
-                    {
-                        visibility.add_static_actor(guid, &name, name_id, model_id, position, icon);
-                    }
+                    visibility.add_battle_spawners(engine);
                 }
             }
         }

@@ -1,5 +1,12 @@
 {
   "schema_version": 1,
+  "combat_marker": {
+    "kind": 3,
+    "image_id": 24,
+    "name_id": 0,
+    "subtext_id": -1,
+    "hide_overhead": true
+  },
   "paid_revive": {
     "cost": 1000,
     "source": [

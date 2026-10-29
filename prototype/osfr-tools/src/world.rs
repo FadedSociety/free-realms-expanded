@@ -769,6 +769,16 @@ impl NpcVisibility {
         npcs.sort_by_key(|npc| npc.spawn.actor_id);
     }
 
+    /// Add every battle spawner as a static actor, with its combat marker (T879).
+    pub fn add_battle_spawners(&mut self, engine: &crate::encounter::EncounterEngine) {
+        for (guid, name, name_id, model_id, position, icon) in engine.battle_spawners() {
+            self.add_static_actor(guid, &name, name_id, model_id, position, icon);
+        }
+        for (guid, marker) in engine.battle_markers() {
+            self.set_notifications(guid, vec![marker]);
+        }
+    }
+
     /// T555: give a drawn static actor (a harvest node) its notifications; the next view sends
     /// them after its 35/2. Content validated them at load ([`Notification::validate`]).
     pub(crate) fn set_notifications(&mut self, actor_id: u64, notifications: Vec<Notification>) {

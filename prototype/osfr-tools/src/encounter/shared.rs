@@ -247,11 +247,17 @@ impl SharedFieldState {
             .iter()
             .find(|f| f.actor.guid == guid && f.present && f.state.health > 0)
         {
-            return Ok(vec![
-                spawn_actor(&self.template.template, &f.actor, f.state.position, 0),
-                enemy_hp(guid, f.state.health, f.actor.max_health),
+            return Ok([
+                Some(spawn_actor(
+                    &self.template.template,
+                    &f.actor,
+                    f.state.position,
+                    0,
+                )),
+                field_marker::packet(guid, f.marker),
+                Some(enemy_hp(guid, f.state.health, f.actor.max_health)),
                 // Late observers start with current status and motion (R).
-                animation(
+                Some(animation(
                     guid,
                     if self.stuns.contains_key(&guid) {
                         1401
@@ -261,9 +267,12 @@ impl SharedFieldState {
                         1
                     },
                     true,
-                ),
-                relevance(&[guid], false),
-            ]);
+                )),
+                Some(relevance(&[guid], false)),
+            ]
+            .into_iter()
+            .flatten()
+            .collect());
         }
         if let Some(b) = self.battles.iter().find(|b| b.spawner.guid == guid) {
             let mut spawn = crate::world::content_spawn_template();
@@ -279,10 +288,16 @@ impl SharedFieldState {
             spawn.rotation = [0., 0., 1., 0.];
             // Same literal-name writer used by passive NPC startup.
             spawn.npc_name = b.spawner.name.clone();
-            return Ok(vec![
-                crate::world::unframe_tunnel(&crate::startup_world::build_add_npc(&spawn))?,
-                relevance(&[guid], false),
-            ]);
+            return Ok([
+                Some(crate::world::unframe_tunnel(
+                    &crate::startup_world::build_add_npc(&spawn),
+                )?),
+                field_marker::packet(guid, b.marker),
+                Some(relevance(&[guid], false)),
+            ]
+            .into_iter()
+            .flatten()
+            .collect());
         }
         Ok(Vec::new())
     }

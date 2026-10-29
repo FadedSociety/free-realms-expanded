@@ -25,6 +25,7 @@ impl EncounterEngine {
         let FieldContent {
             mut enemies,
             spawn_groups,
+            combat_marker,
             ..
         } = content;
         let mut actor_index = BTreeMap::new();
@@ -157,7 +158,9 @@ impl EncounterEngine {
             // (R) Authored stats are level-one baselines. Reuse the final-era HP
             // curve and weapon tiers, rather than inventing per-kind curves.
             self.scale.scale_field_enemy(&mut f.actor);
+            let marker = f.combat_marker.resolve(combat_marker, f.actor.name_id)?;
             field.push(FieldEnemy {
+                marker,
                 state: enemy_state(&f.actor),
                 respawn_ms: u64::from(respawn_seconds) * 1000,
                 aggro_range,
@@ -287,6 +290,9 @@ impl EncounterEngine {
             for a in &mut b.enemies {
                 self.scale.scale_enemy(a, factor, factor);
             }
+            b.marker = b
+                .combat_marker
+                .resolve(file.combat_marker, b.spawner.name_id)?;
         }
         for b in &battles {
             content.dungeons.push(Dungeon {

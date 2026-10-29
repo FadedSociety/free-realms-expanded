@@ -7,6 +7,7 @@
 use crate::{
     abilities::{EffectRecipient, JobEffect},
     character_store::CharacterState,
+    npc_notifications::Notification,
     power_ups::{self, PowerUps, Rng},
     terrain::Terrain,
 };
@@ -23,6 +24,7 @@ mod arena;
 mod battle_drops;
 mod combat_scale;
 mod field;
+mod field_marker;
 pub mod field_rewards;
 mod power_up_use;
 mod revive;
@@ -32,6 +34,7 @@ use self::arena::{ArenaSim, ArenaTick};
 pub use self::arena::{MAX_MEMBERS, SharedArena};
 use self::combat_scale::CombatScale;
 pub(crate) use self::field::level_refusal;
+use self::field_marker::MarkerSetting;
 use self::revive::{AUTO_REVIVE_MS, respawn_hide};
 use self::shared::FieldSim;
 pub use self::shared::{SharedFieldAction, SharedFieldState};
@@ -453,6 +456,9 @@ struct FieldActor {
     /// opening's stage-gated wolves). Empty means always present.
     #[serde(default)]
     quest_ids: Vec<u32>,
+    /// T879: this enemy's combat marker; absent follows the file's shared row.
+    #[serde(default)]
+    combat_marker: MarkerSetting,
     #[serde(default)]
     #[allow(dead_code)]
     source: serde_json::Value,
@@ -498,6 +504,9 @@ struct FieldContent {
     /// (R) Knockout "Revive here" price (`revive.rs`); absent: the retail 1,000.
     #[serde(default)]
     paid_revive: Option<revive::PaidRevive>,
+    /// T879 (R): the shared combat marker row; absent sends none (`name_id` 0 = the actor's own).
+    #[serde(default)]
+    combat_marker: Option<Notification>,
     enemies: Vec<FieldActor>,
     #[serde(default)]
     spawn_groups: Vec<FieldSpawnGroup>,
@@ -520,6 +529,8 @@ struct FieldEnemy {
     seed: u64,
     target: Option<u64>,
     reset_serial: u64,
+    /// The resolved combat marker sent after this enemy's 35/2 (T879).
+    marker: Option<Notification>,
 }
 
 /// Overworld battle started from a spawner (red crossed swords): clicking it
@@ -538,6 +549,12 @@ struct FieldBattle {
     #[serde(default)]
     required_combat_level: u32,
     spawner: Actor,
+    /// T879: this battle's marker; absent follows the file's shared row.
+    #[serde(default)]
+    combat_marker: MarkerSetting,
+    /// The resolved marker sent after the spawner's 35/2.
+    #[serde(skip)]
+    marker: Option<Notification>,
     /// The instanced arena the battle runs in (e.g. sg_random_encounter_clearing).
     zone: ZoneTransition,
     /// Start-screen picture (MiniGameInfo.IconId); e.g. Images.txt 4543
@@ -626,6 +643,9 @@ fn default_battle_icon() -> i32 {
 #[serde(deny_unknown_fields)]
 struct FieldBattleFile {
     schema_version: u32,
+    /// T879 (R): the shared battle marker row; absent sends none.
+    #[serde(default)]
+    combat_marker: Option<Notification>,
     battles: Vec<FieldBattle>,
 }
 

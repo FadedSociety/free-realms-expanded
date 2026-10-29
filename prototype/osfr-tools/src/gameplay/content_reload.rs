@@ -69,12 +69,7 @@ impl Gameplay {
                         self.activities.cards(),
                     )?;
                     if let Some(visibility) = self.npc_visibility.as_mut() {
-                        for (guid, name, name_id, model_id, position, icon) in
-                            encounter.battle_spawners()
-                        {
-                            visibility
-                                .add_static_actor(guid, &name, name_id, model_id, position, icon);
-                        }
+                        visibility.add_battle_spawners(encounter);
                     }
                     done.push("battles");
                 }
