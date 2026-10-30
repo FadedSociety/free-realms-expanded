@@ -12,9 +12,11 @@
 //! * 115 ctor `00b4a9c0` (opcode 115, u32 CRC), sender `00b4fc30`; the CRC is `00704a40`.
 //!
 //! The consumer stores the appearance record and clears the pending entry even when the image
-//! is empty, so an empty image is a valid answer until the lead's upload ingress exists (R).
+//! is empty, so an empty image is the answer for a character with no upload. L071: uploads arrive
+//! through `portrait_upload.rs` and the gateway's portrait port.
 
 use crate::players::{PlayerPresentation, PlayerRegistry, SessionId};
+use std::path::Path;
 
 pub const FAMILY: u16 = 156;
 pub const REQUEST_SUBTYPE: u16 = 2;
@@ -85,18 +87,60 @@ pub fn handle<'a>(
     body: &[u8],
     presentation: impl FnOnce(u64) -> Option<&'a PlayerPresentation>,
 ) -> Option<Vec<u8>> {
+    handle_with(body, presentation, |_, _| Vec::new())
+}
+
+/// `handle` with the image `image(guid, provider)` (L071: the uploaded PNG, or empty).
+pub fn handle_with<'a>(
+    body: &[u8],
+    presentation: impl FnOnce(u64) -> Option<&'a PlayerPresentation>,
+    image: impl FnOnce(u64, &str) -> Vec<u8>,
+) -> Option<Vec<u8>> {
     if is_upload(body) {
         return None;
     }
     let request = parse_request(body)?;
     let target = presentation(request.guid)?;
-    encode_reply(request, target)
+    encode_reply(
+        request,
+        target,
+        &image(request.guid, request.provider.as_str()),
+    )
 }
 
 /// The in-world route's adapter: visibility is `PlayerRegistry`'s directed AddPc rule, plus
 /// the player's own character. An invisible target sends no reply and leaves no pending state.
 pub fn request(body: &[u8], viewer: SessionId, players: &PlayerRegistry) -> Option<Vec<u8>> {
-    handle(body, |guid| players.presentation_of(viewer, guid))
+    request_with(body, viewer, players, None)
+}
+
+/// `request` with the images uploaded under `portraits` (L071; `None` answers an empty image).
+pub fn request_with(
+    body: &[u8],
+    viewer: SessionId,
+    players: &PlayerRegistry,
+    portraits: Option<&Path>,
+) -> Option<Vec<u8>> {
+    handle_with(
+        body,
+        |guid| players.presentation_of(viewer, guid),
+        |guid, provider| {
+            portraits.map_or_else(Vec::new, |root| {
+                crate::portrait_upload::image(root, guid, provider)
+            })
+        },
+    )
+}
+
+/// L071: the 156/2 a viewer would send for `guid`'s `Headshot` or `Portrait`. A fresh upload is
+/// shown by answering this on each viewer's behalf, through the same visibility rule.
+pub fn request_body(guid: u64, provider: &str) -> Vec<u8> {
+    let mut out = Vec::with_capacity(24);
+    put_u16(&mut out, FAMILY);
+    put_u16(&mut out, REQUEST_SUBTYPE);
+    put_u64(&mut out, guid);
+    put_string(&mut out, provider);
+    out
 }
 
 fn parse_request(body: &[u8]) -> Option<Request> {
@@ -121,7 +165,11 @@ fn parse_request(body: &[u8]) -> Option<Request> {
     })
 }
 
-fn encode_reply(request: Request, presentation: &PlayerPresentation) -> Option<Vec<u8>> {
+fn encode_reply(
+    request: Request,
+    presentation: &PlayerPresentation,
+    image: &[u8],
+) -> Option<Vec<u8>> {
     if presentation.character_guid != request.guid
         || presentation.customization_ids.iter().any(|id| *id < 0)
     {
@@ -150,9 +198,10 @@ fn encode_reply(request: Request, presentation: &PlayerPresentation) -> Option<V
         put_i32(&mut out, id);
     }
     put_string(&mut out, request.provider.as_str());
-    // (R) Empty image until the lead's upload ingress stores one. `00bd4a50` keeps the
-    // appearance record and clears the pending request for a zero-length payload.
-    put_i32(&mut out, 0);
+    // The PNG the player uploaded (L071), else empty: `00bd4a50` keeps the appearance record
+    // and clears the pending request for a zero-length payload.
+    put_i32(&mut out, i32::try_from(image.len()).ok()?);
+    out.extend_from_slice(image);
     Some(out)
 }
 

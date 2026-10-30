@@ -57,6 +57,8 @@ mod boombox_routing;
 mod cake_routing;
 #[path = "osfr_gateway/card_listener.rs"]
 mod card_listener;
+#[path = "osfr_gateway/portrait_http.rs"]
+mod portrait_http;
 #[path = "osfr_gateway/client_area_routing.rs"]
 mod client_area_routing;
 #[path = "osfr_gateway/moderation.rs"]
@@ -548,6 +550,8 @@ struct SharedWorld {
     boomboxes: osfr_tools::boombox::Boomboxes,
     /// T557: the placed cakes; session-only.
     cakes: cake_routing::Cakes,
+    /// L071: the uploaded portraits folder (`portrait_http.rs`); 156/2 answers with its images.
+    portraits: Option<Arc<Path>>,
 }
 
 /// Live chat identity for one session. Zone, position and group are derived from the player
@@ -630,6 +634,7 @@ impl SharedWorld {
             world_events: Default::default(),
             boomboxes: Default::default(),
             cakes: Default::default(),
+            portraits: None,
         }
     }
 
@@ -2964,6 +2969,7 @@ pub struct Server {
     tick_stats: tick_stats::TickStats,
     studio: Option<TcpListener>,
     card: Option<card_listener::CardListener>,
+    portraits: Option<portrait_http::PortraitHttp>,
     // Studio asset browser: index files loaded on first search.
     studio_assets: BTreeMap<String, Vec<serde_json::Value>>,
 }
@@ -3378,6 +3384,8 @@ impl Server {
             membership.install_field_seed(0, fields);
         }
         let template = options.account_store.is_some().then_some(seed);
+        let portraits = portrait_http::open(&options, socket.local_addr()?);
+        world.portraits = portraits.as_ref().map(portrait_http::PortraitHttp::root);
         Ok(Self {
             template,
             options,
@@ -3393,6 +3401,7 @@ impl Server {
             tick_stats: tick_stats::TickStats::new(Duration::ZERO),
             studio,
             card,
+            portraits,
             studio_assets: BTreeMap::new(),
             faulted_fields: BTreeSet::new(),
             dormant_fields: BTreeSet::new(),
@@ -3670,6 +3679,7 @@ impl Server {
         self.membership.collect_empty_instances(now_ms);
         self.poll_studio(now_ms);
         self.poll_card(now_ms);
+        self.poll_portraits(now_ms);
         if self.security_flushed.elapsed() >= Duration::from_secs(5) {
             self.flush_security();
             self.security_flushed = Instant::now();

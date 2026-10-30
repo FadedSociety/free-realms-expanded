@@ -108,7 +108,12 @@ pub(super) fn fotomat_reply(
     inner: &[u8],
     world: &SharedWorld,
 ) -> Option<Vec<Delivery>> {
-    let reply = osfr_tools::fotomat::request(inner, session.id, &world.players)?;
+    let reply = osfr_tools::fotomat::request_with(
+        inner,
+        session.id,
+        &world.players,
+        world.portraits.as_deref(),
+    )?;
     Some(vec![Delivery {
         recipient: session.id,
         bytes: wrap_application(&reply),

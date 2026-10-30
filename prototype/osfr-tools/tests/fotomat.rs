@@ -262,3 +262,30 @@ fn login_time_request_is_handled_or_dropped_cleanly() {
     assert!(outcome.replies.is_empty());
     assert_eq!(fresh.snapshot(), before);
 }
+
+/// L071: an uploaded portrait is the image of the 156/3, for whoever may see the character and
+/// nobody else; a provider with no upload still answers an empty image.
+#[test]
+fn an_uploaded_portrait_is_the_image_of_the_reply() {
+    let registry = registry();
+    let root = std::env::temp_dir().join(format!("osfr-fotomat-portraits-{}", std::process::id()));
+    let folder = root.join(VISIBLE_GUID.to_string());
+    std::fs::create_dir_all(&folder).unwrap();
+    let image = b"rebuilt portrait bytes".to_vec();
+    std::fs::write(folder.join("portrait.png"), &image).unwrap();
+    let body = fotomat::request_body(VISIBLE_GUID, "Portrait");
+    assert_eq!(body, request(VISIBLE_GUID, "Portrait"));
+    let mut tail = (image.len() as i32).to_le_bytes().to_vec();
+    tail.extend(&image);
+    let seen = fotomat::request_with(&body, VIEWER, &registry, Some(&root)).unwrap();
+    assert!(seen.ends_with(&tail));
+    let headshot = fotomat::request_body(VISIBLE_GUID, "Headshot");
+    let empty = fotomat::request_with(&headshot, VIEWER, &registry, Some(&root)).unwrap();
+    assert!(empty.ends_with(&[b"Headshot".as_slice(), &0i32.to_le_bytes()].concat()));
+    assert!(fotomat::request_with(&body, FAR, &registry, Some(&root)).is_none());
+    assert!(
+        reply(&body, VIEWER, &registry).ends_with(&0i32.to_le_bytes()),
+        "no folder: empty"
+    );
+    let _ = std::fs::remove_dir_all(root);
+}

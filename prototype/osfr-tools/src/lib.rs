@@ -86,6 +86,7 @@ pub mod pets;
 pub mod placed_cakes;
 pub mod player_radial;
 pub mod players;
+pub mod portrait_upload;
 pub mod power_ups;
 pub mod profiles;
 pub mod progression_extras;
