@@ -1,0 +1,248 @@
+{
+ "schema_version": 1,
+ "locale": 8,
+ "notice": "Local reconstructed objective labels for the opening restoration. Original stock text and gameplay definitions are preserved.",
+ "opening_sha256": "c1f5ed3b124bdc35a5b51f56cbe596f83c88efa577242495b02b0421832a4470",
+ "entries": [
+  {
+   "quest_id": 910001,
+   "objective_id": 91000101,
+   "source_name_id": 0,
+   "source_description_id": 0,
+   "name": "Switch to Brawler",
+   "description": "Choose Brawler in the Jobs menu.",
+   "name_id": 619,
+   "description_id": 620
+  },
+  {
+   "quest_id": 910003,
+   "objective_id": 91000302,
+   "source_name_id": 5100043,
+   "source_description_id": 5100043,
+   "name": "Put out the first farm fire",
+   "description": "Use the filled bucket on this fire. Follow the objectives in order.",
+   "name_id": 704,
+   "description_id": 705
+  },
+  {
+   "quest_id": 910003,
+   "objective_id": 91000303,
+   "source_name_id": 5100043,
+   "source_description_id": 5100043,
+   "name": "Put out the second farm fire",
+   "description": "Use the filled bucket on this fire. Follow the objectives in order.",
+   "name_id": 1006,
+   "description_id": 705
+  },
+  {
+   "quest_id": 910003,
+   "objective_id": 91000304,
+   "source_name_id": 5100043,
+   "source_description_id": 5100043,
+   "name": "Put out the third farm fire",
+   "description": "Use the filled bucket on this fire. Follow the objectives in order.",
+   "name_id": 1014,
+   "description_id": 705
+  },
+  {
+   "quest_id": 910004,
+   "objective_id": 91000402,
+   "source_name_id": 0,
+   "source_description_id": 0,
+   "name": "Switch to Chef",
+   "description": "Choose Chef in the Jobs menu.",
+   "name_id": 1016,
+   "description_id": 1024
+  },
+  {
+   "quest_id": 910004,
+   "objective_id": 91000403,
+   "source_name_id": 0,
+   "source_description_id": 0,
+   "name": "Equip the Student Chef Shirt",
+   "description": "Wear the Student Chef Shirt in your Chef equipment screen.",
+   "name_id": 1026,
+   "description_id": 1034
+  },
+  {
+   "quest_id": 910004,
+   "objective_id": 91000404,
+   "source_name_id": 5100033,
+   "source_description_id": 5100033,
+   "name": "Harvest Rainleaf",
+   "description": "Gather Rainleaf bundles at the farm while playing as Chef.",
+   "name_id": 1037,
+   "description_id": 1039
+  },
+  {
+   "quest_id": 910004,
+   "objective_id": 91000405,
+   "source_name_id": 5100033,
+   "source_description_id": 5100033,
+   "name": "Harvest Gummyfruit",
+   "description": "Gather Gummyfruit bundles at the farm while playing as Chef.",
+   "name_id": 1042,
+   "description_id": 1044
+  },
+  {
+   "quest_id": 910005,
+   "objective_id": 91000502,
+   "source_name_id": 0,
+   "source_description_id": 0,
+   "name": "Switch to Miner",
+   "description": "Choose Miner in the Jobs menu.",
+   "name_id": 1049,
+   "description_id": 1054
+  },
+  {
+   "quest_id": 910006,
+   "objective_id": 91000601,
+   "source_name_id": 0,
+   "source_description_id": 0,
+   "name": "Switch to Blacksmith",
+   "description": "Choose Blacksmith in the Jobs menu.",
+   "name_id": 1057,
+   "description_id": 1059
+  },
+  {
+   "quest_id": 910007,
+   "objective_id": 91000701,
+   "source_name_id": 0,
+   "source_description_id": 0,
+   "name": "Switch to Brawler",
+   "description": "Choose Brawler in the Jobs menu.",
+   "name_id": 619,
+   "description_id": 620
+  },
+  {
+   "quest_id": 910010,
+   "objective_id": 91001001,
+   "source_name_id": 5100332,
+   "source_description_id": 5100332,
+   "name": "Destroy the first Gloam artifact",
+   "description": "Approach this Gloam artifact and interact with it. Follow the objectives in order.",
+   "name_id": 1070,
+   "description_id": 1072
+  },
+  {
+   "quest_id": 910010,
+   "objective_id": 91001002,
+   "source_name_id": 5100332,
+   "source_description_id": 5100332,
+   "name": "Destroy the second Gloam artifact",
+   "description": "Approach this Gloam artifact and interact with it. Follow the objectives in order.",
+   "name_id": 1096,
+   "description_id": 1072
+  },
+  {
+   "quest_id": 910010,
+   "objective_id": 91001003,
+   "source_name_id": 5100332,
+   "source_description_id": 5100332,
+   "name": "Destroy the third Gloam artifact",
+   "description": "Approach this Gloam artifact and interact with it. Follow the objectives in order.",
+   "name_id": 1099,
+   "description_id": 1072
+  },
+  {
+   "quest_id": 910013,
+   "objective_id": 91001301,
+   "source_name_id": 0,
+   "source_description_id": 0,
+   "name": "Switch to Chef",
+   "description": "Choose Chef in the Jobs menu.",
+   "name_id": 1016,
+   "description_id": 1024
+  },
+  {
+   "quest_id": 910013,
+   "objective_id": 91001302,
+   "source_name_id": 5100033,
+   "source_description_id": 5100033,
+   "name": "Harvest Rainleaf",
+   "description": "Gather Rainleaf bundles at the farm while playing as Chef.",
+   "name_id": 1037,
+   "description_id": 1039
+  },
+  {
+   "quest_id": 910013,
+   "objective_id": 91001303,
+   "source_name_id": 5100033,
+   "source_description_id": 5100033,
+   "name": "Harvest Gummyfruit",
+   "description": "Gather Gummyfruit bundles at the farm while playing as Chef.",
+   "name_id": 1042,
+   "description_id": 1044
+  },
+  {
+   "quest_id": 910014,
+   "objective_id": 91001401,
+   "source_name_id": 0,
+   "source_description_id": 0,
+   "name": "Switch to Miner",
+   "description": "Choose Miner in the Jobs menu.",
+   "name_id": 1049,
+   "description_id": 1054
+  },
+  {
+   "quest_id": 910015,
+   "objective_id": 91001501,
+   "source_name_id": 0,
+   "source_description_id": 0,
+   "name": "Switch to Miner",
+   "description": "Choose Miner in the Jobs menu.",
+   "name_id": 1049,
+   "description_id": 1054
+  },
+  {
+   "quest_id": 910015,
+   "objective_id": 91001503,
+   "source_name_id": 0,
+   "source_description_id": 0,
+   "name": "Switch to Blacksmith",
+   "description": "Choose Blacksmith in the Jobs menu.",
+   "name_id": 1057,
+   "description_id": 1059
+  },
+  {
+   "quest_id": 910017,
+   "objective_id": 91001702,
+   "source_name_id": 0,
+   "source_description_id": 0,
+   "name": "Switch to Medic",
+   "description": "Choose Medic in the Jobs menu.",
+   "name_id": 1101,
+   "description_id": 1103
+  },
+  {
+   "quest_id": 910017,
+   "objective_id": 91001703,
+   "source_name_id": 0,
+   "source_description_id": 0,
+   "name": "Switch to Archer",
+   "description": "Choose Archer in the Jobs menu.",
+   "name_id": 1124,
+   "description_id": 1126
+  },
+  {
+   "quest_id": 910017,
+   "objective_id": 91001704,
+   "source_name_id": 0,
+   "source_description_id": 0,
+   "name": "Switch to Chef",
+   "description": "Choose Chef in the Jobs menu.",
+   "name_id": 1016,
+   "description_id": 1024
+  },
+  {
+   "quest_id": 910017,
+   "objective_id": 91001705,
+   "source_name_id": 0,
+   "source_description_id": 0,
+   "name": "Equip the Student Chef Hat",
+   "description": "Wear the Student Chef Hat in your Chef equipment screen.",
+   "name_id": 1152,
+   "description_id": 1236
+  }
+ ]
+}

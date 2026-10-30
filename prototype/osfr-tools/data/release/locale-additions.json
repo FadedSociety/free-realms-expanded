@@ -1,0 +1,147 @@
+{
+ "schema_version": 1,
+ "locale": "en_US",
+ "notice": "Text our server shows that the stock client locale lacks (opening objective labels). The launcher adds these rows to the player's own locale; row hash = Jenkins lookup2 of \"Global.Text.<id>\".",
+ "rows": [
+  {
+   "hash": 225453572,
+   "tag": "ucdt",
+   "text": "Wear the Student Chef Hat in your Chef equipment screen."
+  },
+  {
+   "hash": 244584014,
+   "tag": "ucdt",
+   "text": "Put out the third farm fire"
+  },
+  {
+   "hash": 260200902,
+   "tag": "ucdt",
+   "text": "Choose Blacksmith in the Jobs menu."
+  },
+  {
+   "hash": 325825371,
+   "tag": "ucdt",
+   "text": "Switch to Miner"
+  },
+  {
+   "hash": 349228348,
+   "tag": "ucdt",
+   "text": "Gather Rainleaf bundles at the farm while playing as Chef."
+  },
+  {
+   "hash": 639481644,
+   "tag": "ucdt",
+   "text": "Use the filled bucket on this fire. Follow the objectives in order."
+  },
+  {
+   "hash": 669093933,
+   "tag": "ucdt",
+   "text": "Put out the second farm fire"
+  },
+  {
+   "hash": 1168850750,
+   "tag": "ucdt",
+   "text": "Destroy the second Gloam artifact"
+  },
+  {
+   "hash": 1281575943,
+   "tag": "ucdt",
+   "text": "Approach this Gloam artifact and interact with it. Follow the objectives in order."
+  },
+  {
+   "hash": 1536688732,
+   "tag": "ucdt",
+   "text": "Choose Medic in the Jobs menu."
+  },
+  {
+   "hash": 1565261483,
+   "tag": "ucdt",
+   "text": "Equip the Student Chef Shirt"
+  },
+  {
+   "hash": 1608802218,
+   "tag": "ucdt",
+   "text": "Switch to Chef"
+  },
+  {
+   "hash": 1846063641,
+   "tag": "ucdt",
+   "text": "Put out the first farm fire"
+  },
+  {
+   "hash": 1925826233,
+   "tag": "ucdt",
+   "text": "Gather Gummyfruit bundles at the farm while playing as Chef."
+  },
+  {
+   "hash": 2025975783,
+   "tag": "ucdt",
+   "text": "Harvest Gummyfruit"
+  },
+  {
+   "hash": 2238816129,
+   "tag": "ucdt",
+   "text": "Destroy the first Gloam artifact"
+  },
+  {
+   "hash": 2440006039,
+   "tag": "ucdt",
+   "text": "Harvest Rainleaf"
+  },
+  {
+   "hash": 2622191381,
+   "tag": "ucdt",
+   "text": "Wear the Student Chef Shirt in your Chef equipment screen."
+  },
+  {
+   "hash": 2841312400,
+   "tag": "ucdt",
+   "text": "Switch to Brawler"
+  },
+  {
+   "hash": 3045898174,
+   "tag": "ucdt",
+   "text": "Choose Chef in the Jobs menu."
+  },
+  {
+   "hash": 3122949662,
+   "tag": "ucdt",
+   "text": "Destroy the third Gloam artifact"
+  },
+  {
+   "hash": 3172538054,
+   "tag": "ucdt",
+   "text": "Switch to Medic"
+  },
+  {
+   "hash": 3510976521,
+   "tag": "ucdt",
+   "text": "Choose Miner in the Jobs menu."
+  },
+  {
+   "hash": 3516459402,
+   "tag": "ucdt",
+   "text": "Switch to Blacksmith"
+  },
+  {
+   "hash": 3530601474,
+   "tag": "ucdt",
+   "text": "Equip the Student Chef Hat"
+  },
+  {
+   "hash": 3795155595,
+   "tag": "ucdt",
+   "text": "Switch to Archer"
+  },
+  {
+   "hash": 4037433872,
+   "tag": "ucdt",
+   "text": "Choose Brawler in the Jobs menu."
+  },
+  {
+   "hash": 4128311434,
+   "tag": "ucdt",
+   "text": "Choose Archer in the Jobs menu."
+  }
+ ]
+}
