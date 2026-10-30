@@ -1875,7 +1875,7 @@ impl Session {
             }
             let mut deliveries = staged_world.ride_fanout(self.id, &outcome.nearby);
             if transfer && staged_world.joined.contains(&self.id) {
-                deliveries.extend(staged_world.leave_player(self.id));
+                deliveries.extend(delivery::zone_out(&mut staged_world, self.id));
             }
             // A state-only change (e.g. jump or crouch flags) is relayed like a move.
             let (state, unknown) = staged_gateway.movement_bytes();

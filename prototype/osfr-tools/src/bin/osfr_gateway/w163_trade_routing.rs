@@ -398,6 +398,39 @@ fn leaving_the_world_or_walking_away_ends_the_trade_for_the_partner() {
     assert!(rig.world.trades.inventory(A).is_none());
 }
 
+/// L074: a zone transfer mid-trade tells the partner the trade was canceled (status 8), not
+/// that the player left the game (status 2), and frees both players.
+#[test]
+fn zoning_ends_the_trade_as_a_cancel_not_a_departure() {
+    if !super::tests::test_support::bin_test_target("w163") {
+        return;
+    }
+    let mut rig = rig("zone");
+    rig.a
+        .route_application(&select(A, B), &mut rig.world, 1_000);
+    rig.a.route_application(
+        &choice(B, osfr_tools::player_radial::TRADE_ENTRY_ID),
+        &mut rig.world,
+        1_000,
+    );
+    let id = rig.world.trades.session_id_for(A).unwrap();
+    rig.b
+        .route_application(&pkt(3, id, &[1]), &mut rig.world, 1_100);
+    let zoned = delivery::zone_out(&mut rig.world, rig.a.id);
+    let statuses: Vec<_> = zoned
+        .iter()
+        .filter(|delivery| {
+            delivery.recipient == rig.b.id
+                && delivery.bytes.starts_with(&[5, 0, 1])
+                && inner(delivery)[..3] == [0x3b, 0, 15]
+        })
+        .map(|delivery| *inner(delivery).last().unwrap())
+        .collect();
+    assert_eq!(statuses, [8], "the partner reads a cancel, not a departure");
+    assert!(rig.world.trades.session_id_for(B).is_none());
+    assert!(!rig.world.joined.contains(&rig.a.id));
+}
+
 #[test]
 fn hostile_trade_packets_from_one_session_cannot_reach_the_other() {
     if !super::tests::test_support::bin_test_target("w163") {

@@ -47,6 +47,19 @@ pub(super) fn refresh_trade_player(
     }
 }
 
+/// L074: zoning is not leaving the game. The character's trade ends as a plain cancel (status 8)
+/// before it leaves this zone's world, so the partner never reads "<name> left the game" while
+/// they are online (T885 review 3aefe42); a disconnect still goes through `leave_player` alone.
+pub(super) fn zone_out(world: &mut SharedWorld, session: SessionId) -> Vec<Delivery> {
+    let mut deliveries = Vec::new();
+    if let Some(player) = world.players.get(session) {
+        let guid = player.character_guid;
+        deliveries = trade_deliveries(world.trades.cancel_for(guid));
+    }
+    deliveries.extend(world.leave_player(session));
+    deliveries
+}
+
 /// Queue one delivery: on the current session, or on the recipient's own session when it is
 /// still connected (a recipient that left is skipped).
 pub(super) fn queue_delivery(
