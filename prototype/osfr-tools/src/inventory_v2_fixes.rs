@@ -99,12 +99,17 @@ pub struct ItemUpdateV2 {
     pub item_bar_slot: i32,
     pub consumed_count: i32,
     pub stored_count: i32,
-    /// The last two wire dwords form this 64-bit field.
-    pub last_cast_time: i64,
+    /// The last two wire dwords form this 64-bit field: the item's rental expiry, 0 for an owned
+    /// item. The client's keyed setter (`008c7090`, reached from the 38/3 case at `009397b0`)
+    /// compares it with the item's rental block at `+0x28` or, when there is none, with the null
+    /// time `dword_1BE48B8` (zero); any other value creates the block through `0103e080`, and the
+    /// Stuff window then lists the item as a Rental. The last-cast time travels only in the
+    /// instance record (`008cb5a0` stores it at `+0x20`), never here.
+    pub rental_expiration: i64,
 }
 
 /// Encode 38/3 with the client field order: key, count, bar slot,
-/// consumed count, stored count, then the 64-bit last-cast value.
+/// consumed count, stored count, then the 64-bit rental expiry.
 pub fn encode_item_update_v2(update: ItemUpdateV2) -> Vec<u8> {
     let mut packet = [38u16.to_le_bytes(), 3u16.to_le_bytes()].concat();
     for value in [
@@ -116,6 +121,6 @@ pub fn encode_item_update_v2(update: ItemUpdateV2) -> Vec<u8> {
     ] {
         packet.extend(value.to_le_bytes());
     }
-    packet.extend(update.last_cast_time.to_le_bytes());
+    packet.extend(update.rental_expiration.to_le_bytes());
     packet
 }

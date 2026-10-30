@@ -62,7 +62,7 @@ fn complete_catalogue_keeps_35_37_byte_length_and_definition_count() {
 }
 
 #[test]
-fn item_update_uses_stored_count_and_last_cast_not_ability_or_rental_fields() {
+fn item_update_uses_stored_count_and_the_rental_expiry_not_ability_or_last_cast() {
     let old = current_item_update(77, 9, 1, 6, 0x1122);
     let fixed = encode_item_update_v2(ItemUpdateV2 {
         item_id: 77,
@@ -70,7 +70,7 @@ fn item_update_uses_stored_count_and_last_cast_not_ability_or_rental_fields() {
         item_bar_slot: -1,
         consumed_count: 1,
         stored_count: 3,
-        last_cast_time: 0x1122_3344_5566_7788,
+        rental_expiration: 0x1122_3344_5566_7788,
     });
 
     let expected = [

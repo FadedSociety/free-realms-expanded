@@ -1465,6 +1465,50 @@ fn a_ride_given_in_the_session_is_owned_at_the_next_store_open() {
     assert_eq!(gateway.snapshot(), before, "refusals change nothing");
 }
 
+/// T887: `realm give` onto an owned stack is a 38/3 whose last eight bytes are the item's rental
+/// expiry (client `008c7090` writes the rental block through `0103e080`). It used to send the
+/// 0x7fffffff last-cast value, so the Stuff window showed the stack as a Rental with 4099 days
+/// left. The stack stays owned, merges, and the update carries the null time.
+#[test]
+fn a_stacked_give_sends_the_null_rental_expiry_and_keeps_the_stack_owned() {
+    // Action Power Warrior Hightops: not in the fixture bag, so the first give is a fresh grant
+    // (last-cast 0x7fffffff, like every production grant) and the second one stacks onto it.
+    const STACKED: i32 = 76361;
+    let fixture = Fixture::new();
+    let mut gateway = fixture.connect(fixture.state());
+    gateway.set_dev_tools(true);
+    gateway.set_role(AccountRole::Admin);
+    assert_eq!(count_definition(&inventory_of(&gateway), STACKED), 0);
+    let give = chat::local_request(&format!("realm give {STACKED}"));
+    let fresh = send(&mut gateway, &give);
+    assert!(
+        fresh
+            .iter()
+            .any(|packet| packet.starts_with(&[38, 0, 2, 0]))
+    );
+    for _ in 0..2 {
+        let replies = send(&mut gateway, &give);
+        let update = replies
+            .iter()
+            .find(|packet| packet.starts_with(&[38, 0, 3, 0]))
+            .expect("a stacked grant sends a 38/3");
+        assert_eq!(update.len(), 32);
+        assert_eq!(
+            &update[24..],
+            &0i64.to_le_bytes(),
+            "owned: null rental time"
+        );
+    }
+    let bag = inventory_of(&gateway);
+    assert_eq!(count_definition(&bag, STACKED), 3);
+    assert!(
+        bag.items
+            .iter()
+            .filter(|item| item.definition_id == STACKED)
+            .all(|item| item.rental.is_none())
+    );
+}
+
 /// F387: 66/29 (the store's close statistics, `PacketInGamePurchaseStoreClientStatistics` from
 /// `00b23fc0`) and 117/41 (the one-time commerce session request, `0089b510`) stay unknown
 /// traffic. The gateway drops both before the shared application router, sends no reply and

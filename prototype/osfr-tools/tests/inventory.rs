@@ -344,7 +344,7 @@ fn default_inventory_roundtrip_preserves_rental_and_other_packet_bytes() {
 }
 
 #[test]
-fn existing_reward_38_3_uses_stored_count_and_last_cast_not_ability_or_rental_fields() {
+fn existing_reward_38_3_uses_stored_count_and_a_null_rental_expiry_for_an_owned_stack() {
     let f = Fixture::new();
     let mut inventory = f.inventory();
     let outcome = inventory.grant(50, 100, 3).unwrap();
@@ -356,10 +356,10 @@ fn existing_reward_38_3_uses_stored_count_and_last_cast_not_ability_or_rental_fi
         &command(38, 3, &[7, 5, -1, 0, 1])
     );
     assert_eq!(outcome.replies[1].len(), 32);
-    assert_eq!(
-        &outcome.replies[1][24..],
-        &i64::from(i32::MAX).to_le_bytes()
-    );
+    // T887: the last eight bytes are the rental expiry (client keyed setter `008c7090` writes the
+    // item's rental block, `0103e080`). Sending the 0x7fffffff last-cast value there turned every
+    // stacked grant into a Rental with 4099 days left; an owned stack sends the null time.
+    assert_eq!(&outcome.replies[1][24..], &0i64.to_le_bytes());
     assert_eq!(inventory.state().items[0].ability_count, 6);
     let patched = inventory.initialization_patch(&f.packet).unwrap();
     assert_eq!(signed(&patched, f.coins_offset), 54);
@@ -368,7 +368,7 @@ fn existing_reward_38_3_uses_stored_count_and_last_cast_not_ability_or_rental_fi
 }
 
 #[test]
-fn partial_rental_update_uses_last_cast_time_instead_of_rental_expiration() {
+fn partial_rental_update_keeps_the_rental_expiry_not_the_last_cast_time() {
     let f = Fixture::new();
     let mut inventory = f.inventory();
     let update = inventory.consume(8, 1).unwrap();
@@ -376,11 +376,11 @@ fn partial_rental_update_uses_last_cast_time_instead_of_rental_expiration() {
         update.replies[0],
         [
             command(38, 3, &[8, 1, -1, 0, 1]),
-            987654321i64.to_le_bytes().to_vec()
+            123456789i64.to_le_bytes().to_vec()
         ]
         .concat()
     );
-    assert_ne!(&update.replies[0][24..], &123456789i64.to_le_bytes());
+    assert_ne!(&update.replies[0][24..], &987654321i64.to_le_bytes());
     assert_eq!(inventory.state().items[1].ability_count, 6);
 }
 

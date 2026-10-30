@@ -1779,7 +1779,9 @@ fn item_update(item: &InventoryItem) -> Vec<u8> {
         item_bar_slot: -1,
         consumed_count: item.consumed_count as i32,
         stored_count: item.stored_count as i32,
-        last_cast_time: item.last_cast_time,
+        // An owned item sends the null time (0); sending its last-cast value (0x7fffffff) made
+        // every stack update a Rental with 4099 days left (T887).
+        rental_expiration: item.rental.as_ref().map_or(0, |rental| rental.expiration),
     })
 }
 /// One attachment row from a definition and an instance tint, on the same wire fields every
