@@ -74,6 +74,11 @@ fn unlocks(pet: u32, trick: u32) -> Vec<Vec<u8>> {
     vec![trick_notify(pet, 3, trick, 0, 0), notify(pet, 6, 0)]
 }
 
+/// T888: the say line (15/4) viewers get from the owner, naming the trick's locale string.
+fn name_bubble(trick: u32) -> Vec<u8> {
+    osfr_tools::chat::string_say(OWNER, name_id(trick) as i32)
+}
+
 fn owner_animation(trick: u32) -> Vec<u8> {
     animation_packet(OWNER, trick_row(trick).owner_animation_id, false)
 }
@@ -181,7 +186,11 @@ fn a_known_trick_runs_kind_1_lock_owner_animation_pet_animation_then_the_result_
         ],
         "the name line, the lock, then the owner's animation"
     );
-    assert_eq!(accepted.shared, vec![owner], "viewers see the owner too");
+    assert_eq!(
+        accepted.shared,
+        vec![owner, name_bubble(TRICK)],
+        "viewers see the owner animate and say the trick's name; the owner's own client posts its line from the 53/15 kind 1"
+    );
     assert_eq!(accepted.accepted_trick, Some(TRICK), "the fact T788 reads");
     assert!(!accepted.changed, "a trick saves nothing");
 
@@ -223,6 +232,31 @@ fn a_known_trick_runs_kind_1_lock_owner_animation_pet_animation_then_the_result_
         start + delay + run + 100,
     );
     assert_eq!(again.accepted_trick, Some(TRICK));
+}
+
+#[test]
+fn a_trick_row_without_a_name_gives_viewers_no_bubble() {
+    // T888: nothing to say when the row has no locale string; the rest of the trick is unchanged.
+    let content = content_with(|document| {
+        let row = document["tricks"]
+            .as_array_mut()
+            .unwrap()
+            .iter_mut()
+            .find(|row| row["id"] == TRICK)
+            .unwrap();
+        row.as_object_mut().unwrap().remove("name_id");
+    });
+    let (mut service, pet) = dog_with(content);
+    let mut fixture = kit();
+    send(&mut service, &mut fixture, &summon(pet), START);
+    let accepted = send(
+        &mut service,
+        &mut fixture,
+        &perform_trick(TRICK),
+        START + 1_000,
+    );
+    assert_eq!(accepted.accepted_trick, Some(TRICK));
+    assert_eq!(accepted.shared, vec![owner_animation(TRICK)], "no say line");
 }
 
 #[test]

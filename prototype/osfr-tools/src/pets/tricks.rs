@@ -153,13 +153,20 @@ impl PetService {
             ends_ms: animation_at_ms.saturating_add(u64::from(row.duration_ms)),
         });
         let owner = piece_052::animation_packet(active.owner_guid, row.owner_animation_id, false);
+        // T888: the owner's own client posts the trick-name line itself (53/15 kind 1, `00b5ce60`
+        // case 15), so only viewers get the bubble, as a say line from the owner (15/4, reader
+        // `0x00b0f680`) naming the same locale string.
+        let mut shared = vec![owner.clone()];
+        if let Some(id) = i32::try_from(name_id).ok().filter(|id| *id > 0) {
+            shared.push(crate::chat::string_say(active.owner_guid, id));
+        }
         Some(PetWire {
             private: vec![
                 pet_trick_notify_packet(active.pet_id, TRICK_NAME, trick_id, name_id, 0),
                 pet_utility_notify_packet(active.pet_id, NOTIFY_TRICK, 0),
-                owner.clone(),
+                owner,
             ],
-            shared: vec![owner],
+            shared,
             accepted_trick: Some(trick_id),
             ..PetWire::default()
         })

@@ -395,3 +395,61 @@ fn a_refused_adoption_save_leaves_the_document_and_the_live_session_unchanged() 
         Some(PET_SPECIES)
     );
 }
+
+/// T888: a trick the owner performs shows nearby players the owner's say bubble with the trick's
+/// name (15/4 from the owner's guid), through the real gateway fanout. The owner's own client
+/// posts that line from its 53/15 kind 1, so the owner gets no second copy; a player out of range
+/// gets nothing. Char (model 1756) knows trick 2000, whose `pets.json` name id is 419798.
+#[test]
+fn a_nearby_player_hears_the_owners_trick_name_and_the_owner_is_not_told_twice() {
+    use test_support::Rig;
+    const TRICK: u32 = 2_000;
+    const TRICK_NAME_ID: i32 = 419_798;
+    let Some(mut rig) = Rig::new("t888-trick-bubble", 1_913) else {
+        return;
+    };
+    let owner = rig.scene.session.character_guid;
+    let near = rig.viewer(2, 6.0);
+    let far = rig.viewer(3, 5_000.0);
+    grant_certificate(&mut rig.scene.session);
+    let summon = pet_wire::summon_by_item(ADOPTION_ITEM as u32, 0);
+    rig.scene.send(&rig.options, &summon, 2_000).unwrap();
+    for key in [near, far] {
+        rig.drain(key, 2_000);
+    }
+    rig.drain_owner(2_000);
+
+    let perform = pet_wire::perform_trick(TRICK);
+    rig.scene.send(&rig.options, &perform, 3_000).unwrap();
+
+    let inners = |messages: Vec<Vec<u8>>| -> Vec<Vec<u8>> {
+        messages
+            .iter()
+            .filter_map(|m| m.get(7..))
+            .map(<[u8]>::to_vec)
+            .collect()
+    };
+    let say = osfr_tools::chat::string_say(owner, TRICK_NAME_ID);
+    let heard = inners(rig.drain(near, 3_000));
+    assert!(
+        heard.contains(&say),
+        "the nearby player gets the owner's bubble"
+    );
+    assert!(
+        heard.iter().any(|m| m.starts_with(&[35, 0, 8, 0])),
+        "and the owner's animation, so the fanout reached them"
+    );
+    let mine = inners(rig.drain_owner(3_000));
+    assert!(
+        !mine.contains(&say),
+        "the owner's client already posts its own line"
+    );
+    assert!(
+        mine.iter().any(|m| m.starts_with(&[53, 0, 15])),
+        "the owner still gets the 53/15 kind 1 that makes that line"
+    );
+    assert!(
+        inners(rig.drain(far, 3_000)).is_empty(),
+        "a player out of range gets nothing"
+    );
+}
