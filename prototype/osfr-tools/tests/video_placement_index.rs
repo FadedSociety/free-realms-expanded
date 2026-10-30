@@ -10,17 +10,25 @@
 //! T883 adds the drawn side: Felipe, Murphy and Natali (row plus extras body) and Lucky Chance
 //! McXander (row only), and two single-instance props (Hard Briarwood Defense, Shrouded Glade
 //! Postboxes), all within the index error radius plus 2 m.
+//!
+//! T896 writes the remaining sixteen medium/high solves into their rows and adds the loader
+//! rule: a `video_index` row spawns when its confidence is high or medium and it has a model and
+//! a name id (the loader skips every other reconstructed placement).
 
 #[path = "support/json.rs"]
 mod json;
+#[path = "support/models.rs"]
+mod models;
 #[path = "support/npc_visibility.rs"]
 mod npc_visibility;
 #[path = "support/placement.rs"]
 mod placement;
+#[path = "support/scratch.rs"]
+mod scratch;
 
 use osfr_tools::world::NpcVisibility;
 use placement::{planar_distance, regional_rows, xyz};
-use serde_json::Value;
+use serde_json::{Value, json};
 
 /// (npc id, name, index x, index z, sightings, videos).
 const NPCS: [(u64, &str, f32, f32, u32, u32); 12] = [
@@ -88,7 +96,7 @@ fn moved_npcs_stand_at_their_index_positions() {
     let moved = rows.iter().filter(|row| row["placement"] == "video_index");
     assert_eq!(
         moved.count(),
-        NPCS.len() + MOVED_NPCS.len(),
+        NPCS.len() + MOVED_NPCS.len() + T896_NPCS.len(),
         "only the listed rows moved"
     );
 }
@@ -226,5 +234,284 @@ fn t883_moved_npcs_and_props_stand_within_the_index_error() {
             .find(|npc| npc.actor == guid)
             .unwrap_or_else(|| panic!("{name}: not drawn"));
         assert_at(prop.position, x, z, error + 2.0, name);
+    }
+}
+
+/// T896: (npc id, name, index x, index z, error m, sightings, videos, confidence). The medium
+/// and high solves whose rows stood at a reconstructed offset. Low solves (Ed Sullenfangs,
+/// Orson) and names a drawn row already carries (Burt Crewe, Chad Fastflutter, Derp Axemaker,
+/// Mustang Alli, Captain Sunspark, Tiger the Party Animal) were left alone.
+const T896_NPCS: [(u64, &str, f32, f32, f32, u32, u32, &str); 16] = [
+    (
+        9_500_000_039,
+        "Lord William IV",
+        -2446.6,
+        1191.8,
+        4.0,
+        4,
+        1,
+        "high",
+    ),
+    (
+        9_000_000_450,
+        "Sal Monella",
+        -2104.6,
+        1077.6,
+        2.6,
+        14,
+        11,
+        "high",
+    ),
+    (
+        9_500_000_099,
+        "Buttercup Webbywand",
+        -799.3,
+        1583.6,
+        4.6,
+        5,
+        2,
+        "medium",
+    ),
+    (
+        9_500_000_131,
+        "Figwit Figgletons",
+        -289.9,
+        1939.8,
+        3.6,
+        5,
+        4,
+        "high",
+    ),
+    (
+        9_500_000_295,
+        "Counselor Amira",
+        -1535.5,
+        -548.9,
+        3.3,
+        2,
+        1,
+        "medium",
+    ),
+    (
+        9_500_000_372,
+        "Brennion",
+        -963.8,
+        -375.8,
+        3.2,
+        2,
+        1,
+        "medium",
+    ),
+    (9_500_000_377, "Cudip", -1106.0, -413.2, 2.7, 5, 3, "medium"),
+    (
+        9_500_000_391,
+        "Izzy Fast",
+        -912.3,
+        -393.3,
+        4.0,
+        2,
+        2,
+        "high",
+    ),
+    (
+        9_500_000_393,
+        "Jecca Ruchcups",
+        -1122.4,
+        -435.8,
+        4.0,
+        3,
+        2,
+        "high",
+    ),
+    (
+        9_500_000_456,
+        "Brunhilda",
+        -1273.4,
+        394.1,
+        4.0,
+        3,
+        2,
+        "high",
+    ),
+    (
+        9_500_000_461,
+        "Camellia",
+        -1145.0,
+        325.0,
+        2.7,
+        22,
+        1,
+        "high",
+    ),
+    (
+        9_500_000_653,
+        "Baily Leafcutter",
+        11.2,
+        1070.9,
+        3.5,
+        14,
+        7,
+        "high",
+    ),
+    (
+        9_500_000_716,
+        "Tald Daybreaker",
+        33.8,
+        1094.6,
+        4.1,
+        15,
+        13,
+        "high",
+    ),
+    (
+        9_500_000_751,
+        "Hank Fisticuffs",
+        228.9,
+        382.5,
+        8.8,
+        3,
+        2,
+        "medium",
+    ),
+    (9_500_000_878, "Bodkin", -414.4, -255.8, 4.0, 2, 1, "high"),
+    (
+        9_500_000_959,
+        "Wanderwings",
+        -654.1,
+        -51.5,
+        4.8,
+        4,
+        1,
+        "medium",
+    ),
+];
+
+#[test]
+fn t896_rows_stand_at_their_index_points_with_the_index_confidence() {
+    let rows = regional_rows();
+    for (id, name, x, z, error, sightings, videos, confidence) in T896_NPCS {
+        let row = rows
+            .iter()
+            .find(|row| row["npc_id"].as_u64() == Some(id))
+            .unwrap_or_else(|| panic!("{id}: no regional row"));
+        assert_eq!(row["name"], name);
+        assert_at(xyz(&row["position"]), x, z, error + 2.0, name);
+        assert_eq!(row["placement"], "video_index", "{name}");
+        assert_eq!(row["placement_source"], "video_archive_index", "{name}");
+        assert_eq!(row["placement_confidence"], confidence, "{name}");
+        let reason = row["position_reason"].as_str().unwrap();
+        assert!(
+            reason.contains(&format!("{sightings} sightings in {videos} video")),
+            "{name}: {reason}"
+        );
+        // (R) marks the single-video solve and only that one, as in T883.
+        assert_eq!(reason.starts_with("(R)"), videos == 1, "{name}: {reason}");
+    }
+}
+
+#[test]
+fn t896_a_video_row_with_a_body_spawns_at_the_video_position() {
+    let base = NpcVisibility::load(&npc_visibility::content_dir()).unwrap();
+    let drawn = placement::drawn_npcs(&base);
+    let locale =
+        json::read(&placement::project_parent().join("lab/reports/locale-id-to-text.json"));
+    let model_table = models::read_models();
+    let mut spawned = Vec::new();
+    for row in regional_rows()
+        .iter()
+        .filter(|row| row["placement"] == "video_index")
+    {
+        // A row without a model is only ever drawn through an extras body (T883's three).
+        let id = row["npc_id"].as_u64().unwrap();
+        let Some(model) = row["model_id"].as_i64() else {
+            continue;
+        };
+        let body = drawn
+            .iter()
+            .find(|npc| npc.actor == id)
+            .unwrap_or_else(|| panic!("{id}: a video row with a model is not drawn"));
+        let name = row["name"].as_str().unwrap();
+        spawned.push(name.to_owned());
+        assert!(
+            ["high", "medium"].contains(&row["placement_confidence"].as_str().unwrap()),
+            "{name}: below the floor"
+        );
+        let at = xyz(&row["position"]);
+        assert!(planar_distance(body.position, at) < 0.01, "{name}");
+        // The 35/2 AddNpc the client reads carries the row's model and a real locale name id.
+        let seen = npc_visibility::seen_from(&base, at);
+        let add = seen.iter().find(|npc| npc.actor_id == id).expect("seen");
+        let file = &row["model_file_name"];
+        assert_eq!(i64::from(add.model_id), model, "{name}");
+        assert!(
+            model_table[&model].contains(&file.as_str().unwrap().to_ascii_lowercase()),
+            "{name}: Models.txt does not map {model} to {file}"
+        );
+        let text = locale
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|entry| entry["id"].as_i64() == Some(i64::from(add.name_string_id)));
+        assert_eq!(
+            text.map(|entry| &entry["text"]),
+            Some(&json!(name)),
+            "{name}"
+        );
+    }
+    assert!(
+        spawned.contains(&"Cudip".to_owned()),
+        "Cudip is the row with a body: {spawned:?}"
+    );
+}
+
+/// The loader rule on synthetic rows: only a high or medium `video_index` row with a model and a
+/// name id spawns; a low solve, a missing model, a missing name id and every reconstructed
+/// placement stay out, whatever else they carry.
+#[test]
+fn t896_the_loader_floor_refuses_rows_below_it() {
+    let scratch = scratch::Scratch::new("t896-floor");
+    let row = |id: u64, placement: &str, confidence: &str, model: Value, name: Value| {
+        json!({"npc_id": id, "name": format!("Row {id}"), "zone_id": 0,
+            "position": [10.0, 0.0, 20.0], "placement": placement,
+            "placement_confidence": confidence, "model_id": model, "name_string_id": name})
+    };
+    let rows = [
+        (1, row(1, "video_index", "high", json!(7), json!(8)), true),
+        (2, row(2, "video_index", "medium", json!(7), json!(8)), true),
+        (3, row(3, "video_index", "low", json!(7), json!(8)), false),
+        (
+            4,
+            row(4, "video_index", "high", json!(null), json!(8)),
+            false,
+        ),
+        (5, row(5, "video_index", "high", json!(0), json!(8)), false),
+        (
+            6,
+            row(6, "video_index", "high", json!(7), json!(null)),
+            false,
+        ),
+        (7, row(7, "poi_anchor", "high", json!(7), json!(8)), false),
+        (8, row(8, "legacy_data", "low", json!(7), json!(8)), true),
+    ];
+    let path = scratch.path();
+    let write = |name: &str, value: Value| {
+        std::fs::write(path.join(name), serde_json::to_vec(&value).unwrap()).unwrap()
+    };
+    write(
+        "zones.json",
+        json!({"records": [{"id": 0, "name": "Open"}]}),
+    );
+    write("npc_spawns_extra.json", json!({"records": []}));
+    write(
+        "npcs/rows.json",
+        json!({"records": rows.iter().map(|(_, row, _)| row.clone()).collect::<Vec<_>>()}),
+    );
+    let visibility = NpcVisibility::load(path).unwrap();
+    let drawn: Vec<u64> = placement::drawn_npcs(&visibility)
+        .iter()
+        .map(|npc| npc.actor)
+        .collect();
+    for (id, _, spawns) in rows {
+        assert_eq!(drawn.contains(&id), spawns, "row {id}: {drawn:?}");
     }
 }

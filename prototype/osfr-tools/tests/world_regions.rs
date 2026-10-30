@@ -289,11 +289,13 @@ fn shipped_npc_rows_cover_1192_of_1209() {
     // T665 moved Sorin and Coach Eddie onto drawn Legacy spawns; one of the two landed outside every
     // place and region, which took each count down by one (1,193 / 893 / 954 / 1,193 before).
     assert_eq!(in_place, 1192, "rows in a first-party place group");
+    // T896 moved sixteen reconstructed rows onto their video-archive points; net, one row fewer stands in the
+    // banner regions (892 -> 891) and two fewer in any region shape (953 -> 951).
     assert_eq!(
-        in_recovered_region, 892,
+        in_recovered_region, 891,
         "rows in the banner regions 2..=10"
     );
-    assert_eq!(in_any_region, 953, "rows in a region (including region 1)");
+    assert_eq!(in_any_region, 951, "rows in a region (including region 1)");
     assert_eq!(covered, 1192, "rows in a place or a region");
 }
 

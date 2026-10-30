@@ -168,6 +168,34 @@ struct RegionalNpc {
     scale: Option<f32>,
     #[serde(default)]
     placement: Option<String>,
+    #[serde(default)]
+    placement_confidence: Option<String>,
+}
+
+/// `placement_confidence` classes the loader spawns for a `video_index` row (T896, (R)): the
+/// placement index's `high` and `medium`, the floor T878/T883 used to move rows. A `low` solve
+/// (one sighting, one video) is stored but not drawn.
+const VIDEO_DRAW_CONFIDENCE: [&str; 2] = ["high", "medium"];
+
+impl RegionalNpc {
+    /// Whether the row spawns. `legacy_data` rows carry a recovered spawn transform. A
+    /// `video_index` row stands at a position solved from original-game footage, so it also
+    /// needs the confidence floor and a body: a model and a name id (AddNpc reader
+    /// `0x00921a10`; a zero of either draws nothing usable). Reconstructed POI/zone-centre
+    /// positions are build scaffolding, not NPC transforms, and never spawn.
+    fn drawn(&self) -> bool {
+        match self.placement.as_deref() {
+            Some("legacy_data") => true,
+            Some("video_index") => {
+                self.placement_confidence
+                    .as_deref()
+                    .is_some_and(|confidence| VIDEO_DRAW_CONFIDENCE.contains(&confidence))
+                    && self.model_id.is_some_and(|model| model > 0)
+                    && self.name_string_id.is_some_and(|name| name > 0)
+            }
+            _ => false,
+        }
+    }
 }
 
 #[derive(Deserialize)]
@@ -427,9 +455,7 @@ impl NpcVisibility {
                 // part of the shared open-world coordinate space.
                 .unwrap_or(OPEN_WORLD_ZONE);
             anchors.push((zone_id, position));
-            // Only data-backed placements spawn; reconstructed POI/zone-centre
-            // positions are build scaffolding, not NPC transforms.
-            if npc.placement.as_deref() != Some("legacy_data") {
+            if !npc.drawn() {
                 continue;
             }
             // Content `rotation` is a Y-axis quaternion; AddNpc wants a facing
@@ -948,7 +974,7 @@ impl NpcVisibility {
     }
 
     /// Content NPC targets for the developer teleport index. The same rows
-    /// back 35/2 visibility: regional `legacy_data` placements and renderable
+    /// back 35/2 visibility: regional rows [`RegionalNpc::drawn`] accepts and renderable
     /// extra spawns only. Runtime-excluded startup actors and out-of-season rows
     /// stay out.
     pub fn teleport_targets(&self, zone_id: u32) -> Vec<crate::dev_teleport::Target> {

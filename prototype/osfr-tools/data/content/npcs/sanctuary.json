@@ -9676,9 +9676,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1414.600632,
-        -27.631,
-        344.317086
+        -1273.4,
+        -15.0,
+        394.1
       ],
       "position_w": null,
       "rotation": [
@@ -9687,18 +9687,12 @@
         0.0,
         0.43252943260879895
       ],
-      "placement": "unanchored",
-      "placement_source": "reconstructed_zone_center",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 5,
-          "poi_name": "Sanctuary",
-          "match_score": 0
-        }
-      ],
+      "placement": "video_index",
+      "placement_source": "video_archive_index",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 5. This is not a recovered NPC transform.",
+      "position_reason": "Video archive placement index (2026-10-29): Brunhilda solved at x=-1273.4 z=394.1, error 4.0 m, 3 sightings in 2 videos (dot+rings), confidence high; height sampled from the zone-0 terrain grid. Replaces the reconstructed offset position [-1414.600632, -27.631, 344.317086].",
       "source": [
         {
           "kind": "client",
@@ -9980,18 +9974,14 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 5 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Brunhilda solved at x=-1273.4 z=394.1, error 4.0 m, 3 sightings in 2 videos (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Brunhilda solved at x=-1273.4 z=394.1, error 4.0 m, 3 sightings in 2 videos (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_w": [
@@ -10012,26 +10002,26 @@
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) unanchored is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Brunhilda solved at x=-1273.4 z=394.1, error 4.0 m, 3 sightings in 2 videos (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_zone_center records placement method and provenance, not a recovered NPC transform."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Brunhilda solved at x=-1273.4 z=394.1, error 4.0 m, 3 sightings in 2 videos (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_confidence": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Brunhilda solved at x=-1273.4 z=394.1, error 4.0 m, 3 sightings in 2 videos (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Brunhilda solved at x=-1273.4 z=394.1, error 4.0 m, 3 sightings in 2 videos (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "capture_match": [
@@ -11655,9 +11645,9 @@
       ],
       "services_reason": null,
       "position": [
-        -1415.991721,
-        -27.631,
-        359.019242
+        -1145.0,
+        6.95,
+        325.0
       ],
       "position_w": null,
       "rotation": [
@@ -11666,18 +11656,12 @@
         0.0,
         0.43252943260879895
       ],
-      "placement": "unanchored",
-      "placement_source": "reconstructed_zone_center",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 5,
-          "poi_name": "Sanctuary",
-          "match_score": 0
-        }
-      ],
+      "placement": "video_index",
+      "placement_source": "video_archive_index",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 5. This is not a recovered NPC transform.",
+      "position_reason": "(R) single video, 22 sightings. Video archive placement index (2026-10-29): Camellia solved at x=-1145.0 z=325.0, error 2.7 m, 22 sightings in 1 video (ring), confidence high; height sampled from the zone-0 terrain grid. Replaces the reconstructed offset position [-1415.991721, -27.631, 359.019242].",
       "source": [
         {
           "kind": "client",
@@ -12047,18 +12031,14 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 5 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Camellia solved at x=-1145.0 z=325.0, error 2.7 m, 22 sightings in 1 video (ring), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Camellia solved at x=-1145.0 z=325.0, error 2.7 m, 22 sightings in 1 video (ring), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_w": [
@@ -12079,26 +12059,26 @@
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) unanchored is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Camellia solved at x=-1145.0 z=325.0, error 2.7 m, 22 sightings in 1 video (ring), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_zone_center records placement method and provenance, not a recovered NPC transform."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Camellia solved at x=-1145.0 z=325.0, error 2.7 m, 22 sightings in 1 video (ring), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_confidence": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Camellia solved at x=-1145.0 z=325.0, error 2.7 m, 22 sightings in 1 video (ring), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Camellia solved at x=-1145.0 z=325.0, error 2.7 m, 22 sightings in 1 video (ring), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "capture_match": [

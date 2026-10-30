@@ -17570,9 +17570,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2135.837226,
-        -32.948,
-        1046.96105
+        -2446.6,
+        -31.673,
+        1191.8
       ],
       "position_w": null,
       "rotation": [
@@ -17581,18 +17581,12 @@
         0.0,
         0.9372984296888399
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "medium",
-      "placement_candidates": [
-        {
-          "poi_id": 16,
-          "poi_name": "Blackspore",
-          "match_score": 10
-        }
-      ],
+      "placement": "video_index",
+      "placement_source": "video_archive_index",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) single video, 4 sightings. Video archive placement index (2026-10-29): Lord William IV solved at x=-2446.6 z=1191.8, error 4.0 m, 4 sightings in 1 video (dot+rings), confidence high; height sampled from the zone-0 terrain grid. Replaces the reconstructed offset position [-2135.837226, -32.948, 1046.96105].",
       "source": [
         {
           "kind": "client",
@@ -17874,18 +17868,14 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=16 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=16 NameId=3500 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Lord William IV solved at x=-2446.6 z=1191.8, error 4.0 m, 4 sightings in 1 video (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Lord William IV solved at x=-2446.6 z=1191.8, error 4.0 m, 4 sightings in 1 video (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_w": [
@@ -17906,26 +17896,26 @@
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Lord William IV solved at x=-2446.6 z=1191.8, error 4.0 m, 4 sightings in 1 video (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Lord William IV solved at x=-2446.6 z=1191.8, error 4.0 m, 4 sightings in 1 video (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_confidence": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) medium measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Lord William IV solved at x=-2446.6 z=1191.8, error 4.0 m, 4 sightings in 1 video (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Lord William IV solved at x=-2446.6 z=1191.8, error 4.0 m, 4 sightings in 1 video (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "capture_match": [
@@ -29828,9 +29818,9 @@
       ],
       "services_reason": null,
       "position": [
-        -2136.933047,
-        -32.948,
-        1042.929058
+        -2104.6,
+        -32.25,
+        1077.6
       ],
       "position_w": null,
       "rotation": [
@@ -29839,18 +29829,12 @@
         0.0,
         0.9372984296888399
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "medium",
-      "placement_candidates": [
-        {
-          "poi_id": 16,
-          "poi_name": "Blackspore",
-          "match_score": 10
-        }
-      ],
+      "placement": "video_index",
+      "placement_source": "video_archive_index",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "Video archive placement index (2026-10-29): Sal Monella solved at x=-2104.6 z=1077.6, error 2.6 m, 14 sightings in 11 videos (dots), confidence high; height sampled from the zone-0 terrain grid. Replaces the reconstructed offset position [-2136.933047, -32.948, 1042.929058].",
       "source": [
         {
           "kind": "client",
@@ -30280,18 +30264,14 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=16 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=16 NameId=3500 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Sal Monella solved at x=-2104.6 z=1077.6, error 2.6 m, 14 sightings in 11 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Sal Monella solved at x=-2104.6 z=1077.6, error 2.6 m, 14 sightings in 11 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_w": [
@@ -30312,26 +30292,26 @@
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Sal Monella solved at x=-2104.6 z=1077.6, error 2.6 m, 14 sightings in 11 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Sal Monella solved at x=-2104.6 z=1077.6, error 2.6 m, 14 sightings in 11 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_confidence": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) medium measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Sal Monella solved at x=-2104.6 z=1077.6, error 2.6 m, 14 sightings in 11 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Sal Monella solved at x=-2104.6 z=1077.6, error 2.6 m, 14 sightings in 11 videos (dots), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "capture_match": [

@@ -4852,9 +4852,9 @@
       ],
       "services_reason": null,
       "position": [
-        -989.641532,
-        -6.470751,
-        435.878027
+        -414.4,
+        17.3,
+        -255.8
       ],
       "position_w": null,
       "rotation": [
@@ -4863,33 +4863,12 @@
         0.0,
         0.7788914685836102
       ],
-      "placement": "unanchored",
-      "placement_source": "reconstructed_zone_center",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 31,
-          "poi_name": "Wildwood Speedway",
-          "match_score": 0
-        },
-        {
-          "poi_id": 32,
-          "poi_name": "Thunder Falls Speedway",
-          "match_score": 0
-        },
-        {
-          "poi_id": 60,
-          "poi_name": "Robgoblin Treasure Trove",
-          "match_score": 0
-        },
-        {
-          "poi_id": 69,
-          "poi_name": "Floren Forest",
-          "match_score": 0
-        }
-      ],
+      "placement": "video_index",
+      "placement_source": "video_archive_index",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 31,32,60,69. This is not a recovered NPC transform.",
+      "position_reason": "(R) single video, 2 sightings. Video archive placement index (2026-10-29): Bodkin solved at x=-414.4 z=-255.8, error 4.0 m, 2 sightings in 1 video (dot+rings), confidence high; height sampled from the zone-0 terrain grid. Replaces the reconstructed offset position [-989.641532, -6.470751, 435.878027].",
       "source": [
         {
           "kind": "client",
@@ -5179,18 +5158,14 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 31,32,60,69 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Bodkin solved at x=-414.4 z=-255.8, error 4.0 m, 2 sightings in 1 video (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Bodkin solved at x=-414.4 z=-255.8, error 4.0 m, 2 sightings in 1 video (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_w": [
@@ -5211,26 +5186,26 @@
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) unanchored is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Bodkin solved at x=-414.4 z=-255.8, error 4.0 m, 2 sightings in 1 video (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_zone_center records placement method and provenance, not a recovered NPC transform."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Bodkin solved at x=-414.4 z=-255.8, error 4.0 m, 2 sightings in 1 video (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_confidence": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Bodkin solved at x=-414.4 z=-255.8, error 4.0 m, 2 sightings in 1 video (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Bodkin solved at x=-414.4 z=-255.8, error 4.0 m, 2 sightings in 1 video (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "capture_match": [
@@ -46032,9 +46007,9 @@
       ],
       "services_reason": null,
       "position": [
-        -1903.133053,
-        -39.79,
-        407.417586
+        -654.1,
+        -1.655,
+        -51.5
       ],
       "position_w": null,
       "rotation": [
@@ -46043,23 +46018,12 @@
         0.0,
         0.9559256184725605
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 7,
-          "poi_name": "Cobblestone Village",
-          "match_score": 19
-        },
-        {
-          "poi_id": 5,
-          "poi_name": "Sanctuary",
-          "match_score": 9
-        }
-      ],
+      "placement": "video_index",
+      "placement_source": "video_archive_index",
+      "placement_confidence": "medium",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 7 by longest normalized whole-name score 19; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) single video, 4 sightings. Video archive placement index (2026-10-29): Wanderwings solved at x=-654.1 z=-51.5, error 4.8 m, 4 sightings in 1 video (ring), confidence medium; height sampled from the zone-0 terrain grid. Replaces the reconstructed offset position [-1903.133053, -39.79, 407.417586].",
       "source": [
         {
           "kind": "client",
@@ -46261,18 +46225,14 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=7 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=7 NameId=18142 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Wanderwings solved at x=-654.1 z=-51.5, error 4.8 m, 4 sightings in 1 video (ring), confidence medium; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Wanderwings solved at x=-654.1 z=-51.5, error 4.8 m, 4 sightings in 1 video (ring), confidence medium; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_w": [
@@ -46293,26 +46253,26 @@
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Wanderwings solved at x=-654.1 z=-51.5, error 4.8 m, 4 sightings in 1 video (ring), confidence medium; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Wanderwings solved at x=-654.1 z=-51.5, error 4.8 m, 4 sightings in 1 video (ring), confidence medium; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_confidence": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Wanderwings solved at x=-654.1 z=-51.5, error 4.8 m, 4 sightings in 1 video (ring), confidence medium; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Wanderwings solved at x=-654.1 z=-51.5, error 4.8 m, 4 sightings in 1 video (ring), confidence medium; height sampled from the zone-0 terrain grid."
           }
         ],
         "capture_match": [

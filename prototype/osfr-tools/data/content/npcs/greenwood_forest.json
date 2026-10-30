@@ -5671,9 +5671,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1579.246155,
-        -45.37643,
-        -551.705799
+        -1535.5,
+        -41.476,
+        -548.9
       ],
       "position_w": null,
       "rotation": [
@@ -5682,18 +5682,12 @@
         0.0,
         0.9941277658931138
       ],
-      "placement": "unanchored",
-      "placement_source": "reconstructed_zone_center",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 6,
-          "poi_name": "Greenwood Forest",
-          "match_score": 0
-        }
-      ],
+      "placement": "video_index",
+      "placement_source": "video_archive_index",
+      "placement_confidence": "medium",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 6. This is not a recovered NPC transform.",
+      "position_reason": "(R) single video, 2 sightings. Video archive placement index (2026-10-29): Counselor Amira solved at x=-1535.5 z=-548.9, error 3.3 m, 2 sightings in 1 video (dots), confidence medium; height sampled from the zone-0 terrain grid. Replaces the reconstructed offset position [-1579.246155, -45.37643, -551.705799].",
       "source": [
         {
           "kind": "client",
@@ -5895,18 +5889,14 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 6 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Counselor Amira solved at x=-1535.5 z=-548.9, error 3.3 m, 2 sightings in 1 video (dots), confidence medium; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Counselor Amira solved at x=-1535.5 z=-548.9, error 3.3 m, 2 sightings in 1 video (dots), confidence medium; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_w": [
@@ -5927,26 +5917,26 @@
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) unanchored is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Counselor Amira solved at x=-1535.5 z=-548.9, error 3.3 m, 2 sightings in 1 video (dots), confidence medium; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_zone_center records placement method and provenance, not a recovered NPC transform."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Counselor Amira solved at x=-1535.5 z=-548.9, error 3.3 m, 2 sightings in 1 video (dots), confidence medium; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_confidence": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Counselor Amira solved at x=-1535.5 z=-548.9, error 3.3 m, 2 sightings in 1 video (dots), confidence medium; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Counselor Amira solved at x=-1535.5 z=-548.9, error 3.3 m, 2 sightings in 1 video (dots), confidence medium; height sampled from the zone-0 terrain grid."
           }
         ],
         "capture_match": [

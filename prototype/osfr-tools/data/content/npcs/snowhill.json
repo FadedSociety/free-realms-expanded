@@ -19392,9 +19392,9 @@
       ],
       "services_reason": null,
       "position": [
-        54.13135,
-        30.987,
-        355.764376
+        228.9,
+        23.445,
+        382.5
       ],
       "position_w": null,
       "rotation": [
@@ -19403,18 +19403,12 @@
         0.0,
         0.7361040327419306
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
+      "placement": "video_index",
+      "placement_source": "video_archive_index",
       "placement_confidence": "medium",
-      "placement_candidates": [
-        {
-          "poi_id": 3,
-          "poi_name": "Snowhill",
-          "match_score": 8
-        }
-      ],
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 3 by longest normalized whole-name score 8; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "Video archive placement index (2026-10-29): Hank Fisticuffs solved at x=228.9 z=382.5, error 8.8 m, 3 sightings in 2 videos (ring), confidence medium; height sampled from the zone-0 terrain grid. Replaces the reconstructed offset position [54.13135, 30.987, 355.764376].",
       "source": [
         {
           "kind": "client",
@@ -19704,18 +19698,14 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=3 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=3 NameId=3961 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Hank Fisticuffs solved at x=228.9 z=382.5, error 8.8 m, 3 sightings in 2 videos (ring), confidence medium; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Hank Fisticuffs solved at x=228.9 z=382.5, error 8.8 m, 3 sightings in 2 videos (ring), confidence medium; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_w": [
@@ -19736,26 +19726,26 @@
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Hank Fisticuffs solved at x=228.9 z=382.5, error 8.8 m, 3 sightings in 2 videos (ring), confidence medium; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Hank Fisticuffs solved at x=228.9 z=382.5, error 8.8 m, 3 sightings in 2 videos (ring), confidence medium; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_confidence": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) medium measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Hank Fisticuffs solved at x=228.9 z=382.5, error 8.8 m, 3 sightings in 2 videos (ring), confidence medium; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Hank Fisticuffs solved at x=228.9 z=382.5, error 8.8 m, 3 sightings in 2 videos (ring), confidence medium; height sampled from the zone-0 terrain grid."
           }
         ],
         "capture_match": [
