@@ -827,6 +827,10 @@
       "rewards": [],
       "source": [
         {
+          "kind": "reconstructed",
+          "evidence": "(R) T895: stays disabled: its prerequisite 3110011 (Ninja: Troubled Waters) and the earlier 3110009 and 3110010 are hollow records (no objectives), so the chain cannot be walked, and no reward is recovered; Frostpetal (9000000093) and Ty (9000000223) are drawn, so the W110 'unspawned' note above is stale."
+        },
+        {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 2: level 5 to 10 (Chloe, then Snowhill), row B5; name 'Ninja: Return to the Mentor'; title id cell ucdt 769699029 / ugdt 2876463241"
         },

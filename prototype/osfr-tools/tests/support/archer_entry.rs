@@ -222,9 +222,10 @@ pub fn assert_enabled_archer_chapter_records() {
         .filter(|record| record["enabled"].as_bool().unwrap_or(false))
         // T542 enables the ungated Become an Archer (3010035): the Jobs-window record,
         // not part of the Path/Oath chapter shape this check pins. T671 enables Hilforn's
-        // Archer 5 and Archer Departure (tests/zone_quests_greenwood_round2.rs).
+        // Archer 5 and Archer Departure (tests/zone_quests_greenwood_round2.rs); T895 enables
+        // Pondblaster Payback (tests/quest_use_events.rs).
         .filter(|record| {
-            ![u64::from(BECOME_A_ARCHER), 3_010_009, 3_010_012]
+            ![u64::from(BECOME_A_ARCHER), 3_010_009, 3_010_011, 3_010_012]
                 .contains(&record["id"].as_u64().unwrap())
         })
         .collect();

@@ -47,6 +47,8 @@ pub struct RawQuest {
     pub intro_text_string_id: u32,
     pub description_string_id: u32,
     pub end_text_string_id: u32,
+    /// The record-level `source` notes' evidence text (provenance, `(R)` rules, stay-off reasons).
+    pub source_notes: Vec<String>,
 }
 
 impl RawQuest {
@@ -170,6 +172,12 @@ pub fn read_quests(root: &Path) -> Vec<RawQuest> {
                 intro_text_string_id: as_u32(&record["intro_text_string_id"]).unwrap_or(0),
                 description_string_id: as_u32(&record["description_string_id"]).unwrap_or(0),
                 end_text_string_id: as_u32(&record["end_text_string_id"]).unwrap_or(0),
+                source_notes: record["source"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .filter_map(|tag| tag["evidence"].as_str().map(str::to_owned))
+                    .collect(),
             });
         }
     }

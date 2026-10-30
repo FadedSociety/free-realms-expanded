@@ -562,6 +562,10 @@
       "rewards": [],
       "source": [
         {
+          "kind": "reconstructed",
+          "evidence": "(R) T895: stays disabled: the record backs only the Talk to Honey (9000000107); the guide's collect-and-deliver Bixie Buds steps have no object ids, the quest-lines answer is unresolved and no reward is recovered; Felipe's row (9000000086) and Honey are drawn, so the W110 'unspawned' note above is stale."
+        },
+        {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 1 - Sanctuary (Felipe and Flitter), levels 1 to 5, row 8; name 'Postman: Bixie Buds'; title id cell 4007062377 ucdt; 3195767047 ugdt; 2925384772 unprefixed"
         },

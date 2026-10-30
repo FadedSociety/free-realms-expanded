@@ -226,6 +226,10 @@
       "rewards": [],
       "source": [
         {
+          "kind": "reconstructed",
+          "evidence": "(R) T895: stays disabled: Pet Trainer (profile 121) has no trainer menu in job_trainers.json, so the line cannot be joined, no reward is recovered and the neighbouring records of the chain are hollow (T788 notes); undrawn: unnamed 9000000368."
+        },
+        {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Common trainer series (same after any junior trainer), row 4; name 'Pet Trainer: Speak Up!'; title id cell 3841773075 ucdt; 1161438493 ugdt"
         },
@@ -348,6 +352,10 @@
       "rewards": [],
       "source": [
         {
+          "kind": "reconstructed",
+          "evidence": "(R) T895: stays disabled: Pet Trainer (profile 121) has no trainer menu in job_trainers.json, so the line cannot be joined, no reward is recovered and the neighbouring records of the chain are hollow (T788 notes)."
+        },
+        {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 1: level 1 to 10 (Roscoe, Sanctuary), row 6; name 'Pet Trainer: Sit Up and Take Notice'; title id cell 2980391045 ucdt; 799828340 ugdt"
         },
@@ -419,6 +427,10 @@
       ],
       "rewards": [],
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T895: stays disabled: Pet Trainer (profile 121) has no trainer menu in job_trainers.json, so the line cannot be joined, no reward is recovered and the neighbouring records of the chain are hollow (T788 notes)."
+        },
         {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 1: level 1 to 10 (Roscoe, Sanctuary), row 7; name 'Pet Trainer: Jump High!'; title id cell 3118522154 ucdt; 4150445352 ugdt"
@@ -533,6 +545,10 @@
       "rewards": [],
       "source": [
         {
+          "kind": "reconstructed",
+          "evidence": "(R) T895: stays disabled: Pet Trainer (profile 121) has no trainer menu in job_trainers.json, so the line cannot be joined, no reward is recovered and the neighbouring records of the chain are hollow (T788 notes); the W110 'unspawned' note above is stale for the drawn NPCs."
+        },
+        {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 1: level 1 to 10 (Roscoe, Sanctuary), row 8; name 'Pet Trainer: Mosey On Up'; title id cell 3110761088 ucdt; 2469366365 ugdt"
         },
@@ -625,6 +641,10 @@
       "rewards": [],
       "source": [
         {
+          "kind": "reconstructed",
+          "evidence": "(R) T895: stays disabled: Pet Trainer (profile 121) has no trainer menu in job_trainers.json, so the line cannot be joined, no reward is recovered and the neighbouring records of the chain are hollow (T788 notes)."
+        },
+        {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 2: level 10 to 15 (Vidor Stormshroud, Shrouded Glade), row 9; name 'Pet Trainer: Peek-A-Who?'; title id cell 1648209957 ucdt; 2047280581 ugdt"
         },
@@ -697,6 +717,10 @@
       "rewards": [],
       "source": [
         {
+          "kind": "reconstructed",
+          "evidence": "(R) T895: stays disabled: Pet Trainer (profile 121) has no trainer menu in job_trainers.json, so the line cannot be joined, no reward is recovered and the neighbouring records of the chain are hollow (T788 notes)."
+        },
+        {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 2: level 10 to 15 (Vidor Stormshroud, Shrouded Glade), row 10; name 'Pet Trainer: A Rolling Good Time'; title id cell 3328799344 ucdt; 3286629760 ugdt"
         },
@@ -768,6 +792,10 @@
       ],
       "rewards": [],
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T895: stays disabled: Pet Trainer (profile 121) has no trainer menu in job_trainers.json, so the line cannot be joined, no reward is recovered and the neighbouring records of the chain are hollow (T788 notes)."
+        },
         {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 2: level 10 to 15 (Vidor Stormshroud, Shrouded Glade), row 11; name 'Pet Trainer: Go with the Punches'; title id cell 2934439161 ucdt; 1560554340 ugdt"
@@ -928,6 +956,10 @@
       "rewards": [],
       "source": [
         {
+          "kind": "reconstructed",
+          "evidence": "(R) T895: stays disabled: Pet Trainer (profile 121) has no trainer menu in job_trainers.json, so the line cannot be joined, no reward is recovered and the neighbouring records of the chain are hollow (T788 notes); undrawn: Verill Shiverwings 9000000228; the W110 'unspawned' note above is stale for the drawn NPCs."
+        },
+        {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 2: level 10 to 15 (Vidor Stormshroud, Shrouded Glade), row 13; name 'Pet Trainer: All Aboard to Highroad Junction'; title id cell 3075134853 ucdt; 2354514049 ugdt"
         },
@@ -1004,6 +1036,10 @@
       "rewards": [],
       "source": [
         {
+          "kind": "reconstructed",
+          "evidence": "(R) T895: stays disabled: Pet Trainer (profile 121) has no trainer menu in job_trainers.json, so the line cannot be joined, no reward is recovered and the neighbouring records of the chain are hollow (T788 notes); undrawn: Verill Shiverwings 9000000228."
+        },
+        {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 3: level 15 to 20 (Verill Shiverwings, Highroad Junction), row 14; name 'Pet Trainer: Can You Give Me a Hand... stand?'; title id cell 2687822150 ucdt; 3531685346 ugdt"
         },
@@ -1075,6 +1111,10 @@
       ],
       "rewards": [],
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T895: stays disabled: Pet Trainer (profile 121) has no trainer menu in job_trainers.json, so the line cannot be joined, no reward is recovered and the neighbouring records of the chain are hollow (T788 notes); undrawn: Verill Shiverwings 9000000228."
+        },
         {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 3: level 15 to 20 (Verill Shiverwings, Highroad Junction), row 15; name 'Pet Trainer: Spinning Tails'; title id cell 2809963530 ucdt; 4235736291 ugdt"
@@ -1289,6 +1329,10 @@
       "rewards": [],
       "source": [
         {
+          "kind": "reconstructed",
+          "evidence": "(R) T895: stays disabled: Pet Trainer (profile 121) has no trainer menu in job_trainers.json, so the line cannot be joined, no reward is recovered and the neighbouring records of the chain are hollow (T788 notes); undrawn: Verill Shiverwings 9000000228, Moanna 9000000153; the W110 'unspawned' note above is stale for the drawn NPCs."
+        },
+        {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 3: level 15 to 20 (Verill Shiverwings, Highroad Junction), row 18; name 'Pet Trainer: Down by the Bay'; title id cell 1765787762 ucdt; 2133503166 ugdt"
         },
@@ -1365,6 +1409,10 @@
       "rewards": [],
       "source": [
         {
+          "kind": "reconstructed",
+          "evidence": "(R) T895: stays disabled: Pet Trainer (profile 121) has no trainer menu in job_trainers.json, so the line cannot be joined, no reward is recovered and the neighbouring records of the chain are hollow (T788 notes); undrawn: Moanna 9000000153."
+        },
+        {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 4: level 20 (Moanna, Seaside; Kirill Moonrunner, Sanctuary), row 19; name 'Pet Trainer: Shake Your Groove Thing'; title id cell 2243731891 ucdt; 2720256342 ugdt"
         },
@@ -1430,6 +1478,10 @@
       ],
       "rewards": [],
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T895: stays disabled: Pet Trainer (profile 121) has no trainer menu in job_trainers.json, so the line cannot be joined, no reward is recovered and the neighbouring records of the chain are hollow (T788 notes); undrawn: Moanna 9000000153, Kirill Moonrunner 9000000130; the W110 'unspawned' note above is stale for the drawn NPCs."
+        },
         {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 4: level 20 (Moanna, Seaside; Kirill Moonrunner, Sanctuary), row 20; name 'Pet Trainer: Seek the Master'; title id cell 4224690749 ucdt; 1906296315 ugdt"
@@ -1619,6 +1671,10 @@
       ],
       "rewards": [],
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T895: stays disabled: Pet Trainer (profile 121) has no trainer menu in job_trainers.json, so the line cannot be joined, no reward is recovered and the neighbouring records of the chain are hollow (T788 notes); undrawn: Kirill Moonrunner 9000000130."
+        },
         {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 4: level 20 (Moanna, Seaside; Kirill Moonrunner, Sanctuary), row 22; name 'Pet Trainer: Show Off!'; title id cell 3326084834 ucdt; 861147162 ugdt"

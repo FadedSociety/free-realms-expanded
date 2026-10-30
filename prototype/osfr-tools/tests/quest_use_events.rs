@@ -7,18 +7,22 @@
 //! `00a35150`; 42/6 assign `00c14720`; 42/16 check `00c109f0`; 42/15 use `00c10940`). The quest
 //! catalogue is the production split loader over a scratch copy of `data/content`; only the
 //! objective under test differs, because the shipped quests that name these steps are still
-//! disabled (line endings and provenance stay in the authored files).
+//! disabled (line endings and provenance stay in the authored files). The one exception is
+//! Pondblaster Payback (3010011), enabled by T895 and walked here from the shipped data.
 //!
 //! The session fixture, saved-state round trip and quest packet helpers come from the canonical
 //! `tests/support/npc_quest_chain.rs`; this file adds only the synthetic field population, the
 //! use-goal catalogue and the ability/item request helpers.
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
+#[path = "support/quest_records.rs"]
+mod quest_records;
 
 use npc_quest_chain::{
-    Fixture, accept, character_at_for, content_dir, content_position, counts, finish_quest,
-    has_family, npc_interact, npc_select, objective_complete, objective_update, offer,
-    pending_turnin, quest_status, read_json, release_end_screen, saved, send, talk,
+    Fixture, accept, assert_packet_changes_nothing, character_at_for, content_dir,
+    content_position, counts, finish_quest, has_family, npc_interact, npc_select,
+    objective_complete, objective_update, offer, pending_turnin, quest_reply, quest_status,
+    read_json, release_end_screen, saved, seed_quest, send, talk,
 };
 use osfr_tools::{
     character_store::CharacterState,
@@ -31,6 +35,7 @@ use osfr_tools::{
     },
     quest_engine::{CharacterEligibility, QuestEngine, QuestState, QuestStatus},
 };
+use quest_records::shipped_quest;
 use serde_json::{Value, json};
 use std::{collections::BTreeSet, fs};
 
@@ -38,6 +43,8 @@ use std::{collections::BTreeSet, fs};
 const A: u64 = 701;
 const B: u64 = 702;
 const ARCHER: i32 = 35;
+/// Archer: Achieve Level 5, the shipped prerequisite of Pondblaster Payback.
+const ARCHER_5: u32 = 3_010_009;
 /// Archer toolbar 2, level 5 (`job_abilities.json` definition 62019, name 4830 "Explosive Arrow").
 const EXPLOSIVE_ARROW: i32 = 62019;
 /// The shipped `Robgoblin Pondblasters` enemy definition (`enemies.json` row 1294).
@@ -978,8 +985,8 @@ fn the_pondblaster_quest_requires_archer_level_five() {
         .iter_mut()
         .find(|record| record["id"].as_u64() == Some(u64::from(SHIPPED_QUEST)))
         .expect("the shipped Archer record exists");
-    // The shipped record stays disabled behind its hollow prerequisite, so enable it in this
-    // private copy to exercise the offer gate; the gate fields themselves are asserted as shipped.
+    // The offer gate fields are asserted as shipped; this private copy only drops the
+    // prerequisite so the gate is the one thing under test.
     assert_eq!(
         record["job"].as_u64(),
         Some(35),
@@ -1030,23 +1037,16 @@ fn the_shipped_pondblaster_quest_completes_end_to_end() {
     let enemy_at: [f32; 3] = serde_json::from_value(field_row["position"].clone()).unwrap();
     let fixture = Fixture::for_character(A).with_field_enemies(&[field_row]);
     fixture.copy_content("job_abilities.json");
-    // Enable the authored record in this private copy and drop its hollow prerequisite so the
-    // production offer/turn-in path can run. The shipped file keeps it disabled (3010009 is
-    // still an empty record), which the reachability gate requires.
-    let catalogue = fixture.quest_catalogue();
-    let path = catalogue.join("quests/archer.json");
-    let mut document = read_json(&path);
-    let record = document["records"]
-        .as_array_mut()
-        .expect("archer records")
-        .iter_mut()
-        .find(|record| record["id"].as_u64() == Some(u64::from(SHIPPED_QUEST)))
-        .expect("the shipped Archer record exists");
-    record["enabled"] = json!(true);
-    record["prerequisite_quest_ids"] = json!([]);
-    fs::write(&path, serde_json::to_vec(&document).unwrap()).unwrap();
+    // T895: the shipped record is enabled behind Archer 5 (3010009), so this walks the shipped
+    // data unchanged: the prerequisite is done, nothing is patched.
+    let record = shipped_quest(SHIPPED_QUEST);
+    assert!(record.enabled, "the shipped record is enabled");
+    assert_eq!(record.prerequisite_quest_ids, [ARCHER_5]);
+    let (coins, profile_xp) = record.reward_totals(ARCHER);
+    assert!(coins > 0 && profile_xp > 0, "the reward is authored");
 
-    let mut state = Gameplay::load(fixture.path(), None).unwrap().state();
+    let mut state = fixture.game_as(A, None).state();
+    seed_quest(&mut state, ARCHER_5, QuestStatus::Completed, &[1, 1]);
     {
         let profiles = state.profiles.as_mut().expect("the fixture has profiles");
         profiles.active = ARCHER;
@@ -1095,8 +1095,7 @@ fn the_shipped_pondblaster_quest_completes_end_to_end() {
         "both authored steps complete"
     );
 
-    // The real giver opens the end screen; 49/14 completes the record (its reward rows are
-    // unrecovered, so the turn-in pays nothing).
+    // The real giver opens the end screen; 49/14 completes the record and pays its reward once.
     let talked = talk(&mut game, &at_giver, GIVER_NPC, now);
     assert!(talked.changed, "the final Talk opens the turn-in");
     assert_eq!(pending_turnin(&game), Some(SHIPPED_QUEST));
@@ -1110,6 +1109,60 @@ fn the_shipped_pondblaster_quest_completes_end_to_end() {
     );
     assert!(end.starts_with(&[49, 0, 13, 0, 0, 0]));
     now += 4;
-    finish_quest(&mut game, &at_giver, SHIPPED_QUEST, ARCHER, 0, 0, now);
+    finish_quest(
+        &mut game,
+        &at_giver,
+        SHIPPED_QUEST,
+        ARCHER,
+        coins,
+        profile_xp,
+        now,
+    );
     assert_eq!(quest_status(&game, SHIPPED_QUEST), QuestStatus::Completed);
+}
+
+/// T895: Archer Departure (3010012) follows Pondblaster Payback (3010011), the guide's order, so
+/// Hilforn offers exactly one of the two at a time and the Departure accept is refused until the
+/// Pondblasters are dealt with. Driven through the real offer and accept packets.
+#[test]
+fn archer_departure_waits_for_pondblaster_payback() {
+    const PONDBLASTER: u32 = 3_010_011;
+    const DEPARTURE: u32 = 3_010_012;
+    const GIVER_NPC: u64 = 9_000_000_106;
+    assert_eq!(
+        shipped_quest(DEPARTURE).prerequisite_quest_ids,
+        [PONDBLASTER]
+    );
+
+    // An Archer at rank 5 who finished Archer 5; `done` adds quests finished on top.
+    let hilforn = |done: &[u32]| {
+        let fixture = Fixture::for_character(A);
+        let mut state = fixture.game_as(A, None).state();
+        {
+            let profiles = state.profiles.as_mut().expect("the fixture has profiles");
+            profiles.active = ARCHER;
+            profiles.unlocked.insert(ARCHER);
+            profiles.experience.insert(ARCHER, 400);
+        }
+        for quest in std::iter::once(&ARCHER_5).chain(done) {
+            seed_quest(&mut state, *quest, QuestStatus::Completed, &[1, 1]);
+        }
+        let mut game = fixture.game_as(A, Some(state));
+        let at = character_at_for(A, 0, content_position("greenwood_forest.json", GIVER_NPC));
+        game.initialize_world(&at, 0).unwrap();
+        (game, at)
+    };
+
+    let (mut game, at) = hilforn(&[]);
+    assert_packet_changes_nothing(
+        &mut game,
+        &at,
+        &quest_reply(DEPARTURE, true),
+        100,
+        "accepting Departure before Pondblaster Payback",
+    );
+    offer(&mut game, &at, GIVER_NPC, PONDBLASTER, 1_000);
+
+    let (mut game, at) = hilforn(&[PONDBLASTER]);
+    offer(&mut game, &at, GIVER_NPC, DEPARTURE, 1_000);
 }

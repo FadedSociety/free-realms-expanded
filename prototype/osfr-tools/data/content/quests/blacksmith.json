@@ -1318,6 +1318,10 @@
       "rewards": [],
       "source": [
         {
+          "kind": "reconstructed",
+          "evidence": "(R) T895: stays disabled: the hand-over step gives the Tempest Woven Wand (30480) but no record step or recipe forges it, the prerequisite 3020020 is a hollow record (no objectives) and no reward is recovered."
+        },
+        {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 4: Billie JoBob and Silverray (Blackspore, level 15 to 20), row 21; name 'Blacksmith: Wand Replacement'; title id cell ucdt 2624966332 / ugdt 4136678260; bare 486970765"
         },

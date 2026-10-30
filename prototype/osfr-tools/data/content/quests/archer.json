@@ -729,7 +729,21 @@
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 10,
+          "items": [],
+          "job_xp": {
+            "35": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T895: no client, wiki or repo source names a reward (quest-lines/quests.json q3010011 rewards: none found). 10 coins follows the Archer step ladder (Oath of Honor 3010006, Archer Departure 3010012); 25 Archer (profile 35) XP is the shipped combat-quest rung (Brawler 3000009, Ninja 3110002). The numbers are ours and live in data."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -749,7 +763,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) T789: the two cited steps (defeat definition 1294 and Explosive Arrow 62019 on definition 1294) are authored; the quest stays disabled because its prerequisite 3010009 is still a hollow record (enabled false, empty objectives). The offer gate is job 35 / min_level 5: Explosive Arrow 62019 is an Archer-bar ability, and the cited guide row places this quest in Band 2 (level 5 to 10), so no other job can accept a step it cannot cast."
+          "evidence": "(R) T789 authored the two cited steps (defeat definition 1294 and Explosive Arrow 62019 on definition 1294); T895 enabled the quest: its prerequisite 3010009 (Archer: Achieve Level 5) is enabled since T671, Hilforn (9000000106) is drawn, and field_enemies.json spawns the Pondblasters for this quest. The offer gate is job 35 / min_level 5: Explosive Arrow 62019 is an Archer-bar ability, and the cited guide row places this quest in Band 2 (level 5 to 10), so no other job can accept a step it cannot cast."
         },
         {
           "kind": "reconstructed",
@@ -761,7 +775,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T895: the reward row above replaces the empty one; the original batch note said values were unknown"
         },
         {
           "kind": "reconstructed",
@@ -771,7 +785,7 @@
       "description_string_id": 383171,
       "intro_text_string_id": 383169,
       "end_text_string_id": 383172,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3010012,
@@ -779,7 +793,7 @@
       "title_string_id": 77597,
       "giver_npc_id": 9000000106,
       "prerequisite_quest_ids": [
-        3010009
+        3010011
       ],
       "objectives": [
         {
@@ -875,7 +889,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) T671: prerequisite is 3010009 (Archer: Achieve Level 5): the guide's predecessor 3010011 (Pondblaster Payback, a defeat quest) is disabled, so this step follows the last enabled link of the Hilforn chain. Re-point it when 3010011 is wired. Job gate 35: an Archer quest paying Archer XP, like 3010006."
+          "evidence": "(R) T895: prerequisite is 3010011 (Archer: Pondblaster Payback), the guide's predecessor, now that it is wired (T671 had it follow 3010009 while 3010011 was disabled; 3010011 itself follows 3010009). Job gate 35: an Archer quest paying Archer XP, like 3010006."
         }
       ],
       "description_string_id": 77598,

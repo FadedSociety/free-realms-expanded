@@ -1735,3 +1735,25 @@ fn every_authored_use_goal_resolves_in_the_shipped_tables() {
         "the authored use_ability steps shrank to {ability_steps}; the disabled records are no longer covered"
     );
 }
+
+/// T895: a record that carries objectives but is switched off says why in its own source notes
+/// ("stays disabled" or the W110 "DISABLED" tag), so a reviewer sees what is missing instead of
+/// guessing. An unmarked `enabled` means on, so only an explicit `false` counts.
+#[test]
+fn every_disabled_record_with_objectives_says_why_it_stays_off() {
+    let missing: Vec<u32> = read_quests(&content_dir())
+        .into_iter()
+        .filter(|quest| !quest.enabled && !quest.objectives.is_empty())
+        .filter(|quest| {
+            !quest
+                .source_notes
+                .iter()
+                .any(|note| note.contains("stays disabled") || note.contains("DISABLED"))
+        })
+        .map(|quest| quest.id)
+        .collect();
+    assert!(
+        missing.is_empty(),
+        "disabled records with objectives and no stay-off reason: {missing:?}"
+    );
+}

@@ -38,6 +38,8 @@ const VICKI: u64 = 9_000_000_230;
 const MILI: u64 = 9_000_000_405;
 const FIZZLESTICKS: u64 = 9_000_000_324;
 const ARCHER_5: u32 = 3_010_009;
+/// Pondblaster Payback (T895), the guide's predecessor of Departure.
+const PONDBLASTER: u32 = 3_010_011;
 const DEPARTURE: u32 = 3_010_012;
 const BLACKSMITH_15: u32 = 3_020_019;
 const BETTER_WIZARD: u32 = 3_160_001;
@@ -161,7 +163,7 @@ fn archer_departure_visits_the_farm_then_finds_vicki_and_survives_a_reconnect() 
         &fixture,
         ARCHER,
         &[ADVENTURER, ARCHER],
-        &[(OATH, &[1]), (ARCHER_5, &[1, 1])],
+        &[(OATH, &[1]), (ARCHER_5, &[1, 1]), (PONDBLASTER, &[1, 1])],
     );
     let (hilforn, vicki) = (MAP.at(CHARACTER, HILFORN), MAP.at(CHARACTER, VICKI));
     let mut now = 1_000;
