@@ -35,9 +35,9 @@ mod quest_target_sets;
 use npc_quest_chain::{
     ADVENTURER, CHARACTER, Fixture, ZoneQuest, ZoneQuests, accept, assert_no_offer,
     assert_packet_changes_nothing, breadcrumb_start, character_at_for, coins, content_dir, counts,
-    finish_quest, objective_complete, pending_offer, pending_turnin, quest_end_reply, quest_reply,
-    quest_status, read_json, realm_level, reference_content, release_end_screen, saved,
-    seed_active_profile, select_job, send, talk, zone_player,
+    finish_quest, objective_complete, offer, pending_offer, pending_turnin, quest_end_reply,
+    quest_reply, quest_status, read_json, realm_level, reference_content, release_end_screen,
+    saved, seed_active_profile, select_job, send, talk, zone_player,
 };
 use osfr_tools::{
     chat, gameplay::Gameplay, quest_engine::QuestStatus, quest_journal::BREADCRUMB_REFUSED,
@@ -52,6 +52,7 @@ const CHEF: i32 = 45;
 const WIZARD: i32 = 12;
 const CHEF_5: u32 = 3_050_020;
 const WARRIOR_15: u32 = 3_150_016;
+const ASKING_OLD_FOLKS: u32 = 3_150_019;
 const WIZARD_10: u32 = 3_160_017;
 const FRIEND: u32 = 3_160_019;
 const WIZARD_15: u32 = 3_160_024;
@@ -181,6 +182,17 @@ fn each_quest_is_offered_walked_and_paid_once() {
         let replay = quest_reply(id, true);
         assert_packet_changes_nothing(&mut game, &turnin, &replay, now + 5, "a replayed 49/2");
         let giver = MAP.at(CHARACTER, record(id).giver_npc_id);
+        if id == WARRIOR_15 {
+            // T675: Sir Whittington now offers Asking Old Folks, the errand behind the gate.
+            offer(
+                &mut game,
+                &giver,
+                record(id).giver_npc_id,
+                ASKING_OLD_FOLKS,
+                now,
+            );
+            continue;
+        }
         assert_no_offer(
             &mut game,
             &giver,

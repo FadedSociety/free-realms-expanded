@@ -1185,13 +1185,77 @@
     },
     {
       "id": 3150019,
+      "job": 32,
       "title_string_id": 71480,
       "giver_npc_id": 9000000205,
       "prerequisite_quest_ids": [
-        3150018
+        3150016
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000768,
+          "text_string_id": 71485,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 71485 'Talk to Silversnow' (location line 71486: the northern edge of Snowhill). Silversnow is the legacy_data spawn of fork definition 3578 (FreeRealms-Legacy FabledRealms.lua:2321, NameId 6506) in npcs/snowhill.json."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T675: ordered Talk goal; answer lab/references/quest-lines/quests.json q3150019 objective 1 (talk), order from the offer text 71481 (Silversnow, Milo, Steele)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000756,
+          "text_string_id": 71487,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 71487 'Talk to Milo' (location line 71488: up on a hilltop in Snowhill). Milo is the legacy_data spawn of fork definition 3581 (FabledRealms.lua:2324, NameId 3066) in npcs/snowhill.json."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T675: ordered Talk goal; answer quests.json q3150019 objective 2 (talk)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9000000208,
+          "text_string_id": 71489,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 71489 'Talk to Steele' (location line 71490: by the Clocktower in Snowhill). Steele 9000000208 is the extra spawn already drawn in npc_spawns_extra.json."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T675: the last goal is the Talk to Steele, so he holds the 49/13 (end text 71482) and his row carries the quests_accepted entry; answer quests.json q3150019 objective 3 (talk)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "32": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T675: the answer lab/references/quest-lines/quests.json q3150019 records no reward ('rewards_missing'). 5 coins and 25 Warrior (profile 32) XP repeat the T257 talk-quest rung of 3150001, 3150004, 3150007 and 3150008; no item, and the values live in data."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1211,10 +1275,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -1223,17 +1283,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "T675 text ids (client locale): title 71480, intro 71479 (Sir Whittington), description 71481, end 71482, goals 71485, 71487 and 71489; no progress line is bound (141754 is NPC dialog, not quest text)."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T675: job gate 32 (Warrior). The prerequisite moves from 3150018 to 3150016: Legend of Fastvi Frostflutter is a game-table reenactment the server lacks, so 3150018 stays disabled and would make this quest unreachable; 3150016 is the last enabled step before it. live 'unsure' in lab/references/quest-lines/quests.json q3150019 (client-present, unflagged)."
         }
       ],
       "description_string_id": 71481,
       "intro_text_string_id": 71479,
       "end_text_string_id": 71482,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3150020,

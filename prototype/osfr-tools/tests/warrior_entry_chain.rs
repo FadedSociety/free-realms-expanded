@@ -67,6 +67,8 @@ const W16: u32 = 3_150_016;
 const DISTRACTED: u32 = 3_150_008;
 /// T665 enabled "You Deserve Better" (job gate, two talks, Tumbolina hand-in); `tests/zone_quests_snowhill_dartmoor.rs` owns its shape.
 const W7: u32 = 3_150_007;
+/// T675 enabled "Asking Old Folks" (three ordered talks, Steele hand-in); `tests/zone_quests_snowhill_round2.rs` owns its shape.
+const ASKING_OLD_FOLKS: u32 = 3_150_019;
 const W1_TITLE: u32 = 22_526;
 const W4_TITLE: u32 = 22_580;
 const W4_DESCRIPTION: u32 = 22_581;
@@ -887,6 +889,8 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
         .filter(|row| row["id"].as_u64() != Some(u64::from(BECOME_A_WARRIOR)))
         // T672 enables Tumbolina's Distracted, which has its own shape and suite.
         .filter(|row| row["id"].as_u64() != Some(u64::from(DISTRACTED)))
+        // T675 enables Asking Old Folks, which has its own shape and suite.
+        .filter(|row| row["id"].as_u64() != Some(u64::from(ASKING_OLD_FOLKS)))
         .collect();
     assert_eq!(
         enabled
@@ -1003,7 +1007,18 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
     // generated content already carried.
     for record in records {
         let id = record["id"].as_u64().unwrap();
-        if [W1, W4, W5, W7, W16, BECOME_A_WARRIOR, DISTRACTED].contains(&(id as u32)) {
+        if [
+            W1,
+            W4,
+            W5,
+            W7,
+            W16,
+            BECOME_A_WARRIOR,
+            DISTRACTED,
+            ASKING_OLD_FOLKS,
+        ]
+        .contains(&(id as u32))
+        {
             continue;
         }
         assert_eq!(record["enabled"].as_bool(), Some(false), "quest {id}");

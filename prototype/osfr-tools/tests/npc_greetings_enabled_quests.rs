@@ -499,6 +499,14 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         "Chad Fastflutter: only Raina's referral lines and objective strings; no first-person line of his own.",
     ),
     (
+        9500000756,
+        "Milo (T675 talk target of Warrior: Asking Old Folks, 3150019): the client names him only in third person (71487 'Talk to Milo', 71488 'Speak with Milo, who can be found up on a hilltop', and Sir Whittington's offer 71479 and description 71481 that send the player to him); quest-lines/quests.json q3150019 records no first-person line of his, so none is recovered.",
+    ),
+    (
+        9500000768,
+        "Silversnow (T675 talk target of Warrior: Asking Old Folks, 3150019): the client names him only in third person (71485 'Talk to Silversnow', 71486 'Talk to the old pixie Silversnow', and Sir Whittington's offer 71479 and description 71481 that send the player to him); quest-lines/quests.json q3150019 records no first-person line of his, so none is recovered.",
+    ),
+    (
         9500000872,
         "Blammo (T732 giver and talk target of 3080009): NPCs - Wilds.md:148 and Kart Driver.md row 7 quote only the third-person Exploder's League role; his line 394486 is the quest offer, not a greeting.",
     ),

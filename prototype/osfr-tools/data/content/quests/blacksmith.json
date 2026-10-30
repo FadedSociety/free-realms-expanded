@@ -440,13 +440,45 @@
     },
     {
       "id": 3020007,
+      "job": 16,
       "title_string_id": 91268,
       "giver_npc_id": 9000000033,
       "prerequisite_quest_ids": [
-        3020006
+        3020005
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000069,
+          "text_string_id": 91305,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 91305 'Find and speak with Derp Axemaker, at Dartmoor, southwest of Snowhill.' (lab/reports/locale-id-to-text.json). Derp is the legacy_data spawn of fork definition 3286 (FreeRealms-Legacy FabledRealms.lua:2029, NameId 77270) already drawn in npcs/snowhill.json."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T675: the one goal is the ordered Talk to Derp (answer lab/references/quest-lines/quests.json q3020007 objective 1, kind go); his reply 91270 is the quest's end text, so Derp holds the 49/13 and his row carries the quests_accepted entry."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "16": 20
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T675: the answer lab/references/quest-lines/quests.json q3020007 records no reward (only Derp's promise of new recipes, locale 91267, which no item id backs). 5 coins and 20 Blacksmith (profile 16) XP repeat the rung of the shipped Blacksmith steps 3020003 and 3020005; no item, and the values live in data."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -466,10 +498,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -478,25 +506,78 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "T675 text ids (client locale): title 91268 'Blacksmith: Bat Fighter', intro 91267 (Brody), description 91269 (also the progress line), end 91270 (Derp); goal 91305."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T675: job gate 16 (Blacksmith), like 3020003 and 3020005. The prerequisite moves from 3020006 to 3020005: Warrior Weapon needs the Valiant Guardian Cudgel recipe, which the recipe book does not hold (recipes_unresolved.json blacksmith.valiant_guardian_cudgel has no payload), so 3020006 stays disabled and would make this quest unreachable. live 'yes' in lab/references/quest-lines/quests.json q3020007."
         }
       ],
       "description_string_id": 91269,
       "intro_text_string_id": 91267,
       "end_text_string_id": 91270,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3020008,
+      "job": 16,
       "title_string_id": 387551,
       "giver_npc_id": 9000000033,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3020007
+      ],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "profile_id": 16,
+          "level": 5,
+          "text_string_id": 387615,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387615 'Reach level 5 as a blacksmith, then return to Brody Sparfist.' (lab/reports/locale-id-to-text.json); Blacksmith is profile 16 (the shipped Blacksmith steps 3020003 and 3020005 pay profile 16)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T675: one authoritative job_level objective at profile 16, level 5, judged from the server's own Profiles::rank curve (T361); job_level is objective #0 as quest_engine requires for an ordered quest."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000033,
+          "text_string_id": 387618,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387618 'Return to Brody Sparfist': the giver, npc 9000000033 (name 22436), a drawn legacy_data row in npcs/snowhill.json that already lists 3020008."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T675: the final Talk to the named target opens the 49/13 end screen at Brody (end text 387553)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T675: quest-lines/quests.json q3020008 states no reward ('rewards_missing'). 15 coins, no item and no job XP mirror the shipped level-gate payout (Blacksmith 3020019, Warrior W5 3150005, Miner 3100006); the number is ours and lives in data."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -512,10 +593,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -524,17 +601,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "T675 text ids (client locale): title 387551, intro 387550 (Brody), description 387552, end 387553, goals 387615 and 387618; the answer names 387619 ('Head back to Brody Sparfist to continue your blacksmithing career!') as the progress line, which has no field in the quest record (unbound)."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T675: job gate 16. The record had no prerequisite; Bat Fighter 3020007 is added because the answer (quests.json q3020008 line.previous) and the guide put it directly before this level gate (row 7 then row 8), and Brody would otherwise offer both at once. live 'yes' in lab/references/quest-lines/quests.json q3020008."
         }
       ],
       "description_string_id": 387552,
       "intro_text_string_id": 387550,
       "end_text_string_id": 387553,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3020009,

@@ -10835,8 +10835,24 @@
       "quests_given_text": [
         "Blacksmith and Miner level 10 gate (Blacksmith, Miner)."
       ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "quests_accepted": [
+        {
+          "quest_id": 3020007,
+          "title": "Blacksmith: Bat Fighter",
+          "title_string_id": 91268,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 91270 (the quest's end text) is Derp's reply to being sent by Brody (answer lab/references/quest-lines/quests.json q3020007 dialog.complete; Blacksmith.md row 7)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T675: the last goal of Blacksmith: Bat Fighter is the Talk to Derp, so the normal turn-in NPC is Derp rather than the giver Brody."
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": "T675: the last goal of Blacksmith: Bat Fighter is the Talk to Derp (his reply 91270 is the end text); the hand-in NPC is Derp, not the giver Brody (R).",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [],
@@ -38938,8 +38954,24 @@
       "quests_given_text": [
         "Warrior: Achieve Level 5, Warrior: You Deserve Better, Warrior: Steele is Useful (wiki). Receives the player in Warrior: One With Your Weapon and Warrior: Asking Old Folks."
       ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "quests_accepted": [
+        {
+          "quest_id": 3150019,
+          "title": "Warrior: Asking Old Folks",
+          "title_string_id": 71480,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 71489 'Talk to Steele' is the last goal and 71482 the end text (answer lab/references/quest-lines/quests.json q3150019; Warrior.md row W19, offer text 71481 order Silversnow, Milo, Steele)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T675: the last goal of Warrior: Asking Old Folks is the Talk to Steele, so the normal turn-in NPC is Steele rather than the giver Sir Whittington."
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": "T675: the last goal of Warrior: Asking Old Folks is the Talk to Steele; the hand-in NPC is Steele, not the giver Sir Whittington (R).",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [
