@@ -91,7 +91,7 @@
     {
       "id": 3150002,
       "title_string_id": 77223,
-      "giver_npc_id": 9000000302,
+      "giver_npc_id": 9000000076,
       "prerequisite_quest_ids": [
         3150001
       ],
@@ -143,7 +143,7 @@
     {
       "id": 3150003,
       "title_string_id": 70893,
-      "giver_npc_id": 9000000302,
+      "giver_npc_id": 9000000076,
       "prerequisite_quest_ids": [
         3150002
       ],
@@ -734,7 +734,7 @@
     {
       "id": 3150011,
       "title_string_id": 388361,
-      "giver_npc_id": 9000000267,
+      "giver_npc_id": 9000000040,
       "prerequisite_quest_ids": [
         3150010
       ],
@@ -1082,7 +1082,7 @@
     {
       "id": 3150017,
       "title_string_id": 388365,
-      "giver_npc_id": 9000000267,
+      "giver_npc_id": 9000000040,
       "prerequisite_quest_ids": [
         3150016
       ],
@@ -1447,7 +1447,7 @@
     {
       "id": 3150023,
       "title_string_id": 388369,
-      "giver_npc_id": 9000000267,
+      "giver_npc_id": 9000000040,
       "prerequisite_quest_ids": [
         3150022
       ],

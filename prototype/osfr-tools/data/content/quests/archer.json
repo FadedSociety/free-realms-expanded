@@ -1156,7 +1156,7 @@
     {
       "id": 3010018,
       "title_string_id": 388258,
-      "giver_npc_id": 9000000314,
+      "giver_npc_id": 9500000245,
       "prerequisite_quest_ids": [
         3010017
       ],
@@ -1504,7 +1504,7 @@
     {
       "id": 3010025,
       "title_string_id": 388331,
-      "giver_npc_id": 9000000314,
+      "giver_npc_id": 9500000245,
       "prerequisite_quest_ids": [
         3010024
       ],
@@ -1807,7 +1807,7 @@
     {
       "id": 3010031,
       "title_string_id": 388483,
-      "giver_npc_id": 9000000314,
+      "giver_npc_id": 9500000245,
       "prerequisite_quest_ids": [
         3010030
       ],

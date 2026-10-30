@@ -301,8 +301,9 @@ fn natali_before_the_offer_the_wrong_job_and_a_missing_prerequisite_change_nothi
 /// of the 33 rows need a mechanic or a fact the server lacks (see `notes/Autopilot/T667.md`).
 #[test]
 fn the_other_wilds_rows_stay_off_with_a_blocker() {
-    /// Quests whose giver 9000000058 / 9000000281 / 9000000055 (Coach Eddie) has no drawn row.
-    const NO_GIVER: [u32; 5] = [3_140_006, 3_140_010, 3_140_011, 3_140_023, 3_140_026];
+    /// Quests that named an unresolved Coach Eddie slot until T898 pointed them at his drawn row
+    /// (9000000053); they stay off because no objectives are wired.
+    const NO_OBJECTIVES: [u32; 5] = [3_140_006, 3_140_010, 3_140_011, 3_140_023, 3_140_026];
     /// Quests whose `finish_minigame` id has no server path that reports it.
     const NO_MINIGAME: [(u32, u32); 1] = [(3_040_025, 527)];
     /// Quests behind a prerequisite that is itself disabled.
@@ -319,9 +320,14 @@ fn the_other_wilds_rows_stay_off_with_a_blocker() {
         assert!(!quest.enabled, "quest {id} is enabled, not blocked");
         quest
     };
-    for id in NO_GIVER {
-        let giver = off(id).giver_npc_id;
-        assert!(!drawn.contains(&giver), "{id}: giver {giver} is drawn now");
+    for id in NO_OBJECTIVES {
+        let quest = off(id);
+        let giver = quest.giver_npc_id;
+        assert!(drawn.contains(&giver), "{id}: giver {giver} is not drawn");
+        assert!(
+            quest.objectives.is_empty(),
+            "{id} grew objectives; re-check it"
+        );
     }
     for (id, game) in NO_MINIGAME {
         off(id);

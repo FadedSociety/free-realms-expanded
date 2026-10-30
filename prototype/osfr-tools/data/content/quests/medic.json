@@ -1516,7 +1516,7 @@
     {
       "id": 3090026,
       "title_string_id": 74783,
-      "giver_npc_id": 9000000280,
+      "giver_npc_id": 9000000052,
       "prerequisite_quest_ids": [
         3090025
       ],

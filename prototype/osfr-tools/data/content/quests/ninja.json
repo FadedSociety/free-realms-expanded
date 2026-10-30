@@ -961,7 +961,7 @@
     {
       "id": 3110014,
       "title_string_id": 388404,
-      "giver_npc_id": 9000000439,
+      "giver_npc_id": 9000000180,
       "prerequisite_quest_ids": [
         3110013
       ],
@@ -1117,7 +1117,7 @@
     {
       "id": 3110017,
       "title_string_id": 78889,
-      "giver_npc_id": 9000000447,
+      "giver_npc_id": 9500000766,
       "prerequisite_quest_ids": [
         3110016
       ],
@@ -1169,7 +1169,7 @@
     {
       "id": 3110018,
       "title_string_id": 387209,
-      "giver_npc_id": 9000000447,
+      "giver_npc_id": 9500000766,
       "prerequisite_quest_ids": [],
       "objectives": [],
       "rewards": [],
@@ -1218,7 +1218,7 @@
     {
       "id": 3110019,
       "title_string_id": 388408,
-      "giver_npc_id": 9000000439,
+      "giver_npc_id": 9000000180,
       "prerequisite_quest_ids": [
         3110018
       ],
@@ -1270,7 +1270,7 @@
     {
       "id": 3110020,
       "title_string_id": 78928,
-      "giver_npc_id": 9000000447,
+      "giver_npc_id": 9500000766,
       "prerequisite_quest_ids": [
         3110018
       ],
@@ -1608,7 +1608,7 @@
     {
       "id": 3110025,
       "title_string_id": 388412,
-      "giver_npc_id": 9000000439,
+      "giver_npc_id": 9000000180,
       "prerequisite_quest_ids": [
         3110024
       ],

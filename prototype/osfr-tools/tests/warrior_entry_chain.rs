@@ -1026,8 +1026,9 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
         assert_eq!(record["rewards"], serde_json::json!([]), "quest {id}");
     }
     for (id, title, giver, prerequisites) in [
-        (W2, 77_223_u64, 9_000_000_302_u64, vec![u64::from(W1)]),
-        (W3, 70_893, 9_000_000_302, vec![u64::from(W2)]),
+        // T898: the unresolved Dewey slot 9000000302 is Drill Sergeant Dewey's row.
+        (W2, 77_223_u64, 9_000_000_076_u64, vec![u64::from(W1)]),
+        (W3, 70_893, 9_000_000_076, vec![u64::from(W2)]),
         (W5, 387_433, 9_000_000_208, vec![u64::from(W4)]),
     ] {
         let record = records
