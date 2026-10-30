@@ -3,6 +3,8 @@ use super::*;
 
 // Content loading and staged reloads. `#[path]` keeps the `encounter` hub
 // untouched; the module is still a descendant of `encounter`.
+#[path = "field_camps.rs"]
+mod field_camps;
 #[path = "field_content.rs"]
 mod field_content;
 

@@ -55,28 +55,7 @@ impl EncounterEngine {
             {
                 return Err(invalid("invalid field spawn group"));
             }
-            for source in &group.source {
-                let Some(evidence) = source.get("evidence").and_then(|v| v.as_str()) else {
-                    return Err(invalid("field spawn group source needs evidence"));
-                };
-                if evidence.trim().is_empty() {
-                    return Err(invalid("invalid field spawn group source"));
-                }
-                if source.get("kind").and_then(|v| v.as_str()) == Some("reconstructed")
-                    && !evidence.starts_with("(R)")
-                {
-                    return Err(invalid("reconstructed field spawn group source needs (R)"));
-                }
-            }
-            if !group.source.iter().any(|source| {
-                source.get("kind").and_then(|v| v.as_str()) == Some("reconstructed")
-                    && source
-                        .get("evidence")
-                        .and_then(|v| v.as_str())
-                        .is_some_and(|evidence| evidence.starts_with("(R)"))
-            }) {
-                return Err(invalid("field spawn group needs reconstructed provenance"));
-            }
+            check_sources("field spawn group", &group.source)?;
             for guid in group.members {
                 if !grouped.insert(guid) {
                     return Err(invalid("duplicate field spawn group member"));
@@ -94,8 +73,24 @@ impl EncounterEngine {
                 actor.actor.behaviour = Some(group.behaviour.clone());
             }
         }
-        let mut guids: BTreeSet<u64> = self
-            .content
+        let mut guids = self.claimed_guids();
+        let mut field = Vec::with_capacity(enemies.len());
+        let mut areas = BTreeSet::new();
+        for f in enemies {
+            field.push(self.build_field_enemy(f, &mut guids, &mut areas, combat_marker)?);
+        }
+        Arc::make_mut(&mut self.content).field_sites = field
+            .iter()
+            .map(|f| (f.actor.definition_id, f.actor.guid, f.actor.position))
+            .collect();
+        self.field_sim.enemies = field;
+        self.paid_revive_cost = paid_revive_cost;
+        self.rebuild_behaviours()
+    }
+
+    /// GUIDs the opening, dungeons and battles already claim: a field enemy may not reuse one.
+    pub(super) fn claimed_guids(&self) -> BTreeSet<u64> {
+        self.content
             .world_enemies
             .iter()
             .map(|a| a.guid)
@@ -106,85 +101,85 @@ impl EncounterEngine {
                     .chain(d.guide.iter().map(|g| g.guid))
             }))
             .chain(self.battles.iter().map(|b| b.spawner.guid))
-            .collect();
-        let mut field = Vec::with_capacity(enemies.len());
-        let mut areas = BTreeSet::new();
-        for mut f in enemies {
-            validate_actor(&f.actor)?;
-            let behaviour =
-                resolve_behaviour(&f.actor, &self.behaviour_presets).map_err(|e| invalid(&e))?;
-            let leash = f.leash_radius.unwrap_or(behaviour.leash);
-            let respawn_seconds = f
-                .respawn_seconds
-                .ok_or_else(|| invalid("field enemy has no respawn timer"))?;
-            let aggro_range = f
-                .aggro_range
-                .ok_or_else(|| invalid("field enemy has no aggro range"))?;
-            if !f.actor.stages.is_empty()
-                || f.actor.boss
-                || !(1..=3600).contains(&respawn_seconds)
-                || !(aggro_range > 0.0 && aggro_range <= 40.0)
-                || f.level_band.is_some_and(|[lo, hi]| {
-                    lo == 0 || lo > f.actor.level || hi < f.actor.level || hi > 20
-                })
-                || f.zone_id != self.content.world.zone_id
-                || !leash.is_finite()
-                || leash <= 0.0
-                || leash > 1000.0
-                || f.region
-                    .as_ref()
-                    .is_some_and(|s| s.len() > 120 || s.chars().any(char::is_control))
-            {
-                return Err(invalid("invalid field enemy"));
-            }
-            if let Some(area) = &f.spawn_area {
-                if area.id.is_empty()
-                    || area.id.len() > 120
-                    || area.id.chars().any(char::is_control)
-                    || !areas.insert(area.id.clone())
-                    || area.count != 1
-                    || !valid_position(area.centre)
-                    || area.centre != f.actor.position
-                    || !area.radius.is_finite()
-                    || area.radius < 0.0
-                    || area.radius > leash
-                {
-                    return Err(invalid("invalid field spawn area"));
-                }
-            }
-            if !guids.insert(f.actor.guid) {
-                return Err(invalid("duplicate field enemy GUID"));
-            }
-            // (R) Authored stats are level-one baselines. Reuse the final-era HP
-            // curve and weapon tiers, rather than inventing per-kind curves.
-            self.scale.scale_field_enemy(&mut f.actor);
-            let marker = f.combat_marker.resolve(combat_marker, f.actor.name_id)?;
-            field.push(FieldEnemy {
-                marker,
-                state: enemy_state(&f.actor),
-                respawn_ms: u64::from(respawn_seconds) * 1000,
-                aggro_range,
-                present: f.quest_ids.is_empty(),
-                quest_ids: f.quest_ids,
-                leash_radius: f.leash_radius,
-                roam_radius: f.spawn_area.map_or(0.0, |a| a.radius),
-                motion: FieldMotion::Idle,
-                roam_goal: None,
-                pause_until: 0,
-                target: None,
-                reset_serial: 0,
-                seed: f.actor.guid,
-                actor: f.actor,
-                respawn_at: None,
-            });
+            .collect()
+    }
+
+    /// Validate one authored field actor and give it its live state. `guids` and `areas` are
+    /// the ids already taken; a row that passes claims its own.
+    pub(super) fn build_field_enemy(
+        &self,
+        mut f: FieldActor,
+        guids: &mut BTreeSet<u64>,
+        areas: &mut BTreeSet<String>,
+        combat_marker: Option<Notification>,
+    ) -> io::Result<FieldEnemy> {
+        validate_actor(&f.actor)?;
+        let behaviour =
+            resolve_behaviour(&f.actor, &self.behaviour_presets).map_err(|e| invalid(&e))?;
+        let leash = f.leash_radius.unwrap_or(behaviour.leash);
+        let respawn_seconds = f
+            .respawn_seconds
+            .ok_or_else(|| invalid("field enemy has no respawn timer"))?;
+        let aggro_range = f
+            .aggro_range
+            .ok_or_else(|| invalid("field enemy has no aggro range"))?;
+        if !f.actor.stages.is_empty()
+            || f.actor.boss
+            || !(1..=3600).contains(&respawn_seconds)
+            || !(aggro_range > 0.0 && aggro_range <= 40.0)
+            || f.level_band.is_some_and(|[lo, hi]| {
+                lo == 0 || lo > f.actor.level || hi < f.actor.level || hi > 20
+            })
+            || f.zone_id != self.content.world.zone_id
+            || !leash.is_finite()
+            || leash <= 0.0
+            || leash > 1000.0
+            || f.region
+                .as_ref()
+                .is_some_and(|s| s.len() > 120 || s.chars().any(char::is_control))
+        {
+            return Err(invalid("invalid field enemy"));
         }
-        Arc::make_mut(&mut self.content).field_sites = field
-            .iter()
-            .map(|f| (f.actor.definition_id, f.actor.guid, f.actor.position))
-            .collect();
-        self.field_sim.enemies = field;
-        self.paid_revive_cost = paid_revive_cost;
-        self.rebuild_behaviours()
+        if let Some(area) = &f.spawn_area {
+            if area.id.is_empty()
+                || area.id.len() > 120
+                || area.id.chars().any(char::is_control)
+                || !areas.insert(area.id.clone())
+                || area.count != 1
+                || !valid_position(area.centre)
+                || area.centre != f.actor.position
+                || !area.radius.is_finite()
+                || area.radius < 0.0
+                || area.radius > leash
+            {
+                return Err(invalid("invalid field spawn area"));
+            }
+        }
+        if !guids.insert(f.actor.guid) {
+            return Err(invalid("duplicate field enemy GUID"));
+        }
+        // (R) Authored stats are level-one baselines. Reuse the final-era HP
+        // curve and weapon tiers, rather than inventing per-kind curves.
+        self.scale.scale_field_enemy(&mut f.actor);
+        let marker = f.combat_marker.resolve(combat_marker, f.actor.name_id)?;
+        Ok(FieldEnemy {
+            marker,
+            state: enemy_state(&f.actor),
+            respawn_ms: u64::from(respawn_seconds) * 1000,
+            aggro_range,
+            present: f.quest_ids.is_empty(),
+            quest_ids: f.quest_ids,
+            leash_radius: f.leash_radius,
+            roam_radius: f.spawn_area.map_or(0.0, |a| a.radius),
+            motion: FieldMotion::Idle,
+            roam_goal: None,
+            pause_until: 0,
+            target: None,
+            reset_serial: 0,
+            seed: f.actor.guid,
+            actor: f.actor,
+            respawn_at: None,
+        })
     }
 
     /// Guid and home position of the lowest-guid field enemy of this kind: where a kill
@@ -378,6 +373,9 @@ impl EncounterEngine {
             .collect();
         self.staged(|engine| {
             engine.load_field_enemies(path)?;
+            if let Some(directory) = path.parent() {
+                engine.load_field_camps(directory)?;
+            }
             for guid in &previous {
                 engine.field_sim.moving.remove(guid);
                 engine.field_sim.attacks.remove(guid);
@@ -388,4 +386,32 @@ impl EncounterEngine {
         packets.extend(self.field_initialization());
         Ok(packets)
     }
+}
+
+/// A content row's provenance: every source names its evidence, and at least one reconstructed
+/// source starts with `(R)`, so a guess is never presented as a recovered fact.
+pub(super) fn check_sources(what: &str, sources: &[serde_json::Value]) -> io::Result<()> {
+    for source in sources {
+        let Some(evidence) = source.get("evidence").and_then(|v| v.as_str()) else {
+            return Err(invalid(&format!("{what} source needs evidence")));
+        };
+        if evidence.trim().is_empty() {
+            return Err(invalid(&format!("invalid {what} source")));
+        }
+        if source.get("kind").and_then(|v| v.as_str()) == Some("reconstructed")
+            && !evidence.starts_with("(R)")
+        {
+            return Err(invalid(&format!("reconstructed {what} source needs (R)")));
+        }
+    }
+    if !sources.iter().any(|source| {
+        source.get("kind").and_then(|v| v.as_str()) == Some("reconstructed")
+            && source
+                .get("evidence")
+                .and_then(|v| v.as_str())
+                .is_some_and(|evidence| evidence.starts_with("(R)"))
+    }) {
+        return Err(invalid(&format!("{what} needs reconstructed provenance")));
+    }
+    Ok(())
 }

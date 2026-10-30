@@ -600,6 +600,32 @@ pub fn send(game: &mut Gameplay, character: &CharacterState, packet: &[u8], now:
         })
 }
 
+/// One field kill through the real 26/8 -> Attack menu -> 26/10 path, standing at `position`
+/// (the enemy's home). True once the enemy's 35/3 removal arrives; the removal reader is
+/// `008d69f0`: u16 flag at 4..6, then the actor u64 at 6..14. `now` advances by the swings.
+pub fn kill_field_enemy(game: &mut Gameplay, position: [f32; 3], guid: u64, now: &mut u64) -> bool {
+    const ATTACK_CHOICE: i32 = 103;
+    let character = character_at_for(CHARACTER, 0, position);
+    *now += 100;
+    let menu = send(game, &character, &npc_interact(guid), *now);
+    assert!(
+        menu.replies
+            .iter()
+            .any(|packet| has_family(packet, 26, 9, None)),
+        "field enemy {guid} exposes the interaction menu"
+    );
+    (0..8).any(|_| {
+        *now += 700;
+        send(game, &character, &npc_select(guid, ATTACK_CHOICE), *now)
+            .replies
+            .iter()
+            .any(|packet| {
+                has_family(packet, 35, 3, None)
+                    && packet.get(6..14) == Some(guid.to_le_bytes().as_slice())
+            })
+    })
+}
+
 /// One request through the real `Gateway::handle_at` framing: the application bodies it replies
 /// with, `005` tunnel stripped.
 pub fn gateway_send(gateway: &mut Gateway, inner: &[u8], now: u64) -> Vec<Vec<u8>> {

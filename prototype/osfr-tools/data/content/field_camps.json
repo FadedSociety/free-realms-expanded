@@ -1,0 +1,1559 @@
+{
+  "schema_version": 1,
+  "camps": [
+    {
+      "id": "anon-troll-ice-ice-troll",
+      "definition": "ice_troll",
+      "level": 9,
+      "respawn_seconds": 90,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003756,
+        100000003759,
+        100000003760
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 3 drawn bodies on model 100 (spawn_guid 100000003756..100000003760); npc-interactivity census 2026-10-29 section 7, record def:100:0:, tier enemy, rule U3, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json ice_troll; level 9 is a local choice (the definition has no level); respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-ghostdwarf-m-miner-01-w58b-ghost-dwarf",
+      "definition": "w58b_ghost_dwarf",
+      "level": 5,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000001496,
+        100000001497,
+        100000001498,
+        100000001499,
+        100000001500,
+        100000001501,
+        100000001502,
+        100000003761
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 8 drawn bodies on model 10 (spawn_guid 100000001496..100000003761); npc-interactivity census 2026-10-29 section 7, record def:10:0:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58b_ghost_dwarf; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-floren-floren-default1",
+      "definition": "floren",
+      "level": 5,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003383,
+        100000003384
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 2 drawn bodies on model 134 (spawn_guid 100000003383..100000003384); npc-interactivity census 2026-10-29 section 7, record def:134:0:Default1, tier enemy, rule U3, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json floren; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "floren-leafling-floren",
+      "definition": "floren",
+      "level": 5,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003361,
+        100000003362,
+        100000003367,
+        100000003369,
+        100000003372,
+        100000003374,
+        100000003375,
+        100000003376,
+        100000003395,
+        100000003396,
+        100000003399,
+        100000003400
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 12 drawn bodies on model 134 (spawn_guid 100000003361..100000003400); npc-interactivity census 2026-10-29 section 7, record def:134:442606:, tier enemy, rule E2, confidence low. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json floren; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "floren-defender-floren-default1",
+      "definition": "floren",
+      "level": 5,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003363,
+        100000003368,
+        100000003397,
+        100000003401,
+        100000003402
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 5 drawn bodies on model 134 (spawn_guid 100000003363..100000003402); npc-interactivity census 2026-10-29 section 7, record def:134:442607:Default1, tier enemy, rule E2, confidence low. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json floren; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "bitterleaf-floren-default3",
+      "definition": "floren",
+      "level": 5,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003398
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 1 drawn bodies on model 134 (spawn_guid 100000003398..100000003398); npc-interactivity census 2026-10-29 section 7, record def:134:442608:Default3, tier enemy, rule E2, confidence low. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json floren; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-wolf-vinegolum-vicious-vinewolf",
+      "definition": "vicious_vinewolf",
+      "level": 5,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000002872,
+        100000003745
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 2 drawn bodies on model 142 (spawn_guid 100000002872..100000003745); npc-interactivity census 2026-10-29 section 7, record def:142:0:, tier enemy, rule U3, confidence low. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json vicious_vinewolf; level 5 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-manguana-m-base-w58-sandscale-hunter-l3-enemy",
+      "definition": "w58_sandscale_hunter_l3_enemy",
+      "level": 3,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003859,
+        100000003861
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 2 drawn bodies on model 1528 (spawn_guid 100000003859..100000003861); npc-interactivity census 2026-10-29 section 7, record def:1528:0:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_sandscale_hunter_l3_enemy; level 3 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "sandscale-hunter-w58-sandscale-hunter-l3-enemy",
+      "definition": "w58_sandscale_hunter_l3_enemy",
+      "level": 3,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003867,
+        100000003868,
+        100000003878,
+        100000003888,
+        100000003893,
+        100000003894,
+        100000003897,
+        100000003898,
+        100000003913,
+        100000003915,
+        100000004782,
+        100000004783,
+        100000004785,
+        100000004799,
+        100000004800,
+        100000004801,
+        100000004804,
+        100000004815
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 18 drawn bodies on model 1528 (spawn_guid 100000003867..100000004815); npc-interactivity census 2026-10-29 section 7, record def:1528:5102869:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_sandscale_hunter_l3_enemy; level 3 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "nettleseed-pest-w58-nettleseed-pest-l13-enemy",
+      "definition": "w58_nettleseed_pest_l13_enemy",
+      "level": 14,
+      "respawn_seconds": 120,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000002825,
+        100000002826,
+        100000002828,
+        100000002836,
+        100000002841
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 5 drawn bodies on model 160 (spawn_guid 100000002825..100000002841); npc-interactivity census 2026-10-29 section 7, record def:160:73988:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_nettleseed_pest_l13_enemy; level 14 is that definition (the l13 in its id is not the level); respawn 120 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-snake-snake",
+      "definition": "snake",
+      "level": 3,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000001597,
+        100000002568,
+        100000002569,
+        100000003154,
+        100000003155,
+        100000003382,
+        100000003780,
+        100000004416,
+        100000004417,
+        100000004418,
+        100000004419,
+        100000004506,
+        100000004507,
+        100000006251
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 14 drawn bodies on model 180 (spawn_guid 100000001597..100000006251); npc-interactivity census 2026-10-29 section 7, record def:180:0:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json snake; level 3 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "snake-snake",
+      "definition": "snake",
+      "level": 3,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000031548
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 1 drawn bodies on model 180 (spawn_guid 100000031548..100000031548); npc-interactivity census 2026-10-29 section 7, record def:180:4259:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json snake; level 3 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-troll-scout-troll-roughguard",
+      "definition": "troll_roughguard",
+      "level": 9,
+      "respawn_seconds": 90,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003805,
+        100000003806
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 2 drawn bodies on model 182 (spawn_guid 100000003805..100000003806); npc-interactivity census 2026-10-29 section 7, record def:182:0:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json troll_roughguard; level 9 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "frostfang-snarler-frostfang-snarler",
+      "definition": "frostfang_snarler",
+      "level": 13,
+      "respawn_seconds": 120,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003592
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 1 drawn bodies on model 1938 (spawn_guid 100000003592..100000003592); npc-interactivity census 2026-10-29 section 7, record def:1938:78096:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json frostfang_snarler; level 13 is that definition; respawn 120 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "thugawug-thug-thugawug-thug",
+      "definition": "thugawug_thug",
+      "level": 5,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000004115
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 1 drawn bodies on model 199 (spawn_guid 100000004115..100000004115); npc-interactivity census 2026-10-29 section 7, record def:199:75450:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json thugawug_thug; level 5 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-bear-vinegolem-fungus-fungus-golem",
+      "definition": "fungus_golem",
+      "level": 20,
+      "respawn_seconds": 120,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003770,
+        100000004841
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 2 drawn bodies on model 235 (spawn_guid 100000003770..100000004841); npc-interactivity census 2026-10-29 section 7, record def:235:0:, tier enemy, rule U3, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json fungus_golem; level 20 is that definition; respawn 120 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-bat-01-w58b-bats",
+      "definition": "w58b_bats",
+      "level": 5,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003772
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 1 drawn bodies on model 28 (spawn_guid 100000003772..100000003772); npc-interactivity census 2026-10-29 section 7, record def:28:0:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58b_bats; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-maneatingplant-w58-nettleseed-nibbler-l5-enemy",
+      "definition": "w58_nettleseed_nibbler_l5_enemy",
+      "level": 5,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000002871,
+        100000002873,
+        100000003746,
+        100000004839
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 4 drawn bodies on model 3250 (spawn_guid 100000002871..100000004839); npc-interactivity census 2026-10-29 section 7, record def:3250:0:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_nettleseed_nibbler_l5_enemy; level 5 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "nettleseed-nibbler-w58-nettleseed-nibbler-l5-enemy",
+      "definition": "w58_nettleseed_nibbler_l5_enemy",
+      "level": 5,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000002831,
+        100000002832,
+        100000002833,
+        100000002835,
+        100000002842
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 5 drawn bodies on model 3250 (spawn_guid 100000002831..100000002842); npc-interactivity census 2026-10-29 section 7, record def:3250:45945:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_nettleseed_nibbler_l5_enemy; level 5 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-wolf-generic-wolf",
+      "definition": "wolf",
+      "level": 3,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000002529,
+        100000003143,
+        100000003144
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 3 drawn bodies on model 3284 (spawn_guid 100000002529..100000003144); npc-interactivity census 2026-10-29 section 7, record def:3284:0:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json wolf; level 3 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-wolf-generic-wolf-2",
+      "definition": "wolf",
+      "level": 11,
+      "respawn_seconds": 120,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003116,
+        100000003117,
+        100000003118,
+        100000003119
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 4 drawn bodies on model 3284 (spawn_guid 100000003116..100000003119); npc-interactivity census 2026-10-29 section 7, record def:3284:0:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json wolf; level 11 is a local choice (the definition has no level); respawn 120 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-vulture-bristlewood-vulture",
+      "definition": "bristlewood_vulture",
+      "level": 5,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000002867,
+        100000002868,
+        100000002869,
+        100000002870,
+        100000002874,
+        100000004076,
+        100000004129
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 7 drawn bodies on model 343 (spawn_guid 100000002867..100000004129); npc-interactivity census 2026-10-29 section 7, record def:343:0:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json bristlewood_vulture; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "bristlewood-vulture-bristlewood-vulture",
+      "definition": "bristlewood_vulture",
+      "level": 5,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000002711,
+        100000002712,
+        100000002713
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 3 drawn bodies on model 343 (spawn_guid 100000002711..100000002713); npc-interactivity census 2026-10-29 section 7, record def:343:73654:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json bristlewood_vulture; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-manguana-m-scavenger-w58-sandscale-scavenger-l3-enemy",
+      "definition": "w58_sandscale_scavenger_l3_enemy",
+      "level": 3,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003860,
+        100000004781
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 2 drawn bodies on model 3993 (spawn_guid 100000003860..100000004781); npc-interactivity census 2026-10-29 section 7, record def:3993:0:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_sandscale_scavenger_l3_enemy; level 3 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "sandscale-scavenger-w58-sandscale-scavenger-l3-enemy",
+      "definition": "w58_sandscale_scavenger_l3_enemy",
+      "level": 3,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003869,
+        100000003870,
+        100000003871,
+        100000003872,
+        100000003874,
+        100000003876,
+        100000003877,
+        100000003881,
+        100000003882,
+        100000003883,
+        100000003884,
+        100000003889,
+        100000003899,
+        100000003900,
+        100000003901,
+        100000003902,
+        100000003903,
+        100000003904,
+        100000003906,
+        100000003908,
+        100000003910,
+        100000004789,
+        100000004805,
+        100000004806,
+        100000004810,
+        100000004811,
+        100000004812
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 27 drawn bodies on model 3993 (spawn_guid 100000003869..100000004812); npc-interactivity census 2026-10-29 section 7, record def:3993:403236:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_sandscale_scavenger_l3_enemy; level 3 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-dwarf-m-bikerthug-skullz-skullz-brawler",
+      "definition": "skullz_brawler",
+      "level": 7,
+      "respawn_seconds": 90,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003741
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 1 drawn bodies on model 4011 (spawn_guid 100000003741..100000003741); npc-interactivity census 2026-10-29 section 7, record def:4011:0:, tier enemy, rule U3, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json skullz_brawler; level 7 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-dwarf-m-bikerthug-skullz-skullz-brawler-skullz-mohawkthug",
+      "definition": "skullz_brawler",
+      "level": 7,
+      "respawn_seconds": 90,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003738,
+        100000003739,
+        100000003740,
+        100000003742,
+        100000003743,
+        100000003744
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 6 drawn bodies on model 4011 (spawn_guid 100000003738..100000003744); npc-interactivity census 2026-10-29 section 7, record def:4011:0:skullz_mohawkthug, tier enemy, rule U3, confidence high. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json skullz_brawler; level 7 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "skullz-thug-skullz-brawler-skullz-mohawkthug",
+      "definition": "skullz_brawler",
+      "level": 7,
+      "respawn_seconds": 90,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003965,
+        100000003966,
+        100000003967,
+        100000003968,
+        100000003969,
+        100000003970,
+        100000003971,
+        100000003972,
+        100000003973,
+        100000003974,
+        100000003975,
+        100000003976,
+        100000003977,
+        100000003978,
+        100000003979,
+        100000003980,
+        100000003981,
+        100000003982,
+        100000003983,
+        100000003984,
+        100000003985,
+        100000003986,
+        100000003987,
+        100000003988,
+        100000003989,
+        100000003990,
+        100000003991,
+        100000003992,
+        100000003993,
+        100000003994,
+        100000003995,
+        100000003996,
+        100000004011,
+        100000004012,
+        100000004015,
+        100000004016,
+        100000004456,
+        100000004458
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 38 drawn bodies on model 4011 (spawn_guid 100000003965..100000004458); npc-interactivity census 2026-10-29 section 7, record def:4011:439217:skullz_mohawkthug, tier enemy, rule E2, confidence low. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json skullz_brawler; level 7 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "skullz-hooligan-skullz-brawler-skullz-mohawkthug",
+      "definition": "skullz_brawler",
+      "level": 7,
+      "respawn_seconds": 90,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003997,
+        100000003998,
+        100000003999,
+        100000004000,
+        100000004001,
+        100000004003,
+        100000004004,
+        100000004005,
+        100000004006,
+        100000004007,
+        100000004008,
+        100000004009,
+        100000004010,
+        100000004457
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 14 drawn bodies on model 4011 (spawn_guid 100000003997..100000004457); npc-interactivity census 2026-10-29 section 7, record def:4011:439218:skullz_mohawkthug, tier enemy, rule E2, confidence low. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json skullz_brawler; level 7 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "skullz-commander-skullz-brawler",
+      "definition": "skullz_brawler",
+      "level": 7,
+      "respawn_seconds": 90,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000004002,
+        100000004014,
+        100000004459,
+        100000004460
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 4 drawn bodies on model 4011 (spawn_guid 100000004002..100000004460); npc-interactivity census 2026-10-29 section 7, record def:4011:439219:, tier enemy, rule E2, confidence low. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json skullz_brawler; level 7 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-manguana-m-shaman-sandscale-water-seeker",
+      "definition": "sandscale_water_seeker",
+      "level": 3,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003858
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 1 drawn bodies on model 4047 (spawn_guid 100000003858..100000003858); npc-interactivity census 2026-10-29 section 7, record def:4047:0:, tier enemy, rule U3, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json sandscale_water_seeker; level 3 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "sandscale-water-seeker-sandscale-water-seeker",
+      "definition": "sandscale_water_seeker",
+      "level": 3,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000004790,
+        100000004791
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 2 drawn bodies on model 4047 (spawn_guid 100000004790..100000004791); npc-interactivity census 2026-10-29 section 7, record def:4047:403238:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json sandscale_water_seeker; level 3 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "cray-snapper-w58-cray-snapper-l5-enemy",
+      "definition": "w58_cray_snapper_l5_enemy",
+      "level": 5,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000004194,
+        100000004195,
+        100000004198,
+        100000004199,
+        100000004200,
+        100000004201,
+        100000004205,
+        100000004206,
+        100000004207,
+        100000004208,
+        100000004209,
+        100000004212,
+        100000004213,
+        100000004380,
+        100000004651,
+        100000004652,
+        100000004653
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 17 drawn bodies on model 470 (spawn_guid 100000004194..100000004653); npc-interactivity census 2026-10-29 section 7, record def:470:91930:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_cray_snapper_l5_enemy; level 5 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-cray-arctic-swamp-w58b-cray-marauder",
+      "definition": "w58b_cray_marauder",
+      "level": 3,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000001378,
+        100000001379,
+        100000003766,
+        100000003767,
+        100000003768,
+        100000003769,
+        100000004859,
+        100000004860
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 8 drawn bodies on model 471 (spawn_guid 100000001378..100000004860); npc-interactivity census 2026-10-29 section 7, record def:471:0:, tier enemy, rule U3, confidence low. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58b_cray_marauder; level 3 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "cray-bubbler-w58b-cray-marauder",
+      "definition": "w58b_cray_marauder",
+      "level": 3,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000004196,
+        100000004202,
+        100000004203,
+        100000004204,
+        100000004210,
+        100000004211,
+        100000004378,
+        100000004379,
+        100000004381,
+        100000004382
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 10 drawn bodies on model 471 (spawn_guid 100000004196..100000004382); npc-interactivity census 2026-10-29 section 7, record def:471:5101492:, tier enemy, rule E2, confidence low. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58b_cray_marauder; level 3 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "cultist-initiate-w58-fairy-cultist-l3-enemy",
+      "definition": "w58_fairy_cultist_l3_enemy",
+      "level": 3,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003241,
+        100000003242,
+        100000003243,
+        100000003244,
+        100000003245,
+        100000003246,
+        100000003247,
+        100000003248,
+        100000003249,
+        100000003250,
+        100000003251,
+        100000003252,
+        100000003253,
+        100000003254,
+        100000003255,
+        100000003280,
+        100000003282
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 17 drawn bodies on model 500 (spawn_guid 100000003241..100000003282); npc-interactivity census 2026-10-29 section 7, record def:500:440726:, tier enemy, rule U3, confidence high. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_fairy_cultist_l3_enemy; level 3 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "fairy-cultist-w58-fairy-cultist-l3-enemy",
+      "definition": "w58_fairy_cultist_l3_enemy",
+      "level": 3,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003264,
+        100000003265,
+        100000003266,
+        100000003272,
+        100000003273,
+        100000003274,
+        100000003275,
+        100000003276,
+        100000003277,
+        100000003278,
+        100000003279,
+        100000003281
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 12 drawn bodies on model 500 (spawn_guid 100000003264..100000003281); npc-interactivity census 2026-10-29 section 7, record def:500:441992:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_fairy_cultist_l3_enemy; level 3 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-blackwidow-01-w58b-black-widow",
+      "definition": "w58b_black_widow",
+      "level": 5,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000002725,
+        100000002730,
+        100000003762,
+        100000003763,
+        100000003795,
+        100000003796,
+        100000003798,
+        100000003799,
+        100000003802,
+        100000003803,
+        100000004870,
+        100000004871,
+        100000004873,
+        100000004875,
+        100000004876
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 15 drawn bodies on model 52 (spawn_guid 100000002725..100000004876); npc-interactivity census 2026-10-29 section 7, record def:52:0:, tier enemy, rule U3, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58b_black_widow; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "bristlewood-arachnid-w58b-black-widow",
+      "definition": "w58b_black_widow",
+      "level": 5,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000002723,
+        100000003801
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 2 drawn bodies on model 52 (spawn_guid 100000002723..100000003801); npc-interactivity census 2026-10-29 section 7, record def:52:73655:, tier enemy, rule E2, confidence low. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58b_black_widow; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "shady-smuggler-w58-shady-smuggler-l9-enemy-03",
+      "definition": "w58_shady_smuggler_l9_enemy",
+      "level": 9,
+      "respawn_seconds": 90,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000002839
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 1 drawn bodies on model 669 (spawn_guid 100000002839..100000002839); npc-interactivity census 2026-10-29 section 7, record def:669:140959:03, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_shady_smuggler_l9_enemy; level 9 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "scavenger-swooper-w58-scavenger-swooper-l5-enemy",
+      "definition": "w58_scavenger_swooper_l5_enemy",
+      "level": 5,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000004214,
+        100000004215,
+        100000004222,
+        100000004223,
+        100000004224,
+        100000004657,
+        100000004658,
+        100000004659,
+        100000004660
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 9 drawn bodies on model 750 (spawn_guid 100000004214..100000004660); npc-interactivity census 2026-10-29 section 7, record def:750:5101508:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_scavenger_swooper_l5_enemy; level 5 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "lazy-swooper-w58-lazy-swooper-l5-enemy",
+      "definition": "w58_lazy_swooper_l5_enemy",
+      "level": 5,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000004649,
+        100000004650,
+        100000004654,
+        100000004655,
+        100000004656
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 5 drawn bodies on model 750 (spawn_guid 100000004649..100000004656); npc-interactivity census 2026-10-29 section 7, record def:750:93049:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_lazy_swooper_l5_enemy; level 5 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-wraith-m-cloakedskelly-wraith",
+      "definition": "wraith",
+      "level": 5,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000002945
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 1 drawn bodies on model 751 (spawn_guid 100000002945..100000002945); npc-interactivity census 2026-10-29 section 7, record def:751:0:, tier enemy, rule U3, confidence low. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json wraith; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-troll-forest-troll-naturalist",
+      "definition": "troll_naturalist",
+      "level": 13,
+      "respawn_seconds": 120,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003135
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 1 drawn bodies on model 77 (spawn_guid 100000003135..100000003135); npc-interactivity census 2026-10-29 section 7, record def:77:0:, tier enemy, rule U3, confidence low. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json troll_naturalist; level 13 is that definition; respawn 120 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-troll-forest-troll-roughguard",
+      "definition": "troll_roughguard",
+      "level": 9,
+      "respawn_seconds": 90,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003115,
+        100000004505,
+        100000004872,
+        100000004874,
+        100000004877
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 5 drawn bodies on model 77 (spawn_guid 100000003115..100000004877); npc-interactivity census 2026-10-29 section 7, record def:77:0:, tier enemy, rule U3, confidence low. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json troll_roughguard; level 9 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-troll-forest-troll-spider-trainer",
+      "definition": "troll_spider_trainer",
+      "level": 13,
+      "respawn_seconds": 120,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003148
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 1 drawn bodies on model 77 (spawn_guid 100000003148..100000003148); npc-interactivity census 2026-10-29 section 7, record def:77:0:, tier enemy, rule U3, confidence low. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json troll_spider_trainer; level 13 is that definition; respawn 120 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "troll-guard-troll-roughguard",
+      "definition": "troll_roughguard",
+      "level": 9,
+      "respawn_seconds": 90,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003153
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 1 drawn bodies on model 77 (spawn_guid 100000003153..100000003153); npc-interactivity census 2026-10-29 section 7, record def:77:38243:, tier enemy, rule U3, confidence high. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json troll_roughguard; level 9 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-robgoblin-m-brute-w58-brutus-the-brute-l13-enemy",
+      "definition": "w58_brutus_the_brute_l13_enemy",
+      "level": 13,
+      "respawn_seconds": 120,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000004616
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 1 drawn bodies on model 786 (spawn_guid 100000004616..100000004616); npc-interactivity census 2026-10-29 section 7, record def:786:0:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_brutus_the_brute_l13_enemy; level 13 is that definition; respawn 120 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "brutus-the-brute-w58-brutus-the-brute-l13-enemy",
+      "definition": "w58_brutus_the_brute_l13_enemy",
+      "level": 13,
+      "respawn_seconds": 120,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000004828
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 1 drawn bodies on model 786 (spawn_guid 100000004828..100000004828); npc-interactivity census 2026-10-29 section 7, record def:786:116426:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_brutus_the_brute_l13_enemy; level 13 is that definition; respawn 120 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-human-m-courier-evil-w58-evil-postman-l5-enemy",
+      "definition": "w58_evil_postman_l5_enemy",
+      "level": 5,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003405,
+        100000003407,
+        100000003410,
+        100000003412,
+        100000003415,
+        100000003416,
+        100000003420
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 7 drawn bodies on model 881 (spawn_guid 100000003405..100000003420); npc-interactivity census 2026-10-29 section 7, record def:881:0:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_evil_postman_l5_enemy; level 5 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "evil-postman-w58-evil-postman-l5-enemy",
+      "definition": "w58_evil_postman_l5_enemy",
+      "level": 5,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000004097
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 1 drawn bodies on model 881 (spawn_guid 100000004097..100000004097); npc-interactivity census 2026-10-29 section 7, record def:881:384822:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_evil_postman_l5_enemy; level 5 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "anon-bear-normal-bear",
+      "definition": "bear",
+      "level": 5,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000001238,
+        100000001297,
+        100000004075,
+        100000004077,
+        100000004297
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 5 drawn bodies on model 91 (spawn_guid 100000001238..100000004297); npc-interactivity census 2026-10-29 section 7, record def:91:0:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json bear; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "ghost-ninja-w58-stealthy-despoiler-l9-enemy",
+      "definition": "w58_stealthy_despoiler_l9_enemy",
+      "level": 9,
+      "respawn_seconds": 90,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000004218,
+        100000004219,
+        100000004220,
+        100000004221,
+        100000004225,
+        100000004227,
+        100000004230,
+        100000004231,
+        100000004232,
+        100000004233,
+        100000004234,
+        100000004239,
+        100000004241,
+        100000004242
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 14 drawn bodies on model 945 (spawn_guid 100000004218..100000004242); npc-interactivity census 2026-10-29 section 7, record def:945:5101517:, tier enemy, rule U3, confidence high. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_stealthy_despoiler_l9_enemy; level 9 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "ghost-ninja-striker-w58-stealthy-despoiler-l9-enemy",
+      "definition": "w58_stealthy_despoiler_l9_enemy",
+      "level": 9,
+      "respawn_seconds": 90,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000004228,
+        100000004229,
+        100000004235,
+        100000004236,
+        100000004237,
+        100000004238,
+        100000004240
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 7 drawn bodies on model 945 (spawn_guid 100000004228..100000004240); npc-interactivity census 2026-10-29 section 7, record def:945:5101519:, tier enemy, rule E2, confidence low. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_stealthy_despoiler_l9_enemy; level 9 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    },
+    {
+      "id": "stealthy-despoiler-w58-stealthy-despoiler-l9-enemy",
+      "definition": "w58_stealthy_despoiler_l9_enemy",
+      "level": 9,
+      "respawn_seconds": 90,
+      "aggro_range": 8.0,
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000002018,
+        100000002019
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 2 drawn bodies on model 945 (spawn_guid 100000002018..100000002019); npc-interactivity census 2026-10-29 section 7, record def:945:93120:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_stealthy_despoiler_l9_enemy; level 9 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        }
+      ]
+    }
+  ]
+}

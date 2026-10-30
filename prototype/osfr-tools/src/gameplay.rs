@@ -937,6 +937,7 @@ impl Gameplay {
             let path = npc_content.join("field_enemies.json");
             if path.is_file() {
                 engine.load_field_enemies(&path)?;
+                engine.load_field_camps(npc_content)?;
                 if let Some(visibility) = npc_visibility.as_mut() {
                     visibility.exclude_actor_guids(engine.field_guids());
                 }
