@@ -23,6 +23,18 @@ pub fn allowed(ip: IpAddr, allow_lan: bool) -> bool {
     ip.is_loopback() || (allow_lan && is_private_network(ip))
 }
 
+/// L075 (owner 2026-10-30: port-forwarded and hosted realms): `--allow-public` lets a server bind
+/// the wildcard address; nothing else opens a public bind.
+pub fn bind_allowed(bind: IpAddr, allow_lan: bool, allow_public: bool) -> bool {
+    (allow_public && bind.is_unspecified()) || allowed(bind, allow_lan)
+}
+
+/// A server on the wildcard address (only reachable through [`bind_allowed`] with
+/// `--allow-public`) admits every peer; otherwise the [`allowed`] rule applies.
+pub fn admits(bind: IpAddr, peer: IpAddr, allow_lan: bool) -> bool {
+    bind.is_unspecified() || allowed(peer, allow_lan)
+}
+
 /// Token bucket on a monotonic clock (Security Model L6).
 #[derive(Clone, Copy, Debug)]
 pub struct Bucket {
@@ -132,6 +144,23 @@ mod tests {
         }
         assert!(allowed(ip("127.0.0.1"), false));
         assert!(allowed(ip("::1"), false));
+    }
+
+    #[test]
+    fn only_allow_public_opens_the_wildcard_bind_which_admits_every_peer() {
+        let ip = |s: &str| s.parse::<IpAddr>().unwrap();
+        for wildcard in ["0.0.0.0", "::"] {
+            assert!(bind_allowed(ip(wildcard), true, true), "{wildcard}");
+            assert!(
+                !bind_allowed(ip(wildcard), true, false),
+                "{wildcard} without --allow-public"
+            );
+            assert!(admits(ip(wildcard), ip("8.8.8.8"), false));
+        }
+        // A public bind on a specific address stays refused; a LAN bind keeps the LAN rule.
+        assert!(!bind_allowed(ip("8.8.8.8"), true, true));
+        assert!(!admits(ip("192.168.1.20"), ip("8.8.8.8"), true));
+        assert!(admits(ip("192.168.1.20"), ip("10.0.0.5"), true));
     }
 
     #[test]

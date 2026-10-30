@@ -171,8 +171,10 @@ impl Server {
         let Some(mut http) = self.portraits.take() else {
             return;
         };
-        let allow_lan = self.options.allow_lan;
-        let requests = http.poll(now_ms, |ip| osfr_tools::net_policy::allowed(ip, allow_lan));
+        let (bind, allow_lan) = (self.options.bind.ip(), self.options.allow_lan);
+        let requests = http.poll(now_ms, |ip| {
+            osfr_tools::net_policy::admits(bind, ip, allow_lan)
+        });
         for (connection, input) in requests {
             let upload = match portrait_upload::parse_request(&input) {
                 Ok(upload) => upload,

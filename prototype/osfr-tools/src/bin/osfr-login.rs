@@ -34,6 +34,9 @@ struct Options {
     key: Vec<u8>,
     handoff_key: Vec<u8>,
     gateway: String,
+    /// L075: `--advertise`, the public gateway address handed to every non-loopback player of a
+    /// port-forwarded or hosted realm (`--allow-public`); loopback players get `gateway`.
+    advertise: Option<String>,
     session: String,
     ticket: String,
     max_characters: u32,
@@ -72,13 +75,17 @@ impl Options {
             None,
         );
         let (mut max_characters, mut underage, mut open_chat) = (6, false, true);
-        let mut allow_lan = false;
+        let (mut allow_lan, mut allow_public, mut advertise) = (false, false, None);
         let mut auth_bind: SocketAddr = "127.0.0.1:20043".parse()?;
         let mut server_id_file = None;
         let (mut open_enrollment, mut enroll_handles, mut max_accounts) = (false, None, 64);
         while let Some(flag) = args.next() {
             if flag == "--allow-lan" {
                 allow_lan = true;
+                continue;
+            }
+            if flag == "--allow-public" {
+                (allow_lan, allow_public) = (true, true);
                 continue;
             }
             if flag == "--open-enrollment" {
@@ -97,6 +104,7 @@ impl Options {
                 "--key-file" => key_file = Some(PathBuf::from(value)),
                 "--handoff-key-file" => handoff_key_file = Some(PathBuf::from(value)),
                 "--gateway" => gateway = Some(value),
+                "--advertise" => advertise = Some(value),
                 "--session" => session = value,
                 "--ticket" => ticket = value,
                 "--max-characters" => max_characters = value.parse()?,
@@ -109,8 +117,19 @@ impl Options {
                 _ => return Err(format!("unknown login option {flag}").into()),
             }
         }
-        if !osfr_tools::net_policy::allowed(bind.ip(), allow_lan) {
-            return Err("login binds loopback, or a private-network IP with --allow-lan".into());
+        if !osfr_tools::net_policy::bind_allowed(bind.ip(), allow_lan, allow_public) {
+            return Err("login binds loopback, a private-network IP with --allow-lan, or 0.0.0.0 with --allow-public".into());
+        }
+        // L075: the advertised address is where players outside reach the gateway (the router's
+        // public IP or the host's); it must be a real unicast address.
+        if let Some(public) = &advertise {
+            let ip = public
+                .parse::<SocketAddr>()
+                .map_err(|_| "invalid --advertise address (IP:port)")?
+                .ip();
+            if !allow_public || ip.is_unspecified() || ip.is_loopback() || ip.is_multicast() {
+                return Err("--advertise takes a unicast IP:port and needs --allow-public".into());
+            }
         }
         // L053: every client is sent the gateway address; loopback, or a private/VPN one with --allow-lan.
         if let Some(gateway) = &gateway {
@@ -125,9 +144,9 @@ impl Options {
         let authenticated = account_store.is_some();
         // Security Model decision 2 (2026-10-16): the broker may listen on the
         // VPN address under the same rule as the UDP binds; public stays closed.
-        if !osfr_tools::net_policy::allowed(auth_bind.ip(), allow_lan) {
+        if !osfr_tools::net_policy::bind_allowed(auth_bind.ip(), allow_lan, allow_public) {
             return Err(
-                "credential broker binds loopback, or a private-network IP with --allow-lan".into(),
+                "credential broker binds loopback, a private-network IP with --allow-lan, or 0.0.0.0 with --allow-public".into(),
             );
         }
         open_enrollment |= enroll_handles.is_some();
@@ -168,6 +187,7 @@ impl Options {
             key,
             handoff_key,
             gateway: gateway.ok_or("--gateway required")?,
+            advertise,
             session,
             ticket,
             max_characters,
@@ -185,16 +205,16 @@ impl Options {
         })
     }
     fn service(&self) -> io::Result<LoginService> {
-        self.service_for(&self.session)
+        self.service_for(&self.session, IpAddr::from([127, 0, 0, 1]))
     }
-    fn service_for(&self, handle: &str) -> io::Result<LoginService> {
+    fn service_for(&self, handle: &str, peer: IpAddr) -> io::Result<LoginService> {
         LoginService::new(
             Resources::load(&self.resources)?,
             LoginConfig {
                 identity_file: self.identity.clone(),
                 legacy_save_file: self.state.clone(),
                 account_store_file: self.account_store.clone(),
-                gateway_address: self.gateway.clone(),
+                gateway_address: gateway_for(&self.gateway, self.advertise.as_deref(), peer),
                 local_session: handle.to_owned(),
                 gateway_ticket: self.ticket.clone(),
                 handoff_key: self.handoff_key.clone(),
@@ -227,6 +247,8 @@ struct Broker {
     native_ips: IpLimiter,
     global: Bucket,
     allow_lan: bool,
+    /// L075: a wildcard broker bind (`--allow-public`) admits every peer.
+    bind: IpAddr,
     enrollment: Option<Enrollment>,
     /// (R) Claims per address: 3 an hour, so one peer cannot fill the account cap.
     claims: IpLimiter,
@@ -251,6 +273,7 @@ impl Broker {
             native_ips: IpLimiter::new(20.0 / 60.0, 20.0, 1024),
             global: Bucket::full(20.0, Instant::now()),
             allow_lan: options.allow_lan,
+            bind: options.auth_bind.ip(),
             enrollment: options.open_enrollment.then(|| Enrollment {
                 handles: options.enroll_handles.clone(),
                 max_accounts: options.max_accounts,
@@ -367,7 +390,7 @@ impl Broker {
                 Ok((stream, address)) => {
                     // Peers pass the bind rule; the per-IP and global buckets
                     // below apply to every peer, loopback included.
-                    if !osfr_tools::net_policy::allowed(address.ip(), self.allow_lan)
+                    if !osfr_tools::net_policy::admits(self.bind, address.ip(), self.allow_lan)
                         || self.peers.len() >= 16
                     {
                         continue;
@@ -564,7 +587,7 @@ impl Session {
             codec,
             receiver: ReliableReceiver::new(0, 128, login::MAX_LOGIN_MESSAGE + 1, 128 * 1024)?,
             sender,
-            service: options.service()?,
+            service: options.service_for(&options.session, peer.ip())?,
             rx: Rc4::new(&options.key)?,
             tx: Rc4::new(&options.key)?,
             last: Instant::now(),
@@ -857,7 +880,7 @@ impl Session {
         // This also reloads resource tables; replace with the lead's shared-store
         // API if measured login load warrants it. No packet can choose this
         // synthetic identity.
-        self.service = options.service_for(handle)?;
+        self.service = options.service_for(handle, self.peer.ip())?;
         let authenticated = self.service.handle(&handle_login_request(handle))?;
         if bytes.first() == Some(&1) {
             return Ok(authenticated);
@@ -924,7 +947,13 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
             broker.poll(&options.account_store, instant)?;
         }
         match socket.recv_from(&mut buffer) {
-            Ok((n, peer)) if osfr_tools::net_policy::allowed(peer.ip(), options.allow_lan) => {
+            Ok((n, peer))
+                if osfr_tools::net_policy::admits(
+                    options.bind.ip(),
+                    peer.ip(),
+                    options.allow_lan,
+                ) =>
+            {
                 let wire = &buffer[..n];
                 if wire.starts_with(&[0, 1]) {
                     if handshakes.allow(peer.ip(), instant) {
@@ -1022,9 +1051,38 @@ fn main() {
     }
 }
 
+/// L075: behind port forwarding the realm's own PC still reaches the gateway on loopback;
+/// every other player is handed the advertised public address.
+fn gateway_for(gateway: &str, advertise: Option<&str>, peer: IpAddr) -> String {
+    match advertise {
+        Some(public) if !peer.is_loopback() => public.to_owned(),
+        _ => gateway.to_owned(),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_port_forwarded_realm_hands_outsiders_the_public_gateway_and_itself_loopback() {
+        let ip = |s: &str| s.parse::<IpAddr>().unwrap();
+        let (local, public) = ("127.0.0.1:20041", Some("203.0.113.7:20041"));
+        assert_eq!(
+            gateway_for(local, public, ip("198.51.100.4")),
+            "203.0.113.7:20041"
+        );
+        assert_eq!(
+            gateway_for(local, public, ip("192.168.1.20")),
+            "203.0.113.7:20041"
+        );
+        assert_eq!(gateway_for(local, public, ip("127.0.0.1")), local);
+        assert_eq!(
+            gateway_for(local, None, ip("198.51.100.4")),
+            local,
+            "no --advertise: unchanged"
+        );
+    }
 
     #[test]
     fn a_logged_in_session_outlives_the_pre_login_lifetime_while_it_keeps_alive() {

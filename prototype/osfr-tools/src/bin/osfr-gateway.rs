@@ -352,7 +352,7 @@ impl Options {
         let (mut gateway_ticket, mut handoff_key_file) =
             (login::DEFAULT_GATEWAY_TICKET.to_owned(), None);
         let mut dev_tools = false;
-        let mut allow_lan = false;
+        let (mut allow_lan, mut allow_public) = (false, false);
         let mut studio_port = 47_800;
         let mut client_logs = None;
         let mut terrain = None;
@@ -367,8 +367,8 @@ impl Options {
                 dev_tools = true;
                 continue;
             }
-            if key == "--allow-lan" {
-                allow_lan = true;
+            if key == "--allow-lan" || key == "--allow-public" {
+                (allow_lan, allow_public) = (true, allow_public || key == "--allow-public");
                 continue;
             }
             let value = args.next().ok_or("missing option value")?;
@@ -411,9 +411,9 @@ impl Options {
             return Err("--guild-invite-ttl-ms must be 1..=600000".into());
         }
         // Security Model L1/L5: loopback by default; a private-network bind only
-        // with --allow-lan, in account-store mode, and never with dev tools.
-        if !osfr_tools::net_policy::allowed(bind.ip(), allow_lan) {
-            return Err("gateway binds loopback, or a private-network IP with --allow-lan".into());
+        // with --allow-lan (L075: 0.0.0.0 with --allow-public), in account-store mode, no dev tools.
+        if !osfr_tools::net_policy::bind_allowed(bind.ip(), allow_lan, allow_public) {
+            return Err("gateway binds loopback, a private-network IP with --allow-lan, or 0.0.0.0 with --allow-public".into());
         }
         if !bind.ip().is_loopback() && (dev_tools || account_store.is_none()) {
             return Err(
@@ -3315,7 +3315,7 @@ impl Server {
     }
 
     pub fn new(options: Options) -> Result<Self, Box<dyn std::error::Error>> {
-        if !osfr_tools::net_policy::allowed(options.bind.ip(), options.allow_lan) {
+        if !osfr_tools::net_policy::bind_allowed(options.bind.ip(), options.allow_lan, true) {
             return Err("gateway binds loopback, or a private-network IP with --allow-lan".into());
         }
         if let Some(parent) = options
@@ -3692,13 +3692,11 @@ impl Server {
             self.flush_security();
             self.security_flushed = Instant::now();
         }
-        let mut buffer = [0; 65_535];
+        let (mut buffer, bind, lan) = ([0; 65_535], self.options.bind.ip(), self.options.allow_lan);
         // (R) Bound each receive batch; tick the world after at most 64 packets.
         for _ in 0..64 {
             match self.socket.recv_from(&mut buffer) {
-                Ok((length, peer))
-                    if osfr_tools::net_policy::allowed(peer.ip(), self.options.allow_lan) =>
-                {
+                Ok((length, peer)) if osfr_tools::net_policy::admits(bind, peer.ip(), lan) => {
                     let wire = &buffer[..length];
                     if wire.starts_with(&[0, 1])
                         && !peer.ip().is_loopback()
