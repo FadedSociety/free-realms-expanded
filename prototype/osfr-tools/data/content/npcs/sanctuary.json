@@ -20377,9 +20377,9 @@
       ],
       "services_reason": null,
       "position": [
-        -1276.9783,
-        -14.72255,
-        303.08456
+        -1270.1,
+        -15.0,
+        286.1
       ],
       "position_w": null,
       "rotation": [
@@ -20388,12 +20388,12 @@
         0.0,
         0.9264468800045519
       ],
-      "placement": "reference_data",
-      "placement_source": "reference_spawn",
-      "placement_confidence": "medium",
+      "placement": "video_index",
+      "placement_source": "video_archive_index",
+      "placement_confidence": "high",
       "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Sanctuary-main@10f129e placement FabledRealms.lua:3614; replaces reconstructed guess [-1417.836, -27.631, 351.001]",
+      "position_reason": "Video archive placement index (2026-10-29): Felipe solved at x=-1270.1 z=286.1, error 2.5 m, 15 sightings in 6 videos (ring), confidence high; height sampled from the zone-0 terrain grid. Replaces the Sanctuary-main reference placement [-1276.9783, -14.72255, 303.08456].",
       "source": [
         {
           "kind": "client",
@@ -20999,14 +20999,14 @@
         ],
         "position": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3614 spawnNpcWithGuid(33390); src/Resources/Npcs.json Id=33390"
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Felipe solved at x=-1270.1 z=286.1, error 2.5 m, 15 sightings in 6 videos (ring), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_reason": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3614 spawnNpcWithGuid(33390); src/Resources/Npcs.json Id=33390"
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Felipe solved at x=-1270.1 z=286.1, error 2.5 m, 15 sightings in 6 videos (ring), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_w": [
@@ -21017,32 +21017,32 @@
         ],
         "rotation": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3614 spawnNpcWithGuid(33390); src/Resources/Npcs.json Id=33390"
+            "kind": "reconstructed",
+            "evidence": "(R) facing kept from the earlier Sanctuary-main placement; the video index gives a position, not a heading"
           }
         ],
         "placement": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3614 spawnNpcWithGuid(33390); src/Resources/Npcs.json Id=33390"
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Felipe solved at x=-1270.1 z=286.1, error 2.5 m, 15 sightings in 6 videos (ring), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_source": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3614 spawnNpcWithGuid(33390); src/Resources/Npcs.json Id=33390"
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Felipe solved at x=-1270.1 z=286.1, error 2.5 m, 15 sightings in 6 videos (ring), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_confidence": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3614 spawnNpcWithGuid(33390); src/Resources/Npcs.json Id=33390"
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Felipe solved at x=-1270.1 z=286.1, error 2.5 m, 15 sightings in 6 videos (ring), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3614 spawnNpcWithGuid(33390); src/Resources/Npcs.json Id=33390"
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Felipe solved at x=-1270.1 z=286.1, error 2.5 m, 15 sightings in 6 videos (ring), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "capture_match": [
@@ -21053,8 +21053,8 @@
         ],
         "heading": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3614 spawnNpcWithGuid(33390); src/Resources/Npcs.json Id=33390"
+            "kind": "reconstructed",
+            "evidence": "(R) facing kept from the earlier Sanctuary-main placement; the video index gives a position, not a heading"
           }
         ]
       },

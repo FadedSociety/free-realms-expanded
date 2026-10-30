@@ -447,10 +447,24 @@ const VIDEO_INDEX_FIELDS: [&str; 6] = [
 ];
 
 /// T878: a `poi_anchor`/`unanchored` row moved to a video-archive position, nothing else changed.
+/// T883: so is a `reference_data` row, whose kept `heading`/`rotation` values stay but whose
+/// Sanctuary-main evidence tags are rewritten (a reference tag may sit only on a reference row).
 fn is_video_index_move(old: &Value, new: &Value) -> bool {
-    matches!(old["placement"].as_str(), Some("poi_anchor" | "unanchored"))
-        && new["placement"] == "video_index"
-        && without_fields(old, &VIDEO_INDEX_FIELDS) == without_fields(new, &VIDEO_INDEX_FIELDS)
+    let facing_tags = |row: &Value| {
+        let mut row = row.clone();
+        if let Some(tags) = row["field_sources"].as_object_mut() {
+            tags.remove("heading");
+            tags.remove("rotation");
+        }
+        row
+    };
+    let (old, new) = match old["placement"].as_str() {
+        Some("poi_anchor" | "unanchored") => (old.clone(), new.clone()),
+        Some("reference_data") => (facing_tags(old), facing_tags(new)),
+        _ => return false,
+    };
+    new["placement"] == "video_index"
+        && without_fields(&old, &VIDEO_INDEX_FIELDS) == without_fields(&new, &VIDEO_INDEX_FIELDS)
 }
 
 /// `row` with `fields` and their `field_sources` evidence removed.

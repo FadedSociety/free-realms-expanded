@@ -3110,9 +3110,9 @@
       "name": "Shrouded Glade Postboxes",
       "name_string_id": 104027,
       "position": [
-        76.22441,
-        61.77683,
-        1199.034
+        68.5,
+        60.87,
+        1181.4
       ],
       "heading": -2.597929,
       "capture_match": null,
@@ -3120,6 +3120,14 @@
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:193; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1426 (ModelId=340, ModelFileName=sg_mailbox_group_01.adr, NameId=104027)."
+        },
+        {
+          "kind": "video",
+          "evidence": "Video archive placement index (2026-10-29): Shrouded Glade Postboxes solved at x=68.5 z=1181.4, error 3.2 m, 4 sightings in 2 videos (ring), confidence medium; height sampled from the zone-0 terrain grid."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) position replaced by the video archive index; medium-confidence solve; the Legacy position was [76.22441, 61.77683, 1199.034]"
         }
       ],
       "position_w": null
@@ -23761,9 +23769,9 @@
       "name": "Hard Briarwood Defense",
       "name_string_id": 140638,
       "position": [
-        -637.2068,
-        -70.12873,
-        2276.394
+        -640.7,
+        -68.385,
+        2296.4
       ],
       "heading": 1.730386,
       "capture_match": null,
@@ -23771,6 +23779,14 @@
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1536; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2793 (ModelId=325, ModelFileName=sh_table_wartable01.adr, NameId=140638)."
+        },
+        {
+          "kind": "video",
+          "evidence": "Video archive placement index (2026-10-29): Hard Briarwood Defense solved at x=-640.7 z=2296.4, error 3.1 m, 7 sightings in 3 videos (ring), confidence high; height sampled from the zone-0 terrain grid."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) position replaced by the video archive index; the Legacy position was [-637.2068, -70.12873, 2276.394]"
         }
       ],
       "position_w": null
@@ -61774,13 +61790,17 @@
       "name": "Felipe",
       "name_string_id": 21276,
       "position": [
-        -1276.9783,
-        -14.72255,
-        303.08456
+        -1270.1,
+        -15.0,
+        286.1
       ],
       "heading": -0.771869999,
       "capture_match": null,
       "source": [
+        {
+          "kind": "video",
+          "evidence": "Video archive placement index (2026-10-29): Felipe solved at x=-1270.1 z=286.1, error 2.5 m, 15 sightings in 6 videos (ring), confidence high; height sampled from the zone-0 terrain grid."
+        },
         {
           "kind": "reference",
           "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3614 spawnNpcWithGuid(33390); src/Resources/Npcs.json Id=33390"
@@ -61790,12 +61810,12 @@
           "evidence": "Global.Text.21276 = Felipe (lab/reports/locale-id-to-text.json); Models.txt 442 = fairy_m_courier_01.agr"
         },
         {
-          "kind": "reconstructed",
-          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
-        },
-        {
           "kind": "reference",
           "evidence": "Sanctuary-main-20261019@10f129e Npcs.json Id=33390 SubTextNameId=24621"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) position replaced by the video archive index; the earlier Sanctuary-main position was [-1276.9783, -14.72255, 303.08456] and its heading is kept"
         }
       ],
       "position_w": null,
@@ -62703,13 +62723,17 @@
       "name": "Natali",
       "name_string_id": 388323,
       "position": [
-        -721.9529,
-        9.966442,
-        885.3096
+        -698.1,
+        -0.216,
+        986.3
       ],
       "heading": -0.604641049,
       "capture_match": null,
       "source": [
+        {
+          "kind": "video",
+          "evidence": "Video archive placement index (2026-10-29): Natali solved at x=-698.1 z=986.3, error 4.0 m, 2 sightings in 2 videos (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
+        },
         {
           "kind": "reference",
           "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3767 spawnNpcWithGuid(33545); src/Resources/Npcs.json Id=33545"
@@ -62720,7 +62744,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+          "evidence": "(R) position replaced by the video archive index; the earlier Sanctuary-main position was [-721.9529, 9.966442, 885.3096] and its heading is kept"
         }
       ],
       "position_w": null
@@ -63277,13 +63301,17 @@
       "name": "Murphy",
       "name_string_id": 3063,
       "position": [
-        263.157,
-        24.16891,
-        243.43916
+        259.7,
+        14.71,
+        260.0
       ],
       "heading": -0.391319999,
       "capture_match": null,
       "source": [
+        {
+          "kind": "video",
+          "evidence": "Video archive placement index (2026-10-29): Murphy solved at x=259.7 z=260.0, error 4.0 m, 7 sightings in 3 videos (ring), confidence high; height sampled from the zone-0 terrain grid."
+        },
         {
           "kind": "reference",
           "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3888 spawnNpcWithGuid(33670); src/Resources/Npcs.json Id=33670"
@@ -63293,12 +63321,12 @@
           "evidence": "Global.Text.3063 = Murphy (lab/reports/locale-id-to-text.json); Models.txt 49 = fairy_m_02.adr"
         },
         {
-          "kind": "reconstructed",
-          "evidence": "(R) another emulator placement with no stated source; ground offset +4.4 m; off the terrain grid (cave or structure)"
-        },
-        {
           "kind": "reference",
           "evidence": "Sanctuary-main-20261019@10f129e Npcs.json Id=33670 TextureAlias=02 TintAlias=jungle"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) position replaced by the video archive index; the earlier Sanctuary-main position was [263.157, 24.16891, 243.43916] and its heading is kept"
         }
       ],
       "position_w": null,

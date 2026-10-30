@@ -10728,9 +10728,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -721.9529,
-        9.966442,
-        885.3096
+        -698.1,
+        -0.216,
+        986.3
       ],
       "position_w": null,
       "rotation": [
@@ -10739,12 +10739,12 @@
         0.0,
         0.954648155698227
       ],
-      "placement": "reference_data",
-      "placement_source": "reference_spawn",
-      "placement_confidence": "medium",
+      "placement": "video_index",
+      "placement_source": "video_archive_index",
+      "placement_confidence": "high",
       "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Sanctuary-main@10f129e placement FabledRealms.lua:3767; replaces reconstructed guess [-728.172, 9.09, 946.751]",
+      "position_reason": "Video archive placement index (2026-10-29): Natali solved at x=-698.1 z=986.3, error 4.0 m, 2 sightings in 2 videos (dot+rings), confidence high; height sampled from the zone-0 terrain grid. Replaces the Sanctuary-main reference placement [-721.9529, 9.966442, 885.3096].",
       "source": [
         {
           "kind": "client",
@@ -11026,14 +11026,14 @@
         ],
         "position": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3767 spawnNpcWithGuid(33545); src/Resources/Npcs.json Id=33545"
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Natali solved at x=-698.1 z=986.3, error 4.0 m, 2 sightings in 2 videos (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_reason": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3767 spawnNpcWithGuid(33545); src/Resources/Npcs.json Id=33545"
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Natali solved at x=-698.1 z=986.3, error 4.0 m, 2 sightings in 2 videos (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "position_w": [
@@ -11044,32 +11044,32 @@
         ],
         "rotation": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3767 spawnNpcWithGuid(33545); src/Resources/Npcs.json Id=33545"
+            "kind": "reconstructed",
+            "evidence": "(R) facing kept from the earlier Sanctuary-main placement; the video index gives a position, not a heading"
           }
         ],
         "placement": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3767 spawnNpcWithGuid(33545); src/Resources/Npcs.json Id=33545"
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Natali solved at x=-698.1 z=986.3, error 4.0 m, 2 sightings in 2 videos (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_source": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3767 spawnNpcWithGuid(33545); src/Resources/Npcs.json Id=33545"
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Natali solved at x=-698.1 z=986.3, error 4.0 m, 2 sightings in 2 videos (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_confidence": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3767 spawnNpcWithGuid(33545); src/Resources/Npcs.json Id=33545"
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Natali solved at x=-698.1 z=986.3, error 4.0 m, 2 sightings in 2 videos (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3767 spawnNpcWithGuid(33545); src/Resources/Npcs.json Id=33545"
+            "kind": "video",
+            "evidence": "Video archive placement index (2026-10-29): Natali solved at x=-698.1 z=986.3, error 4.0 m, 2 sightings in 2 videos (dot+rings), confidence high; height sampled from the zone-0 terrain grid."
           }
         ],
         "capture_match": [
@@ -11080,8 +11080,8 @@
         ],
         "heading": [
           {
-            "kind": "reference",
-            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3767 spawnNpcWithGuid(33545); src/Resources/Npcs.json Id=33545"
+            "kind": "reconstructed",
+            "evidence": "(R) facing kept from the earlier Sanctuary-main placement; the video index gives a position, not a heading"
           }
         ]
       },

@@ -6,6 +6,10 @@
 //! bodies). Seventeen dungeon files gain `dungeon_data.entrance.position`, the entrance (or the
 //! enemy that starts the battle) in the same world frame. Each pin below is the index value,
 //! kept apart from the data so a drifted row fails against it.
+//!
+//! T883 adds the drawn side: Felipe, Murphy and Natali (row plus extras body) and Lucky Chance
+//! McXander (row only), and two single-instance props (Hard Briarwood Defense, Shrouded Glade
+//! Postboxes), all within the index error radius plus 2 m.
 
 #[path = "support/json.rs"]
 mod json;
@@ -55,10 +59,10 @@ const DUNGEONS: [(&str, f32, f32, u32, u32, bool); 17] = [
     ("snakes_in_a_maze", -884.9, 1912.5, 11, 7, false),
 ];
 
-fn assert_at(position: [f32; 3], x: f32, z: f32, owner: &str) {
+fn assert_at(position: [f32; 3], x: f32, z: f32, tolerance: f32, owner: &str) {
     assert!(position[1].is_finite(), "{owner}: height");
     let off = planar_distance(position, [x, position[1], z]);
-    assert!(off <= 1.0, "{owner}: {off} m from the index point");
+    assert!(off <= tolerance, "{owner}: {off} m from the index point");
 }
 
 #[test]
@@ -71,7 +75,7 @@ fn moved_npcs_stand_at_their_index_positions() {
             .unwrap_or_else(|| panic!("{id}: no regional row"));
         let owner = format!("{id} ({name})");
         assert_eq!(row["name"], name, "{owner}");
-        assert_at(xyz(&row["position"]), x, z, &owner);
+        assert_at(xyz(&row["position"]), x, z, 1.0, &owner);
         assert_eq!(row["placement"], "video_index", "{owner}");
         assert_eq!(row["placement_confidence"], "high", "{owner}");
         let reason = row["position_reason"].as_str().unwrap();
@@ -82,7 +86,11 @@ fn moved_npcs_stand_at_their_index_positions() {
         );
     }
     let moved = rows.iter().filter(|row| row["placement"] == "video_index");
-    assert_eq!(moved.count(), NPCS.len(), "only the listed rows moved");
+    assert_eq!(
+        moved.count(),
+        NPCS.len() + MOVED_NPCS.len(),
+        "only the listed rows moved"
+    );
 }
 
 #[test]
@@ -110,7 +118,7 @@ fn dungeon_entrances_carry_the_index_position() {
     for (id, x, z, sightings, videos, medium) in DUNGEONS {
         let file = json::read(&dir.join(format!("{id}.json")));
         let position = &file["records"][0]["dungeon_data"]["entrance"]["position"];
-        assert_at(xyz(&position["value"]), x, z, id);
+        assert_at(xyz(&position["value"]), x, z, 1.0, id);
         assert!(position["reason"].is_null(), "{id}");
         let tags = position["source"].as_array().unwrap();
         assert!(
@@ -134,4 +142,89 @@ fn dungeon_entrances_carry_the_index_position() {
         .filter(|file| !file["records"][0]["dungeon_data"]["entrance"]["position"].is_null())
         .count();
     assert_eq!(positioned, DUNGEONS.len(), "only the listed dungeons");
+}
+
+/// T883: (name, actor id, index x, index z, error m, sightings, videos, drawn). The ids are
+/// the regional `npc_id` (which is also the extras `spawn_guid` of the three drawn NPCs). The
+/// index error plus 2 m is the brief's tolerance.
+const MOVED_NPCS: [(&str, u64, f32, f32, f32, u32, u32, bool); 4] = [
+    ("Felipe", 9_000_000_086, -1270.1, 286.1, 2.5, 15, 6, true),
+    ("Murphy", 9_000_000_158, 259.7, 260.0, 4.0, 7, 3, true),
+    ("Natali", 9_500_000_360, -698.1, 986.3, 4.0, 2, 2, true),
+    (
+        "Lucky Chance McXander",
+        9_000_000_134,
+        -1045.9,
+        -462.1,
+        4.0,
+        2,
+        1,
+        false,
+    ),
+];
+
+/// T883 single-instance minigame props: (name, extras spawn_guid, index x, index z, error m,
+/// sightings, videos). Both are medium or high, two or more videos, and one row in the data.
+const MOVED_PROPS: [(&str, u64, f32, f32, f32, u32, u32); 2] = [
+    (
+        "Hard Briarwood Defense",
+        100_000_002_793,
+        -640.7,
+        2296.4,
+        3.1,
+        7,
+        3,
+    ),
+    (
+        "Shrouded Glade Postboxes",
+        100_000_001_426,
+        68.5,
+        1181.4,
+        3.2,
+        4,
+        2,
+    ),
+];
+
+#[test]
+fn t883_moved_npcs_and_props_stand_within_the_index_error() {
+    let rows = regional_rows();
+    let base = NpcVisibility::load(&npc_visibility::content_dir()).unwrap();
+    let drawn = placement::drawn_npcs(&base);
+    for (name, id, x, z, error, sightings, videos, is_drawn) in MOVED_NPCS {
+        let row = rows
+            .iter()
+            .find(|row| row["npc_id"].as_u64() == Some(id))
+            .unwrap_or_else(|| panic!("{id}: no regional row"));
+        assert_eq!(row["name"], name);
+        let at = xyz(&row["position"]);
+        assert_at(at, x, z, error + 2.0, name);
+        assert_eq!(row["placement"], "video_index", "{name}");
+        assert_eq!(row["placement_source"], "video_archive_index", "{name}");
+        let reason = row["position_reason"].as_str().unwrap();
+        assert!(
+            reason.contains(&format!("{sightings} sighting"))
+                && reason.contains(&format!("in {videos} video")),
+            "{name}: {reason}"
+        );
+        // (R) marks the single-video solve and only that one.
+        assert_eq!(reason.starts_with("(R)"), videos == 1, "{name}: {reason}");
+        // Interaction range reads the row and the client draws the body: they must agree.
+        let body = drawn.iter().find(|npc| npc.actor == id);
+        assert_eq!(body.is_some(), is_drawn, "{name}: drawn or not");
+        if let Some(body) = body {
+            assert_at(body.position, x, z, error + 2.0, name);
+            assert!(
+                planar_distance(body.position, at) < 0.01,
+                "{name}: body vs row"
+            );
+        }
+    }
+    for (name, guid, x, z, error, ..) in MOVED_PROPS {
+        let prop = drawn
+            .iter()
+            .find(|npc| npc.actor == guid)
+            .unwrap_or_else(|| panic!("{name}: not drawn"));
+        assert_at(prop.position, x, z, error + 2.0, name);
+    }
 }

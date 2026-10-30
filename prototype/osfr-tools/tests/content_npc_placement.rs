@@ -101,6 +101,17 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
                                 .is_some_and(|text| text.contains("placement index (2026-10-29)"))),
                     "{owner}: position lacks the video index tag"
                 );
+                // T883: a moved NPC the client draws keeps its extras body on the row's spot,
+                // because clicks are range-checked against the row.
+                for body in extras
+                    .iter()
+                    .filter(|row| row["content_key"] == npc["npc_id"])
+                {
+                    assert_eq!(
+                        body["position"], npc["position"],
+                        "{owner}: extras body is not at the video-index position"
+                    );
+                }
             }
             if placement == "unanchored" {
                 assert!(
