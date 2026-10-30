@@ -2,7 +2,7 @@
 use ed25519_dalek::{Signer, SigningKey};
 use osfr_tools::{
     account::{AccountFlags, SlotPolicy},
-    account_store::AccountStore,
+    account_store::{AccountRole, AccountStore},
     login::{self, Rc4},
     login_auth::{login_handle_hash, signing_message},
     session::decode_controls,
@@ -41,6 +41,15 @@ impl Server {
     }
 
     fn start_at(secure: bool, auth_bind: SocketAddr, allow_lan: bool) -> Self {
+        Self::launch(secure, auth_bind, allow_lan, &[])
+    }
+
+    /// L070: a secure loopback realm started with enrolment flags.
+    fn open(flags: &[&str]) -> Self {
+        Self::launch(true, "127.0.0.1:0".parse().unwrap(), false, flags)
+    }
+
+    fn launch(secure: bool, auth_bind: SocketAddr, allow_lan: bool, flags: &[&str]) -> Self {
         let root = PathBuf::from(env!("CARGO_TARGET_TMPDIR"));
         let directory = root.join(format!(
             "test-{}-{}",
@@ -133,6 +142,7 @@ impl Server {
         if allow_lan {
             command.arg("--allow-lan");
         }
+        command.args(flags);
         let mut child = command
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
@@ -737,4 +747,115 @@ fn slow_broker_peer_cannot_block_native_login_and_expires() {
     let mut native = NativeClient::connect(server.udp);
     assert_eq!(native.login(&token), accepted(2));
     assert_eq!(slow.read(&mut [0; 1]).unwrap(), 0);
+}
+
+/// L070: an open realm lets a friend's launcher join with no offline step. The first valid proof
+/// for an unclaimed handle claims a player account with that key; a racing second claimant loses,
+/// the handle then answers only to the claiming key, and held or keyless accounts are never taken.
+#[test]
+fn open_enrollment_claims_an_unknown_handle_once_and_keeps_it() {
+    let server = Server::open(&["--open-enrollment"]);
+    let friend = SigningKey::from_bytes(&[20; 32]);
+    let (first, second) = (
+        challenge(server.auth, "new_friend"),
+        challenge(server.auth, "new_friend"),
+    );
+    let reply = proof(server.auth, "new_friend", &first, &friend, &SERVER);
+    assert_eq!(reply[0], 1);
+    let rival = SigningKey::from_bytes(&[21; 32]);
+    assert_eq!(
+        proof(server.auth, "new_friend", &second, &rival, &SERVER),
+        [0; 69]
+    );
+    let store = AccountStore::load(&server.directory.join("accounts.json")).unwrap();
+    let id = store
+        .account_id_by_login_hash(&login_handle_hash("new_friend").unwrap())
+        .unwrap();
+    assert_eq!(
+        store.public_keys(id).unwrap(),
+        [friend.verifying_key().to_bytes()]
+    );
+    assert_eq!(store.account_role(id), Some(AccountRole::Player));
+    assert!(!server.directory.join("accounts.json.lock").exists());
+    // The token logs in natively and lists characters, like any enrolled account's.
+    let mut client = NativeClient::connect(server.udp);
+    assert_ne!(client.login(&reply[1..33]), login::login_reply(false));
+    assert_eq!(client.request(&[11])[0], 12);
+    assert_eq!(token(&server, "new_friend", 20).len(), 32);
+    for handle in ["new_friend", HANDLE, "acct_003"] {
+        let c = challenge(server.auth, handle);
+        assert_eq!(
+            proof(server.auth, handle, &c, &rival, &SERVER),
+            [0; 69],
+            "{handle}"
+        );
+    }
+    let store = AccountStore::load(&server.directory.join("accounts.json")).unwrap();
+    assert_eq!(store.account_ids().count(), 4, "one claim, no takeover");
+}
+
+/// L070: `--enroll-handles` limits claims to the listed handles, `--max-accounts` caps the store
+/// (accounts already in it count), one address claims at most three accounts an hour, and a
+/// realm without either flag claims nothing (`broker_good_signature_..._no_enumeration`).
+#[test]
+fn enrollment_keeps_to_the_handle_list_the_account_cap_and_the_claim_budget() {
+    let claim = |server: &Server, handle: &str, seed: u8| {
+        let c = challenge(server.auth, handle);
+        proof(
+            server.auth,
+            handle,
+            &c,
+            &SigningKey::from_bytes(&[seed; 32]),
+            &SERVER,
+        )[0]
+    };
+    let list = PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join(format!(
+        "handles-{}-{}",
+        std::process::id(),
+        NEXT.fetch_add(1, Ordering::Relaxed)
+    ));
+    fs::write(&list, "# friends\nfriend_a\n\n  friend_b\n").unwrap();
+    let listed = Server::open(&[
+        "--enroll-handles",
+        list.to_str().unwrap(),
+        "--max-accounts",
+        "4",
+    ]);
+    assert_eq!(claim(&listed, "stranger", 30), 0, "not listed");
+    assert_eq!(claim(&listed, "friend_a", 31), 1);
+    assert_eq!(
+        claim(&listed, "friend_b", 32),
+        0,
+        "listed, but the store is at its cap"
+    );
+    let open = Server::open(&["--open-enrollment"]);
+    for (n, handle) in ["claim_1", "claim_2", "claim_3", "claim_4"]
+        .into_iter()
+        .enumerate()
+    {
+        assert_eq!(
+            claim(&open, handle, 40 + n as u8),
+            u8::from(n < 3),
+            "{handle}"
+        );
+    }
+    // Bad settings stop the start instead of opening the realm differently than asked.
+    fs::write(&list, "friend_a\nnot a handle\n").unwrap();
+    for args in [
+        vec!["--enroll-handles", list.to_str().unwrap()],
+        vec!["--open-enrollment"],
+    ] {
+        let result = Command::new(env!("CARGO_BIN_EXE_osfr-login"))
+            .args(&args)
+            .output()
+            .unwrap();
+        let stderr = String::from_utf8_lossy(&result.stderr);
+        assert!(!result.status.success(), "{args:?}");
+        assert!(
+            stderr.contains("invalid handle")
+                || stderr.contains("enrollment needs --account-store"),
+            "{args:?}: {stderr}"
+        );
+    }
+    let _ = fs::remove_file(&list);
 }

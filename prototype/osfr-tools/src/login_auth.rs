@@ -7,11 +7,12 @@
 //! per-IP/account rate limits before calling it. No sockets or private keys live
 //! here. Do not log challenges, signatures, tokens or the signed transcript.
 
+use crate::account::{AccountFlags, SlotPolicy};
 use crate::account_store::AccountStore;
 use ed25519_dalek::{Signature, VerifyingKey};
 use sha2::{Digest, Sha256};
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, BTreeSet},
     fmt,
     time::{Duration, Instant},
 };
@@ -79,6 +80,17 @@ pub fn signing_message(
     message.extend_from_slice(nonce);
     message.extend_from_slice(handle.as_bytes());
     Ok(message)
+}
+
+/// L070 open enrolment (owner, 2026-10-29: a hosted realm is open by default, with an optional
+/// handle list). Operator-owned settings for `LoginAuth::verify_or_enroll`.
+pub struct Enrollment {
+    /// Handles that may claim an account; `None` lets any valid handle claim one.
+    pub handles: Option<BTreeSet<String>>,
+    /// No claim once the store holds this many accounts (the host's own included).
+    pub max_accounts: usize,
+    pub flags: AccountFlags,
+    pub slots: SlotPolicy,
 }
 
 struct PendingChallenge {
@@ -167,6 +179,68 @@ impl LoginAuth {
         signature: &[u8],
         now: Instant,
     ) -> Result<String, AuthError> {
+        let (challenge, login_hash, key_bytes) = self.prove(nonce, public_key, signature, now)?;
+        // (R) Unknown and disabled accounts perform signature verification too.
+        // Fixed replies are non-enumerating; the whole endpoint is not constant-time.
+        let account_id = challenge.account_id.ok_or(AuthError::InvalidCredentials)?;
+        if !binding_is_current(store, account_id, &login_hash, &key_bytes) {
+            return Err(AuthError::InvalidCredentials);
+        }
+        self.mint(account_id, login_hash, key_bytes, challenge.handle, now)
+    }
+
+    /// L070 `verify` on an open realm: a valid proof for a handle no account holds claims a new
+    /// player account with the proving key, so a friend's launcher joins with no offline step.
+    /// A held handle answers only to its enrolled keys, exactly as in `verify`. The store is read
+    /// as it is now, not at challenge time, so of two peers racing for one handle only the first
+    /// claim stands. Returns the token and the claimed account id; the caller saves `store`
+    /// under the store lock. (R) Open claims reveal which handles are taken; a list or the
+    /// account cap is the host's control.
+    pub fn verify_or_enroll(
+        &mut self,
+        store: &mut AccountStore,
+        nonce: &[u8],
+        public_key: &[u8],
+        signature: &[u8],
+        now: Instant,
+        enrollment: &Enrollment,
+    ) -> Result<(String, Option<u64>), AuthError> {
+        let (challenge, login_hash, key_bytes) = self.prove(nonce, public_key, signature, now)?;
+        let (account_id, claimed) = match store.account_id_by_login_hash(&login_hash) {
+            Some(id) => (id, None),
+            None => {
+                if enrollment
+                    .handles
+                    .as_ref()
+                    .is_some_and(|handles| !handles.contains(&challenge.handle))
+                    || store.account_ids().count() >= enrollment.max_accounts
+                {
+                    return Err(AuthError::InvalidCredentials);
+                }
+                let id = store
+                    .create_account(login_hash, enrollment.flags.clone(), enrollment.slots)
+                    .map_err(|_| AuthError::InvalidCredentials)?;
+                store
+                    .add_public_key(id, &key_bytes)
+                    .map_err(|_| AuthError::InvalidCredentials)?;
+                (id, Some(id))
+            }
+        };
+        if !binding_is_current(store, account_id, &login_hash, &key_bytes) {
+            return Err(AuthError::InvalidCredentials);
+        }
+        let token = self.mint(account_id, login_hash, key_bytes, challenge.handle, now)?;
+        Ok((token, claimed))
+    }
+
+    /// Consume the challenge and check the signature over it; any failure spends the challenge.
+    fn prove(
+        &mut self,
+        nonce: &[u8],
+        public_key: &[u8],
+        signature: &[u8],
+        now: Instant,
+    ) -> Result<(PendingChallenge, [u8; 32], [u8; 32]), AuthError> {
         self.expire(now);
         let nonce = <[u8; 32]>::try_from(nonce).map_err(|_| AuthError::InvalidCredentials)?;
         let challenge = self
@@ -184,12 +258,17 @@ impl LoginAuth {
             &signature,
         )
         .map_err(|_| AuthError::InvalidCredentials)?;
-        // (R) Unknown and disabled accounts perform signature verification too.
-        // Fixed replies are non-enumerating; the whole endpoint is not constant-time.
-        let account_id = challenge.account_id.ok_or(AuthError::InvalidCredentials)?;
-        if !binding_is_current(store, account_id, &login_hash, &key_bytes) {
-            return Err(AuthError::InvalidCredentials);
-        }
+        Ok((challenge, login_hash, key_bytes))
+    }
+
+    fn mint(
+        &mut self,
+        account_id: u64,
+        login_hash: [u8; 32],
+        key_bytes: [u8; 32],
+        handle: String,
+        now: Instant,
+    ) -> Result<String, AuthError> {
         if self.tokens.len() >= MAX_TOKENS {
             return Err(AuthError::Capacity);
         }
@@ -218,7 +297,7 @@ impl LoginAuth {
                 login_hash,
                 public_key: key_bytes,
                 issued: now,
-                handle: challenge.handle.clone(),
+                handle: handle.clone(),
             });
             return Ok(token);
         }

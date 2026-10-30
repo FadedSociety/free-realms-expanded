@@ -3,10 +3,11 @@
 use osfr_tools::trace;
 
 use osfr_tools::{
-    account_store::{AccountStore, AccountStoreLock},
+    account::{AccountFlags, SlotPolicy},
+    account_store::{AccountStore, AccountStoreLock, STAFF_LOCK_WAIT},
     identity::Resources,
     login::{self, LoginConfig, LoginService, Rc4},
-    login_auth::{LoginAuth, LoginFailures, login_handle_hash},
+    login_auth::{Enrollment, LoginAuth, LoginFailures, login_handle_hash},
     net_policy::{Bucket, IpLimiter},
     session::{clock_reflect, decode_controls},
     soe::{
@@ -16,10 +17,10 @@ use osfr_tools::{
 };
 use serde_json::json;
 use std::{
-    collections::HashMap,
+    collections::{BTreeSet, HashMap},
     env, fs, io,
     io::{Read, Write},
-    net::{SocketAddr, TcpListener, TcpStream, UdpSocket},
+    net::{IpAddr, SocketAddr, TcpListener, TcpStream, UdpSocket},
     path::PathBuf,
     time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
@@ -45,6 +46,11 @@ struct Options {
     authenticated: bool,
     auth_bind: SocketAddr,
     server_id: Option<[u8; 32]>,
+    /// L070: a valid proof for an unclaimed handle claims an account (`--open-enrollment`, or
+    /// only the handles in `--enroll-handles`), up to `--max-accounts` (default 64).
+    open_enrollment: bool,
+    enroll_handles: Option<BTreeSet<String>>,
+    max_accounts: usize,
 }
 impl Options {
     fn parse() -> Result<Self, Box<dyn std::error::Error>> {
@@ -69,9 +75,14 @@ impl Options {
         let mut allow_lan = false;
         let mut auth_bind: SocketAddr = "127.0.0.1:20043".parse()?;
         let mut server_id_file = None;
+        let (mut open_enrollment, mut enroll_handles, mut max_accounts) = (false, None, 64);
         while let Some(flag) = args.next() {
             if flag == "--allow-lan" {
                 allow_lan = true;
+                continue;
+            }
+            if flag == "--open-enrollment" {
+                open_enrollment = true;
                 continue;
             }
             let value = args.next().ok_or("missing login option value")?;
@@ -93,6 +104,8 @@ impl Options {
                 "--open-chat" => open_chat = value.parse()?,
                 "--seconds" => seconds = value.parse()?,
                 "--trace" => trace_file = Some(PathBuf::from(value)),
+                "--enroll-handles" => enroll_handles = Some(handle_list(&value)?),
+                "--max-accounts" => max_accounts = value.parse()?,
                 _ => return Err(format!("unknown login option {flag}").into()),
             }
         }
@@ -116,6 +129,10 @@ impl Options {
             return Err(
                 "credential broker binds loopback, or a private-network IP with --allow-lan".into(),
             );
+        }
+        open_enrollment |= enroll_handles.is_some();
+        if open_enrollment && !authenticated {
+            return Err("enrollment needs --account-store".into());
         }
         if !authenticated && (!bind.ip().is_loopback() || server_id_file.is_some()) {
             return Err(
@@ -162,6 +179,9 @@ impl Options {
             authenticated,
             auth_bind,
             server_id,
+            open_enrollment,
+            enroll_handles,
+            max_accounts,
         })
     }
     fn service(&self) -> io::Result<LoginService> {
@@ -190,6 +210,7 @@ impl Options {
 // One request/connection, at most 192 body bytes and 16 sockets, 3 s total.
 struct BrokerPeer {
     stream: TcpStream,
+    ip: IpAddr,
     started: Instant,
     input: Vec<u8>,
     reply: Option<[u8; 69]>,
@@ -206,6 +227,9 @@ struct Broker {
     native_ips: IpLimiter,
     global: Bucket,
     allow_lan: bool,
+    enrollment: Option<Enrollment>,
+    /// (R) Claims per address: 3 an hour, so one peer cannot fill the account cap.
+    claims: IpLimiter,
 }
 
 impl Broker {
@@ -227,10 +251,30 @@ impl Broker {
             native_ips: IpLimiter::new(20.0 / 60.0, 20.0, 1024),
             global: Bucket::full(20.0, Instant::now()),
             allow_lan: options.allow_lan,
+            enrollment: options.open_enrollment.then(|| Enrollment {
+                handles: options.enroll_handles.clone(),
+                max_accounts: options.max_accounts,
+                // The same new-account settings as login's own account creation (login.rs).
+                flags: AccountFlags {
+                    underage: options.underage,
+                    open_chat: options.open_chat,
+                    ..AccountFlags::NEW_ACCOUNT
+                },
+                slots: SlotPolicy {
+                    max_characters: options.max_characters,
+                },
+            }),
+            claims: IpLimiter::new(3.0 / 3600.0, 3.0, 1024),
         })
     }
 
-    fn answer(&mut self, path: &std::path::Path, body: &[u8], now: Instant) -> [u8; 69] {
+    fn answer(
+        &mut self,
+        path: &std::path::Path,
+        body: &[u8],
+        peer: IpAddr,
+        now: Instant,
+    ) -> [u8; 69] {
         let mut reply = [0; 69];
         let result = (|| -> Option<()> {
             if body.get(..5)? != b"AUTH2" {
@@ -263,10 +307,33 @@ impl Broker {
                         self.auth.discard_challenge(nonce);
                         return None;
                     }
-                    match self
-                        .auth
-                        .verify(&store, nonce, &body[38..70], &body[70..134], now)
-                    {
+                    let (key, signature) = (&body[38..70], &body[70..134]);
+                    let verified = match &self.enrollment {
+                        Some(enrollment) if store.account_id_by_login_hash(&hash).is_none() => {
+                            if !self.claims.allow(peer, now) {
+                                self.auth.discard_challenge(nonce);
+                                return None;
+                            }
+                            // A claim writes the store: one load-modify-save under its lock,
+                            // waiting no longer than a staff write (L042).
+                            let _lock =
+                                AccountStoreLock::acquire_within(path, STAFF_LOCK_WAIT).ok()?;
+                            let mut store = AccountStore::load(path).ok()?;
+                            let result = self.auth.verify_or_enroll(
+                                &mut store, nonce, key, signature, now, enrollment,
+                            );
+                            if let Ok((_, Some(id))) = &result {
+                                store.save(path).ok()?;
+                                eprintln!(
+                                    "{}",
+                                    json!({"event":"account_enrolled","account_id":id,"peer":peer.to_string()})
+                                );
+                            }
+                            result.map(|(token, _)| token)
+                        }
+                        _ => self.auth.verify(&store, nonce, key, signature, now),
+                    };
+                    match verified {
                         Ok(token) => {
                             self.limits.succeeded(&hash);
                             reply[1..33].copy_from_slice(token.as_bytes());
@@ -312,6 +379,7 @@ impl Broker {
                         self.ips.allow(address.ip(), now) && self.global.take(1.0, 2.0, 20.0, now);
                     self.peers.push(BrokerPeer {
                         stream,
+                        ip: address.ip(),
                         started: now,
                         input: Vec::new(),
                         written: 0,
@@ -342,7 +410,7 @@ impl Broker {
                     if !(10..=192).contains(&length) || peer.input.len() > length + 4 {
                         peer.reply = Some([0; 69]);
                     } else if peer.input.len() == length + 4 {
-                        peer.reply = Some(self.answer(path, &peer.input[4..], now));
+                        peer.reply = Some(self.answer(path, &peer.input[4..], peer.ip, now));
                     }
                 }
             }
@@ -362,6 +430,20 @@ impl Broker {
         }
         Ok(())
     }
+}
+
+/// L070 `--enroll-handles`: one handle per line; blank lines and `#` comments are skipped, and
+/// a malformed handle stops the start rather than being silently dropped.
+fn handle_list(path: &str) -> Result<BTreeSet<String>, Box<dyn std::error::Error>> {
+    let mut handles = BTreeSet::new();
+    for line in fs::read_to_string(path)?.lines().map(str::trim) {
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        login_handle_hash(line).map_err(|_| format!("invalid handle {line:?} in {path}"))?;
+        handles.insert(line.to_owned());
+    }
+    Ok(handles)
 }
 
 /// Parse the existing two-string native login before consuming a Session token.

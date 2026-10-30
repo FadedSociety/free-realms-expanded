@@ -200,6 +200,8 @@ Login takes the account-store writer lock only for a write: a character create o
 
 ## 2. Each friend
 
+**Open hosting (L070).** The launcher's "Play locally" with "Host for friends" starts login with `--open-enrollment` on this PC's LAN or VPN address: a friend makes a profile in Join a realm (address, "Ask the realm for its identity", a handle of their choice) and their first PLAY creates their player account. No key exchange and no restart. A `whitelist.txt` beside the account store (one handle per line) switches to `--enroll-handles`, so only listed handles can claim. Accounts made this way are players; the host's own account is admin. The operator-assisted steps below still work for a realm started without enrollment.
+
 1. Install the client and launcher build designated for this playtest. Do not send the private playtest bundle.
 
 The W131 installer and friend join flow are coming. The intended screen is Settings → Join a realm. The launcher README describes entering the game address, the 64-digit server identity, and an account handle; comparing the host fingerprint; creating a per-server key; then sending only the public key to the owner. The join screen also has a login broker field, prefilled with the realm address's IP and port 20043; leave it unless the host says otherwise. W131's brief was not present in the checked-in notes, and this path has not passed fresh-PC acceptance.
