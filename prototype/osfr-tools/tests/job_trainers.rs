@@ -32,6 +32,8 @@ use std::{
 mod collect_quest;
 #[path = "common/job_playtest.rs"]
 mod job_playtest;
+#[path = "support/json.rs"]
+mod json;
 
 use job_playtest::{
     bar_ids, hits_from, install_starter_outfits, install_starter_weapon_definitions,
@@ -40,6 +42,21 @@ use job_playtest::{
 const CRATE: &str = env!("CARGO_MANIFEST_DIR");
 /// The four jobs today's features need: Miner, Chef, Fisherman, Kart Driver.
 const PRIORITY: [i32; 4] = [14, 45, 137, 48];
+/// Jobs whose extra `jobs.json` trainers get no row (T893): Pet Trainer has no profile row in
+/// `profiles.json` (a row naming it would not load), Brawler is unlocked from the start (a Learn
+/// menu would only ever refuse), and the client names only Sam Potts for Card Duelist.
+const NO_TRAINER_ROWS: [i32; 3] = [121, 43, 120];
+/// (NPC, job) pairs `jobs.json` lists that stay without a row: `card_duelist_trainer.rs` pins
+/// Garrison Gold's whole menu to Talk, so his Demo Derby Driver row waits for the Card Duelist call.
+/// Soccer Star: the build guide says Manager Landon is the only trainer that starts the job; Fred
+/// Futbol sells the gear and Coach Eddie runs the team, so `jobs.json` listing them gets no row.
+const LEFT_OUT: [(u64, i32); 3] = [
+    (9_000_000_094, 49),
+    (9_000_000_092, 52),
+    (9_000_000_053, 52),
+];
+/// T893: a row for an NPC the world does not draw yet says so; its menu works once placed.
+const DORMANT: &str = "dormant until placed";
 /// Synthetic collect objective used to prove one starter grant raises one count.
 const COLLECT_QUEST: u32 = 9_900_001;
 static NEXT: AtomicU64 = AtomicU64::new(0);
@@ -195,7 +212,7 @@ fn profile_state(profiles: &Profiles, trainer: &Trainer, prerequisite: bool) -> 
 fn trainer_rows_match_the_job_and_spawned_npc_content() {
     let content = Content::new();
     let rows = trainers(&content);
-    let jobs: Value = serde_json::from_slice(&fs::read(data().join("jobs.json")).unwrap()).unwrap();
+    let jobs = json::read(&data().join("jobs.json"));
     let jobs = jobs["records"].as_array().unwrap();
     let npcs = npc_rows();
     let extras = extra_rows();
@@ -216,8 +233,8 @@ fn trainer_rows_match_the_job_and_spawned_npc_content() {
             trainer.job
         );
         assert!(
-            is_drawn(&extras, row, trainer),
-            "{}: the trainer must be drawn in game",
+            is_drawn(&extras, row, trainer) || trainer.source.contains(DORMANT),
+            "{}: the trainer must be drawn in game or say it is dormant",
             trainer.job
         );
         assert!(!trainer.source.trim().is_empty());
@@ -667,6 +684,17 @@ fn state_for(content: &Content, trainer: &Trainer, prerequisite: bool) -> Gamepl
     state
 }
 
+/// The first row of each job whose NPC the world draws.
+fn first_drawn_per_job(content: &Content) -> Vec<Trainer> {
+    let npcs = npc_rows();
+    let extras = extra_rows();
+    let mut seen = BTreeSet::new();
+    trainers(content)
+        .into_iter()
+        .filter(|t| is_drawn(&extras, npc(&npcs, t.npc), t) && seen.insert(t.profile))
+        .collect()
+}
+
 fn trainer_position(npcs: &[Value], trainer: &Trainer) -> [f32; 3] {
     serde_json::from_value(npc(npcs, trainer.npc)["position"].clone()).unwrap()
 }
@@ -681,7 +709,8 @@ fn an_ordinary_player_learns_each_trainers_job_once_and_only_switches_to_a_compl
     let profiles = Profiles::load(&content.0, None).unwrap();
     let mut checked = Vec::new();
     let mut selectable = 0;
-    for trainer in trainers(&content) {
+    // One drawn trainer per job (the first row); `every_added_trainer_teaches_its_job...` covers the rest.
+    for trainer in first_drawn_per_job(&content) {
         let position = trainer_position(&npcs, &trainer);
         let near = [position[0] + 2.0, position[1], position[2]];
         let mut state = base.state();
@@ -789,6 +818,86 @@ fn an_ordinary_player_learns_each_trainers_job_once_and_only_switches_to_a_compl
         selectable >= 5,
         "the five trainer jobs with complete starter kits must remain selectable"
     );
+}
+
+/// T893: every NPC `jobs.json` lists as a job's trainer (and that exists as NPC content) opens the
+/// Learn row, and all trainers of one job teach it identically (same label, same prerequisite),
+/// so a second trainer can never bypass the first one's gate.
+#[test]
+fn every_listed_trainer_of_every_job_has_a_learn_row_with_the_jobs_label_and_prerequisite() {
+    let content = Content::new();
+    let rows = trainers(&content);
+    let jobs = json::read(&data().join("jobs.json"));
+    let npcs = npc_rows();
+    let mut jobs_with_rows = 0;
+    for job in jobs["records"].as_array().unwrap() {
+        let profile = job["profile_id"].as_i64().unwrap() as i32;
+        if NO_TRAINER_ROWS.contains(&profile) {
+            continue;
+        }
+        let of_job: Vec<&Trainer> = rows.iter().filter(|t| t.profile == profile).collect();
+        for id in job["trainer_npc_ids"].as_array().unwrap() {
+            let id = id.as_u64().unwrap();
+            if LEFT_OUT.contains(&(id, profile)) {
+                continue;
+            }
+            if npcs.iter().any(|n| n["npc_id"].as_u64() == Some(id)) {
+                assert!(
+                    of_job.iter().any(|t| t.npc == id),
+                    "{}: trainer {id} has no Learn row",
+                    job["name"]
+                );
+            }
+        }
+        if let Some(first) = of_job.first() {
+            jobs_with_rows += 1;
+            for t in &of_job {
+                assert_eq!(t.label_string_id, first.label_string_id, "{}", t.job);
+                assert_eq!(t.requires, first.requires, "{}", t.job);
+            }
+        }
+    }
+    assert_eq!(jobs_with_rows, 13, "every job with trainer rows is covered");
+}
+
+/// T893, one gateway run per job: the last row of each job whose trainer the world draws offers
+/// Learn on the ordinary frame path and unlocks the job once.
+#[test]
+fn every_added_trainer_teaches_its_job_through_the_ordinary_frame_path() {
+    let content = Content::new();
+    let npcs = npc_rows();
+    let extras = extra_rows();
+    let base = Gameplay::load(&content.0, None).expect("the trainer content loads");
+    let profiles = Profiles::load(&content.0, None).unwrap();
+    let mut last_drawn = std::collections::BTreeMap::new();
+    for trainer in trainers(&content) {
+        if is_drawn(&extras, npc(&npcs, trainer.npc), &trainer) {
+            last_drawn.insert(trainer.profile, trainer);
+        }
+    }
+    assert_eq!(
+        last_drawn.len(),
+        14,
+        "12 jobs with added trainers plus 2 with original rows only (Soccer Star)"
+    );
+    for trainer in last_drawn.values() {
+        let position = trainer_position(&npcs, trainer);
+        let near = [position[0] + 2.0, position[1], position[2]];
+        let mut state = base.state();
+        state.profiles = Some(profile_state(&profiles, trainer, true));
+        let mut gateway = gateway_at(&content, state, near);
+        assert!(!unlocked(&gateway).contains(&i64::from(trainer.profile)));
+        let menu = click(&mut gateway, trainer.npc, 2_000);
+        let choice = option_with_label(&menu, trainer.label_string_id)
+            .unwrap_or_else(|| panic!("{}: Learn option in the menu", trainer.job));
+        let learned = choose(&mut gateway, trainer.npc, choice, 2_100).unwrap();
+        assert!(
+            said(&bodies(&learned), "You learned the"),
+            "{}",
+            trainer.job
+        );
+        assert!(unlocked(&gateway).contains(&i64::from(trainer.profile)));
+    }
 }
 
 #[test]

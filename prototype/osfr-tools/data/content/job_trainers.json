@@ -113,6 +113,871 @@
       "job": "Card Duelist",
       "label_string_id": 392269,
       "source": "client: 392269 'Become a Card Duelist' (menu label, hash 2010917501); 392273 'Find Sam Potts at Sanctuary to become a Card Duelist.' (hash 1454484288) and 383099 'To become a Card Duelist, you need to find Sam Potts.' (hash 1943395019). guide: notes/Build Guides/Content/Jobs/Card Duelist.md:22,31-34 (Sam Potts is the trainer every referral names; no client line makes Poe, Bry or Garrison one). Sanctuary-main@10f129e src/Resources/Profiles.json Id 120 Hint 384207 ('find Sam Potts in Sanctuary'), DefaultItems [] (no starter outfit). reconstructed: (R) the menu choice grants the job directly, as for every other trainer row; Sam is drawn at her Sanctuary spawn (T467)"
+    },
+    {
+      "npc": 9000000047,
+      "profile": 2,
+      "job": "Ninja",
+      "label_string_id": 412437,
+      "requires": {
+        "profile": 35,
+        "job": "Archer",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412437; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000108,
+      "profile": 12,
+      "job": "Wizard",
+      "label_string_id": 412481,
+      "requires": {
+        "profile": 11,
+        "job": "Medic",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412481; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000203,
+      "profile": 16,
+      "job": "Blacksmith",
+      "label_string_id": 412314,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412314; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000203,
+      "profile": 14,
+      "job": "Miner",
+      "label_string_id": 139748,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 139748; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000008,
+      "profile": 48,
+      "job": "Kart Driver",
+      "label_string_id": 407752,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 407752; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000046,
+      "profile": 45,
+      "job": "Chef",
+      "label_string_id": 413021,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 413021; (R) several NPCs may teach one job (T893); dormant until placed (not drawn today)"
+    },
+    {
+      "npc": 9000000048,
+      "profile": 48,
+      "job": "Kart Driver",
+      "label_string_id": 407752,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 407752; (R) several NPCs may teach one job (T893); dormant until placed (not drawn today)"
+    },
+    {
+      "npc": 9000000071,
+      "profile": 11,
+      "job": "Medic",
+      "label_string_id": 412422,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412422; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000111,
+      "profile": 49,
+      "job": "Demo Derby Driver",
+      "label_string_id": 412342,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412342; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000377,
+      "profile": 137,
+      "job": "Fisherman",
+      "label_string_id": 412490,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412490; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000163,
+      "profile": 35,
+      "job": "Archer",
+      "label_string_id": 412187,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412187; (R) several NPCs may teach one job (T893); dormant until placed (not drawn today)"
+    },
+    {
+      "npc": 9000000169,
+      "profile": 14,
+      "job": "Miner",
+      "label_string_id": 139748,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 139748; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000183,
+      "profile": 49,
+      "job": "Demo Derby Driver",
+      "label_string_id": 412342,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412342; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000470,
+      "profile": 14,
+      "job": "Miner",
+      "label_string_id": 139748,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 139748; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000209,
+      "profile": 12,
+      "job": "Wizard",
+      "label_string_id": 412481,
+      "requires": {
+        "profile": 11,
+        "job": "Medic",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412481; (R) several NPCs may teach one job (T893); dormant until placed (not drawn today)"
+    },
+    {
+      "npc": 9000000156,
+      "profile": 35,
+      "job": "Archer",
+      "label_string_id": 412187,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412187; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000396,
+      "profile": 45,
+      "job": "Chef",
+      "label_string_id": 413021,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 413021; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000334,
+      "profile": 35,
+      "job": "Archer",
+      "label_string_id": 412187,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412187; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000337,
+      "profile": 14,
+      "job": "Miner",
+      "label_string_id": 139748,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 139748; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000106,
+      "profile": 35,
+      "job": "Archer",
+      "label_string_id": 412187,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412187; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000122,
+      "profile": 35,
+      "job": "Archer",
+      "label_string_id": 412187,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412187; (R) several NPCs may teach one job (T893); dormant until placed (not drawn today)"
+    },
+    {
+      "npc": 9000000479,
+      "profile": 16,
+      "job": "Blacksmith",
+      "label_string_id": 412314,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412314; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000019,
+      "profile": 45,
+      "job": "Chef",
+      "label_string_id": 413021,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 413021; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000178,
+      "profile": 45,
+      "job": "Chef",
+      "label_string_id": 413021,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 413021; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000236,
+      "profile": 14,
+      "job": "Miner",
+      "label_string_id": 139748,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 139748; (R) several NPCs may teach one job (T893); dormant until placed (not drawn today)"
+    },
+    {
+      "npc": 9000000027,
+      "profile": 137,
+      "job": "Fisherman",
+      "label_string_id": 412490,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412490; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000129,
+      "profile": 2,
+      "job": "Ninja",
+      "label_string_id": 412437,
+      "requires": {
+        "profile": 35,
+        "job": "Archer",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412437; (R) several NPCs may teach one job (T893); dormant until placed (not drawn today)"
+    },
+    {
+      "npc": 9000000146,
+      "profile": 45,
+      "job": "Chef",
+      "label_string_id": 413021,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 413021; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000194,
+      "profile": 137,
+      "job": "Fisherman",
+      "label_string_id": 412490,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412490; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000030,
+      "profile": 32,
+      "job": "Warrior",
+      "label_string_id": 412471,
+      "requires": {
+        "profile": 43,
+        "job": "Brawler",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412471; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000044,
+      "profile": 45,
+      "job": "Chef",
+      "label_string_id": 413021,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 413021; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000174,
+      "profile": 4,
+      "job": "Postman",
+      "label_string_id": 412445,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412445; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000222,
+      "profile": 32,
+      "job": "Warrior",
+      "label_string_id": 412471,
+      "requires": {
+        "profile": 43,
+        "job": "Brawler",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412471; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000023,
+      "profile": 11,
+      "job": "Medic",
+      "label_string_id": 412422,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412422; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000052,
+      "profile": 11,
+      "job": "Medic",
+      "label_string_id": 412422,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412422; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000073,
+      "profile": 11,
+      "job": "Medic",
+      "label_string_id": 412422,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412422; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000073,
+      "profile": 32,
+      "job": "Warrior",
+      "label_string_id": 412471,
+      "requires": {
+        "profile": 43,
+        "job": "Brawler",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412471; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000086,
+      "profile": 4,
+      "job": "Postman",
+      "label_string_id": 412445,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412445; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000097,
+      "profile": 32,
+      "job": "Warrior",
+      "label_string_id": 412471,
+      "requires": {
+        "profile": 43,
+        "job": "Brawler",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412471; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000126,
+      "profile": 12,
+      "job": "Wizard",
+      "label_string_id": 412481,
+      "requires": {
+        "profile": 11,
+        "job": "Medic",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412481; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000376,
+      "profile": 12,
+      "job": "Wizard",
+      "label_string_id": 412481,
+      "requires": {
+        "profile": 11,
+        "job": "Medic",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412481; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000160,
+      "profile": 16,
+      "job": "Blacksmith",
+      "label_string_id": 412314,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412314; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000164,
+      "profile": 12,
+      "job": "Wizard",
+      "label_string_id": 412481,
+      "requires": {
+        "profile": 11,
+        "job": "Medic",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412481; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000190,
+      "profile": 12,
+      "job": "Wizard",
+      "label_string_id": 412481,
+      "requires": {
+        "profile": 11,
+        "job": "Medic",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412481; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000205,
+      "profile": 32,
+      "job": "Warrior",
+      "label_string_id": 412471,
+      "requires": {
+        "profile": 43,
+        "job": "Brawler",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412471; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000207,
+      "profile": 16,
+      "job": "Blacksmith",
+      "label_string_id": 412314,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412314; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000070,
+      "profile": 45,
+      "job": "Chef",
+      "label_string_id": 413021,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 413021; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000072,
+      "profile": 11,
+      "job": "Medic",
+      "label_string_id": 412422,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412422; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000079,
+      "profile": 4,
+      "job": "Postman",
+      "label_string_id": 412445,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412445; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000080,
+      "profile": 4,
+      "job": "Postman",
+      "label_string_id": 412445,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412445; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000213,
+      "profile": 45,
+      "job": "Chef",
+      "label_string_id": 413021,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 413021; (R) several NPCs may teach one job (T893); dormant until placed (not drawn today)"
+    },
+    {
+      "npc": 9000000031,
+      "profile": 4,
+      "job": "Postman",
+      "label_string_id": 412445,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412445; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000045,
+      "profile": 45,
+      "job": "Chef",
+      "label_string_id": 413021,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 413021; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000173,
+      "profile": 4,
+      "job": "Postman",
+      "label_string_id": 412445,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412445; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000016,
+      "profile": 45,
+      "job": "Chef",
+      "label_string_id": 413021,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 413021; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000024,
+      "profile": 137,
+      "job": "Fisherman",
+      "label_string_id": 412490,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412490; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000033,
+      "profile": 16,
+      "job": "Blacksmith",
+      "label_string_id": 412314,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412314; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000034,
+      "profile": 14,
+      "job": "Miner",
+      "label_string_id": 139748,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 139748; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000069,
+      "profile": 16,
+      "job": "Blacksmith",
+      "label_string_id": 412314,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412314; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000069,
+      "profile": 14,
+      "job": "Miner",
+      "label_string_id": 139748,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 139748; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000085,
+      "profile": 32,
+      "job": "Warrior",
+      "label_string_id": 412471,
+      "requires": {
+        "profile": 43,
+        "job": "Brawler",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412471; (R) several NPCs may teach one job (T893); dormant until placed (not drawn today)"
+    },
+    {
+      "npc": 9000000093,
+      "profile": 2,
+      "job": "Ninja",
+      "label_string_id": 412437,
+      "requires": {
+        "profile": 35,
+        "job": "Archer",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412437; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000132,
+      "profile": 4,
+      "job": "Postman",
+      "label_string_id": 412445,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412445; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000133,
+      "profile": 45,
+      "job": "Chef",
+      "label_string_id": 413021,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 413021; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000143,
+      "profile": 11,
+      "job": "Medic",
+      "label_string_id": 412422,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412422; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000143,
+      "profile": 12,
+      "job": "Wizard",
+      "label_string_id": 412481,
+      "requires": {
+        "profile": 11,
+        "job": "Medic",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412481; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000151,
+      "profile": 2,
+      "job": "Ninja",
+      "label_string_id": 412437,
+      "requires": {
+        "profile": 35,
+        "job": "Archer",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412437; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000154,
+      "profile": 12,
+      "job": "Wizard",
+      "label_string_id": 412481,
+      "requires": {
+        "profile": 11,
+        "job": "Medic",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412481; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000155,
+      "profile": 32,
+      "job": "Warrior",
+      "label_string_id": 412471,
+      "requires": {
+        "profile": 43,
+        "job": "Brawler",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412471; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000422,
+      "profile": 45,
+      "job": "Chef",
+      "label_string_id": 413021,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 413021; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000180,
+      "profile": 2,
+      "job": "Ninja",
+      "label_string_id": 412437,
+      "requires": {
+        "profile": 35,
+        "job": "Archer",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412437; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000201,
+      "profile": 14,
+      "job": "Miner",
+      "label_string_id": 139748,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 139748; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000472,
+      "profile": 14,
+      "job": "Miner",
+      "label_string_id": 139748,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 139748; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000476,
+      "profile": 14,
+      "job": "Miner",
+      "label_string_id": 139748,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 139748; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000208,
+      "profile": 32,
+      "job": "Warrior",
+      "label_string_id": 412471,
+      "requires": {
+        "profile": 43,
+        "job": "Brawler",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412471; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000487,
+      "profile": 14,
+      "job": "Miner",
+      "label_string_id": 139748,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 139748; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000217,
+      "profile": 14,
+      "job": "Miner",
+      "label_string_id": 139748,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 139748; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000220,
+      "profile": 16,
+      "job": "Blacksmith",
+      "label_string_id": 412314,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412314; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000234,
+      "profile": 12,
+      "job": "Wizard",
+      "label_string_id": 412481,
+      "requires": {
+        "profile": 11,
+        "job": "Medic",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412481; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000010,
+      "profile": 137,
+      "job": "Fisherman",
+      "label_string_id": 412490,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412490; (R) several NPCs may teach one job (T893); dormant until placed (not drawn today)"
+    },
+    {
+      "npc": 9000000096,
+      "profile": 45,
+      "job": "Chef",
+      "label_string_id": 413021,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 413021; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000101,
+      "profile": 137,
+      "job": "Fisherman",
+      "label_string_id": 412490,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412490; (R) several NPCs may teach one job (T893); dormant until placed (not drawn today)"
+    },
+    {
+      "npc": 9000000103,
+      "profile": 45,
+      "job": "Chef",
+      "label_string_id": 413021,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 413021; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000117,
+      "profile": 137,
+      "job": "Fisherman",
+      "label_string_id": 412490,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412490; (R) several NPCs may teach one job (T893); dormant until placed (not drawn today)"
+    },
+    {
+      "npc": 9000000124,
+      "profile": 49,
+      "job": "Demo Derby Driver",
+      "label_string_id": 412342,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412342; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000114,
+      "profile": 16,
+      "job": "Blacksmith",
+      "label_string_id": 412314,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412314; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000179,
+      "profile": 16,
+      "job": "Blacksmith",
+      "label_string_id": 412314,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412314; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000193,
+      "profile": 16,
+      "job": "Blacksmith",
+      "label_string_id": 412314,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412314; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000243,
+      "profile": 32,
+      "job": "Warrior",
+      "label_string_id": 412471,
+      "requires": {
+        "profile": 43,
+        "job": "Brawler",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412471; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000040,
+      "profile": 32,
+      "job": "Warrior",
+      "label_string_id": 412471,
+      "requires": {
+        "profile": 43,
+        "job": "Brawler",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412471; (R) several NPCs may teach one job (T893); dormant until placed (not drawn today)"
+    },
+    {
+      "npc": 9000000295,
+      "profile": 49,
+      "job": "Demo Derby Driver",
+      "label_string_id": 412342,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412342; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000317,
+      "profile": 4,
+      "job": "Postman",
+      "label_string_id": 412445,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412445; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000335,
+      "profile": 2,
+      "job": "Ninja",
+      "label_string_id": 412437,
+      "requires": {
+        "profile": 35,
+        "job": "Archer",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412437; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000415,
+      "profile": 12,
+      "job": "Wizard",
+      "label_string_id": 412481,
+      "requires": {
+        "profile": 11,
+        "job": "Medic",
+        "rank": 5
+      },
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412481; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000172,
+      "profile": 4,
+      "job": "Postman",
+      "label_string_id": 412445,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412445; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9500000892,
+      "profile": 16,
+      "job": "Blacksmith",
+      "label_string_id": 412314,
+      "source": "(R) guide services text names this job (client guide row, no jobs.json entry); label locale 412314; (R) several NPCs may teach one job (T893); dormant until placed (not drawn today)"
+    },
+    {
+      "npc": 9500000892,
+      "profile": 14,
+      "job": "Miner",
+      "label_string_id": 139748,
+      "source": "(R) guide services text names this job (client guide row, no jobs.json entry); label locale 139748; (R) several NPCs may teach one job (T893); dormant until placed (not drawn today)"
+    },
+    {
+      "npc": 9000000028,
+      "profile": 45,
+      "job": "Chef",
+      "label_string_id": 413021,
+      "source": "(R) wiki Chef trainer list (Jobs and Chef pages), no jobs.json entry; label locale 413021; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9500000891,
+      "profile": 48,
+      "job": "Kart Driver",
+      "label_string_id": 407752,
+      "source": "(R) guide services text names this job (client guide row, no jobs.json entry); label locale 407752; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9500000911,
+      "profile": 48,
+      "job": "Kart Driver",
+      "label_string_id": 407752,
+      "source": "(R) guide services text names this job (client guide row, no jobs.json entry); label locale 407752; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9500000923,
+      "profile": 48,
+      "job": "Kart Driver",
+      "label_string_id": 407752,
+      "source": "(R) guide services text names this job (client guide row, no jobs.json entry); label locale 407752; (R) several NPCs may teach one job (T893); dormant until placed (not drawn today)"
+    },
+    {
+      "npc": 9500000884,
+      "profile": 49,
+      "job": "Demo Derby Driver",
+      "label_string_id": 412342,
+      "source": "(R) guide services text names this job (client guide row, no jobs.json entry); label locale 412342; (R) several NPCs may teach one job (T893); dormant until placed (not drawn today)"
+    },
+    {
+      "npc": 9000000289,
+      "profile": 49,
+      "job": "Demo Derby Driver",
+      "label_string_id": 412342,
+      "source": "(R) guide services text names this job (client guide row, no jobs.json entry); label locale 412342; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000206,
+      "profile": 14,
+      "job": "Miner",
+      "label_string_id": 139748,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 139748; (R) several NPCs may teach one job (T893)"
+    },
+    {
+      "npc": 9000000405,
+      "profile": 16,
+      "job": "Blacksmith",
+      "label_string_id": 412314,
+      "source": "jobs.json trainer_npc_ids lists this NPC for the job; label locale 412314; (R) several NPCs may teach one job (T893)"
     }
   ]
 }

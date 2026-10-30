@@ -238,12 +238,16 @@ fn each_mapped_row_reaches_an_enabled_quest() {
         .expect("the shipped split catalogue loads");
     let browser = read_json(&root.join("job_browser.json"));
     let trainers = read_json(&root.join("job_trainers.json"));
-    let trainer_by_profile: BTreeMap<i64, u64> = trainers["trainers"]
+    // The first row of a job is its original trainer: later rows are extra trainers (T893).
+    let mut trainer_by_profile: BTreeMap<i64, u64> = BTreeMap::new();
+    for row in trainers["trainers"]
         .as_array()
         .expect("job_trainers.json trainers")
-        .iter()
-        .filter_map(|row| Some((row["profile"].as_i64()?, row["npc"].as_u64()?)))
-        .collect();
+    {
+        if let (Some(profile), Some(npc)) = (row["profile"].as_i64(), row["npc"].as_u64()) {
+            trainer_by_profile.entry(profile).or_insert(npc);
+        }
+    }
     let records: BTreeMap<u32, RawQuest> = read_quests(&root)
         .into_iter()
         .map(|row| (row.id, row))
