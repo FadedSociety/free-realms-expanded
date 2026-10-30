@@ -161,6 +161,8 @@ pub struct ClientAreas {
     /// T775: whether the last `season_changes` call moved the active season set, even when those
     /// seasons hold no client area (so no packet was sent). Read with [`Self::season_changed`].
     season_changed: bool,
+    /// T900: each session's area-banner state (104 and 15/2); see [`crate::area_banner`].
+    pub banners: crate::area_banner::AreaBanners,
 }
 
 impl ClientAreas {

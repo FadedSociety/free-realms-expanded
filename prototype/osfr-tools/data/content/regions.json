@@ -1,5 +1,6 @@
 {
   "schema_version": 1,
+  "banner_settle_ms": 1500,
   "client_name_ids": [
     3499,
     3500,

@@ -63,6 +63,33 @@ pub(super) fn season_tick(world: &mut SharedWorld, sessions: &mut SessionMap, un
     }
 }
 
+/// T900: the area banner (104, then 15/2) to every session in the open world, once the
+/// player has stayed in a new named area for the settle time (`osfr_tools::area_banner`). A
+/// session outside the open world holds no state, so it is announced again on return. A
+/// refused queue is logged and skips only that session.
+pub(super) fn banner_tick(world: &mut SharedWorld, sessions: &mut SessionMap, now_ms: u64) {
+    for session in sessions.values_mut() {
+        let view = in_open_world(&session.gateway)
+            .then(|| {
+                let state = session.gateway.state();
+                let table = session.gateway.gameplay()?.region_table()?;
+                Some((table, state.zone_id, state.position))
+            })
+            .flatten();
+        let packets = world.client_areas.banners.poll(session.id.0, view, now_ms);
+        let queued = packets
+            .iter()
+            .try_for_each(|packet| session.queue_shared_message(&wrap_application(packet)));
+        if let Err(error) = queued {
+            event(
+                json!({"event":"area_banner_send_failed","session":session.id.0,"reason":error.to_string()}),
+            );
+        }
+    }
+    let live = |id| sessions.values().any(|session| session.id.0 == id);
+    world.client_areas.banners.prune(sessions.len(), live);
+}
+
 #[cfg(test)]
 mod tests {
     use super::super::f120_fishing_hour_reconnect::drain_replies;
@@ -331,6 +358,121 @@ mod tests {
         assert!(
             area_messages(&heard).is_empty(),
             "an area-less season sends no 89 packet: {heard:?}"
+        );
+    }
+
+    /// T900: the banner messages in a session's replies: framed 5/1 tunnels of 104 or 15/2.
+    fn banners(messages: &[Vec<u8>]) -> Vec<Vec<u8>> {
+        messages
+            .iter()
+            .filter(|message| matches!(message.get(7..9), Some([104, 0] | [15, 0])))
+            .cloned()
+            .collect()
+    }
+
+    /// The tunnelled 104 and 15/2 of one announcement.
+    fn announced(name: u32, region: u32) -> Vec<Vec<u8>> {
+        [
+            osfr_tools::area_banner::poi_change(name, region, 0),
+            osfr_tools::chat::enter_area(name),
+        ]
+        .map(|packet| wrap_application(&packet))
+        .to_vec()
+    }
+
+    /// A banner tick on the session's own clock; everything it queued.
+    fn banner_at(
+        world: &mut SharedWorld,
+        sessions: &mut SessionMap,
+        key: SessionKey,
+        now: u64,
+    ) -> Vec<Vec<u8>> {
+        banner_tick(world, sessions, now);
+        banners(&drain_replies(sessions.get_mut(&key).unwrap(), now))
+    }
+
+    #[test]
+    fn walking_into_a_named_area_sends_the_banner_once_after_the_settle_time() {
+        if !super::super::tests::test_support::bin_test_target("client-area") {
+            return;
+        }
+        let scratch = Scratch::new("t900-banner");
+        let options = test_support::options(scratch.state());
+        if !test_support::fixtures_present(&options) {
+            eprintln!("skip t900-banner: the private lab fixtures are absent");
+            return;
+        }
+        // Sanctuary's centre; the walk below steps one unit at a time until the area changes.
+        let (x, z) = (-1239.0, 533.0);
+        let mut character = Gateway::reference_state(&options.reference).unwrap();
+        character.zone_id = 0;
+        character.position = [x, 0.0, z];
+        character.rotation = [0.0, 0.0, 1.0];
+        let content = options.content.as_ref().unwrap();
+        let gameplay = osfr_tools::gameplay::Gameplay::load(content, None)
+            .unwrap()
+            .state();
+        test_support::save_character(&options.state, &character, &gameplay);
+
+        let mut world = SharedWorld::new();
+        let mut sessions = SessionMap::new();
+        let mut player = test_support::enter(&options, 31);
+        let waiting = test_support::enter(&options, 32);
+        let guid = player.gateway.state().guid;
+        let table = player
+            .gateway
+            .gameplay()
+            .and_then(|game| game.region_table())
+            .expect("the session's gameplay holds regions.json");
+        let here = table
+            .named_area_at(0, x, z)
+            .expect("Sanctuary is a named area");
+        assert_eq!(here.0, 5);
+        let edge = (0..4000)
+            .map(|step| x + step as f32)
+            .find(|x| table.named_area_at(0, *x, z) != Some(here))
+            .expect("the area ends");
+        let next = table.named_area_at(0, edge, z);
+
+        let key = |session: &Session| SessionKey {
+            peer: session.peer,
+            connection_id: session.request.id,
+        };
+        let (player_key, waiting_key) = (key(&player), key(&waiting));
+        sessions.insert(waiting_key, waiting);
+        // Not loaded yet: nothing, and a loaded world later starts the clock.
+        player.gateway.handle(&wrap_application(&[13, 0])).unwrap();
+        sessions.insert(player_key, player);
+        assert!(banner_at(&mut world, &mut sessions, player_key, 100).is_empty());
+        let player = sessions.get_mut(&player_key).unwrap();
+        player.gateway.handle(&wrap_application(&[10, 0])).unwrap();
+        let _ = drain_replies(player, 200);
+
+        assert!(banner_at(&mut world, &mut sessions, player_key, 1_000).is_empty());
+        assert!(banner_at(&mut world, &mut sessions, player_key, 2_499).is_empty());
+        let entered = banner_at(&mut world, &mut sessions, player_key, 2_500);
+        assert_eq!(entered, announced(here.1, here.0));
+        for now in [2_550, 9_000] {
+            assert!(banner_at(&mut world, &mut sessions, player_key, now).is_empty());
+        }
+
+        // Walk one unit past the edge: a new area (or none) through the real movement reader.
+        let player = sessions.get_mut(&player_key).unwrap();
+        let step = super::super::tests::l039_login_pose::step(guid, [edge, 0.0, z]);
+        player.gateway.handle(&step).unwrap();
+        assert_eq!(player.gateway.state().position, [edge, 0.0, z]);
+        assert!(banner_at(&mut world, &mut sessions, player_key, 10_000).is_empty());
+        let walked = banner_at(&mut world, &mut sessions, player_key, 11_500);
+        match next {
+            Some((region, name)) => assert_eq!(walked, announced(name, region)),
+            None => assert!(walked.is_empty(), "outside every area announces nothing"),
+        }
+        assert!(banner_at(&mut world, &mut sessions, player_key, 30_000).is_empty());
+
+        let heard = drain_replies(sessions.get_mut(&waiting_key).unwrap(), 30_000);
+        assert!(
+            banners(&heard).is_empty(),
+            "a session that never loaded the world hears none"
         );
     }
 }

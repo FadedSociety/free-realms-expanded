@@ -38,6 +38,9 @@ const MAX_SHAPES: usize = 4096;
 const MAX_NAME_IDS: usize = 256;
 const MAX_COORD: f32 = 20_000.0;
 const MAX_BANNER_BYTES: usize = 64;
+/// T900: sanity bound for `banner_settle_ms`, and its value when a content set omits it.
+const MAX_SETTLE_MS: u32 = 60_000;
+const DEFAULT_SETTLE_MS: u32 = 1_500;
 
 /// One row of the world zone/region/place table.
 #[derive(Debug, Deserialize)]
@@ -48,6 +51,11 @@ struct Content {
     /// region and place `name_string_id` must be in this set; `scripts/content_check.py`
     /// resolves each one in the shipped client locale.
     client_name_ids: Vec<u32>,
+    /// T900 (R): how long a player must stay in a new named area before the area banner
+    /// shows. Community value (Sanctuary `Player.cs` `AreaSettleMilliseconds`); the client
+    /// has no such delay. Tunable, 0..=60000.
+    #[serde(default = "default_settle_ms")]
+    banner_settle_ms: u32,
     zones: Vec<Zone>,
     regions: Vec<Region>,
     places: Vec<Place>,
@@ -179,6 +187,10 @@ impl Shape {
     }
 }
 
+fn default_settle_ms() -> u32 {
+    DEFAULT_SETTLE_MS
+}
+
 fn named(path: &Path, error: impl fmt::Display) -> io::Error {
     io::Error::new(
         io::ErrorKind::InvalidData,
@@ -191,6 +203,9 @@ impl Content {
     fn finish(&mut self) -> Result<u32, String> {
         if self.schema_version != 1 {
             return Err("schema_version must be 1".to_owned());
+        }
+        if self.banner_settle_ms > MAX_SETTLE_MS {
+            return Err(format!("banner_settle_ms must be 0..={MAX_SETTLE_MS}"));
         }
         if self.zones.is_empty() || self.zones.len() > MAX_ZONES {
             return Err(format!("zones must contain 1..={MAX_ZONES} rows"));
@@ -421,6 +436,24 @@ impl RegionTable {
     /// region (or nothing) covers it.
     pub fn place_at(&self, zone: u32, x: f32, z: f32) -> Option<&Place> {
         self.classify(zone, x, z).and_then(|(_, place)| place)
+    }
+
+    /// T900: the named area a world position is in, as `(region id, name string id)`: the
+    /// first-party place's locale id when a place group covers it, else the region's. The
+    /// region id is the 104 POI id (2..=10 shows the banner, 1 does not); the name id is the
+    /// 104 name and the 15/2 area. `None` outside every region.
+    pub fn named_area_at(&self, zone: u32, x: f32, z: f32) -> Option<(u32, u32)> {
+        let (region, place) = self.classify(zone, x, z)?;
+        let name = match place {
+            Some(place) => place.name_string_id,
+            None => self.region(region)?.name_string_id,
+        };
+        Some((region, name))
+    }
+
+    /// T900: the area-banner settle time from `regions.json` (`banner_settle_ms`).
+    pub fn banner_settle_ms(&self) -> u32 {
+        self.content.banner_settle_ms
     }
 
     fn classify(&self, zone: u32, x: f32, z: f32) -> Option<(u32, Option<&Place>)> {

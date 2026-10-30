@@ -81,6 +81,15 @@ pub fn local_request(text: &str) -> Vec<u8> {
     packet
 }
 
+/// T900: 15/2 `ChatPacketEnterArea`, 8 bytes: reader `0x00b10580` (header `0x00b0f550` takes two
+/// `u16`) reads one `u32`, which display path `0x00b10250` looks up in the locale and binds to
+/// the `[*area*]` of `EnteringChatArea` ("Now entering [*area*].").
+pub fn enter_area(name_string_id: u32) -> Vec<u8> {
+    let mut packet = vec![15, 0, 2, 0];
+    packet.extend(name_string_id.to_le_bytes());
+    packet
+}
+
 pub fn system(message: &str) -> Vec<u8> {
     let escaped = message
         .replace('&', "&amp;")

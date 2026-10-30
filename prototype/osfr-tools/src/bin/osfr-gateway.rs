@@ -3800,6 +3800,7 @@ impl Server {
             group_arena::tick(self, now_ms);
             let unix_ms = osfr_tools::client_areas::unix_now_ms();
             client_area_routing::season_tick(&mut self.world, &mut self.sessions, unix_ms);
+            client_area_routing::banner_tick(&mut self.world, &mut self.sessions, now_ms);
             world_event_routing::tick(&mut self.world, &mut self.sessions, now_ms, unix_ms);
             boombox_routing::tick(&mut self.world, &mut self.sessions, now_ms);
             cake_routing::tick(&mut self.world, &mut self.sessions, now_ms);
