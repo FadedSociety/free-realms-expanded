@@ -13,6 +13,10 @@ use osfr_tools::{game_store::Snapshot, gameplay::GameplayState};
 #[allow(dead_code)]
 mod item_catalogue;
 
+#[path = "fishing_fixtures.rs"]
+#[allow(dead_code)] // only `copy_tree` is used here
+mod fixtures;
+
 /// A clean temp directory; dropping it removes the directory and the saves in it.
 pub struct Scratch(PathBuf);
 
@@ -136,6 +140,19 @@ pub fn item_catalogue(content: &Path, rows: &[(u32, usize)]) {
         .map(|(id, size)| item_catalogue::sized_row(*id, *size))
         .collect();
     item_catalogue::write(content, &definitions);
+}
+
+/// The repo's content copied into a scratch `content` directory, then the runtime pack
+/// (`runtime`, e.g. `round70_content::source()`) over it, as the playtest host ran it: the repo
+/// fills what the pack does not ship (zones, NPCs, field actors) and the pack wins elsewhere.
+pub fn repo_and_runtime_content(scratch: &Scratch, runtime: &Path) -> PathBuf {
+    let content = scratch.path().join("content");
+    fixtures::copy_tree(
+        &PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content"),
+        &content,
+    );
+    fixtures::copy_tree(runtime, &content);
+    content
 }
 
 /// True when `options` names the private lab fixture pair a session rig loads: the
@@ -712,5 +729,137 @@ impl Rig {
         held.filter(|i| i.definition_id == item)
             .map(|i| i.count)
             .last()
+    }
+}
+
+/// T889: a `Server` whose logged-in sessions share its world and field. Every packet goes through
+/// `Session::dispatch_message` (staging, `commit_outcome`, the shared-field step), the path a
+/// socket datagram takes, so a bug that only shows with two clients on one gateway can be pinned.
+/// Session `index` is character guid `index + 1`; `players` holds each one's saved character.
+#[allow(dead_code)] // the embedded integration copies of the gateway never build a table
+pub struct Table {
+    pub server: Server,
+    pub keys: Vec<SessionKey>,
+    /// Every application packet each session was sent so far, in order.
+    pub seen: Vec<Vec<Vec<u8>>>,
+    _scratch: Scratch,
+}
+
+#[allow(dead_code)]
+impl Table {
+    /// `content` is the content directory every session loads and `reference` the character
+    /// directory; `None` if the private lab reference is absent, so a clean checkout skips
+    /// instead of failing in setup.
+    pub fn new(
+        scratch: Scratch,
+        content: &Path,
+        reference: &Path,
+        players: &[(CharacterState, osfr_tools::gameplay::GameplayState)],
+    ) -> Option<Self> {
+        if !reference.join("manifest.json").is_file() {
+            eprintln!("skip: the private lab fixtures are absent");
+            return None;
+        }
+        let make = |state: PathBuf| Options {
+            content: Some(content.to_owned()),
+            reference: reference.to_owned(),
+            world: Some(scratch.path().join("world")),
+            ..options(state)
+        };
+        let mut server = Server::new(make(scratch.state())).unwrap();
+        let manifest: serde_json::Value =
+            serde_json::from_slice(&fs::read(reference.join("manifest.json")).unwrap()).unwrap();
+        let version = manifest["client_version"].as_str().unwrap().to_owned();
+        let mut keys = Vec::new();
+        for (index, (character, saved)) in players.iter().enumerate() {
+            let id = index as u32 + 1;
+            let key = SessionKey {
+                peer: format!("127.0.0.1:{}", 45_000 + id).parse().unwrap(),
+                connection_id: id,
+            };
+            let options = make(scratch.path().join(format!("character-{id}.json")));
+            let mut session = session(&options, id, 45_000 + id, 1400);
+            let mut gateway =
+                Gateway::load_gameplay(reference, character.clone(), content, Some(saved.clone()))
+                    .unwrap();
+            gateway.take_shared_fields();
+            session.gateway = gateway;
+            session.character_guid = character.guid;
+            session.account_guid = 10_000 + character.guid;
+            session.state_path = options.state.clone();
+            server.world.session_keys.insert(session.id, key);
+            server.sessions.insert(key, session);
+            keys.push(key);
+        }
+        let mut table = Self {
+            server,
+            seen: vec![Vec::new(); keys.len()],
+            keys,
+            _scratch: scratch,
+        };
+        for (index, (character, _)) in players.iter().enumerate() {
+            for (step, message) in [
+                f160_field_views::f213_login(character.guid, &version, "t889"),
+                wrap(&[13, 0]),
+                wrap(&[10, 0]),
+            ]
+            .iter()
+            .enumerate()
+            {
+                table.dispatch(index, message, 100 + step as u64 * 100);
+            }
+            table.drain(index, 400);
+        }
+        Some(table)
+    }
+
+    fn dispatch(&mut self, index: usize, message: &[u8], now: u64) {
+        let key = self.keys[index];
+        let server = &mut self.server;
+        let mut session = server.sessions.remove(&key).unwrap();
+        let result = session.dispatch_message(
+            message,
+            &server.options,
+            now,
+            &mut server.world,
+            &mut server.membership,
+            &mut server.sessions,
+            None,
+        );
+        server.sessions.insert(key, session);
+        result.unwrap();
+    }
+
+    /// Everything queued for session `index` as inner application bodies.
+    pub fn drain(&mut self, index: usize, now: u64) -> Vec<Vec<u8>> {
+        let session = self.server.sessions.get_mut(&self.keys[index]).unwrap();
+        let replies: Vec<_> = super::f120_fishing_hour_reconnect::drain_replies(session, now)
+            .into_iter()
+            .filter(|message| message.starts_with(&[5, 0, 1]))
+            .map(|message| message[7..].to_vec())
+            .collect();
+        self.seen[index].extend(replies.iter().cloned());
+        replies
+    }
+
+    /// One client packet from session `index`, then what that session was sent.
+    pub fn send(&mut self, index: usize, inner: &[u8], now: u64) -> Vec<Vec<u8>> {
+        self.dispatch(index, &wrap(inner), now);
+        self.drain(index, now)
+    }
+
+    /// One shared-field tick (view sync, motion), then empty every session's queue.
+    pub fn tick(&mut self, now: u64) {
+        self.server.tick_shared_fields(now);
+        for index in 0..self.keys.len() {
+            self.drain(index, now);
+        }
+    }
+
+    pub fn field(&self) -> &osfr_tools::encounter::SharedFieldState {
+        self.server
+            .membership
+            .field(0)
+            .expect("the field is installed")
     }
 }

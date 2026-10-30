@@ -751,6 +751,17 @@ pub fn unsupported_cast_failure() -> Vec<u8> {
     build_failure(UNSUPPORTED_CAST_MESSAGE_ID)
 }
 
+/// T889: what a job without a basic attack hears when it tries to fight, on the solo path and on
+/// the shared field alike. The field menu's Attack choice (26/10) gets a chat line (R); a 36/10
+/// cast gets the client's own cast failure.
+pub fn non_combat_refusal(from_menu: bool) -> Vec<u8> {
+    if from_menu {
+        crate::chat::system("Switch to a combat job before attacking.")
+    } else {
+        unsupported_cast_failure()
+    }
+}
+
 /// Parse a client 36/12 request: header plus one `i32` ability id. The native
 /// writer `00a34410` (via `00a32eb0`) emits exactly the int16 pair and a dword
 /// on a definition-cache miss (`00a34d10`). Any other length is malformed.

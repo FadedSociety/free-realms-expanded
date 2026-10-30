@@ -1793,13 +1793,19 @@ impl EncounterEngine {
                 ..Default::default()
             };
         }
-        if let Some((a, s)) = self.enemy(guid) {
-            if s.health > 0 && distance(position, s.position) <= 3.0 {
-                return EncounterOutcome {
+        if let Some((a, s)) = self.enemy(guid).filter(|(_, s)| s.health > 0) {
+            // T889: a click from farther than the 3 m reach (R) answers a line, not silence.
+            return if distance(position, s.position) <= 3.0 {
+                EncounterOutcome {
                     replies: vec![menu(guid, &a.name, &[(ATTACK, 22498)], true)],
                     ..Default::default()
-                };
-            }
+                }
+            } else {
+                EncounterOutcome {
+                    feedback: Some("Move closer to attack.".into()),
+                    ..Default::default()
+                }
+            };
         }
         EncounterOutcome::default()
     }

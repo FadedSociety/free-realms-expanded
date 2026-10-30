@@ -12,8 +12,8 @@
 use serde_json::Value;
 
 /// Spawn-area id and centre, in `data/content/field_enemies.json` order: the 12
-/// W102 starter camps first.
-pub const VERIFIED_CENTRES: [(&str, [f32; 3]); 30] = [
+/// W102 starter camps first; the two T889 tent camps are last.
+pub const VERIFIED_CENTRES: [(&str, [f32; 3]); 32] = [
     ("W102-F1", [-1899.204, -50.59, 307.902]),
     ("W102-F2", [-1887.867, -51.14, 291.159]),
     ("W102-F3", [-1962.89, -46.92, 284.723]),
@@ -44,6 +44,10 @@ pub const VERIFIED_CENTRES: [(&str, [f32; 3]); 30] = [
     ("ELITE-Q2", [-560.0, 16.6, 320.0]),
     ("ELITE-H1", [-1817.0, -44.45, 176.0]),
     ("ELITE-H2", [-1817.0, -43.45, 188.0]),
+    // T889: the Highroad tent's Hooligan (Legacy 4667, moved 8.8 m off its failing-slope spot) and
+    // Hooligan Archer (Legacy 4675); both passed `check_placements.py` validate() (notes/Autopilot/T889.md).
+    ("MID-H3", [-2033.0, -34.1, 634.0]),
+    ("MID-H4", [-2090.0, -25.9, 694.0]),
 ];
 
 /// The audited centre of `area`; usable in a `const`, where a typo is a compile error.

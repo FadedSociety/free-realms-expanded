@@ -1077,6 +1077,15 @@ impl DerbyService {
         Ok(packet)
     }
 
+    /// T889: the 41/107 ready sent right after the offer. A type-11 offer has no preload list, so
+    /// the client's own ready step never runs and the start dialog stays on "Loading..." (the
+    /// fishing and soccer rule, `minigame.rs` `offer`). Dispatcher `00aa36c0` case 0x6b decodes the
+    /// bare encounter header (`00a9f990`) and calls `MiniGame:SetMiniGameReady` (`009b0cc0`)
+    /// without checking the ids; they are the game id and the instance (R), as fishing sends.
+    pub fn ready_packet(&self) -> Vec<u8> {
+        crate::minigame::encounter_packet(107, self.game_id, self.instance_id)
+    }
+
     /// A normal Go request is 39/5. The client type-11 status bit then arms processor activation
     /// (bit 11, SetActive 009f1b80); its player-update carrier is not established by the client.
     pub fn handle_minigame_packet(&mut self, packet: &[u8]) -> Result<Vec<u8>, DerbyError> {

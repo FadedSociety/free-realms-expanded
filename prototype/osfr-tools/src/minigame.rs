@@ -803,7 +803,7 @@ fn encounter_started_packet(encounter_id: i32, instance_id: i32, player_guid: u6
 
 /// Encounter header `u16 41 | u16 sub | i32 encounter | i32 instance` (reader `008d6690`); alone
 /// it is the whole 41/107 body (`00a9f990`).
-fn encounter_packet(sub: u16, encounter_id: i32, instance_id: i32) -> Vec<u8> {
+pub(crate) fn encounter_packet(sub: u16, encounter_id: i32, instance_id: i32) -> Vec<u8> {
     let mut bytes = [FAMILY_ENCOUNTER.to_le_bytes(), sub.to_le_bytes()].concat();
     bytes.extend(encounter_id.to_le_bytes());
     bytes.extend(instance_id.to_le_bytes());

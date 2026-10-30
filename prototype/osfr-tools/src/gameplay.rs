@@ -538,6 +538,11 @@ impl Gameplay {
         };
         if let Some(slot) = slot {
             if !abilities.supports_basic(profile) {
+                // T889: the solo path's refusal, not silence (a click on a wolf from a job
+                // without a basic attack used to do nothing at all).
+                let from_menu = matches!(action, SharedFieldAction::Select { .. });
+                out.replies
+                    .push(crate::abilities::non_combat_refusal(from_menu));
                 return Ok(out);
             }
             if !abilities.weapon_matches(&self.inventory, profile, slot, self.job_level(profile)) {
@@ -4406,8 +4411,7 @@ impl Gameplay {
                 .unwrap()
                 .supports_basic(active_profile)
         {
-            out.replies
-                .push(chat::system("Switch to a combat job before attacking."));
+            out.replies.push(crate::abilities::non_combat_refusal(true));
             return Ok(out);
         }
         // Both native basic paths share the live equipment guard. (R) Job

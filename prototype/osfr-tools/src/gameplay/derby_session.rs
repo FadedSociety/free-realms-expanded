@@ -139,6 +139,7 @@ impl Gameplay {
         let offer = derby.begin_row(character, now_ms, row)?;
         derby.set_previous_job(previous_job);
         out.replies.push(offer);
+        out.replies.extend(derby.ready_packet());
         out.changed = true;
         Ok(out)
     }

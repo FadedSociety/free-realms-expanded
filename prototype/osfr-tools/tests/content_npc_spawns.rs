@@ -312,8 +312,11 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // ambient critter and townsfolk rows Sanctuary-main places that nothing else drew (2,909);
     // T550 appended the 194 harvest plants and 115 static props among the same 895 spawns (3,218);
     // T665 drew Coach Eddie 9000000053 as a `legacy_data` regional row and dropped his twin extra
-    // body, Legacy definition 4282 at the same spot (3,217).
-    assert_eq!(extra_rows.len(), 3217);
+    // body, Legacy definition 4282 at the same spot (3,217). T889 dropped 18 of the 20 Legacy
+    // Hooligan, Hooligan Archer and Hooligan Wolf bodies (friendly blue props nobody could fight; 4154/4155
+    // stay, the quest camp shares their GUIDs). 4667 and 4675 stay too: field_enemies.json now gives
+    // each a hostile body with the same GUID, which hides the passive copy. That leaves 3,199.
+    assert_eq!(extra_rows.len(), 3199);
     assert_eq!(captured_actors.len(), 9);
     println!(
         "NPC placements: {regional_legacy} Legacy, {regional_reconstructed} reconstructed; {} extra spawns, {} capture-confirmed",

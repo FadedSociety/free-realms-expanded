@@ -5,12 +5,11 @@
 //! `commit_outcome`, which is where the production save happens
 //! (`src/bin/osfr-gateway.rs`: `outcome.state_changed |= result.changed`, and
 //! `save` only when `state_changed`). Test-only; no production code changes.
-#[path = "fishing_fixtures.rs"]
-#[allow(dead_code)] // the shared fixtures module also ships builders this test does not use
-mod fixtures;
+#[path = "../../../tests/common/round70_content.rs"]
+#[allow(dead_code)] // this test uses the paths, not the fixture builder
+mod round70_content;
 use super::test_support::{self, Scratch};
 use super::*;
-use fixtures::copy_tree;
 use osfr_tools::{
     character_store::CharacterState,
     gameplay::{Gameplay, GameplayState},
@@ -40,21 +39,11 @@ struct Fixture {
 impl Fixture {
     fn new() -> Self {
         let scratch = Scratch::new("f276-field-session");
-        let lab = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
-        let reference = lab.join("references/rust-gateway-reference");
-        let content = scratch.path().join("content");
-        fs::create_dir_all(&content).unwrap();
+        let reference = round70_content::reference();
         // The repo's content fills the files the runtime pack does not ship
         // (zones, NPCs, field actors); the runtime pack then wins for the files
         // both carry (startup, world and encounter content).
-        copy_tree(
-            &PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content"),
-            &content,
-        );
-        copy_tree(
-            &lab.join("reports/round70-native-20261016T061000Z/content"),
-            &content,
-        );
+        let content = test_support::repo_and_runtime_content(&scratch, &round70_content::source());
         // The synthetic population keeps the fight short and the payout fixed.
         fs::write(
             content.join("field_enemies.json"),

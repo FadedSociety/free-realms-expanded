@@ -379,6 +379,33 @@
           "evidence": "(R) Two elite Hooligans (levels 19 and 20) in one group with a 180 s respawn; part of the six-actor/three-group T332 shape. Local progression above the level 13-14 high camps, reusing the shipped 930060 base definition. Count, respawn and rates are local policy, not a recovered 2014 spawn table."
         }
       ]
+    },
+    {
+      "id": "mid_highroad_tent_hooligans",
+      "zone_id": 0,
+      "region": "Highroad outskirts",
+      "respawn_seconds": 90,
+      "aggro_range": 8.0,
+      "level_band": [
+        7,
+        8
+      ],
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "members": [
+        100000004667,
+        100000004675
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "data/content/field_enemies.json mid_highroad_hooligans (same band, respawn, aggro and 12 m leash) and elite_hooligans; notes/Autopilot/T889.md. The two Legacy Highroad spawns 4667 and 4675 are the owner-confirmed Hooligan and Hooligan Archer bodies by the tent near (-2050, 680)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Two always-on hostile Highroad bodies (a Hooligan and a Hooligan Archer) replace their blue passive Legacy copies; level band 7-8 and 90 s respawn as mid_highroad_hooligans. Count, respawn and rates are local policy, not a recovered 2014 spawn table."
+        }
+      ]
     }
   ],
   "enemies": [
@@ -2526,6 +2553,94 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T730: the spot is about 19 m from Pappy Farnum, whose quest asks for it, and 32 m from the Sheep Watch marker (battle 12350), on the standable ground that the T103 disc rule samples (the opening stage 910008's own Gloam Creature placement, encounters.json guid 5715144128442925075, sits 21 m from that marker and so could not be reused). Level 4 (the top of the starter bands: a level 5 band sits 21 m from low-level battle 12350's marker, inside the 40 m clearance), health 100, damage 8, respawn 60 s and aggro 8.0 m are the local balance on the field ladder T699 used, not the opening's scripted 300/35. Present only while quest 3000010 is active. The GUID is a fresh actor id, not the opening actor's. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest, so it cannot be farmed."
+        }
+      ]
+    },
+    {
+      "guid": 100000004667,
+      "definition_id": 930060,
+      "model_id": 518,
+      "name_id": 5100401,
+      "name": "Hooligan",
+      "texture_alias": "",
+      "position": [
+        -2033.0,
+        -34.1,
+        634.0
+      ],
+      "max_health": 180,
+      "damage": 15,
+      "boss": false,
+      "power_up_table": "standard",
+      "quest_ids": [],
+      "level": 7,
+      "spawn_area": {
+        "id": "MID-H3",
+        "centre": [
+          -2033.0,
+          -34.1,
+          634.0
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "reference_spawn_guid": 100000004667,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt: model 518 = human_f_hooligan_brawler_01.agr; lab/reports/locale-id-to-text.json: locale 5100401 = Hooligan. These prove resource identities, not free-field use."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:3301, NPC row 4667, position [-2041.375, -33.63479, 636.6123]; this hostile body replaces that passive copy (same GUID, hidden by the overworld-enemy replacement in Gameplay::load) and stands 8.8 m from it. Position anchor only; no source code or combat rules reused."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T889: the owner saw this Legacy spawn as a blue (friendly) Hooligan that could not be fought, so it is promoted to a hostile always-on body in the mid_highroad_tent_hooligans group. The Legacy spot itself fails the T415 slope check (a hostile camp's 12 m leash must stay under 25 degrees), so the camp stands on the nearest passing ground. T889 reran lab/reports/field-enemies-w102/check_placements.py validate() over lab/terrain/zone_0.hgt for this centre with the group's 12 m leash and 2.5 m reach: height error under 0.051 m, max slope 22.6 deg over every 2 m node of the leash disc, 86.3 m from the nearest NPC body (need 39.5), and a 4-neighbour walk over 2 m nodes with slope <= 25 deg reaches the W102-H1 camp. Level 7 in band 7-8 as the MID-H1/MID-H2 Hooligans beside it; HP/damage are the enemies.json definition 930060 values (180/15); W105 scaling by level produces the live stats. 12 m leash, melee reach and the 90 s group respawn are as mid_highroad_hooligans; count and rates are local policy."
+        }
+      ]
+    },
+    {
+      "guid": 100000004675,
+      "definition_id": 930012,
+      "model_id": 520,
+      "name_id": 5100400,
+      "name": "Hooligan Archer",
+      "texture_alias": "",
+      "position": [
+        -2090.0,
+        -25.9,
+        694.0
+      ],
+      "max_health": 140,
+      "damage": 11,
+      "boss": false,
+      "power_up_table": "standard",
+      "quest_ids": [],
+      "level": 8,
+      "spawn_area": {
+        "id": "MID-H4",
+        "centre": [
+          -2090.0,
+          -25.9,
+          694.0
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "reference_spawn_guid": 100000004675,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt: model 520 = human_m_hooligan_archer_02.agr; lab/reports/locale-id-to-text.json: locale 5100400 = Hooligan Archer. These prove resource identities, not free-field use."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:3309, NPC row 4675, position [-2090.276, -25.88265, 694.5722]; this hostile body replaces that passive copy (same GUID, hidden by the overworld-enemy replacement in Gameplay::load) and stands 0.6 m from it. Position anchor only; no source code or combat rules reused."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T889: the owner saw this Legacy spawn as a blue (friendly) Hooligan Archer that could not be fought, so it is promoted to a hostile always-on body in the mid_highroad_tent_hooligans group. The Legacy spot passes the same check, so the body keeps it to within a metre. T889 reran lab/reports/field-enemies-w102/check_placements.py validate() over lab/terrain/zone_0.hgt for this centre with the group's 12 m leash and 2.5 m reach: height error under 0.051 m, max slope 8.5 deg over every 2 m node of the leash disc, 55.1 m from the nearest NPC body (need 39.5), and a 4-neighbour walk over 2 m nodes with slope <= 25 deg reaches the W102-H1 camp. Level 8 in band 7-8 as the MID-H1/MID-H2 Hooligans beside it; HP/damage are the enemies.json definition 930012 values (140/11); W105 scaling by level produces the live stats. 12 m leash, melee reach and the 90 s group respawn are as mid_highroad_hooligans; count and rates are local policy."
         }
       ]
     }

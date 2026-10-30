@@ -247,6 +247,8 @@ const ELITE_RESPAWN_MS: u64 = 180_000;
 const T699_ACTORS: usize = 15;
 /// T730 appended one more (the Gloam Creature of One More Gloam).
 const T730_ACTORS: usize = 1;
+/// T889 appended the hostile Hooligan and Hooligan Archer of the Highroad tent (one group).
+const T889_ACTORS: usize = 2;
 
 fn shipped_field() -> Value {
     serde_json::from_slice(&fs::read(content_path()).unwrap()).unwrap()
@@ -405,14 +407,18 @@ fn six_elite_camps_load_with_levels_fifteen_to_twenty() {
 
     assert_eq!(
         enemies.len(),
-        49 + T730_ACTORS,
-        "28 pre-T332 + 6 elite actors + 15 T699 and 1 T730 quest targets"
+        49 + T730_ACTORS + T889_ACTORS,
+        "28 pre-T332 + 6 elite actors + 15 T699 and 1 T730 quest targets + 2 T889 tent bodies"
     );
-    assert_eq!(groups.len(), 13, "10 pre-T332 + 3 elite groups");
+    assert_eq!(
+        groups.len(),
+        14,
+        "10 pre-T332 + 3 elite groups + the T889 tent group"
+    );
     assert_eq!(
         engine.field_guids().len(),
-        49 + T730_ACTORS,
-        "the live field vector grows from 28 to 34 + 15 T699 and 1 T730 quest targets"
+        49 + T730_ACTORS + T889_ACTORS,
+        "the live field vector grows from 28 to 34 + 15 T699, 1 T730 quest targets and 2 T889 tent bodies"
     );
     assert_eq!(
         &engine.field_guids()[..EXISTING_ACTORS.len()],
@@ -550,7 +556,11 @@ fn the_elite_camps_spawn_in_on_zone_ready() {
     let mut engine = EngineFixture::shipped().load();
     let out = engine.on_zone_ready(11, 0).unwrap();
     let spawned = spawned(&out);
-    assert_eq!(spawned.len(), 30, "24 pre-T332 always-on + 6 elite actors");
+    assert_eq!(
+        spawned.len(),
+        32,
+        "24 pre-T332 always-on + 6 elite actors + 2 T889 tent bodies"
+    );
     let mut scaled = Vec::new();
     for elite in ELITE {
         assert!(
@@ -900,9 +910,9 @@ fn the_existing_camps_and_wolf_quest_are_unchanged() {
     let groups = field["spawn_groups"].as_array().unwrap();
     assert_eq!(
         enemies.len(),
-        EXISTING_ACTORS.len() + ELITE.len() + T699_ACTORS + T730_ACTORS
+        EXISTING_ACTORS.len() + ELITE.len() + T699_ACTORS + T730_ACTORS + T889_ACTORS
     );
-    assert_eq!(groups.len(), EXISTING_GROUPS.len() + CAMPS.len());
+    assert_eq!(groups.len(), EXISTING_GROUPS.len() + CAMPS.len() + 1);
     assert_eq!(
         enemies[..EXISTING_ACTORS.len()]
             .iter()
@@ -933,12 +943,20 @@ fn the_existing_camps_and_wolf_quest_are_unchanged() {
         "the six ELITE actors are appended"
     );
     assert_eq!(
-        groups[EXISTING_GROUPS.len()..]
+        groups[EXISTING_GROUPS.len()..EXISTING_GROUPS.len() + CAMPS.len()]
             .iter()
             .map(|row| row["id"].as_str().unwrap())
             .collect::<Vec<_>>(),
         CAMPS.iter().map(|camp| camp.id).collect::<Vec<_>>(),
         "the three elite groups are appended"
+    );
+    assert_eq!(
+        groups[EXISTING_GROUPS.len() + CAMPS.len()..]
+            .iter()
+            .map(|row| row["id"].as_str().unwrap())
+            .collect::<Vec<_>>(),
+        ["mid_highroad_tent_hooligans"],
+        "T889 appended the tent group after the elite three"
     );
 
     // Seven always-on definition-3156 wolves are live: three starter, two

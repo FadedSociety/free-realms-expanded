@@ -536,6 +536,11 @@ impl DerbyGateway {
         self.begin_row(character, now_ms, None)
     }
 
+    /// T889: the 41/107 ready for the offer `begin_row` just returned; `None` with no match.
+    pub fn ready_packet(&self) -> Option<Vec<u8>> {
+        self.service.as_ref().map(DerbyService::ready_packet)
+    }
+
     /// Start the named hosted row (`None` is the default row) and return its native 39/16 offer.
     /// The 39/16 game id, the running match and the completion credit all come from this package.
     pub fn begin_row(

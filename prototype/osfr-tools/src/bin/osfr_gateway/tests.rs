@@ -1788,6 +1788,11 @@ mod quest_reward_save_failure;
 #[path = "f276_field_session_save.rs"]
 mod f276_field_session_save;
 
+/// T889: two clients on one gateway: field enemy click, derby trainer, kart race NPC.
+#[cfg(test)]
+#[path = "t889_shared_gateway.rs"]
+mod t889_shared_gateway;
+
 /// L039: a save off the map or deep under the terrain enters at the nearest warpstone.
 #[cfg(test)]
 #[path = "l039_login_pose.rs"]

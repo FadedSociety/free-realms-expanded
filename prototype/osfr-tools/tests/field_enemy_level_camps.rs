@@ -275,8 +275,8 @@ fn four_mid_level_camps_load_with_valid_bands_and_ids() {
         .collect();
     assert_eq!(
         always_on.len(),
-        30,
-        "12 starter + 8 mid-level + 4 high-level + 6 elite always-on actors"
+        32,
+        "12 starter + 8 mid-level + 4 high-level + 6 elite + 2 T889 tent always-on actors"
     );
     assert_eq!(
         spawned, always_on,
@@ -381,13 +381,13 @@ fn the_actor_and_group_counts_stay_inside_the_loader_bounds() {
     let groups = field["spawn_groups"].as_array().unwrap();
     assert_eq!(
         enemies.len(),
-        50,
-        "12 starter + 4 quest-gated + 8 mid-level + 4 high-level + 6 elite actors + 15 T699 and 1 T730 quest targets"
+        52,
+        "12 starter + 4 quest-gated + 8 mid-level + 4 high-level + 6 elite actors + 15 T699 and 1 T730 quest targets + 2 T889 tent bodies"
     );
     assert_eq!(
         groups.len(),
-        13,
-        "four starter + four mid-level + two high-level + three elite groups"
+        14,
+        "four starter + four mid-level + two high-level + three elite + one T889 tent groups"
     );
     assert!(enemies.len() <= 64, "64 actors max");
     assert!(groups.len() <= 64, "64 groups max");
