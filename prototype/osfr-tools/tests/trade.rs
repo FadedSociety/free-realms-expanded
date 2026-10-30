@@ -356,8 +356,9 @@ fn builders_match_native_trade_reader_layouts() {
             .all(|message| message.bytes == [0x3b, 0, 18, session as u8, 0, 0, 0])
     );
     let ended = world.trades.cancel(A, session).unwrap();
-    assert_eq!(ended[0].bytes, [0x3b, 0, 15, 1]);
+    assert_eq!(ended[0].bytes, [0x3b, 0, 15, 7]);
     assert_eq!(ended[1].bytes, [0x3b, 0, 5, session as u8, 0, 0, 0]);
+    assert_eq!(ended[2].bytes, [0x3b, 0, 15, 1]);
 }
 
 #[test]
@@ -722,10 +723,127 @@ fn timeout_closes_active_trade_without_settlement() {
         timeout
             .iter()
             .filter(|message| sub(message) == 15)
-            .all(|message| status(message) == 1)
+            .all(|message| status(message) == 8)
     );
     assert_eq!(state_of(&world, A), &before_a);
     assert_eq!(state_of(&world, B), &before_b);
+}
+
+/// The 59/15 status byte each player gets (by character guid; `world` gives guid `g` session
+/// `g + 1_000`), in send order, from one close (T885).
+fn closing_statuses(messages: &[TradeMessage]) -> Vec<(u64, u8)> {
+    messages
+        .iter()
+        .filter(|message| sub(message) == 15)
+        .map(|message| (message.recipient.0 - 1_000, status(message)))
+        .collect()
+}
+
+/// T885: "<partner> left the game" (2) only when a player really left. Every other close names a
+/// cancel: the canceller reads 7, a partner with an open window reads 1, everything the server
+/// ends while both stay online reads 8 (client status handler `00c6df10` case 15).
+#[test]
+fn cancel_reasons_never_claim_an_online_player_left() {
+    let mut world = world(
+        trade_inventory(state(0, vec![]), 8),
+        trade_inventory(state(0, vec![]), 8),
+    );
+    let session = open(&mut world);
+    let by_b = world.trades.cancel(B, session).unwrap();
+    assert_eq!(closing_statuses(&by_b), [(A, 1), (B, 7)]);
+
+    world
+        .trades
+        .invite(&world.players, &world.social, A, B, 0)
+        .unwrap();
+    let pending = world.trades.session_id_for(A).unwrap();
+    let withdrawn = world.trades.cancel(A, pending).unwrap();
+    assert_eq!(closing_statuses(&withdrawn), [(A, 7), (B, 8)]);
+
+    world
+        .trades
+        .invite(&world.players, &world.social, A, B, 0)
+        .unwrap();
+    let pending = world.trades.session_id_for(A).unwrap();
+    let expired = world.trades.timeout(pending).unwrap();
+    assert_eq!(closing_statuses(&expired), [(A, 8), (B, 8)]);
+
+    world
+        .trades
+        .invite(&world.players, &world.social, A, B, 0)
+        .unwrap();
+    let aged = world.trades.maintain(&world.players, &world.social, 60_000);
+    assert_eq!(closing_statuses(&aged), [(A, 8), (B, 8)]);
+
+    open(&mut world);
+    let battle = world.trades.set_away(A, true);
+    assert_eq!(closing_statuses(&battle), [(A, 8), (B, 8)]);
+    world.trades.set_away(A, false);
+
+    let session = open(&mut world);
+    let stale = world.trades.maintain(&world.players, &world.social, 300_000);
+    assert_eq!(closing_statuses(&stale), [(A, 8), (B, 8)]);
+    assert_eq!(world.trades.session_counter(session), None);
+}
+
+#[test]
+fn failed_commit_reads_as_a_cancel_not_a_partner_cancel() {
+    let mut world = world(
+        trade_inventory(state(10, vec![item(10, 100, 1)]), 8),
+        trade_inventory(state(20, vec![]), 8),
+    );
+    let session = open(&mut world);
+    world
+        .trades
+        .offer_item(&world.players, &world.social, A, session, 10, 1)
+        .unwrap();
+    let counter = world.trades.session_counter(session).unwrap();
+    for guid in [A, B] {
+        world
+            .trades
+            .set_lock(&world.players, &world.social, guid, session, counter, true, 0)
+            .unwrap();
+    }
+    world
+        .trades
+        .accept(&world.players, &world.social, A, session, counter, 10_000)
+        .unwrap();
+    world
+        .trades
+        .accept(&world.players, &world.social, B, session, counter, 10_000)
+        .unwrap();
+    let failed = world.trades.settled(session, false).unwrap();
+    assert_eq!(closing_statuses(&failed), [(A, 8), (B, 8)]);
+}
+
+#[test]
+fn a_real_logout_tells_the_player_still_present_their_partner_left() {
+    let mut world = world(
+        trade_inventory(state(0, vec![]), 8),
+        trade_inventory(state(0, vec![]), 8),
+    );
+    open(&mut world);
+    world.players.leave(SessionId(B + 1_000));
+    world.social.logout(B).unwrap();
+    let left = world.trades.maintain(&world.players, &world.social, 1);
+    assert_eq!(closing_statuses(&left), [(A, 2), (B, 2)]);
+
+    let mut world = world_pair();
+    world
+        .trades
+        .invite(&world.players, &world.social, A, B, 0)
+        .unwrap();
+    world.players.leave(SessionId(B + 1_000));
+    world.social.logout(B).unwrap();
+    let left = world.trades.maintain(&world.players, &world.social, 1);
+    assert_eq!(closing_statuses(&left), [(A, 2), (B, 2)]);
+}
+
+fn world_pair() -> World {
+    world(
+        trade_inventory(state(0, vec![]), 8),
+        trade_inventory(state(0, vec![]), 8),
+    )
 }
 
 #[test]

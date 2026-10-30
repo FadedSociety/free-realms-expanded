@@ -17,8 +17,8 @@ pub(super) fn trade_deliveries(messages: Vec<TradeMessage>) -> Vec<Delivery> {
 }
 
 /// (W163) Keep the trade service's copy of this character's inventory current. A character
-/// whose inventory does not validate is not tradable: it is unregistered, which also ends a
-/// trade it is in.
+/// whose inventory does not validate is not tradable: its trade ends as a plain cancel (the
+/// player is still online, so nobody reads "left the game", T885), then it is unregistered.
 pub(super) fn refresh_trade_player(
     world: &mut SharedWorld,
     session: SessionId,
@@ -39,7 +39,11 @@ pub(super) fn refresh_trade_player(
             // A battle or dungeon run ends a trade and blocks a new one.
             trade_deliveries(world.trades.set_away(guid, gateway.in_encounter()))
         }
-        None => trade_deliveries(world.trades.unregister_player(guid)),
+        None => {
+            let mut ended = world.trades.cancel_for(guid);
+            ended.extend(world.trades.unregister_player(guid));
+            trade_deliveries(ended)
+        }
     }
 }
 

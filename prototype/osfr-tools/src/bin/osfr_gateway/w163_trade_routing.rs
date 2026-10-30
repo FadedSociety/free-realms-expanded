@@ -299,13 +299,14 @@ fn a_full_trade_ends_in_a_settlement_and_cancels_when_the_commit_refuses() {
     assert_eq!(rig.world.trades.inventory(A).unwrap(), &before[0]);
 
     // This rig's sessions hold no live inventory equal to the settlement's `before`, so the
-    // lead's commit refuses: both are told "canceled" (status 1), the window closes (59/5)
-    // and nothing in either inventory changed (the commit's own tests cover success).
+    // lead's commit refuses: both are told "Your trade with <name> has been canceled." (status 8,
+    // T885), the window closes (59/5) and nothing in either inventory changed (the commit's own
+    // tests cover success).
     let end = settle_trades(&mut rig.a, &mut SessionMap::new(), &mut rig.world).unwrap();
     assert_eq!(subs(&end).len(), 4);
     for pair in end.chunks(2) {
         assert_eq!(inner(&pair[0])[2], 15);
-        assert_eq!(inner(&pair[0])[3], 1);
+        assert_eq!(inner(&pair[0])[3], 8);
         assert_eq!(inner(&pair[1])[2], 5);
     }
     assert!(rig.world.trade_settlements.is_empty());

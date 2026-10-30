@@ -1045,7 +1045,8 @@ fn assert_cancelled_clean(
 fn a_client_cancel_closes_both_windows_and_a_replay_does_nothing() {
     let (mut world, id, before) = standing_trade();
     let end = world.send(A, &cancel(id)).unwrap().messages;
-    assert_cancelled_clean(&mut world, &end, [1, 1], &before);
+    // T885: the canceller reads 7, the partner reads 1 ("<name> canceled the trade").
+    assert_cancelled_clean(&mut world, &end, [7, 1], &before);
     assert_eq!(subs(&refused_ok(&mut world, A, &cancel(id))), [5]);
     assert_eq!(subs(&refused_ok(&mut world, B, &accept(id, 1))), [5]);
 }
@@ -1063,7 +1064,7 @@ fn walking_out_of_reach_cancels_with_the_plain_status() {
         .update_pose(sess(B), zone(1), [41.0, 0.0, 0.0], 0.0)
         .unwrap();
     let end = world.maintain();
-    assert_cancelled_clean(&mut world, &end, [1, 1], &before);
+    assert_cancelled_clean(&mut world, &end, [8, 8], &before);
     assert_eq!(subs(&refused_ok(&mut world, B, &accept(id, 1))), [5]);
 }
 
@@ -1075,14 +1076,14 @@ fn zoning_into_another_instance_cancels_and_covers_a_battle_instance() {
         .update_pose(sess(A), zone(9), [0.0, 0.0, 0.0], 0.0)
         .unwrap();
     let end = world.maintain();
-    assert_cancelled_clean(&mut world, &end, [1, 1], &before);
+    assert_cancelled_clean(&mut world, &end, [8, 8], &before);
 }
 
 #[test]
 fn a_battle_the_host_sees_cancels_a_session_and_an_invite() {
     let (mut world, _, before) = standing_trade();
     let end = world.trades.set_away(B, true);
-    assert_cancelled_clean(&mut world, &end, [1, 1], &before);
+    assert_cancelled_clean(&mut world, &end, [8, 8], &before);
     // While away B cannot be invited, cannot invite, and gets no Trade entry.
     assert_eq!(world.invite(A, B), Err(TradeError::PlayerBusy));
     assert_eq!(world.invite(B, A), Err(TradeError::PlayerBusy));
@@ -1104,14 +1105,14 @@ fn a_battle_the_host_sees_cancels_a_session_and_an_invite() {
     let session = world.trades.session_id_for(A).unwrap();
     world.send(B, &reply(session, true)).unwrap();
     let end = world.trades.cancel_for(B);
-    assert_eq!(closes(&end).iter().map(|c| c.1).collect::<Vec<_>>(), [1, 1]);
+    assert_eq!(closes(&end).iter().map(|c| c.1).collect::<Vec<_>>(), [8, 8]);
 }
 
 #[test]
 fn the_plain_cancel_hook_covers_a_session_and_an_invite() {
     let (mut world, _, before) = standing_trade();
     let end = world.trades.cancel_for(B);
-    assert_cancelled_clean(&mut world, &end, [1, 1], &before);
+    assert_cancelled_clean(&mut world, &end, [8, 8], &before);
     // A pending invite: the toast is withdrawn from the invitee (status 2 is what clears it).
     world.invite(A, B).unwrap();
     let end = world.trades.cancel_for(A);
@@ -1160,7 +1161,7 @@ fn expiry_closes_stale_invites_and_sessions_and_the_rules_are_tunable() {
     assert!(world.maintain().is_empty());
     world.now += 1;
     let end = world.maintain();
-    assert_eq!(closes(&end).iter().map(|c| c.1).collect::<Vec<_>>(), [1, 1]);
+    assert_eq!(closes(&end).iter().map(|c| c.1).collect::<Vec<_>>(), [8, 8]);
     assert_eq!(world.trades.session_counter(id), None);
 
     assert!(
@@ -1286,7 +1287,7 @@ fn a_failed_commit_cancels_and_leaves_the_snapshots_alone() {
     let (mut world, id, before) = standing_trade();
     world.lock_and_accept(id).settlement.unwrap();
     let end = world.trades.settled(id, false).unwrap();
-    assert_cancelled_clean(&mut world, &end, [1, 1], &before);
+    assert_cancelled_clean(&mut world, &end, [8, 8], &before);
 }
 
 #[test]

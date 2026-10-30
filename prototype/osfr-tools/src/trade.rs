@@ -71,6 +71,11 @@ pub struct TradeMessage {
     pub bytes: Vec<u8>,
 }
 
+/// The 59/15 status byte picks the closing line the client prints (status handler `00c6df10` case 15,
+/// keys from `CodeStringMappings.txt`): 1 "<partner> canceled the trade", 2 "<partner> left the game",
+/// 7 "Your trade has been canceled.", 8 "Your trade with <partner> has been canceled." 2, 7 and 8 also
+/// withdraw an unanswered invite toast. 7 and 8 are named for instanced zones but read as plain cancels,
+/// so they close every trade that neither player ended by leaving (T885).
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 #[repr(u8)]
 pub enum TradeStatus {
@@ -84,6 +89,11 @@ pub enum TradeStatus {
     YourOfferExceedsPartnerMaxStack = 9,
     PartnerOfferExceedsYourMaxStack = 10,
 }
+
+/// A trade the server ended while both players stayed online: "Your trade with <partner> has been canceled."
+const ENDED: [TradeStatus; 2] = [TradeStatus::PartnerEnteredInstancedZone; 2];
+/// A player really left: the one still present reads "<partner> left the game".
+const GONE: [TradeStatus; 2] = [TradeStatus::PartnerDisconnected; 2];
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum TradeError {
@@ -422,8 +432,8 @@ impl TradeService {
             ]);
         }
         if !self.in_reach(players, from, to) {
-            // The inviter walked away while the toast was open (R): withdraw it.
-            return Ok(self.close_pending(session_id, invite));
+            // The inviter walked away while the toast was open (R): withdraw it; both are online.
+            return Ok(self.close_pending(session_id, invite, ENDED));
         }
 
         let participants = [invite.inviter, invite.invitee];
@@ -680,7 +690,7 @@ impl TradeService {
 
     /// The host's answer for a settlement it was handed: `true` once both saves were committed
     /// together (the cached snapshots take the committed states and both players get status 6
-    /// then 59/5), `false` when nothing was committed (status 1 then 59/5, snapshots untouched).
+    /// then 59/5), `false` when nothing was committed (status 8 then 59/5, snapshots untouched).
     /// Anything that is not a session waiting for this answer changes nothing.
     pub fn settled(
         &mut self,
@@ -699,28 +709,36 @@ impl TradeService {
                 }
             }
         }
-        let status = if committed {
-            TradeStatus::Completed
+        let statuses = if committed {
+            [TradeStatus::Completed; 2]
         } else {
-            TradeStatus::Cancelled
+            ENDED
         };
-        Ok(self.finish(session_id, [status; 2]))
+        Ok(self.finish(session_id, statuses))
     }
 
-    /// Client cancel (sub 7). Active sessions always receive status then end 5.
+    /// Client cancel (sub 7). The canceller reads 7; the partner reads 1 ("<name> canceled the
+    /// trade") for an open window or 8 for an unanswered invite, whose toast must go. Each then gets end 5.
     pub fn cancel(&mut self, guid: u64, session_id: u32) -> Result<Vec<TradeMessage>, TradeError> {
         if let Some(session) = self.sessions.get(&session_id) {
-            session.index(guid)?;
+            let index = session.index(guid)?;
             if session.settlement.is_some() {
                 return Err(TradeError::Settling);
             }
-            return Ok(self.close_active(session_id, [TradeStatus::Cancelled; 2]));
+            let mut statuses = [TradeStatus::Cancelled; 2];
+            statuses[index] = TradeStatus::EnteredInstancedZone;
+            return Ok(self.close_active(session_id, statuses));
         }
         if let Some(invite) = self.pending.get(&session_id).copied() {
-            if guid != invite.inviter && guid != invite.invitee {
+            let mut statuses = ENDED;
+            if guid == invite.inviter {
+                statuses[0] = TradeStatus::EnteredInstancedZone;
+            } else if guid == invite.invitee {
+                statuses[1] = TradeStatus::EnteredInstancedZone;
+            } else {
                 return Err(TradeError::NotParticipant);
             }
-            return Ok(self.close_pending(session_id, invite));
+            return Ok(self.close_pending(session_id, invite, statuses));
         }
         Err(TradeError::UnknownSession)
     }
@@ -740,27 +758,29 @@ impl TradeService {
         }
     }
 
-    /// Cancel whatever `guid` is in, with the plain cancelled status. For events the host sees
-    /// and the registry does not: a battle starting, a mini-game, a zone change.
+    /// Cancel whatever `guid` is in, with status 8 for both. For events the host sees and the
+    /// registry does not: a battle starting, a mini-game, a zone change, an inventory that stopped
+    /// validating. Both players are still online, so neither reads "left the game".
     pub fn cancel_for(&mut self, guid: u64) -> Vec<TradeMessage> {
         let Some(session_id) = self.busy.get(&guid).copied() else {
             return Vec::new();
         };
         match self.pending.get(&session_id).copied() {
-            Some(invite) => self.close_pending(session_id, invite),
-            None => self.close_active(session_id, [TradeStatus::Cancelled; 2]),
+            Some(invite) => self.close_pending(session_id, invite, ENDED),
+            None => self.close_active(session_id, ENDED),
         }
     }
 
-    /// Disconnect cleanup. No inventory changes occur before both accepts commit successfully.
+    /// Disconnect cleanup: the player still present reads status 2, "<partner> left the game".
+    /// No inventory changes occur before both accepts commit successfully.
     pub fn disconnect(&mut self, guid: u64) -> Vec<TradeMessage> {
         let Some(session_id) = self.busy.get(&guid).copied() else {
             return Vec::new();
         };
         if let Some(invite) = self.pending.get(&session_id).copied() {
-            self.close_pending(session_id, invite)
+            self.close_pending(session_id, invite, GONE)
         } else {
-            self.close_active(session_id, [TradeStatus::PartnerDisconnected; 2])
+            self.close_active(session_id, GONE)
         }
     }
 
@@ -811,25 +831,25 @@ impl TradeService {
             } else {
                 return Vec::new();
             };
-            return self.close_pending_with_status(session_id, invite, statuses);
+            return self.close_pending(session_id, invite, statuses);
         }
         Vec::new()
     }
 
-    /// Host-chosen expiry for one invite or session. Active timeout closes with status 1 and end 5.
+    /// Host-chosen expiry for one invite or session: status 8 and end 5 for both.
     pub fn timeout(&mut self, session_id: u32) -> Result<Vec<TradeMessage>, TradeError> {
         if let Some(invite) = self.pending.get(&session_id).copied() {
-            return Ok(self.close_pending(session_id, invite));
+            return Ok(self.close_pending(session_id, invite, ENDED));
         }
         if self.sessions.contains_key(&session_id) {
-            return Ok(self.close_active(session_id, [TradeStatus::Cancelled; 2]));
+            return Ok(self.close_active(session_id, ENDED));
         }
         Err(TradeError::UnknownSession)
     }
 
     /// Housekeeping, safe to call after every routed message and on a timer: closes invites
     /// and sessions whose player left the game (status 2), moved to another zone instance (this
-    /// covers a battle instance), walked out of reach, or ran out of time (status 1 / toast
+    /// covers a battle instance), walked out of reach, or ran out of time (status 8, toast
     /// withdrawn). A session waiting for `settled` is never touched.
     pub fn maintain(
         &mut self,
@@ -841,10 +861,15 @@ impl TradeService {
         let pending: Vec<_> = self.pending.iter().map(|(id, i)| (*id, *i)).collect();
         for (id, invite) in pending {
             let who = [invite.inviter, invite.invitee];
-            if !self.pair_ok(players, social, who)
+            let present = who
+                .iter()
+                .all(|guid| self.online_player(players, social, *guid).is_ok());
+            if !present {
+                out.extend(self.close_pending(id, invite, GONE));
+            } else if !self.pair_ok(players, social, who)
                 || now_ms.saturating_sub(invite.opened_ms) >= self.rules.invite_ttl_ms
             {
-                out.extend(self.close_pending(id, invite));
+                out.extend(self.close_pending(id, invite, ENDED));
             }
         }
         let active: Vec<_> = self
@@ -857,11 +882,11 @@ impl TradeService {
                 .iter()
                 .all(|guid| self.online_player(players, social, *guid).is_ok());
             if !present {
-                out.extend(self.close_active(id, [TradeStatus::PartnerDisconnected; 2]));
+                out.extend(self.close_active(id, GONE));
             } else if !self.pair_ok(players, social, who)
                 || now_ms.saturating_sub(opened_ms) >= self.rules.session_ttl_ms
             {
-                out.extend(self.close_active(id, [TradeStatus::Cancelled; 2]));
+                out.extend(self.close_active(id, ENDED));
             }
         }
         out
@@ -1084,11 +1109,7 @@ impl TradeService {
         out
     }
 
-    fn close_pending(&mut self, session_id: u32, invite: PendingInvite) -> Vec<TradeMessage> {
-        self.close_pending_with_status(session_id, invite, [TradeStatus::PartnerDisconnected; 2])
-    }
-
-    fn close_pending_with_status(
+    fn close_pending(
         &mut self,
         session_id: u32,
         invite: PendingInvite,
