@@ -6,6 +6,10 @@ use world::{InstanceKind, World, WorldError, WorldPose};
 
 #[path = "support/json.rs"]
 mod json;
+#[path = "support/npc_visibility.rs"]
+mod npc_visibility;
+#[path = "support/quest_marker_packets.rs"]
+mod quest_marker_packets;
 
 fn content() -> ContentDb {
     ContentDb::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/world")).unwrap()
@@ -579,4 +583,201 @@ fn shipped_extra_spawns_carry_legacy_skins_and_sanctuary_subtitles() {
             .count()
             >= 58
     );
+}
+
+/// T899: the packets a player at the extras' shared spot is sent, with a presentation table.
+fn drawn_with_presentation(
+    tag: &str,
+    table: serde_json::Value,
+    rows: serde_json::Value,
+) -> Vec<Vec<u8>> {
+    let dir = extras_content(tag, rows);
+    json::write_pretty(&dir.join("npc_presentation.json"), &table);
+    world::NpcVisibility::load(&dir)
+        .unwrap()
+        .update(0, [1.0, 0.0, 1.0])
+        .unwrap()
+}
+
+#[test]
+fn presentation_rows_reach_the_draw_after_the_spawn_and_never_override_the_npc_row() {
+    use quest_marker_packets::{cursors, markers};
+    use serde_json::json;
+    let table = json!({"records": [{
+        "name_string_id": 7001, "cursor_id": 17, "sub_text_name_string_id": 36, "disposition": 0,
+        "notifications": [{"kind": 1, "image_id": 12, "state": 1, "name_id": 7001, "subtext_id": 36}]
+    }]});
+    let packets = drawn_with_presentation(
+        "presentation",
+        table,
+        json!([
+            extra_row(31, json!({"name_string_id": 7001})),
+            // The row's own line under the name and its own notification win.
+            extra_row(
+                32,
+                json!({"name_string_id": 7001, "sub_text_name_string_id": 38093,
+                       "notifications": [{"kind": 6, "image_id": 3, "name_id": 7001}]})
+            ),
+            extra_row(33, json!({"name_string_id": 7002})),
+        ]),
+    );
+    let spawns: Vec<_> = packets
+        .iter()
+        .filter(|packet| packet.starts_with(&[35, 0, 2, 0]))
+        .map(|packet| startup_world::parse_add_npc(packet).unwrap())
+        .collect();
+    let spawn = |guid| spawns.iter().find(|npc| npc.actor_id == guid).unwrap();
+    assert_eq!(
+        (spawn(31).sub_text_name_string_id, spawn(31).disposition),
+        (36, 0)
+    );
+    assert_eq!(spawn(32).sub_text_name_string_id, 38093);
+    assert_eq!(
+        (spawn(33).sub_text_name_string_id, spawn(33).disposition),
+        (-1, 1)
+    );
+
+    let (shown, _) = markers(&packets);
+    let rows_of = |guid| {
+        shown
+            .iter()
+            .filter(move |row| row.guid == guid)
+            .collect::<Vec<_>>()
+    };
+    let shop = rows_of(31);
+    assert_eq!((shop[0].kind, shop[0].image, shop[0].state), (1, 12, 1));
+    assert_eq!(rows_of(32).len(), 1);
+    assert_eq!(rows_of(32)[0].kind, 6);
+    assert!(rows_of(33).is_empty());
+    assert_eq!(
+        cursors(&packets),
+        [(31, Some(17), false), (32, Some(17), false)]
+    );
+    // The cursor follows its actor's spawn and notifications, never precedes them.
+    let at = |prefix: &[u8], guid: u64| {
+        packets.iter().position(|packet| {
+            packet.starts_with(prefix) && packet.windows(8).any(|w| w == guid.to_le_bytes())
+        })
+    };
+    assert!(at(&[35, 0, 2, 0], 31) < at(&[35, 0, 10, 0], 31));
+    assert!(at(&[35, 0, 10, 0], 31) < at(&[35, 0, 12, 0], 31));
+}
+
+#[test]
+fn an_absent_presentation_file_changes_nothing_and_a_bad_row_refuses_the_load() {
+    use serde_json::json;
+    let rows = json!([extra_row(41, json!({"name_string_id": 7001}))]);
+    let dir = extras_content("presentation-absent", rows.clone());
+    let packets = world::NpcVisibility::load(&dir)
+        .unwrap()
+        .update(0, [1.0, 0.0, 1.0])
+        .unwrap();
+    assert!(quest_marker_packets::cursors(&packets).is_empty());
+    assert_eq!(
+        add_npc_of(&dir, 41).sub_text_name_string_id,
+        -1,
+        "no table, no line"
+    );
+
+    for (index, bad) in [
+        json!({"name_string_id": 7001, "cursor_id": 200}),
+        json!({"name_string_id": 7001, "notifications": [{"image_id": 0, "name_id": 1}]}),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let dir = extras_content(&format!("presentation-bad{index}"), rows.clone());
+        json::write_pretty(
+            &dir.join("npc_presentation.json"),
+            &json!({"records": [bad]}),
+        );
+        let error = world::NpcVisibility::load(&dir).err().unwrap();
+        assert_eq!(
+            error.kind(),
+            std::io::ErrorKind::InvalidData,
+            "case {index}"
+        );
+        assert!(error.to_string().contains("7001"), "case {index}: {error}");
+    }
+}
+
+#[test]
+fn shipped_npcs_with_a_presentation_row_are_drawn_with_it() {
+    use quest_marker_packets::{cursors, markers};
+    use serde_json::Value;
+    let content_dir = npc_visibility::content_dir();
+    let table = json::read(&content_dir.join("npc_presentation.json"));
+    let table = table["records"].as_array().unwrap();
+    assert!(table.len() >= 100, "the Sanctuary rows for our name ids");
+    let extras = json::read(&content_dir.join("npc_spawns_extra.json"));
+    let extras = extras["records"].as_array().unwrap();
+    // One drawn extra for each kind of row: a shop marker, a red name, a line under the name.
+    let wanted: [(&str, fn(&Value) -> bool); 3] = [
+        ("shop marker", |row| {
+            row["notifications"]
+                .as_array()
+                .is_some_and(|rows| rows.iter().any(|n| n["kind"] == 1))
+                && !row["cursor_id"].is_null()
+        }),
+        ("hostile name", |row| row["disposition"] == 0),
+        ("line under the name", |row| {
+            !row["sub_text_name_string_id"].is_null()
+        }),
+    ];
+    for (what, pick) in wanted {
+        let (row, extra) = table
+            .iter()
+            .filter(|row| pick(row))
+            .find_map(|row| {
+                let extra = extras.iter().find(|extra| {
+                    extra["name_string_id"] == row["name_string_id"]
+                        && extra["capture_match"].is_null()
+                        && extra["notifications"].is_null()
+                        && extra["sub_text_name_string_id"].is_null()
+                })?;
+                Some((row, extra))
+            })
+            .unwrap_or_else(|| panic!("no drawn extra for a {what} row"));
+        let guid = extra["spawn_guid"].as_u64().unwrap();
+        let position: [f32; 3] = serde_json::from_value(extra["position"].clone()).unwrap();
+        let packets = world::NpcVisibility::load(&content_dir)
+            .unwrap()
+            .update(0, position)
+            .unwrap();
+        let spawn = packets
+            .iter()
+            .filter(|packet| packet.starts_with(&[35, 0, 2, 0]))
+            .filter_map(|packet| startup_world::parse_add_npc(packet).ok())
+            .find(|npc| npc.actor_id == guid)
+            .unwrap_or_else(|| panic!("{what}: {guid} is not drawn"));
+        if let Some(sub_text) = row["sub_text_name_string_id"].as_i64() {
+            assert_eq!(i64::from(spawn.sub_text_name_string_id), sub_text, "{what}");
+        }
+        if let Some(disposition) = row["disposition"].as_i64() {
+            assert_eq!(i64::from(spawn.disposition), disposition, "{what}");
+        }
+        let (shown, _) = markers(&packets);
+        let mine: Vec<_> = shown.iter().filter(|marker| marker.guid == guid).collect();
+        let expected = row["notifications"]
+            .as_array()
+            .map_or(&[][..], Vec::as_slice);
+        assert_eq!(mine.len(), expected.len(), "{what}");
+        for (marker, row) in mine.iter().zip(expected) {
+            assert_eq!(
+                i64::from(marker.kind),
+                row["kind"].as_i64().unwrap(),
+                "{what}"
+            );
+            assert!(
+                marker.image > 0,
+                "{what}: the client skips an image key of 0"
+            );
+        }
+        let cursor = cursors(&packets).into_iter().find(|entry| entry.0 == guid);
+        assert_eq!(
+            cursor.map(|entry| entry.1),
+            row["cursor_id"].as_u64().map(|id| Some(id as u8)),
+            "{what}"
+        );
+    }
 }

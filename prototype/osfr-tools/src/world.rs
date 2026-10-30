@@ -6,6 +6,7 @@
 use crate::{
     content::{ContentDb, Dungeon, NpcSpawn as ContentNpcSpawn, Rotation, Zone},
     npc_notifications::{self, Notification},
+    npc_presentation::{self, Cursor, Presentation},
     startup_messages::{self, ZoneDetails},
     startup_world::{self, NpcSpawn},
     zone_transition::{self, ZoneTransition},
@@ -75,11 +76,14 @@ struct VisibleNpc {
     season: Option<String>,
     /// T555: minimap/overhead notifications sent right after this actor's 35/2.
     notifications: Vec<Notification>,
+    /// T899: the hover cursor sent after the notifications (`npc_presentation.json`).
+    cursor: Option<Cursor>,
 }
 
 impl VisibleNpc {
     /// What a viewer is sent to learn about this actor: its unframed 35/2, then its 35/10 when
-    /// it has notifications (the client skips a 35/10 guid it has not spawned, `00984960`).
+    /// it has notifications (the client skips a 35/10 guid it has not spawned, `00984960`), then
+    /// its 35/12 hover cursor.
     fn draw_packets(&self) -> io::Result<Vec<Vec<u8>>> {
         let mut packets = vec![unframe_tunnel(&startup_world::build_add_npc(&self.spawn))?];
         let rows: Vec<_> = self
@@ -90,6 +94,12 @@ impl VisibleNpc {
         // A row set `encode_add` refuses (too many) is dropped, never sent truncated.
         if !rows.is_empty() {
             packets.extend(npc_notifications::encode_add(&rows));
+        }
+        if let Some(cursor) = self.cursor {
+            packets.push(npc_presentation::encode_cursors(&[(
+                self.spawn.actor_id,
+                cursor,
+            )]));
         }
         Ok(packets)
     }
@@ -439,6 +449,7 @@ impl NpcVisibility {
             season_clock,
             ..Self::default()
         };
+        let presentation = read_presentation(content_dir)?;
         let mut anchors = Vec::new();
         for npc in regional {
             let Some(position) = npc.position.filter(|p| p.iter().all(|v| v.is_finite())) else {
@@ -480,6 +491,8 @@ impl NpcVisibility {
             spawn.rotation = rotation;
             spawn.scale = npc.scale.unwrap_or(1.0);
             result.content_keys.insert(npc.npc_id, npc.npc_id);
+            let mut notifications = Vec::new();
+            let cursor = presentation.apply(&mut spawn, &mut notifications);
             Arc::make_mut(&mut result.by_zone)
                 .entry(OPEN_WORLD_ZONE)
                 .or_default()
@@ -489,7 +502,8 @@ impl NpcVisibility {
                     position,
                     heading: heading.filter(|value| value.is_finite()),
                     season: None,
-                    notifications: Vec::new(),
+                    notifications,
+                    cursor,
                 });
         }
         if anchors.is_empty() {
@@ -546,6 +560,8 @@ impl NpcVisibility {
                 result.content_keys.insert(npc.spawn_guid, content_key);
             }
             let _ = zone_id; // nearest-anchor label kept for diagnostics only
+            let mut notifications = npc.notifications;
+            let cursor = presentation.apply(&mut spawn, &mut notifications);
             Arc::make_mut(&mut result.by_zone)
                 .entry(OPEN_WORLD_ZONE)
                 .or_default()
@@ -555,7 +571,8 @@ impl NpcVisibility {
                     position: npc.position,
                     heading: npc.heading.filter(|value| value.is_finite()),
                     season: npc.season,
-                    notifications: npc.notifications,
+                    notifications,
+                    cursor,
                 });
         }
         let placements = content_dir.join("npc_placements.json");
@@ -701,6 +718,7 @@ impl NpcVisibility {
             // T491: placed and battle actors are never seasonal.
             season: None,
             notifications: Vec::new(),
+            cursor: None,
         });
         npcs.sort_by_key(|npc| npc.spawn.actor_id);
         self.placed.insert(placement.guid);
@@ -791,6 +809,7 @@ impl NpcVisibility {
             // T491: placed and battle actors are never seasonal.
             season: None,
             notifications: Vec::new(),
+            cursor: None,
         });
         npcs.sort_by_key(|npc| npc.spawn.actor_id);
     }
@@ -1102,6 +1121,17 @@ fn distance_squared(left: [f32; 3], right: [f32; 3]) -> f64 {
         .zip(right)
         .map(|(a, b)| f64::from(*a - b).powi(2))
         .sum()
+}
+
+/// T899: `npc_presentation.json`, or an empty table when the content set has none.
+fn read_presentation(content_dir: &Path) -> io::Result<Presentation> {
+    let path = content_dir.join(npc_presentation::CONTENT_FILE);
+    let rows = if path.is_file() {
+        read_rows(&path)?.records
+    } else {
+        Vec::new()
+    };
+    Presentation::new(rows).map_err(|reason| invalid(format!("NPC presentation: {reason}")))
 }
 
 fn read_rows<T: DeserializeOwned>(path: &Path) -> io::Result<Rows<T>> {

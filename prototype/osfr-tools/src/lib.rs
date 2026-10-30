@@ -76,6 +76,7 @@ pub mod net_policy;
 pub mod npc_ambient;
 pub mod npc_interaction;
 pub mod npc_notifications;
+pub mod npc_presentation;
 pub mod obstacles;
 pub mod opening;
 pub mod opening_abilities;

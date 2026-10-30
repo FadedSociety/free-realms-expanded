@@ -61,3 +61,24 @@ pub fn spawn_index(packets: &[Vec<u8>], actor: u64) -> Option<usize> {
             && parse_add_npc(packet).is_ok_and(|npc| npc.actor_id == actor)
     })
 }
+
+/// Every 35/12 `NpcRelevance` entry in `packets`, in order: the actor, its cursor id (`None`
+/// without the has-cursor flag) and the trailing flag. Entry layout from reader `008db5e0`: u64
+/// guid, u8 has-cursor, an i8 id only when set, u8 flag; the count (an i32) comes first.
+pub fn cursors(packets: &[Vec<u8>]) -> Vec<(u64, Option<u8>, bool)> {
+    let mut found = Vec::new();
+    for packet in packets.iter().filter(|p| p.starts_with(&[35, 0, 12, 0])) {
+        let mut at = 8;
+        for _ in 0..word(packet, 4) {
+            let has = packet[at + 8] != 0;
+            found.push((
+                guid(packet, at),
+                has.then(|| packet[at + 9]),
+                packet[at + 9 + usize::from(has)] != 0,
+            ));
+            at += 10 + usize::from(has);
+        }
+        assert_eq!(at, packet.len(), "no bytes left after the entries");
+    }
+    found
+}

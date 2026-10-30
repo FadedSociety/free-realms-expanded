@@ -35,6 +35,7 @@ use crate::{
     abilities::effect_packets::{encode_play_composite_effect, encode_remove_gracefully},
     consumable_effects::{self, Kind, Spec},
     encounter::animation,
+    npc_presentation::{Cursor, encode_cursors},
     players::ZoneInstance,
     power_ups::Rng,
     startup_world::{self, NpcSpawn},
@@ -308,11 +309,8 @@ pub fn roll_excluding(len: usize, last: Option<usize>, seed: u64) -> usize {
 
 /// 35/12 with one entry: the cake's hover cursor. Wire in the module doc.
 fn cursor_relevance(guid: u64, cursor_id: i32) -> Vec<u8> {
-    let mut bytes = vec![35, 0, 12, 0];
-    bytes.extend(1_i32.to_le_bytes());
-    bytes.extend(guid.to_le_bytes());
-    bytes.extend([1, cursor_id as u8, 0]);
-    bytes
+    let id = cursor_id as u8;
+    encode_cursors(&[(guid, Cursor { id, flag: false })])
 }
 
 impl Cake {
