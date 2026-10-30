@@ -1169,6 +1169,11 @@ impl Gateway {
         }
     }
 
+    /// L072: the item catalogue this session's world entry sends (the referee panel lists it).
+    pub fn item_catalogue(&self) -> &[crate::startup_snapshot::ItemDefinitionSnapshot] {
+        &self.startup_snapshot.catalogues.item_definitions
+    }
+
     pub fn role(&self) -> crate::account_store::AccountRole {
         self.role
     }

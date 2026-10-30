@@ -59,7 +59,9 @@ pub fn request(inner: &[u8], _guid: u64) -> io::Result<Option<String>> {
     if r.at != inner.len() {
         return Err(bad());
     }
-    Ok(Some(message))
+    // L072: the referee panel's `!give`, `!godmode` and `!mod` are realm commands under the same
+    // role gate.
+    Ok(Some(crate::gm_panel::alias(&message).unwrap_or(message)))
 }
 
 /// A client local-chat request (15/1) carrying `text`, as the client sends it;

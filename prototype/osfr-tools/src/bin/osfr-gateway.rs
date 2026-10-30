@@ -59,6 +59,8 @@ mod cake_routing;
 mod card_listener;
 #[path = "osfr_gateway/portrait_http.rs"]
 mod portrait_http;
+#[path = "osfr_gateway/gm_panel_routing.rs"]
+mod gm_panel_routing;
 #[path = "osfr_gateway/client_area_routing.rs"]
 mod client_area_routing;
 #[path = "osfr_gateway/moderation.rs"]
@@ -388,6 +390,8 @@ impl Options {
                 "--client-locale" => {
                     let dat = Path::new(&value).join("en_us_data.dat");
                     stock_text = Some(Arc::new(osfr_tools::world_text::stock_hashes(&dat)?));
+                    // L072: names for the referee panel's lists.
+                    osfr_tools::world_text::install_locale(osfr_tools::world_text::locale_rows(&dat)?);
                 }
                 "--terrain" => {
                     terrain = Some(Arc::new(osfr_tools::terrain::Terrain::load(Path::new(
@@ -2197,6 +2201,10 @@ impl Session {
             return self.route_guild(inner, world, now_ms);
         }
         if inner.starts_with(&[15, 0, 1, 0]) {
+            // L072: referee panel lines are never chat.
+            if let Some(deliveries) = gm_panel_routing::route(self, inner, world) {
+                return deliveries;
+            }
             return self.route_typed_chat(inner, world);
         }
         if inner.starts_with(&[67, 0, 2, 0]) || inner.starts_with(&[67, 0, 3, 0]) {

@@ -12,10 +12,11 @@
 //! id is usable when its hash is not already a row in the stock file.
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::HashSet,
+    collections::{HashMap, HashSet},
     fs,
     io::{self, BufRead},
     path::{Path, PathBuf},
+    sync::OnceLock,
 };
 
 /// (R) Authored ids start here, above every stock id (max 5,103,267) and the
@@ -85,6 +86,43 @@ pub fn stock_hashes(dat: &Path) -> io::Result<HashSet<u32>> {
         }
     }
     Ok(hashes)
+}
+
+/// L072: each locale row's text (`hash\ttag\ttext`), keyed by its hash.
+pub fn locale_rows(dat: &Path) -> io::Result<HashMap<u32, String>> {
+    let file = fs::File::open(dat)?;
+    let mut rows = HashMap::new();
+    for line in io::BufReader::new(file).split(b'\n') {
+        let line = line?;
+        let line = line.strip_prefix(b"\xef\xbb\xbf").unwrap_or(&line);
+        let line = line.strip_suffix(b"\r").unwrap_or(line);
+        let mut fields = line.splitn(3, |b| *b == b'\t');
+        let (Some(key), Some(_tag), Some(text)) = (fields.next(), fields.next(), fields.next())
+        else {
+            continue;
+        };
+        if let Some(hash) = std::str::from_utf8(key)
+            .ok()
+            .and_then(|k| k.parse::<u32>().ok())
+        {
+            rows.insert(hash, String::from_utf8_lossy(text).into_owned());
+        }
+    }
+    Ok(rows)
+}
+
+/// The host client's locale text, installed once by the gateway's `--client-locale`.
+// ponytail: one process-wide table set at startup; a field on the gateway options if a process
+// ever needs two locales.
+static LOCALE: OnceLock<HashMap<u32, String>> = OnceLock::new();
+
+pub fn install_locale(rows: HashMap<u32, String>) {
+    let _ = LOCALE.set(rows);
+}
+
+/// The installed locale's text for a text id, if a locale was given and has that row.
+pub fn locale_text(id: i32) -> Option<String> {
+    LOCALE.get()?.get(&locale_hash(id)).cloned()
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]

@@ -36,6 +36,7 @@ pub mod game_rules;
 pub mod game_store;
 pub mod gameplay;
 pub mod gateway;
+pub mod gm_panel;
 pub mod guilds;
 pub mod harvesting;
 mod hash;
