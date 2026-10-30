@@ -50,7 +50,7 @@ This repository is going public: everything committed here is published, history
 - personal emails or names, or absolute home paths (write repo-relative paths);
 - anything from `../lab`, as files or as prose copied from the wiki, article and forum research: carry ids, numbers and dates with a citation;
 - client binaries, packs, extracted assets, game screenshots or decompiler output (cite the client function name and address instead);
-- code or test fixtures copied from AGPL projects (Sanctuary, FreeRealms-Legacy);
+- code from Sanctuary or FreeRealms-Legacy without credit: adapting it is allowed since the 2026-10-29 move to AGPL-3.0-or-later, but each adapted file says so in a header (project, file, licence) and NOTICE lists the project;
 - build output, logs, scratch scripts, or any file over 10 MB.
 
 Before each push the lead runs the upload gate (`../lab/autopilot/publish-check.sh`) over every new commit. Players supply their own game client; release downloads carry only our server builds and content.

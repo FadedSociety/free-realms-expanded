@@ -1,9 +1,11 @@
 Free Realms Expanded
 Copyright (c) 2026 FadedSociety and the Free Realms Expanded contributors
 
-Our code, tools, scripts, tests and notes are dual-licensed under the MIT License (LICENSE-MIT) or the
-Apache License 2.0 (LICENSE-APACHE), at your option. Use them for anything, as long as the copyright notice
-and licence text come along (that is the credit).
+Our code, tools, scripts, tests and notes are licensed under the GNU Affero General Public License, version 3
+or (at your option) any later version (AGPL-3.0-or-later; full text in LICENSE). You may use, change and share
+them; anything you build from them, including a modified server that players connect to, must be offered to its
+users under the same licence with its source. Until 2026-10-29 the project was MIT OR Apache-2.0; it moved to
+AGPL so it can build on the community server projects below with credit.
 
 Not covered by our licence (it stays under its own terms):
 
@@ -11,14 +13,16 @@ Not covered by our licence (it stays under its own terms):
   some notes quote item names, dialog and quest text taken from the client's data files so the original client
   can talk to this server. That material belongs to its owners (Daybreak Game Company / Sony Online
   Entertainment). Free Realms is their trademark. This project is unofficial and non-commercial.
-- Data rows derived from the community server projects Sanctuary and FreeRealms-Legacy. Each such row names its
-  source in its provenance fields, and keeps that project's licence (AGPL-3.0).
+- Code and data adapted from the community server projects Sanctuary and FreeRealms-Legacy (AGPL-3.0). Their
+  copyright stays with their contributors; files and rows that adapt them say so in a header or provenance field
+  and are distributed under AGPL-3.0 with the rest of this project.
 - Text and facts collected from the Free Realms Wiki on Fandom, available under CC BY-SA 3.0. Rows that use it
   cite the wiki page.
 
 Credits
 
-- Sanctuary and FreeRealms-Legacy, the community Free Realms server projects, read as references.
+- Sanctuary (Open-Source-Free-Realms) and FreeRealms-Legacy, the community Free Realms server projects: read as
+  references, and code adapted from them with credit (AGPL-3.0).
 - FreeRealmsLocaleTools, used to build the client's text packs.
 - fr-adr-toolkit, used to check our reading of the client's actor and model files.
 - The Free Realms Wiki on Fandom and its editors.

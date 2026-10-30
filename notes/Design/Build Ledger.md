@@ -140,7 +140,7 @@ Dates on "Tests only" rows are the commit dates of the task that routed the syst
 | Content checker, asset index and graph | Built and used | `scripts/content_check.py --strict` | 0 errors was the standard at the last batch (not re-run for this refresh). The asset graph is private. |
 | Debug harness (trace, Lua probe, Frida hooks, real-client driver) | Seen working (carried; used on every run since 2026-10-20) | [[Design/Debug Harness]]; `scripts/native_hook.py`, `run-local-baseline.py`, `drive-local-game.py` | A Frida exception logger (a private native-lane script) caught the Inspect crash on 2026-10-21; `native_hook.py` itself does not cover exceptions (unverified at this tip). |
 | Native function map | Mostly done, paused; the last recorded figure is 830 of 901 shards accepted (2026-10-16), unverified since | `scripts/native_map/`; [[Native Map/Native Map]] | The front page of the map note still shows the 2026-10-12 coverage. IDA cross-check of accepted shards: 99.5 % exact boundaries (2026-10-16). |
-| Version control | In place | Public GitHub repo `FadedSociety/free-realms-expanded`; MIT or Apache-2.0 for our code and notes, `NOTICE` for third-party terms (L066) | Never commit `lab/`, saves, keys, client files or decompiler output (`AGENTS.md`). |
+| Version control | In place | Public GitHub repo `FadedSociety/free-realms-expanded`; AGPL-3.0-or-later for our code and notes since 2026-10-29 (was MIT or Apache-2.0), `NOTICE` for third-party terms (L066) | Never commit `lab/`, saves, keys, client files or decompiler output (`AGENTS.md`). |
 
 ## Not routed, not built or waiting
 

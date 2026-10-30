@@ -46,7 +46,7 @@ You and about 10 friends log into our server from your own PCs and play together
 
 - [x] Audit the true state and write the [[Build Ledger]] (2026-10-15), refreshed 2026-10-17 and 2026-10-27.
 - [x] This plan, and the [[Build Playbook]] (2026-10-18): the enforced rules, the spine ratchet, the deletion phase (D001 to D010, merged 2026-10-18 to 10-20) and dormancy slice 1.
-- [x] **Version control** (2026-10-15), and the move to a **public** repository (2026-10-26: publishing rules L064, README and ROADMAP L065, MIT or Apache-2.0 plus `NOTICE` L066, launcher split out L067).
+- [x] **Version control** (2026-10-15), and the move to a **public** repository (2026-10-26: publishing rules L064, README and ROADMAP L065, MIT or Apache-2.0 plus `NOTICE` L066, AGPL-3.0-or-later since 2026-10-29 L069, launcher split out L067).
 - [x] **Code memory** (codebase-memory graph, re-indexed after every integration) and the worker preamble.
 - [x] **Stale notes brought up to date** (2026-10-15 to 10-27): `AGENTS.md`, [[Project Map]], the Ledger and this plan.
 

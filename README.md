@@ -167,7 +167,7 @@ A few things to know:
 Free Realms Expanded stands on the work of the Free Realms community.
 
 - **Sanctuary**, the community Free Realms server project. We read it as a reference, and some data rows derive from it.
-- **FreeRealms-Legacy**, the community Free Realms server project. We read it as a reference, and some data rows derive from it. (Sanctuary and FreeRealms-Legacy are AGPL-licensed.)
+- **FreeRealms-Legacy**, the community Free Realms server project. We read it as a reference and adapt code and data from it with credit. (Sanctuary and FreeRealms-Legacy are AGPL-licensed, like this project.)
 - **FreeRealmsLocaleTools**, community tools for the client's locale files, which we use unchanged to build text packs.
 - **fr-adr-toolkit**, community tools for the client's actor and model files, used to check our asset reading.
 - **The Free Realms Wiki on Fandom.** Some prices, quest facts and achievement text were collected from it. Its text is available under CC BY-SA.
@@ -176,7 +176,7 @@ Thank you to everyone who kept the game alive after 2014.
 
 ## Licence
 
-Our code, tools and notes are dual-licensed under [MIT](LICENSE-MIT) or [Apache 2.0](LICENSE-APACHE), at your option. Use them for anything you like, as long as the credit (the copyright notice and licence text) comes along. Game text and data from the original client, data rows derived from community projects, and wiki text keep their own terms; [NOTICE](NOTICE) lists what those are.
+Our code, tools and notes are licensed under the [GNU AGPL v3 or later](LICENSE). Use, change and share them freely; anything built from them, including a modified server people play on, must stay open under the same licence with its source. Game text and data from the original client, data rows derived from community projects, and wiki text keep their own terms; [NOTICE](NOTICE) lists what those are.
 
 ## Legal
 
