@@ -978,11 +978,13 @@ fn the_existing_greetings_and_other_regions_are_unchanged() {
             panic!("{path} changed: the change under test is not readable JSON");
         };
         let working_tree = base == ChangeBase::WorkingTree;
+        // A greeting-only edit is allowed in both bases: each foreign region's
+        // own greeting suite pins its bindings, so a committed binding slice
+        // (T894) must not trip this guard once the integrator commits it.
         assert!(
             is_quest_binding_change_between(path, &old, &new)
-                || (working_tree
-                    && (is_greeting_only_change_between(&old, &new)
-                        || is_quest_binding_and_greeting_change_between(&old, &new))),
+                || is_greeting_only_change_between(&old, &new)
+                || (working_tree && is_quest_binding_and_greeting_change_between(&old, &new)),
             "{path} changed: this slice owns only merry_vale.json and stillwater_crossing.json"
         );
     }

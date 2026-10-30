@@ -159,6 +159,9 @@ const T246_GREETINGS: [(&str, u64, u32); 8] = [
     ("highroad_junction.json", 9000000019, 431140),
 ];
 
+/// Bound after this suite was written (T894 Sammy "The Shark"); expected, not a regression.
+const LATER_GREETINGS: [(&str, u64, u32); 1] = [("highroad_junction.json", 9500000337, 436638)];
+
 /// The 19 W126 bindings across the NPC content; this slice must not touch one.
 const W126_GREETINGS: [(&str, u64, u32); 19] = [
     ("cobblestone_village.json", 9000000021, 4420092),
@@ -706,6 +709,7 @@ fn the_t246_rows_and_all_other_regions_are_unchanged() {
     let pinned: BTreeMap<(String, u64), u32> = T246_GREETINGS
         .iter()
         .chain(W126_GREETINGS.iter())
+        .chain(LATER_GREETINGS.iter())
         .map(|(file, npc_id, greeting)| ((file.to_string(), *npc_id), *greeting))
         .collect();
     for (file, expected_rows) in [

@@ -27038,8 +27038,19 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.427591, quest-lines index strings row (quest_dialog). Speaker proof: first-person apology addressed to Arianna; the next client row 427592 is the reply addressed to Rylan by name, and the row before the pair, 427589, is his npc_name."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T894: the reunion-scene line is used as the fixed Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
-      }
+      },
+      "greeting_string_id": 427591
     },
     {
       "npc_id": 9500000423,

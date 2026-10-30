@@ -43304,8 +43304,19 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.70733, quest-lines index strings row (npc_dialog, hint Tooga). Speaker proof: first-person amnesia line that says his own name is Tooga; 71856 is a third-person line asking where Tooga is and is not his."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T894: use this verified speaker's line as the fixed Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
-      }
+      },
+      "greeting_string_id": 70733
     },
     {
       "npc_id": 9500000954,

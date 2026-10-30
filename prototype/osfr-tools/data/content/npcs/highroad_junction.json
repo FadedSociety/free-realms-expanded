@@ -9303,8 +9303,19 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.436638, quest-lines index strings row. Block 436624-436650 pairs seven pitch NPCs (436624-436630, Sammy first) with seven activity names (436631-436637) and seven first-person pitches (436638, 436640 ... 436650) in the same order; the last two pitches (pirate talk, chef talk) match the last two names."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T894: speaker pairing is by block order, not by a tagged speaker; this is the first pitch (Trading Card Game). Original server greeting/phase binding is not recovered."
+          }
         ]
-      }
+      },
+      "greeting_string_id": 436638
     },
     {
       "npc_id": 9500000338,

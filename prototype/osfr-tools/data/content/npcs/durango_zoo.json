@@ -323,8 +323,19 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.116073, quest-lines index strings row (quest_dialog, quest title 116067 Glenn's Gone). Speaker proof: first-person line of the lost field-trip kid (frog daydream, forgot his class); 116066 and 116081 are Nugglewug's lines, not his."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T894: the found-Glenn line is the fixed Talk greeting; the row is mentioned_only with an unanchored placeholder position, so nothing draws it yet."
+          }
         ]
-      }
+      },
+      "greeting_string_id": 116073
     },
     {
       "npc_id": 9500000258,

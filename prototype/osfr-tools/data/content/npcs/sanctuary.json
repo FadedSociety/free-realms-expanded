@@ -413,8 +413,19 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.5102533, quest-lines index strings row (npc_dialog, hint Abacus Coinmiser). Speaker proof: the eight rows 5102533-5102540 are one first-person idle monologue by this named NPC (npc_name 5102532 precedes them)."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T894: the first line of the idle sequence is the fixed Talk greeting; whether the original cycled the other seven (5102534-5102540) is not recovered. The row's presence is retired (wiki: no longer in-game)."
+          }
         ]
-      }
+      },
+      "greeting_string_id": 5102533
     },
     {
       "npc_id": 9500000436,

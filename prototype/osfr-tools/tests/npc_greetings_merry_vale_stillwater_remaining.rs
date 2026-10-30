@@ -422,6 +422,9 @@ fn quoted_locale_line(evidence: &str) -> &str {
     &evidence[start..end]
 }
 
+/// Bound after T316 (T894 Rylan, an undrawn row); expected in the owned files.
+const LATER_BOUND: [(u64, &str); 1] = [(9500000422, "merry_vale.json")];
+
 fn known_bound() -> BTreeSet<(String, u64)> {
     NEW_GREETINGS
         .iter()
@@ -435,6 +438,11 @@ fn known_bound() -> BTreeSet<(String, u64)> {
             OWNED_PRE_EXISTING
                 .iter()
                 .map(|(npc_id, file, _)| ((*file).to_owned(), *npc_id)),
+        )
+        .chain(
+            LATER_BOUND
+                .iter()
+                .map(|(npc_id, file)| ((*file).to_owned(), *npc_id)),
         )
         .collect()
 }

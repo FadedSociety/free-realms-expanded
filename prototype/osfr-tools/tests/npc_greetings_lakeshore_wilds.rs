@@ -247,9 +247,10 @@ const EXISTING_GREETINGS: [(&str, u64, u32); 19] = [
     ("merry_vale.json", 9500000430, 41268),
 ];
 
-/// Bindings added after this suite was written (T378, T369). They are expected
+/// Bindings added after this suite was written (T378, T369, T894 Tooga). They are expected
 /// in the two owned files, not a T298 regression.
-const LATER_GREETINGS: [(&str, u64, u32); 3] = [
+const LATER_GREETINGS: [(&str, u64, u32); 4] = [
+    ("wilds.json", 9500000953, 70733),
     ("wilds.json", 9500000941, 94519),
     ("wilds.json", 9000000289, 393376),
     ("wilds.json", 9000000295, 395495),

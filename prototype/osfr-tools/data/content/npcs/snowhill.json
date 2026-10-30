@@ -4589,11 +4589,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2292; src/Resources/Npcs.json Id=3549 (ModelId=20, ModelFileName=human_rockstar_m.adr, NameId=201)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.4419632, quest-lines index strings row (npc_dialog, hint Bruce). Speaker proof: first-person music-block promo that names itself as Bruce."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T894: use this verified speaker's promo as the fixed Talk greeting; the reply row 4419633 is not wired and the original server greeting/phase binding is not recovered."
+          }
         ]
       },
       "heading": -0.568856,
       "model_id": 20,
-      "model_file_name": "human_rockstar_m.adr"
+      "model_file_name": "human_rockstar_m.adr",
+      "greeting_string_id": 4419632
     },
     {
       "npc_id": 9000000034,
@@ -32234,9 +32245,20 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3988 spawnNpcWithGuid(33824); src/Resources/Npcs.json Id=33824"
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.432172, quest-lines index strings row (npc_dialog, hint Roland Sporeling). Speaker proof: first-person racetrack boast in the 432170-432172 block (npc_name 432170, sub text 432171)."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T894: use this verified speaker's line as the fixed Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
-      "heading": -0.266676996
+      "heading": -0.266676996,
+      "greeting_string_id": 432172
     },
     {
       "npc_id": 9500000765,

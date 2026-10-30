@@ -232,7 +232,8 @@ const PRE_EXISTING: [(u64, u32); 11] = [
 /// T378 bindings recovered after T280. They are expected in `sanctuary.json`,
 /// not a T280 regression. T546 bound Kellin Warpwatcher's Snowhill Warp Tests
 /// offer line (`tests/npc_greetings_warpwatchers.rs`).
-const LATER_GREETINGS: [(u64, u32); 3] = [
+const LATER_GREETINGS: [(u64, u32); 4] = [
+    (9500000435, 5102533), // T894 Abacus Coinmiser
     (9000000330, 90621),
     (9500000488, 415317),
     (9500000502, 385689),

@@ -238,7 +238,9 @@ const TARGETS: [Target; 20] = [
 /// The W126/T246 bindings that this slice must not touch, plus the three T378
 /// Snowhill bindings recovered after this suite was written and T546's Vaelen
 /// Warpwatcher binding (`tests/npc_greetings_warpwatchers.rs`).
-const EXISTING_GREETINGS: [(&str, u64, u32); 23] = [
+const EXISTING_GREETINGS: [(&str, u64, u32); 25] = [
+    ("snowhill.json", 9500000729, 4419632), // T894, bound after this suite
+    ("snowhill.json", 9500000764, 432172),  // T894 Roland Sporeling
     ("cobblestone_village.json", 9000000021, 4420092),
     ("cobblestone_village.json", 9000000120, 94293),
     ("cobblestone_village.json", 9000000121, 94297),
