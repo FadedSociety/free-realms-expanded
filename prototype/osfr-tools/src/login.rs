@@ -171,9 +171,15 @@ impl LoginService {
     pub fn new(resources: Resources, config: LoginConfig) -> io::Result<Self> {
         identity::load(&config.identity_file)?;
         let address: std::net::SocketAddr = config.gateway_address.parse().map_err(invalid)?;
-        // L053: loopback, or a private-network/VPN gateway (Security Model decision 2); never public.
-        // The osfr-login binary admits a private one only with --allow-lan.
-        if !crate::net_policy::allowed(address.ip(), true)
+        // L053 allowed only a loopback or private/VPN gateway. L075 hosting hands outside players the
+        // realm's public --advertise address, which osfr-login validates at startup (needs
+        // --allow-public; never wildcard, loopback or multicast), so any unicast gateway is accepted
+        // here (L076): refusing it failed every remote player's login session. Never the wildcard,
+        // multicast or broadcast address.
+        let ip = address.ip();
+        if ip.is_unspecified()
+            || ip.is_multicast()
+            || ip == std::net::IpAddr::from([255, 255, 255, 255])
             || config.local_session.is_empty()
             || config.local_session.len() > 1024
             || !config.gateway_ticket.is_ascii()

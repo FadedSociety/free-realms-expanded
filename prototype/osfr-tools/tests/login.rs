@@ -1195,3 +1195,33 @@ fn private_actual_native_creation_resolves_against_supplied_resources() {
     }
     assert_eq!(creations, 1);
 }
+
+#[test]
+fn a_port_forwarded_realm_hands_outside_players_its_public_gateway() {
+    // L076: v0.1.4 refused the --advertise address here, so every remote player's session failed.
+    let t = Temp::new();
+    let config = |gateway: &str| LoginConfig {
+        identity_file: t.0.join("identity.json"),
+        legacy_save_file: t.0.join("state.json"),
+        account_store_file: t.0.join("accounts.json"),
+        gateway_address: gateway.into(),
+        local_session: "synthetic-session".into(),
+        gateway_ticket: "synthetic-ticket".into(),
+        handoff_key: b"synthetic-handoff-key".to_vec(),
+        max_characters: 6,
+        underage: false,
+        open_chat: true,
+    };
+    for gateway in ["203.0.113.7:20041", "192.168.1.20:20041", "127.0.0.1:20041"] {
+        assert!(
+            LoginService::new(resources(&t), config(gateway)).is_ok(),
+            "{gateway}"
+        );
+    }
+    for gateway in ["0.0.0.0:20041", "224.0.0.1:20041", "255.255.255.255:20041"] {
+        assert!(
+            LoginService::new(resources(&t), config(gateway)).is_err(),
+            "{gateway}"
+        );
+    }
+}
