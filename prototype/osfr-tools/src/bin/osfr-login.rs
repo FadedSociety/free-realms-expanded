@@ -15,6 +15,7 @@ use osfr_tools::{
     },
     soe_send::{ReliableSender, SendError, SenderConfig},
 };
+use ed25519_dalek::{Signer, SigningKey};
 use serde_json::json;
 use std::{
     collections::{BTreeSet, HashMap},
@@ -54,6 +55,9 @@ struct Options {
     open_enrollment: bool,
     enroll_handles: Option<BTreeSet<String>>,
     max_accounts: usize,
+    /// L077: the realm's listing key (a 32-byte Ed25519 seed); the broker then proves the realm to the
+    /// server browser directory (AUTH2 type 3). Without it the broker refuses listing checks.
+    listing_key_file: Option<PathBuf>,
 }
 impl Options {
     fn parse() -> Result<Self, Box<dyn std::error::Error>> {
@@ -68,6 +72,7 @@ impl Options {
             mut handoff_key_file,
             mut gateway,
         ) = (None, None, None, None, None, None, None);
+        let mut listing_key_file = None;
         let (mut session, mut ticket, mut seconds, mut trace_file) = (
             "local-session".to_owned(),
             login::DEFAULT_GATEWAY_TICKET.to_owned(),
@@ -105,6 +110,7 @@ impl Options {
                 "--handoff-key-file" => handoff_key_file = Some(PathBuf::from(value)),
                 "--gateway" => gateway = Some(value),
                 "--advertise" => advertise = Some(value),
+                "--listing-key-file" => listing_key_file = Some(PathBuf::from(value)),
                 "--session" => session = value,
                 "--ticket" => ticket = value,
                 "--max-characters" => max_characters = value.parse()?,
@@ -198,6 +204,7 @@ impl Options {
             allow_lan,
             authenticated,
             auth_bind,
+            listing_key_file,
             server_id,
             open_enrollment,
             enroll_handles,
@@ -252,6 +259,8 @@ struct Broker {
     enrollment: Option<Enrollment>,
     /// (R) Claims per address: 3 an hour, so one peer cannot fill the account cap.
     claims: IpLimiter,
+    /// L077: signs listing checks for the server browser directory.
+    listing: Option<SigningKey>,
 }
 
 impl Broker {
@@ -288,6 +297,14 @@ impl Broker {
                 },
             }),
             claims: IpLimiter::new(3.0 / 3600.0, 3.0, 1024),
+            listing: match &options.listing_key_file {
+                Some(path) => Some(SigningKey::from_bytes(
+                    &fs::read(path)?
+                        .try_into()
+                        .map_err(|_| io::Error::other("listing key must be 32 bytes"))?,
+                )),
+                None => None,
+            },
         })
     }
 
@@ -366,6 +383,12 @@ impl Broker {
                             return None;
                         }
                     }
+                }
+                // L077: the directory's listing check: sign its nonce with the listing key.
+                3 => {
+                    let nonce = body.get(6..38).filter(|_| body.len() == 38)?;
+                    let key = self.listing.as_ref()?;
+                    reply[1..65].copy_from_slice(&listing_proof(key, &self.server_id, nonce));
                 }
                 _ => return None,
             }
@@ -1060,9 +1083,32 @@ fn gateway_for(gateway: &str, advertise: Option<&str>, peer: IpAddr) -> String {
     }
 }
 
+/// L077: the server browser directory's proof that this machine runs the realm it lists. The domain tag
+/// keeps the signature out of every other use of the key.
+fn listing_proof(key: &SigningKey, server_id: &[u8; 32], nonce: &[u8]) -> [u8; 64] {
+    let mut message = b"osfr-listing-v1".to_vec();
+    message.extend(server_id);
+    message.extend(nonce);
+    key.sign(&message).to_bytes()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_listing_proof_verifies_for_its_server_id_and_nonce_only() {
+        use ed25519_dalek::Verifier;
+        let key = SigningKey::from_bytes(&[7; 32]);
+        let (server_id, nonce) = ([3; 32], [9; 32]);
+        let proof = ed25519_dalek::Signature::from_bytes(&listing_proof(&key, &server_id, &nonce));
+        let mut message = b"osfr-listing-v1".to_vec();
+        message.extend(server_id);
+        message.extend(nonce);
+        assert!(key.verifying_key().verify(&message, &proof).is_ok());
+        message[20] ^= 1;
+        assert!(key.verifying_key().verify(&message, &proof).is_err());
+    }
 
     #[test]
     fn a_port_forwarded_realm_hands_outsiders_the_public_gateway_and_itself_loopback() {
