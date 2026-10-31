@@ -546,3 +546,179 @@ fn l043_player_builder_and_unaudited_moves_are_refused_without_effect() {
     );
     assert_eq!(fs::read(rig.save_path("Bravo")).unwrap(), saved);
 }
+
+/// L081: what `first` got back since the last read: the 26/9 wheel row ids and system lines.
+fn read(rig: &mut Rig, first: &str) -> (Vec<i32>, Vec<String>) {
+    let (mut ids, mut lines) = (Vec::new(), Vec::new());
+    for message in rig.drain(rig.guid(first)) {
+        let Some(body) = message.get(7..) else {
+            continue;
+        };
+        let at = |offset: usize| i32::from_le_bytes(body[offset..offset + 4].try_into().unwrap());
+        if body.starts_with(&[26, 0, 9, 0]) {
+            ids = (0..at(13) as usize).map(|row| at(17 + row * 28)).collect();
+        } else if body.starts_with(&[15, 0, 3, 0]) {
+            lines.push(String::from_utf8(body[8..8 + at(4) as usize].to_vec()).unwrap());
+        }
+    }
+    (ids, lines)
+}
+
+fn send(rig: &mut Rig, first: &str, inner: &[u8], now: &mut u64) -> (Vec<i32>, Vec<String>) {
+    *now += 100;
+    // The account action budget (5/s, burst 10) runs on the real clock; refill it per step.
+    rig.server.world.security.lock().unwrap().budgets = Default::default();
+    rig.dispatch(rig.guid(first), &wrap_application(inner), *now)
+        .unwrap();
+    read(rig, first)
+}
+
+/// Alpha opens Bravo's wheel and picks `ids` in order; what the last step got back.
+fn gm(rig: &mut Rig, now: &mut u64, ids: &[i32]) -> (Vec<i32>, Vec<String>) {
+    let (alpha, bravo) = (rig.guid("Alpha"), rig.guid("Bravo"));
+    let select = [
+        &[26, 0, 19, 0][..],
+        &alpha.to_le_bytes(),
+        &bravo.to_le_bytes(),
+    ]
+    .concat();
+    let mut last = send(rig, "Alpha", &select, now);
+    for id in ids {
+        let choice = [&[26, 0, 10, 0][..], &bravo.to_le_bytes(), &id.to_le_bytes()].concat();
+        last = send(rig, "Alpha", &choice, now);
+    }
+    last
+}
+
+/// L081: the admin GM wheel through the production path. Only an admin's wheel on another
+/// player carries the GM entry; its pages open in place; a chosen mute, coin gift, summon, go-to
+/// and role land through the rules their chat commands use.
+#[test]
+fn l081_gm_wheel_mutes_gifts_moves_and_sets_a_role() {
+    if !test_support::bin_test_target("l081") {
+        return;
+    }
+    let mut rig = Rig::new(
+        "l081-wheel",
+        &[
+            ("Alpha", AccountRole::Admin),
+            ("Bravo", AccountRole::Player),
+        ],
+        true,
+    );
+    rig.login("Alpha", true);
+    rig.login("Bravo", true);
+    let (alpha, bravo) = (rig.guid("Alpha"), rig.guid("Bravo"));
+    let bravo_account = AccountStore::load(&rig.accounts)
+        .unwrap()
+        .character(bravo)
+        .unwrap()
+        .owner_account_id;
+    let mut now = 2_000;
+
+    let select = [
+        &[26, 0, 19, 0][..],
+        &bravo.to_le_bytes(),
+        &alpha.to_le_bytes(),
+    ]
+    .concat();
+    let (wheel, _) = send(&mut rig, "Bravo", &select, &mut now);
+    assert!(
+        !wheel.contains(&1100),
+        "a player's wheel has no GM entry: {wheel:?}"
+    );
+    assert!(gm(&mut rig, &mut now, &[]).0.contains(&1100));
+    assert_eq!(
+        gm(&mut rig, &mut now, &[1100]).0,
+        (1101..=1108).collect::<Vec<_>>()
+    );
+    assert_eq!(
+        gm(&mut rig, &mut now, &[1100, 1101]).0,
+        [1111, 1112, 1113, 1119]
+    );
+
+    let (_, lines) = gm(&mut rig, &mut now, &[1100, 1101, 1111]);
+    assert!(lines.iter().any(|l| l == "Player muted."), "{lines:?}");
+    let store = AccountStore::load(&rig.accounts).unwrap();
+    assert!(
+        store
+            .sanctions(bravo_account)
+            .muted(osfr_tools::moderation::unix_now())
+    );
+
+    let coins =
+        |rig: &Rig| rig.session(bravo).gateway.gameplay_summary().unwrap()["coins"].as_u64();
+    let before = coins(&rig).unwrap();
+    read(&mut rig, "Bravo");
+    assert_eq!(
+        gm(&mut rig, &mut now, &[1100, 1104]).0,
+        [1131, 1132, 1133, 1134, 1139]
+    );
+    let (_, lines) = gm(&mut rig, &mut now, &[1100, 1104, 1131]);
+    assert!(lines.iter().any(|l| l == "Gift sent."), "{lines:?}");
+    assert_eq!(coins(&rig), Some(before + 1_000));
+    let (_, told) = read(&mut rig, "Bravo");
+    assert!(
+        told.iter().any(|l| l == "A GM gave you 1000 coins."),
+        "{told:?}"
+    );
+
+    // Summon: Bravo is moved off first, then the wheel brings it to Alpha.
+    let here = rig.session(alpha).gateway.state().position;
+    let away = [here[0] + 7.0, here[1] + 1.0, here[2] - 3.0];
+    let text = format!("realm move {bravo} {} {} {}", away[0], away[1], away[2]);
+    let request = osfr_tools::chat::local_request(&text);
+    send(&mut rig, "Alpha", &request, &mut now);
+    assert_eq!(rig.session(bravo).gateway.state().position, away);
+    gm(&mut rig, &mut now, &[1100, 1107]);
+    assert_eq!(rig.session(bravo).gateway.state().position, here);
+
+    // Go to: Bravo is moved off again, and the wheel takes Alpha there.
+    send(&mut rig, "Alpha", &request, &mut now);
+    let (_, lines) = gm(&mut rig, &mut now, &[1100, 1106]);
+    assert!(
+        lines.iter().any(|l| l.starts_with("Moved you to")),
+        "{lines:?}"
+    );
+    assert_eq!(rig.session(alpha).gateway.state().position, away);
+
+    let (_, lines) = gm(&mut rig, &mut now, &[1100, 1108, 1153]);
+    assert!(lines.iter().any(|l| l == "Role saved."), "{lines:?}");
+    let store = AccountStore::load(&rig.accounts).unwrap();
+    assert_eq!(
+        store.account_role(bravo_account),
+        Some(AccountRole::Moderator)
+    );
+
+    let (_, lines) = gm(&mut rig, &mut now, &[1100, 1105, 1141]);
+    assert!(lines.iter().any(|l| l == "Gift sent."), "{lines:?}");
+    let (_, told) = read(&mut rig, "Bravo");
+    assert!(
+        told.iter().any(|l| l == "A GM gave you 100 Station Cash."),
+        "{told:?}"
+    );
+
+    // The panel's Players tab: Summon, then Go to, by name.
+    let here = rig.session(alpha).gateway.state().position;
+    let off = [here[0] - 4.0, here[1], here[2] + 2.0];
+    let text = format!("realm move {bravo} {} {} {}", off[0], off[1], off[2]);
+    let request = osfr_tools::chat::local_request(&text);
+    let panel = |text: &str| osfr_tools::chat::local_request(text);
+    send(&mut rig, "Alpha", &request, &mut now);
+    assert_eq!(rig.session(bravo).gateway.state().position, off);
+    send(&mut rig, "Alpha", &panel("!gm summon bravo TEST"), &mut now);
+    assert_eq!(rig.session(bravo).gateway.state().position, here);
+    send(&mut rig, "Alpha", &request, &mut now);
+    send(&mut rig, "Alpha", &panel("!gm goto Bravo Test"), &mut now);
+    assert_eq!(rig.session(alpha).gateway.state().position, off);
+    let (_, lines) = send(&mut rig, "Alpha", &panel("!gm goto Nobody Here"), &mut now);
+    assert!(
+        lines.iter().any(|l| l.contains("no single online player")),
+        "{lines:?}"
+    );
+
+    // An admin outranks a moderator: the kick ends Bravo's session.
+    let (_, lines) = gm(&mut rig, &mut now, &[1100, 1102]);
+    assert!(lines.iter().any(|l| l == "Player kicked."), "{lines:?}");
+    assert!(rig.session(bravo).kicked);
+}

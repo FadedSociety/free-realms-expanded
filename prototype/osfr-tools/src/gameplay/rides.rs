@@ -399,6 +399,11 @@ impl Gameplay {
         Ok(())
     }
 
+    /// L081: the item table for the GM panel's Items tab.
+    pub fn panel_item_rows(&self) -> impl Iterator<Item = (i32, &str)> + '_ {
+        self.inventory.definition_rows()
+    }
+
     /// T772/F792: `realm give <item> [count]`. A pet adoption item beyond the roster's room is
     /// refused before the grant, so no category-200 item is stranded in the bag.
     pub(super) fn realm_give(

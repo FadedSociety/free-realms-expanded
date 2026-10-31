@@ -115,6 +115,8 @@ pub struct PublicLook {
 pub struct MenuOffer {
     pub inspect: bool,
     pub trade: bool,
+    /// L081: the clicker is an admin; the wheel carries the GM entry.
+    pub gm: bool,
 }
 
 /// What a valid 26/10 choice asks the server to do.
@@ -124,6 +126,8 @@ pub enum Chosen {
     Inspect(Vec<u8>),
     /// Start a trade with this character; `TradeService::invite` re-checks everything.
     Trade(u64),
+    /// L081: a GM wheel entry on this character (open a page, or an action to queue).
+    Gm(u64, crate::player_gm_menu::Step),
 }
 
 /// Per-session radial state: at most one open menu and one open inspect.
@@ -132,6 +136,11 @@ pub struct PlayerRadial {
     reach_m: f32,
     menu_target: Option<u64>,
     menu_offer: MenuOffer,
+    /// L081: the GM page shown for `menu_target`, when the open wheel is one.
+    menu_page: Option<crate::player_gm_menu::Page>,
+    /// L081: GM actions chosen this message on the wheel or the panel: (target, action,
+    /// message time), for the host.
+    pending_gm: Vec<(u64, crate::player_gm_menu::GmAction, u64)>,
     inspecting: Option<u64>,
 }
 
@@ -141,6 +150,8 @@ impl Default for PlayerRadial {
             reach_m: DEFAULT_REACH_M,
             menu_target: None,
             menu_offer: MenuOffer::default(),
+            menu_page: None,
+            pending_gm: Vec::new(),
             inspecting: None,
         }
     }
@@ -167,6 +178,7 @@ impl PlayerRadial {
     pub fn reset(&mut self) {
         self.menu_target = None;
         self.menu_offer = MenuOffer::default();
+        self.menu_page = None;
         self.inspecting = None;
     }
 
@@ -181,6 +193,7 @@ impl PlayerRadial {
         self.select_menu(registry, viewer, inner, |guid| MenuOffer {
             inspect: has_look(guid),
             trade: false,
+            gm: false,
         })
     }
 
@@ -196,6 +209,7 @@ impl PlayerRadial {
     ) -> Result<Vec<Vec<u8>>, RadialError> {
         self.menu_target = None;
         self.menu_offer = MenuOffer::default();
+        self.menu_page = None;
         if inner.len() != SELECT_PLAYER_LEN || inner[..4] != [26, 0, 19, 0] {
             return Err(RadialError::Malformed);
         }
@@ -204,7 +218,7 @@ impl PlayerRadial {
         let name = self.visible_name(registry, viewer, target)?;
         // Only offer an action that can work: no public look, no Inspect entry.
         let offer = offer(target);
-        if !offer.inspect && !offer.trade {
+        if !offer.inspect && !offer.trade && !offer.gm {
             return Err(RadialError::NoLook);
         }
         self.menu_target = Some(target);
@@ -224,7 +238,7 @@ impl PlayerRadial {
         match self.choose_entry(registry, viewer, inner, look_of)? {
             None => Ok(None),
             Some(Chosen::Inspect(packet)) => Ok(Some(vec![packet])),
-            Some(Chosen::Trade(_)) => Err(RadialError::InvalidChoice),
+            Some(Chosen::Trade(_) | Chosen::Gm(..)) => Err(RadialError::InvalidChoice),
         }
     }
 
@@ -247,16 +261,23 @@ impl PlayerRadial {
         }
         self.menu_target = None;
         let offered = std::mem::take(&mut self.menu_offer);
+        let page = self.menu_page.take();
         let id = i32::from_le_bytes(inner[12..16].try_into().unwrap());
-        let allowed = match id {
-            INSPECT_ENTRY_ID => offered.inspect,
-            TRADE_ENTRY_ID => offered.trade,
+        let allowed = match (page, id) {
+            (None, INSPECT_ENTRY_ID) => offered.inspect,
+            (None, TRADE_ENTRY_ID) => offered.trade,
+            (None, crate::player_gm_menu::ENTRY_GM) => offered.gm,
+            // L081: a GM page accepts only the entries it showed.
+            (Some(page), id) => crate::player_gm_menu::rows(page).iter().any(|r| r.0 == id),
             _ => false,
         };
         if !allowed {
             return Err(RadialError::InvalidChoice);
         }
         self.visible_name(registry, viewer, guid)?; // stale or moved away since the menu
+        if let Some(step) = crate::player_gm_menu::resolve(id).filter(|_| offered.gm) {
+            return Ok(Some(Chosen::Gm(guid, step)));
+        }
         if id == TRADE_ENTRY_ID {
             return Ok(Some(Chosen::Trade(guid)));
         }
@@ -264,6 +285,39 @@ impl PlayerRadial {
         let packet = start_inspect_packet(guid, &look)?;
         self.inspecting = Some(guid);
         Ok(Some(Chosen::Inspect(packet)))
+    }
+
+    /// L081: show a GM page for `target` (the wheel stays on that player); the caller has checked
+    /// that the viewer is an admin.
+    pub fn open_gm_page(
+        &mut self,
+        registry: &PlayerRegistry,
+        viewer: SessionId,
+        target: u64,
+        page: crate::player_gm_menu::Page,
+    ) -> Result<Vec<Vec<u8>>, RadialError> {
+        let name = self.visible_name(registry, viewer, target)?;
+        self.menu_target = Some(target);
+        self.menu_offer = MenuOffer {
+            gm: true,
+            ..MenuOffer::default()
+        };
+        self.menu_page = Some(page);
+        Ok(vec![rows_packet(
+            target,
+            &name,
+            &crate::player_gm_menu::rows(page),
+        )])
+    }
+
+    /// L081: queue a chosen GM action for the post-commit host.
+    pub fn queue_gm(&mut self, target: u64, action: crate::player_gm_menu::GmAction, now_ms: u64) {
+        self.pending_gm.push((target, action, now_ms));
+    }
+
+    /// L081: the queued GM actions, emptied.
+    pub fn take_gm(&mut self) -> Vec<(u64, crate::player_gm_menu::GmAction, u64)> {
+        std::mem::take(&mut self.pending_gm)
     }
 
     /// 149/2. Idempotent; no reply.
@@ -330,22 +384,29 @@ fn put_i32(out: &mut Vec<u8>, value: i32) {
 /// 26/9 body: guid, auto-select bool, entry count, seven-i32 rows, name,
 /// two trailing bools (`00aa2220`; same shape as the proven NPC menus).
 fn menu_packet(guid: u64, name: &str, offer: MenuOffer) -> Vec<u8> {
-    let mut out = vec![26, 0, 9, 0];
-    out.extend_from_slice(&guid.to_le_bytes());
-    out.push(0);
-    // Trade before Inspect, as in the original menu (video `fjZluIfbUIo/00024`).
-    let entries: Vec<[i32; 3]> = [
-        (offer.trade, [TRADE_ENTRY_ID, TRADE_ICON, TRADE_LABEL]),
+    // Trade before Inspect, as in the original menu (video `fjZluIfbUIo/00024`); GM last (L081).
+    let (id, icon, label) = crate::player_gm_menu::gm_row();
+    let entries: Vec<(i32, i32, i32)> = [
+        (offer.trade, (TRADE_ENTRY_ID, TRADE_ICON, TRADE_LABEL)),
         (
             offer.inspect,
-            [INSPECT_ENTRY_ID, INSPECT_ICON, INSPECT_LABEL],
+            (INSPECT_ENTRY_ID, INSPECT_ICON, INSPECT_LABEL),
         ),
+        (offer.gm, (id, icon, label)),
     ]
     .into_iter()
     .filter_map(|(shown, entry)| shown.then_some(entry))
     .collect();
+    rows_packet(guid, name, &entries)
+}
+
+/// A 26/9 wheel of `(id, icon, label)` rows for `guid`.
+fn rows_packet(guid: u64, name: &str, entries: &[(i32, i32, i32)]) -> Vec<u8> {
+    let mut out = vec![26, 0, 9, 0];
+    out.extend_from_slice(&guid.to_le_bytes());
+    out.push(0);
     put_i32(&mut out, entries.len() as i32);
-    for [id, icon, label] in entries {
+    for &(id, icon, label) in entries {
         for value in [id, icon, label, 0, 0, 0, 0] {
             put_i32(&mut out, value);
         }

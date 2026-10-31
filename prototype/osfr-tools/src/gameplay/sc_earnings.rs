@@ -20,11 +20,25 @@ impl Gameplay {
             out.replies.push(chat::system("Usage: realm sc <amount>"));
             return Ok(true);
         };
-        let Some(shop) = self.npc_coin_shop.as_ref() else {
-            out.replies.push(chat::system("This realm has no Marketplace for Station Cash."));
-            return Ok(true);
-        };
         let amount = amount.min(1_000_000);
+        let line = match self.grant_sc(amount, out)? {
+            Ok(()) => format!("Gave {amount} Station Cash."),
+            Err(refusal) => refusal,
+        };
+        out.replies.push(chat::system(&line));
+        Ok(true)
+    }
+
+    /// `amount` Station Cash through the earned-SC applier; the inner `Err` is the refusal line
+    /// and stages nothing. L081: the admin GM wheel's gift uses it too.
+    pub(super) fn grant_sc(
+        &mut self,
+        amount: u32,
+        out: &mut Outcome,
+    ) -> io::Result<Result<(), String>> {
+        let Some(shop) = self.npc_coin_shop.as_ref() else {
+            return Ok(Err("This realm has no Marketplace for Station Cash.".into()));
+        };
         let rewards = self.reward_snapshot().with_wallet(
             shop.sc_wallet().clone(),
             shop.sc_catalogue().config().max_balance,
@@ -38,14 +52,10 @@ impl Gameplay {
             Ok((next, replies)) => {
                 out.replies.extend(replies);
                 self.adopt_reward_state(next, out)?;
-                out.replies
-                    .push(chat::system(&format!("Gave {amount} Station Cash.")));
+                Ok(Ok(()))
             }
-            Err(error) => out
-                .replies
-                .push(chat::system(&format!("Cannot give Station Cash: {error}"))),
+            Err(error) => Ok(Err(format!("Cannot give Station Cash: {error}"))),
         }
-        Ok(true)
     }
 
     /// Profile state for a reward transaction; a default one without class content.

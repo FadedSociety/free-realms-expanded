@@ -1540,6 +1540,38 @@ fn store_statistics_and_one_time_session_requests_stay_unrouted_and_change_nothi
     assert_eq!(gateway.snapshot(), before);
 }
 
+/// L081: an admin makes a redeem code through the panel's `!code` words; a player redeems it once
+/// through `!redeem` (coins and the item arrive), and a second redeem is refused.
+#[test]
+fn a_redeem_code_grants_once_per_character() {
+    let store = std::env::temp_dir().join(format!("osfr-l081-codes-{}.json", std::process::id()));
+    let _ = std::fs::remove_file(&store);
+    osfr_tools::redeem_codes::set_store(store.clone());
+    let fixture = Fixture::new();
+    let mut gateway = fixture.connect(fixture.state());
+    gateway.set_dev_tools(true);
+    gateway.set_role(AccountRole::Admin);
+    for line in [
+        "!code new FR-L081-TEST",
+        "!code set FR-L081-TEST coins 250",
+        "!code item add FR-L081-TEST 76361 2",
+    ] {
+        send(&mut gateway, &chat::local_request(line));
+    }
+    gateway.set_dev_tools(false);
+    gateway.set_role(AccountRole::Player);
+    let (coins, items) = (
+        inventory_of(&gateway).coins,
+        count_definition(&inventory_of(&gateway), 76361),
+    );
+    send(&mut gateway, &chat::local_request("!redeem fr-l081-test"));
+    assert_eq!(inventory_of(&gateway).coins, coins + 250);
+    assert_eq!(count_definition(&inventory_of(&gateway), 76361), items + 2);
+    send(&mut gateway, &chat::local_request("!redeem FR-L081-TEST"));
+    assert_eq!(inventory_of(&gateway).coins, coins + 250, "once per character");
+    let _ = std::fs::remove_file(&store);
+}
+
 /// T817/L080: `realm sc` credits the Station Cash wallet for an authorized role; a player is
 /// refused and the wallet keeps its balance.
 #[test]

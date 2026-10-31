@@ -62,4 +62,23 @@ impl Gateway {
             ..GatewayOutcome::default()
         })
     }
+
+    /// L081: an admin GM wheel gift of coins or Station Cash to this character, staged like a
+    /// move and committed through this character's own session. An error stages nothing.
+    pub fn stage_admin_grant(&mut self, coins: u32, sc: u32) -> io::Result<GatewayOutcome> {
+        if !self.loaded {
+            return Err(invalid("it is still loading"));
+        }
+        let result = self
+            .gameplay
+            .as_mut()
+            .ok_or_else(|| invalid("it has no gameplay session"))?
+            .admin_grant(coins, sc)?;
+        Ok(GatewayOutcome {
+            replies: result.replies.iter().map(|reply| wrapped(reply)).collect(),
+            state_changed: true,
+            gameplay_changed: true,
+            ..GatewayOutcome::default()
+        })
+    }
 }

@@ -578,6 +578,14 @@ impl Inventory {
         }
     }
 
+    /// L081: every item definition as `(id, serialized ClientItemDefinition hex)`, for the GM panel.
+    pub fn definition_rows(&self) -> impl Iterator<Item = (i32, &str)> + '_ {
+        self.content
+            .definitions
+            .values()
+            .map(|d| (d.id, d.serialized_hex.as_str()))
+    }
+
     pub fn state(&self) -> &InventoryState {
         &self.state
     }

@@ -1197,37 +1197,6 @@ impl Gateway {
         Ok(count)
     }
 
-    fn change_account_role(&mut self, command: &str) -> &'static str {
-        use crate::account_store::{AccountRole, AccountStore, AccountStoreLock, STAFF_LOCK_WAIT};
-        let words: Vec<_> = command.split_whitespace().collect();
-        let ["role", id, role] = words.as_slice() else {
-            return "Usage: realm role <account-id> <player|builder|moderator|admin>";
-        };
-        let (Some(target), Some(role)) = (
-            id.parse::<u64>().ok().filter(|id| *id > 0),
-            AccountRole::parse(role),
-        ) else {
-            return "Usage: realm role <account-id> <player|builder|moderator|admin>";
-        };
-        let Some((path, actor)) = &self.role_account else {
-            return "Cannot do that: a verified account binding is required.";
-        };
-        // (R) Cooperate with login/CLI writers; never overwrite a newer key or role.
-        let Ok(_lock) = AccountStoreLock::acquire_within(path, STAFF_LOCK_WAIT) else {
-            return "Cannot do that: account store is busy or unavailable.";
-        };
-        let result = AccountStore::load(path).and_then(|mut store| {
-            store.set_account_role(*actor, target, role)?;
-            store.save(path)
-        });
-        self.refresh_role();
-        if result.is_ok() {
-            "Account role saved."
-        } else {
-            "Cannot do that: account role was not saved."
-        }
-    }
-
     /// Stock locale row keys for World Builder text ids.
     pub fn set_stock_text(
         &mut self,

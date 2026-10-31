@@ -92,9 +92,11 @@ pub fn can_run_realm_command(role: AccountRole, command: &str) -> bool {
                 | "reload placements"
         ),
         // (R) L042: moderators get the moderation commands and nothing else.
-        AccountRole::Moderator => matches!(command, "mute" | "unmute" | "kick" | "ban" | "unban"),
+        AccountRole::Moderator => {
+            matches!(command, "mute" | "unmute" | "kick" | "ban" | "unban" | "gm")
+        }
         AccountRole::Tester => {
-            !matches!(command, "mute" | "unmute" | "kick" | "ban" | "unban" | "role")
+            !matches!(command, "mute" | "unmute" | "kick" | "ban" | "unban" | "role" | "code")
         }
         AccountRole::Player => false,
     }
@@ -856,7 +858,7 @@ mod tester_role_tests {
         for command in ["give", "coins", "sc", "level", "god", "goto", "here", "place", "reload all"] {
             assert!(can_run_realm_command(tester, command), "{command}");
         }
-        for command in ["mute", "unmute", "kick", "ban", "unban", "role"] {
+        for command in ["mute", "unmute", "kick", "ban", "unban", "role", "code"] {
             assert!(!can_run_realm_command(tester, command), "{command}");
         }
         assert!(!tester.outranks(AccountRole::Player), "testers cannot moderate anyone");

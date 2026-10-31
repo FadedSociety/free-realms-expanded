@@ -293,6 +293,7 @@ fn open_menu(
             trade: world
                 .trades
                 .can_invite(&world.players, &world.social, viewer, t),
+            gm: false,
         }
     })
 }

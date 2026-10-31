@@ -86,6 +86,7 @@ mod quest_delivery;
 mod quest_pickups;
 /// T789: an accepted job-ability cast or a spent single-use item credits a `use_*` objective.
 mod quest_use;
+mod redeem;
 mod rides;
 /// Station Cash earned by server-verified activity completions (T229).
 mod sc_earnings;
@@ -2743,6 +2744,7 @@ impl Gameplay {
                 say(out, format!("God mode {}.", if on { "on" } else { "off" }));
             }
             ["give", item, rest @ ..] => return self.realm_give(item, rest, now_ms, out),
+            ["code", ..] => return self.realm_code(&raw_words, out),
             ["sc", n] => return self.realm_sc(n, out),
             ["coins", n] => {
                 let Ok(coins) = n.parse::<u32>() else {
@@ -3493,6 +3495,7 @@ impl Gameplay {
                 | "retry"
                 | "accept"
                 | "turnin"
+                | "redeem"
         ) || (first == "race" && self.kart_entry.is_none());
         Ok(!ordinary && !self.may_run(command))
     }
@@ -4040,6 +4043,12 @@ impl Gameplay {
                 // Same byte offsets as `command` (ASCII lowercasing keeps lengths):
                 // literal names keep their case.
                 let raw = &text.trim()["realm ".len()..];
+                // L081: every player may redeem a code (no role gate).
+                if command.split_whitespace().next() == Some("redeem") {
+                    let words: Vec<&str> = raw.split_whitespace().collect();
+                    self.realm_redeem(&words, character, now_ms, &mut out)?;
+                    return Ok(out);
+                }
                 if tool && command.split_whitespace().next() == Some("broadcast") {
                     crate::world_notice::stage(raw, &mut out);
                     return Ok(out);

@@ -54,7 +54,12 @@ fn gm_lines_parse_into_open_lists_and_the_rest() {
             search: String::new()
         })
     );
-    assert_eq!(parse("!gm goto Rae"), Some(Request::Other));
+    assert_eq!(
+        parse("!gm goto Rae  Smith"),
+        Some(Request::GoTo("Rae Smith".into()))
+    );
+    assert_eq!(parse("!gm summon Rae"), Some(Request::Summon("Rae".into())));
+    assert_eq!(parse("!gm zone ls"), Some(Request::Other));
     for other in ["!gmx", "gm players 1", "hello"] {
         assert_eq!(parse(other), None, "{other}");
     }
@@ -75,8 +80,9 @@ fn a_list_reply_has_the_header_its_page_and_an_end() {
     );
     assert_eq!(page_two.last().unwrap(), &format!("{TOKEN}|end"));
     let found = list(ListKind::Players, 9, "player 1", &rows);
-    // "Player 1" and "Player 10".."Player 15"; page 9 is out of range, so the last page shows.
-    assert_eq!(found[0], format!("{TOKEN}|players|player 1|1|1|7"));
+    // "Player 1" and "Player 10".."Player 19" (PAGE 18 + 3 rows); page 9 is out of range, so the
+    // last page shows.
+    assert_eq!(found[0], format!("{TOKEN}|players|player 1|1|1|11"));
     let empty = list(ListKind::Items, 1, "", &[]);
     assert_eq!(
         empty,
@@ -108,7 +114,10 @@ fn item_rows_read_the_catalogue_records() {
     ];
     let named = |id: i32| (id == 393077).then(|| "Heart Bed".to_owned());
     assert_eq!(
-        item_rows(&items, named),
+        item_rows(
+            items.iter().map(|i| (i.id, i.serialized_hex.as_str())),
+            named
+        ),
         [
             vec!["12", "7", "", "", "#12"],
             vec!["56757", "3897", "", "", "Heart Bed"],

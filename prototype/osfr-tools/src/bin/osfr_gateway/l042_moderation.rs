@@ -352,6 +352,13 @@ fn moderator_cannot_target_admin_moderator_or_self() {
         store.account_role(account(PIP)),
         Some(AccountRole::Moderator)
     );
+    // L081: the GM panel's Demote prompt names the character instead of the account id.
+    assert!(said(
+        &rig.command(ada, "!admin demote Pip Player"),
+        "Account role saved."
+    ));
+    let store = AccountStore::load(&files.store()).unwrap();
+    assert_eq!(store.account_role(account(PIP)), Some(AccountRole::Player));
 }
 
 #[test]

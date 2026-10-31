@@ -7,10 +7,16 @@ use osfr_tools::{
     account_store::can_run_realm_command,
     chat,
     gm_panel::{self, ListKind, Request},
+    player_gm_menu::GmAction,
 };
 
 /// `Some` (possibly empty) when `inner` is a panel command; `None` leaves it to ordinary chat.
-pub(super) fn route(session: &Session, inner: &[u8], world: &SharedWorld) -> Option<Vec<Delivery>> {
+pub(super) fn route(
+    session: &mut Session,
+    inner: &[u8],
+    world: &SharedWorld,
+    now_ms: u64,
+) -> Option<Vec<Delivery>> {
     let text = social_chat::parse_client_chat(inner).ok()?.message;
     if gm_panel::alias(&text).is_some() {
         return Some(Vec::new());
@@ -30,13 +36,21 @@ pub(super) fn route(session: &Session, inner: &[u8], world: &SharedWorld) -> Opt
             kind: ListKind::Items,
             page,
             search,
-        } => {
-            let rows = gm_panel::item_rows(
-                session.gateway.item_catalogue(),
-                osfr_tools::world_text::locale_text,
-            );
-            gm_panel::list(ListKind::Items, page, &search, &rows)
+        } => gm_panel::list(ListKind::Items, page, &search, &items(session)),
+        Request::Pos => {
+            let state = session.gateway.state();
+            let [x, y, z] = state.position.map(|v| format!("{v:.1}"));
+            vec![gm_panel::line(&[
+                "pos",
+                &format!("zone {}", state.zone_id),
+                &x,
+                &y,
+                &z,
+            ])]
         }
+        // L081: queued like the GM wheel's choice; its host answers.
+        Request::GoTo(name) => queue_move(session, world, &name, GmAction::GoTo, now_ms),
+        Request::Summon(name) => queue_move(session, world, &name, GmAction::Summon, now_ms),
         // (R) NPCs and houses need their name catalogs (a later slice); empty until then.
         Request::List { kind, page, search } => gm_panel::list(kind, page, &search, &[]),
         Request::Other => vec!["The referee panel cannot do that here yet.".to_owned()],
@@ -50,6 +64,55 @@ pub(super) fn route(session: &Session, inner: &[u8], world: &SharedWorld) -> Opt
             })
             .collect(),
     )
+}
+
+/// L081: the whole item table's rows, built once (every session of a realm loads the same
+/// content); without it, the startup catalogue as before.
+fn items(session: &Session) -> std::borrow::Cow<'static, [Vec<String>]> {
+    use std::borrow::Cow;
+    static ROWS: std::sync::OnceLock<Vec<Vec<String>>> = std::sync::OnceLock::new();
+    let names = osfr_tools::world_text::locale_text;
+    if let Some(rows) = ROWS.get() {
+        return Cow::Borrowed(rows);
+    }
+    if let Some(game) = session.gateway.gameplay() {
+        let rows = gm_panel::item_rows(game.panel_item_rows(), names);
+        if !rows.is_empty() {
+            return Cow::Borrowed(ROWS.get_or_init(|| rows));
+        }
+    }
+    let startup = session.gateway.item_catalogue();
+    Cow::Owned(gm_panel::item_rows(
+        startup.iter().map(|i| (i.id, i.serialized_hex.as_str())),
+        names,
+    ))
+}
+
+/// `realm move` is admin only, so the panel's Go to and Summon are too.
+fn queue_move(
+    session: &mut Session,
+    world: &SharedWorld,
+    name: &str,
+    action: GmAction,
+    now_ms: u64,
+) -> Vec<String> {
+    if !can_run_realm_command(session.gateway.role(), "move") {
+        return vec!["Cannot do that: admins only.".to_owned()];
+    }
+    let name = name.trim().to_lowercase();
+    let mut online = world.active_sessions.keys().filter(|guid| {
+        world.identities.get(guid).is_some_and(|identity| {
+            let full = format!("{} {}", identity.name.first, identity.name.last);
+            full.trim().to_lowercase() == name
+        })
+    });
+    match (online.next(), online.next()) {
+        (Some(guid), None) => {
+            session.radial.queue_gm(*guid, action, now_ms);
+            Vec::new()
+        }
+        _ => vec!["Cannot do that: no single online player has that name.".to_owned()],
+    }
 }
 
 /// Every player in the world: guid, name, and where they are.

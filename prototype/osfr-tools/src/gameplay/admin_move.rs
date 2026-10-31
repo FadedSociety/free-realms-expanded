@@ -126,6 +126,24 @@ impl Gameplay {
         self.apply_relocation(relocation, character, &mut out)?;
         Ok(out)
     }
+
+    /// L081: the gifted player's side of an admin GM wheel Coins or Station Cash, staged on a
+    /// clone like `admin_relocation`. An error is the refusal for the admin; it stages nothing.
+    pub fn admin_grant(&mut self, coins: u32, sc: u32) -> io::Result<Outcome> {
+        let mut out = Outcome::default();
+        if coins > 0 {
+            self.grant_reward(coins.min(1_000_000), &[], &mut out)?;
+            out.replies
+                .push(chat::system(&format!("A GM gave you {coins} coins.")));
+        }
+        if sc > 0 {
+            self.grant_sc(sc.min(1_000_000), &mut out)?
+                .map_err(io::Error::other)?;
+            out.replies
+                .push(chat::system(&format!("A GM gave you {sc} Station Cash.")));
+        }
+        Ok(out)
+    }
 }
 
 /// Split `<character> <destination>` from the end: three trailing coordinates are x y z, two

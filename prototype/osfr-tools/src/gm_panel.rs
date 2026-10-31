@@ -11,8 +11,8 @@
 
 /// The marker the panel looks for in a system line (`gmToken`).
 pub const TOKEN: &str = "[[SANCTUARY_GM]]";
-/// (R) Results per page; the panel draws whatever page the server sends.
-pub const PAGE: usize = 12;
+/// Results per page: Sanctuary's `GmChatCommand.PageSize`, the panel's 3x6 grid.
+pub const PAGE: usize = 18;
 
 /// The panel's commands that map onto an existing realm command, as that command.
 /// (R) `!godmode on|off` toggles: the realm command keeps no state the panel can name.
@@ -20,6 +20,22 @@ pub fn alias(text: &str) -> Option<String> {
     let words: Vec<&str> = text.split_whitespace().collect();
     Some(match words.as_slice() {
         ["!give", item, count] => format!("realm give {item} {count}"),
+        // L081: the World tab's Promote / Demote prompts (admin only: `realm role`).
+        ["!admin", "promote", name @ ..] if !name.is_empty() => {
+            format!("realm role {} moderator", name.join(" "))
+        }
+        ["!admin", "demote", name @ ..] if !name.is_empty() => {
+            format!("realm role {} player", name.join(" "))
+        }
+        // L081: the World tab's "Teleport x y z" prompt.
+        ["!teleport", x, y, z] => format!("realm goto {x} {y} {z}"),
+        // L081: redeem codes (the gold hub tree, the redeem box, the Codes tab).
+        ["!redeem", rest @ ..] => format!("realm redeem {}", rest.join(""))
+            .trim_end()
+            .to_owned(),
+        ["!code", rest @ ..] => format!("realm code {}", rest.join(" "))
+            .trim_end()
+            .to_owned(),
         ["!godmode", "on" | "off"] => "realm god".to_owned(),
         [
             "!mod",
@@ -71,6 +87,12 @@ pub enum Request {
         page: usize,
         search: String,
     },
+    /// L081 `!gm pos`: where the referee stands.
+    Pos,
+    /// L081 `!gm goto <First Last>` (Players tab "Go to"): the referee moves to that player.
+    GoTo(String),
+    /// L081 `!gm summon <First Last>` (Players tab "Summon"): that player moves to the referee.
+    Summon(String),
     /// Any other `!gm` line: not built yet.
     Other,
 }
@@ -90,6 +112,9 @@ pub fn parse(text: &str) -> Option<Request> {
         "npcs" => ListKind::Npcs,
         "players" => ListKind::Players,
         "houses" => ListKind::Houses,
+        "pos" => return Some(Request::Pos),
+        "goto" => return Some(Request::GoTo(words.collect::<Vec<_>>().join(" "))),
+        "summon" => return Some(Request::Summon(words.collect::<Vec<_>>().join(" "))),
         _ => return Some(Request::Other),
     };
     let page = words
@@ -102,6 +127,42 @@ pub fn parse(text: &str) -> Option<Request> {
         page,
         search: words.collect::<Vec<_>>().join(" "),
     })
+}
+
+/// The panel's free-text escape (`PanelTextHelper.Escape`): `\\`, `\n`, `\p` for `|`, `\t`.
+pub fn panel_escape(text: &str) -> String {
+    let mut out = String::with_capacity(text.len());
+    for c in text.chars() {
+        match c {
+            '\\' => out.push_str("\\\\"),
+            '\n' => out.push_str("\\n"),
+            '|' => out.push_str("\\p"),
+            '\t' => out.push_str("\\t"),
+            c => out.push(c),
+        }
+    }
+    out
+}
+
+/// The panel's send escape undone (`\\`, `\n`, `\p`, `\t`, `\s` for a kept space).
+pub fn panel_unescape(text: &str) -> String {
+    let mut out = String::with_capacity(text.len());
+    let mut chars = text.chars();
+    while let Some(c) = chars.next() {
+        if c != '\\' {
+            out.push(c);
+            continue;
+        }
+        match chars.next() {
+            Some('n') => out.push('\n'),
+            Some('p') => out.push('|'),
+            Some('t') => out.push('\t'),
+            Some('s') => out.push(' '),
+            Some(other) => out.push(other),
+            None => out.push('\\'),
+        }
+    }
+    out
 }
 
 /// One panel data line. `|` separates fields, so it never appears inside one; `chat::system`
@@ -142,12 +203,12 @@ pub fn list(kind: ListKind, page: usize, search: &str, rows: &[Vec<String>]) -> 
     out
 }
 
-/// L072: the Items tab's rows from the startup item catalogue, one per item id. A record starts
-/// with the client's `ClientItemDefinition` fields id, name id, description id and icon id; the
-/// row is `[id, icon, "", "", name]` (`gmItemCell` reads 0, 1 and 4). Without a name the row
-/// shows `#id`.
-pub fn item_rows(
-    items: &[crate::startup_snapshot::ItemDefinitionSnapshot],
+/// L072: the Items tab's rows, one per item id, from `(id, serialized ClientItemDefinition hex)`.
+/// A record starts with the fields id, name id, description id and icon id; the row is
+/// `[id, icon, "", "", name]` (`gmItemCell` reads 0, 1 and 4). L081: the whole item table. An item
+/// without a name shows `#id` (Sanctuary hides them; a referee can still give one by id).
+pub fn item_rows<'a>(
+    items: impl IntoIterator<Item = (i32, &'a str)>,
     name: impl Fn(i32) -> Option<String>,
 ) -> Vec<Vec<String>> {
     let field = |hex: &str, index: usize| {
@@ -159,20 +220,17 @@ pub fn item_rows(
         Some(i32::from_le_bytes(le))
     };
     let mut rows = std::collections::BTreeMap::new();
-    for item in items {
-        let (Some(name_id), Some(icon)) = (
-            field(&item.serialized_hex, 1),
-            field(&item.serialized_hex, 3),
-        ) else {
+    for (id, hex) in items {
+        let (Some(name_id), Some(icon)) = (field(hex, 1), field(hex, 3)) else {
             continue;
         };
-        rows.entry(item.id).or_insert_with(|| {
+        rows.entry(id).or_insert_with(|| {
             vec![
-                item.id.to_string(),
+                id.to_string(),
                 icon.to_string(),
                 String::new(),
                 String::new(),
-                name(name_id).unwrap_or_else(|| format!("#{}", item.id)),
+                name(name_id).unwrap_or_else(|| format!("#{id}")),
             ]
         });
     }

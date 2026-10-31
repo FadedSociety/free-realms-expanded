@@ -43,6 +43,8 @@ mod ambient;
 mod delivery;
 #[path = "osfr_gateway/encounter_invites.rs"]
 mod encounter_invites;
+#[path = "osfr_gateway/gm_menu_routing.rs"]
+mod gm_menu_routing;
 #[path = "osfr_gateway/group_arena.rs"]
 mod group_arena;
 #[path = "osfr_gateway/house_visits.rs"]
@@ -67,6 +69,8 @@ mod client_area_routing;
 mod moderation;
 #[path = "osfr_gateway/paths.rs"]
 mod paths;
+#[path = "osfr_gateway/player_menu_routing.rs"]
+mod player_menu_routing;
 #[path = "osfr_gateway/startup_source.rs"]
 mod startup_source;
 #[path = "osfr_gateway/t006_guilds.rs"]
@@ -980,6 +984,9 @@ fn load_gateway_from(
     // Decision 1: account-store roles are server-owned, so builder/admin
     // `realm` commands run by role without --dev-tools (Studio stays off).
     gateway.set_role_commands(options.account_store.is_some());
+    if let Some(store) = &options.account_store {
+        osfr_tools::redeem_codes::set_store(store.with_file_name("redeem-codes.json"));
+    }
     gateway.set_terrain(options.terrain.clone());
     gateway.set_style_tables(options.resources.clone());
     // L039: every save load passes here; a recovered pose is saved at once (atomic replace).
@@ -1741,6 +1748,7 @@ impl Session {
                 world_event_routing::apply(self, world, now_ms, command)?;
             }
             moderation::run_staged(self, sessions, world, options, staged)?;
+            gm_menu_routing::run(self, options, sessions, world, membership, now_ms)?;
             encounter_invites::run(self, sessions, world, membership, now_ms, invites)?;
         }
         Ok(())
@@ -2093,55 +2101,6 @@ impl Session {
         Ok(true)
     }
 
-    /// 26/19 select, 26/10 choice on an open player menu, 149/2 close (W143).
-    /// A refusal is a silent drop (R): nothing is sent, so ids cannot be probed.
-    fn route_player_radial(
-        &mut self,
-        inner: &[u8],
-        world: &mut SharedWorld,
-        now_ms: u64,
-    ) -> Vec<Delivery> {
-        let looks = &world.public_looks;
-        let me = self.character_guid;
-        let replies = if inner == [149, 0, 2] {
-            self.radial.stop_inspect(inner).map(|()| Vec::new())
-        } else if inner.starts_with(&[26, 0, 19, 0]) {
-            // W163: Trade is offered only where an invite would be admitted right now.
-            let trades = &world.trades;
-            self.radial
-                .select_menu(&world.players, self.id, inner, |guid| MenuOffer {
-                    inspect: looks.contains_key(&guid),
-                    trade: trades.can_invite(&world.players, &world.social, me, guid),
-                })
-        } else {
-            match self
-                .radial
-                .choose_entry(&world.players, self.id, inner, |guid| {
-                    looks.get(&guid).cloned()
-                }) {
-                Ok(Some(Chosen::Trade(target))) => {
-                    // The service re-checks everything; a refusal is a silent drop (R).
-                    let invited =
-                        world
-                            .trades
-                            .invite(&world.players, &world.social, me, target, now_ms);
-                    return trade_deliveries(invited.unwrap_or_default());
-                }
-                Ok(Some(Chosen::Inspect(packet))) => Ok(vec![packet]),
-                Ok(None) => Ok(Vec::new()),
-                Err(error) => Err(error),
-            }
-        };
-        replies
-            .unwrap_or_default()
-            .iter()
-            .map(|reply| Delivery {
-                recipient: self.id,
-                bytes: wrap_application(reply),
-            })
-            .collect()
-    }
-
     /// The six client trade requests (59/3, 6, 7, 8, 9, 10). The actor is `self.character_guid`;
     /// the body never names anyone. A settlement is queued for `settle_trades`, not committed here.
     fn route_trade(&mut self, inner: &[u8], world: &mut SharedWorld, now_ms: u64) -> Vec<Delivery> {
@@ -2194,6 +2153,10 @@ impl Session {
         if matches!(inner, [108, 0, 1 | 3 | 5, 0, ..]) || matches!(inner, [152, 0, 4 | 5, 0, ..]) {
             return Vec::new();
         }
+        // L072/L081: referee panel lines are never chat, and run before the mute check.
+        if let Some(deliveries) = gm_panel_routing::route(self, inner, world, now_ms) {
+            return deliveries;
+        }
         if let Some(refusal) = moderation::muted_chat(self, inner) {
             return refusal;
         }
@@ -2201,10 +2164,6 @@ impl Session {
             return self.route_guild(inner, world, now_ms);
         }
         if inner.starts_with(&[15, 0, 1, 0]) {
-            // L072: referee panel lines are never chat.
-            if let Some(deliveries) = gm_panel_routing::route(self, inner, world) {
-                return deliveries;
-            }
             return self.route_typed_chat(inner, world);
         }
         if inner.starts_with(&[67, 0, 2, 0]) || inner.starts_with(&[67, 0, 3, 0]) {

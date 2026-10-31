@@ -43,6 +43,48 @@ impl Gateway {
         true
     }
 
+    /// `realm role <account-id | First Last> <role>`: admin only (`set_account_role` checks the
+    /// actor). L081: a character name works too, for the panel's `!admin promote|demote`.
+    fn change_account_role(&mut self, command: &str) -> &'static str {
+        use crate::account_store::{AccountRole, AccountStore, AccountStoreLock, STAFF_LOCK_WAIT};
+        let usage = "Usage: realm role <account-id or First Last> <player|builder|moderator|admin>";
+        let words: Vec<_> = command.split_whitespace().collect();
+        let ["role", target @ .., role] = words.as_slice() else {
+            return usage;
+        };
+        // Account 0 is never real: an id of 0 stays a usage error, as before names were taken.
+        let zero = matches!(target, [id] if id.parse::<u64>() == Ok(0));
+        let Some(role) = AccountRole::parse(role).filter(|_| !target.is_empty() && !zero) else {
+            return usage;
+        };
+        let Some((path, actor)) = &self.role_account else {
+            return "Cannot do that: a verified account binding is required.";
+        };
+        // (R) Cooperate with login/CLI writers; never overwrite a newer key or role.
+        let Ok(_lock) = AccountStoreLock::acquire_within(path, STAFF_LOCK_WAIT) else {
+            return "Cannot do that: account store is busy or unavailable.";
+        };
+        let result = AccountStore::load(path).and_then(|mut store| {
+            let id = match target {
+                [id] if id.parse::<u64>().is_ok() => id.parse().ok(),
+                name => store.account_by_display_name(
+                    &name.iter().map(|w| w.to_string()).collect::<Vec<_>>(),
+                ),
+            };
+            let id = id
+                .filter(|id| *id > 0)
+                .ok_or_else(|| std::io::Error::other("no such account"))?;
+            store.set_account_role(*actor, id, role)?;
+            store.save(path)
+        });
+        self.refresh_role();
+        if result.is_ok() {
+            "Account role saved."
+        } else {
+            "Cannot do that: account role was not saved."
+        }
+    }
+
     /// L042: whether this account's chat is refused now. `refresh_role` re-reads the stored
     /// mute with the role on every message; it expires by the wall clock.
     pub fn chat_muted(&self) -> bool {

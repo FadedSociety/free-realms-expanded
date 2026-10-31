@@ -115,32 +115,54 @@ fn move_online(
     let mut target = sessions
         .remove(&key)
         .ok_or("that character's session is gone")?;
-    let result = (|| {
-        if target.character_guid != guid {
-            return Err("that account is online with another character".to_owned());
-        }
-        let before = target.gateway.state().clone();
-        let mut staged = target.gateway.clone();
-        let outcome = staged
-            .stage_admin_relocation(request.position, request.rotation, now_ms)
-            .map_err(|error| error.to_string())?;
-        let arrived = staged.state().clone();
-        let committed = target.commit_outcome(
-            staged,
-            before.clone(),
-            outcome,
+    let result = if target.character_guid != guid {
+        Err("that account is online with another character".to_owned())
+    } else {
+        let (position, rotation) = (request.position, request.rotation);
+        relocate(
+            &mut target,
+            position,
+            rotation,
+            sessions,
             world,
             membership,
-            sessions,
             now_ms,
-        );
-        match committed {
-            Ok(true) => Ok((before, arrived)),
-            // A queue error after the install cannot undo the move or its save.
-            Err(_) if target.gateway.state() == &arrived => Ok((before, arrived)),
-            _ => Err("the move was not saved".to_owned()),
-        }
-    })();
+        )
+    };
     sessions.insert(key, target);
     result
+}
+
+/// Stage a relocation on a clone of `session`'s gateway and commit it through that session.
+/// L081: the admin's own GM wheel go-to uses it too (the dispatching session is not in `sessions`).
+pub(super) fn relocate(
+    session: &mut Session,
+    position: [f32; 3],
+    rotation: Option<[f32; 3]>,
+    sessions: &mut SessionMap,
+    world: &mut SharedWorld,
+    membership: &mut World,
+    now_ms: u64,
+) -> Result<(CharacterState, CharacterState), String> {
+    let before = session.gateway.state().clone();
+    let mut staged = session.gateway.clone();
+    let outcome = staged
+        .stage_admin_relocation(position, rotation, now_ms)
+        .map_err(|error| error.to_string())?;
+    let arrived = staged.state().clone();
+    let committed = session.commit_outcome(
+        staged,
+        before.clone(),
+        outcome,
+        world,
+        membership,
+        sessions,
+        now_ms,
+    );
+    match committed {
+        Ok(true) => Ok((before, arrived)),
+        // A queue error after the install cannot undo the move or its save.
+        Err(_) if session.gateway.state() == &arrived => Ok((before, arrived)),
+        _ => Err("the move was not saved".to_owned()),
+    }
 }
