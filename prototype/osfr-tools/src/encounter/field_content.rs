@@ -179,6 +179,7 @@ impl EncounterEngine {
             seed: f.actor.guid,
             actor: f.actor,
             respawn_at: None,
+            threat: Default::default(),
         })
     }
 

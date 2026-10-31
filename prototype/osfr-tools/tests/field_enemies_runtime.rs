@@ -443,3 +443,37 @@ fn malformed_metadata_and_positions_fail_without_replacing_field() {
         "rejected reload must preserve enemy attack cooldown"
     );
 }
+
+/// L083 (Sanctuary port P2, threat): an enemy shot from beyond its aggro range used to ignore its attacker;
+/// now the attacker is on its threat table and is fought anywhere within the leash, then forgotten once the
+/// enemy evades home.
+#[test]
+fn a_hit_from_beyond_aggro_range_is_fought_within_the_leash() {
+    let f = Fixture::new(1, 0.0);
+    let mut e = f.load();
+    // Profile 12's basic attack reaches 20 m; the fixture wolf aggroes at 8 m and leashes at 12 m.
+    let archer = [10.0, 0.0, 0.0];
+    assert!(hp(&e.attack(GUID, archer, 12, 0, 0).unwrap()).unwrap().0 < full());
+    let mut hit_back = false;
+    for t in 1..=60 {
+        let out = e.tick(archer, 12, t * 100).unwrap();
+        hit_back |= !hits_from(&out, GUID).is_empty();
+    }
+    assert!(hit_back, "the wolf closes in and fights its attacker");
+    assert!(radius(at(&e)) > 5.0, "it walked out to the archer");
+
+    // Out of the leash the attacker is forgotten: the wolf goes home, heals and stays idle.
+    let mut healed = false;
+    for t in 61..=200 {
+        let out = e.tick([60.0, 0.0, 0.0], 12, t * 100).unwrap();
+        healed |= hp(&out) == Some((full(), full()));
+    }
+    assert!(healed, "it evades home and heals");
+    for t in 201..=230 {
+        let out = e.tick(archer, 12, t * 100).unwrap();
+        assert!(
+            hits_from(&out, GUID).is_empty(),
+            "threat was cleared on the way home"
+        );
+    }
+}

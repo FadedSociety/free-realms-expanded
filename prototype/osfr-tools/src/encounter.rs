@@ -30,6 +30,7 @@ mod power_up_use;
 mod revive;
 mod shared;
 mod skills;
+mod threat;
 use self::arena::{ArenaSim, ArenaTick};
 pub use self::arena::{MAX_MEMBERS, SharedArena};
 use self::combat_scale::CombatScale;
@@ -531,6 +532,8 @@ struct FieldEnemy {
     reset_serial: u64,
     /// The resolved combat marker sent after this enemy's 35/2 (T879).
     marker: Option<Notification>,
+    /// L083: who hurt it and by how much (Sanctuary `MobBrain`).
+    threat: threat::Threat,
 }
 
 /// Overworld battle started from a spawner (red crossed swords): clicking it
@@ -1937,6 +1940,7 @@ impl EncounterEngine {
         if let (Some(member), true) = (self.arena.acting, dealt > 0) {
             self.arena.last_hit.insert(guid, member);
         }
+        self.add_threat(guid, dealt);
         if let (Some(sender), true) = (self.shared_sender, dealt > 0) {
             self.field_sim
                 .kills

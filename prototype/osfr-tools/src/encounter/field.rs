@@ -49,6 +49,7 @@ impl FieldEnemy {
         self.seed = self.actor.guid;
         self.target = None;
         self.reset_serial = self.reset_serial.wrapping_add(1);
+        self.threat.clear();
     }
 
     /// (R) Per-actor deterministic random stream, same LCG as combat crits.
@@ -62,6 +63,20 @@ impl FieldEnemy {
 }
 
 impl EncounterEngine {
+    /// L083: a landed hit on a field enemy puts its attacker on the threat table (the shared sender, or 1 on
+    /// a solo field, as kill credit counts them). Not an evading enemy: `strike_damage` refuses those first.
+    pub(super) fn add_threat(&mut self, guid: u64, amount: u32) {
+        let attacker = self.shared_sender.unwrap_or(1);
+        if let Some(f) = self
+            .field_sim
+            .enemies
+            .iter_mut()
+            .find(|f| f.actor.guid == guid)
+        {
+            f.threat.add(attacker, amount);
+        }
+    }
+
     /// Authored field level, for client presentation by the owning gameplay
     /// route once its wire carrier is verified. Never infer it from HP.
     pub fn field_level(&self, guid: u64) -> Option<u32> {
@@ -524,6 +539,7 @@ impl EncounterEngine {
             if !f.present {
                 continue;
             }
+            let threat = f.threat.clone();
             let valid = |p: &&FieldParticipant| {
                 p.combat
                     && p.known_npcs
@@ -533,38 +549,48 @@ impl EncounterEngine {
                     && now_ms >= p.grace_until
                     && valid_position(p.position)
                     && (!shared || horizontal_distance(p.position, home) <= leash + b.reach)
-                    && distance(p.position, f.state.position)
+                    && (distance(p.position, f.state.position)
                         <= if f.motion == FieldMotion::Chasing {
                             f.aggro_range + 4.0
                         } else {
                             f.aggro_range
                         }
+                        // L083: whoever hurt it stays a target anywhere within its leash.
+                        || threat.holds(p.guid)
+                            && horizontal_distance(p.position, f.state.position) <= leash)
             };
-            let player = players
-                .iter()
-                .filter(valid)
-                .find(|p| Some(p.guid) == f.target)
+            let targets: Vec<&FieldParticipant> = players.iter().filter(valid).collect();
+            let player = threat
+                .pick(targets.iter().map(|p| p.guid), f.target)
+                .and_then(|most| targets.iter().copied().find(|p| p.guid == most))
+                .or_else(|| targets.iter().copied().find(|p| Some(p.guid) == f.target))
                 .or_else(|| {
-                    players.iter().filter(valid).min_by(|a, b| {
+                    targets.iter().copied().min_by(|a, b| {
                         distance(a.position, f.state.position)
                             .total_cmp(&distance(b.position, f.state.position))
                             .then(a.guid.cmp(&b.guid))
                     })
                 });
+            // Forget anyone who left, fell, or got past the leash: it would never catch them.
+            f.threat
+                .retain(|player| targets.iter().any(|p| p.guid == player));
             let position = player.map_or(home, |p| p.position);
             let delta = player.map_or(f32::MAX, |_| distance(position, f.state.position));
             f.target = player.map(|p| p.guid);
             let mitigation = player.map_or(1., |p| p.mitigation);
             // (R) A 4 m hysteresis margin avoids target flicker at aggro range.
+            // `player` is None for a chaser whose target left aggro range plus the 4 m margin (or, for one
+            // on the threat table, the leash): the old distance give-up, now through `valid`.
             if !shared && now_ms < self.field_grace_until
                 || horizontal_distance(f.state.position, home) > leash
-                || (f.motion == FieldMotion::Chasing && delta > f.aggro_range + 4.0)
+                || (f.motion == FieldMotion::Chasing && player.is_none())
             {
                 f.motion = FieldMotion::Returning;
                 f.roam_goal = None;
                 f.target = None;
+                f.threat.clear();
             }
-            if f.motion == FieldMotion::Idle && delta <= f.aggro_range {
+            if f.motion == FieldMotion::Idle && player.is_some() {
                 f.motion = FieldMotion::Chasing;
                 f.roam_goal = None;
             }
