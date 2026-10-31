@@ -34,6 +34,9 @@ pub enum AccountRole {
     /// L042: mute, unmute, kick, ban and unban only.
     Moderator,
     Admin,
+    /// L078 (owner 2026-10-31): a test realm's players. Every realm command (give, coins, level,
+    /// god, goto, place...) except the moderator verbs; they cannot moderate anyone.
+    Tester,
 }
 
 impl AccountRole {
@@ -44,6 +47,7 @@ impl AccountRole {
             "builder" => Some(Self::Builder),
             "moderator" => Some(Self::Moderator),
             "admin" => Some(Self::Admin),
+            "tester" => Some(Self::Tester),
             _ => None,
         }
     }
@@ -52,7 +56,7 @@ impl AccountRole {
     /// strictly lower role, so equals (and admins) cannot moderate each other.
     pub fn outranks(self, target: Self) -> bool {
         let rank = |role| match role {
-            Self::Player | Self::Builder => 0,
+            Self::Player | Self::Builder | Self::Tester => 0,
             Self::Moderator => 1,
             Self::Admin => 2,
         };
@@ -89,6 +93,9 @@ pub fn can_run_realm_command(role: AccountRole, command: &str) -> bool {
         ),
         // (R) L042: moderators get the moderation commands and nothing else.
         AccountRole::Moderator => matches!(command, "mute" | "unmute" | "kick" | "ban" | "unban"),
+        AccountRole::Tester => {
+            !matches!(command, "mute" | "unmute" | "kick" | "ban" | "unban" | "role")
+        }
         AccountRole::Player => false,
     }
 }
@@ -837,6 +844,23 @@ fn read_legacy_state(path: &Path) -> io::Result<CharacterState> {
 
 fn invalid_data(error: impl Into<Box<dyn std::error::Error + Send + Sync>>) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, error)
+}
+
+#[cfg(test)]
+mod tester_role_tests {
+    use super::{AccountRole, can_run_realm_command};
+
+    #[test]
+    fn a_tester_runs_every_realm_command_but_the_moderator_verbs() {
+        let tester = AccountRole::parse("tester").unwrap();
+        for command in ["give", "coins", "sc", "level", "god", "goto", "here", "place", "reload all"] {
+            assert!(can_run_realm_command(tester, command), "{command}");
+        }
+        for command in ["mute", "unmute", "kick", "ban", "unban", "role"] {
+            assert!(!can_run_realm_command(tester, command), "{command}");
+        }
+        assert!(!tester.outranks(AccountRole::Player), "testers cannot moderate anyone");
+    }
 }
 
 #[cfg(test)]

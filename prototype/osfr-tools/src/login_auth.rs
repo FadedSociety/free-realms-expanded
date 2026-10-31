@@ -91,6 +91,9 @@ pub struct Enrollment {
     pub max_accounts: usize,
     pub flags: AccountFlags,
     pub slots: SlotPolicy,
+    /// L078: the role a claimed account gets (osfr-login --new-account-role: player, tester or
+    /// builder; never admin or moderator from the network).
+    pub role: crate::account_store::AccountRole,
 }
 
 struct PendingChallenge {
@@ -222,6 +225,9 @@ impl LoginAuth {
                     .map_err(|_| AuthError::InvalidCredentials)?;
                 store
                     .add_public_key(id, &key_bytes)
+                    .map_err(|_| AuthError::InvalidCredentials)?;
+                store
+                    .set_account_role_offline(id, enrollment.role)
                     .map_err(|_| AuthError::InvalidCredentials)?;
                 (id, Some(id))
             }

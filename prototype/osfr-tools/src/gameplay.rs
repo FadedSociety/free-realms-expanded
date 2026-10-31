@@ -2743,6 +2743,7 @@ impl Gameplay {
                 say(out, format!("God mode {}.", if on { "on" } else { "off" }));
             }
             ["give", item, rest @ ..] => return self.realm_give(item, rest, now_ms, out),
+            ["sc", n] => return self.realm_sc(n, out),
             ["coins", n] => {
                 let Ok(coins) = n.parse::<u32>() else {
                     say(out, "Usage: realm coins <amount>".into());

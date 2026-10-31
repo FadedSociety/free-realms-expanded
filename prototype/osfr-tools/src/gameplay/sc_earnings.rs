@@ -13,6 +13,41 @@ use crate::{
 };
 
 impl Gameplay {
+    /// T817: `realm sc <n>` for test realms: Station Cash through the same applier and data
+    /// ceiling as earned SC, at most 1,000,000 per command like `realm coins`.
+    pub(super) fn realm_sc(&mut self, n: &str, out: &mut Outcome) -> io::Result<bool> {
+        let Ok(amount) = n.parse::<u32>() else {
+            out.replies.push(chat::system("Usage: realm sc <amount>"));
+            return Ok(true);
+        };
+        let Some(shop) = self.npc_coin_shop.as_ref() else {
+            out.replies.push(chat::system("This realm has no Marketplace for Station Cash."));
+            return Ok(true);
+        };
+        let amount = amount.min(1_000_000);
+        let rewards = self.reward_snapshot().with_wallet(
+            shop.sc_wallet().clone(),
+            shop.sc_catalogue().config().max_balance,
+        );
+        let grant = station_cash::Earned {
+            sc: amount,
+            ..Default::default()
+        }
+        .grant();
+        match apply_grant(&rewards, &grant, "realm-sc") {
+            Ok((next, replies)) => {
+                out.replies.extend(replies);
+                self.adopt_reward_state(next, out)?;
+                out.replies
+                    .push(chat::system(&format!("Gave {amount} Station Cash.")));
+            }
+            Err(error) => out
+                .replies
+                .push(chat::system(&format!("Cannot give Station Cash: {error}"))),
+        }
+        Ok(true)
+    }
+
     /// Profile state for a reward transaction; a default one without class content.
     pub(super) fn reward_profiles(&self) -> ProfileState {
         self.profiles

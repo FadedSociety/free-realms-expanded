@@ -1540,6 +1540,25 @@ fn store_statistics_and_one_time_session_requests_stay_unrouted_and_change_nothi
     assert_eq!(gateway.snapshot(), before);
 }
 
+/// T817/L080: `realm sc` credits the Station Cash wallet for an authorized role; a player is
+/// refused and the wallet keeps its balance.
+#[test]
+fn realm_sc_credits_the_wallet_and_is_refused_for_a_player() {
+    let fixture = Fixture::new().with_sc();
+    let mut state = fixture.state();
+    state.sc_wallet = Some(Wallet {
+        balance: 150,
+        ..Wallet::default()
+    });
+    let mut gateway = fixture.connect(state);
+    send(&mut gateway, &chat::local_request("realm sc 500"));
+    assert_eq!(wallet_balance(&send(&mut gateway, &marketplace(10))), 150);
+    gateway.set_dev_tools(true);
+    gateway.set_role(AccountRole::Admin);
+    send(&mut gateway, &chat::local_request("realm sc 500"));
+    assert_eq!(wallet_balance(&send(&mut gateway, &marketplace(10))), 650);
+}
+
 /// T230: the real gateway path shows the wallet, debits exactly the listed price and grants the
 /// ride once; a replay and an insufficient order leave the snapshot untouched.
 #[test]

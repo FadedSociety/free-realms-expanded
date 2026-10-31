@@ -16,6 +16,7 @@ use osfr_tools::{
     soe_send::{ReliableSender, SendError, SenderConfig},
 };
 use ed25519_dalek::{Signer, SigningKey};
+use osfr_tools::account_store::AccountRole;
 use serde_json::json;
 use std::{
     collections::{BTreeSet, HashMap},
@@ -58,6 +59,8 @@ struct Options {
     /// L077: the realm's listing key (a 32-byte Ed25519 seed); the broker then proves the realm to the
     /// server browser directory (AUTH2 type 3). Without it the broker refuses listing checks.
     listing_key_file: Option<PathBuf>,
+    /// L078: the role open enrollment gives a new account (player, tester or builder).
+    new_account_role: AccountRole,
 }
 impl Options {
     fn parse() -> Result<Self, Box<dyn std::error::Error>> {
@@ -73,6 +76,7 @@ impl Options {
             mut gateway,
         ) = (None, None, None, None, None, None, None);
         let mut listing_key_file = None;
+        let mut new_account_role = AccountRole::Player;
         let (mut session, mut ticket, mut seconds, mut trace_file) = (
             "local-session".to_owned(),
             login::DEFAULT_GATEWAY_TICKET.to_owned(),
@@ -111,6 +115,12 @@ impl Options {
                 "--gateway" => gateway = Some(value),
                 "--advertise" => advertise = Some(value),
                 "--listing-key-file" => listing_key_file = Some(PathBuf::from(value)),
+                "--new-account-role" => {
+                    new_account_role = match AccountRole::parse(&value) {
+                        Some(role @ (AccountRole::Player | AccountRole::Tester | AccountRole::Builder)) => role,
+                        _ => return Err("--new-account-role takes player, tester or builder".into()),
+                    }
+                }
                 "--session" => session = value,
                 "--ticket" => ticket = value,
                 "--max-characters" => max_characters = value.parse()?,
@@ -205,6 +215,7 @@ impl Options {
             authenticated,
             auth_bind,
             listing_key_file,
+            new_account_role,
             server_id,
             open_enrollment,
             enroll_handles,
@@ -286,6 +297,7 @@ impl Broker {
             enrollment: options.open_enrollment.then(|| Enrollment {
                 handles: options.enroll_handles.clone(),
                 max_accounts: options.max_accounts,
+                role: options.new_account_role,
                 // The same new-account settings as login's own account creation (login.rs).
                 flags: AccountFlags {
                     underage: options.underage,
