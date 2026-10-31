@@ -40,6 +40,7 @@ pub mod gateway;
 pub mod gm_panel;
 pub mod player_gm_menu;
 pub mod redeem_codes;
+pub mod loot_tables;
 pub mod guilds;
 pub mod harvesting;
 mod hash;

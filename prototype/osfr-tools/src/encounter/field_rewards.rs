@@ -46,7 +46,7 @@ pub(super) struct KillCredit {
     at: [f32; 3],
     participants: usize,
     /// The field reward earned by this kill, carried until the claim.
-    pub(super) reward: Option<(u32, u32)>,
+    pub(super) reward: Option<FieldReward>,
     /// The defeated actor's definition id, the claimant's own quest event.
     /// `0` names no quest target and is also what `retain_after_leave` sets for
     /// a player who left the field: the event is forfeited, the reward is not.
@@ -64,7 +64,31 @@ impl KillCredit {
         self.table = None;
         self.definition = 0;
         self.reward
-            .is_some_and(|(coins, job_xp)| coins > 0 || job_xp > 0)
+            .as_ref()
+            .is_some_and(|r| r.coins > 0 || r.job_xp > 0 || r.loot.is_some())
+    }
+}
+
+/// L084: a loot roll on a reward row: `percent` of kills roll `table` (`loot_tables.json`) for each
+/// credited player, as Sanctuary rolls each mob type's drop chance for everyone who helped.
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub(super) struct LootChance {
+    table: String,
+    percent: u32,
+}
+
+/// One credited player's pay for a field kill: the coin and job-XP pair and (L084) a loot roll.
+#[derive(Clone, Debug, PartialEq)]
+pub(super) struct FieldReward {
+    coins: u32,
+    job_xp: u32,
+    loot: Option<LootChance>,
+}
+
+impl FieldReward {
+    pub(super) fn pair(&self) -> (u32, u32) {
+        (self.coins, self.job_xp)
     }
 }
 
@@ -75,6 +99,8 @@ pub(super) struct FieldKillRewards {
     bands: Vec<LevelReward>,
     /// Sorted by `definition_id`; unique.
     overrides: Vec<DefinitionReward>,
+    /// L084: the tables `loot` rows roll (`loot_tables.json` beside this file).
+    loot_tables: crate::loot_tables::LootTables,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -85,6 +111,8 @@ struct LevelReward {
     /// Zero means this part of the payout is empty.
     coins: u32,
     job_xp: u32,
+    #[serde(default)]
+    loot: Option<LootChance>,
     source: Vec<crate::content::SourceTag>,
 }
 
@@ -94,6 +122,8 @@ struct DefinitionReward {
     definition_id: i32,
     coins: u32,
     job_xp: u32,
+    #[serde(default)]
+    loot: Option<LootChance>,
     source: Vec<crate::content::SourceTag>,
 }
 
@@ -107,6 +137,11 @@ struct RewardFile {
 }
 
 impl FieldKillRewards {
+    /// L084: the loot tables loaded beside the reward rows (battle drops roll them too).
+    pub(super) fn loot_tables(&self) -> &crate::loot_tables::LootTables {
+        &self.loot_tables
+    }
+
     /// Load `field_kill_rewards.json` from a content directory. A missing file
     /// is an empty table (old test packages); a bad file is an error.
     pub(super) fn load(directory: impl AsRef<Path>) -> io::Result<Self> {
@@ -122,7 +157,18 @@ impl FieldKillRewards {
             Err(error) => return Err(error),
         }
         // Bound the read itself too, not just the metadata.
-        Self::parse(&Self::read_bounded(fs::File::open(path)?)?)
+        let mut rewards = Self::parse(&Self::read_bounded(fs::File::open(path)?)?)?;
+        rewards.loot_tables = crate::loot_tables::LootTables::load(directory.as_ref())?;
+        let chances = rewards.bands.iter().filter_map(|band| band.loot.as_ref());
+        for chance in chances.chain(rewards.overrides.iter().filter_map(|row| row.loot.as_ref())) {
+            if !(1..=100).contains(&chance.percent) || !rewards.loot_tables.contains(&chance.table)
+            {
+                return Err(invalid(
+                    "field kill reward loot: a 1-100 percent of a listed table",
+                ));
+            }
+        }
+        Ok(rewards)
     }
 
     /// Read at most one byte past `MAX_BYTES`, so a file that grows (or a
@@ -179,31 +225,40 @@ impl FieldKillRewards {
         {
             return Err(invalid("duplicate field kill reward override"));
         }
-        Ok(Self { bands, overrides })
+        Ok(Self {
+            bands,
+            overrides,
+            loot_tables: Default::default(),
+        })
     }
 
     /// The override first, then the band containing `level`. A level outside
     /// 1..=20, or one no band covers, pays nothing rather than guessing.
-    pub(super) fn reward_for(&self, definition_id: i32, level: u32) -> Option<(u32, u32)> {
+    pub(super) fn reward_for(&self, definition_id: i32, level: u32) -> Option<FieldReward> {
         if !(1..=MAX_LEVEL).contains(&level) {
             return None;
         }
+        let reward = |coins, job_xp, loot: &Option<LootChance>| FieldReward {
+            coins,
+            job_xp,
+            loot: loot.clone(),
+        };
         if let Ok(index) = self
             .overrides
             .binary_search_by_key(&definition_id, |row| row.definition_id)
         {
             let row = &self.overrides[index];
-            return Some((row.coins, row.job_xp));
+            return Some(reward(row.coins, row.job_xp, &row.loot));
         }
         self.bands
             .iter()
             .find(|band| (band.min_level..=band.max_level).contains(&level))
-            .map(|band| (band.coins, band.job_xp))
+            .map(|band| reward(band.coins, band.job_xp, &band.loot))
     }
 }
 
 /// Every row carries provenance, and a reconstructed row starts with `(R)`.
-pub(super) fn validate_source(source: &[crate::content::SourceTag]) -> io::Result<()> {
+pub(crate) fn validate_source(source: &[crate::content::SourceTag]) -> io::Result<()> {
     if source.is_empty() {
         return Err(invalid("field kill reward row needs provenance"));
     }
@@ -227,7 +282,7 @@ impl EncounterEngine {
     pub(super) fn credit_field_kill(
         &mut self,
         table: Option<&str>,
-        reward: Option<(u32, u32)>,
+        reward: Option<FieldReward>,
         definition: i32,
         enemy: u64,
         at: [f32; 3],
@@ -244,7 +299,7 @@ impl EncounterEngine {
             if let Some(table) = table {
                 self.drop_power_ups(table, kill, at, now_ms, 1, out);
             }
-            pay_field_reward(reward, out);
+            self.pay_field_reward(reward.as_ref(), out);
             return;
         };
         let window = self
@@ -262,7 +317,7 @@ impl EncounterEngine {
         if let Some(table) = table {
             self.drop_power_ups(table, kill, at, now_ms, participants, out);
         }
-        pay_field_reward(reward, out);
+        self.pay_field_reward(reward.as_ref(), out);
         for player in who.into_iter().filter(|&p| p != killer) {
             let waiting = self.field_sim.kills.credits.entry(player).or_default();
             if waiting.len() >= MAX_CREDITS {
@@ -273,7 +328,7 @@ impl EncounterEngine {
                 table: table.map(str::to_owned),
                 at,
                 participants,
-                reward,
+                reward: reward.clone(),
                 definition,
                 expires_ms: now_ms.saturating_add(CREDIT_TTL_MS),
             });
@@ -309,7 +364,7 @@ impl EncounterEngine {
                         out,
                     );
                 }
-                pay_field_reward(credit.reward, out);
+                self.pay_field_reward(credit.reward.as_ref(), out);
                 // The claimant's own server-authored defeat event. The killer
                 // is excluded from its own credits, so the T256 push in
                 // `strike_damage` remains the single event for the killer.
@@ -321,19 +376,44 @@ impl EncounterEngine {
     }
 }
 
-/// A zero row is no payout; the reward never carries items in this slice. A
-/// non-zero pair becomes one `EncounterReward`, so the payout rides the existing
-/// replies: 38/19 (one i32 coin total, client ctor `0x0089e670`) and 38/14 (six
-/// i32 profile/rank/progress rows, client reader `0x008d86e0`).
-fn pay_field_reward(reward: Option<(u32, u32)>, out: &mut EncounterOutcome) {
-    if let Some((coins, job_xp)) = reward {
-        if coins > 0 || job_xp > 0 {
+impl EncounterEngine {
+    /// A zero row that rolls no loot is no payout. Otherwise one `EncounterReward`, so the payout rides the
+    /// existing replies: 38/19 (one i32 coin total, client ctor `0x0089e670`) and 38/14 (six i32
+    /// profile/rank/progress rows, client reader `0x008d86e0`). L084: a loot roll that hits adds its coins
+    /// and XP, and its items go in `bonus_items`, granted only while the bag has room.
+    fn pay_field_reward(&mut self, reward: Option<&FieldReward>, out: &mut EncounterOutcome) {
+        let Some(reward) = reward else {
+            return;
+        };
+        let loot = reward
+            .loot
+            .as_ref()
+            .map(|chance| self.roll_loot(chance))
+            .unwrap_or_default();
+        let coins = reward.coins.saturating_add(loot.coins);
+        let job_xp = reward.job_xp.saturating_add(loot.job_xp);
+        if coins > 0 || job_xp > 0 || !loot.items.is_empty() {
             out.rewards.push(EncounterReward {
                 coins,
                 job_xp,
+                bonus_items: loot.items,
                 ..Default::default()
             });
         }
+    }
+
+    /// `percent` of calls roll the table; the engine's power-up random source, made on first use.
+    fn roll_loot(&mut self, chance: &LootChance) -> crate::loot_tables::Loot {
+        let tables = Arc::clone(&self.field_rewards);
+        let rng = self.power_up_rng.get_or_insert_with(|| {
+            // ponytail: OS randomness never fails in practice; a fixed seed keeps drops working if it does.
+            crate::power_ups::Rng::from_entropy().unwrap_or(crate::power_ups::Rng::seeded(0x5EED))
+        });
+        let mut below = |n: u32| (rng.next_u64() % u64::from(n.max(1))) as u32;
+        if below(100) >= chance.percent {
+            return Default::default();
+        }
+        tables.loot_tables.roll(&chance.table, &mut below)
     }
 }
 
@@ -376,9 +456,10 @@ mod tests {
             }]),
         );
         let rewards = FieldKillRewards::parse(&bytes).unwrap();
-        assert_eq!(rewards.reward_for(930050, 1), Some((2, 5)));
-        assert_eq!(rewards.reward_for(930050, 3), Some((4, 10)));
-        assert_eq!(rewards.reward_for(3156, 3), Some((1, 3)));
+        let pair = |definition, level| rewards.reward_for(definition, level).map(|r| r.pair());
+        assert_eq!(pair(930050, 1), Some((2, 5)));
+        assert_eq!(pair(930050, 3), Some((4, 10)));
+        assert_eq!(pair(3156, 3), Some((1, 3)));
         assert_eq!(rewards.reward_for(930050, 0), None);
         assert_eq!(rewards.reward_for(930050, 21), None);
         assert_eq!(rewards.reward_for(930050, 5), None);
@@ -518,7 +599,7 @@ mod tests {
                 "the shipped field content no longer has {definition_id} at level {level}"
             );
             assert_eq!(
-                rewards.reward_for(definition_id, level),
+                rewards.reward_for(definition_id, level).map(|r| r.pair()),
                 Some(expected),
                 "{definition_id} level {level}"
             );
@@ -529,12 +610,13 @@ mod tests {
     fn the_shipped_table_covers_the_high_band_and_pays_nothing_past_20() {
         let shipped = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
         let rewards = FieldKillRewards::load(shipped).unwrap();
-        assert_eq!(rewards.reward_for(930053, 10), Some((12, 25)));
-        assert_eq!(rewards.reward_for(930025, 13), Some((12, 25)));
-        assert_eq!(rewards.reward_for(930025, 14), Some((18, 35)));
-        assert_eq!(rewards.reward_for(930025, 20), Some((18, 35)));
+        let pair = |definition, level| rewards.reward_for(definition, level).map(|r| r.pair());
+        assert_eq!(pair(930053, 10), Some((12, 25)));
+        assert_eq!(pair(930025, 13), Some((12, 25)));
+        assert_eq!(pair(930025, 14), Some((18, 35)));
+        assert_eq!(pair(930025, 20), Some((18, 35)));
         assert_eq!(rewards.reward_for(930025, 21), None);
         // The wolf override still owns every level-14 definition-3156 kill.
-        assert_eq!(rewards.reward_for(3156, 14), Some((2, 5)));
+        assert_eq!(pair(3156, 14), Some((2, 5)));
     }
 }

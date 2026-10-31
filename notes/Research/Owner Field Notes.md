@@ -134,3 +134,19 @@ Observations the owner gathers from original-game videos and screenshots. They a
   - Chances stay tunable for group play.
   - The big heart's group heal must not stack absurdly.
   - The original game's behaviour is unrecorded, so this is (R).
+
+## 2026-10-31
+
+### Loot: what dropped where (the owner, 2026-10-31)
+- **Regular enemies in a combat dungeon never dropped permanent gear.** They often dropped temporary combat power-ups (Big Hearts, speed boosts): a floating icon over the knocked-out body that you walk into to use, or put on the hotkey.
+- **End-of-dungeon rewards.** Permanent items (weapons, job gear such as gloves and clothes, coins, potions) came as randomized loot pools when the dungeon was completed, not from individual regular mobs.
+- **Bosses.** Early in the game's life, the boss at the end of a dungeon had its own loot table and dropped rare equipment directly on defeat. The sought-after "Green Text" weapons were random dungeon-boss drops until SOE retired direct green-weapon drops from dungeons in December 2009, moving gear toward crafting, trading and quest rewards.
+- **Sunstone Valley (added later)** was the exception: an open-world combat zone where normal wilderness enemies did drop clothes, crafting ingredients, recipes and coins directly on the ground.
+- Lead use (L084 loot tables): item loot is opt-in per enemy row (Sunstone Valley's wilderness enemies, bosses), never a blanket per-mob chance (Sanctuary's `mob-loot` guess contradicts this). Dungeon and battle completion pools are the main home of item loot, and the green-weapon boss drop is an early-era rule.
+
+### No loot bags: Mystery Chests and TCG loot cards (the owner, 2026-10-31)
+- Free Realms had no loot bags as a core mechanic. Random rewards came from two things:
+- **Mystery Chests:** one free chest a day for taking part in combat minigames; opening one needs a Mystery Key bought with Station Cash; it gives random cosmetics (hoodies, beanies, hover boots) or rare mounts. Themed chests followed (Sci-Fi Mystery Chest, Clockwork Mystery Chest).
+- **TCG loot cards:** the Topps Free Realms Trading Card Game sold packs and starter decks in stores; each pack held one virtual loot card with a code typed into the game for an exclusive item, pet (such as the Black Labrador) or ride.
+- Lead use: no `open_loot_table` bag kind (L084 part C dropped). Our chest already needs a chest plus a Mystery Key (item 78137); the daily free chest from combat minigames and the themed chest pools are follow-ups, and loot tables can drive the pools. Loot-card codes are redeem codes (L081).
+- Wiki fact-check (lead, 2026-10-31, local Fandom harvest): "loot bag" never appears, but four container items do. **Battle Item Mystery Pack** is on every dungeon's job prize wheel ("This prize grants the winner 3 battle items!"); **Thick Pocket Book** ("Looks like a powerful opponent dropped some of his belongings", giving sellable items such as a Mint Condition Antique Coin worth 50); a Marketplace **Daily Grab Bag** (2013 screenshot: 250, was 550); and holiday-boss chests giving each participant one random **Mystery Gift** (Snow Days, Super Spooktacular, Birthday Bash, Festival of Hearts). The dungeon pages also confirm end-of-dungeon rewards as a per-job prize wheel (gear, a Battle Item Mystery Pack, coins).

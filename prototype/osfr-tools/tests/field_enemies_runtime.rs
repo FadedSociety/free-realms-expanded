@@ -154,6 +154,42 @@ fn lost_target_returns_at_run_speed_then_heals() {
     assert!(healed);
 }
 
+/// L084 (Sanctuary port P3, loot tables): a field kill reward row can roll a loot table. The roll's items
+/// ride the reward as bonus items (granted only with bag room), its coins and XP add to the row's pair, and a
+/// row naming a table that does not exist refuses to load.
+#[test]
+fn a_kill_reward_row_with_loot_pays_the_rolled_items() {
+    let f = Fixture::new(1, 0.0);
+    let source = json!([{"kind": "reconstructed", "evidence": "(R) test table"}]);
+    let tables = json!({"schema_version": 1, "tables": [{"key": "wolf-drops", "source": source, "entries": [
+        {"kind": "item", "weight": 1, "definition_id": 2001, "quantity": 2}
+    ]}]});
+    fs::write(f.0.join("loot_tables.json"), tables.to_string()).unwrap();
+    let rewards = |table: &str| {
+        json!({"schema_version": 1, "level_rewards": [{"min_level": 1, "max_level": 1, "coins": 3, "job_xp": 4,
+            "loot": {"table": table, "percent": 100}, "source": source}]})
+        .to_string()
+    };
+    fs::write(f.0.join("field_kill_rewards.json"), rewards("wolf-drops")).unwrap();
+    let mut e = f.load();
+    let mut paid = Vec::new();
+    for t in 0..300 {
+        paid.extend(e.attack(GUID, at(&e), 11, 0, t * 700).unwrap().rewards);
+        if !paid.is_empty() {
+            break;
+        }
+    }
+    assert_eq!(paid.len(), 1, "one kill, one payout");
+    assert_eq!((paid[0].coins, paid[0].job_xp), (3, 4));
+    assert_eq!(paid[0].bonus_items, vec![(2001, 2)]);
+
+    fs::write(f.0.join("field_kill_rewards.json"), rewards("missing")).unwrap();
+    assert!(
+        EncounterEngine::load(&f.0, None).is_err(),
+        "an unknown loot table refuses to load"
+    );
+}
+
 #[test]
 fn kill_then_respawn_forgets_skill_effects() {
     let f = Fixture::new(1, 0.0);
