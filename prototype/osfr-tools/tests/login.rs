@@ -330,6 +330,15 @@ fn account_login_creates_lists_selects_and_deletes_two_characters() {
     let listed = service.handle(&[11]).unwrap().replies.remove(0);
     assert_eq!(listed[0], 12);
     assert_eq!(u32::from_le_bytes(listed[6..10].try_into().unwrap()), 2);
+    // L079: each row's appearance payload names its own character (the client selects by it).
+    let mut at = 10;
+    for _ in 0..2 {
+        let guid = u64::from_le_bytes(listed[at..at + 8].try_into().unwrap());
+        let len = u32::from_le_bytes(listed[at + 16..at + 20].try_into().unwrap()) as usize;
+        let inner = &listed[at + 20..at + 20 + len];
+        assert_eq!(u64::from_le_bytes(inner[4..12].try_into().unwrap()), guid);
+        at += 20 + len;
+    }
     let store = AccountStore::load(&t.0.join("accounts.json")).unwrap();
     assert_eq!(store.account(1).unwrap().character_guids, [1, 2]);
 

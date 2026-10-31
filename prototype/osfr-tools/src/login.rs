@@ -332,7 +332,13 @@ impl LoginService {
             // The row payload is the appearance record the native character
             // select renders from (accepted natively before W59); see
             // `selection_reply`. A base64 name here drops the model.
-            payload(&mut bytes, &appearance_payload(&record.identity));
+            // L079: the client selects by the guid inside this payload; stored identities all
+            // hold guid 1, so a second account's relog selected character 1 and was refused.
+            let identity = CharacterIdentity {
+                guid: entry.guid,
+                ..record.identity.clone()
+            };
+            payload(&mut bytes, &appearance_payload(&identity));
         }
         Ok(bytes)
     }
