@@ -332,8 +332,10 @@ impl Gameplay {
         character: &CharacterState,
         now_ms: u64,
     ) -> io::Result<Option<Outcome>> {
-        let minigame_active = self.blocks(|gates| gates.pets);
-        let busy = crate::pets::PetBusy { minigame_active };
+        let blocker = self.blocker(|gates| gates.pets);
+        let busy = crate::pets::PetBusy {
+            minigame_active: blocker.is_some(),
+        };
         // T490: the 53/26 walk check samples the character's zone heightfield (none without a grid).
         // T534: and the zone's baked placed-object meshes, when the bake wrote them.
         let terrain = self.terrain.clone();
@@ -359,6 +361,11 @@ impl Gameplay {
         // T788: only an accepted 53/7 carries the trick, so a refusal or a 53/8 credits no quest.
         let accepted_trick = wire.accepted_trick;
         let mut out = Self::pet_outcome(wire);
+        // L082 (owner playtest 2026-10-30): a trick refused for an activity said nothing.
+        if let Some(blocker) = blocker.filter(|_| inner.starts_with(&[53, 0, 7])) {
+            let line = format!("Your pet can't do tricks during {}.", blocker.activity());
+            out.replies.push(chat::system(&line));
+        }
         self.sync_happy_buff(character, now_ms, &mut out);
         self.pet_trick_quest_event(accepted_trick, &mut out)?;
         Ok(Some(out))

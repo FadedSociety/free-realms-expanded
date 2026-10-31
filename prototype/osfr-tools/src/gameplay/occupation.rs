@@ -75,6 +75,28 @@ impl Occupation {
     /// only on an ability or item use (`SendDismountRequest` 0x00b06cc0, four callers), never on
     /// the 26/8 interaction (`PlayClient::RequestInteraction` 0x0092efe0), so the server ends it.
     /// Their row now matches Encounter's: start, warp, ride and pets; not location.
+    /// L082: the activity as a refusal line names it ("... during a kart race").
+    pub(super) const fn activity(self) -> &'static str {
+        use Occupation::*;
+        match self {
+            Forging => "forging",
+            Smelting => "smelting",
+            Cooking => "cooking",
+            Mining => "mining",
+            Harvesting => "harvesting",
+            Chess => "a chess game",
+            CardGame => "a card game",
+            Encounter | FieldEngaged => "a fight",
+            Derby => "a derby",
+            Fishing => "fishing",
+            Soccer => "a soccer match",
+            Kart => "a kart race",
+            Housing => "a house visit",
+            Groom => "grooming",
+            Wheel => "the prize wheel",
+        }
+    }
+
     pub(super) const fn gates(self) -> Gates {
         use Occupation::*;
         let (start, warp, ride, pets, location) = match self {
@@ -139,10 +161,15 @@ impl Gameplay {
 
     /// Whether any active occupation closes this gate.
     pub(super) fn blocks(&self, gate: fn(Gates) -> bool) -> bool {
+        self.blocker(gate).is_some()
+    }
+
+    /// L082: the first running activity whose `gate` is closed, so a refusal can say why.
+    pub(super) fn blocker(&self, gate: fn(Gates) -> bool) -> Option<Occupation> {
         Occupation::ALL
             .iter()
             .copied()
-            .any(|occupation| gate(occupation.gates()) && self.is_occupied(occupation))
+            .find(|occupation| gate(occupation.gates()) && self.is_occupied(*occupation))
     }
 
     /// True while a crafting, gathering or battle activity is running.

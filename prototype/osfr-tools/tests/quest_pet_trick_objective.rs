@@ -369,6 +369,9 @@ fn blocked_pet_credits_nothing() {
         !accepted(&refused.replies),
         "a blocked pet refuses the trick"
     );
+    // L082: the refusal says what blocks it, instead of nothing.
+    let why = osfr_tools::chat::system("Your pet can't do tricks during a chess game.");
+    assert!(refused.replies.contains(&why), "{:?}", refused.replies);
     assert!(
         quest_packets(&refused).is_empty(),
         "a blocked pet sends no quest packet"
