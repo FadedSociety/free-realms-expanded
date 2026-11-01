@@ -66,8 +66,12 @@ impl Drop for Fixture {
 fn id(g: &Cooking) -> i32 {
     g.state().active.as_ref().unwrap().instance_id
 }
+/// A movie payload as the native client sends it after launch: GameId -1 (`SendPayload
+/// 009be6b0`), bound by the active instance, so any recipe's game accepts it (L099).
 fn send(g: &mut Cooking, text: &str) -> cooking::CookingOutcome {
-    g.handle(&payload_packet(id(g), text).unwrap()).unwrap()
+    let mut packet = payload_packet(id(g), text).unwrap();
+    packet[11..15].copy_from_slice(&(-1_i32).to_le_bytes());
+    g.handle(&packet).unwrap()
 }
 fn start(g: &mut Cooking) -> cooking::CookingOutcome {
     let mut b = vec![39, 0, 5];

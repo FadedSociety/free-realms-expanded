@@ -11,7 +11,7 @@
       "job_profile_id": 45,
       "required_job_rank": null,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 198,
       "ingredients": [
         {
           "definition_id": 2883,
@@ -99,6 +99,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Sugar count 8."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 198 is the 'Cooking: Briarmelon Surprise' game (NAME_ID 386064); the live server's Games window row 476 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -130,7 +134,7 @@
       "job_profile_id": 45,
       "required_job_rank": 1,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 178,
       "ingredients": [
         {
           "definition_id": 2859,
@@ -230,6 +234,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Butter count 3."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 178 is the 'Cooking: Burnetta's Curious Creation' game (NAME_ID 386029); the live server's Games window row 455 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -261,7 +269,7 @@
       "job_profile_id": 45,
       "required_job_rank": 20,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 197,
       "ingredients": [
         {
           "definition_id": 2883,
@@ -361,6 +369,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Sugar count 8."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 197 is the 'Cooking: Candied Briarmelon' game (NAME_ID 386063); the live server's Games window row 475 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -392,7 +404,7 @@
       "job_profile_id": 45,
       "required_job_rank": 5,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 179,
       "ingredients": [
         {
           "definition_id": 2879,
@@ -492,6 +504,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Sugar count 4."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 179 is the 'Cooking: Crispy Choychoy Delight' game (NAME_ID 386030); the live server's Games window row 456 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -523,7 +539,7 @@
       "job_profile_id": 45,
       "required_job_rank": 1,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 194,
       "ingredients": [
         {
           "definition_id": 2884,
@@ -623,6 +639,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Egg count 7."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 194 is the 'Cooking: De'Flor Family Fried Dumplings' game (NAME_ID 386060); the live server's Games window row 472 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -658,7 +678,7 @@
       "job_profile_id": 45,
       "required_job_rank": 1,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 185,
       "ingredients": [
         {
           "definition_id": 2886,
@@ -758,6 +778,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Spice count 7."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 185 is the 'Cooking: Fried Starnut Stick' game (NAME_ID 386049); the live server's Games window row 463 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -789,7 +813,7 @@
       "job_profile_id": 45,
       "required_job_rank": 15,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 182,
       "ingredients": [
         {
           "definition_id": 2887,
@@ -889,6 +913,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Broth count 3."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 182 is the 'Cooking: Glerga's Gourmet Goulash' game (NAME_ID 386044); the live server's Games window row 459 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -920,7 +948,7 @@
       "job_profile_id": 45,
       "required_job_rank": 1,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 175,
       "ingredients": [
         {
           "definition_id": 2875,
@@ -1020,6 +1048,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Broth count 3."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 175 is the 'Cooking: Gummyfruit Gumbo' game (NAME_ID 386026); the live server's Games window row 452 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -1051,7 +1083,7 @@
       "job_profile_id": 45,
       "required_job_rank": 1,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 183,
       "ingredients": [
         {
           "definition_id": 2875,
@@ -1151,6 +1183,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Sugar count 4."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 183 is the 'Cooking: Gummyfruit Topped Sundae' game (NAME_ID 386045); the live server's Games window row 460 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -1182,7 +1218,7 @@
       "job_profile_id": 45,
       "required_job_rank": 20,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 195,
       "ingredients": [
         {
           "definition_id": 2878,
@@ -1282,6 +1318,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Spice count 8."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 195 is the 'Cooking: Honey Roasted Moonbean' game (NAME_ID 386061); the live server's Games window row 473 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -1313,7 +1353,7 @@
       "job_profile_id": 45,
       "required_job_rank": 15,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 189,
       "ingredients": [
         {
           "definition_id": 2882,
@@ -1413,6 +1453,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Spice count 7."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 189 is the 'Cooking: Merri's Marinated Mystery Meat' game (NAME_ID 386053); the live server's Games window row 467 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -1444,7 +1488,7 @@
       "job_profile_id": 45,
       "required_job_rank": 1,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 199,
       "ingredients": [
         {
           "definition_id": 2878,
@@ -1544,6 +1588,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Snowhill Ice Cream: Chocolate count 3."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 199 is the 'Cooking: Moonbean Mousse' game (NAME_ID 386065); the live server's Games window row 477 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -1575,7 +1623,7 @@
       "job_profile_id": 45,
       "required_job_rank": 1,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 196,
       "ingredients": [
         {
           "definition_id": 2878,
@@ -1675,6 +1723,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Snowhill Ice Cream: Vanilla count 3."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 196 is the 'Cooking: Moonbean Sundae Sweettreat' game (NAME_ID 386062); the live server's Games window row 474 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -1706,7 +1758,7 @@
       "job_profile_id": 45,
       "required_job_rank": null,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 180,
       "ingredients": [
         {
           "definition_id": 2859,
@@ -1794,6 +1846,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Spice count 4."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 180 is the 'Cooking: Mystery Pot Roast' game (NAME_ID 386042); the live server's Games window row 457 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -1825,7 +1881,7 @@
       "job_profile_id": 45,
       "required_job_rank": 15,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 193,
       "ingredients": [
         {
           "definition_id": 2875,
@@ -1925,6 +1981,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Egg count 7."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 193 is the 'Cooking: Oddly Colored Omelette' game (NAME_ID 386059); the live server's Games window row 471 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -1956,7 +2016,7 @@
       "job_profile_id": 45,
       "required_job_rank": 1,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 188,
       "ingredients": [
         {
           "definition_id": 2884,
@@ -2056,6 +2116,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Egg count 6."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 188 is the 'Cooking: Rainleaf Wrapped Dumpling' game (NAME_ID 386052); the live server's Games window row 466 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -2087,7 +2151,7 @@
       "job_profile_id": 45,
       "required_job_rank": 1,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 190,
       "ingredients": [
         {
           "definition_id": 2875,
@@ -2187,6 +2251,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Broth count 7."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 190 is the 'Cooking: Royal Stew du Jour' game (NAME_ID 386054); the live server's Games window row 468 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -2218,7 +2286,7 @@
       "job_profile_id": 45,
       "required_job_rank": 1,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 174,
       "ingredients": [
         {
           "definition_id": 2877,
@@ -2318,6 +2386,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Broth count 3."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 174 is the 'Cooking: Savory Spiralmint Soup' game (NAME_ID 386025); the live server's Games window row 451 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -2349,7 +2421,7 @@
       "job_profile_id": 45,
       "required_job_rank": 1,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 191,
       "ingredients": [
         {
           "definition_id": 2880,
@@ -2449,6 +2521,10 @@
         "ingredients[3].count": {
           "kind": "client",
           "evidence": "lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json Recipes[Unknown=51].ComponentData[3].Unknown3=7."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 191 is the 'Cooking: Seared Stainberry' game (NAME_ID 386055); the live server's Games window row 469 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -2476,7 +2552,7 @@
       "job_profile_id": 45,
       "required_job_rank": 10,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 184,
       "ingredients": [
         {
           "definition_id": 2876,
@@ -2576,6 +2652,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Butter count 6."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 184 is the 'Cooking: Sizzling Snowberry Saute' game (NAME_ID 386046); the live server's Games window row 462 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -2607,7 +2687,7 @@
       "job_profile_id": 45,
       "required_job_rank": 5,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 181,
       "ingredients": [
         {
           "definition_id": 2893,
@@ -2707,6 +2787,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Broth count 4."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 181 is the 'Cooking: Slugmud Surprise' game (NAME_ID 386043); the live server's Games window row 458 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -2738,7 +2822,7 @@
       "job_profile_id": 45,
       "required_job_rank": 1,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 192,
       "ingredients": [
         {
           "definition_id": 2882,
@@ -2838,6 +2922,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Butter count 7."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 192 is the 'Cooking: Spicy Vegetable Stirfry' game (NAME_ID 386056); the live server's Games window row 470 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -2869,7 +2957,7 @@
       "job_profile_id": 45,
       "required_job_rank": 1,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 173,
       "ingredients": [
         {
           "definition_id": 2877,
@@ -2969,6 +3057,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Spice count 3."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 173 is the 'Cooking: Simone's Spiralmint Steak' game (NAME_ID 386024); the live server's Games window row 450 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -3000,7 +3092,7 @@
       "job_profile_id": 45,
       "required_job_rank": 10,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 187,
       "ingredients": [
         {
           "definition_id": 2875,
@@ -3100,6 +3192,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Chocolate Bar count 3."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 187 is the 'Cooking: Stainberry Chocolate Gumdrop' game (NAME_ID 386051); the live server's Games window row 465 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [
@@ -3131,7 +3227,7 @@
       "job_profile_id": 45,
       "required_job_rank": 1,
       "minigame_type_id": 9,
-      "minigame_id": null,
+      "minigame_id": 186,
       "ingredients": [
         {
           "definition_id": 2886,
@@ -3231,6 +3327,10 @@
         "ingredients[3].count": {
           "kind": "wiki",
           "evidence": "local freerealms-wiki List of Recipes (Chef), oldid=45318; recipe list has 25 ingredient rows; Sugar count 6."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 186 is the 'Cooking: Starnut Sundae' game (NAME_ID 386050); the live server's Games window row 464 carried it as ContentId (data/content/activity_catalogue.json, L095)."
         }
       },
       "source": [

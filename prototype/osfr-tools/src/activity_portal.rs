@@ -115,7 +115,8 @@ const ART: &str = "bandit_hideout_detail.dds";
 const CHESS_CATEGORY: u32 = 0;
 const CHESS_DETAIL: &str = "chess_detail.dds";
 const CHESS_THUMBNAIL: &str = "chess_thumb.dds";
-const MAX_ACTIVITIES: usize = 64;
+/// L099: the service rows include one per runnable recipe (31 today).
+const MAX_ACTIVITIES: usize = 128;
 const MAX_FILE: u64 = 1 << 20;
 const PLAY_LEN: usize = 12;
 

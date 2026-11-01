@@ -703,9 +703,12 @@ fn shipped_minigame_producers_are_pinned() {
             .iter()
             .copied()
             .collect::<Vec<_>>(),
+        // L099: each cooking recipe credits its own MiniGameData row (173-199) since the movie
+        // runs it, no longer game 46 for every recipe.
         vec![
-            18, 20, 31, 39, 42, 43, 44, 46, 66, 67, 77, 111, 134, 135, 136, 137, 139, 596, 597,
-            598, 599, 600, 601, 604,
+            18, 20, 31, 39, 42, 43, 44, 46, 66, 67, 77, 111, 134, 135, 136, 137, 139, 173, 174,
+            175, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193,
+            194, 195, 196, 197, 198, 199, 596, 597, 598, 599, 600, 601, 604,
         ],
         "the finish_minigame producer set changed; update the producer table and this pin"
     );

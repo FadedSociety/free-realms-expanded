@@ -324,8 +324,8 @@ fn catalogue_validation() {
         Catalogue::new(vec![row(5, 0), row(5, 1)]).is_err(),
         "duplicate id"
     );
-    assert!(Catalogue::new((1..=64).map(|i| row(i, 0)).collect()).is_ok());
-    assert!(Catalogue::new((1..=65).map(|i| row(i, 0)).collect()).is_err());
+    assert!(Catalogue::new((1..=128).map(|i| row(i, 0)).collect()).is_ok());
+    assert!(Catalogue::new((1..=129).map(|i| row(i, 0)).collect()).is_err());
 }
 
 const BATTLES: &str = r#"{"schema_version":1,"battles":[
@@ -542,16 +542,16 @@ fn assembly_refuses_collisions_and_too_many_rows() {
             .append([chess_row(20).into(), chess_row(20).into()])
             .is_err()
     );
-    // 17 card rows plus 47 battles fit; one more does not.
-    let battles = |n: u32| (1000..1000 + n).map(|id| row(id, 0)).collect::<Vec<_>>();
+    // 17 card rows plus 111 battles fit (L099 cap 128); one more does not.
+    let battles = |n: u32| (2000..2000 + n).map(|id| row(id, 0)).collect::<Vec<_>>();
     assert!(
-        Catalogue::new(battles(47))
+        Catalogue::new(battles(111))
             .unwrap()
             .append(cards.portal_rows())
             .is_ok()
     );
     assert!(
-        Catalogue::new(battles(48))
+        Catalogue::new(battles(112))
             .unwrap()
             .append(cards.portal_rows())
             .is_err()
@@ -740,9 +740,8 @@ fn the_shipped_live_rows_cover_every_games_window_tile() {
 }
 
 /// L098: every shipped recipe with a MiniGameData row is a live crafting row's ContentId, so its
-/// Games window row starts it: the five smelting bars and the Spunky Scrapper Hammer (Strong Arm
-/// Stew's live row is hidden, category 99). The other cooking recipes carry no MiniGameData row
-/// yet: the cooking movie runs game 46's data for them, so their rows stay closed.
+/// Games window row starts it: 31 of 32 (Strong Arm Stew's live row is hidden, category 99).
+/// L099: the 25 cooking recipes carry their own rows since the movie runs any recipe's game.
 #[test]
 fn shipped_recipes_join_their_live_crafting_rows() {
     let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
@@ -757,5 +756,5 @@ fn shipped_recipes_join_their_live_crafting_rows() {
                 .any(|row| matches!(row.category, 12 | 14 | 21) && u64::from(row.content_id) == *id)
         })
         .count();
-    assert_eq!(joined, 6);
+    assert_eq!(joined, 31);
 }
