@@ -510,6 +510,9 @@ impl Gameplay {
         now_ms: u64,
     ) -> io::Result<Outcome> {
         use crate::encounter::SharedFieldAction;
+        if matches!(action, SharedFieldAction::Item { .. }) {
+            return self.throw_battle_item(action, field, known, character, now_ms);
+        }
         let mut out = Outcome::default();
         let Some(profile) = self
             .profiles
@@ -2218,7 +2221,7 @@ impl Gameplay {
             return Ok(outcome);
         }
         if self.opening.is_none() {
-            if let Some(result) = self.handle_item_bar(inner, character, now_ms)? {
+            if let Some(result) = self.handle_item_bar(inner, character, now_ms, None)? {
                 return Ok(result);
             }
             return self.handle(inner, character.guid, character.position, now_ms);
@@ -4160,7 +4163,7 @@ impl Gameplay {
             }
             return Ok(out);
         }
-        if let Some(result) = self.handle_item_bar(inner, character, now_ms)? {
+        if let Some(result) = self.handle_item_bar(inner, character, now_ms, None)? {
             return Ok(result);
         }
         if let Some(result) = self.handle_style_card(inner, character.guid)? {

@@ -94,17 +94,44 @@ impl Gameplay {
     /// player is mounted (the Mounts guide's wiki rule), busy (the start gate of the occupation
     /// table) or outside the open world (R), and otherwise leaves the definition in
     /// `Outcome::boombox` for the host to place the box after the commit.
+    ///
+    /// L088: a battle item flies at the clicked enemy, else the nearest in reach; with none in reach
+    /// (or the clicked one out of it) the bar refuses it and nothing is spent. `field` is the shared
+    /// field when the press was aimed at one of its enemies.
     pub(super) fn handle_item_bar(
         &mut self,
         inner: &[u8],
         character: &CharacterState,
         now_ms: u64,
+        mut field: Option<&mut crate::encounter::SharedFieldState>,
     ) -> io::Result<Option<Outcome>> {
         // T528: a saddle is not a bar item; its 42/16/42/15 pair opens the client's own ride
         // upgrade picker (36/17) and changes nothing.
         if let Some(out) = self.use_upgrade_item(inner)? {
             return Ok(Some(out));
         }
+        let aimed = inner
+            .starts_with(&[36, 0, 10, 0])
+            .then(|| crate::item_bar::use_wire::decode_client_request_start_ability(inner))
+            .flatten()
+            .and_then(|request| match request.target {
+                crate::item_bar::use_wire::Target::Guid(guid)
+                    if guid != 0 && guid != character.guid =>
+                {
+                    Some(guid)
+                }
+                _ => None,
+            });
+        let position = character.position;
+        let can_strike = match (self.encounter.as_mut(), field.as_deref_mut()) {
+            (Some(engine), Some(field)) => engine
+                .with_shared_fields(field, character.guid, |engine| {
+                    Ok(engine.battle_item_target(position, aimed))
+                })?
+                .is_some(),
+            (Some(engine), None) => engine.battle_item_target(position, aimed).is_some(),
+            (None, _) => false,
+        };
         let player = crate::item_bar::Player {
             guid: character.guid,
             alive: self
@@ -116,6 +143,7 @@ impl Gameplay {
                 && !self.blocks(|gates| gates.start),
             can_heal: self.encounter.is_some(),
             transformed: self.consumable_effects.has_transform(),
+            can_strike,
         };
         let Some(reply) = self
             .item_bar
@@ -150,6 +178,28 @@ impl Gameplay {
                 out.absorb(applied);
             }
         }
+        if let Some(strike) = reply.strike {
+            let throw = move |engine: &mut crate::encounter::EncounterEngine| {
+                engine.use_battle_item(
+                    strike.damage,
+                    strike.stun_ms,
+                    strike.radius,
+                    aimed,
+                    position,
+                    now_ms,
+                )
+            };
+            let result = match (self.encounter.as_mut(), field) {
+                (Some(engine), Some(field)) => {
+                    Some(engine.with_shared_fields(field, character.guid, throw)?)
+                }
+                (Some(engine), None) => Some(throw(engine)?),
+                (None, _) => None,
+            };
+            if let Some(result) = result {
+                self.apply_encounter(result, &mut out)?;
+            }
+        }
         // T557: a cake is placed by the host after the commit; this press spent nothing.
         out.shared_cake = reply
             .place
@@ -157,6 +207,22 @@ impl Gameplay {
         // T789: only a single-use item that was actually spent credits a `use_item` objective.
         self.emit_item_use(reply.used_definition, &mut out)?;
         Ok(Some(out))
+    }
+
+    /// L088: an item-bar press aimed at a shared field enemy, under the same interest restriction
+    /// as a job ability; the field is lent to the encounter engine for the check and the throw.
+    pub(super) fn throw_battle_item(
+        &mut self,
+        action: &crate::encounter::SharedFieldAction,
+        field: &mut crate::encounter::SharedFieldState,
+        known: &std::collections::BTreeSet<u64>,
+        character: &CharacterState,
+        now_ms: u64,
+    ) -> io::Result<Outcome> {
+        let presence = field.restrict_to(known);
+        let result = self.handle_item_bar(&action.request(), character, now_ms, Some(field));
+        field.restore_presence(presence);
+        Ok(result?.unwrap_or_default())
     }
 
     /// T557: the host could not place the cake `definition` a press named (the world holds its

@@ -68,6 +68,10 @@ const MAX_EFFECT_ROWS: usize = 512;
 const MAX_COOLDOWN_MS: u32 = 86_400_000;
 /// (R) OSFR `MinCooldownMs`: the client never shows a shorter recast than this.
 const MIN_COOLDOWN_MS: u32 = 3_000;
+// L088 (R) sanity bounds on a strike row, not tuning values.
+const MAX_STRIKE_DAMAGE: u32 = 100_000;
+const MAX_STUN_MS: u64 = 60_000;
+const MAX_BLAST_RADIUS: f32 = 30.0;
 const SUB_ASSIGN_BY_RECORD: &[u8] = &[42, 0, 9, 0];
 
 /// One usable consumable row. `name_id`/`description_id` are the 42/16 confirm text and the buff
@@ -84,7 +88,7 @@ pub struct Effect {
     pub source: String,
 }
 
-/// The six row effects. A heal is applied by the caller to health; the aura, transform, scale and boost
+/// The seven row effects. A heal (to health) and a strike (L088, at enemies) are applied by the caller; the aura, transform, scale and boost
 /// become a [`consumable_effects::Spec`] that the caller applies through the shared effect stack;
 /// a placed cake is put in the world by the host (T557).
 #[derive(Clone, Copy, Debug, PartialEq, Deserialize)]
@@ -122,6 +126,16 @@ pub enum EffectKind {
         percent: u32,
         duration_ms: u64,
         icon_id: i32,
+    },
+    /// L088: a battle item: `damage` (its tier-1 value) and a `stun_ms` stun on the enemy it lands
+    /// on and, with a `radius`, on every enemy within it of that one.
+    Strike {
+        #[serde(default)]
+        damage: u32,
+        #[serde(default)]
+        stun_ms: u64,
+        #[serde(default)]
+        radius: f32,
     },
     /// The cake row of `placed_cakes.json` this item places; it must be the item's own definition
     /// (the host refunds a refused place by definition). Never single-use.
@@ -188,6 +202,16 @@ impl Effect {
                         && duration(duration_ms)
                         && (1..=consumable_effects::MAX_BOOST_PERCENT).contains(&percent)
                 }
+                EffectKind::Strike {
+                    damage,
+                    stun_ms,
+                    radius,
+                } => {
+                    (damage > 0 || stun_ms > 0)
+                        && damage <= MAX_STRIKE_DAMAGE
+                        && stun_ms <= MAX_STUN_MS
+                        && (0.0..=MAX_BLAST_RADIUS).contains(&radius)
+                }
             }
     }
 
@@ -211,6 +235,22 @@ impl Effect {
         }
     }
 
+    /// L088: a battle item's throw.
+    fn strike(&self) -> Option<Strike> {
+        match self.effect {
+            EffectKind::Strike {
+                damage,
+                stun_ms,
+                radius,
+            } => Some(Strike {
+                damage,
+                stun_ms,
+                radius,
+            }),
+            _ => None,
+        }
+    }
+
     /// L085: the rest of a heal over time, `(percent, over_ms)`.
     fn heal_over(&self) -> Option<(u32, u64)> {
         match self.effect {
@@ -226,7 +266,9 @@ impl Effect {
     /// The effect-stack spec for a non-heal row; `None` for a heal.
     pub fn spec(&self) -> Option<consumable_effects::Spec> {
         let (kind, duration_ms, icon_id) = match self.effect {
-            EffectKind::Heal { .. } | EffectKind::PlacedCake { .. } => return None,
+            EffectKind::Heal { .. } | EffectKind::PlacedCake { .. } | EffectKind::Strike { .. } => {
+                return None;
+            }
             EffectKind::Aura {
                 composite_effect_id,
                 duration_ms,
@@ -460,6 +502,16 @@ pub struct Player {
     pub can_heal: bool,
     /// A temporary appearance is live, so a transform row is refused (R).
     pub transformed: bool,
+    /// L088: an enemy stands where a battle item would land, so a strike row may be used.
+    pub can_strike: bool,
+}
+
+/// L088: a battle item's throw, for the caller's encounter engine (see [`EffectKind::Strike`]).
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct Strike {
+    pub damage: u32,
+    pub stun_ms: u64,
+    pub radius: f32,
 }
 
 /// What a handled request produced. `heal_percent` is for the caller to apply to the player's
@@ -475,6 +527,8 @@ pub struct Reply {
     pub heal_percent: u32,
     /// L085: the rest of a heal over time, `(percent, over_ms)`, for the caller's encounter engine.
     pub heal_over: Option<(u32, u64)>,
+    /// L088: the battle item just spent, for the caller to throw.
+    pub strike: Option<Strike>,
     pub boombox: Option<i32>,
     pub effect: Option<consumable_effects::Spec>,
     /// T557: the cake row (a `placed_cakes.json` `item_id`) the host must now place. The item is
@@ -492,6 +546,7 @@ struct Use {
     replies: Vec<Vec<u8>>,
     heal_percent: u32,
     heal_over: Option<(u32, u64)>,
+    strike: Option<Strike>,
     effect: Option<consumable_effects::Spec>,
     place: Option<i32>,
     spent: bool,
@@ -780,6 +835,7 @@ impl ItemBar {
                     changed: used.spent,
                     heal_percent: used.heal_percent,
                     heal_over: used.heal_over,
+                    strike: used.strike,
                     effect: used.effect,
                     place: used.place,
                     used_definition: used.spent.then_some(used.definition),
@@ -804,10 +860,12 @@ impl ItemBar {
             replies: vec![abilities::unsupported_cast_failure()],
             ..Reply::default()
         };
-        // Self-target only: a forged guid can't redirect the heal (R). 0 is "no target".
-        let on_self =
-            matches!(request.target, use_wire::Target::Guid(g) if g == player.guid || g == 0);
+        // Self-target only: a forged guid can't redirect the heal (R). 0 is "no target". L088: a
+        // battle item is thrown at the clicked actor; the caller's engine decides what it hits.
         let binding = self.bar.bound(request.slot);
+        let thrown = binding.is_some_and(|b| self.strikes(b.item_instance_id, inventory));
+        let on_self = matches!(request.target,
+            use_wire::Target::Guid(g) if thrown || g == player.guid || g == 0);
         let (true, Some(binding)) = (on_self, binding) else {
             return Ok(refused());
         };
@@ -833,6 +891,7 @@ impl ItemBar {
                     changed: used.spent,
                     heal_percent: used.heal_percent,
                     heal_over: used.heal_over,
+                    strike: used.strike,
                     effect: used.effect,
                     place: used.place,
                     used_definition: used.spent.then_some(used.definition),
@@ -864,6 +923,7 @@ impl ItemBar {
         let spent = effect.single_use;
         let heal_percent = effect.heal_percent();
         let heal_over = effect.heal_over();
+        let strike = effect.strike();
         let spec = effect.spec();
         let place = match effect.effect {
             EffectKind::PlacedCake { row } => Some(row),
@@ -882,11 +942,23 @@ impl ItemBar {
             replies,
             heal_percent,
             heal_over,
+            strike,
             effect: spec,
             place,
             spent,
             definition,
         })
+    }
+
+    /// L088: whether instance `id` is a battle item.
+    fn strikes(&self, id: i32, inventory: &Inventory) -> bool {
+        inventory
+            .state()
+            .items
+            .iter()
+            .find(|i| i.id == id)
+            .and_then(|i| self.effects.get(i.definition_id))
+            .is_some_and(|row| matches!(row.effect, EffectKind::Strike { .. }))
     }
 
     fn usable(
@@ -921,6 +993,9 @@ impl ItemBar {
             return Ok(());
         };
         if matches!(effect.effect, EffectKind::Heal { .. }) && !player.can_heal {
+            return Err(Refusal::NotUsable);
+        }
+        if matches!(effect.effect, EffectKind::Strike { .. }) && !player.can_strike {
             return Err(Refusal::NotUsable);
         }
         if matches!(effect.effect, EffectKind::PlacedCake { .. }) && !player.can_place_box {

@@ -37,15 +37,30 @@ pub(super) struct KillLedger {
 /// (R) Parsed intents only. Session supplies identity, position and instance.
 #[derive(Clone, Debug)]
 pub enum SharedFieldAction {
-    Ability { slot: i32, target: u64 },
-    Interact { target: u64, flag: u8 },
-    Select { target: u64, choice: i32 },
+    Ability {
+        slot: i32,
+        target: u64,
+    },
+    /// L088: an item-bar press aimed at a field enemy (a battle item, if the slot holds one).
+    Item {
+        slot: i32,
+        target: u64,
+    },
+    Interact {
+        target: u64,
+        flag: u8,
+    },
+    Select {
+        target: u64,
+        choice: i32,
+    },
 }
 
 impl SharedFieldAction {
     pub fn target(&self) -> u64 {
         match *self {
             Self::Ability { target, .. }
+            | Self::Item { target, .. }
             | Self::Interact { target, .. }
             | Self::Select { target, .. } => target,
         }
@@ -55,6 +70,14 @@ impl SharedFieldAction {
             Self::Ability { slot, target } => [
                 header(36, 10),
                 1_i32.to_le_bytes().to_vec(),
+                slot.to_le_bytes().to_vec(),
+                0_i32.to_le_bytes().to_vec(),
+                target.to_le_bytes().to_vec(),
+            ]
+            .concat(),
+            Self::Item { slot, target } => [
+                header(36, 10),
+                2_i32.to_le_bytes().to_vec(),
                 slot.to_le_bytes().to_vec(),
                 0_i32.to_le_bytes().to_vec(),
                 target.to_le_bytes().to_vec(),
@@ -375,10 +398,14 @@ impl EncounterEngine {
             if kind != 0 || inner.len() != 24 {
                 return Err(invalid("malformed shared target ability"));
             }
+            let target = u64::from_le_bytes(inner[16..24].try_into().unwrap());
+            // L088: an item-bar press aimed at a shared field enemy may throw a battle item.
+            if bar == 2 && known(target) {
+                return Ok(Some(SharedFieldAction::Item { slot, target }));
+            }
             if bar != 1 || !(0..=9).contains(&slot) {
                 return Ok(None);
             }
-            let target = u64::from_le_bytes(inner[16..24].try_into().unwrap());
             // Personal story actors keep their own route, including self selection.
             if self.enemy(target).is_some()
                 || (target == character.guid

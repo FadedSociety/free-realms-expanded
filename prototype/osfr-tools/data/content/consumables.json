@@ -80,6 +80,19 @@
       "source": "AAA Star Booster: the Super Star Booster's ability 203 in the client data, so its effect. Wiki: the Super Star Booster page and item tooltip read 'Activatable Effects: + 50% Stars' (SC Shop, 200 SC; Cannot Sell, Cannot Trade). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 841 NameId 3630 DescriptionId 3631 Icon 1157 ActivatableAbilityId 203 SingleUse true). Duration 1800000 (R): the client and the wiki say only 'for a while'; the BubbaJoeX fork's ItemAbilities.json picks 30 minutes. Cooldown 5000 (R, the fork's buff cooldown). The buff row shows the item's own icon (R). L087."
     },
     {
+      "definition": 1197,
+      "name_id": 6280,
+      "description_id": 6284,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "strike": {
+          "damage": 254
+        }
+      },
+      "source": "Wiki: the Wheeler Frag Orb tooltip reads 'Deals 254 damage.'; it shares the Frag Orb's ability 1644. (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 1197 NameId 6280 DescriptionId 6284 Icon 1904 ActivatableAbilityId 1644 SingleUse true). Damage is the tier-1 value; the engine scales it by the job level's tier (x1.75 at levels 4/8/12/16) like every hit. (R): the 10 m blast (our Flame Wave power-up's radius), the 20 m throw (the Wizard's reach), the 10 s recast (the BubbaJoeX fork's orb cooldown). L088."
+    },
+    {
       "definition": 2939,
       "name_id": 234,
       "description_id": 2740,
@@ -478,6 +491,34 @@
         }
       },
       "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 2031 (Wolf); item 3006 ActivatableAbilityId 2031 (Legacy@9e08202 ClientItemDefinitions Id 3006 NameId 242 DescriptionId 3153 SingleUse true); model 176 wolf.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3153: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 3015,
+      "name_id": 36523,
+      "description_id": 9166,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "strike": {
+          "stun_ms": 5000,
+          "radius": 10.0
+        }
+      },
+      "source": "Wiki: the Flabbergast Sphere tooltip reads 'Stuns all targets caught in the blast.'; Coin Shop, 50 coins (the client cost 50). No time is given: the Flabbergast Orb's 5 s (R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 3015 NameId 36523 DescriptionId 9166 Icon 1899 ActivatableAbilityId 5294 SingleUse true). Damage is the tier-1 value; the engine scales it by the job level's tier (x1.75 at levels 4/8/12/16) like every hit. (R): the 10 m blast (our Flame Wave power-up's radius), the 20 m throw (the Wizard's reach), the 10 s recast (the BubbaJoeX fork's orb cooldown). L088."
+    },
+    {
+      "definition": 3025,
+      "name_id": 36540,
+      "description_id": 9163,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "strike": {
+          "damage": 508,
+          "radius": 10.0
+        }
+      },
+      "source": "Wiki: the Frag Sphere tooltip reads 'Deals 508 damage at Level 1', 888 at 4, 1552 at 8, 2714 at 12, 4744 at 16 (our tier ladder gives 889/1556/2722/4764); Coin Shop, 50 coins (the client cost 50). Its wiki page also says it stuns, which the tooltip does not: no stun (R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 3025 NameId 36540 DescriptionId 9163 Icon 1905 ActivatableAbilityId 5290 SingleUse true). Damage is the tier-1 value; the engine scales it by the job level's tier (x1.75 at levels 4/8/12/16) like every hit. (R): the 10 m blast (our Flame Wave power-up's radius), the 20 m throw (the Wizard's reach), the 10 s recast (the BubbaJoeX fork's orb cooldown). L088."
     },
     {
       "definition": 3991,
@@ -1523,6 +1564,60 @@
         }
       },
       "source": "Sanctuary-main@10f129e Consumables.json Cakes ItemId 7974 (Boss Birthday Cake); item 7974 (Legacy@9e08202 ClientItemDefinitions Id 7974 NameId 30109 DescriptionId 30118 SingleUse false); placed by placed_cakes.json row 7974, whose item_cooldown_ms is the recast (R, T556)."
+    },
+    {
+      "definition": 10518,
+      "name_id": 36523,
+      "description_id": 9166,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "strike": {
+          "stun_ms": 5000,
+          "radius": 10.0
+        }
+      },
+      "source": "Wiki: the Flabbergast Sphere tooltip reads 'Stuns all targets caught in the blast.'; Coin Shop, 50 coins (the client cost 50). No time is given: the Flabbergast Orb's 5 s (R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 10518 NameId 36523 DescriptionId 9166 Icon 1899 ActivatableAbilityId 5294 SingleUse true). Damage is the tier-1 value; the engine scales it by the job level's tier (x1.75 at levels 4/8/12/16) like every hit. (R): the 10 m blast (our Flame Wave power-up's radius), the 20 m throw (the Wizard's reach), the 10 s recast (the BubbaJoeX fork's orb cooldown). L088."
+    },
+    {
+      "definition": 10519,
+      "name_id": 36540,
+      "description_id": 9163,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "strike": {
+          "damage": 508,
+          "radius": 10.0
+        }
+      },
+      "source": "Wiki: the Frag Sphere tooltip reads 'Deals 508 damage at Level 1', 888 at 4, 1552 at 8, 2714 at 12, 4744 at 16 (our tier ladder gives 889/1556/2722/4764); Coin Shop, 50 coins (the client cost 50). Its wiki page also says it stuns, which the tooltip does not: no stun (R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 10519 NameId 36540 DescriptionId 9163 Icon 1905 ActivatableAbilityId 5290 SingleUse true). Damage is the tier-1 value; the engine scales it by the job level's tier (x1.75 at levels 4/8/12/16) like every hit. (R): the 10 m blast (our Flame Wave power-up's radius), the 20 m throw (the Wizard's reach), the 10 s recast (the BubbaJoeX fork's orb cooldown). L088."
+    },
+    {
+      "definition": 11008,
+      "name_id": 20441,
+      "description_id": 20438,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "strike": {
+          "damage": 254
+        }
+      },
+      "source": "Wiki: the Frag Orb page and tooltip read 'Deals 254 damage.' (Battle Item Mystery Packs). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 11008 NameId 20441 DescriptionId 20438 Icon 1904 ActivatableAbilityId 1644 SingleUse true). Damage is the tier-1 value; the engine scales it by the job level's tier (x1.75 at levels 4/8/12/16) like every hit. (R): the 10 m blast (our Flame Wave power-up's radius), the 20 m throw (the Wizard's reach), the 10 s recast (the BubbaJoeX fork's orb cooldown). L088."
+    },
+    {
+      "definition": 11017,
+      "name_id": 20460,
+      "description_id": 20459,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "strike": {
+          "stun_ms": 5000
+        }
+      },
+      "source": "Wiki: the Flabbergast Orb page and tooltip read 'Stuns your target for 5 seconds.' (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 11017 NameId 20460 DescriptionId 20459 Icon 1898 ActivatableAbilityId 1653 SingleUse true). Damage is the tier-1 value; the engine scales it by the job level's tier (x1.75 at levels 4/8/12/16) like every hit. (R): the 10 m blast (our Flame Wave power-up's radius), the 20 m throw (the Wizard's reach), the 10 s recast (the BubbaJoeX fork's orb cooldown). L088."
     },
     {
       "definition": 15958,

@@ -5,7 +5,7 @@ use osfr_tools::{
     consumable_effects::{EffectStack, Kind, Spec},
     inventory::{Inventory, InventoryItem, InventoryState, RentalState},
     item_bar::{
-        Effect, EffectKind, Effects, ItemBar, Player, Reply,
+        Effect, EffectKind, Effects, ItemBar, Player, Reply, Strike,
         bar_wire::{self, SLOT_UPDATE_BYTES},
     },
 };
@@ -35,6 +35,7 @@ const ALIVE: Player = Player {
     can_place_box: true,
     can_heal: true,
     transformed: false,
+    can_strike: false,
 };
 const KNOCKED_OUT: Player = Player {
     alive: false,
@@ -1152,6 +1153,44 @@ fn a_refused_check_keeps_the_pending_confirmation() {
     assert!(is_chat(&refused));
     let used = run(&mut bar, &mut inventory, &use_item(10), &ALIVE, 0).unwrap();
     assert_eq!((used.heal_percent, count(&inventory, 10)), (35, 2));
+}
+
+/// L088: a battle item is spent only when an enemy stands where it would land, and it may be aimed
+/// at another actor (a potion may not: see the refusals above).
+#[test]
+fn a_battle_item_needs_an_enemy_in_reach_and_may_be_aimed() {
+    let fixture = Fixture::new();
+    fixture.write_consumables(&json!({
+        "schema_version": 2,
+        "consumables": [row_json(MEDIUM, 20441, 20438, 10_000, true, json!({"strike": {"damage": 254}}))],
+    }));
+    let (mut inventory, mut bar) = (fixture.inventory(), fixture.bar());
+    run(&mut bar, &mut inventory, &assign(0, 12), &ALIVE, 0).unwrap();
+    let enemy = ME + 1;
+    let kept = run(&mut bar, &mut inventory, &cast_on(2, 0, enemy), &ALIVE, 0).unwrap();
+    assert!(is_ability_failure(&kept) && kept.strike.is_none());
+    assert_eq!(count(&inventory, 12), 2, "no enemy in reach: kept");
+    let in_reach = Player {
+        can_strike: true,
+        ..ALIVE
+    };
+    let thrown = run(
+        &mut bar,
+        &mut inventory,
+        &cast_on(2, 0, enemy),
+        &in_reach,
+        0,
+    )
+    .unwrap();
+    assert_eq!(
+        thrown.strike,
+        Some(Strike {
+            damage: 254,
+            stun_ms: 0,
+            radius: 0.0
+        })
+    );
+    assert_eq!(count(&inventory, 12), 1);
 }
 
 #[test]

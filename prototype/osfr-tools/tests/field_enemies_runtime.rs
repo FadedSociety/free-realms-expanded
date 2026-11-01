@@ -221,6 +221,41 @@ fn a_heal_over_time_comes_a_step_a_second_and_stops() {
     assert_eq!(steps[3], steps[2], "nothing after the heal is spent");
 }
 
+/// L088: battle items (wiki numbers). A Frag Orb hits the clicked wolf for its 254 (or a critical);
+/// a clicked wolf out of reach is no target; a Flabbergast Orb stuns it for 5 s, so it cannot hit back.
+#[test]
+fn a_battle_item_strikes_or_stuns_the_wolf_in_reach() {
+    let f = Fixture::new(1, 0.0);
+    let mut e = f.load();
+    let near = [5.0, 0.0, 0.0];
+    assert_eq!(e.battle_item_target([60.0, 0.0, 0.0], Some(GUID)), None);
+    assert_eq!(
+        e.battle_item_target(near, None),
+        Some(GUID),
+        "no click: the nearest"
+    );
+    let thrown = e.use_battle_item(254, 0, 0.0, Some(GUID), near, 0).unwrap();
+    let (health, _) = hp(&thrown).expect("the wolf's health after the orb");
+    assert!(full() - health >= 254, "a 254 hit, or its critical");
+    let stunned = e
+        .use_battle_item(0, 5_000, 0.0, Some(GUID), near, 100)
+        .unwrap();
+    assert!(hp(&stunned).is_none(), "a stun deals no damage");
+    for t in 2..50 {
+        let out = e.tick(near, 12, t * 100).unwrap();
+        assert!(
+            hits_from(&out, GUID).is_empty(),
+            "stunned at {} ms",
+            t * 100
+        );
+    }
+    let mut hit_back = false;
+    for t in 52..=120 {
+        hit_back |= !hits_from(&e.tick(near, 12, t * 100).unwrap(), GUID).is_empty();
+    }
+    assert!(hit_back, "it fights again once the stun ends");
+}
+
 #[test]
 fn kill_then_respawn_forgets_skill_effects() {
     let f = Fixture::new(1, 0.0);

@@ -1008,6 +1008,7 @@ const ME: Player = Player {
     can_place_box: true,
     can_heal: true,
     transformed: false,
+    can_strike: false,
 };
 
 #[test]

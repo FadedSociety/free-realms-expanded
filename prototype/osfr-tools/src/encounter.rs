@@ -22,6 +22,7 @@ use std::{
 
 mod arena;
 mod battle_drops;
+mod battle_items;
 mod combat_scale;
 mod field;
 mod field_marker;

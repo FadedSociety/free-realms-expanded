@@ -37,7 +37,7 @@ fn the_shipped_rows_load_through_the_real_loader_with_their_client_checked_value
     let effects = Effects::load(&directory).expect("consumables.json parses");
     let rows = effects.rows();
     assert!(
-        (90..=110).contains(&rows.len()),
+        (90..=130).contains(&rows.len()),
         "{} consumable rows, outside the content bounds",
         rows.len()
     );
@@ -103,6 +103,7 @@ fn the_shipped_rows_load_through_the_real_loader_with_their_client_checked_value
     // The retained joins: 23 food items and 69 transformation items after the exclusions, and
     // the nine birthday cakes (T557).
     let (mut heals, mut auras, mut transforms, mut cakes, mut boosts) = (0, 0, 0, 0, 0);
+    let mut strikes = 0;
     for row in rows {
         match row.effect {
             EffectKind::Heal { .. } => heals += 1,
@@ -111,6 +112,7 @@ fn the_shipped_rows_load_through_the_real_loader_with_their_client_checked_value
             EffectKind::Scale { .. } => {}
             EffectKind::PlacedCake { .. } => cakes += 1,
             EffectKind::Boost { .. } => boosts += 1,
+            EffectKind::Strike { .. } => strikes += 1,
         }
     }
     assert_eq!(heals, 2);
@@ -119,6 +121,18 @@ fn the_shipped_rows_load_through_the_real_loader_with_their_client_checked_value
     assert_eq!(cakes, 9);
     // L087: three +50% star boosters (ability 203), the Wheeler star and coin scrolls (wiki).
     assert_eq!(boosts, 5);
+    // L088: the Frag and Flabbergast orbs and spheres (wiki).
+    assert_eq!(strikes, 7);
+    let frag = effects.get(11008).expect("Frag Orb");
+    assert!(matches!(
+        frag.effect,
+        EffectKind::Strike {
+            damage: 254,
+            stun_ms: 0,
+            ..
+        }
+    ));
+    assert_eq!((frag.name_id, frag.description_id), (20441, 20438));
     let booster = effects.get(78).expect("Super Star Booster");
     assert!(matches!(
         booster.effect,
