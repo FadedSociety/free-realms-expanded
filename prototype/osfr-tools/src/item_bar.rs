@@ -128,12 +128,17 @@ pub enum EffectKind {
         icon_id: i32,
     },
     /// L088: a battle item: `damage` (its tier-1 value) and a `stun_ms` stun on the enemy it lands
-    /// on and, with a `radius`, on every enemy within it of that one.
+    /// on and, with a `radius`, on every enemy within it of that one. L089: `sleep_ms` (a stun its
+    /// next hit ends) and `root_ms` (no walking until a hit).
     Strike {
         #[serde(default)]
         damage: u32,
         #[serde(default)]
         stun_ms: u64,
+        #[serde(default)]
+        sleep_ms: u64,
+        #[serde(default)]
+        root_ms: u64,
         #[serde(default)]
         radius: f32,
     },
@@ -205,11 +210,15 @@ impl Effect {
                 EffectKind::Strike {
                     damage,
                     stun_ms,
+                    sleep_ms,
+                    root_ms,
                     radius,
                 } => {
-                    (damage > 0 || stun_ms > 0)
+                    (damage > 0 || stun_ms > 0 || sleep_ms > 0 || root_ms > 0)
                         && damage <= MAX_STRIKE_DAMAGE
-                        && stun_ms <= MAX_STUN_MS
+                        && [stun_ms, sleep_ms, root_ms]
+                            .iter()
+                            .all(|ms| *ms <= MAX_STUN_MS)
                         && (0.0..=MAX_BLAST_RADIUS).contains(&radius)
                 }
             }
@@ -241,10 +250,14 @@ impl Effect {
             EffectKind::Strike {
                 damage,
                 stun_ms,
+                sleep_ms,
+                root_ms,
                 radius,
             } => Some(Strike {
                 damage,
                 stun_ms,
+                sleep_ms,
+                root_ms,
                 radius,
             }),
             _ => None,
@@ -511,6 +524,8 @@ pub struct Player {
 pub struct Strike {
     pub damage: u32,
     pub stun_ms: u64,
+    pub sleep_ms: u64,
+    pub root_ms: u64,
     pub radius: f32,
 }
 

@@ -101,7 +101,8 @@ impl ArenaSim {
                 }
                 continue;
             }
-            if delta > b.reach && b.mode != Mode::Stationary {
+            if delta > b.reach && b.mode != Mode::Stationary && !t.skills.rooted(actor.guid, now_ms)
+            {
                 let heading = [
                     (position[0] - s.position[0]) / delta,
                     0.0,
@@ -241,6 +242,7 @@ pub struct SharedArena {
     sim: ArenaSim,
     enemies: Vec<EnemyState>,
     stuns: BTreeMap<u64, u64>,
+    holds: BTreeMap<u64, super::skills::Hold>,
     target_buffs: BTreeMap<(u64, i32), SkillBuff>,
     /// The arena's own tick clock: one driver tick per interval, whoever drives it.
     last_tick: Option<u64>,
@@ -337,6 +339,7 @@ impl EncounterEngine {
             },
             enemies: self.state.active.as_ref()?.enemies.clone(),
             stuns: self.skills.stuns.clone(),
+            holds: self.skills.holds.clone(),
             target_buffs: self.skills.target_buffs.clone(),
             last_tick: None,
             won: false,
@@ -363,6 +366,7 @@ impl EncounterEngine {
             ..arena.sim.clone()
         };
         self.skills.stuns.clone_from(&arena.stuns);
+        self.skills.holds.clone_from(&arena.holds);
         self.skills.target_buffs.clone_from(&arena.target_buffs);
         true
     }
@@ -380,6 +384,7 @@ impl EncounterEngine {
             arena.won |= active.phase == EncounterPhase::Won;
         }
         arena.stuns.clone_from(&self.skills.stuns);
+        arena.holds.clone_from(&self.skills.holds);
         arena.target_buffs.clone_from(&self.skills.target_buffs);
     }
 

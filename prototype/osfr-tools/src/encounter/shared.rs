@@ -106,6 +106,7 @@ pub struct SharedFieldState {
     pub(super) field_sim: FieldSim,
     pub(super) dots: BTreeMap<u64, BTreeMap<(u64, i32), SkillDot>>,
     pub(super) stuns: BTreeMap<u64, u64>,
+    pub(super) holds: BTreeMap<u64, super::skills::Hold>,
     pub(super) target_buffs: BTreeMap<(u64, i32), SkillBuff>,
     pub(super) last_tick: Option<u64>,
     pub(super) template: Arc<Content>,
@@ -351,6 +352,7 @@ impl EncounterEngine {
             },
             dots: BTreeMap::new(),
             stuns: BTreeMap::new(),
+            holds: BTreeMap::new(),
             target_buffs: BTreeMap::new(),
             last_tick: None,
             template: self.content.clone(),
@@ -465,6 +467,8 @@ impl EncounterEngine {
         );
         let personal_stuns =
             std::mem::replace(&mut self.skills.stuns, std::mem::take(&mut runtime.stuns));
+        let personal_holds =
+            std::mem::replace(&mut self.skills.holds, std::mem::take(&mut runtime.holds));
         let personal_target_buffs = std::mem::replace(
             &mut self.skills.target_buffs,
             std::mem::take(&mut runtime.target_buffs),
@@ -476,6 +480,7 @@ impl EncounterEngine {
         );
         runtime.dots.retain(|_, dots| !dots.is_empty());
         runtime.stuns = std::mem::replace(&mut self.skills.stuns, personal_stuns);
+        runtime.holds = std::mem::replace(&mut self.skills.holds, personal_holds);
         runtime.target_buffs =
             std::mem::replace(&mut self.skills.target_buffs, personal_target_buffs);
         std::mem::swap(&mut self.field_sim, &mut runtime.field_sim);

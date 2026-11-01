@@ -1946,6 +1946,7 @@ impl EncounterEngine {
             self.arena.last_hit.insert(guid, member);
         }
         self.add_threat(guid, dealt);
+        self.skills.wake(guid, dealt);
         if let (Some(sender), true) = (self.shared_sender, dealt > 0) {
             self.field_sim
                 .kills

@@ -123,7 +123,13 @@ impl Gameplay {
                 _ => None,
             });
         let position = character.position;
+        // Only an item-bar press, check or use can spend a battle item: nothing else pays the scan.
+        let item_request = inner.starts_with(&[36, 0, 10, 0])
+            && inner.get(4..8) == Some(&2_i32.to_le_bytes()[..])
+            || inner.starts_with(&[42, 0, 15, 0])
+            || inner.starts_with(&[42, 0, 16, 0]);
         let can_strike = match (self.encounter.as_mut(), field.as_deref_mut()) {
+            _ if !item_request => false,
             (Some(engine), Some(field)) => engine
                 .with_shared_fields(field, character.guid, |engine| {
                     Ok(engine.battle_item_target(position, aimed))
@@ -180,14 +186,7 @@ impl Gameplay {
         }
         if let Some(strike) = reply.strike {
             let throw = move |engine: &mut crate::encounter::EncounterEngine| {
-                engine.use_battle_item(
-                    strike.damage,
-                    strike.stun_ms,
-                    strike.radius,
-                    aimed,
-                    position,
-                    now_ms,
-                )
+                engine.use_battle_item(strike, aimed, position, now_ms)
             };
             let result = match (self.encounter.as_mut(), field) {
                 (Some(engine), Some(field)) => {
@@ -222,7 +221,9 @@ impl Gameplay {
         let presence = field.restrict_to(known);
         let result = self.handle_item_bar(&action.request(), character, now_ms, Some(field));
         field.restore_presence(presence);
-        Ok(result?.unwrap_or_default())
+        let mut out = result?.unwrap_or_default();
+        self.sync_tracked_target(character, &mut out);
+        Ok(out)
     }
 
     /// T557: the host could not place the cake `definition` a press named (the world holds its

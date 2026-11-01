@@ -21,10 +21,19 @@ pub(super) struct SkillBuff {
 /// (R) Session-only skill state: DoTs, stuns and buffs. Reapplication refreshes
 /// one entry per target/definition; caster buffs are private to the player,
 /// while stuns and target buffs are shared with the field.
+/// L089: a battle item's hold on an enemy: asleep (its stun ends at a hit) or rooted.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) struct Hold {
+    pub(super) until: u64,
+    pub(super) root: bool,
+}
+
 #[derive(Clone, Default)]
 pub(super) struct SkillEffects {
     pub(super) dots: BTreeMap<(u64, i32), SkillDot>,
     pub(super) stuns: BTreeMap<u64, u64>,
+    /// L089: battle-item holds, shared like stuns.
+    pub(super) holds: BTreeMap<u64, Hold>,
     pub(super) caster_buffs: BTreeMap<i32, SkillBuff>,
     pub(super) target_buffs: BTreeMap<(u64, i32), SkillBuff>,
 }
@@ -33,6 +42,7 @@ impl SkillEffects {
     pub(super) fn clear(&mut self) {
         self.dots.clear();
         self.stuns.clear();
+        self.holds.clear();
         self.caster_buffs.clear();
         self.target_buffs.clear();
     }
@@ -41,17 +51,36 @@ impl SkillEffects {
     pub(super) fn forget_target(&mut self, guid: u64) {
         self.dots.retain(|(target, _), _| *target != guid);
         self.stuns.remove(&guid);
+        self.holds.remove(&guid);
         self.target_buffs.retain(|(target, _), _| *target != guid);
     }
 
     pub(super) fn expire(&mut self, now_ms: u64) {
         self.stuns.retain(|_, until| now_ms < *until);
+        self.holds.retain(|_, hold| now_ms < hold.until);
         self.caster_buffs.retain(|_, buff| now_ms < buff.until_ms);
         self.target_buffs.retain(|_, buff| now_ms < buff.until_ms);
     }
 
     pub(super) fn stunned(&self, guid: u64, now_ms: u64) -> bool {
         self.stuns.get(&guid).is_some_and(|until| now_ms < *until)
+    }
+
+    /// L089: a rooted enemy does not walk (it still strikes what is in reach).
+    pub(super) fn rooted(&self, guid: u64, now_ms: u64) -> bool {
+        self.holds
+            .get(&guid)
+            .is_some_and(|hold| hold.root && now_ms < hold.until)
+    }
+
+    /// L089: a hit that deals damage ends a sleep (its stun) or a root.
+    pub(super) fn wake(&mut self, guid: u64, dealt: u32) {
+        if dealt > 0
+            && let Some(hold) = self.holds.remove(&guid)
+            && !hold.root
+        {
+            self.stuns.remove(&guid);
+        }
     }
 
     /// (R) Strongest modifier wins; repeated casts refresh instead of stacking.

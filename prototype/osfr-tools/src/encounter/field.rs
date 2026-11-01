@@ -617,6 +617,8 @@ impl EncounterEngine {
                 }
             }
             let goal = match f.motion {
+                // L089: a rooted enemy does not walk; it still strikes what is in reach.
+                _ if f.motion != FieldMotion::Returning && self.skills.rooted(guid, now_ms) => None,
                 FieldMotion::Returning => Some(home),
                 FieldMotion::Chasing if delta > b.reach => Some(position),
                 FieldMotion::Idle if now_ms >= f.pause_until => f.roam_goal,

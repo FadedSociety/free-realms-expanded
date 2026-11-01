@@ -1186,8 +1186,7 @@ fn a_battle_item_needs_an_enemy_in_reach_and_may_be_aimed() {
         thrown.strike,
         Some(Strike {
             damage: 254,
-            stun_ms: 0,
-            radius: 0.0
+            ..Strike::default()
         })
     );
     assert_eq!(count(&inventory, 12), 1);

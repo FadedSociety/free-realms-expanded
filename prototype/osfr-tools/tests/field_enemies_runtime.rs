@@ -1,5 +1,6 @@
 use osfr_tools::{
     encounter::{EncounterEngine, EncounterOutcome},
+    item_bar::Strike,
     opening_abilities::JobAbility,
 };
 use serde_json::{Value, json};
@@ -234,11 +235,23 @@ fn a_battle_item_strikes_or_stuns_the_wolf_in_reach() {
         Some(GUID),
         "no click: the nearest"
     );
-    let thrown = e.use_battle_item(254, 0, 0.0, Some(GUID), near, 0).unwrap();
+    let frag = Strike {
+        damage: 254,
+        ..Strike::default()
+    };
+    let thrown = e.use_battle_item(frag, Some(GUID), near, 0).unwrap();
     let (health, _) = hp(&thrown).expect("the wolf's health after the orb");
     assert!(full() - health >= 254, "a 254 hit, or its critical");
     let stunned = e
-        .use_battle_item(0, 5_000, 0.0, Some(GUID), near, 100)
+        .use_battle_item(
+            Strike {
+                stun_ms: 5_000,
+                ..Strike::default()
+            },
+            Some(GUID),
+            near,
+            100,
+        )
         .unwrap();
     assert!(hp(&stunned).is_none(), "a stun deals no damage");
     for t in 2..50 {
@@ -254,6 +267,37 @@ fn a_battle_item_strikes_or_stuns_the_wolf_in_reach() {
         hit_back |= !hits_from(&e.tick(near, 12, t * 100).unwrap(), GUID).is_empty();
     }
     assert!(hit_back, "it fights again once the stun ends");
+}
+
+/// L089: a Sleep Orb holds the wolf at home until a hit wakes it; an Unmoving Orb roots it until a hit
+/// frees it (wiki: "Hitting your target will wake them" / "will allow them to move").
+#[test]
+fn a_sleeping_or_rooted_wolf_moves_again_once_hit() {
+    let f = Fixture::new(1, 0.0);
+    // Inside the wolf's 8 m aggro, out of its reach: an awake wolf walks over.
+    let player = [6.0, 0.0, 0.0];
+    for hold in [
+        Strike {
+            sleep_ms: 10_000,
+            ..Strike::default()
+        },
+        Strike {
+            root_ms: 10_000,
+            ..Strike::default()
+        },
+    ] {
+        let mut e = f.load();
+        e.use_battle_item(hold, Some(GUID), player, 0).unwrap();
+        for t in 1..30 {
+            e.tick(player, 12, t * 100).unwrap();
+        }
+        assert!(radius(at(&e)) < 0.5, "held at home: {hold:?}");
+        assert!(hp(&e.attack(GUID, player, 12, 0, 3_000).unwrap()).is_some());
+        for t in 31..60 {
+            e.tick(player, 12, t * 100).unwrap();
+        }
+        assert!(radius(at(&e)) > 1.0, "the hit lets it walk: {hold:?}");
+    }
 }
 
 #[test]
