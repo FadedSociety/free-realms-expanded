@@ -79,7 +79,8 @@ const FROZEN_SHA256: &[(&str, &str)] = &[
     ),
     (
         "mining.json",
-        "498a4f006f1ace7f1c6cc7e6ad1e70146704b141e7e4a78ff1d276097a4c3553",
+        // L100: Copper Mining (game 91) added on the copper board.
+        "4de59391aaa02d6d9ccbf8b74f4adb81b7c6168fa101947d8da595413c602ccd",
     ),
     (
         "harvesting.json",

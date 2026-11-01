@@ -253,8 +253,9 @@ struct Content {
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     powerup_definitions: Vec<Type8PowerupDefinition>,
     /// T553 (R): further games that share this file's movie, board shape and tuning and differ
-    /// only in the produce they ask for (the regional Harvesting games). Empty for Mining and
-    /// for every older file.
+    /// only in the produce they ask for (the regional Harvesting games). L100 (R): Mining offers
+    /// Copper Mining (client MiniGameData 91, the live Games window row 400) on the copper board
+    /// of its own game 18. Empty for every older file.
     #[serde(default)]
     games: Vec<GameVariant>,
     spec: Type8BoardSpec,

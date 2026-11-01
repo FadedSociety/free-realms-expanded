@@ -19,6 +19,9 @@ pub enum CraftingJob {
 }
 
 impl CraftingJob {
+    /// Declaration order, so `job as usize` indexes it.
+    pub const ALL: [Self; 3] = [Self::Chef, Self::Blacksmith, Self::Miner];
+
     pub const fn profile_id(self) -> i32 {
         match self {
             Self::Chef => 45,

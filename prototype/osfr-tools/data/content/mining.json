@@ -1,6 +1,86 @@
 {
   "description_id": 7911,
   "game_id": 18,
+  "games": [
+    {
+      "description_id": 7911,
+      "game_id": 91,
+      "goals": [
+        {
+          "icon_id": 909,
+          "index": 0,
+          "per_reward": 1,
+          "quota": 6,
+          "value": 601
+        },
+        {
+          "icon_id": 909,
+          "index": 1,
+          "per_reward": 2,
+          "quota": 6,
+          "value": 602
+        }
+      ],
+      "icon_id": 909,
+      "name_id": 16221,
+      "outputs": [
+        {
+          "cluster_quantity": 1,
+          "definition_id": 2739,
+          "value": 601
+        },
+        {
+          "cluster_quantity": 2,
+          "definition_id": 2739,
+          "value": 602
+        }
+      ],
+      "selectable": [
+        401,
+        402,
+        403,
+        404,
+        405
+      ],
+      "tiles": [
+        {
+          "category": 400,
+          "icon_id": 1,
+          "value": 401
+        },
+        {
+          "category": 400,
+          "icon_id": 2,
+          "value": 402
+        },
+        {
+          "category": 400,
+          "icon_id": 3,
+          "value": 403
+        },
+        {
+          "category": 400,
+          "icon_id": 4,
+          "value": 404
+        },
+        {
+          "category": 400,
+          "icon_id": 5,
+          "value": 405
+        },
+        {
+          "category": 600,
+          "icon_id": 909,
+          "value": 601
+        },
+        {
+          "category": 600,
+          "icon_id": 909,
+          "value": 602
+        }
+      ]
+    }
+  ],
   "icon_id": 909,
   "launch_movie": "game_mining.gfx",
   "name_id": 7910,

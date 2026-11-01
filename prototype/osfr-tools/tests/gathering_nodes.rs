@@ -1305,6 +1305,59 @@ fn mushroom() -> NodeActor {
         .clone()
 }
 
+/// The client's Games window Play (167/1/2): the live row id, then the clock dword it never
+/// trusts.
+fn play(gateway: &mut Gateway, row: u32, now_ms: u64) -> GatewayOutcome {
+    let mut packet = vec![167, 0, 1, 2];
+    packet.extend(row.to_le_bytes());
+    packet.extend(0_u32.to_le_bytes());
+    send(gateway, &packet, now_ms)
+}
+
+/// L100: Play on a live harvest row starts that row's game 60 m from every node, under the
+/// node's own job lines, and pays its produce; a live row no engine offers stays closed. With
+/// the shipped `mining.json`, Copper Mining (row 400) starts game 91 on the copper board.
+#[test]
+fn games_window_play_starts_the_rows_gather_game_away_from_every_node() {
+    let fixture = Fixture::new(PLOT);
+    let mut idle = fixture.gateway_at(fixture.state(false, true), &fixture.node, 60.0);
+    let before = idle.snapshot();
+    let refused = play(&mut idle, 410, 2_000);
+    assert!(
+        said(&refused, "Switch to the Chef job"),
+        "{}",
+        chat_text(&refused)
+    );
+    assert_eq!(idle.snapshot(), before, "a refused Play changes nothing");
+
+    let mut gateway = fixture.gateway_at(fixture.state(true, true), &fixture.node, 60.0);
+    tick(&mut gateway, 1_500);
+    let started = play(&mut gateway, 410, 2_000);
+    let queensfields = harvesting::region(109).unwrap();
+    assert_eq!(
+        started_game(&started),
+        (109, queensfields.name_id, queensfields.description_id)
+    );
+    let id = active(&gateway, PLOT).expect("the row's run is offered") as i32;
+    win(&mut gateway, PLOT, id, 2_100);
+    assert_eq!(ore(&gateway, PLOT), vec![1; 4], "game 109 produce");
+    send(&mut gateway, &CLOSE, 3_100);
+    let closed = play(&mut gateway, 412, 3_200);
+    assert!(said(&closed, "not open yet"), "{}", chat_text(&closed));
+
+    let fixture = Fixture::new(MINING).with_shipped_mining();
+    let mut gateway = fixture.gateway_at(fixture.state(true, true), &fixture.node, 60.0);
+    tick(&mut gateway, 1_500);
+    let started = play(&mut gateway, 400, 2_000);
+    assert_eq!(started_game(&started), (91, 16221, 7911));
+    assert!(
+        active(&gateway, MINING).is_some(),
+        "Copper Mining run offered"
+    );
+    let tin = play(&mut gateway, 401, 2_100);
+    assert!(said(&tin, "not open yet"), "{}", chat_text(&tin));
+}
+
 #[test]
 fn each_farm_plot_starts_its_own_region_game_and_pays_its_own_produce() {
     for (region, outputs) in REGION_OUTPUTS {

@@ -59,6 +59,12 @@
 //!   and its Play is refused ("not open yet"). A field battle the live tiles lack is listed the way
 //!   the live server listed its own: category 99 and placeholder art, so no tile shows it. Other
 //!   unjoined service rows are not listed. Without the file the bullets below hold unchanged.
+//! * L100: every game a Type8 engine offers (`mining.json`, `harvesting.json` `games`) is a
+//!   gather row joined by its MiniGameData row. A recipe row is joinable at the recipe's rank in
+//!   its job, active or not. The live lists back the rule's shape, not its numbers: their mining
+//!   rows asked Miner rank 5/9/13/17 (`RequirementSets.txt` 15-18) and the capturing player could
+//!   join exactly the rows under its ranks, while iron, silver and gold smelting carried no set
+//!   and were closed too, so the live server kept its own recipe ranks.
 //! * Only activities backed by a running battle or a configured native soccer match are published:
 //!   one row per `field_battles.json` battle (category 10, Battles) and one per `soccer.json` game
 //!   (category 22, art `Soccer_Briarwood.dds`; both values are the client `ActivityCategories.txt`
@@ -76,7 +82,10 @@
 //!   "currently unavailable" line (Global.Text 140987): there is no card service yet. Rows publish
 //!   entry type 1 like every other row.
 
-use crate::{card_game, chess_service::ChessService, soccer_entry};
+use crate::{
+    card_game, chess_service::ChessService, harvest_nodes::Gather, recipes::CraftingJob,
+    soccer_entry,
+};
 use serde::Deserialize;
 use std::{
     fs,
@@ -139,9 +148,16 @@ pub enum Kind {
     Kart,
     Derby,
     /// L098: a recipe's minigame (cooking, forging, smelting); the row's id is its MiniGameData
-    /// row and Play starts `recipe_id` through the recipe book, anywhere (R).
+    /// row and Play starts `recipe_id` through the recipe book, anywhere (R). L100: `job` is the
+    /// recipe's job, whose rank the row's `required_level` asks for.
     Recipe {
         recipe_id: u32,
+        job: CraftingJob,
+    },
+    /// L100: a mining or harvesting game a Type8 engine offers; the row's id is its MiniGameData
+    /// row and Play starts that game's board, anywhere (R).
+    Gather {
+        gather: Gather,
     },
 }
 
@@ -263,6 +279,9 @@ pub struct Viewer {
     pub combat_job: bool,
     /// Level of the active job.
     pub level: u32,
+    /// L100: rank of each crafting job, active or not, in `CraftingJob` order (Chef, Blacksmith,
+    /// Miner).
+    pub crafts: [u32; 3],
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -495,7 +514,7 @@ impl Catalogue {
             // (R) Chess needs no job or level; the table is open to every player.
             Kind::Chess { .. } => {}
             // L097: the race and derby services decide admission at Play.
-            Kind::Kart | Kind::Derby | Kind::Recipe { .. } => {}
+            Kind::Kart | Kind::Derby | Kind::Recipe { .. } | Kind::Gather { .. } => {}
             // (R) Soccer is a world activity, not a combat-job gate. Its row
             // still honors the configured level floor; the original gate is unknown.
             Kind::Soccer => {
@@ -528,14 +547,17 @@ impl Catalogue {
         self.cards.as_ref()?.row(id)
     }
     /// CanPlayerJoin for a service row: battles want a combat job at the level, soccer its level
-    /// floor, a card row its data's flag; chess is open.
+    /// floor, a card row its data's flag; chess is open. L100 (R): a recipe row wants the
+    /// recipe's rank in its job, active or not (the client's own row requirement is
+    /// `CheckRankLastProfileByType`); the gather games listed today have no rank floor.
     fn can_join(&self, a: &Activity, viewer: Viewer) -> bool {
         match a.kind {
             Kind::Battle => viewer.combat_job && viewer.level >= a.required_level,
             Kind::Chess { .. } => true,
             Kind::Soccer => viewer.level >= a.required_level,
             Kind::CardGame { .. } => self.card(a.id).is_some_and(|card| card.can_player_join),
-            Kind::Kart | Kind::Derby | Kind::Recipe { .. } => true,
+            Kind::Recipe { job, .. } => viewer.crafts[job as usize] >= a.required_level,
+            Kind::Kart | Kind::Derby | Kind::Gather { .. } => true,
         }
     }
 
@@ -628,7 +650,7 @@ impl Catalogue {
                 }
             }
             // Only live rows list them (`with_live`).
-            Kind::Kart | Kind::Derby | Kind::Recipe { .. } => return None,
+            Kind::Kart | Kind::Derby | Kind::Recipe { .. } | Kind::Gather { .. } => return None,
         })
     }
 
@@ -724,7 +746,7 @@ fn runs(row: &LiveRow, a: &Activity) -> bool {
         Kind::Soccer => row.category == SOCCER_CATEGORY && row.name_id == a.name_id,
         Kind::Chess { row_id } => row.entry_type == ENTRY_CLIENT_TUNNEL && row.content_id == row_id,
         Kind::CardGame { .. } => row.id == a.id,
-        Kind::Kart | Kind::Derby | Kind::Recipe { .. } => {
+        Kind::Kart | Kind::Derby | Kind::Recipe { .. } | Kind::Gather { .. } => {
             row.entry_type == ENTRY_CLIENT_TUNNEL && row.content_id == a.id
         }
     }

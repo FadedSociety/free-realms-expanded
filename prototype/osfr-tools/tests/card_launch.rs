@@ -43,6 +43,7 @@ const LAKESHORE: [f32; 3] = [-733.952, 9.09, 945.973];
 const CHARACTER: u64 = 7_000_123;
 const VIEWER: Viewer = Viewer {
     level: 1,
+    crafts: [0; 3],
     combat_job: true,
 };
 

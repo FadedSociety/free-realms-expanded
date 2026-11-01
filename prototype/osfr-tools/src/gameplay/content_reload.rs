@@ -75,6 +75,7 @@ impl Gameplay {
                             self.kart_entry.as_ref(),
                             self.derby.as_ref(),
                             &self.recipe_catalog,
+                            [self.mining.as_ref(), self.harvesting.as_ref()],
                         ),
                     )?;
                     if let Some(visibility) = self.npc_visibility.as_mut() {

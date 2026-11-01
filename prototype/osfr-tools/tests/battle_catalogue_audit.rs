@@ -915,6 +915,7 @@ fn every_battle_is_published_or_documented_guide_only() {
             Viewer {
                 combat_job: true,
                 level: MAX_JOB_LEVEL,
+                crafts: [0; 3],
             },
             false,
         ) {

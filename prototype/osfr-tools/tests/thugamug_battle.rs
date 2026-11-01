@@ -224,7 +224,8 @@ fn the_battle_loads_and_is_published_with_the_expected_values() {
                 THUGAMUG,
                 Viewer {
                     combat_job: true,
-                    level: REQUIRED_LEVEL
+                    level: REQUIRED_LEVEL,
+                    crafts: [0; 3],
                 },
                 false
             )
@@ -237,7 +238,8 @@ fn the_battle_loads_and_is_published_with_the_expected_values() {
             THUGAMUG,
             Viewer {
                 combat_job: true,
-                level: REQUIRED_LEVEL - 1
+                level: REQUIRED_LEVEL - 1,
+                crafts: [0; 3],
             },
             false
         ),
@@ -248,7 +250,8 @@ fn the_battle_loads_and_is_published_with_the_expected_values() {
             THUGAMUG,
             Viewer {
                 combat_job: false,
-                level: 20
+                level: 20,
+                crafts: [0; 3],
             },
             false
         ),
@@ -259,6 +262,7 @@ fn the_battle_loads_and_is_published_with_the_expected_values() {
     let rows = decode_list(&catalogue.list_packet(Viewer {
         combat_job: true,
         level: REQUIRED_LEVEL,
+        crafts: [0; 3],
     }));
     let published = rows.iter().find(|row| row.id == THUGAMUG).unwrap();
     assert_eq!(published.title, TITLE);
@@ -268,6 +272,7 @@ fn the_battle_loads_and_is_published_with_the_expected_values() {
     let refused = decode_list(&catalogue.list_packet(Viewer {
         combat_job: true,
         level: REQUIRED_LEVEL - 1,
+        crafts: [0; 3],
     }));
     assert!(
         !refused

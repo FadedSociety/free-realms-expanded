@@ -1102,9 +1102,9 @@ impl Gameplay {
         }
         let folders = [directory, bundled_npc_content.as_path()];
         let (kart, derby_ref) = (kart_entry.as_ref(), derby.as_ref());
-        let recipes = &recipe_catalog;
-        let activities =
-            portal_games::with_live(activities, folders, &daily_wheel, kart, derby_ref, recipes)?;
+        let type8 = [mining.as_ref(), harvesting.as_ref()];
+        let games = portal_games::games(kart, derby_ref, &recipe_catalog, type8);
+        let activities = portal_games::with_live(activities, folders, &daily_wheel, games)?;
         let fishing_spots = crate::fishing_service::FishingSpots::load(directory)?.map(Arc::new);
         if let (Some(spots), Some(interaction)) = (&fishing_spots, &mut npc_interaction) {
             let unknown = interaction.set_fish_gates(&spots.gate_npcs(), spots.menu_string_id());
@@ -3103,6 +3103,7 @@ impl Gameplay {
                 .as_ref()
                 .is_some_and(|a| a.supports_basic(profile)),
             level: self.job_level(profile),
+            crafts: CraftingJob::ALL.map(|job| self.job_level(job.profile_id())),
         }
     }
 
@@ -3284,8 +3285,8 @@ impl Gameplay {
                                 .push(chat::system("You cannot start that activity here.")),
                         }
                     }
-                    // L097: the kart race and derby rows.
-                    Ok((_, kind)) => out = self.begin_portal_game(kind, character, now_ms)?,
+                    // L097: the kart race and derby rows; L098 recipes; L100 gather games.
+                    Ok((id, kind)) => out = self.begin_portal_game(id, kind, character, now_ms)?,
                 }
             }
         }

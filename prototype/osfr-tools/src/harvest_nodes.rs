@@ -228,6 +228,18 @@ impl Gather {
         }
     }
 
+    /// The job lines every gather start shares (a node click, L100 a Games window row): the job
+    /// unlocked, then active.
+    pub fn admit_job(self, active_job: i32, unlocked_jobs: &BTreeSet<i32>) -> Result<(), Denied> {
+        if !unlocked_jobs.contains(&self.job()) {
+            return Err(Denied::NoJob(self));
+        }
+        if active_job != self.job() {
+            return Err(Denied::WrongJob(self));
+        }
+        Ok(())
+    }
+
     /// Lowercase noun for the developer-command sentences.
     pub(crate) fn noun(self) -> &'static str {
         match self {
@@ -492,13 +504,7 @@ impl GatheringNodes {
         let SiteKind::Gather(gather) = &site.kind else {
             return Err(Denied::NotNeeded);
         };
-        let job = gather.job();
-        if !who.unlocked_jobs.contains(&job) {
-            return Err(Denied::NoJob(*gather));
-        }
-        if who.active_job != job {
-            return Err(Denied::WrongJob(*gather));
-        }
+        gather.admit_job(who.active_job, who.unlocked_jobs)?;
         Ok(*gather)
     }
 

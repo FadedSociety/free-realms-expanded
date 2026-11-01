@@ -5,32 +5,33 @@ use super::*;
 use crate::{
     activity_portal::{Activity, Catalogue, Kind, game_row},
     derby_gateway::{DerbyEntryDenied, DerbyGateway},
+    harvest_nodes::{Denied, payout_fits},
     kart_gateway::{EntryDenied, KartGateway},
     recipes::RecipeCatalog,
 };
 
 /// The live Games window rows (from the first of `folders` that has them) over `catalogue`, with
-/// the wheel and the kart/derby rows the server runs.
+/// the wheel and the service's own `games`.
 pub(super) fn with_live(
     catalogue: Catalogue,
     folders: [&Path; 2],
     wheel: &crate::daily_wheel::DailyWheel,
-    kart: Option<&KartGateway>,
-    derby: Option<&DerbyGateway>,
-    recipes: &RecipeCatalog,
+    games: Vec<Activity>,
 ) -> io::Result<Catalogue> {
     let live = (folders.into_iter())
         .find(|base| base.join(crate::activity_portal::CATALOGUE_FILE).is_file())
         .map_or_else(|| Ok(Vec::new()), crate::activity_portal::load_live)?;
-    catalogue.with_live(live, wheel.activity_id(), games(kart, derby, recipes))
+    catalogue.with_live(live, wheel.activity_id(), games)
 }
 
-/// The kart race, the default derby and (L098) every recipe with a client recipe id and a
-/// MiniGameData row, as Games window join rows keyed by their MiniGameData rows.
+/// The kart race, the default derby, (L098) every recipe with a client recipe id and a
+/// MiniGameData row and (L100) every game the mining and harvesting engines (`type8`, in that
+/// order) offer, as Games window join rows keyed by their MiniGameData rows.
 pub(super) fn games(
     kart: Option<&KartGateway>,
     derby: Option<&DerbyGateway>,
     recipes: &RecipeCatalog,
+    type8: [Option<&Type8Engine>; 2],
 ) -> Vec<Activity> {
     let kart = kart.and_then(KartGateway::minigame_id);
     let derby = derby.and_then(|derby| u32::try_from(derby.game_id()).ok());
@@ -42,12 +43,31 @@ pub(super) fn games(
     ]
     .into_iter()
     .flat_map(|job| recipes.by_job(job))
-    .filter_map(|recipe| Some((recipe.minigame_id?, recipe.recipe_id?)))
-    .filter(|(minigame, _)| seen.insert(*minigame))
-    .map(|(minigame, recipe_id)| game_row(minigame, Kind::Recipe { recipe_id }));
+    .filter_map(|recipe| Some((recipe.minigame_id?, recipe.recipe_id?, recipe)))
+    .filter(|(minigame, ..)| seen.insert(*minigame))
+    .map(|(minigame, recipe_id, recipe)| Activity {
+        required_level: recipe.required_job_rank.map_or(0, u32::from),
+        ..game_row(
+            minigame,
+            Kind::Recipe {
+                recipe_id,
+                job: recipe.job,
+            },
+        )
+    });
+    let gathers = [Gather::Mining, Gather::Harvesting]
+        .into_iter()
+        .zip(type8)
+        .filter_map(|(gather, engine)| Some((gather, engine?)))
+        .flat_map(|(gather, engine)| {
+            (engine.games()).filter_map(move |(game, _)| {
+                Some(game_row(u32::try_from(game).ok()?, Kind::Gather { gather }))
+            })
+        });
     (kart.map(|id| game_row(id, Kind::Kart)).into_iter())
         .chain(derby.map(|id| game_row(id, Kind::Derby)))
         .chain(crafts)
+        .chain(gathers)
         .collect()
 }
 
@@ -62,10 +82,11 @@ impl Gameplay {
     }
 
     /// L097: Play on the kart race's or the derby's Games window row: the gate's admission without
-    /// the gate, then the gate's entry; L098: a recipe row through the recipe book. A refusal
-    /// answers with one chat line and changes nothing.
+    /// the gate, then the gate's entry; L098: a recipe row through the recipe book; L100: game
+    /// `id` of a gather row. A refusal answers with one chat line and changes nothing.
     pub(super) fn begin_portal_game(
         &mut self,
+        id: u32,
         kind: Kind,
         character: &CharacterState,
         now_ms: u64,
@@ -89,11 +110,39 @@ impl Gameplay {
                 None => Ok(refused(DerbyEntryDenied::Unavailable.message())),
             },
             // L098: a recipe row starts the recipe book anywhere (R).
-            Kind::Recipe { recipe_id } => {
+            Kind::Recipe { recipe_id, .. } => {
                 let mut out = Outcome::default();
                 let recipe = i32::try_from(recipe_id).map_err(|_| invalid("recipe id"))?;
                 self.start_recipe(recipe, true, character, now_ms, &mut out)?;
                 Ok(out)
+            }
+            // L100 (R): a node's gates without the node: idle, the gather job unlocked and
+            // active, the game offered and its whole payout fitting the bag.
+            Kind::Gather { gather } => {
+                let game = i32::try_from(id).map_err(|_| invalid("gather game id"))?;
+                let profiles = self
+                    .profiles
+                    .as_ref()
+                    .ok_or_else(|| invalid("no profiles"))?;
+                let admitted = if busy {
+                    Err(Denied::Busy)
+                } else {
+                    gather.admit_job(profiles.active(), &profiles.state().unlocked)
+                };
+                if let Err(denied) = admitted {
+                    return Ok(refused(&denied.message()));
+                }
+                let Some(spec) = self.type8(gather).and_then(|e| e.spec_for(Some(game))) else {
+                    return Ok(refused("Gathering is not available in this campaign."));
+                };
+                if !payout_fits(&self.inventory, spec) {
+                    return Ok(refused("Your bag is full. Make room before gathering."));
+                }
+                self.commit_if_changed(|staged| {
+                    let mut out = Outcome::default();
+                    staged.begin_gather(gather, Some(game), now_ms, &mut out)?;
+                    Ok(out)
+                })
             }
             _ => Err(invalid("not a Games window game row")),
         }

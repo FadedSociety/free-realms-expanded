@@ -9,6 +9,8 @@ use osfr_tools::{
         game_row, parse,
     },
     card_game,
+    harvest_nodes::Gather,
+    recipes::CraftingJob,
 };
 use std::{
     collections::BTreeSet,
@@ -60,6 +62,7 @@ fn row(id: u32, level: u32) -> Activity {
 const FIGHTER: Viewer = Viewer {
     combat_job: true,
     level: 5,
+    crafts: [0; 3],
 };
 
 /// Bounded little-endian reader that mirrors the client stream (flag on short read).
@@ -171,14 +174,16 @@ fn can_join_is_per_player() {
     assert_eq!(
         joins(Viewer {
             combat_job: true,
-            level: 9
+            level: 9,
+            crafts: [0; 3],
         }),
         [1, 1]
     );
     assert_eq!(
         joins(Viewer {
             combat_job: false,
-            level: 20
+            level: 20,
+            crafts: [0; 3],
         }),
         [0, 0],
         "a non-combat job joins nothing"
@@ -278,6 +283,7 @@ fn admission_follows_the_rules_in_order() {
     let nine = Viewer {
         combat_job: true,
         level: 9,
+        crafts: [0; 3],
     };
     assert_eq!(catalogue.admit(12302, nine, false).unwrap().id, 12302);
 }
@@ -288,6 +294,7 @@ fn forged_ids_never_admit_and_reveal_nothing() {
     let sleeper = Viewer {
         combat_job: false,
         level: 0,
+        crafts: [0; 3],
     };
     for id in [0, 1, 95, 97, 0x8000_0000, u32::MAX] {
         for busy in [false, true] {
@@ -409,6 +416,7 @@ fn chess_rows_follow_battles_and_open_without_a_combat_job() {
     let civilian = Viewer {
         combat_job: false,
         level: 0,
+        crafts: [0; 3],
     };
     let list = decode_list(&catalogue.list_packet(civilian));
     assert_eq!(list.rows.len(), 3);
@@ -469,6 +477,7 @@ fn card_rows_match_the_client_reader() {
     let list = decode_list(&catalogue.list_packet(Viewer {
         combat_job: false,
         level: 0,
+        crafts: [0; 3],
     }));
     assert_eq!(list.rows.len(), 17);
     for (n, data) in cards.rows().iter().enumerate() {
@@ -605,7 +614,13 @@ fn live_rows_publish_the_live_values_and_play_their_service_rows() {
             vec![
                 game_row(28, Kind::Kart),
                 game_row(39, Kind::Derby),
-                game_row(77, Kind::Recipe { recipe_id: 4 }),
+                game_row(
+                    77,
+                    Kind::Recipe {
+                        recipe_id: 4,
+                        job: CraftingJob::Miner,
+                    },
+                ),
             ],
         )
         .unwrap();
@@ -668,7 +683,10 @@ fn live_rows_publish_the_live_values_and_play_their_service_rows() {
     // L098: a recipe row starts its recipe by MiniGameData row.
     assert_eq!(
         catalogue.admit(516, FIGHTER, false).unwrap().kind,
-        Kind::Recipe { recipe_id: 4 }
+        Kind::Recipe {
+            recipe_id: 4,
+            job: CraftingJob::Miner,
+        }
     );
     // L097: the race and derby rows start their services by MiniGameData row.
     assert_eq!(
@@ -681,6 +699,57 @@ fn live_rows_publish_the_live_values_and_play_their_service_rows() {
     );
     assert_eq!(catalogue.admit(65, FIGHTER, false).unwrap().id, 39);
     assert_eq!(catalogue.admit(28, FIGHTER, false), Err(Refusal::Unknown));
+}
+
+/// L100: a recipe row is joinable from its recipe's rank in its job, whichever job is active
+/// (the live tin smelting row asked Miner rank 5); a gather row joins the game its engine offers
+/// by MiniGameData row, and a live gather row no engine offers stays closed.
+#[test]
+fn recipe_rows_open_at_their_rank_and_gather_rows_join_their_game() {
+    let tin = Activity {
+        required_level: 5,
+        ..game_row(
+            134,
+            Kind::Recipe {
+                recipe_id: 5,
+                job: CraftingJob::Miner,
+            },
+        )
+    };
+    let harvest = Kind::Gather {
+        gather: Gather::Harvesting,
+    };
+    let catalogue = Catalogue::new(vec![row(96, 0)])
+        .unwrap()
+        .with_live(
+            vec![
+                live_row(2, 569, 21, 74_000, 134),
+                live_row(2, 410, 15, 100_833, 109),
+                live_row(2, 412, 15, 100_838, 113),
+            ],
+            None,
+            vec![tin, game_row(109, harvest), game_row(111, harvest)],
+        )
+        .unwrap();
+    let joins = |crafts: [u32; 3]| -> Vec<(u32, u8)> {
+        let viewer = Viewer { crafts, ..FIGHTER };
+        let list = decode_list(&catalogue.minigame_list_packet(viewer).unwrap());
+        (list.rows.iter().zip(&list.flags))
+            .map(|(r, f)| (r[0], f.0))
+            .collect()
+    };
+    // Chef, Blacksmith, Miner.
+    assert_eq!(joins([20, 20, 4]), [(569, 0), (410, 1), (412, 0)]);
+    assert_eq!(joins([1, 1, 5]), [(569, 1), (410, 1), (412, 0)]);
+
+    let started = catalogue.admit(410, FIGHTER, false).unwrap();
+    assert_eq!((started.id, started.kind), (109, harvest));
+    assert_eq!(catalogue.admit(412, FIGHTER, false), Err(Refusal::NotOpen));
+    assert_eq!(
+        catalogue.admit(111, FIGHTER, false),
+        Err(Refusal::Unknown),
+        "an offered game with no live row is not listed"
+    );
 }
 
 #[test]
