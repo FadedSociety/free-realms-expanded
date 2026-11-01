@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "chests": [
+    {
+      "definition_id": 910100,
+      "rewards": [
+        78142,
+        11584,
+        78143,
+        79370,
+        79373,
+        78141,
+        78144
+      ],
+      "source": "Wiki 'Mystery Chest', Original (Series 1): the prizes the owner's field notes list from it, by the client catalogue's ids; members and gender rules as the wiki gives them. Left out, no definition anywhere: Zoot Suit Costume. Chest id reconstructed (R); drop odds are equal (R)."
+    },
+    {
+      "definition_id": 910101,
+      "rewards": [
+        {
+          "item": 79450,
+          "members": true
+        },
+        79459,
+        79418,
+        79247,
+        79244,
+        79256,
+        79250,
+        79253
+      ],
+      "source": "Wiki 'Mystery Chest', Sci-Fi (Series 2): the prizes the owner's field notes list from it, by the client catalogue's ids; members and gender rules as the wiki gives them. Left out, no definition anywhere: Robot Boombox. Chest id reconstructed (R); drop odds are equal (R)."
+    },
+    {
+      "definition_id": 910102,
+      "rewards": [
+        79445,
+        35759,
+        79268,
+        79262,
+        79259,
+        79271,
+        79265,
+        79443,
+        13676
+      ],
+      "source": "Wiki 'Mystery Chest', Clockwork (Series 3, mysterychest_sunstone): the prizes the owner's field notes list from it, by the client catalogue's ids; members and gender rules as the wiki gives them. Chest id reconstructed (R); drop odds are equal (R)."
+    },
+    {
+      "definition_id": 910103,
+      "rewards": [
+        79451,
+        79213,
+        79216,
+        79409,
+        79204,
+        79210,
+        79207,
+        {
+          "item": 79452,
+          "members": true
+        }
+      ],
+      "source": "Wiki 'Mystery Chest', Snow Days (seasonal; no description of its own, the series' shared line): the prizes the owner's field notes list from it, by the client catalogue's ids; members and gender rules as the wiki gives them. Left out, no definition anywhere: Light Strand Whip. Chest id reconstructed (R); drop odds are equal (R)."
+    },
+    {
+      "definition_id": 910104,
+      "rewards": [
+        {
+          "item": 79186,
+          "gender": 1
+        },
+        {
+          "item": 79189,
+          "gender": 1
+        },
+        {
+          "item": 79192,
+          "gender": 1
+        },
+        {
+          "item": 79195,
+          "gender": 1
+        },
+        {
+          "item": 79198,
+          "gender": 1
+        },
+        {
+          "item": 79171,
+          "gender": 2
+        },
+        {
+          "item": 79174,
+          "gender": 2
+        },
+        {
+          "item": 79177,
+          "gender": 2
+        },
+        {
+          "item": 79180,
+          "gender": 2
+        },
+        {
+          "item": 79183,
+          "gender": 2
+        },
+        79449,
+        79436
+      ],
+      "source": "Wiki 'Mystery Chest', Chest of Wonders (mysterychest_genie): the prizes the owner's field notes list from it, by the client catalogue's ids; members and gender rules as the wiki gives them. Left out, no definition anywhere: Magic Lamp, Magical Scimitar. Chest id reconstructed (R); drop odds are equal (R)."
+    }
+  ]
+}

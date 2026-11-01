@@ -22,6 +22,10 @@ const MAX_CONTENT: usize = 256 * 1024;
 struct Binding {
     definition_id: i32,
     rewards: Vec<Prize>,
+    /// L093: content provenance; the server never reads it.
+    #[serde(default)]
+    #[allow(dead_code)]
+    source: String,
 }
 
 /// L086: one prize: a bare item id, or an item for members only and/or one gender (1 boy, 2 girl). Wiki

@@ -395,7 +395,7 @@ pub struct Inventory {
 /// or per purchase cost seconds and ~50 MiB each. The key includes each file's
 /// size and modification time, so edited content is parsed again.
 fn shared_content(directory: &Path) -> io::Result<Arc<Content>> {
-    type Key = (PathBuf, Option<[u8; 32]>, [Option<(u64, SystemTime)>; 2]);
+    type Key = (PathBuf, Option<[u8; 32]>, [Option<(u64, SystemTime)>; 3]);
     static CACHE: OnceLock<Mutex<HashMap<Key, Arc<Content>>>> = OnceLock::new();
     // inventory.json (~2 MB) is keyed by its content: a same-size rewrite inside
     // one timestamp tick must not return the old definitions. The ~50 MB
@@ -415,7 +415,11 @@ fn shared_content(directory: &Path) -> io::Result<Arc<Content>> {
     let key = (
         directory.to_path_buf(),
         digest,
-        [stamp("item-catalogue.json"), stamp("item-table.json")],
+        [
+            stamp("item-catalogue.json"),
+            stamp("item-table.json"),
+            stamp("item-table-supplement.json"),
+        ],
     );
     let cache = CACHE.get_or_init(Default::default);
     if let Some(content) = cache.lock().unwrap_or_else(|e| e.into_inner()).get(&key) {
@@ -494,6 +498,10 @@ impl Inventory {
         for (name, load) in [
             ("item-catalogue.json", load_catalogue as CatalogueLoader),
             ("item-table.json", |file| {
+                item_table::load(&read_catalogue_file(file)?)
+            }),
+            // L093: items the original table lacks (reconstructed chests, donor prize rows), last.
+            ("item-table-supplement.json", |file| {
                 item_table::load(&read_catalogue_file(file)?)
             }),
         ] {
