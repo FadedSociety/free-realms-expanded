@@ -86,6 +86,21 @@ impl ArenaSim {
                 continue;
             }
             let b = t.behaviours.get(&actor.guid).cloned().unwrap_or_default();
+            // L092: a scared enemy runs straight away from its scarer and strikes nobody.
+            if let Some(from) = t.skills.fleeing_from(actor.guid, now_ms) {
+                let step = b.move_speed * elapsed.min(250) as f32 / 1000.0;
+                let unit = super::battle_items::away_from(s.position, from, 1.0);
+                let away = [unit[0] - s.position[0], 0.0, unit[2] - s.position[2]];
+                let mut next = super::battle_items::away_from(s.position, from, step);
+                t.ground.snap(&mut next);
+                s.position = next;
+                out.replies.push(movement(actor.guid, next, away));
+                if self.moving.insert(actor.guid) {
+                    out.replies.push(animation(actor.guid, 3, true));
+                }
+                out.changed = true;
+                continue;
+            }
             if b.mode == Mode::Skittish {
                 if t.backup {
                     self.kiting.remove(&actor.guid);

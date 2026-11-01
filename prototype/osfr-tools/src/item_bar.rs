@@ -75,6 +75,14 @@ const MAX_BLAST_RADIUS: f32 = 30.0;
 const MAX_KNOCKBACK: f32 = 20.0;
 const SUB_ASSIGN_BY_RECORD: &[u8] = &[42, 0, 9, 0];
 
+/// L092: a row's scare: every enemy within `radius` of the player runs from it for `flee_ms`.
+#[derive(Clone, Copy, Debug, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Scare {
+    pub radius: f32,
+    pub flee_ms: u64,
+}
+
 /// One usable consumable row. `name_id`/`description_id` are the 42/16 confirm text and the buff
 /// row name; `source` is content provenance that the server never reads.
 #[derive(Clone, Debug, PartialEq, Deserialize)]
@@ -87,6 +95,9 @@ pub struct Effect {
     pub single_use: bool,
     pub effect: EffectKind,
     pub source: String,
+    /// L092: the row also scares the enemies around the player (the Scare Orb's illusion).
+    #[serde(default)]
+    pub scare: Option<Scare>,
 }
 
 /// The seven row effects. A heal (to health) and a strike (L088, at enemies) are applied by the caller; the aura, transform, scale and boost
@@ -156,6 +167,11 @@ impl Effect {
     fn valid(&self) -> bool {
         let duration = |ms: u64| (1..=consumable_effects::MAX_DURATION_MS).contains(&ms);
         self.definition > 0
+            && self.scare.is_none_or(|scare| {
+                scare.radius > 0.0
+                    && scare.radius <= MAX_BLAST_RADIUS
+                    && (1..=MAX_STUN_MS).contains(&scare.flee_ms)
+            })
             && self.name_id > 0
             && self.description_id > 0
             && self.cooldown_ms <= MAX_COOLDOWN_MS
@@ -396,6 +412,7 @@ impl Default for Effects {
                             over_ms: 5_000,
                         },
                         source: String::new(),
+                        scare: None,
                     }
                 })
                 .to_vec(),
@@ -506,6 +523,7 @@ impl Effect {
                 over_ms: 0,
             },
             source: String::new(),
+            scare: None,
         })
     }
 }
@@ -553,6 +571,8 @@ pub struct Reply {
     pub heal_over: Option<(u32, u64)>,
     /// L088: the battle item just spent, for the caller to throw.
     pub strike: Option<Strike>,
+    /// L092: the scare of the row just used, for the caller's encounter engine.
+    pub scare: Option<Scare>,
     pub boombox: Option<i32>,
     pub effect: Option<consumable_effects::Spec>,
     /// T557: the cake row (a `placed_cakes.json` `item_id`) the host must now place. The item is
@@ -571,6 +591,7 @@ struct Use {
     heal_percent: u32,
     heal_over: Option<(u32, u64)>,
     strike: Option<Strike>,
+    scare: Option<Scare>,
     effect: Option<consumable_effects::Spec>,
     place: Option<i32>,
     spent: bool,
@@ -860,6 +881,7 @@ impl ItemBar {
                     heal_percent: used.heal_percent,
                     heal_over: used.heal_over,
                     strike: used.strike,
+                    scare: used.scare,
                     effect: used.effect,
                     place: used.place,
                     used_definition: used.spent.then_some(used.definition),
@@ -916,6 +938,7 @@ impl ItemBar {
                     heal_percent: used.heal_percent,
                     heal_over: used.heal_over,
                     strike: used.strike,
+                    scare: used.scare,
                     effect: used.effect,
                     place: used.place,
                     used_definition: used.spent.then_some(used.definition),
@@ -948,6 +971,7 @@ impl ItemBar {
         let heal_percent = effect.heal_percent();
         let heal_over = effect.heal_over();
         let strike = effect.strike();
+        let scare = effect.scare;
         let spec = effect.spec();
         let place = match effect.effect {
             EffectKind::PlacedCake { row } => Some(row),
@@ -967,6 +991,7 @@ impl ItemBar {
             heal_percent,
             heal_over,
             strike,
+            scare,
             effect: spec,
             place,
             spent,
@@ -974,7 +999,7 @@ impl ItemBar {
         })
     }
 
-    /// L088: whether instance `id` is a battle item.
+    /// L088: whether instance `id` may be aimed at an enemy: a battle item, or (L092) a scare.
     fn strikes(&self, id: i32, inventory: &Inventory) -> bool {
         inventory
             .state()
@@ -982,7 +1007,9 @@ impl ItemBar {
             .iter()
             .find(|i| i.id == id)
             .and_then(|i| self.effects.get(i.definition_id))
-            .is_some_and(|row| matches!(row.effect, EffectKind::Strike { .. }))
+            .is_some_and(|row| {
+                matches!(row.effect, EffectKind::Strike { .. }) || row.scare.is_some()
+            })
     }
 
     fn usable(

@@ -616,7 +616,15 @@ impl EncounterEngine {
                     f.pause_until = now_ms.saturating_add(3000);
                 }
             }
+            // L092: a scared enemy runs straight away from its scarer.
+            let flee = self
+                .skills
+                .fleeing_from(guid, now_ms)
+                .filter(|_| f.motion != FieldMotion::Returning);
             let goal = match f.motion {
+                _ if flee.is_some() => {
+                    flee.map(|from| super::battle_items::away_from(f.state.position, from, 10.0))
+                }
                 // L089: a rooted enemy does not walk; it still strikes what is in reach.
                 _ if f.motion != FieldMotion::Returning && self.skills.rooted(guid, now_ms) => None,
                 FieldMotion::Returning => Some(home),
@@ -686,6 +694,9 @@ impl EncounterEngine {
                 continue;
             }
             engaged = true;
+            if flee.is_some() {
+                continue;
+            }
             if distance(position, f.state.position) <= b.reach {
                 stand(guid, &mut self.field_sim.moving, out);
                 if self

@@ -188,11 +188,28 @@ impl Gameplay {
             let throw = move |engine: &mut crate::encounter::EncounterEngine| {
                 engine.use_battle_item(strike, aimed, position, now_ms)
             };
-            let result = match (self.encounter.as_mut(), field) {
+            let result = match (self.encounter.as_mut(), field.as_deref_mut()) {
                 (Some(engine), Some(field)) => {
                     Some(engine.with_shared_fields(field, character.guid, throw)?)
                 }
                 (Some(engine), None) => Some(throw(engine)?),
+                (None, _) => None,
+            };
+            if let Some(result) = result {
+                self.apply_encounter(result, &mut out)?;
+            }
+        }
+        // L092: a scare sends the enemies around the player running (the shared field's when the
+        // press was aimed at one of them).
+        if let Some(scare) = reply.scare {
+            let run = move |engine: &mut crate::encounter::EncounterEngine| {
+                Ok(engine.scare(scare.radius, scare.flee_ms, position, now_ms))
+            };
+            let result = match (self.encounter.as_mut(), field) {
+                (Some(engine), Some(field)) => {
+                    Some(engine.with_shared_fields(field, character.guid, run)?)
+                }
+                (Some(engine), None) => Some(run(engine)?),
                 (None, _) => None,
             };
             if let Some(result) = result {

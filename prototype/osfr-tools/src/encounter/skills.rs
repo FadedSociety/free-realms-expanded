@@ -21,11 +21,13 @@ pub(super) struct SkillBuff {
 /// (R) Session-only skill state: DoTs, stuns and buffs. Reapplication refreshes
 /// one entry per target/definition; caster buffs are private to the player,
 /// while stuns and target buffs are shared with the field.
-/// L089: a battle item's hold on an enemy: asleep (its stun ends at a hit) or rooted.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+/// L089: a battle item's hold on an enemy: asleep (its stun ends at a hit) or rooted. L092: or
+/// scared, running from `flee_from` (a hit does not end it).
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub(super) struct Hold {
     pub(super) until: u64,
     pub(super) root: bool,
+    pub(super) flee_from: Option<[f32; 3]>,
 }
 
 #[derive(Clone, Default)]
@@ -73,10 +75,25 @@ impl SkillEffects {
             .is_some_and(|hold| hold.root && now_ms < hold.until)
     }
 
-    /// L089: a hit that deals damage ends a sleep (its stun) or a root.
+    /// L092: where a scared enemy runs from, while it is scared.
+    pub(super) fn fleeing_from(&self, guid: u64, now_ms: u64) -> Option<[f32; 3]> {
+        self.holds
+            .get(&guid)
+            .filter(|hold| now_ms < hold.until)
+            .and_then(|hold| hold.flee_from)
+    }
+
+    /// L089: a hit that deals damage ends a sleep (its stun) or a root; a scare runs its course.
     pub(super) fn wake(&mut self, guid: u64, dealt: u32) {
-        if dealt > 0
-            && let Some(hold) = self.holds.remove(&guid)
+        if dealt == 0
+            || self
+                .holds
+                .get(&guid)
+                .is_none_or(|hold| hold.flee_from.is_some())
+        {
+            return;
+        }
+        if let Some(hold) = self.holds.remove(&guid)
             && !hold.root
         {
             self.stuns.remove(&guid);

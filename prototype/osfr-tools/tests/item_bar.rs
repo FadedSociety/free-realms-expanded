@@ -1038,6 +1038,7 @@ fn effect(definition: i32) -> Effect {
             over_ms: 0,
         },
         source: "T510 bounds".into(),
+        scare: None,
     }
 }
 

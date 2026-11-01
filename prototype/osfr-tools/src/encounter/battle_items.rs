@@ -118,6 +118,34 @@ impl EncounterEngine {
         }
     }
 
+    /// L092: send every living enemy within `radius` of the player running from it for `flee_ms`;
+    /// it strikes nobody meanwhile, and the client plays its emo_scare clip (3369) once (R).
+    pub fn scare(
+        &mut self,
+        radius: f32,
+        flee_ms: u64,
+        position: [f32; 3],
+        now_ms: u64,
+    ) -> EncounterOutcome {
+        let mut out = EncounterOutcome::default();
+        let until = now_ms.saturating_add(flee_ms);
+        for guid in self.area_targets(position, radius, MAX_BLAST_TARGETS, None) {
+            if self.shielded(guid) {
+                continue;
+            }
+            self.skills.holds.insert(
+                guid,
+                Hold {
+                    until,
+                    root: false,
+                    flee_from: Some(position),
+                },
+            );
+            out.replies.push(animation(guid, 3369, false)); // client emo_scare
+        }
+        out
+    }
+
     /// Where a knocked-back enemy now stands: the field's copy, or the fight's or world's.
     fn set_enemy_position(&mut self, guid: u64, to: [f32; 3]) {
         if self.state.active.is_none()
@@ -156,11 +184,30 @@ impl EncounterEngine {
         let until = now_ms.saturating_add(duration_ms);
         for &guid in targets {
             if self.enemy(guid).is_some_and(|(_, s)| s.health > 0) && !self.shielded(guid) {
-                self.skills.holds.insert(guid, Hold { until, root });
+                self.skills.holds.insert(
+                    guid,
+                    Hold {
+                        until,
+                        root,
+                        flee_from: None,
+                    },
+                );
                 if root && (self.arena.moving.remove(&guid) | self.field_sim.moving.remove(&guid)) {
                     out.replies.push(animation(guid, 1, true));
                 }
             }
         }
     }
+}
+
+/// L092: `distance` straight away from `from`, level with `at` (along +x when they coincide).
+pub(super) fn away_from(at: [f32; 3], from: [f32; 3], distance: f32) -> [f32; 3] {
+    let (dx, dz) = (at[0] - from[0], at[2] - from[2]);
+    let length = dx.hypot(dz);
+    let (ux, uz) = if length > 0.001 {
+        (dx / length, dz / length)
+    } else {
+        (1.0, 0.0)
+    };
+    [at[0] + ux * distance, at[1], at[2] + uz * distance]
 }

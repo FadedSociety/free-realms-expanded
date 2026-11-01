@@ -329,6 +329,23 @@ fn a_blast_orb_knocks_the_wolf_away_from_the_thrower() {
     }
 }
 
+/// L092: a scare sends the wolf running straight away from the player for 4 s, striking nobody;
+/// a hit does not end it (wiki: "causing opponents to panic and flee in terror").
+#[test]
+fn a_scared_wolf_runs_from_the_player_and_strikes_nobody() {
+    let f = Fixture::new(1, 0.0);
+    let mut e = f.load();
+    let player = [2.0, 0.0, 0.0];
+    let out = e.scare(10.0, 4_000, player, 0);
+    assert!(!out.replies.is_empty(), "the wolf in range is scared");
+    for t in 1..38 {
+        let out = e.tick(player, 12, t * 100).unwrap();
+        assert!(hits_from(&out, GUID).is_empty(), "scared at {} ms", t * 100);
+    }
+    let [x, _, _] = at(&e);
+    assert!(x < -1.0, "it ran away from the player: x {x}");
+}
+
 #[test]
 fn kill_then_respawn_forgets_skill_effects() {
     let f = Fixture::new(1, 0.0);

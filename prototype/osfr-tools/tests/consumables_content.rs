@@ -117,7 +117,13 @@ fn the_shipped_rows_load_through_the_real_loader_with_their_client_checked_value
     }
     assert_eq!(heals, 2);
     assert_eq!(auras, 23);
-    assert_eq!(transforms, 69);
+    assert_eq!(
+        transforms, 72,
+        "L092: and the Scare Orb, Scare Sphere and Spook Sphere"
+    );
+    let scare = effects.get(306).expect("Scare Orb");
+    assert_eq!(scare.scare.map(|s| s.flee_ms), Some(4_000));
+    assert!(effects.get(896).expect("Spook Sphere").scare.is_none());
     assert_eq!(cakes, 9);
     // L087: three +50% star boosters (ability 203), the Wheeler star and coin scrolls (wiki).
     assert_eq!(boosts, 5);

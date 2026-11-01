@@ -64,6 +64,46 @@
       "source": "Wiki: the Super Star Booster page and item tooltip read 'Activatable Effects: + 50% Stars' (SC Shop, 200 SC; Cannot Sell, Cannot Trade). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 78 NameId 2440 DescriptionId 2446 Icon 1157 ActivatableAbilityId 203 SingleUse true). Duration 1800000 (R): the client and the wiki say only 'for a while'; the BubbaJoeX fork's ItemAbilities.json picks 30 minutes. Cooldown 5000 (R, the fork's buff cooldown). The buff row shows the item's own icon (R). L087."
     },
     {
+      "definition": 306,
+      "name_id": 291,
+      "description_id": 292,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 175,
+          "poof_effect_id": 21,
+          "duration_ms": 4000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Wiki: the Scare Orb page and tooltip read 'A magical orb that transforms the player into a frightful creature, causing opponents to panic and flee in terror.' and 'Illusion: Mauthedog - 4 seconds'. (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 306 NameId 291 DescriptionId 292 Icon 2585 ActivatableAbilityId 1161 SingleUse true). Model 175 mauthedog.adr with poof 21 PFX_smoke_black_explosion and buff icon 3843, as the existing Mauthe Dog transform rows. (R): the 10 m scare radius (the battle-item blast), the flee lasting the illusion's 4 s, scared enemies running straight away and striking nobody, the client's emo_scare clip 3369 (AnimationTypes.xml), the 10 s recast. A press aimed at a field enemy scares the shared field; one aimed at nobody scares only personal enemies. L092.",
+      "scare": {
+        "radius": 10.0,
+        "flee_ms": 4000
+      }
+    },
+    {
+      "definition": 308,
+      "name_id": 295,
+      "description_id": 292,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 175,
+          "poof_effect_id": 21,
+          "duration_ms": 4000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Wiki: the Scare Sphere tooltip reads the Scare Orb's text and 'Illusion: Mauthedog - 4 seconds', 'Members Only', 'Required: Membership' (use is not gated by membership here, R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 308 NameId 295 DescriptionId 292 Icon 2586 ActivatableAbilityId 1163 SingleUse true). Model 175 mauthedog.adr with poof 21 PFX_smoke_black_explosion and buff icon 3843, as the existing Mauthe Dog transform rows. (R): the 10 m scare radius (the battle-item blast), the flee lasting the illusion's 4 s, scared enemies running straight away and striking nobody, the client's emo_scare clip 3369 (AnimationTypes.xml), the 10 s recast. A press aimed at a field enemy scares the shared field; one aimed at nobody scares only personal enemies. L092.",
+      "scare": {
+        "radius": 10.0,
+        "flee_ms": 4000
+      }
+    },
+    {
       "definition": 841,
       "name_id": 3630,
       "description_id": 3631,
@@ -78,6 +118,22 @@
         }
       },
       "source": "AAA Star Booster: the Super Star Booster's ability 203 in the client data, so its effect. Wiki: the Super Star Booster page and item tooltip read 'Activatable Effects: + 50% Stars' (SC Shop, 200 SC; Cannot Sell, Cannot Trade). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 841 NameId 3630 DescriptionId 3631 Icon 1157 ActivatableAbilityId 203 SingleUse true). Duration 1800000 (R): the client and the wiki say only 'for a while'; the BubbaJoeX fork's ItemAbilities.json picks 30 minutes. Cooldown 5000 (R, the fork's buff cooldown). The buff row shows the item's own icon (R). L087."
+    },
+    {
+      "definition": 896,
+      "name_id": 2822,
+      "description_id": 2827,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 175,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Wiki: the Spook Sphere tooltip reads 'A magical orb that transforms the player into a frightful creature.' and 'Illusion: Mauthedog - 30 minutes' (no flee is named, so no scare); Cannot Sell, Cannot Trade. (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 896 NameId 2822 DescriptionId 2827 Icon 2587 ActivatableAbilityId 227 SingleUse true). Model 175 mauthedog.adr with poof 21 PFX_smoke_black_explosion and buff icon 3843, as the existing Mauthe Dog transform rows. (R): the 30-minute recast, as the other 30-minute transforms. L092."
     },
     {
       "definition": 1197,
