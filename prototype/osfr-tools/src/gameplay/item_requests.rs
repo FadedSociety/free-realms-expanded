@@ -15,11 +15,17 @@ impl Gameplay {
             return Ok(None);
         };
         let before = self.inventory.state().clone();
+        let member = self
+            .game_rules
+            .membership
+            .is_active_at(current_unix_seconds());
         let result = content.handle(
             &mut self.inventory,
             &mut self.pending_chest,
             request,
             player_guid,
+            member,
+            self.gender,
         )?;
         let mut out = Outcome {
             replies: result.replies,

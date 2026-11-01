@@ -21,7 +21,52 @@ const MAX_CONTENT: usize = 256 * 1024;
 #[serde(deny_unknown_fields)]
 struct Binding {
     definition_id: i32,
-    rewards: Vec<i32>,
+    rewards: Vec<Prize>,
+}
+
+/// L086: one prize: a bare item id, or an item for members only and/or one gender (1 boy, 2 girl). Wiki
+/// (Mystery Chest page): the Sci-Fi chest's Flying Saucer was a members' prize, and the Chest of Wonders held a
+/// boys' Desert Traveler set and a girls' Elegant Desert set.
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
+#[serde(untagged)]
+enum Prize {
+    Item(i32),
+    Ruled {
+        item: i32,
+        #[serde(default)]
+        members: bool,
+        #[serde(default)]
+        gender: Option<i32>,
+    },
+}
+
+impl Prize {
+    fn item(self) -> i32 {
+        match self {
+            Self::Item(item) | Self::Ruled { item, .. } => item,
+        }
+    }
+
+    /// Whether this player may draw it. An unknown gender (0) draws no gendered prize.
+    fn fits(self, member: bool, gender: i32) -> bool {
+        match self {
+            Self::Item(_) => true,
+            Self::Ruled {
+                members,
+                gender: only,
+                ..
+            } => (member || !members) && only.is_none_or(|only| only == gender),
+        }
+    }
+}
+
+/// The prizes of a chest this player may draw, in content order.
+fn eligible(prizes: &[Prize], member: bool, gender: i32) -> Vec<i32> {
+    prizes
+        .iter()
+        .filter(|prize| prize.fits(member, gender))
+        .map(|prize| prize.item())
+        .collect()
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -31,7 +76,7 @@ struct Document {
 }
 
 pub struct MysteryChests {
-    rewards: BTreeMap<i32, Vec<i32>>,
+    rewards: BTreeMap<i32, Vec<Prize>>,
 }
 
 fn invalid(message: &str) -> io::Error {
@@ -73,7 +118,17 @@ impl MysteryChests {
                 return Err(invalid("invalid chest or reward binding"));
             }
             let mut unique = std::collections::BTreeSet::new();
-            for &reward in &binding.rewards {
+            for prize in &binding.rewards {
+                if let Prize::Ruled {
+                    gender: Some(gender),
+                    ..
+                } = prize
+                {
+                    if !matches!(gender, 1 | 2) {
+                        return Err(invalid("a chest prize's gender is 1 (boy) or 2 (girl)"));
+                    }
+                }
+                let reward = prize.item();
                 let metadata = inventory.presentation(reward)?;
                 if reward == KEY
                     || metadata.item_type == 28
@@ -100,6 +155,8 @@ impl MysteryChests {
         pending: &mut Option<i32>,
         request: Request,
         player_guid: u64,
+        member: bool,
+        gender: i32,
     ) -> io::Result<InventoryOutcome> {
         let id = match request {
             Request::Check(id) | Request::Use(id) => id,
@@ -151,7 +208,14 @@ impl MysteryChests {
                 ..InventoryOutcome::default()
             });
         }
-        let choices = &self.rewards[&chest.definition_id];
+        let choices = eligible(&self.rewards[&chest.definition_id], member, gender);
+        if choices.is_empty() {
+            return Ok(InventoryOutcome {
+                replies: vec![chat::system("Nothing in this Mystery Chest can be yours.")],
+                changed: false,
+                ..InventoryOutcome::default()
+            });
+        }
         // ponytail: reproducible local selection; replace with recovered roll
         // rules when historical distribution and entropy behavior are known.
         let mut hash = Sha256::new();
@@ -196,5 +260,27 @@ impl MysteryChests {
         )?);
         *inventory = staged;
         Ok(outcome)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// L086: members-only and gendered prizes are drawn only by the players they fit, in content order.
+    #[test]
+    fn prizes_fit_by_membership_and_gender() {
+        let prizes: Vec<Prize> = serde_json::from_str(
+            r#"[11, {"item": 12, "members": true}, {"item": 13, "gender": 1}, {"item": 14, "gender": 2, "members": true}]"#,
+        )
+        .unwrap();
+        assert_eq!(eligible(&prizes, false, 1), vec![11, 13]);
+        assert_eq!(eligible(&prizes, true, 1), vec![11, 12, 13]);
+        assert_eq!(eligible(&prizes, true, 2), vec![11, 12, 14]);
+        assert_eq!(
+            eligible(&prizes, false, 0),
+            vec![11],
+            "an unknown gender draws no gendered prize"
+        );
     }
 }
