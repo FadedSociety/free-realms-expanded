@@ -27,6 +27,8 @@ use osfr_tools::station_cash::EarnSource;
 const LAKESHORE: [f32; 3] = [-733.952, 9.09, 945.973];
 /// Easy single-player row; the portal id is the client minigame row id.
 const CHESS_ROW: u32 = 20;
+/// L095: the live Games window row for chess (Micro-Games, MiniGameData 20): the id Play names.
+const CHESS_ACTIVITY: u32 = 515;
 const GUMBO: i32 = 70;
 const COOKING_INPUTS: [(i32, u32); 4] = [(2862, 4), (2875, 4), (2884, 4), (2900, 4)];
 static NEXT_FIXTURE: AtomicU64 = AtomicU64::new(0);
@@ -269,15 +271,22 @@ fn offer_instance(out: &Outcome) -> i32 {
     i32::from_le_bytes(header[0..4].try_into().unwrap())
 }
 
-/// `enter` publishes the portal list (167/1/1); return the row ids and join flags.
+/// `enter` publishes the portal lists (167/1/1; L095: the world list and the minigame list);
+/// return the row ids and join flags of both.
 fn published_list(entry: &Outcome) -> (Vec<u32>, Vec<u8>) {
-    let list = packets(entry, &[167, 0, 1, 1]);
-    assert_eq!(list.len(), 1, "one list at world entry");
-    let list = list[0];
-    let count = i32::from_le_bytes(list[8..12].try_into().unwrap()) as usize;
-    let mut at = 12;
+    let lists = packets(entry, &[167, 0, 1, 1]);
+    assert_eq!(lists.len(), 2, "two lists at world entry");
     let mut ids = Vec::new();
     let mut joins = Vec::new();
+    for list in lists {
+        read_list(list, &mut ids, &mut joins);
+    }
+    (ids, joins)
+}
+
+fn read_list(list: &[u8], ids: &mut Vec<u32>, joins: &mut Vec<u8>) {
+    let count = i32::from_le_bytes(list[8..12].try_into().unwrap()) as usize;
+    let mut at = 12;
     for _ in 0..count {
         ids.push(u32::from_le_bytes(list[at..at + 4].try_into().unwrap()));
         at += 10 * 4;
@@ -290,7 +299,6 @@ fn published_list(entry: &Outcome) -> (Vec<u32>, Vec<u8>) {
         at += 4 * 4;
     }
     assert_eq!(at, list.len(), "the client reader consumes the whole list");
-    (ids, joins)
 }
 
 /// Enter, start, connect and begin the game. Returns the instance id.
@@ -300,7 +308,9 @@ fn running_game(game: &mut Gameplay) -> i32 {
 
 fn running_game_at(game: &mut Gameplay, who: &CharacterState) -> i32 {
     game.initialize_world(who, 500).unwrap();
-    let offered = game.handle_in_world(&play(CHESS_ROW), who, 1_000).unwrap();
+    let offered = game
+        .handle_in_world(&play(CHESS_ACTIVITY), who, 1_000)
+        .unwrap();
     let instance = offer_instance(&offered);
     assert!(offered.changed);
 
@@ -449,7 +459,7 @@ fn entry_request_uses_a_server_reply_and_ignores_client_opponent_moves() {
     let (ids, joins) = published_list(&entry);
     let chess_at = ids
         .iter()
-        .position(|id| *id == CHESS_ROW)
+        .position(|id| *id == CHESS_ACTIVITY)
         .expect("chess row");
     assert_eq!(joins[chess_at], 1, "chess needs no combat job");
 
@@ -518,7 +528,9 @@ fn entry_request_uses_a_server_reply_and_ignores_client_opponent_moves() {
         game.state().sc_wallet.is_none(),
         "quitting before the settlement pays no Station Cash"
     );
-    let again = game.handle_in_world(&play(CHESS_ROW), &who, 2_800).unwrap();
+    let again = game
+        .handle_in_world(&play(CHESS_ACTIVITY), &who, 2_800)
+        .unwrap();
     assert_ne!(
         offer_instance(&again),
         instance,
@@ -625,7 +637,9 @@ fn a_single_player_win_pays_once_after_acknowledgement_and_closes_cleanly() {
     let close = game.handle_in_world(&[26, 0, 42, 0], &who, 9_300).unwrap();
     assert!(close.changed, "Close retires the finished run");
     assert_eq!(game.state(), state);
-    let again = game.handle_in_world(&play(CHESS_ROW), &who, 9_400).unwrap();
+    let again = game
+        .handle_in_world(&play(CHESS_ACTIVITY), &who, 9_400)
+        .unwrap();
     assert_eq!(packets(&again, &[39, 0, 16]).len(), 1);
     assert_ne!(offer_instance(&again), instance);
 }
@@ -707,8 +721,8 @@ fn refusals_and_illegal_traffic_change_nothing() {
     game.initialize_world(&who, 500).unwrap();
     let before = coins(&game);
 
-    // Unpublished ids are unknown and start nothing.
-    for id in [0, 1, 21, CHESS_ROW + 1, u32::MAX] {
+    // Unpublished ids are unknown and start nothing; so is the chess service row's own id (L095).
+    for id in [0, 1, CHESS_ROW, 9_999, u32::MAX] {
         let out = game.handle_in_world(&play(id), &who, 1_000).unwrap();
         assert!(packets(&out, &[39, 0, 16]).is_empty(), "id {id}");
         assert!(!out.changed && out.replies.len() == 1, "id {id}");
@@ -718,7 +732,9 @@ fn refusals_and_illegal_traffic_change_nothing() {
 
     let instance = running_game(&mut game);
     // A second Play while the table is open is refused and sends no offer.
-    let busy = game.handle_in_world(&play(CHESS_ROW), &who, 2_000).unwrap();
+    let busy = game
+        .handle_in_world(&play(CHESS_ACTIVITY), &who, 2_000)
+        .unwrap();
     assert!(packets(&busy, &[39, 0, 16]).is_empty());
     assert!(!busy.changed);
     assert!(chat_text(&busy).contains("Finish what you are doing"));
@@ -765,7 +781,9 @@ fn refusals_and_illegal_traffic_change_nothing() {
     );
     assert!(!paid_won(&quit));
     assert_eq!(coins(&game), before);
-    let again = game.handle_in_world(&play(CHESS_ROW), &who, 2_800).unwrap();
+    let again = game
+        .handle_in_world(&play(CHESS_ACTIVITY), &who, 2_800)
+        .unwrap();
     assert_eq!(packets(&again, &[39, 0, 16]).len(), 1);
     assert_ne!(offer_instance(&again), instance);
 }
@@ -779,7 +797,9 @@ fn results_close_without_chess_is_inert_and_start_is_malformed_safe() {
     assert!(!idle.changed && idle.replies.is_empty());
 
     // Canary for the lifecycle parser: a short start body is an error, not a start.
-    let offered = game.handle_in_world(&play(CHESS_ROW), &who, 1_000).unwrap();
+    let offered = game
+        .handle_in_world(&play(CHESS_ACTIVITY), &who, 1_000)
+        .unwrap();
     let instance = offer_instance(&offered);
     let mut short = lifecycle(5, instance);
     short.pop();

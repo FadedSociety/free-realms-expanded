@@ -55,8 +55,8 @@ const OTHER_TRICK: u32 = 12;
 /// A trick id no `pets.json` row has.
 const UNKNOWN_TRICK: u32 = 999_999;
 /// A chess activity row in the shipped `data/content/chess.json`; entering it closes the
-/// occupation table's pets gate.
-const CHESS_ROW: u32 = 20;
+/// occupation table's pets gate. L095: its live Games window id (MiniGameData 20), which Play names.
+const CHESS_ROW: u32 = 515;
 /// A moment well after every pet's adoption, so needs and care clocks are live.
 const START: u64 = 6_000_000;
 

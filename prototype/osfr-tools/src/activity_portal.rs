@@ -20,12 +20,24 @@
 //!   (the client first removes every listed activity of that entry type, then adds the new rows),
 //!   `i32 count`, then per row, little endian: `u32` Id, AppSystemId, Category, ImageSetId,
 //!   ActivityPositionId, DisplayNameId, DisplayDescriptionId, NameId, DescriptionId, EntryType;
-//!   `u8` CanPlayerJoin; `u32` preferred-state; `u32` featured-window count (+ 36 bytes each, always
-//!   0 here); `u32` TutorialActivityId; `u8` MembersOnly; `i32 len` + bytes DetailImageFilename;
-//!   `i32 len` + bytes ThumbnailImageFilename; `u32` Difficulty, unknown `+0xc`, unknown `+0x68`,
-//!   MysteryChestIcon. The reader fails (and the client drops the list) if the packet has trailing
-//!   or missing bytes. Field-to-column mapping is from `ClientActivityDatasource::GetCell`
-//!   (`00cfc180`, jump table `00cfc434`) and the Lua `Activities_col`.
+//!   `u8` CanPlayerJoin; `u32` RecommendedSetId; `u32` featured-window count (+ 33 bytes each,
+//!   always 0 here); `u32` TutorialActivityId; `u8` MembersOnly; `i32 len` + bytes
+//!   DetailImageFilename; `i32 len` + bytes ThumbnailImageFilename; `u32` Difficulty, ContentId
+//!   (`+0xc`), unknown `+0x68`, MysteryChestIcon. The reader fails (and the client drops the list)
+//!   if the packet has trailing or missing bytes. Field-to-column mapping is from
+//!   `ClientActivityDatasource::GetCell` (`00cfc180`, jump table `00cfc434`) and the Lua
+//!   `Activities_col`.
+//! * L095, the live server's own lists (the community captures `packets_2.pcapng`, `p2`, `p3`, `p12`
+//!   and the racing and demo derby captures, 2014-03-24..30, decoded with our transport framing):
+//!   entry type 1 carried 238 world activities (battles, the kart garage, Pirate's Plunder, events,
+//!   meeting places), entry type 2 the 179 minigames. Every row parses to the last byte with 33-byte
+//!   featured windows. ContentId is the client `MiniGameData.txt` row of every entry-type-2 row (all
+//!   179 names agree) and the battle's own id on battle rows. RecommendedSetId is a client
+//!   `RequirementSets.txt` row (mining 15-18 = Miner rank 5/9/13/17, cooking 11-14 Chef, forging
+//!   19-22 Blacksmith, battles 2-6 combat-rank bands); CanPlayerJoin is set apart from it (every
+//!   battle was joinable whatever its band). Rows outside every Games window tile carry category 99
+//!   and `placeholder_*.dds` art, the field battles among them. All 417 rows name art the client
+//!   ships.
 //! * `Ui.RequestToJoinActivity(id, 0)` (portal Play button) is the only Lua entry to `00be7d80`.
 //! * Category decides where a row shows (T399). After every list the client files each row under
 //!   the datasource `"Activities.Category%d"` of its Category dword (`00cea720`, format `00cfc0b0`
@@ -39,6 +51,14 @@
 //!
 //! # Reconstructed policy (R)
 //!
+//! * L095: with `activity_catalogue.json` (the live Games window rows: all 16 tiles, every wire value
+//!   but CanPlayerJoin) the client sees the live tree with its own art, in the live entry-type lists.
+//!   A live row whose game this server runs is joined to that service row: a battle or soccer row by
+//!   tile and name, chess by its MiniGameData row, a card row by id, the wheel by its activity id.
+//!   Play on the live id starts the service row. Every other live row is listed with CanPlayerJoin 0
+//!   and its Play is refused ("not open yet"). A field battle the live tiles lack is listed the way
+//!   the live server listed its own: category 99 and placeholder art, so no tile shows it. Other
+//!   unjoined service rows are not listed. Without the file the bullets below hold unchanged.
 //! * Only activities backed by a running battle or a configured native soccer match are published:
 //!   one row per `field_battles.json` battle (category 10, Battles) and one per `soccer.json` game
 //!   (category 22, art `Soccer_Briarwood.dds`; both values are the client `ActivityCategories.txt`
@@ -71,6 +91,17 @@ const SUB_LIST: u8 = 1;
 const SUB_PLAY: u8 = 2;
 const SUB_REFRESH: u8 = 4;
 const ENTRY_WORLD_TUNNEL: u32 = 1;
+/// L095: the live minigame rows' entry type; the client sends their Play through the client tunnel.
+const ENTRY_CLIENT_TUNNEL: u32 = 2;
+/// L095: the category the live server gave rows listed outside every Games window tile.
+const HIDDEN_CATEGORY: u32 = 99;
+const HIDDEN_DETAIL: &str = "placeholder_detail.dds";
+const HIDDEN_THUMBNAIL: &str = "placeholder_thumb.dds";
+/// L095: the live Games window rows, beside the other content files.
+pub const CATALOGUE_FILE: &str = "activity_catalogue.json";
+/// The live lists held 417 rows.
+const MAX_LIVE_ROWS: usize = 512;
+const MAX_IMAGE_NAME: usize = 64;
 /// "Battles", row 10 of the client `Resources/ActivityCategories.txt` (T399; was 18, Micro-Games).
 const COMBAT_CATEGORY: u32 = 10;
 /// Recovered soccer category row 22 in the client `Resources/ActivityCategories.txt`.
@@ -155,6 +186,62 @@ struct Battle {
     icon_id: i64,
 }
 
+/// L095: one row of the live server's Games window lists: every wire value but CanPlayerJoin.
+#[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct LiveRow {
+    pub entry_type: u32,
+    pub id: u32,
+    pub app_system_id: u32,
+    pub category: u32,
+    pub image_set_id: u32,
+    pub position: u32,
+    pub display_name_id: u32,
+    pub display_description_id: u32,
+    pub name_id: u32,
+    pub description_id: u32,
+    pub recommended_set_id: u32,
+    pub tutorial_activity_id: u32,
+    pub difficulty: u32,
+    pub content_id: u32,
+    pub detail_image: String,
+    pub thumbnail_image: String,
+    pub members_only: bool,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct LiveFile {
+    schema_version: u32,
+    #[allow(dead_code)]
+    source: String,
+    rows: Vec<LiveRow>,
+}
+
+/// What starts a live row: a service row (an index into `Catalogue::rows`), the daily wheel (its
+/// own handler takes the Play first), or nothing here yet.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Runner {
+    Service(usize),
+    Wheel,
+    Closed,
+}
+
+/// L095: the live rows in `directory`, or none when the file is absent.
+pub fn load_live(directory: &Path) -> io::Result<Vec<LiveRow>> {
+    let path = directory.join(CATALOGUE_FILE);
+    if !path.is_file() {
+        return Ok(Vec::new());
+    }
+    let file: LiveFile =
+        serde_json::from_str(&read_bounded(&path)?).map_err(|e| invalid(&e.to_string()))?;
+    if file.schema_version != 1 {
+        return Err(invalid("unsupported activity catalogue"));
+    }
+    validate_live(&file.rows)?;
+    Ok(file.rows)
+}
+
 /// What the server knows about the asking player.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Viewer {
@@ -175,6 +262,8 @@ pub enum Refusal {
     /// The card content has no launch block (T504; T765 opens it).
     CardGameClosed,
     TreasureWarClosed,
+    /// L095: a live row this server does not run yet (its Play is greyed out; this one was forged).
+    NotOpen,
 }
 
 impl Refusal {
@@ -188,6 +277,7 @@ impl Refusal {
             Self::CardGameClosed => "The Free Realms Trading Card Game is currently unavailable. Please try again in a few minutes.".into(),
             // (R) The client has no Treasure War closed line.
             Self::TreasureWarClosed => "Treasure War is not open yet.".into(),
+            Self::NotOpen => "That activity is not open yet.".into(),
         }
     }
 }
@@ -208,13 +298,80 @@ pub struct Catalogue {
     rows: Vec<Activity>,
     /// The card-game rows' own wire values (`Kind::CardGame` rows read them by id).
     cards: Option<Arc<card_game::Content>>,
+    /// L095: the live Games window rows and what starts each one.
+    live: Vec<(LiveRow, Runner)>,
 }
 
 impl Catalogue {
     /// Build from rows; ids must be unique and nonzero (they are the client's hash keys).
     pub fn new(rows: Vec<Activity>) -> io::Result<Self> {
         validate_rows(&rows)?;
-        Ok(Self { rows, cards: None })
+        Ok(Self {
+            rows,
+            ..Self::default()
+        })
+    }
+
+    /// L095: list the live Games window rows, each joined to the service row that runs it (see
+    /// `runs`); `wheel` is the daily wheel's activity id while the wheel is on. Call after the last
+    /// `append`. A service row joins at most one live row.
+    pub fn with_live(mut self, live: Vec<LiveRow>, wheel: Option<u32>) -> io::Result<Self> {
+        validate_live(&live)?;
+        let mut taken = vec![false; self.rows.len()];
+        self.live = live
+            .into_iter()
+            .map(|row| {
+                let joined = (wheel != Some(row.id))
+                    .then(|| (0..self.rows.len()).find(|&i| !taken[i] && runs(&row, &self.rows[i])))
+                    .flatten();
+                let runner = match joined {
+                    Some(i) => {
+                        taken[i] = true;
+                        Runner::Service(i)
+                    }
+                    None if wheel == Some(row.id) => Runner::Wheel,
+                    None => Runner::Closed,
+                };
+                (row, runner)
+            })
+            .collect();
+        if self
+            .own_rows()
+            .any(|(_, a)| self.live.iter().any(|(row, _)| row.id == a.id))
+        {
+            return Err(invalid("an activity id repeats a live activity id"));
+        }
+        Ok(self)
+    }
+
+    /// The live rows, so a rebuild can publish them again.
+    pub fn live(&self) -> Vec<LiveRow> {
+        self.live.iter().map(|(row, _)| row.clone()).collect()
+    }
+
+    /// Service rows listed by their own id, with their index: all of them without live rows; with
+    /// live rows only the field battles no live row runs (listed hidden, as the live server listed
+    /// its field battles).
+    fn own_rows(&self) -> impl Iterator<Item = (usize, &Activity)> {
+        self.rows.iter().enumerate().filter(|(i, a)| {
+            self.live.is_empty()
+                || (a.kind == Kind::Battle
+                    && !self.live.iter().any(|(_, r)| *r == Runner::Service(*i)))
+        })
+    }
+
+    /// The service row a client id starts; `Ok(None)` for a listed live row nothing here runs.
+    fn lookup(&self, id: u32) -> Result<Option<&Activity>, Refusal> {
+        if let Some((_, runner)) = self.live.iter().find(|(row, _)| row.id == id) {
+            return Ok(match *runner {
+                Runner::Service(i) => Some(&self.rows[i]),
+                Runner::Wheel | Runner::Closed => None,
+            });
+        }
+        self.own_rows()
+            .find(|(_, a)| a.id == id)
+            .map(|(_, a)| Some(a))
+            .ok_or(Refusal::Unknown)
     }
 
     /// The one place the catalogue is assembled, at startup and on `realm reload battles`:
@@ -259,14 +416,8 @@ impl Catalogue {
     /// Read `field_battles.json` (the same file the battle engine loads, so every row here is a
     /// battle `EncounterEngine::begin` accepts). Unknown fields are ignored.
     pub fn load(path: &Path) -> io::Result<Self> {
-        let mut text = String::new();
-        fs::File::open(path)?
-            .take(MAX_FILE + 1)
-            .read_to_string(&mut text)?;
-        if text.len() as u64 > MAX_FILE {
-            return Err(invalid("field battles file too large"));
-        }
-        let file: BattleFile = serde_json::from_str(&text).map_err(|e| invalid(&e.to_string()))?;
+        let file: BattleFile =
+            serde_json::from_str(&read_bounded(path)?).map_err(|e| invalid(&e.to_string()))?;
         Self::new(
             file.battles
                 .into_iter()
@@ -288,18 +439,17 @@ impl Catalogue {
         &self.rows
     }
 
-    /// The kind behind an id, without admitting the player. Unknown ids are `None`.
+    /// The kind behind a client id, without admitting the player. Unknown ids and live rows
+    /// nothing here runs are `None`.
     pub fn kind(&self, id: u32) -> Option<Kind> {
-        self.rows.iter().find(|a| a.id == id).map(|a| a.kind)
+        self.lookup(id).ok().flatten().map(|a| a.kind)
     }
 
-    /// Admission for a Play. Order matters: an unknown id reveals nothing about the player.
+    /// Admission for a Play on client id `id`; the result is the service row it starts (its own
+    /// id, which a live row's differs from). Order matters: an unknown or closed id reveals
+    /// nothing about the player.
     pub fn admit(&self, id: u32, viewer: Viewer, busy: bool) -> Result<&Activity, Refusal> {
-        let activity = self
-            .rows
-            .iter()
-            .find(|a| a.id == id)
-            .ok_or(Refusal::Unknown)?;
+        let activity = self.lookup(id)?.ok_or(Refusal::NotOpen)?;
         if busy {
             return Err(Refusal::Busy);
         }
@@ -330,7 +480,7 @@ impl Catalogue {
                     .cards
                     .as_ref()
                     .is_some_and(|cards| cards.launch().is_some());
-                match self.card(id) {
+                match self.card(activity.id) {
                     Some(card) if card.category == card_game::TREASURE_WAR_CATEGORY => {
                         return Err(Refusal::TreasureWarClosed);
                     }
@@ -347,23 +497,77 @@ impl Catalogue {
     fn card(&self, id: u32) -> Option<&card_game::Row> {
         self.cards.as_ref()?.row(id)
     }
-    /// The values of row `index` that differ per kind; `None` when its data row is missing.
-    fn wire(&self, index: usize, a: &Activity, viewer: Viewer) -> Option<Wire<'_>> {
+    /// CanPlayerJoin for a service row: battles want a combat job at the level, soccer its level
+    /// floor, a card row its data's flag; chess is open.
+    fn can_join(&self, a: &Activity, viewer: Viewer) -> bool {
+        match a.kind {
+            Kind::Battle => viewer.combat_job && viewer.level >= a.required_level,
+            Kind::Chess { .. } => true,
+            Kind::Soccer => viewer.level >= a.required_level,
+            Kind::CardGame { .. } => self.card(a.id).is_some_and(|card| card.can_player_join),
+        }
+    }
+
+    /// A live row as the client gets it: every value from the row, CanPlayerJoin from its runner.
+    fn live_wire<'a>(&'a self, row: &'a LiveRow, runner: Runner, viewer: Viewer) -> Wire<'a> {
+        Wire {
+            id: row.id,
+            app_system_id: row.app_system_id,
+            category: row.category,
+            image_set: row.image_set_id,
+            position: row.position,
+            display_name: row.display_name_id,
+            display_description: row.display_description_id,
+            name: row.name_id,
+            description: row.description_id,
+            entry_type: row.entry_type,
+            can_join: match runner {
+                Runner::Service(i) => self.can_join(&self.rows[i], viewer),
+                Runner::Wheel => true,
+                Runner::Closed => false,
+            },
+            recommended_set: row.recommended_set_id,
+            tutorial: row.tutorial_activity_id,
+            members_only: row.members_only,
+            detail: &row.detail_image,
+            thumbnail: &row.thumbnail_image,
+            difficulty: row.difficulty,
+            content: row.content_id,
+        }
+    }
+
+    /// A service row listed by its own id (`index` in `rows`); `None` when its data row is
+    /// missing. With live rows only hidden field battles come here.
+    fn own_wire(&self, index: usize, a: &Activity, viewer: Viewer) -> Option<Wire<'_>> {
         let plain = Wire {
+            id: a.id,
             app_system_id: 0,
             category: 0,
+            image_set: a.icon_id,
             position: index as u32 + 1,
             display_name: a.name_id,
             display_description: a.description_id,
+            name: a.name_id,
+            description: a.description_id,
+            entry_type: ENTRY_WORLD_TUNNEL, // (R) card rows too; see `card_game.rs`
+            can_join: self.can_join(a, viewer),
+            recommended_set: 0,
             tutorial: 0,
-            can_join: true,
+            members_only: false,
             detail: ART,
             thumbnail: ART,
+            difficulty: a.difficulty,
+            content: 0,
         };
         Some(match a.kind {
+            Kind::Battle if !self.live.is_empty() => Wire {
+                category: HIDDEN_CATEGORY,
+                detail: HIDDEN_DETAIL,
+                thumbnail: HIDDEN_THUMBNAIL,
+                ..plain
+            },
             Kind::Battle => Wire {
                 category: COMBAT_CATEGORY,
-                can_join: viewer.combat_job && viewer.level >= a.required_level,
                 ..plain
             },
             Kind::Chess { .. } => Wire {
@@ -374,7 +578,6 @@ impl Catalogue {
             },
             Kind::Soccer => Wire {
                 category: SOCCER_CATEGORY,
-                can_join: viewer.level >= a.required_level,
                 detail: SOCCER_ART,
                 thumbnail: SOCCER_ART,
                 ..plain
@@ -388,69 +591,139 @@ impl Catalogue {
                     display_name: card.display_name_id,
                     display_description: card.display_description_id,
                     tutorial: card.tutorial_activity_id.unwrap_or(0),
-                    can_join: card.can_player_join,
                     detail: &card.detail_image,
                     thumbnail: &card.thumbnail_image,
+                    ..plain
                 }
             }
         })
     }
 
-    /// 167/1/1: the whole list for this player. Sent at world entry and on every 167/1/4.
-    /// One row writer for every kind; the layout is the client reader `00be63e0`.
+    /// 167/1/1 for entry type 1, the world activities: the whole list for this player. Sent at
+    /// world entry and on every 167/1/4.
     pub fn list_packet(&self, viewer: Viewer) -> Vec<u8> {
-        let rows: Vec<(&Activity, Wire)> = self
-            .rows
+        self.entry_list(ENTRY_WORLD_TUNNEL, viewer)
+    }
+
+    /// L095: 167/1/1 for entry type 2 (the live minigame rows), sent beside `list_packet`; `None`
+    /// without live minigame rows.
+    pub fn minigame_list_packet(&self, viewer: Viewer) -> Option<Vec<u8>> {
+        self.live
             .iter()
-            .enumerate()
-            .filter_map(|(index, a)| Some((a, self.wire(index, a, viewer)?)))
+            .any(|(row, _)| row.entry_type == ENTRY_CLIENT_TUNNEL)
+            .then(|| self.entry_list(ENTRY_CLIENT_TUNNEL, viewer))
+    }
+
+    /// One row writer for every row of one entry type; the layout is the client reader `00be63e0`.
+    fn entry_list(&self, entry_type: u32, viewer: Viewer) -> Vec<u8> {
+        let live = (self.live.iter()).map(|(row, runner)| self.live_wire(row, *runner, viewer));
+        let own = self
+            .own_rows()
+            .filter_map(|(index, a)| self.own_wire(index, a, viewer));
+        let rows: Vec<Wire> = live
+            .chain(own)
+            .filter(|w| w.entry_type == entry_type)
             .collect();
         let mut out = header(SUB_LIST);
-        out.extend(ENTRY_WORLD_TUNNEL.to_le_bytes());
+        out.extend(entry_type.to_le_bytes());
         out.extend((rows.len() as i32).to_le_bytes());
-        for (a, w) in rows {
+        for w in rows {
             for dword in [
-                a.id,
+                w.id,
                 w.app_system_id,
                 w.category,
-                a.icon_id,
+                w.image_set,
                 w.position,
                 w.display_name,
                 w.display_description,
-                a.name_id,
-                a.description_id,
-                ENTRY_WORLD_TUNNEL, // (R) card rows too; see `card_game.rs`
+                w.name,
+                w.description,
+                w.entry_type,
             ] {
                 out.extend(dword.to_le_bytes());
             }
             out.push(u8::from(w.can_join));
-            out.extend(0u32.to_le_bytes()); // preferred state
+            out.extend(w.recommended_set.to_le_bytes()); // RecommendedSetId
             out.extend(0u32.to_le_bytes()); // featured windows
             out.extend(w.tutorial.to_le_bytes()); // TutorialActivityId
-            out.push(0); // MembersOnly
+            out.push(u8::from(w.members_only));
             for name in [w.detail, w.thumbnail] {
                 out.extend((name.len() as i32).to_le_bytes());
                 out.extend(name.as_bytes());
             }
-            for dword in [a.difficulty, 0, 0, 0] {
-                out.extend(dword.to_le_bytes()); // Difficulty, +0xc, +0x68, MysteryChestIcon
+            for dword in [w.difficulty, w.content, 0, 0] {
+                out.extend(dword.to_le_bytes()); // Difficulty, ContentId, +0x68, MysteryChestIcon
             }
         }
         out
     }
 }
 
-/// The per-kind values of one 167/1/1 row; id, image set, name ids and difficulty come from `Activity`.
+/// One 167/1/1 row as written.
 struct Wire<'a> {
+    id: u32,
     app_system_id: u32,
     category: u32,
+    image_set: u32,
     position: u32,
     display_name: u32,
     display_description: u32,
-    tutorial: u32,
+    name: u32,
+    description: u32,
+    entry_type: u32,
     can_join: bool,
+    recommended_set: u32,
+    tutorial: u32,
+    members_only: bool,
     detail: &'a str,
     thumbnail: &'a str,
+    difficulty: u32,
+    content: u32,
+}
+
+/// L095: whether service row `a` runs live row `row`: a battle or soccer row by its tile and
+/// name, chess by its MiniGameData row (an entry-type-2 ContentId), a card row by id (the card
+/// data already carries the live ids).
+fn runs(row: &LiveRow, a: &Activity) -> bool {
+    match a.kind {
+        Kind::Battle => row.category == COMBAT_CATEGORY && row.name_id == a.name_id,
+        Kind::Soccer => row.category == SOCCER_CATEGORY && row.name_id == a.name_id,
+        Kind::Chess { row_id } => row.entry_type == ENTRY_CLIENT_TUNNEL && row.content_id == row_id,
+        Kind::CardGame { .. } => row.id == a.id,
+    }
+}
+
+fn validate_live(rows: &[LiveRow]) -> io::Result<()> {
+    if rows.len() > MAX_LIVE_ROWS {
+        return Err(invalid("too many live activities"));
+    }
+    for (i, row) in rows.iter().enumerate() {
+        if row.id == 0 || rows[..i].iter().any(|other| other.id == row.id) {
+            return Err(invalid("live activity ids must be unique and nonzero"));
+        }
+        if !matches!(row.entry_type, ENTRY_WORLD_TUNNEL | ENTRY_CLIENT_TUNNEL) {
+            return Err(invalid("unknown activity entry type"));
+        }
+        if [&row.detail_image, &row.thumbnail_image]
+            .iter()
+            .any(|name| name.len() > MAX_IMAGE_NAME || !name.is_ascii())
+        {
+            return Err(invalid("bad activity image name"));
+        }
+    }
+    Ok(())
+}
+
+/// A content file, refused past `MAX_FILE`.
+fn read_bounded(path: &Path) -> io::Result<String> {
+    let mut text = String::new();
+    fs::File::open(path)?
+        .take(MAX_FILE + 1)
+        .read_to_string(&mut text)?;
+    if text.len() as u64 > MAX_FILE {
+        return Err(invalid("activity file too large"));
+    }
+    Ok(text)
 }
 
 /// Decode a client message of family 167. `Ok(None)` for other families and for sub-ops the

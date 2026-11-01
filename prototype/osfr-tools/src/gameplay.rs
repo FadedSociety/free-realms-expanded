@@ -995,16 +995,22 @@ impl Gameplay {
             Some(path) => Some(Arc::new(crate::soccer_entry::Content::load(&path)?)),
             None => None,
         };
+        let daily_wheel = crate::daily_wheel::DailyWheel::load(npc_content, saved_wheel_day)?;
+        // L095: the live Games window rows, from the first content folder that has them.
+        let live_activities = [directory, bundled_npc_content.as_path()]
+            .into_iter()
+            .find(|base| base.join(crate::activity_portal::CATALOGUE_FILE).is_file())
+            .map_or_else(|| Ok(Vec::new()), crate::activity_portal::load_live)?;
         let activities = crate::activity_portal::Catalogue::assemble(
             content_presence::battle_rows(&battle_file, encounter.is_some()),
             chess.as_ref(),
             soccer_content.as_ref(),
             crate::card_game::Content::load_optional(npc_content)?.as_ref(),
-        )?;
+        )?
+        .with_live(live_activities, daily_wheel.activity_id())?;
         let card_launches = (activities.cards().and_then(|cards| cards.launch()))
             .map(crate::card_game::Launches::new)
             .transpose()?;
-        let daily_wheel = crate::daily_wheel::DailyWheel::load(npc_content, saved_wheel_day)?;
         let mut npc_interaction = if crate::content::npc_shop_enabled(npc_content) {
             Some(NpcInteraction::load(
                 &npc_content.join("npcs"),
@@ -3088,8 +3094,11 @@ impl Gameplay {
 
     /// W150: the portal list for this player (167/1/1).
     fn append_activity_list(&self, out: &mut Outcome) {
+        let viewer = self.activity_viewer();
+        out.replies.push(self.activities.list_packet(viewer));
+        // L095: the live minigame rows travel in their own entry-type list.
         out.replies
-            .push(self.activities.list_packet(self.activity_viewer()));
+            .extend(self.activities.minigame_list_packet(viewer));
     }
 
     fn activity_viewer(&self) -> crate::activity_portal::Viewer {

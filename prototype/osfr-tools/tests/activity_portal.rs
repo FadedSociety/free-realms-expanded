@@ -4,10 +4,13 @@
 //! `00be6fa0` -> `00be63e0`), not from the writer under test, and fails on any trailing or missing
 //! byte exactly as the client does. All content is synthetic; no player names or chat appear.
 use osfr_tools::{
-    activity_portal::{Activity, Catalogue, ChessActivity, Kind, Refusal, Request, Viewer, parse},
+    activity_portal::{
+        self, Activity, Catalogue, ChessActivity, Kind, LiveRow, Refusal, Request, Viewer, parse,
+    },
     card_game,
 };
 use std::{
+    collections::BTreeSet,
     fs,
     path::PathBuf,
     sync::{
@@ -551,5 +554,159 @@ fn assembly_refuses_collisions_and_too_many_rows() {
             .unwrap()
             .append(cards.portal_rows())
             .is_err()
+    );
+}
+
+fn live_row(entry_type: u32, id: u32, category: u32, name_id: u32, content_id: u32) -> LiveRow {
+    LiveRow {
+        entry_type,
+        id,
+        app_system_id: entry_type,
+        category,
+        image_set_id: 7_000 + id,
+        position: 3,
+        display_name_id: name_id + 1,
+        display_description_id: name_id + 2,
+        name_id,
+        description_id: name_id + 3,
+        recommended_set_id: 15,
+        tutorial_activity_id: 1_048,
+        difficulty: 2,
+        content_id,
+        detail_image: format!("row{id}_detail.dds"),
+        thumbnail_image: format!("row{id}_thumb.dds"),
+        members_only: id % 2 == 1,
+    }
+}
+
+/// L095: live rows go out exactly as the live server wrote them, the minigames in their own
+/// entry-type list. A live row starts the service row joined to it (Play names the live id, the
+/// service id starts); every other live row is greyed out and refused; a field battle no live row
+/// runs is listed hidden; other unjoined service rows are not listed.
+#[test]
+fn live_rows_publish_the_live_values_and_play_their_service_rows() {
+    let battle = row(12_370, 0);
+    let catalogue = Catalogue::new(vec![battle.clone(), row(96, 0)])
+        .unwrap()
+        .append([chess_row(20), chess_row(66)].map(Activity::from))
+        .unwrap()
+        .with_live(
+            vec![
+                live_row(1, 37, 10, battle.name_id, 37),
+                live_row(2, 515, 18, 950, 20),
+                live_row(2, 63, 16, 37_933, 37),
+                live_row(2, 8, 17, 409_962, 8),
+            ],
+            Some(8),
+        )
+        .unwrap();
+
+    let world = decode_list(&catalogue.list_packet(FIGHTER));
+    assert_eq!(world.key, 1);
+    let ids: Vec<u32> = world.rows.iter().map(|r| r[0]).collect();
+    assert_eq!(ids, [37, 96], "the live battle row, then the hidden battle");
+    let name = battle.name_id;
+    assert_eq!(
+        world.rows[0][..10],
+        [37, 1, 10, 7_037, 3, name + 1, name + 2, name, name + 3, 1]
+    );
+    // RecommendedSetId, TutorialActivityId, Difficulty, ContentId, +0x68, MysteryChestIcon.
+    assert_eq!(world.rows[0][10..], [15, 1_048, 2, 37, 0, 0]);
+    assert_eq!(world.flags[0], (1, 1), "joinable, members only");
+    assert_eq!(
+        world.strings[0],
+        ("row37_detail.dds".into(), "row37_thumb.dds".into())
+    );
+    assert_eq!(world.rows[1][2], 99, "hidden, as the live field battles");
+    assert_eq!(
+        world.strings[1],
+        (
+            "placeholder_detail.dds".into(),
+            "placeholder_thumb.dds".into()
+        )
+    );
+
+    let minigames = decode_list(&catalogue.minigame_list_packet(FIGHTER).unwrap());
+    assert_eq!(minigames.key, 2);
+    assert!(minigames.rows.iter().all(|r| r[9] == 2), "row entry types");
+    let joinable: Vec<(u32, u8)> = (minigames.rows.iter().zip(&minigames.flags))
+        .map(|(r, f)| (r[0], f.0))
+        .collect();
+    assert_eq!(
+        joinable,
+        [(515, 1), (63, 0), (8, 1)],
+        "chess, kart closed, wheel"
+    );
+
+    assert_eq!(catalogue.admit(37, FIGHTER, false).unwrap().id, 12_370);
+    assert_eq!(
+        catalogue.admit(515, FIGHTER, false).unwrap().kind,
+        Kind::Chess { row_id: 20 }
+    );
+    assert_eq!(catalogue.admit(96, FIGHTER, false).unwrap().id, 96);
+    assert_eq!(catalogue.admit(63, FIGHTER, false), Err(Refusal::NotOpen));
+    assert_eq!(catalogue.admit(63, FIGHTER, true), Err(Refusal::NotOpen));
+    for service_id in [12_370, 20, 66] {
+        assert_eq!(
+            catalogue.admit(service_id, FIGHTER, false),
+            Err(Refusal::Unknown),
+            "{service_id} is not a client id any more"
+        );
+    }
+    assert_eq!(catalogue.kind(37), Some(Kind::Battle));
+    assert_eq!(catalogue.kind(63), None);
+    assert_eq!(catalogue.live().len(), 4);
+}
+
+#[test]
+fn live_rows_refuse_bad_rows_and_a_battle_shadowing_a_live_id() {
+    let base = || Catalogue::new(vec![row(96, 0)]).unwrap();
+    let with = |rows: Vec<LiveRow>| base().with_live(rows, None);
+    assert!(with(vec![live_row(1, 5, 10, 1, 5), live_row(2, 5, 18, 2, 6)]).is_err());
+    assert!(with(vec![live_row(1, 0, 10, 1, 5)]).is_err(), "zero id");
+    assert!(with(vec![live_row(3, 5, 10, 1, 5)]).is_err(), "entry type");
+    let mut long = live_row(2, 5, 18, 1, 5);
+    long.detail_image = "x".repeat(65);
+    assert!(with(vec![long]).is_err(), "image name");
+    // The client keys rows by id: a hidden battle may not reuse a live id.
+    assert!(with(vec![live_row(2, 96, 18, 1, 5)]).is_err());
+    assert_eq!(with(vec![]).unwrap(), base(), "no live rows: unchanged");
+}
+
+/// L095: the shipped live rows cover all 16 Games window tiles with client art names, among them
+/// the Frost Ridge kart row of the owner's 2010 frames.
+#[test]
+fn the_shipped_live_rows_cover_every_games_window_tile() {
+    let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let rows = activity_portal::load_live(&dir).unwrap();
+    assert_eq!(rows.len(), 211);
+    let tiles: BTreeSet<u32> = rows.iter().map(|r| r.category).collect();
+    assert_eq!(
+        tiles.into_iter().collect::<Vec<_>>(),
+        [
+            10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 26
+        ]
+    );
+    assert!(
+        rows.iter()
+            .all(|r| r.detail_image.ends_with(".dds") && r.thumbnail_image.ends_with(".dds"))
+    );
+    let kart = rows.iter().find(|r| r.id == 63).unwrap();
+    assert_eq!(
+        (kart.entry_type, kart.category, kart.content_id),
+        (2, 16, 37)
+    );
+    assert_eq!(kart.tutorial_activity_id, 1_048);
+    assert_eq!(
+        (kart.detail_image.as_str(), kart.thumbnail_image.as_str()),
+        (
+            "frost_ridge_racing_detail.dds",
+            "frost_ridge_racing_thumb.dds"
+        )
+    );
+    assert!(
+        activity_portal::load_live(&dir.join("missing"))
+            .unwrap()
+            .is_empty()
     );
 }

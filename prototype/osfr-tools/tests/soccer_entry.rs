@@ -30,6 +30,8 @@ use soccer_play::{client_goal, lifecycle, offer_instance, play, position, shot};
 
 const GUID: u64 = 0x0000_0010_0080_06b2;
 const SOCCER_ACTIVITY: u32 = 43;
+/// L095: the live Games window row Snowhill Soccer (name 37945) joins: the id Play names.
+const SOCCER_LIVE: u32 = 73;
 static NEXT: AtomicU64 = AtomicU64::new(0);
 /// Trusted server claim issued to this session while a match runs.
 const CLAIM: u64 = 0x0f26_0000_0000_0001;
@@ -195,17 +197,20 @@ fn portal_play_reaches_a_server_result_and_pays_once() {
     let listed = game
         .handle_in_world(&[167, 0, 1, 4], &character, 600)
         .unwrap();
-    let rows = portal_rows(&listed.replies[0]);
+    let rows: Vec<_> = (listed.replies.iter())
+        .filter(|reply| reply.starts_with(&[167, 0, 1, 1]))
+        .flat_map(|list| portal_rows(list))
+        .collect();
     let soccer = rows
         .iter()
-        .find(|(id, _, _, _)| *id == SOCCER_ACTIVITY)
+        .find(|(id, _, _, _)| *id == SOCCER_LIVE)
         .expect("soccer row is published");
     assert_eq!(soccer.1, 22, "client soccer category");
-    assert_eq!(soccer.2, "Soccer_Briarwood.dds");
+    assert_eq!(soccer.2, "Soccer_Snowhill.dds", "the live row's own art");
     assert_eq!(soccer.3, 1, "soccer does not need a combat job");
 
     let played = game
-        .handle_in_world(&play(SOCCER_ACTIVITY), &character, 1_000)
+        .handle_in_world(&play(SOCCER_LIVE), &character, 1_000)
         .unwrap();
     let scene = played.scene_zoning.expect("Play zones into sg_soccer");
     assert_eq!(scene.scene, "sg_soccer");
@@ -320,7 +325,7 @@ fn forged_entries_and_client_goals_change_nothing() {
     assert_eq!(game.state(), before);
 
     // Enter a real match, then prove a client goal and a second Play change no state.
-    game.handle_in_world(&play(SOCCER_ACTIVITY), &character, 2_000)
+    game.handle_in_world(&play(SOCCER_LIVE), &character, 2_000)
         .unwrap();
     game.initialize_world(&character, 2_100).unwrap();
     let before_match = game.state();
@@ -333,7 +338,7 @@ fn forged_entries_and_client_goals_change_nothing() {
     assert_eq!(game.state(), before_match);
 
     let second = game
-        .handle_in_world(&play(SOCCER_ACTIVITY), &character, 2_300)
+        .handle_in_world(&play(SOCCER_LIVE), &character, 2_300)
         .unwrap();
     assert!(second.scene_zoning.is_none());
     assert!(text(&second).contains("Finish what you are doing"));
@@ -348,7 +353,7 @@ fn quitting_before_a_result_cancels_without_a_payout() {
     game.initialize_world(&character, 500).unwrap();
     let coins_before = game.inventory_state().coins;
 
-    game.handle_in_world(&play(SOCCER_ACTIVITY), &character, 1_000)
+    game.handle_in_world(&play(SOCCER_LIVE), &character, 1_000)
         .unwrap();
     let loaded = game.initialize_world(&character, 1_100).unwrap();
     let instance = offer_instance(&loaded.replies);
@@ -459,7 +464,7 @@ fn enter_world(fixture: &Fixture, xp: u32, ticket: &str) -> Gateway {
 /// Portal Play through Loaded: returns the offered lifecycle instance id and
 /// the Loaded time.
 fn enter_match(gateway: &mut Gateway, at: u64) -> (i32, u64) {
-    let played = gateway_send(gateway, &play(SOCCER_ACTIVITY), at);
+    let played = gateway_send(gateway, &play(SOCCER_LIVE), at);
     assert!(played.began_zoning, "Play zones into the soccer scene");
     gateway_send(gateway, &13u16.to_le_bytes(), at + 100);
     let loaded = gateway_send(gateway, &10u16.to_le_bytes(), at + 200);

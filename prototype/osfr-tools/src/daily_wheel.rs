@@ -157,6 +157,11 @@ impl DailyWheel {
         self.content.is_some()
     }
 
+    /// The wheel's Games window row while the wheel is on (L095 lists that live row open).
+    pub fn activity_id(&self) -> Option<u32> {
+        self.content.as_ref().map(|content| content.activity_id)
+    }
+
     /// The day stamp `GameplayState` saves. Kept even while the content is absent.
     pub fn last_spin_day(&self) -> Option<u64> {
         self.last_spin_day

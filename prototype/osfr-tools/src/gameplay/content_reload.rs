@@ -67,7 +67,8 @@ impl Gameplay {
                         self.chess.as_ref(),
                         self.soccer_content.as_ref(),
                         self.activities.cards(),
-                    )?;
+                    )?
+                    .with_live(self.activities.live(), self.daily_wheel.activity_id())?;
                     if let Some(visibility) = self.npc_visibility.as_mut() {
                         visibility.add_battle_spawners(encounter);
                     }

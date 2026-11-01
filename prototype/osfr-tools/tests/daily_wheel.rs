@@ -28,8 +28,9 @@ const DAY: u64 = 86_400;
 const TODAY: u64 = 20_000;
 const CLOCK: u64 = TODAY * DAY + 3_600;
 const WHEEL_GAME: i32 = 8;
-/// Single-player chess row (`chess_route.rs`): a real occupation with no extra content.
-const CHESS_ROW: u32 = 20;
+/// Single-player chess row (`chess_route.rs`): a real occupation with no extra content. L095: its
+/// live Games window id (MiniGameData 20), the id Play names.
+const CHESS_ROW: u32 = 515;
 const FIRST_INSTANCE: i32 = 62_000_001;
 
 fn character() -> CharacterState {

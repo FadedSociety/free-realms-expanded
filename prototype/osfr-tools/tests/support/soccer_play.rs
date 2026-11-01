@@ -21,10 +21,18 @@ use osfr_tools::{
     soccer::{self, SoccerPacket},
 };
 
-/// 167/1/2 activity-portal Play: activity id, then a zero dword.
+/// 167/1/2 activity-portal Play: activity id, then a zero dword. L095: a shipped soccer game
+/// (MiniGameData 42/43/44) is listed as the live Games window row with its name (72/73/18), the
+/// id the client names; any other id goes out as given.
 pub fn play(activity: u32) -> Vec<u8> {
+    let listed: u32 = match activity {
+        42 => 72,
+        43 => 73,
+        44 => 18,
+        other => other,
+    };
     let mut inner = vec![167, 0, 1, 2];
-    inner.extend(activity.to_le_bytes());
+    inner.extend(listed.to_le_bytes());
     inner.extend(0u32.to_le_bytes());
     inner
 }

@@ -874,10 +874,13 @@ fn every_battle_is_published_or_documented_guide_only() {
         .replies
         .iter()
         .map(|packet| unframe(packet))
-        .find(|packet| packet.starts_with(&[167, 0, 1, 1]))
-        .expect("world entry sends the 167/1/1 activity list");
-    let published: BTreeMap<u32, PortalRow> = decode_list(list)
-        .into_iter()
+        .filter(|packet| packet.starts_with(&[167, 0, 1, 1]))
+        .collect::<Vec<_>>();
+    assert!(
+        !list.is_empty(),
+        "world entry sends the 167/1/1 activity lists"
+    );
+    let published: BTreeMap<u32, PortalRow> = (list.into_iter().flat_map(decode_list))
         .map(|row| (row.id, row))
         .collect();
     let catalogue = Catalogue::load(&battle_path()).expect("the shipped portal catalogue loads");
@@ -885,7 +888,13 @@ fn every_battle_is_published_or_documented_guide_only() {
     let mut violations: Vec<String> = Vec::new();
     for row in &rows {
         let id = unsigned(row, "id");
+        // L095: a battle the live Battles tile names goes out as that live row (its own id and
+        // values); the live presentation is the evidence there, not the authored row.
+        let live_row = published
+            .values()
+            .any(|portal| portal.category == 10 && portal.name == unsigned(row, "title_id"));
         match published.get(&id) {
+            None if live_row => {}
             Some(portal) => {
                 if portal.title != unsigned(row, "title_id")
                     || portal.description != unsigned(row, "description_id")

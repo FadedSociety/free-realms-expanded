@@ -58,6 +58,8 @@ use terrain::{disc_points, slope_degrees};
 
 /// The new row, inserted directly after battle 96.
 const BIXIE_HIVE: u32 = 12370;
+/// L095: the live Games window Battles row named Bixie Hive (name 5702), the id Play names.
+const BIXIE_HIVE_ROW: u32 = 37;
 const TITLE: i32 = 5702;
 const DESCRIPTION: i32 = 15336;
 const OBJECTIVE: i32 = 16791;
@@ -180,12 +182,12 @@ fn published_list(replies: &[Vec<u8>]) -> Vec<PortalRow> {
 fn published_row(replies: &[Vec<u8>]) -> PortalRow {
     let rows = published_list(replies);
     assert_eq!(
-        rows.iter().filter(|row| row.id == BIXIE_HIVE).count(),
+        rows.iter().filter(|row| row.id == BIXIE_HIVE_ROW).count(),
         1,
         "Bixie Hive is published exactly once"
     );
     rows.into_iter()
-        .find(|row| row.id == BIXIE_HIVE)
+        .find(|row| row.id == BIXIE_HIVE_ROW)
         .expect("Bixie Hive is in the 167/1/1 list")
 }
 
@@ -551,7 +553,7 @@ fn a_busy_character_is_refused() {
     enter_battle(&mut gateway, &screen, row, 600);
     let before = (gateway.snapshot(), saved_bytes(&gateway));
 
-    for activity in [BIXIE_HIVE, 12350] {
+    for activity in [BIXIE_HIVE_ROW, 12350] {
         let refused = send(&mut gateway, &portal_play(activity), 1_500);
         assert!(!refused.began_zoning && !refused.state_changed);
         assert!(
@@ -696,7 +698,7 @@ fn refusals_leave_everything_unchanged() {
     assert!(
         published_list(&send(&mut gateway, &[167, 0, 1, 4], 450).replies)
             .iter()
-            .any(|row| row.id == BIXIE_HIVE),
+            .any(|row| row.id == BIXIE_HIVE_ROW),
         "the session still answers an ordinary refresh"
     );
 
@@ -1151,8 +1153,11 @@ fn the_portal_row_applies_the_same_gates() {
     let fixture = Fixture::new();
     let (mut gateway, entry) = fixture.session(MARKER, 7001);
     let published = published_row(&entry.replies);
-    assert_eq!(published.title, TITLE as u32);
-    assert_eq!(published.description, DESCRIPTION as u32);
+    // L095: the live Battles row: "Battle" (425259) over the name Bixie Hive, the live
+    // description (16784) and difficulty.
+    assert_eq!(published.name, TITLE as u32);
+    assert_eq!(published.title, 425_259);
+    assert_eq!(published.description, 16_784);
     assert_eq!(published.difficulty, DIFFICULTY);
     assert!(
         !published.can_join,
@@ -1160,7 +1165,7 @@ fn the_portal_row_applies_the_same_gates() {
     );
 
     let before = (gateway.snapshot(), saved_bytes(&gateway));
-    let refused = send(&mut gateway, &portal_play(BIXIE_HIVE), 300);
+    let refused = send(&mut gateway, &portal_play(BIXIE_HIVE_ROW), 300);
     assert!(!refused.began_zoning && !refused.state_changed);
     assert!(
         chat_text(&refused).contains("Switch to a combat job before starting a battle."),
@@ -1180,7 +1185,7 @@ fn the_portal_row_applies_the_same_gates() {
         "a level-1 combat job may join"
     );
     let before = economy(&gateway, &prize_ids(battle(&battles(), BIXIE_HIVE)));
-    let arena = send(&mut gateway, &portal_play(BIXIE_HIVE), 800);
+    let arena = send(&mut gateway, &portal_play(BIXIE_HIVE_ROW), 800);
     assert!(arena.began_zoning, "Play starts the same run");
     assert_eq!(gateway.state().zone_id, ARENA_ZONE);
     let ready = arena_spawned(&mut gateway, 900);
@@ -1234,7 +1239,7 @@ fn the_portal_row_applies_the_same_gates() {
     let (mut full, bag) = fixture.gateway_with_bag(MARKER, 7002, MAX_ITEMS);
     assert_eq!(bag.items.len(), MAX_ITEMS);
     let before = (full.snapshot(), saved_bytes(&full));
-    let refused = send(&mut full, &portal_play(BIXIE_HIVE), 800);
+    let refused = send(&mut full, &portal_play(BIXIE_HIVE_ROW), 800);
     assert!(!refused.began_zoning && !refused.state_changed);
     assert!(
         chat_text(&refused).contains(REFUSAL_PRIZE),
@@ -1414,7 +1419,7 @@ fn a_failing_start_does_not_stop_the_other_session() {
     assert!(
         published_list(&send(&mut failing, &[167, 0, 1, 4], 1_000).replies)
             .iter()
-            .any(|row| row.id == BIXIE_HIVE)
+            .any(|row| row.id == BIXIE_HIVE_ROW)
     );
     assert!(send(&mut failing, &switch_job(BRAWLER), 1_100).state_changed);
     let screen = open_battle(&mut failing, MARKER_GUID, row, 1_200);

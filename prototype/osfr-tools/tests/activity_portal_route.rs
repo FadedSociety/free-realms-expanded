@@ -63,11 +63,6 @@ fn switch_to_combat(game: &mut Gameplay) {
     assert!(out.changed, "class switch accepted");
 }
 
-/// CanPlayerJoin of the first row (header 4 + key 4 + count 4 + ten dwords).
-fn first_can_join(list: &[u8]) -> u8 {
-    list[12 + 40]
-}
-
 fn lists(out: &Outcome) -> Vec<&Vec<u8>> {
     out.replies
         .iter()
@@ -75,11 +70,18 @@ fn lists(out: &Outcome) -> Vec<&Vec<u8>> {
         .collect()
 }
 
-fn ids(list: &[u8]) -> Vec<u32> {
-    // header 4 + entry type 4 + count 4, then rows; ids are only readable for the first row here.
-    let count = u32::from_le_bytes(list[8..12].try_into().unwrap()) as usize;
-    assert!(count >= 1);
-    vec![u32::from_le_bytes(list[12..16].try_into().unwrap())]
+/// Every row of every 167/1/1 (L095: the world list, then the minigame list).
+fn all_rows(out: &Outcome) -> Vec<field_battle_fixture::PortalRow> {
+    lists(out)
+        .into_iter()
+        .flat_map(|list| decode_list(list))
+        .collect()
+}
+
+/// CanPlayerJoin of the field battle's own row in the world list.
+fn battle_can_join(list: &[u8]) -> bool {
+    let rows = decode_list(list);
+    rows.iter().find(|row| row.id == BATTLE).unwrap().can_join
 }
 
 fn chat_text(out: &Outcome) -> String {
@@ -99,11 +101,13 @@ fn world_entry_and_refresh_publish_the_same_populated_list() {
     let mut game = game();
     let entry = game.initialize_world(&character(), 500).unwrap();
     let published = lists(&entry);
-    assert_eq!(published.len(), 1, "one 167/1/1 at world entry");
-    assert_eq!(ids(published[0]), [BATTLE]);
     assert_eq!(
-        first_can_join(published[0]),
-        0,
+        published.len(),
+        2,
+        "L095: the world list and the minigame list"
+    );
+    assert!(
+        !battle_can_join(published[0]),
         "a non-combat job cannot join"
     );
 
@@ -114,16 +118,18 @@ fn world_entry_and_refresh_publish_the_same_populated_list() {
     // The client asks again after a class change (009392c0); the answer now says Join.
     switch_to_combat(&mut game);
     let after = game.handle_in_world(&REFRESH, &character(), 1_500).unwrap();
-    assert_eq!(first_can_join(lists(&after)[0]), 1);
+    assert!(battle_can_join(lists(&after)[0]));
 }
 
-/// T399: Games > Battles opens the finder on `Activities.Category10` (client
+/// T399/L095: Games > Battles opens the finder on `Activities.Category10` (client
 /// `ActivityCategories.txt` row 10, "Battles"), and the client files each row under its
-/// Category dword (`00cea720`). Every shipped battle must land there with its name and
-/// icon, and a combat job gets PLAY! for every battle without a level floor.
+/// Category dword (`00cea720`). Every shipped battle is listed once: as the live Battles row with
+/// its name when there is one, otherwise by its own id under the hidden category 99 the live
+/// server gave its field battles. A combat job gets PLAY! for every battle without a level floor.
 #[test]
-fn world_entry_lists_every_battle_under_battles() {
+fn world_entry_lists_every_battle_once() {
     const BATTLES_CATEGORY: u32 = 10;
+    const HIDDEN: u32 = 99;
     let mut game = game();
     let entry = game.initialize_world(&character(), 500).unwrap();
     let rows = decode_list(lists(&entry)[0]);
@@ -136,23 +142,27 @@ fn world_entry_lists_every_battle_under_battles() {
     for battle in shipped {
         let id = battle["id"].as_u64().unwrap() as u32;
         let field = |name: &str| battle[name].as_i64().unwrap_or(0);
-        let mut listed = rows.iter().filter(|row| row.id == id);
-        let row = listed
-            .next()
-            .unwrap_or_else(|| panic!("battle {id} is listed"));
-        assert!(listed.next().is_none(), "battle {id} is listed once");
-        assert_eq!(
-            row.category, BATTLES_CATEGORY,
-            "battle {id} is under Battles"
-        );
-        assert_eq!(i64::from(row.name), field("title_id"), "battle {id} name");
-        assert_eq!(
-            i64::from(row.icon),
-            field("icon_id").max(0),
-            "battle {id} icon"
-        );
+        let named = |row: &&field_battle_fixture::PortalRow| {
+            row.category == BATTLES_CATEGORY && i64::from(row.name) == field("title_id")
+        };
+        let live: Vec<_> = rows.iter().filter(named).collect();
+        let own: Vec<_> = rows.iter().filter(|row| row.id == id).collect();
+        let row = match (live.as_slice(), own.as_slice()) {
+            ([row], []) => row,
+            ([], [row]) => {
+                assert_eq!(row.category, HIDDEN, "battle {id} is hidden");
+                assert_eq!(i64::from(row.name), field("title_id"), "battle {id} name");
+                assert_eq!(
+                    i64::from(row.icon),
+                    field("icon_id").max(0),
+                    "battle {id} icon"
+                );
+                row
+            }
+            _ => panic!("battle {id} is listed once"),
+        };
         assert!(!row.can_join, "battle {id}: no PLAY! before a combat job");
-        let after = refreshed.iter().find(|row| row.id == id).unwrap();
+        let after = refreshed.iter().find(|r| r.id == row.id).unwrap();
         if field("required_combat_level") == 0 {
             assert!(after.can_join, "battle {id}: PLAY! for a combat job");
         }
@@ -200,7 +210,7 @@ fn forged_and_unlisted_ids_neither_zone_nor_change_anything() {
             .is_some()
     );
 
-    for id in [0, 1, BATTLE + 1, 411, 0x8000_0000, u32::MAX] {
+    for id in [0, 1, BATTLE + 1, 9_999, 0x8000_0000, u32::MAX] {
         let out = game
             .handle_in_world(&play(id), &character(), 2_000)
             .unwrap();
@@ -211,6 +221,12 @@ fn forged_and_unlisted_ids_neither_zone_nor_change_anything() {
         assert!(!out.changed, "id {id}");
         assert!(chat_text(&out).contains("not available"), "id {id}");
     }
+    // L095: a listed live row nothing here runs (a harvesting row) is refused and changes nothing.
+    let closed = game
+        .handle_in_world(&play(411), &character(), 2_000)
+        .unwrap();
+    assert!(closed.zoning.is_none() && closed.scene_zoning.is_none() && !closed.changed);
+    assert!(chat_text(&closed).contains("not open yet"));
     // Malformed Play is an error, not a start.
     assert!(
         game.handle_in_world(&[167, 0, 1, 2, 96, 0, 0, 0], &character(), 2_500)
@@ -278,7 +294,7 @@ fn world_entry_lists_the_card_game_rows() {
     const TREASURE_WAR: u32 = 26;
     let mut game = game();
     let entry = game.initialize_world(&character(), 500).unwrap();
-    let rows = decode_list(lists(&entry)[0]);
+    let rows = all_rows(&entry);
     let mut expected: Vec<u32> = vec![7];
     expected.extend([
         490, 491, 492, 494, 495, 496, 497, 498, 499, 500, 502, 503, 504, 505,
@@ -298,10 +314,10 @@ fn world_entry_lists_the_card_game_rows() {
         assert_eq!(row.category, category, "card row {id} category");
         assert!(row.can_join, "card row {id}: PLAY! is on for everyone");
     }
-    // Battles keep their own category beside them.
+    // The field battle keeps its own (hidden) row beside them.
     assert_eq!(
         rows.iter().find(|row| row.id == BATTLE).unwrap().category,
-        10
+        99
     );
 }
 
@@ -351,7 +367,7 @@ fn playing_a_card_row_says_unavailable_and_changes_nothing() {
     }
 
     // An unlisted id is refused first, whatever the player is doing.
-    let unknown = send(&mut gateway, &portal_play(1079), 90_000);
+    let unknown = send(&mut gateway, &portal_play(9_999), 90_000);
     assert!(only_chat(&unknown).contains("not available"));
 
     // A busy player gets the Busy refusal before the card one (the gateway drops packets while
@@ -377,13 +393,14 @@ fn playing_a_card_row_says_unavailable_and_changes_nothing() {
         assert!(busy.zoning.is_none() && !busy.changed, "row {id}");
     }
     let still_unknown = game
-        .handle_in_world(&play(1079), &character(), 4_000)
+        .handle_in_world(&play(9_999), &character(), 4_000)
         .unwrap();
     assert!(chat_text(&still_unknown).contains("not available"));
 }
 
-/// The catalogue is assembled by one function: after `realm reload battles` the list still holds the
-/// chess, soccer and card rows (the old reload dropped soccer).
+/// The catalogue is assembled by one function: after `realm reload battles` the lists still hold the
+/// chess, soccer and card rows (the old reload dropped soccer); L095: chess and soccer under their
+/// live ids (chess 515, soccer 72/73/18).
 #[test]
 fn reload_battles_keeps_chess_soccer_and_card_rows() {
     use field_battle_fixture::{chat_text, send};
@@ -396,14 +413,13 @@ fn reload_battles_keeps_chess_soccer_and_card_rows() {
             .map(|r| field_battle_fixture::unframe(r))
             .filter(|r| r.starts_with(&[167, 0, 1, 1]))
             .collect();
-        assert_eq!(packets.len(), 1);
-        decode_list(packets[0])
-            .into_iter()
+        assert_eq!(packets.len(), 2);
+        (packets.into_iter().flat_map(decode_list))
             .map(|row| (row.id, row.category))
             .collect::<Vec<_>>()
     };
     let at_startup = listed(&loaded);
-    for id in card_ids().into_iter().chain([20, 66, 67, 42, 43, 44]) {
+    for id in card_ids().into_iter().chain([515, 72, 73, 18]) {
         assert!(at_startup.iter().any(|row| row.0 == id), "{id} at startup");
     }
     let reloaded = send(
