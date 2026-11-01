@@ -58,6 +58,10 @@ fn default_daily_reward_coins() -> u32 {
     1_000
 }
 
+fn default_engine_movetime_ms() -> u32 {
+    250
+}
+
 fn default_near_equal_margin() -> u32 {
     chess::DEFAULT_NEAR_EQUAL_MARGIN as u32
 }
@@ -97,6 +101,10 @@ pub struct ChessRow {
     /// Server-reply skill used by the local computer move chooser (0 to 100).
     pub skill: u32,
     pub success_coins: u32,
+    /// L105 (R): the host engine's strength for this row (`chess_engine`); absent keeps the
+    /// built-in chooser even with an engine configured.
+    #[serde(default)]
+    pub engine: Option<crate::chess_engine::Strength>,
 }
 
 /// `chess.json`: a bounded, strict content file.
@@ -124,6 +132,9 @@ pub struct ChessContent {
     /// replaced with compiled tuning.
     pub scoring: ChessScoring,
     pub rows: Vec<ChessRow>,
+    /// L105 (R): the engine's thinking time per move, 50 to 1000 ms. The gateway waits for it.
+    #[serde(default = "default_engine_movetime_ms")]
+    pub engine_movetime_ms: u32,
 }
 
 impl ChessContent {
@@ -159,6 +170,9 @@ impl ChessContent {
             ));
         }
         self.scoring.validate()?;
+        if !(50..=1000).contains(&self.engine_movetime_ms) {
+            return Err(invalid("chess engine move time must be 50 to 1000 ms"));
+        }
         let mut seen = BTreeSet::new();
         for row in &self.rows {
             if row.row_id == 0 || row.row_id > i32::MAX as u32 || !seen.insert(row.row_id) {
@@ -169,6 +183,9 @@ impl ChessContent {
             }
             if row.skill > 100 {
                 return Err(invalid("chess skill must be 0 to 100"));
+            }
+            if row.engine.is_some_and(|strength| !strength.valid()) {
+                return Err(invalid("chess engine strength is out of range"));
             }
             if row.success_coins > MAX_COINS_PER_WIN {
                 return Err(invalid("chess coin award exceeds the local bound"));
@@ -517,6 +534,12 @@ impl ChessService {
                 row.skill as u8,
                 i64::from(self.content.near_equal_margin),
             )?;
+        let engine = row
+            .engine
+            .map(|strength| (strength, self.content.engine_movetime_ms));
+        if let Some(tables) = self.tables.as_mut() {
+            tables.set_engine(instance as u64, engine);
+        }
         self.started_ms = Some(now_ms);
         Ok(())
     }

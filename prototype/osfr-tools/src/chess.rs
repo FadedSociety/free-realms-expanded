@@ -1060,6 +1060,8 @@ pub struct ChessTable {
     rng: Rng,
     /// (R) Content-supplied chooser weights for this table.
     scoring: ChessScoring,
+    /// L105: the row's engine strength and move time; `None` keeps the built-in chooser.
+    engine: Option<(crate::chess_engine::Strength, u32)>,
 }
 
 impl ChessTable {
@@ -1113,6 +1115,7 @@ impl ChessTable {
             game_over: HashSet::new(),
             settled: HashSet::new(),
             rng: Rng::seeded(seed),
+            engine: None,
             scoring,
         })
     }
@@ -1149,6 +1152,7 @@ impl ChessTable {
             game_over: HashSet::new(),
             settled: HashSet::new(),
             rng: Rng::seeded(seed),
+            engine: None,
             scoring,
         })
     }
@@ -1303,6 +1307,15 @@ impl ChessTable {
     /// easier rows. The client engine's proposed move is never an input here,
     /// so a modified client cannot choose the opponent's move or its loss.
     fn server_move(&mut self) -> Option<ChessMove> {
+        // L105: the host's engine first, when this row names a strength; its reply is played
+        // only if it is one of this position's legal moves.
+        if let Some((strength, movetime)) = self.engine
+            && let Some(mv) =
+                crate::chess_engine::best_move(&self.position.to_fen(), strength, movetime)
+                    .and_then(|text| self.legal_from_uci(&text))
+        {
+            return Some(mv);
+        }
         let mut ranked: Vec<(i64, ChessMove)> = self
             .position
             .legal_moves()
@@ -1331,6 +1344,20 @@ impl ChessTable {
             .count();
         let index = (self.rng.next_u64() % candidates.max(1) as u64) as usize;
         ranked.get(index).map(|(_, mv)| *mv)
+    }
+
+    /// The legal move a UCI reply names, if any.
+    fn legal_from_uci(&self, text: &str) -> Option<ChessMove> {
+        let (from, to, promote) = crate::chess_engine::parse_uci(text)?;
+        let promote = match promote {
+            None => None,
+            Some('q') => Some(Kind::Queen),
+            Some('r') => Some(Kind::Rook),
+            Some('b') => Some(Kind::Bishop),
+            Some(_) => Some(Kind::Knight),
+        };
+        (self.position.legal_moves().into_iter())
+            .find(|mv| mv.from == from && mv.to == to && mv.promote == promote)
     }
 
     fn score_move(&self, mv: &ChessMove) -> i64 {
@@ -1884,6 +1911,17 @@ impl ChessTables {
 
     pub fn table(&self, table_id: u64) -> Option<&ChessTable> {
         self.tables.get(&table_id)
+    }
+
+    /// L105: give an open table its row's engine strength and move time.
+    pub fn set_engine(
+        &mut self,
+        table_id: u64,
+        engine: Option<(crate::chess_engine::Strength, u32)>,
+    ) {
+        if let Some(table) = self.tables.get_mut(&table_id) {
+            table.engine = engine;
+        }
     }
 
     pub fn table_mut(&mut self, table_id: u64) -> Option<&mut ChessTable> {

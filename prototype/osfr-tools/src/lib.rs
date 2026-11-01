@@ -14,6 +14,7 @@ pub mod chat;
 pub mod chess;
 pub mod chess_service;
 pub mod checkers;
+pub mod chess_engine;
 pub mod client_areas;
 pub mod coin_shop;
 pub mod collection_catalogue;
