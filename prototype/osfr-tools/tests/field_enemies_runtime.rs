@@ -190,6 +190,37 @@ fn a_kill_reward_row_with_loot_pays_the_rolled_items() {
     );
 }
 
+/// L085 (Sanctuary port P4a): a potion's heal over time comes a step a second, in equal steps, and stops
+/// once spent.
+#[test]
+fn a_heal_over_time_comes_a_step_a_second_and_stops() {
+    let f = Fixture::new(1, 0.0);
+    let mut e = f.load();
+    let max = e.state().player_health;
+    let mut now = 0;
+    // The wolf takes some health first; then the player walks off past its leash.
+    while e.state().player_health > max * 6 / 10 {
+        now += 100;
+        e.tick([0.0; 3], 11, now).unwrap();
+        assert!(now < 120_000, "the wolf never hit");
+    }
+    for _ in 0..40 {
+        now += 100;
+        e.tick([100.0, 0.0, 0.0], 11, now).unwrap();
+    }
+    let start = e.state().player_health;
+    e.heal_player_over_time(30, 3_000, now);
+    let mut steps = Vec::new();
+    for second in 1..=4 {
+        e.tick([100.0, 0.0, 0.0], 11, now + second * 1_000).unwrap();
+        steps.push(e.state().player_health);
+    }
+    let step = max * 10 / 100;
+    assert_eq!(steps[0], start + step, "the first step a second in");
+    assert_eq!(steps[2], start + 3 * step, "three steps of 10%");
+    assert_eq!(steps[3], steps[2], "nothing after the heal is spent");
+}
+
 #[test]
 fn kill_then_respawn_forgets_skill_effects() {
     let f = Fixture::new(1, 0.0);

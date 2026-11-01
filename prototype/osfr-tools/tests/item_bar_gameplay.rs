@@ -290,8 +290,17 @@ fn a_bound_potion_heals_once_per_recast_and_the_bar_survives_a_reload() {
     assert_eq!(potions(&game), 2, "exactly one potion was spent");
     let (now, max) = health_packet(&used).expect("the HUD gets a 38/1");
     assert_eq!(now as u32, health(&game));
-    assert_eq!(now as u32, (hurt + max as u32 * 35 / 100).min(max as u32));
+    // L085: 2% at once, then the rest of the 35% a step a second over 5 s (our client's text).
+    assert_eq!(now as u32, (hurt + max as u32 * 2 / 100).min(max as u32));
     assert!(now as u32 > hurt);
+    for second in 1..=5 {
+        game.tick(&who(), 3_000 + second * 1_000).unwrap();
+    }
+    let healed = health(&game);
+    assert!(
+        healed > now as u32 && healed <= (hurt + max as u32 * 35 / 100).min(max as u32),
+        "the rest comes over the next seconds, 35% in all: {hurt} -> {healed} of {max}"
+    );
     assert!(
         used.replies.iter().any(|r| r.starts_with(&[38, 0, 3, 0])),
         "38/3 count update"

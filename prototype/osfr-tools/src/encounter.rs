@@ -27,6 +27,7 @@ mod field;
 mod field_marker;
 pub mod field_rewards;
 mod power_up_use;
+mod restore;
 mod revive;
 mod shared;
 mod skills;
@@ -703,6 +704,8 @@ pub struct EncounterEngine {
     // next regeneration step, plus each ability slot's cooldown end.
     energy: i32,
     energy_regen_at: u64,
+    /// L085: a potion's heal still to come (session only, like energy).
+    heal_over_time: Option<restore::HealOverTime>,
     /// Damage, health and tier levels from `combat_scale.json`.
     scale: CombatScale,
     // The player's max health and weapon damage multiplier at the active
@@ -1090,6 +1093,7 @@ impl EncounterEngine {
             dropped_return,
             energy: ENERGY_MAX,
             energy_regen_at: 0,
+            heal_over_time: None,
             max_health: scale.player_base_health(),
             scale,
             damage_scale: 1.0,
@@ -2343,6 +2347,7 @@ impl EncounterEngine {
         self.last_tick = Some(now_ms);
         let mut energy = EncounterOutcome::default();
         self.tick_job_effects(now_ms, &mut energy)?;
+        self.tick_heal_over_time(now_ms, &mut energy);
         if self
             .state
             .active

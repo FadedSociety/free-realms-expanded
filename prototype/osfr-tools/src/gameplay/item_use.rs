@@ -135,6 +135,12 @@ impl Gameplay {
                     .extend(encounter.heal_player_percent(reply.heal_percent));
             }
         }
+        // L085: the rest of a heal over time comes a step a second from the engine's tick.
+        if let (Some((percent, over_ms)), Some(encounter)) =
+            (reply.heal_over, self.encounter.as_mut())
+        {
+            encounter.heal_player_over_time(percent, over_ms, now_ms);
+        }
         if let Some(spec) = reply.effect {
             // The item bar admitted this exact spec in the same call, before spending the item,
             // and `apply` runs the same pure check: an error here is unreachable.

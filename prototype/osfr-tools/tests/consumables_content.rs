@@ -51,7 +51,14 @@ fn the_shipped_rows_load_through_the_real_loader_with_their_client_checked_value
     );
     for definition in POTIONS {
         let row = effects.get(definition).expect("a potion row");
-        assert!(matches!(row.effect, EffectKind::Heal { percent: 35 }));
+        assert!(matches!(
+            row.effect,
+            EffectKind::Heal {
+                percent: 35,
+                instant_percent: 2,
+                over_ms: 5_000
+            }
+        ));
         assert_eq!(row.cooldown_ms, 10_000);
         assert!(row.single_use);
         assert_eq!((row.name_id, row.description_id), (422909, 422916));

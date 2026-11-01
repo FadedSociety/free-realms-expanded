@@ -9,10 +9,12 @@
       "single_use": true,
       "effect": {
         "heal": {
-          "percent": 35
+          "percent": 35,
+          "instant_percent": 2,
+          "over_ms": 5000
         }
       },
-      "source": "Sanctuary-main@10f129e Consumables.json has no potion row; item 2173 (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree: Id 2173 NameId 422909 DescriptionId 422916 SingleUse true); the built-in table's 35% / 10 s heal values are kept (R, W146)."
+      "source": "Sanctuary-main@10f129e Consumables.json has no potion row; item 2173 (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree: Id 2173 NameId 422909 DescriptionId 422916 SingleUse true); the built-in table's 35% / 10 s heal values are kept (R, W146). L085: our client's description 422916 reads 'A potion that restores some of your health over 5 seconds.'; the wiki tooltip (another era) reads 'Instantly heals you for 2% health' and 'Heals you for 11% health/second for 3 seconds' (35% in all). So 35% in all, 2% at once, the rest over our client's 5 seconds (R: the per-second split)."
     },
     {
       "definition": 11002,
@@ -22,10 +24,12 @@
       "single_use": true,
       "effect": {
         "heal": {
-          "percent": 35
+          "percent": 35,
+          "instant_percent": 2,
+          "over_ms": 5000
         }
       },
-      "source": "Sanctuary-main@10f129e Consumables.json has no potion row; item 11002 (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree: Id 11002 NameId 422909 DescriptionId 422916 SingleUse true); the built-in table's 35% / 10 s heal values are kept (R, W146)."
+      "source": "Sanctuary-main@10f129e Consumables.json has no potion row; item 11002 (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree: Id 11002 NameId 422909 DescriptionId 422916 SingleUse true); the built-in table's 35% / 10 s heal values are kept (R, W146). L085: our client's description 422916 reads 'A potion that restores some of your health over 5 seconds.'; the wiki tooltip (another era) reads 'Instantly heals you for 2% health' and 'Heals you for 11% health/second for 3 seconds' (35% in all). So 35% in all, 2% at once, the rest over our client's 5 seconds (R: the per-second split)."
     },
     {
       "definition": 36,

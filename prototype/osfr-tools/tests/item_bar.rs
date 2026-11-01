@@ -522,7 +522,10 @@ fn using_a_bar_slot_spends_exactly_one_potion_and_asks_for_the_heal() {
     run(&mut bar, &mut inventory, &assign(0, 10), &ALIVE, 0).unwrap();
     let reply = run(&mut bar, &mut inventory, &cast(0), &ALIVE, 5_000).unwrap();
     assert!(reply.changed);
-    assert_eq!(reply.heal_percent, 35);
+    assert_eq!(
+        (reply.heal_percent, reply.heal_over),
+        (2, Some((33, 5_000)))
+    );
     assert_eq!(count(&inventory, 10), 2);
     assert!(reply.replies[0].starts_with(&[38, 0, 3, 0])); // item update with the new count
     let slot = slot_updates(&reply)[0];
@@ -536,7 +539,7 @@ fn using_a_bar_slot_spends_exactly_one_potion_and_asks_for_the_heal() {
         run(&mut bar2, &mut inventory2, &cast_on(2, 0, 0), &ALIVE, 0)
             .unwrap()
             .heal_percent,
-        35
+        2
     );
 }
 
@@ -550,7 +553,7 @@ fn the_recast_window_blocks_replays_and_ends_on_its_boundary() {
         run(&mut bar, &mut inventory, &cast(0), &ALIVE, 1_000)
             .unwrap()
             .heal_percent,
-        35
+        2
     );
     for now in [1_000, 1_001, 10_999] {
         for slot in [0, 1] {
@@ -563,7 +566,7 @@ fn the_recast_window_blocks_replays_and_ends_on_its_boundary() {
     assert_eq!(count(&inventory, 14), 1);
     // The next slot has to wait for the same item's window, then it works.
     let reply = run(&mut bar, &mut inventory, &cast(1), &ALIVE, 11_000).unwrap();
-    assert_eq!(reply.heal_percent, 35);
+    assert_eq!(reply.heal_percent, 2);
     // The slot shows the running recast to the client.
     let slot = slot_updates(&reply)[0];
     assert_eq!(slot.cast_age_ms, 0);
@@ -572,7 +575,7 @@ fn the_recast_window_blocks_replays_and_ends_on_its_boundary() {
         run(&mut bar, &mut inventory, &cast(0), &ALIVE, 0)
             .unwrap()
             .heal_percent,
-        35
+        2
     );
 }
 
@@ -582,7 +585,11 @@ fn the_last_potion_unbinds_its_slot() {
     let (mut inventory, mut bar) = (fixture.inventory(), fixture.bar());
     run(&mut bar, &mut inventory, &assign(2, 11), &ALIVE, 0).unwrap();
     let reply = run(&mut bar, &mut inventory, &cast(2), &ALIVE, 0).unwrap();
-    assert_eq!(reply.heal_percent, 35);
+    // L085: the potion heals 2% at once and 33% over 5 s.
+    assert_eq!(
+        (reply.heal_percent, reply.heal_over),
+        (2, Some((33, 5_000)))
+    );
     assert!(reply.replies[0].starts_with(&[38, 0, 4, 0])); // item removed
     assert!(inventory.state().items.iter().all(|i| i.id != 11));
     assert!(bar.is_empty());
@@ -624,7 +631,7 @@ fn bar_use_refusals_spend_nothing_and_each_has_a_canary() {
         run(&mut bar, &mut inventory, &cast(0), &ALIVE, 0)
             .unwrap()
             .heal_percent,
-        35
+        2
     );
     // A definition without a row can no longer take a slot (T510 replaces the catalogue gate).
     let reply = run(&mut bar, &mut inventory, &assign(1, 12), &ALIVE, 0).unwrap();
@@ -660,11 +667,11 @@ fn the_check_then_use_flow_confirms_once_and_only_for_the_checked_instance() {
     let reply = run(&mut bar, &mut inventory, &use_item(11), &ALIVE, 1).unwrap();
     assert!(is_chat(&reply) && count(&inventory, 11) == 1);
     let reply = run(&mut bar, &mut inventory, &use_item(10), &ALIVE, 1).unwrap();
-    assert_eq!((reply.heal_percent, count(&inventory, 10)), (35, 2));
+    assert_eq!((reply.heal_percent, count(&inventory, 10)), (2, 2));
     // Canary: after the recast a new check and use spend one and heal again.
     run(&mut bar, &mut inventory, &check(10), &ALIVE, 20_000).unwrap();
     let reply = run(&mut bar, &mut inventory, &use_item(10), &ALIVE, 20_000).unwrap();
-    assert_eq!((reply.heal_percent, count(&inventory, 10)), (35, 1));
+    assert_eq!((reply.heal_percent, count(&inventory, 10)), (2, 1));
     // A replayed 42/15 needs a new check.
     let reply = run(&mut bar, &mut inventory, &use_item(10), &ALIVE, 30_000).unwrap();
     assert!(is_chat(&reply) && reply.heal_percent == 0 && count(&inventory, 10) == 1);
@@ -709,7 +716,7 @@ fn the_bar_persists_and_runtime_state_does_not() {
         run(&mut loaded, &mut inventory, &cast(0), &ALIVE, 0)
             .unwrap()
             .heal_percent,
-        35
+        2
     );
     // The first refresh after load shows every slot and drops a binding whose stack is gone.
     let mut gone = fixture.inventory();
@@ -767,7 +774,14 @@ fn schema_one_still_loads_the_potion_rule() {
     // Absent file: the built-in Small Health Potion rows, unchanged.
     let builtin = Effects::load(&fixture.path).unwrap();
     let small = builtin.get(SMALL).expect("built-in potion row");
-    assert!(matches!(small.effect, EffectKind::Heal { percent: 35 }));
+    assert!(matches!(
+        small.effect,
+        EffectKind::Heal {
+            percent: 35,
+            instant_percent: 2,
+            over_ms: 5_000
+        }
+    ));
     assert_eq!(builtin.get(MEDIUM), None);
     // Schema 1 (the old potion-only shape) still loads and its values still apply.
     fixture.write_consumables(&json!({
@@ -833,7 +847,14 @@ fn schema_two_rows_load_within_sanity_bounds() {
     ));
     for definition in [SMALL, SMALL_ALT] {
         let row = effects.get(definition).unwrap();
-        assert!(matches!(row.effect, EffectKind::Heal { percent: 35 }));
+        assert!(matches!(
+            row.effect,
+            EffectKind::Heal {
+                percent: 35,
+                instant_percent: 0,
+                over_ms: 0
+            }
+        ));
         assert!(row.single_use);
     }
     // Every loaded row is admissible for the effect stack, so an `apply` after a spend cannot
@@ -1010,7 +1031,11 @@ fn effect(definition: i32) -> Effect {
         description_id: VEAL_DESC,
         cooldown_ms: 0,
         single_use: true,
-        effect: EffectKind::Heal { percent: 10 },
+        effect: EffectKind::Heal {
+            percent: 10,
+            instant_percent: 0,
+            over_ms: 0,
+        },
         source: "T510 bounds".into(),
     }
 }

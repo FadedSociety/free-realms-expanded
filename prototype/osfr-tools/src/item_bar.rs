@@ -90,8 +90,14 @@ pub struct Effect {
 #[derive(Clone, Copy, Debug, PartialEq, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum EffectKind {
+    /// `percent` of maximum health in all. L085: with `over_ms`, `instant_percent` of it comes at once and
+    /// the rest a step a second over `over_ms` (a potion's heal over time).
     Heal {
         percent: u32,
+        #[serde(default)]
+        instant_percent: u32,
+        #[serde(default)]
+        over_ms: u64,
     },
     Aura {
         composite_effect_id: i32,
@@ -112,9 +118,7 @@ pub enum EffectKind {
     },
     /// The cake row of `placed_cakes.json` this item places; it must be the item's own definition
     /// (the host refunds a refused place by definition). Never single-use.
-    PlacedCake {
-        row: i32,
-    },
+    PlacedCake { row: i32 },
 }
 
 impl Effect {
@@ -126,7 +130,19 @@ impl Effect {
             && self.description_id > 0
             && self.cooldown_ms <= MAX_COOLDOWN_MS
             && match self.effect {
-                EffectKind::Heal { percent } => (1..=100).contains(&percent),
+                EffectKind::Heal {
+                    percent,
+                    instant_percent,
+                    over_ms,
+                } => {
+                    (1..=100).contains(&percent)
+                        && over_ms <= 60_000
+                        && (if over_ms == 0 {
+                            instant_percent == 0
+                        } else {
+                            instant_percent < percent
+                        })
+                }
                 EffectKind::PlacedCake { row } => row == self.definition && !self.single_use,
                 EffectKind::Aura {
                     composite_effect_id,
@@ -163,10 +179,30 @@ impl Effect {
         self.cooldown_ms.max(MIN_COOLDOWN_MS)
     }
 
+    /// The part healed at once: all of it, or `instant_percent` of a heal over time.
     fn heal_percent(&self) -> u32 {
         match self.effect {
-            EffectKind::Heal { percent } => percent,
+            EffectKind::Heal {
+                percent,
+                over_ms: 0,
+                ..
+            } => percent,
+            EffectKind::Heal {
+                instant_percent, ..
+            } => instant_percent,
             _ => 0,
+        }
+    }
+
+    /// L085: the rest of a heal over time, `(percent, over_ms)`.
+    fn heal_over(&self) -> Option<(u32, u64)> {
+        match self.effect {
+            EffectKind::Heal {
+                percent,
+                instant_percent,
+                over_ms,
+            } if over_ms > 0 => Some((percent - instant_percent, over_ms)),
+            _ => None,
         }
     }
 
@@ -264,7 +300,11 @@ impl Default for Effects {
                         description_id: item.description_id,
                         cooldown_ms: 10_000,
                         single_use: true,
-                        effect: EffectKind::Heal { percent: 35 },
+                        effect: EffectKind::Heal {
+                            percent: 35,
+                            instant_percent: 2,
+                            over_ms: 5_000,
+                        },
                         source: String::new(),
                     }
                 })
@@ -372,6 +412,8 @@ impl Effect {
             single_use: true,
             effect: EffectKind::Heal {
                 percent: row.heal_percent,
+                instant_percent: 0,
+                over_ms: 0,
             },
             source: String::new(),
         })
@@ -404,6 +446,8 @@ pub struct Reply {
     /// changes neither (its effect and cooldown are session-only).
     pub changed: bool,
     pub heal_percent: u32,
+    /// L085: the rest of a heal over time, `(percent, over_ms)`, for the caller's encounter engine.
+    pub heal_over: Option<(u32, u64)>,
     pub boombox: Option<i32>,
     pub effect: Option<consumable_effects::Spec>,
     /// T557: the cake row (a `placed_cakes.json` `item_id`) the host must now place. The item is
@@ -420,6 +464,7 @@ pub struct Reply {
 struct Use {
     replies: Vec<Vec<u8>>,
     heal_percent: u32,
+    heal_over: Option<(u32, u64)>,
     effect: Option<consumable_effects::Spec>,
     place: Option<i32>,
     spent: bool,
@@ -707,6 +752,7 @@ impl ItemBar {
                     replies,
                     changed: used.spent,
                     heal_percent: used.heal_percent,
+                    heal_over: used.heal_over,
                     effect: used.effect,
                     place: used.place,
                     used_definition: used.spent.then_some(used.definition),
@@ -759,6 +805,7 @@ impl ItemBar {
                     replies,
                     changed: used.spent,
                     heal_percent: used.heal_percent,
+                    heal_over: used.heal_over,
                     effect: used.effect,
                     place: used.place,
                     used_definition: used.spent.then_some(used.definition),
@@ -789,6 +836,7 @@ impl ItemBar {
         let effect = self.effects.get(definition).ok_or(Refusal::NotUsable)?;
         let spent = effect.single_use;
         let heal_percent = effect.heal_percent();
+        let heal_over = effect.heal_over();
         let spec = effect.spec();
         let place = match effect.effect {
             EffectKind::PlacedCake { row } => Some(row),
@@ -806,6 +854,7 @@ impl ItemBar {
         Ok(Use {
             replies,
             heal_percent,
+            heal_over,
             effect: spec,
             place,
             spent,
