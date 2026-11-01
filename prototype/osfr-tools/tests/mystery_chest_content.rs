@@ -61,3 +61,30 @@ fn the_five_chests_load_with_their_prizes() {
     );
     let _ = fs::remove_dir_all(&dir);
 }
+
+/// L094: the Mystery Key sells in the Marketplace at the wiki's 180 SC on the client's own
+/// "Mystery Chests" category shelf (408, name 436411).
+#[test]
+fn the_mystery_key_has_its_marketplace_shelf() {
+    let data = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/stores.json");
+    let stores: Value = serde_json::from_slice(&fs::read(data).unwrap()).unwrap();
+    let key = stores["items"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["item_id"] == 78137)
+        .expect("the key row");
+    assert_eq!(
+        (key["sc_price"].as_u64(), key["category_id"].as_u64()),
+        (Some(180), Some(408))
+    );
+    let shelves = stores["station_cash"]["item_shelves"].as_array().unwrap();
+    assert!(shelves.iter().any(|shelf| {
+        shelf["category_id"] == 408
+            && shelf["category_name_id"] == 436411
+            && shelf["item_category_ids"]
+                .as_array()
+                .unwrap()
+                .contains(&Value::from(408))
+    }));
+}

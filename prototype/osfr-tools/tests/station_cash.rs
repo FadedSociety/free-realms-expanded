@@ -1173,10 +1173,11 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
     // are earn-only), plus the 55 items T634 priced from the wiki, plus the 663 Station Cash only
     // items T638 moved from their Legacy coin price, plus the 4 boomboxes T495 priced, plus the
     // Training Saddle of Gliding T528 lists, plus the 1,115 housing fixtures T871 moved from
-    // their Legacy coin price (the 16 wiki-priced fixtures are already in the 55).
+    // their Legacy coin price (the 16 wiki-priced fixtures are already in the 55), plus the Mystery
+    // Key L094 lists at the wiki's 180 SC.
     assert_eq!(
         decoded.len(),
-        1_928,
+        1_929,
         "the shipped ride, deed, wiki item, boombox, saddle and housing fixture count"
     );
     assert!(
@@ -1301,7 +1302,14 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
     const CLOTHES: u32 = 45;
     const PETS: u32 = 59;
     const HOUSING: u32 = 116;
-    for (id, name_id) in [(CLOTHES, 23_327), (PETS, 954), (HOUSING, 21_088)] {
+    // L094: the client's Mystery Chests category (ItemCategories 408, name 436411).
+    const MYSTERY_CHESTS: u32 = 408;
+    for (id, name_id) in [
+        (CLOTHES, 23_327),
+        (PETS, 954),
+        (HOUSING, 21_088),
+        (MYSTERY_CHESTS, 436_411),
+    ] {
         assert_eq!(names.get(&id), Some(&name_id), "category {id} name");
         assert_eq!(parents.get(&id), Some(&0), "category {id} is top level");
     }
@@ -1365,13 +1373,20 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
         "a T871 housing fixture at its scaled item Cost"
     );
     assert_eq!(housing.get(&17192), Some(&100), "a lot deed");
+    assert_eq!(
+        listed_under(MYSTERY_CHESTS).get(&78137),
+        Some(&45),
+        "the Mystery Key at the wiki's 180 SC, scaled"
+    );
     // Every bundle is under exactly one leaf category; the leaves cover the whole catalogue.
     let mut covered = BTreeSet::new();
-    for leaf in RIDE_CATEGORIES
-        .iter()
-        .map(|(_, id, _, _)| *id)
-        .chain([BOOMBOX, CLOTHES, PETS, HOUSING])
-    {
+    for leaf in RIDE_CATEGORIES.iter().map(|(_, id, _, _)| *id).chain([
+        BOOMBOX,
+        CLOTHES,
+        PETS,
+        HOUSING,
+        MYSTERY_CHESTS,
+    ]) {
         for item in listed_under(leaf).keys() {
             assert!(
                 covered.insert(*item),
@@ -1855,6 +1870,8 @@ fn catalogue_navigation_packets_match_the_client_readers() {
         (45, 23_327, 45, 0, 3),
         (59, 954, 59, 0, 4),
         (116, 21_088, 116, 0, 5),
+        // L094: the client's Mystery Chests category, the Mystery Key's shelf.
+        (408, 436_411, 408, 0, 6),
         (2, 5_101_131, 2, config.category_id, 10),
         (3, 5_101_134, 3, config.category_id, 20),
         (4, 5_101_132, 4, config.category_id, 30),
@@ -1899,7 +1916,7 @@ fn catalogue_navigation_packets_match_the_client_readers() {
     assert_eq!(
         reader.u32() as usize,
         shelves.len(),
-        "nine categories (T657 adds three item shelves)"
+        "ten categories (T657 adds three item shelves, L094 the Mystery Chests shelf)"
     );
     for (category, name, _, parent, order) in shelves {
         assert_eq!(reader.u32(), category, "category map key");

@@ -69,7 +69,8 @@ fn ids(value: &Value, keys: &[&str], out: &mut BTreeSet<i32>) {
 /// (file, keys, ids, resolved from the captured `inventory.json` alone, resolved with the table).
 const CONSUMERS: [(&str, &[&str], usize, usize, usize); 4] = [
     // L093: the supplement's donor prize rows resolve 37 more store items (16,910 with the table alone).
-    ("stores.json", &["item_id"], 17_623, 811, 16_947),
+    // L094: the Mystery Key row (78137, in the captured inventory) adds one to each count.
+    ("stores.json", &["item_id"], 17_624, 812, 16_948),
     ("vendors.json", &["item_id", "item_ids"], 1_166, 328, 1_166),
     (
         "recipes.json",
