@@ -26,14 +26,14 @@ pub(super) fn with_live(
 }
 
 /// The kart race, the default derby, (L098) every recipe with a client recipe id and a
-/// MiniGameData row, (L100) every game the mining and harvesting engines (`type8`, in that
-/// order) offer and (L102) every fishing hole, as Games window join rows keyed by their
-/// MiniGameData rows.
+/// MiniGameData row, (L100) every game the mining, harvesting and (L103) mail sorting engines
+/// (`type8`, in that order) offer and (L102) every fishing hole, as Games window join rows keyed
+/// by their MiniGameData rows.
 pub(super) fn games(
     kart: Option<&KartGateway>,
     derby: Option<&DerbyGateway>,
     recipes: &RecipeCatalog,
-    type8: [Option<&Type8Engine>; 2],
+    type8: [Option<&Type8Engine>; 3],
     fishing: Option<&FishingSpots>,
 ) -> Vec<Activity> {
     let kart = kart.and_then(KartGateway::minigame_id);
@@ -58,7 +58,7 @@ pub(super) fn games(
             },
         )
     });
-    let gathers = [Gather::Mining, Gather::Harvesting]
+    let gathers = [Gather::Mining, Gather::Harvesting, Gather::Mail]
         .into_iter()
         .zip(type8)
         .filter_map(|(gather, engine)| Some((gather, engine?)))

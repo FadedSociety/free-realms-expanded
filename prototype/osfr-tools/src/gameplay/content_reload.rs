@@ -75,7 +75,11 @@ impl Gameplay {
                             self.kart_entry.as_ref(),
                             self.derby.as_ref(),
                             &self.recipe_catalog,
-                            [self.mining.as_ref(), self.harvesting.as_ref()],
+                            [
+                                self.mining.as_ref(),
+                                self.harvesting.as_ref(),
+                                self.mail_sorting.as_ref(),
+                            ],
                             self.fishing_spots.as_deref(),
                         ),
                     )?;

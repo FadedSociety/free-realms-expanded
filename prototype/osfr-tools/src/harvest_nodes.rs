@@ -213,11 +213,13 @@ pub struct HarvestNodeSpawn {
 }
 
 /// Which Type8 engine a node starts. (R) Mushroom nodes start Harvesting111 (Chef), ore nodes
-/// Mining18; a pool's `game_id` picks another Harvesting game on the same engine (T553).
+/// Mining18; a pool's `game_id` picks another Harvesting game on the same engine (T553). L103:
+/// Mail Sorting (Postman) runs on a third engine and has no node; only the Games window starts it.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Gather {
     Mining,
     Harvesting,
+    Mail,
 }
 
 impl Gather {
@@ -225,6 +227,7 @@ impl Gather {
         match self {
             Self::Mining => MINER_PROFILE_ID,
             Self::Harvesting => CHEF_PROFILE_ID,
+            Self::Mail => crate::mail_sorting::POSTMAN_PROFILE_ID,
         }
     }
 
@@ -245,6 +248,7 @@ impl Gather {
         match self {
             Self::Mining => "mining",
             Self::Harvesting => "harvesting",
+            Self::Mail => "mail sorting",
         }
     }
 
@@ -253,6 +257,7 @@ impl Gather {
         match self {
             Self::Mining => "Mining",
             Self::Harvesting => "Harvesting",
+            Self::Mail => "Mail Sorting",
         }
     }
 
@@ -261,6 +266,7 @@ impl Gather {
         match self {
             Self::Mining => "Miner",
             Self::Harvesting => "Chef",
+            Self::Mail => "Postman",
         }
     }
 }
@@ -794,7 +800,9 @@ fn add_sites(
                 composite_effect_id: Some(node_type.composite_effect_id),
                 ..NodePresentation::default()
             },
-            NodeSource::Gather(Gather::Mining) | NodeSource::Pickup => NodePresentation::default(),
+            NodeSource::Gather(Gather::Mining | Gather::Mail) | NodeSource::Pickup => {
+                NodePresentation::default()
+            }
         };
         presentation.scale = Some(node_type.scale);
         presentation.texture_alias = texture_alias;

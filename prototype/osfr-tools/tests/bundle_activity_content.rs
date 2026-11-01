@@ -41,6 +41,7 @@ const FILES: &[&str] = &[
     "derby_minigames.json",
     "mining.json",
     "harvesting.json",
+    "mail_sorting.json",
     "fishing_spots.json",
     "mining_nodes.json",
     "harvest_nodes.json",
@@ -85,6 +86,11 @@ const FROZEN_SHA256: &[(&str, &str)] = &[
     (
         "harvesting.json",
         "edc3435a5a0a49c41f2aebfddc60c11a81d4b51f75660639aaf5e235b61051bc",
+    ),
+    (
+        // L103: the six Mail Sorting boards.
+        "mail_sorting.json",
+        "f7c796f6f54c8d00f5825ca3d8eef16838f8a39eba440a98004fc46680764a71",
     ),
 ];
 
@@ -226,6 +232,15 @@ fn bundled_activity_content_loads_without_lab() {
     assert_eq!(harvest.profile_id(), CHEF_PROFILE_ID);
     assert_eq!(harvest.preload_file(), FARMING_PRELOAD_FILE);
     assert_eq!(harvest.launch_movie(), FARMING_LAUNCH_MOVIE);
+
+    // L103: the shipped Mail Sorting file loads (no opening campaign here, so Gameplay skips it).
+    let mail = osfr_tools::mail_sorting::load(directory, None).expect("mail sorting content loads");
+    let games: Vec<i32> = mail.games().map(|(game, _)| game).collect();
+    assert_eq!(games, (376..=381).collect::<Vec<_>>());
+    assert!(
+        mail.games()
+            .all(|(_, spec)| spec.outputs.is_empty() && spec.goals.len() == 4)
+    );
 
     let encounter = EncounterEngine::load(directory, None).expect("encounter content loads");
     assert_eq!(encounter.world().zone_id, 0);

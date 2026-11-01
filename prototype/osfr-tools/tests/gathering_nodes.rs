@@ -22,6 +22,7 @@ use osfr_tools::{
         lifecycle::RECONSTRUCTED_CHEF_XP_PER_WIN,
     },
     inventory::InventoryItem,
+    mail_sorting,
     mining::{
         self, MINER_PROFILE_ID, MINING_GAME_ID, SIDE, Type8BoardSpec, Type8Goal, Type8Kind,
         Type8Output, Type8Phase, Type8Run, lifecycle::RECONSTRUCTED_MINER_XP_PER_WIN,
@@ -1356,6 +1357,76 @@ fn games_window_play_starts_the_rows_gather_game_away_from_every_node() {
     );
     let tin = play(&mut gateway, 401, 2_100);
     assert!(said(&tin, "not open yet"), "{}", chat_text(&tin));
+}
+
+/// L103: Mail Sorting runs on a third Type8 engine for the Postman. Play on the live Sanctuary
+/// row (414, game 376) tells an inactive Postman to switch and changes nothing; as the Postman it
+/// starts the board 60 m from every node, and a won run pays Postman XP once and no item. The
+/// board is the synthetic W171 one with no outputs, the shipped file's payout shape.
+#[test]
+fn games_window_play_sorts_mail_for_the_postman() {
+    const POSTMAN: i32 = mail_sorting::POSTMAN_PROFILE_ID;
+    let mail = Game {
+        node: "",
+        json_key: "mail_sorting",
+        profile: POSTMAN,
+        goals: 4,
+        outputs: OUTPUTS,
+        region: None,
+    };
+    let fixture = Fixture::new(PLOT);
+    let mut spec = serde_json::to_value(board(4)).unwrap();
+    spec["outputs"] = json!([]);
+    let content = json!({
+        "schema_version": 1, "game_id": 376, "profile_id": POSTMAN, "name_id": 102030,
+        "description_id": 35611, "icon_id": 911, "preload_file": "MailsortingAssets.txt",
+        "launch_movie": "game_mailsorting.gfx", "spec": spec,
+    });
+    let path = fixture.directory.join(mail_sorting::CONTENT_FILE);
+    fs::write(path, serde_json::to_vec(&content).unwrap()).unwrap();
+    let state = |active: bool| {
+        let mut state = fixture.state(false, false);
+        let profiles = state.profiles.as_mut().unwrap();
+        profiles.unlocked.insert(POSTMAN);
+        if active {
+            profiles.active = POSTMAN;
+        }
+        state
+    };
+
+    let mut idle = fixture.gateway_at(state(false), &fixture.node, 60.0);
+    let before = idle.snapshot();
+    let refused = play(&mut idle, 414, 2_000);
+    assert!(
+        said(&refused, "Switch to the Postman job"),
+        "{}",
+        chat_text(&refused)
+    );
+    assert_eq!(idle.snapshot(), before, "a refused Play changes nothing");
+
+    let mut gateway = fixture.gateway_at(state(true), &fixture.node, 60.0);
+    tick(&mut gateway, 1_500);
+    let started = play(&mut gateway, 414, 2_000);
+    assert_eq!(started_game(&started), (376, 102030, 35611));
+    let id = active(&gateway, mail).expect("the mail run is offered") as i32;
+    let (xp, items) = (
+        profile_xp(&gateway, POSTMAN),
+        gameplay_json(&gateway)["inventory"].clone(),
+    );
+    win(&mut gateway, mail, id, 2_100);
+    let paid = mail_sorting::RECONSTRUCTED_POSTMAN_XP_PER_WIN;
+    assert_eq!(profile_xp(&gateway, POSTMAN), xp + u64::from(paid));
+    assert_eq!(
+        gameplay_json(&gateway)["inventory"],
+        items,
+        "no item is paid"
+    );
+    send(&mut gateway, &payload(id, "OnNextLevelMsg"), 3_000);
+    assert_eq!(
+        profile_xp(&gateway, POSTMAN),
+        xp + u64::from(paid),
+        "paid once"
+    );
 }
 
 #[test]

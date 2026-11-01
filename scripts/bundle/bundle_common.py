@@ -81,6 +81,7 @@ ACTIVITY_CONTENT = (
     "derby_minigames.json",  # content.rs read_minigame_rows: TYPE-11 proof for those rows
     "mining.json",  # mining.rs: Mining18 board
     "harvesting.json",  # harvesting.rs: Harvesting111 board
+    "mail_sorting.json",  # mail_sorting.rs: (L103) the six Mail Sorting boards
     "fishing_spots.json",  # fishing_service.rs: guide NPCs and fish items
     "mining_nodes.json",  # harvest_nodes.rs: clickable copper veins
     "harvest_nodes.json",  # harvest_nodes.rs: clickable mushroom nodes
@@ -100,6 +101,7 @@ ACTIVITY_MAX_BYTES = {
     "derby_minigames.json": 64 * 1024,
     "mining.json": 1024 * 1024,
     "harvesting.json": 1024 * 1024,
+    "mail_sorting.json": 1024 * 1024,
     "fishing_spots.json": 64 * 1024,
     "mining_nodes.json": 1024 * 1024,
     "harvest_nodes.json": 1024 * 1024,
@@ -792,6 +794,10 @@ def check_activity_content(bundle: Path) -> str:
         "harvesting.json", read_json(content / "harvesting.json"), 111, 45,
         "FarmingAssets.txt", "game_farming.gfx",
     )
+    _check_board(
+        "mail_sorting.json", read_json(content / "mail_sorting.json"), 376, 4,
+        "MailsortingAssets.txt", "game_mailsorting.gfx",
+    )
 
     spots = read_json(content / "fishing_spots.json")
     if (
@@ -820,7 +826,7 @@ def check_activity_content(bundle: Path) -> str:
     return (
         f"kart entry {sha256_file(content / 'kart_entry.json')[:12]} "
         f"({len(gates)} gate NPCs, lobby 5 tables), derby {len(derby_gates)} gates, "
-        f"mining 18, harvesting 111, "
+        f"mining 18, harvesting 111, mail sorting 376, "
         f"encounter {dungeons[0]['id']} + {len(world_enemies)} world enemies, "
         f"fishing {len(spots['spots'])} spots, nodes 3 tables"
     )

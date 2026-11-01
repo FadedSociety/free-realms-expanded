@@ -68,6 +68,7 @@ pub mod kart_service;
 pub mod kart_weapons;
 pub mod login;
 pub mod login_auth;
+pub mod mail_sorting;
 pub mod matchmaking;
 pub mod minigame;
 pub mod mining;

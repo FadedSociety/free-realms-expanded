@@ -146,6 +146,9 @@ pub struct GameplayState {
     /// loaded. Older saves without the field stay byte-identical.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub harvesting: Option<Type8State>,
+    /// L103: Mail Sorting (Postman); absent unless `mail_sorting.json` is loaded.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mail_sorting: Option<Type8State>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub kart_entry: Option<crate::kart_gateway::KartGatewayState>,
     /// The derby completion ledger (see `DerbyGatewayState`); predecessor-only saves may also
@@ -210,6 +213,7 @@ pub struct Gameplay {
     cooking: Option<Cooking>,
     mining: Option<Type8Engine>,
     harvesting: Option<Type8Engine>,
+    mail_sorting: Option<Type8Engine>,
     forging_tick_ms: Option<u64>,
     /// L098 (R): the running craft came from its Games window row, so it completes anywhere.
     games_window_craft: bool,
@@ -682,6 +686,7 @@ impl Gameplay {
             cooking,
             mining,
             harvesting,
+            mail_sorting,
             kart_entry,
             saved_npc_quests,
             mut learned_recipes,
@@ -699,11 +704,13 @@ impl Gameplay {
                 state.cooking,
                 state.mining,
                 state.harvesting,
+                state.mail_sorting,
                 state.kart_entry,
                 state.npc_quests,
                 state.learned_recipes,
             ),
             None => (
+                None,
                 None,
                 None,
                 None,
@@ -1045,12 +1052,23 @@ impl Gameplay {
             dormant.harvesting = harvesting;
             None
         };
+        // L103: Mail Sorting is a third Type8 engine (Postman), skipped like Harvesting.
+        let file = crate::mail_sorting::CONTENT_FILE;
+        let mail_sorting = if presence.minigame(directory, "mail_sorting", file, opening.is_some())
+        {
+            Some(crate::mail_sorting::load(directory, mail_sorting)?)
+        } else {
+            dormant.mail_sorting = mail_sorting;
+            None
+        };
+        let type8 = |engine: &Option<Type8Engine>| engine.as_ref().is_some_and(Type8Engine::active);
         if [
             forging.as_ref().is_some_and(Forging::active),
             smelting.as_ref().is_some_and(Smelting::active),
             cooking.as_ref().is_some_and(Cooking::active),
-            mining.as_ref().is_some_and(Type8Engine::active),
-            harvesting.as_ref().is_some_and(Type8Engine::active),
+            type8(&mining),
+            type8(&harvesting),
+            type8(&mail_sorting),
         ]
         .into_iter()
         .filter(|active| *active)
@@ -1102,7 +1120,7 @@ impl Gameplay {
         }
         let folders = [directory, bundled_npc_content.as_path()];
         let (kart, derby_ref) = (kart_entry.as_ref(), derby.as_ref());
-        let type8 = [mining.as_ref(), harvesting.as_ref()];
+        let type8 = [mining.as_ref(), harvesting.as_ref(), mail_sorting.as_ref()];
         let fishing_spots = crate::fishing_service::FishingSpots::load(directory)?.map(Arc::new);
         let fishing = fishing_spots.as_deref();
         let games = portal_games::games(kart, derby_ref, &recipe_catalog, type8, fishing);
@@ -1205,6 +1223,7 @@ impl Gameplay {
             cooking,
             mining,
             harvesting,
+            mail_sorting,
             forging_tick_ms: None,
             games_window_craft: false,
             type8_tick_ms: None,
@@ -1401,6 +1420,7 @@ impl Gameplay {
             cooking: self.cooking.as_ref().map(|s| s.state().clone()),
             mining: self.mining.as_ref().map(|m| m.state().clone()),
             harvesting: self.harvesting.as_ref().map(|h| h.state().clone()),
+            mail_sorting: self.mail_sorting.as_ref().map(|m| m.state().clone()),
             kart_entry: self.kart_entry.as_ref().map(|k| k.state().clone()),
             derby: self
                 .derby
@@ -1606,7 +1626,7 @@ impl Gameplay {
     }
 
     pub fn summary(&self) -> serde_json::Value {
-        serde_json::json!({"coins": self.inventory.state().coins, "inventory_instances": self.inventory.state().items.len(), "quests":self.quests.state(), "combat":self.combat.state(), "profiles":self.profiles.as_ref().map(Profiles::state),"identity":self.identity_fingerprint,"opening":self.opening.as_ref().map(OpeningEngine::state),"encounter":self.encounter.as_ref().map(EncounterEngine::state),"smelting":self.smelting.as_ref().map(Smelting::state),"forging":self.forging.as_ref().map(Forging::state),"cooking":self.cooking.as_ref().map(Cooking::state),"mining":self.mining.as_ref().map(Type8Engine::state),"harvesting":self.harvesting.as_ref().map(Type8Engine::state)})
+        serde_json::json!({"coins": self.inventory.state().coins, "inventory_instances": self.inventory.state().items.len(), "quests":self.quests.state(), "combat":self.combat.state(), "profiles":self.profiles.as_ref().map(Profiles::state),"identity":self.identity_fingerprint,"opening":self.opening.as_ref().map(OpeningEngine::state),"encounter":self.encounter.as_ref().map(EncounterEngine::state),"smelting":self.smelting.as_ref().map(Smelting::state),"forging":self.forging.as_ref().map(Forging::state),"cooking":self.cooking.as_ref().map(Cooking::state),"mining":self.mining.as_ref().map(Type8Engine::state), "mail_sorting":self.mail_sorting.as_ref().map(Type8Engine::state),"harvesting":self.harvesting.as_ref().map(Type8Engine::state)})
     }
 
     pub fn patch_self(&self, bytes: &[u8]) -> io::Result<Vec<u8>> {
@@ -1766,9 +1786,13 @@ impl Gameplay {
         // (R) Same rule for the Type8 movies: a reconnecting client has no board or tile queue,
         // so an unfinished Mining/Harvesting run (even a paid Won run waiting for results Close)
         // is released here instead of blocking jobs, equipment and interaction forever.
-        for engine in [&mut self.mining, &mut self.harvesting]
-            .into_iter()
-            .flatten()
+        for engine in [
+            &mut self.mining,
+            &mut self.harvesting,
+            &mut self.mail_sorting,
+        ]
+        .into_iter()
+        .flatten()
         {
             let cancelled = engine.cancel();
             out.changed |= cancelled.changed;

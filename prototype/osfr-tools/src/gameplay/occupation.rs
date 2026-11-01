@@ -30,6 +30,8 @@ occupations!(
     Cooking,
     Mining,
     Harvesting,
+    // L103: a Mail Sorting run (Postman).
+    Mail,
     Chess,
     // T765: a Trading Card Game run (the client's card DLL window is open).
     CardGame,
@@ -84,6 +86,7 @@ impl Occupation {
             Cooking => "cooking",
             Mining => "mining",
             Harvesting => "harvesting",
+            Mail => "mail sorting",
             Chess => "a chess game",
             CardGame => "a card game",
             Encounter | FieldEngaged => "a fight",
@@ -101,8 +104,8 @@ impl Occupation {
         use Occupation::*;
         let (start, warp, ride, pets, location) = match self {
             // (R) A card run closes the same gates as chess (T765).
-            Forging | Smelting | Cooking | Mining | Harvesting | Chess | CardGame | Fishing
-            | Encounter => (true, true, true, true, false),
+            Forging | Smelting | Cooking | Mining | Harvesting | Mail | Chess | CardGame
+            | Fishing | Encounter => (true, true, true, true, false),
             Derby | Soccer | Kart => (true, true, true, true, true),
             FieldEngaged => (false, false, true, false, false),
             // (R) A lot is its own scene: leave it before travelling, riding or starting an
@@ -139,6 +142,7 @@ impl Gameplay {
             Occupation::Cooking => self.cooking.as_ref().is_some_and(Cooking::active),
             Occupation::Mining => self.mining.as_ref().is_some_and(Type8Engine::active),
             Occupation::Harvesting => self.harvesting.as_ref().is_some_and(Type8Engine::active),
+            Occupation::Mail => self.mail_sorting.as_ref().is_some_and(Type8Engine::active),
             Occupation::Chess => self.chess.as_ref().is_some_and(ChessService::is_active),
             Occupation::CardGame => self
                 .card_launches
@@ -198,15 +202,15 @@ mod tests {
         assert_eq!(
             members(|g| g.start),
             [
-                Forging, Smelting, Cooking, Mining, Harvesting, Chess, CardGame, Encounter, Derby,
-                Fishing, Soccer, Kart, Housing, Groom, Wheel
+                Forging, Smelting, Cooking, Mining, Harvesting, Mail, Chess, CardGame, Encounter,
+                Derby, Fishing, Soccer, Kart, Housing, Groom, Wheel
             ]
         );
         assert_eq!(
             members(|g| g.warp),
             [
-                Forging, Smelting, Cooking, Mining, Harvesting, Chess, CardGame, Encounter, Derby,
-                Fishing, Soccer, Kart, Housing, Wheel
+                Forging, Smelting, Cooking, Mining, Harvesting, Mail, Chess, CardGame, Encounter,
+                Derby, Fishing, Soccer, Kart, Housing, Wheel
             ]
         );
         assert_eq!(
@@ -217,6 +221,7 @@ mod tests {
                 Cooking,
                 Mining,
                 Harvesting,
+                Mail,
                 Chess,
                 CardGame,
                 Encounter,
@@ -231,8 +236,8 @@ mod tests {
         assert_eq!(
             members(|g| g.pets),
             [
-                Forging, Smelting, Cooking, Mining, Harvesting, Chess, CardGame, Encounter, Derby,
-                Fishing, Soccer, Kart
+                Forging, Smelting, Cooking, Mining, Harvesting, Mail, Chess, CardGame, Encounter,
+                Derby, Fishing, Soccer, Kart
             ]
         );
         assert_eq!(members(|g| g.location), [Derby, Soccer, Kart, Housing]);
@@ -240,8 +245,8 @@ mod tests {
         assert_eq!(
             members(|g| g.style_card),
             [
-                Forging, Smelting, Cooking, Mining, Harvesting, Chess, CardGame, Encounter, Derby,
-                Fishing, Soccer, Kart, Groom, Wheel
+                Forging, Smelting, Cooking, Mining, Harvesting, Mail, Chess, CardGame, Encounter,
+                Derby, Fishing, Soccer, Kart, Groom, Wheel
             ]
         );
     }

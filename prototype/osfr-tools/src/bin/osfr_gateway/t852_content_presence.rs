@@ -68,6 +68,7 @@ fn shipped_content_alone_reaches_world_entry_and_logs_every_skipped_module() {
         ("cooking", "cooking-campaign.json"),
         ("mining", "the opening campaign"),
         ("harvesting", "the opening campaign"),
+        ("mail_sorting", "the opening campaign"),
         ("inventory", "inventory.json"),
         ("categories", "categories.json"),
         ("quests", "quests.json"),

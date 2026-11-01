@@ -35,14 +35,10 @@ impl Gameplay {
                 let result = self.smelting.as_mut().unwrap().cancel();
                 self.apply_craft(CraftingJob::Miner, result, character, out)?;
             }
-            Movie::Mining => {
-                let result = self.type8_mut(Gather::Mining).unwrap().cancel();
-                self.apply_type8(Gather::Mining, result, out)?;
-                self.type8_tick_ms = None;
-            }
-            Movie::Harvesting => {
-                let result = self.type8_mut(Gather::Harvesting).unwrap().cancel();
-                self.apply_type8(Gather::Harvesting, result, out)?;
+            Movie::Mining | Movie::Harvesting | Movie::Mail => {
+                let gather = movie.gather().unwrap();
+                let result = self.type8_mut(gather).unwrap().cancel();
+                self.apply_type8(gather, result, out)?;
                 self.type8_tick_ms = None;
             }
         }
@@ -73,13 +69,10 @@ impl Gameplay {
                 let result = self.smelting.as_mut().unwrap().handle(inner)?;
                 self.apply_craft(CraftingJob::Miner, result, character, out)
             }
-            Movie::Mining => {
-                let result = self.type8_mut(Gather::Mining).unwrap().handle(inner)?;
-                self.apply_type8(Gather::Mining, result, out)
-            }
-            Movie::Harvesting => {
-                let result = self.type8_mut(Gather::Harvesting).unwrap().handle(inner)?;
-                self.apply_type8(Gather::Harvesting, result, out)
+            Movie::Mining | Movie::Harvesting | Movie::Mail => {
+                let gather = movie.gather().unwrap();
+                let result = self.type8_mut(gather).unwrap().handle(inner)?;
+                self.apply_type8(gather, result, out)
             }
         }
     }
@@ -188,6 +181,7 @@ impl Gameplay {
             }
             Movie::Mining => self.tick_gather(Gather::Mining, now_ms, out)?,
             Movie::Harvesting => self.tick_gather(Gather::Harvesting, now_ms, out)?,
+            Movie::Mail => self.tick_gather(Gather::Mail, now_ms, out)?,
             Movie::Cooking | Movie::Smelting => {}
         }
         Ok(())
@@ -572,6 +566,7 @@ impl Gameplay {
         match gather {
             Gather::Mining => self.mining.as_ref(),
             Gather::Harvesting => self.harvesting.as_ref(),
+            Gather::Mail => self.mail_sorting.as_ref(),
         }
     }
 
@@ -579,14 +574,15 @@ impl Gameplay {
         match gather {
             Gather::Mining => self.mining.as_mut(),
             Gather::Harvesting => self.harvesting.as_mut(),
+            Gather::Mail => self.mail_sorting.as_mut(),
         }
     }
 
-    /// Stage a TYPE8 outcome (Mining18 or Harvesting111). The only reward path is
-    /// the engine's server-side transaction derived from the configured
-    /// `outputs` and the collected quota; client score or win reports never
-    /// reach it. Grants commit inside the staged gameplay clone, which the
-    /// gateway saves before sending.
+    /// Stage a TYPE8 outcome (Mining18, Harvesting111 or, L103, Mail Sorting). The only reward
+    /// path is the engine's server-side transaction derived from the configured `outputs` and
+    /// the collected quota, or for Mail Sorting (no outputs) the engine's own one-time win;
+    /// client score or win reports never reach it. Grants commit inside the staged gameplay
+    /// clone, which the gateway saves before sending.
     pub(super) fn apply_type8(
         &mut self,
         gather: Gather,
@@ -603,11 +599,13 @@ impl Gameplay {
                         .map_or(HARVESTING_GAME_ID, Type8Engine::game_id),
                     0,
                 )?,
+                Gather::Mail => return Err(invalid("mail sorting pays no items")),
             };
             if self.profiles.as_ref().map(Profiles::active) != Some(gather.job()) {
                 return Err(invalid(match gather {
                     Gather::Mining => "mining completion is outside the accepted Miner job",
                     Gather::Harvesting => "harvesting completion is outside the accepted Chef job",
+                    Gather::Mail => "mail sorting completion is outside the accepted Postman job",
                 }));
             }
             self.consume_materials(transaction.consumes, out)?;
@@ -635,6 +633,15 @@ impl Gameplay {
             if let Some(nodes) = self.gathering_nodes.as_mut() {
                 nodes.paid();
             }
+        } else if gather == Gather::Mail && result.completed {
+            // L103 (R): a sorted run pays Postman XP, once, on the engine's own win.
+            if self.profiles.as_ref().map(Profiles::active) != Some(gather.job()) {
+                return Err(invalid(
+                    "mail sorting completion is outside the accepted Postman job",
+                ));
+            }
+            self.npc_minigame_win(&result.replies, out)?;
+            self.award_job_xp(crate::mail_sorting::RECONSTRUCTED_POSTMAN_XP_PER_WIN, out)?;
         } else {
             // T787: the client's `FRServer_GameOver` presents the 39/18 record after
             // the win already credited the id-only event; only its facts are new.

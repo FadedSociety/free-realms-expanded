@@ -1,4 +1,4 @@
-//! The five crafting and gathering movies: gate order, busy row and fixed
+//! The six crafting and gathering movies (L103: Mail Sorting the sixth): gate order, busy row and fixed
 //! refusals. One type serves the gate and the tick so their order and strings
 //! cannot diverge.
 use super::occupation::Occupation;
@@ -17,17 +17,19 @@ pub(super) enum Movie {
     Smelting,
     Mining,
     Harvesting,
+    Mail,
 }
 
 impl Movie {
     /// The order the five per-engine blocks were checked in. Only one movie
     /// runs at a time; a hand-made state with two keeps the earlier answer.
-    pub(super) const ALL: [Movie; 5] = [
+    pub(super) const ALL: [Movie; 6] = [
         Movie::Forging,
         Movie::Cooking,
         Movie::Smelting,
         Movie::Mining,
         Movie::Harvesting,
+        Movie::Mail,
     ];
 
     /// The malformed 26/42 refusal, byte-identical to the five old blocks. Static
@@ -39,6 +41,7 @@ impl Movie {
             Movie::Smelting => "invalid smelting leave request",
             Movie::Mining => "invalid mining leave request",
             Movie::Harvesting => "invalid harvesting leave request",
+            Movie::Mail => "invalid mail sorting leave request",
         }
     }
 
@@ -61,6 +64,9 @@ impl Movie {
             Movie::Harvesting => {
                 "Close the harvesting game before changing jobs, equipment or interacting."
             }
+            Movie::Mail => {
+                "Close the mail sorting game before changing jobs, equipment or interacting."
+            }
         }
     }
 
@@ -72,6 +78,18 @@ impl Movie {
             Movie::Smelting => "Close the smelting game before other opening actions.",
             Movie::Mining => "Close the mining game before other opening actions.",
             Movie::Harvesting => "Close the harvesting game before other opening actions.",
+            Movie::Mail => "Close the mail sorting game before other opening actions.",
+        }
+    }
+
+    /// The Type8 engine behind a gathering movie; `None` for the three crafting movies.
+    pub(super) fn gather(self) -> Option<crate::harvest_nodes::Gather> {
+        use crate::harvest_nodes::Gather;
+        match self {
+            Movie::Mining => Some(Gather::Mining),
+            Movie::Harvesting => Some(Gather::Harvesting),
+            Movie::Mail => Some(Gather::Mail),
+            Movie::Forging | Movie::Cooking | Movie::Smelting => None,
         }
     }
 
@@ -83,6 +101,7 @@ impl Movie {
             Movie::Smelting => Occupation::Smelting,
             Movie::Mining => Occupation::Mining,
             Movie::Harvesting => Occupation::Harvesting,
+            Movie::Mail => Occupation::Mail,
         }
     }
 }
@@ -191,6 +210,11 @@ mod tests {
                     "Close the harvesting game before changing jobs, equipment or interacting.",
                     "Close the harvesting game before other opening actions.",
                     "invalid harvesting leave request",
+                ),
+                Movie::Mail => (
+                    "Close the mail sorting game before changing jobs, equipment or interacting.",
+                    "Close the mail sorting game before other opening actions.",
+                    "invalid mail sorting leave request",
                 ),
             };
             assert_eq!(movie.blocked_message(), blocked);
