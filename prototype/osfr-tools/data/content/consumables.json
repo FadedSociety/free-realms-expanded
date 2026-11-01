@@ -560,7 +560,7 @@
           "radius": 10.0
         }
       },
-      "source": "Client text 9164: 'A magical orb that puts opponents to sleep.' The wiki has no page for it: the Sleep Orb's 10 s, and a hit wakes (R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 3011 NameId 36525 DescriptionId 9164 Icon 1911 ActivatableAbilityId 5287 SingleUse true). A sleeper shows the stun clip and a rooted enemy simply stands (R). (R): the 10 m blast, the 20 m throw, the 10 s recast (as L088). L089."
+      "source": "Client text 9164: 'A magical orb that puts opponents to sleep.' The wiki has no page for it: the Sleep Orb's 10 s, and a hit wakes (R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 3011 NameId 36525 DescriptionId 9164 Icon 1911 ActivatableAbilityId 5287 SingleUse true). A sleeper shows the stun clip (R). Any damage wakes it, a damage-over-time tick included (R: the wiki says only 'Hitting'). (R): the 10 m blast, the 20 m throw, the 10 s recast (as L088). L089."
     },
     {
       "definition": 3013,
@@ -574,7 +574,7 @@
           "radius": 10.0
         }
       },
-      "source": "Wiki: the Unmoving Sphere tooltip reads 'Roots all targets caught in the blast in place. Hitting them will allow them to move again.' No time is given: the Unmoving Orb's 10 s (R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 3013 NameId 36527 DescriptionId 9165 Icon 1917 ActivatableAbilityId 5292 SingleUse true). A sleeper shows the stun clip and a rooted enemy simply stands (R). (R): the 10 m blast, the 20 m throw, the 10 s recast (as L088). L089."
+      "source": "Wiki: the Unmoving Sphere tooltip reads 'Roots all targets caught in the blast in place. Hitting them will allow them to move again.' No time is given: the Unmoving Orb's 10 s (R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 3013 NameId 36527 DescriptionId 9165 Icon 1917 ActivatableAbilityId 5292 SingleUse true). A rooted enemy simply stands and still strikes what is in reach (R). Any damage frees it, a damage-over-time tick included (R: the wiki says only 'Hitting'). (R): the 10 m blast, the 20 m throw, the 10 s recast (as L088). L089."
     },
     {
       "definition": 3015,
@@ -642,7 +642,7 @@
           "stun_ms": 10000
         }
       },
-      "source": "Wiki: the Confusion Orb page and tooltip read 'Confuses your target for 10 seconds.' Confused enemies cannot fight: a stun (R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 3087 NameId 37650 DescriptionId 2823 Icon 1892 ActivatableAbilityId 3120 SingleUse true). A sleeper shows the stun clip and a rooted enemy simply stands (R). (R): the 20 m throw, the 10 s recast (as L088). L089."
+      "source": "Wiki: the Confusion Orb page and tooltip read 'Confuses your target for 10 seconds.' Confused enemies cannot fight: a stun (R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 3087 NameId 37650 DescriptionId 2823 Icon 1892 ActivatableAbilityId 3120 SingleUse true). (R): the 20 m throw, the 10 s recast (as L088). L089."
     },
     {
       "definition": 3089,
@@ -656,7 +656,7 @@
           "radius": 10.0
         }
       },
-      "source": "Wiki: the Confusion Sphere page reads 'Confuses all targets caught in the blast.' No time is given: the Confusion Orb's 10 s (R); confused enemies cannot fight, a stun (R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 3089 NameId 37653 DescriptionId 9168 Icon 1893 ActivatableAbilityId 5296 SingleUse true). A sleeper shows the stun clip and a rooted enemy simply stands (R). (R): the 10 m blast, the 20 m throw, the 10 s recast (as L088). L089."
+      "source": "Wiki: the Confusion Sphere page reads 'Confuses all targets caught in the blast.' No time is given: the Confusion Orb's 10 s (R); confused enemies cannot fight, a stun (R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 3089 NameId 37653 DescriptionId 9168 Icon 1893 ActivatableAbilityId 5296 SingleUse true). (R): the 10 m blast, the 20 m throw, the 10 s recast (as L088). L089."
     },
     {
       "definition": 3991,
@@ -1715,7 +1715,7 @@
           "radius": 10.0
         }
       },
-      "source": "Client text 9164: 'A magical orb that puts opponents to sleep.' The wiki has no page for it: the Sleep Orb's 10 s, and a hit wakes (R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 10516 NameId 36525 DescriptionId 9164 Icon 1911 ActivatableAbilityId 5287 SingleUse true). A sleeper shows the stun clip and a rooted enemy simply stands (R). (R): the 10 m blast, the 20 m throw, the 10 s recast (as L088). L089."
+      "source": "Client text 9164: 'A magical orb that puts opponents to sleep.' The wiki has no page for it: the Sleep Orb's 10 s, and a hit wakes (R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 10516 NameId 36525 DescriptionId 9164 Icon 1911 ActivatableAbilityId 5287 SingleUse true). A sleeper shows the stun clip (R). Any damage wakes it, a damage-over-time tick included (R: the wiki says only 'Hitting'). (R): the 10 m blast, the 20 m throw, the 10 s recast (as L088). L089."
     },
     {
       "definition": 10517,
@@ -1729,7 +1729,7 @@
           "radius": 10.0
         }
       },
-      "source": "Wiki: the Unmoving Sphere tooltip reads 'Roots all targets caught in the blast in place. Hitting them will allow them to move again.' No time is given: the Unmoving Orb's 10 s (R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 10517 NameId 36527 DescriptionId 9165 Icon 1917 ActivatableAbilityId 5292 SingleUse true). A sleeper shows the stun clip and a rooted enemy simply stands (R). (R): the 10 m blast, the 20 m throw, the 10 s recast (as L088). L089."
+      "source": "Wiki: the Unmoving Sphere tooltip reads 'Roots all targets caught in the blast in place. Hitting them will allow them to move again.' No time is given: the Unmoving Orb's 10 s (R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 10517 NameId 36527 DescriptionId 9165 Icon 1917 ActivatableAbilityId 5292 SingleUse true). A rooted enemy simply stands and still strikes what is in reach (R). Any damage frees it, a damage-over-time tick included (R: the wiki says only 'Hitting'). (R): the 10 m blast, the 20 m throw, the 10 s recast (as L088). L089."
     },
     {
       "definition": 10518,
@@ -1797,7 +1797,7 @@
           "sleep_ms": 10000
         }
       },
-      "source": "Wiki: the Sleep Orb page and tooltip read 'Puts your target to sleep for 10 seconds. Hitting your target will wake them.' (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 11011 NameId 20447 DescriptionId 20444 Icon 1910 ActivatableAbilityId 1647 SingleUse true). A sleeper shows the stun clip and a rooted enemy simply stands (R). (R): the 20 m throw, the 10 s recast (as L088). L089."
+      "source": "Wiki: the Sleep Orb page and tooltip read 'Puts your target to sleep for 10 seconds. Hitting your target will wake them.' (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 11011 NameId 20447 DescriptionId 20444 Icon 1910 ActivatableAbilityId 1647 SingleUse true). A sleeper shows the stun clip (R). Any damage wakes it, a damage-over-time tick included (R: the wiki says only 'Hitting'). (R): the 20 m throw, the 10 s recast (as L088). L089."
     },
     {
       "definition": 11014,
@@ -1810,7 +1810,7 @@
           "root_ms": 10000
         }
       },
-      "source": "Wiki: the Unmoving Orb page and tooltip read 'Roots your target in place for 10 seconds. Hitting your target will allow them to move.' (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 11014 NameId 20453 DescriptionId 20450 Icon 1916 ActivatableAbilityId 1650 SingleUse true). A sleeper shows the stun clip and a rooted enemy simply stands (R). (R): the 20 m throw, the 10 s recast (as L088). L089."
+      "source": "Wiki: the Unmoving Orb page and tooltip read 'Roots your target in place for 10 seconds. Hitting your target will allow them to move.' (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 11014 NameId 20453 DescriptionId 20450 Icon 1916 ActivatableAbilityId 1650 SingleUse true). A rooted enemy simply stands and still strikes what is in reach (R). Any damage frees it, a damage-over-time tick included (R: the wiki says only 'Hitting'). (R): the 20 m throw, the 10 s recast (as L088). L089."
     },
     {
       "definition": 11017,

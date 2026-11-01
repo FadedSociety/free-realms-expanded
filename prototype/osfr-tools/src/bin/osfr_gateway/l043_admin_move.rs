@@ -227,12 +227,12 @@ impl Rig {
         character_state_path(&self.server.options.state, self.guid(first))
     }
 
-    fn audit_rows(&self) -> Vec<serde_json::Value> {
+    fn audit_rows(&self, kind: &str) -> Vec<serde_json::Value> {
         fs::read_to_string(self.scratch.path().join("security.jsonl"))
             .unwrap_or_default()
             .lines()
             .map(|line| serde_json::from_str::<serde_json::Value>(line).unwrap())
-            .filter(|row| row["kind"] == "admin_move")
+            .filter(|row| row["kind"] == kind)
             .collect()
     }
 }
@@ -293,7 +293,7 @@ fn l043_offline_move_rewrites_only_the_pose_and_holds_at_next_login() {
         "only the pose may change"
     );
 
-    let rows = rig.audit_rows();
+    let rows = rig.audit_rows("admin_move");
     assert_eq!(rows.len(), 1, "{rows:?}");
     let admin_account = AccountStore::load(&rig.accounts)
         .unwrap()
@@ -435,7 +435,7 @@ fn l043_online_move_relocates_saves_and_audits() {
         target,
         "an admin move is saved at once"
     );
-    let rows = rig.audit_rows();
+    let rows = rig.audit_rows("admin_move");
     assert_eq!(rows.len(), 1, "{rows:?}");
     assert_eq!(rows[0]["online"], true);
     assert_eq!(rows[0]["target_guid"], bravo);
@@ -449,7 +449,7 @@ fn l043_online_move_relocates_saves_and_audits() {
         "{replies:?}"
     );
     assert_eq!(fs::read(rig.save_path("Alpha")).unwrap(), own);
-    assert_eq!(rig.audit_rows().len(), 1);
+    assert_eq!(rig.audit_rows("admin_move").len(), 1);
 }
 
 /// A selected but not yet loaded character is refused with its save, its live state and the
@@ -487,7 +487,7 @@ fn l043_loading_or_busy_account_is_refused_and_unchanged() {
         rig.drain(bravo).is_empty(),
         "the loading client was sent something"
     );
-    assert!(rig.audit_rows().is_empty());
+    assert!(rig.audit_rows("admin_move").is_empty());
 }
 
 /// Players and builders get the ordinary role refusal whether or not the target exists, and
@@ -525,7 +525,7 @@ fn l043_player_builder_and_unaudited_moves_are_refused_without_effect() {
         );
     }
     assert_eq!(fs::read(rig.save_path("Bravo")).unwrap(), saved);
-    assert!(rig.audit_rows().is_empty());
+    assert!(rig.audit_rows("admin_move").is_empty());
 
     let mut rig = Rig::new(
         "l043-unaudited",
@@ -689,6 +689,13 @@ fn l081_gm_wheel_mutes_gifts_moves_and_sets_a_role() {
         store.account_role(bravo_account),
         Some(AccountRole::Moderator)
     );
+    // L101 (review 281675b-L090): the saved change wrote one audit row, ids and role only.
+    let alpha_account = store.character(alpha).unwrap().owner_account_id;
+    let rows = rig.audit_rows("role_change");
+    assert_eq!(rows.len(), 1, "{rows:?}");
+    assert_eq!(rows[0]["account_id"], alpha_account);
+    assert_eq!(rows[0]["target_account_id"], bravo_account);
+    assert_eq!(rows[0]["role"], "moderator");
 
     let (_, lines) = gm(&mut rig, &mut now, &[1100, 1105, 1141]);
     assert!(lines.iter().any(|l| l == "Gift sent."), "{lines:?}");

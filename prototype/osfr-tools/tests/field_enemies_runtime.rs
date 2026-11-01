@@ -300,6 +300,51 @@ fn a_sleeping_or_rooted_wolf_moves_again_once_hit() {
     }
 }
 
+/// L101 (review 522c6f8-L089): a root that replaces a sleep takes the sleep with it, so one hit
+/// frees the wolf; and waking a sleeper leaves a separate 5 s stun running to its own end.
+#[test]
+fn a_hold_and_a_stun_keep_their_own_timers() {
+    let f = Fixture::new(1, 0.0);
+    let player = [6.0, 0.0, 0.0];
+    let sleep = Strike {
+        sleep_ms: 10_000,
+        ..Strike::default()
+    };
+    let root = Strike {
+        root_ms: 10_000,
+        ..Strike::default()
+    };
+    let stun = Strike {
+        stun_ms: 5_000,
+        ..Strike::default()
+    };
+
+    let mut e = f.load();
+    e.use_battle_item(sleep, Some(GUID), player, 0).unwrap();
+    e.use_battle_item(root, Some(GUID), player, 0).unwrap();
+    assert!(hp(&e.attack(GUID, player, 12, 0, 1_000).unwrap()).is_some());
+    for t in 11..40 {
+        e.tick(player, 12, t * 100).unwrap();
+    }
+    assert!(
+        radius(at(&e)) > 1.0,
+        "the root's hit frees it, no sleep stun left"
+    );
+
+    let mut e = f.load();
+    e.use_battle_item(stun, Some(GUID), player, 0).unwrap();
+    e.use_battle_item(sleep, Some(GUID), player, 0).unwrap();
+    assert!(hp(&e.attack(GUID, player, 12, 0, 1_000).unwrap()).is_some());
+    for t in 11..48 {
+        e.tick(player, 12, t * 100).unwrap();
+    }
+    assert!(radius(at(&e)) < 0.5, "the stun still holds it until 5 s");
+    for t in 52..80 {
+        e.tick(player, 12, t * 100).unwrap();
+    }
+    assert!(radius(at(&e)) > 1.0, "free once the stun ends");
+}
+
 /// L091: a Blast Orb knocks the wolf 6 yd (5.5 m) straight away from the thrower and it stays down
 /// for 2 s before it comes back (wiki: "Knocks your target back 6 yards").
 #[test]

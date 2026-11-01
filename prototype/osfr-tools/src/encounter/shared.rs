@@ -283,7 +283,9 @@ impl SharedFieldState {
                 // Late observers start with current status and motion (R).
                 Some(animation(
                     guid,
-                    if self.stuns.contains_key(&guid) {
+                    if self.stuns.contains_key(&guid)
+                        || self.holds.get(&guid).is_some_and(|hold| hold.asleep())
+                    {
                         1401
                     } else if self.field_sim.moving.contains(&guid) {
                         3

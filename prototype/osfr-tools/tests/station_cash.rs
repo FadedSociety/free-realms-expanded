@@ -2043,6 +2043,31 @@ fn a_boombox_order_debits_once_and_grants_one_and_a_replay_grants_nothing() {
     );
 }
 
+/// L101 (review a55600e-L094): the Mystery Key sells through the shared order path: one order
+/// debits its 45 SC and grants one key; a replay grants nothing.
+#[test]
+fn a_mystery_key_order_debits_its_price_and_grants_one_key() {
+    const MYSTERY_KEY: i32 = 78_137;
+    let mut shop = new_shop(wallet(1_000), usize::MAX);
+    let listing = *shop
+        .sc_catalogue()
+        .listing(MYSTERY_KEY as u32)
+        .expect("the key is listed");
+    assert_eq!(listing.price, 45);
+    let before = count_definition(shop.inventory().state(), MYSTERY_KEY);
+    let packet = buy_item(311, MYSTERY_KEY);
+    let outcome = shop.handle(&packet).expect("order parses");
+    assert_eq!(outcome.result_code, station_cash::ORDER_SUCCESS);
+    assert_eq!(shop.sc_wallet().balance, 1_000 - 45);
+    assert_eq!(
+        count_definition(shop.inventory().state(), MYSTERY_KEY),
+        before + 1
+    );
+    let once = snapshot(&shop);
+    assert!(!shop.handle(&packet).expect("replay parses").changed);
+    assert_eq!(snapshot(&shop), once, "a replay grants and debits nothing");
+}
+
 /// T495: a refused boombox order changes nothing, and a boombox the wiki does not sell for
 /// Station Cash is not a listing.
 #[test]

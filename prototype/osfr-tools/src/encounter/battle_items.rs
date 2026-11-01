@@ -168,8 +168,9 @@ impl EncounterEngine {
         }
     }
 
-    /// L089: put each living target to sleep (a stun its next hit ends) or root it (it cannot walk
-    /// until a hit) for `duration_ms`. A sleeper shows the stun clip (R: no sleep clip is wired).
+    /// L089: put each living target to sleep (stunned until its next hit) or root it (it cannot
+    /// walk until a hit) for `duration_ms`. A sleeper shows the stun clip (R: no sleep clip is
+    /// wired). A new hold replaces the old one (L101: a root over a sleep ends the sleep).
     fn apply_hold(
         &mut self,
         targets: &[u64],
@@ -178,9 +179,6 @@ impl EncounterEngine {
         now_ms: u64,
         out: &mut EncounterOutcome,
     ) {
-        if !root {
-            self.apply_stun(targets, duration_ms, now_ms, out);
-        }
         let until = now_ms.saturating_add(duration_ms);
         for &guid in targets {
             if self.enemy(guid).is_some_and(|(_, s)| s.health > 0) && !self.shielded(guid) {
@@ -192,7 +190,9 @@ impl EncounterEngine {
                         flee_from: None,
                     },
                 );
-                if root && (self.arena.moving.remove(&guid) | self.field_sim.moving.remove(&guid)) {
+                if !root {
+                    self.show_stun(guid, out);
+                } else if self.arena.moving.remove(&guid) | self.field_sim.moving.remove(&guid) {
                     out.replies.push(animation(guid, 1, true));
                 }
             }

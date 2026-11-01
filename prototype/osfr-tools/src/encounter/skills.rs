@@ -18,11 +18,9 @@ pub(super) struct SkillBuff {
     pub(super) crit_damage: f32,
 }
 
-/// (R) Session-only skill state: DoTs, stuns and buffs. Reapplication refreshes
-/// one entry per target/definition; caster buffs are private to the player,
-/// while stuns and target buffs are shared with the field.
-/// L089: a battle item's hold on an enemy: asleep (its stun ends at a hit) or rooted. L092: or
-/// scared, running from `flee_from` (a hit does not end it).
+/// L089: a battle item's hold on an enemy: asleep (stunned until a hit) or rooted. L092: or
+/// scared, running from `flee_from` (a hit does not end it). L101: a sleep is its own hold, not a
+/// stun entry, so ending it never touches another item's or skill's stun.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub(super) struct Hold {
     pub(super) until: u64,
@@ -30,6 +28,15 @@ pub(super) struct Hold {
     pub(super) flee_from: Option<[f32; 3]>,
 }
 
+impl Hold {
+    pub(super) fn asleep(&self) -> bool {
+        !self.root && self.flee_from.is_none()
+    }
+}
+
+/// (R) Session-only skill state: DoTs, stuns and buffs. Reapplication refreshes
+/// one entry per target/definition; caster buffs are private to the player,
+/// while stuns and target buffs are shared with the field.
 #[derive(Clone, Default)]
 pub(super) struct SkillEffects {
     pub(super) dots: BTreeMap<(u64, i32), SkillDot>,
@@ -64,8 +71,10 @@ impl SkillEffects {
         self.target_buffs.retain(|_, buff| now_ms < buff.until_ms);
     }
 
+    /// Stunned by a skill or item, or (L089) asleep.
     pub(super) fn stunned(&self, guid: u64, now_ms: u64) -> bool {
         self.stuns.get(&guid).is_some_and(|until| now_ms < *until)
+            || (self.holds.get(&guid)).is_some_and(|hold| hold.asleep() && now_ms < hold.until)
     }
 
     /// L089: a rooted enemy does not walk (it still strikes what is in reach).
@@ -83,20 +92,16 @@ impl SkillEffects {
             .and_then(|hold| hold.flee_from)
     }
 
-    /// L089: a hit that deals damage ends a sleep (its stun) or a root; a scare runs its course.
+    /// L089: a hit that deals damage ends a sleep or a root; a scare runs its course, and so does
+    /// any stun (L101).
     pub(super) fn wake(&mut self, guid: u64, dealt: u32) {
-        if dealt == 0
-            || self
+        if dealt > 0
+            && self
                 .holds
                 .get(&guid)
-                .is_none_or(|hold| hold.flee_from.is_some())
+                .is_some_and(|hold| hold.flee_from.is_none())
         {
-            return;
-        }
-        if let Some(hold) = self.holds.remove(&guid)
-            && !hold.root
-        {
-            self.stuns.remove(&guid);
+            self.holds.remove(&guid);
         }
     }
 
@@ -480,13 +485,18 @@ impl EncounterEngine {
                     .entry(guid)
                     .and_modify(|current| *current = (*current).max(until))
                     .or_insert(until);
-                // The stunned enemy is an arena's or the field's; the GUID sets are disjoint.
-                self.arena.moving.remove(&guid);
-                self.field_sim.moving.remove(&guid);
-                out.replies.push(animation(guid, 1, true));
-                out.replies.push(animation(guid, 1401, false)); // client com_stunned
+                self.show_stun(guid, out);
             }
         }
+    }
+
+    /// The stunned (or, L089, sleeping) enemy stops and plays the stun clip. It is an arena's or
+    /// the field's; the GUID sets are disjoint.
+    pub(super) fn show_stun(&mut self, guid: u64, out: &mut EncounterOutcome) {
+        self.arena.moving.remove(&guid);
+        self.field_sim.moving.remove(&guid);
+        out.replies.push(animation(guid, 1, true));
+        out.replies.push(animation(guid, 1401, false)); // client com_stunned
     }
 
     /// A caster-private buff (the player's own damage/mitigation fold).
