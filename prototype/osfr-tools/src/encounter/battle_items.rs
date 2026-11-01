@@ -11,6 +11,8 @@ use super::*;
 pub const BATTLE_ITEM_REACH: f32 = 20.0;
 /// (R) The most enemies one blast takes, as the Flame Wave power-up's.
 const MAX_BLAST_TARGETS: usize = 16;
+/// L091 (R): how long a knocked-back enemy stays down before it walks back (the fork's knockback hold).
+const KNOCKBACK_MS: u64 = 2_000;
 
 impl EncounterEngine {
     /// The enemy a battle item thrown from `position` lands on, if any.
@@ -64,7 +66,78 @@ impl EncounterEngine {
         if strike.root_ms > 0 {
             self.apply_hold(&targets, strike.root_ms, true, now_ms, &mut out);
         }
+        if strike.knockback > 0.0 {
+            self.apply_knockback(&targets, position, strike.knockback, now_ms, &mut out);
+        }
         Ok(out)
+    }
+
+    /// L091: push each living target `distance` straight away from `from` (the thrower), onto the
+    /// ground, facing the thrower, then hold it for `KNOCKBACK_MS` with the client's com_knock_down
+    /// clip (1402). A push that would leave the terrain (a ledge, a hole) does not move it (R).
+    fn apply_knockback(
+        &mut self,
+        targets: &[u64],
+        from: [f32; 3],
+        distance: f32,
+        now_ms: u64,
+        out: &mut EncounterOutcome,
+    ) {
+        let ground = self.ground();
+        let mut pushed = Vec::new();
+        for &guid in targets {
+            let Some(at) = self
+                .enemy(guid)
+                .filter(|(_, s)| s.health > 0)
+                .map(|(_, s)| s.position)
+            else {
+                continue;
+            };
+            if self.shielded(guid) {
+                continue;
+            }
+            let (dx, dz) = (at[0] - from[0], at[2] - from[2]);
+            let length = dx.hypot(dz);
+            let (ux, uz) = if length > 0.001 {
+                (dx / length, dz / length)
+            } else {
+                (1.0, 0.0)
+            };
+            let Some(to) =
+                ground.field_position([at[0] + ux * distance, at[1], at[2] + uz * distance])
+            else {
+                continue;
+            };
+            self.set_enemy_position(guid, to);
+            out.replies.push(movement(guid, to, [-ux, 0.0, -uz]));
+            pushed.push(guid);
+        }
+        self.apply_stun(&pushed, KNOCKBACK_MS, now_ms, out);
+        for &guid in &pushed {
+            out.replies.push(animation(guid, 1402, false)); // client com_knock_down
+        }
+    }
+
+    /// Where a knocked-back enemy now stands: the field's copy, or the fight's or world's.
+    fn set_enemy_position(&mut self, guid: u64, to: [f32; 3]) {
+        if self.state.active.is_none()
+            && let Some(f) = self
+                .field_sim
+                .enemies
+                .iter_mut()
+                .find(|f| f.present && f.actor.guid == guid)
+        {
+            f.state.position = to;
+            return;
+        }
+        let states = if let Some(active) = &mut self.state.active {
+            &mut active.enemies
+        } else {
+            &mut self.state.world_enemies
+        };
+        if let Some(s) = states.iter_mut().find(|s| s.guid == guid) {
+            s.position = to;
+        }
     }
 
     /// L089: put each living target to sleep (a stun its next hit ends) or root it (it cannot walk

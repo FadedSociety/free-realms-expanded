@@ -549,6 +549,33 @@
       "source": "Wiki: the Frag Sphere tooltip reads 'Deals 508 damage at Level 1', 888 at 4, 1552 at 8, 2714 at 12, 4744 at 16 (our tier ladder gives 889/1556/2722/4764); Coin Shop, 50 coins (the client cost 50). Its wiki page also says it stuns, which the tooltip does not: no stun (R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 3025 NameId 36540 DescriptionId 9163 Icon 1905 ActivatableAbilityId 5290 SingleUse true). Damage is the tier-1 value; the engine scales it by the job level's tier (x1.75 at levels 4/8/12/16) like every hit. (R): the 10 m blast (our Flame Wave power-up's radius), the 20 m throw (the Wizard's reach), the 10 s recast (the BubbaJoeX fork's orb cooldown). L088."
     },
     {
+      "definition": 3072,
+      "name_id": 37407,
+      "description_id": 37382,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "strike": {
+          "knockback": 5.5
+        }
+      },
+      "source": "Wiki: the Blast Orb page and tooltip read 'Knocks your target back 6 yards.' (Battle Item Mystery Packs). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 3072 NameId 37407 DescriptionId 37382 Icon 1886 ActivatableAbilityId 3101 SingleUse true). 6 yd is 5.5 m. The push lands on the ground facing the thrower and holds the enemy 2 s with the client's com_knock_down clip 1402 (AnimationTypes.xml); a push off the terrain does not move it (R). (R): the 20 m throw, the 10 s recast (as L088). L091."
+    },
+    {
+      "definition": 3074,
+      "name_id": 37409,
+      "description_id": 9167,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "strike": {
+          "knockback": 5.5,
+          "radius": 10.0
+        }
+      },
+      "source": "Wiki: the Blast Sphere page and tooltip read 'Knocks back all targets caught in the blast.' (Coin Shop, 50 coins; the client cost 50). No distance is given: the Blast Orb's 6 yd, and a 10 m blast (R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 3074 NameId 37409 DescriptionId 9167 Icon 1887 ActivatableAbilityId 5307 SingleUse true). 6 yd is 5.5 m. The push lands on the ground facing the thrower and holds the enemy 2 s with the client's com_knock_down clip 1402 (AnimationTypes.xml); a push off the terrain does not move it (R). (R): the 20 m throw, the 10 s recast (as L088). L091."
+    },
+    {
       "definition": 3087,
       "name_id": 37650,
       "description_id": 2823,
@@ -1675,6 +1702,20 @@
         }
       },
       "source": "Wiki: the Frag Sphere tooltip reads 'Deals 508 damage at Level 1', 888 at 4, 1552 at 8, 2714 at 12, 4744 at 16 (our tier ladder gives 889/1556/2722/4764); Coin Shop, 50 coins (the client cost 50). Its wiki page also says it stuns, which the tooltip does not: no stun (R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 10519 NameId 36540 DescriptionId 9163 Icon 1905 ActivatableAbilityId 5290 SingleUse true). Damage is the tier-1 value; the engine scales it by the job level's tier (x1.75 at levels 4/8/12/16) like every hit. (R): the 10 m blast (our Flame Wave power-up's radius), the 20 m throw (the Wizard's reach), the 10 s recast (the BubbaJoeX fork's orb cooldown). L088."
+    },
+    {
+      "definition": 10520,
+      "name_id": 37409,
+      "description_id": 9167,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "strike": {
+          "knockback": 5.5,
+          "radius": 10.0
+        }
+      },
+      "source": "Wiki: the Blast Sphere page and tooltip read 'Knocks back all targets caught in the blast.' (Coin Shop, 50 coins; the client cost 50). No distance is given: the Blast Orb's 6 yd, and a 10 m blast (R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 10520 NameId 37409 DescriptionId 9167 Icon 1887 ActivatableAbilityId 5307 SingleUse true). 6 yd is 5.5 m. The push lands on the ground facing the thrower and holds the enemy 2 s with the client's com_knock_down clip 1402 (AnimationTypes.xml); a push off the terrain does not move it (R). (R): the 20 m throw, the 10 s recast (as L088). L091."
     },
     {
       "definition": 11008,

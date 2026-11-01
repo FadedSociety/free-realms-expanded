@@ -122,7 +122,9 @@ fn the_shipped_rows_load_through_the_real_loader_with_their_client_checked_value
     // L087: three +50% star boosters (ability 203), the Wheeler star and coin scrolls (wiki).
     assert_eq!(boosts, 5);
     // L088: the Frag and Flabbergast orbs and spheres; L089: Sleep, Unmoving and Confusion (wiki, client text).
-    assert_eq!(strikes, 15);
+    assert_eq!(strikes, 18, "L091: and the Blast Orb and Spheres");
+    let blast = effects.get(3072).expect("Blast Orb");
+    assert!(matches!(blast.effect, EffectKind::Strike { knockback, .. } if knockback == 5.5));
     let sleep = effects.get(11011).expect("Sleep Orb");
     assert!(matches!(
         sleep.effect,

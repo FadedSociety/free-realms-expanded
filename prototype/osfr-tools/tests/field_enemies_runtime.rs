@@ -300,6 +300,35 @@ fn a_sleeping_or_rooted_wolf_moves_again_once_hit() {
     }
 }
 
+/// L091: a Blast Orb knocks the wolf 6 yd (5.5 m) straight away from the thrower and it stays down
+/// for 2 s before it comes back (wiki: "Knocks your target back 6 yards").
+#[test]
+fn a_blast_orb_knocks_the_wolf_away_from_the_thrower() {
+    let f = Fixture::new(1, 0.0);
+    let mut e = f.load();
+    let player = [3.0, 0.0, 0.0];
+    let blast = Strike {
+        knockback: 5.5,
+        ..Strike::default()
+    };
+    let out = e.use_battle_item(blast, Some(GUID), player, 0).unwrap();
+    let [x, _, z] = at(&e);
+    assert!(
+        (x + 5.5).abs() < 0.01 && z.abs() < 0.01,
+        "pushed away from the thrower: {x} {z}"
+    );
+    assert!(
+        out.replies
+            .iter()
+            .any(|p| p.starts_with(&125_u16.to_le_bytes())),
+        "a movement update"
+    );
+    for t in 1..19 {
+        let out = e.tick(player, 12, t * 100).unwrap();
+        assert!(hits_from(&out, GUID).is_empty(), "down at {} ms", t * 100);
+    }
+}
+
 #[test]
 fn kill_then_respawn_forgets_skill_effects() {
     let f = Fixture::new(1, 0.0);

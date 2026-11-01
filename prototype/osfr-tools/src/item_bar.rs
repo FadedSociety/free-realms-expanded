@@ -72,6 +72,7 @@ const MIN_COOLDOWN_MS: u32 = 3_000;
 const MAX_STRIKE_DAMAGE: u32 = 100_000;
 const MAX_STUN_MS: u64 = 60_000;
 const MAX_BLAST_RADIUS: f32 = 30.0;
+const MAX_KNOCKBACK: f32 = 20.0;
 const SUB_ASSIGN_BY_RECORD: &[u8] = &[42, 0, 9, 0];
 
 /// One usable consumable row. `name_id`/`description_id` are the 42/16 confirm text and the buff
@@ -139,6 +140,9 @@ pub enum EffectKind {
         sleep_ms: u64,
         #[serde(default)]
         root_ms: u64,
+        /// L091: metres each target is pushed straight away from the thrower.
+        #[serde(default)]
+        knockback: f32,
         #[serde(default)]
         radius: f32,
     },
@@ -212,9 +216,11 @@ impl Effect {
                     stun_ms,
                     sleep_ms,
                     root_ms,
+                    knockback,
                     radius,
                 } => {
-                    (damage > 0 || stun_ms > 0 || sleep_ms > 0 || root_ms > 0)
+                    (damage > 0 || stun_ms > 0 || sleep_ms > 0 || root_ms > 0 || knockback > 0.0)
+                        && (0.0..=MAX_KNOCKBACK).contains(&knockback)
                         && damage <= MAX_STRIKE_DAMAGE
                         && [stun_ms, sleep_ms, root_ms]
                             .iter()
@@ -252,12 +258,14 @@ impl Effect {
                 stun_ms,
                 sleep_ms,
                 root_ms,
+                knockback,
                 radius,
             } => Some(Strike {
                 damage,
                 stun_ms,
                 sleep_ms,
                 root_ms,
+                knockback,
                 radius,
             }),
             _ => None,
@@ -526,6 +534,7 @@ pub struct Strike {
     pub stun_ms: u64,
     pub sleep_ms: u64,
     pub root_ms: u64,
+    pub knockback: f32,
     pub radius: f32,
 }
 
