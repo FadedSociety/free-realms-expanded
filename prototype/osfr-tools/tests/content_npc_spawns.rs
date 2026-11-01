@@ -205,9 +205,18 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
                 );
             }
         }
-        // T470: the 90 named Sanctuary NPCs carry a `reference` tag (Sanctuary-main) instead.
+        // T470: the 90 named Sanctuary NPCs carry a `reference` tag (Sanctuary-main) instead;
+        // L096: a live gate actor cites the live server's spawn in the community captures.
+        let live_capture = row["source"].as_array().is_some_and(|tags| {
+            tags.iter().any(|tag| {
+                tag["kind"] == "client"
+                    && tag["evidence"]
+                        .as_str()
+                        .is_some_and(|text| text.contains("community captures"))
+            })
+        });
         assert!(
-            has_source(row, "legacy-data") || has_source(row, "reference"),
+            has_source(row, "legacy-data") || has_source(row, "reference") || live_capture,
             "{owner}: missing Legacy or reference tag"
         );
         for tag in row["source"].as_array().unwrap() {
@@ -291,8 +300,9 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // repair-guy binding rows, so the total is 1,201; T498 appended the Burglz legacy spawn (1,202);
     // T500 appended the unanchored Hasti row (1,203) and moved Dani and Honey to legacy spawns;
     // T501 appended the unanchored Shannon and Sugaboo rows (1,205); T739 appended four
-    // `legacy_data` clickable quest props (1,209, all Legacy spawns).
-    assert_eq!(regional_legacy + regional_reconstructed, 1209);
+    // `legacy_data` clickable quest props (1,209, all Legacy spawns); L096 the two Wildwood
+    // turnstile actors (1,211, live_capture).
+    assert_eq!(regional_legacy + regional_reconstructed, 1211);
     assert!(
         regional_legacy >= 582,
         "regional NPCs dropped to {regional_legacy}"
@@ -316,7 +326,8 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // Hooligan, Hooligan Archer and Hooligan Wolf bodies (friendly blue props nobody could fight; 4154/4155
     // stay, the quest camp shares their GUIDs). 4667 and 4675 stay too: field_enemies.json now gives
     // each a hostile body with the same GUID, which hides the passive copy. That leaves 3,199.
-    assert_eq!(extra_rows.len(), 3199);
+    // L096 appended the bodies of the two Wildwood turnstile actors (3,201).
+    assert_eq!(extra_rows.len(), 3201);
     assert_eq!(captured_actors.len(), 9);
     println!(
         "NPC placements: {regional_legacy} Legacy, {regional_reconstructed} reconstructed; {} extra spawns, {} capture-confirmed",

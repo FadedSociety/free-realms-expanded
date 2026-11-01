@@ -1,4 +1,7 @@
 //! T221: the kart and derby entry drivers stand at the speedway portals and start the race UI.
+//! L096 (the owner 2026-11-01: the speedway gates, not NPCs, let you into the races): at Wildwood,
+//! the speedway whose track the server runs, the entry is the two actors the live server stood on
+//! the turnstile; the drivers stay the entry at the other speedways until their tracks exist.
 //!
 //! The content side is `data/content/kart_gates.json` and `data/content/derby_gates.json`; the
 //! drivers themselves are the speedway NPCs already spawned by the client content (the portal
@@ -36,6 +39,9 @@ const CALE: u64 = 9_000_000_039;
 const MUSTANG: u64 = 9_500_000_759;
 const JOHNNY: u64 = 9_500_000_911;
 const SPUD: u64 = 9_500_000_630;
+/// L096: the Wildwood turnstile actors (live kart race and derby entries).
+const KART_GATE: u64 = 9_500_001_020;
+const DERBY_GATE: u64 = 9_500_001_021;
 /// The four derby trainers at the four arenas (Sandstorm has no derby).
 const MAD_JACK: u64 = 9_000_000_391;
 const CRASH: u64 = 9_000_000_289;
@@ -68,13 +74,18 @@ const KART_PORTALS: [(u64, &str, [f32; 3]); 5] = [
         [-237.6, 1.05, -51.89],
     ),
     (
-        JOHNNY,
-        "sg_raceway_01 @ Wildwood",
-        [-2262.71, -16.44, 585.04],
+        KART_GATE,
+        "sg_turnstyle_01 @ Wildwood",
+        [-2268.80, -16.47, 587.89],
     ),
     (SPUD, "ss_raceway_01 @ Sandstorm", [31.6, -14.6, -1192.3]),
 ];
-const DERBY_PORTALS: [(u64, &str, [f32; 3]); 4] = [
+const DERBY_PORTALS: [(u64, &str, [f32; 3]); 5] = [
+    (
+        DERBY_GATE,
+        "sg_turnstyle_01 @ Wildwood",
+        [-2268.80, -16.47, 587.89],
+    ),
     (
         MAD_JACK,
         "sg_raceway_01 @ Wildwood",
@@ -166,15 +177,28 @@ fn distance(left: [f32; 3], right: [f32; 3]) -> f32 {
 fn assert_drawable(id: u64, visibility: &NpcVisibility) {
     let record = npc_record(id);
     let owner = format!("NPC {id} ({})", record["name"]);
-    assert_eq!(
-        record["placement"], "legacy_data",
-        "{owner}: only legacy_data regional rows are drawn"
-    );
-    let model_id = record["model_id"]
+    // L096: a live gate actor is drawn by its extras body (the live spawn's model) at the row's
+    // spot; every other gate is a legacy_data regional row, drawn from the row itself.
+    let model = if record["placement"] == "live_capture" {
+        let extras = read_json(&data().join("npc_spawns_extra.json"));
+        let body = (extras["records"].as_array().unwrap().iter())
+            .find(|body| body["content_key"].as_u64() == Some(id))
+            .unwrap_or_else(|| panic!("{owner}: no extras body"))
+            .clone();
+        assert_eq!(body["position"], record["position"], "{owner}: body moved");
+        body
+    } else {
+        assert_eq!(
+            record["placement"], "legacy_data",
+            "{owner}: only legacy_data regional rows are drawn"
+        );
+        record.clone()
+    };
+    let model_id = model["model_id"]
         .as_u64()
         .unwrap_or_else(|| panic!("{owner}: model id"));
     assert!(model_id > 0, "{owner}: model id 0 is not drawable");
-    let model_file = record["model_file_name"]
+    let model_file = model["model_file_name"]
         .as_str()
         .unwrap_or_else(|| panic!("{owner}: model file"));
     assert!(
@@ -384,8 +408,8 @@ fn shipped_kart_gates_load_and_every_gate_is_a_drawable_driver_at_its_portal() {
         .expect("the shipped kart package");
     assert_eq!(
         gateway.gate_npcs(),
-        &[CHASE, CALE, MUSTANG, JOHNNY, SPUD][..],
-        "the three reviewed gates stay and Wildwood/Sandstorm join them"
+        &[CHASE, CALE, MUSTANG, KART_GATE, SPUD][..],
+        "the reviewed drivers stay; Wildwood's entry is its turnstile (L096, was Johnny Thunder)"
     );
     assert_eq!(gateway.menu_string_id(), DEFAULT_MENU_STRING_ID);
 
@@ -417,7 +441,7 @@ fn shipped_derby_gates_load_and_every_gate_is_a_drawable_driver_at_its_arena() {
         serde_json::from_slice(&fs::read(content.join("derby_gates.json")).unwrap()).unwrap();
     assert_eq!(gates.schema_version, 1);
     assert_eq!(gates.menu_string_id, 3053, "Demo Derby Lobby");
-    assert_eq!(gates.npcs, vec![MAD_JACK, CRASH, BURT, RIP]);
+    assert_eq!(gates.npcs, vec![DERBY_GATE, MAD_JACK, CRASH, BURT, RIP]);
 
     // The production validator accepts the shipped file with a real derby package.
     let valid = DerbyGateway::new(derby_content(), Some(gates.clone())).unwrap();
@@ -453,7 +477,10 @@ fn the_shipped_package_offers_from_every_gate() {
     let shipped = DerbyGateway::load(&content, None)
         .expect("the shipped package respects every loader bound")
         .expect("the shipped derby package exists");
-    assert_eq!(shipped.gate_npcs(), &[MAD_JACK, CRASH, BURT, RIP][..]);
+    assert_eq!(
+        shipped.gate_npcs(),
+        &[DERBY_GATE, MAD_JACK, CRASH, BURT, RIP][..]
+    );
     assert_eq!(shipped.menu_string_id(), 3053);
     let mut interaction =
         NpcInteraction::load(&content.join("npcs"), &content.join("stores.json")).unwrap();
@@ -487,7 +514,7 @@ fn a_kart_gate_list_is_dormant_without_race_content() {
 fn the_race_choice_shares_the_account_action_budget() {
     let mut budgets = ActionBudgets::default();
     let now = Instant::now();
-    let choice = npc_select(JOHNNY, 2);
+    let choice = npc_select(KART_GATE, 2);
     for _ in 0..10 {
         assert!(
             budgets.allow(PLAYER, &choice, now),
@@ -503,9 +530,9 @@ fn the_race_choice_shares_the_account_action_budget() {
 // ---- real gateway -------------------------------------------------------------------------
 
 #[test]
-fn the_wildwood_driver_offers_and_starts_the_kart_race_for_two_players() {
+fn the_wildwood_turnstile_offers_and_starts_the_kart_race_for_two_players() {
     let content = Content::new();
-    let position = npc_position(JOHNNY);
+    let position = npc_position(KART_GATE);
     let base = content.state();
     let prior_job = base.profiles.as_ref().unwrap().active;
 
@@ -513,9 +540,13 @@ fn the_wildwood_driver_offers_and_starts_the_kart_race_for_two_players() {
     let mut first = gateway_at(&content, base.clone(), position);
     let mut second = gateway_at(&content, base, position);
 
-    let menu = bodies(&click(&mut first, JOHNNY, NOW));
+    let menu = bodies(&click(&mut first, KART_GATE, NOW));
     let option = menu_option(&menu, DEFAULT_MENU_STRING_ID).expect("Kart Race Lobby option");
-    let started = choose(&mut first, JOHNNY, option, NOW + 100);
+    // L096: the driver who stood in for the gate no longer offers the race.
+    let mut driver = gateway_at(&content, content.state(), npc_position(JOHNNY));
+    let driver_menu = bodies(&click(&mut driver, JOHNNY, NOW));
+    assert!(menu_option(&driver_menu, DEFAULT_MENU_STRING_ID).is_none());
+    let started = choose(&mut first, KART_GATE, option, NOW + 100);
     assert!(started.gameplay_changed, "the choice must be saved");
     assert!(
         bodies(&started)
@@ -531,10 +562,10 @@ fn the_wildwood_driver_offers_and_starts_the_kart_race_for_two_players() {
 
     // The second player at the same driver gets the same offer and their own entry; the first
     // player's session is untouched by it.
-    let second_menu = bodies(&click(&mut second, JOHNNY, NOW));
+    let second_menu = bodies(&click(&mut second, KART_GATE, NOW));
     let second_option =
         menu_option(&second_menu, DEFAULT_MENU_STRING_ID).expect("second player's menu");
-    let second_started = choose(&mut second, JOHNNY, second_option, NOW + 100);
+    let second_started = choose(&mut second, KART_GATE, second_option, NOW + 100);
     assert!(second_started.gameplay_changed);
     assert!(
         second
@@ -599,10 +630,10 @@ fn a_busy_player_is_refused_and_nothing_changes() {
 
     let mut character: CharacterState = Gateway::reference_state(&reference()).unwrap();
     character.zone_id = 0;
-    character.position = npc_position(JOHNNY);
+    character.position = npc_position(KART_GATE);
     let before = serde_json::to_vec(&game.state()).unwrap();
     let menu = game
-        .handle_in_world(&npc_click(JOHNNY), &character, NOW)
+        .handle_in_world(&npc_click(KART_GATE), &character, NOW)
         .unwrap();
     assert!(
         !menu
@@ -612,7 +643,7 @@ fn a_busy_player_is_refused_and_nothing_changes() {
         "a busy player must not get the driver's menu"
     );
     let refused = game
-        .handle_in_world(&npc_select(JOHNNY, 2), &character, NOW + 100)
+        .handle_in_world(&npc_select(KART_GATE, 2), &character, NOW + 100)
         .expect("a busy refusal is reported, not a disconnect");
     assert!(!refused.changed);
     assert_eq!(
@@ -645,22 +676,22 @@ fn an_ineligible_or_forged_choice_changes_nothing() {
     );
 
     // A gate's open menu refuses a forged choice without consuming the menu.
-    let mut gateway = gateway_at(&content, content.state(), npc_position(JOHNNY));
+    let mut gateway = gateway_at(&content, content.state(), npc_position(KART_GATE));
     let before = save_bytes(&gateway);
-    let menu = bodies(&click(&mut gateway, JOHNNY, NOW));
+    let menu = bodies(&click(&mut gateway, KART_GATE, NOW));
     let option = menu_option(&menu, DEFAULT_MENU_STRING_ID).expect("race option");
-    let _ = gateway.handle_at(&wrap(&npc_select(JOHNNY, 99)), NOW + 100);
+    let _ = gateway.handle_at(&wrap(&npc_select(KART_GATE, 99)), NOW + 100);
     assert_eq!(
         save_bytes(&gateway),
         before,
         "a forged choice changes nothing"
     );
-    let started = choose(&mut gateway, JOHNNY, option, NOW + 200);
+    let started = choose(&mut gateway, KART_GATE, option, NOW + 200);
     assert!(started.gameplay_changed, "the offered choice still works");
 }
 
 #[test]
-fn a_kart_driver_offers_nothing_while_the_track_is_dormant() {
+fn the_kart_gate_offers_nothing_while_the_track_is_dormant() {
     let content = Content::new();
     let mut entry = read_json(&content.0.join("kart_entry.json"));
     entry["race"] = Value::Null;
@@ -669,14 +700,14 @@ fn a_kart_driver_offers_nothing_while_the_track_is_dormant() {
         serde_json::to_vec(&entry).unwrap(),
     )
     .unwrap();
-    let mut gateway = gateway_at(&content, content.state(), npc_position(JOHNNY));
-    let menu = bodies(&click(&mut gateway, JOHNNY, NOW));
+    let mut gateway = gateway_at(&content, content.state(), npc_position(KART_GATE));
+    let menu = bodies(&click(&mut gateway, KART_GATE, NOW));
     assert!(
         menu_option(&menu, DEFAULT_MENU_STRING_ID).is_none(),
         "a dormant kart track must not list the race"
     );
     let before = save_bytes(&gateway);
-    let _ = gateway.handle_at(&wrap(&npc_select(JOHNNY, 2)), NOW + 100);
+    let _ = gateway.handle_at(&wrap(&npc_select(KART_GATE, 2)), NOW + 100);
     assert_eq!(save_bytes(&gateway), before);
 }
 
@@ -739,8 +770,8 @@ fn a_content_set_without_a_derby_package_keeps_the_derby_dormant() {
         serde_json::from_slice(&fs::read(content.0.join("derby_gates.json")).unwrap()).unwrap();
     assert_eq!(
         gates.npcs,
-        vec![MAD_JACK, CRASH, BURT, RIP],
-        "the dormant rule must be observed with the four shipped gate ids present"
+        vec![DERBY_GATE, MAD_JACK, CRASH, BURT, RIP],
+        "the dormant rule must be observed with the shipped gate ids present"
     );
 
     // The production loaders are the dormancy decision: absent content leaves no route and no

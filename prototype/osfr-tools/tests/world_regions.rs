@@ -283,20 +283,22 @@ fn shipped_npc_rows_cover_1192_of_1209() {
         }
     }
 
-    assert_eq!(total, 1209, "shipped NPC rows");
+    assert_eq!(total, 1211, "shipped NPC rows");
     // T876 (was 981 / 844 / 905 / 1091 with the T753 grouping and the community region shapes): the places'
     // music/ambience area families and the client-row regions cover 1,193 rows, of which every one is in a place.
     // T665 moved Sorin and Coach Eddie onto drawn Legacy spawns; one of the two landed outside every
     // place and region, which took each count down by one (1,193 / 893 / 954 / 1,193 before).
-    assert_eq!(in_place, 1192, "rows in a first-party place group");
+    // L096 added the two Wildwood turnstile actors, both inside a place (1,194).
+    assert_eq!(in_place, 1194, "rows in a first-party place group");
     // T896 moved sixteen reconstructed rows onto their video-archive points; net, one row fewer stands in the
     // banner regions (892 -> 891) and two fewer in any region shape (953 -> 951).
     assert_eq!(
         in_recovered_region, 891,
         "rows in the banner regions 2..=10"
     );
-    assert_eq!(in_any_region, 951, "rows in a region (including region 1)");
-    assert_eq!(covered, 1192, "rows in a place or a region");
+    // L096's two turnstile actors stand in the region 1 fallback sphere, not a banner region (953).
+    assert_eq!(in_any_region, 953, "rows in a region (including region 1)");
+    assert_eq!(covered, 1194, "rows in a place or a region");
 }
 
 #[test]

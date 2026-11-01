@@ -261,8 +261,9 @@ const LATER_GREETINGS: [(&str, u64, u32); 4] = [
 const BLANK: u64 = 9500000364;
 
 const LAKESHORE_RECORDS: usize = 39;
-/// T498 appended the Burglz row (a quest hand-in with no greeting), so 119.
-const WILDS_RECORDS: usize = 119;
+/// T498 appended the Burglz row (a quest hand-in with no greeting), so 119; L096 the two Wildwood
+/// turnstile actors (no greeting), so 121.
+const WILDS_RECORDS: usize = 121;
 
 fn assert_drawable(record: &Value, npc_id: u64) {
     assert!(

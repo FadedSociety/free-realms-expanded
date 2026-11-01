@@ -77311,6 +77311,70 @@
         }
       ],
       "position_w": null
+    },
+    {
+      "spawn_guid": 9500001020,
+      "legacy_npc_id": null,
+      "content_key": 9500001020,
+      "model_id": 69,
+      "model_file_name": "widget_01.adr",
+      "name": "Wildwood Kart Racing",
+      "name_string_id": 17958,
+      "position": [
+        -2268.808,
+        -16.374,
+        586.806
+      ],
+      "heading": -1.5707963267948966,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Live gate actor guid 7490422964306 named 17958, model 69 widget_01.adr, scale 0.75, heading -90 degrees: the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.17958 reads 'Wildwood Kart Racing' (client locale); it is the NAME_ID of client MiniGameData.txt row 28"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) NPC id is a reconstructed package key for the live gate actor (its runtime guid is session state)"
+        }
+      ],
+      "position_w": null,
+      "scale": 0.75
+    },
+    {
+      "spawn_guid": 9500001021,
+      "legacy_npc_id": null,
+      "content_key": 9500001021,
+      "model_id": 271,
+      "model_file_name": "invisible_cube.adr",
+      "name": "Wildwood Demo Derby",
+      "name_string_id": 37938,
+      "position": [
+        -2268.444,
+        -16.377,
+        588.369
+      ],
+      "heading": -1.5707963267948966,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Live gate actor guid 65283502899282 named 37938, model 271 invisible_cube.adr, scale 1.0, heading -90 degrees: the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.37938 reads 'Wildwood Demo Derby' (client locale); it is the NAME_ID of client MiniGameData.txt row 39"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) NPC id is a reconstructed package key for the live gate actor (its runtime guid is session state)"
+        }
+      ],
+      "position_w": null,
+      "scale": 1.0
     }
   ]
 }

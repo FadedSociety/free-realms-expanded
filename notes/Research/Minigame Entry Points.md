@@ -137,3 +137,27 @@ five provenance entries (the T201 Warrior-trainer shape); the gate list needs no
 - No derby content package ships, so the four derby drivers correctly offer nothing until an operator
   adds `derby_entry.json`.
 - The minimap track id per speedway and the exact client prompt text per gate remain unrecovered.
+
+## L096: the live gate actors (2026-11-01)
+
+The owner, from a 2010 video: the races were entered at the speedway gates, not from NPCs (an arch
+with checkered flags, the nameplate "Frost Ridge Kart Racing" over a ground ring "Kart Race Lobby").
+The client's quest text calls the gate the turnstile ("Interact with the Frost Ridge Speedway
+turnstile"). [client] The live server's own spawns in the community captures (`packets_4.pcapng` and
+the racing and demo derby captures, 2014) show what stood there at Wildwood: two named actors on the
+turnstile pair.
+
+| Actor | Name id [client] | Model | Position | Heading |
+|---|---|---|---|---|
+| Wildwood Kart Racing (live guid 7490422964306) | 17958 = `MiniGameData.txt` row 28's NAME_ID | 69 `widget_01.adr`, scale 0.75 | (-2268.808, -16.374, 586.806) = `sg_turnstyle_02` | -90 |
+| Wildwood Demo Derby (live guid 65283502899282) | 37938 = row 39's NAME_ID | 271 `invisible_cube.adr`, scale 1.0 | (-2268.444, -16.377, 588.369) | -90 |
+
+L096 spawns both as content keys 9500001020 and 9500001021 (`npcs/wilds.json` records with
+`placement: captured`, `npc_spawns_extra.json` bodies at the same spot) and makes them Wildwood's
+gates: 9500001020 replaces Johnny Thunder in `kart_gates.json`, 9500001021 heads
+`derby_gates.json` (the default derby row goes to every gate; the four arena drivers keep row 604).
+The other four speedways keep their drivers until the server runs their own track scenes; their
+gates then go on their turnstile pairs listed above, named after their minigame rows (Frost Ridge
+Kart Racing 37933 = row 37, Tangletrack Kart Racing 37934 = row 38, Thunder Falls Speedway 3606 =
+row 567, Sandstorm Speedway 401623 = row 578; derbies Frost Ridge 31328 = row 40, Tangletrack 37940
+= row 41).

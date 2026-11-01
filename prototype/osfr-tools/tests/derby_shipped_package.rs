@@ -40,6 +40,8 @@ use std::{
 
 const CRATE: &str = env!("CARGO_MANIFEST_DIR");
 /// The four arena drivers shipped by `derby_gates.json` (T221).
+/// L096: the Wildwood turnstile's derby actor heads the gate list.
+const DERBY_GATE: u64 = 9_500_001_021;
 const MAD_JACK: u64 = 9_000_000_391;
 const CRASH: u64 = 9_000_000_289;
 const BURT: u64 = 9_500_000_731;
@@ -495,11 +497,14 @@ fn the_shipped_package_loads_and_offers_from_all_four_drivers() {
     let shipped = DerbyGateway::load(&data(), None)
         .expect("the shipped package respects every loader bound")
         .expect("the shipped derby package exists");
-    assert_eq!(shipped.gate_npcs(), &[MAD_JACK, CRASH, BURT, RIP][..]);
+    assert_eq!(
+        shipped.gate_npcs(),
+        &[DERBY_GATE, MAD_JACK, CRASH, BURT, RIP][..]
+    );
     assert_eq!(shipped.menu_string_id(), DERBY_LABEL);
     let gates: DerbyGates =
         serde_json::from_slice(&fs::read(data().join("derby_gates.json")).unwrap()).unwrap();
-    assert_eq!(gates.npcs, vec![MAD_JACK, CRASH, BURT, RIP]);
+    assert_eq!(gates.npcs, vec![DERBY_GATE, MAD_JACK, CRASH, BURT, RIP]);
     let mut interaction =
         NpcInteraction::load(&data().join("npcs"), &data().join("stores.json")).unwrap();
     assert!(
@@ -917,7 +922,10 @@ fn malformed_content_is_refused_and_the_shipped_definition_is_real() {
     let restored = DerbyGateway::load(package.path(), None)
         .unwrap()
         .expect("the restored package");
-    assert_eq!(restored.gate_npcs(), &[MAD_JACK, CRASH, BURT, RIP][..]);
+    assert_eq!(
+        restored.gate_npcs(),
+        &[DERBY_GATE, MAD_JACK, CRASH, BURT, RIP][..]
+    );
     assert_eq!(restored.menu_string_id(), DERBY_LABEL);
     assert_eq!(fs::read(&entry).unwrap(), original_entry);
     assert_eq!(fs::read(&gates_path).unwrap(), original_gates);

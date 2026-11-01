@@ -48988,6 +48988,584 @@
       "heading": 2.590048,
       "model_id": 167,
       "model_file_name": "troll_peasant_02.adr"
+    },
+    {
+      "npc_id": 9500001020,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Wildwood Kart Racing",
+      "name_reason": null,
+      "name_string_id": 17958,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 17958
+        }
+      ],
+      "name_string_id_reason": null,
+      "zone": "Wilds",
+      "zone_id": 16,
+      "zone_reason": null,
+      "region_pages": [
+        "Wilds"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "The Wildwood Speedway turnstile: the kart race entry the live server spawned."
+      ],
+      "roles": [
+        "ambient"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "Live gate actor 7490422964306 at the Wildwood Speedway turnstile."
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [],
+      "quests_accepted": [],
+      "quests_accepted_reason": "A race gate takes no quest hand-ins.",
+      "vendor_stock": null,
+      "vendor_stock_reason": "A race gate sells nothing.",
+      "services": [],
+      "services_reason": "The kart race option is listed by kart_gates.json.",
+      "position": [
+        -2268.808,
+        -16.374,
+        586.806
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        -0.7071067811865476,
+        0.0,
+        0.7071067811865476
+      ],
+      "placement": "live_capture",
+      "placement_source": "live_capture_spawn",
+      "placement_confidence": "high",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Live gate actor guid 7490422964306 named 17958, model 69 widget_01.adr, scale 0.75, heading -90 degrees: the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) NPC id is a reconstructed package key for the live gate actor (its runtime guid is session state)"
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "client",
+            "evidence": "Live gate actor guid 7490422964306 named 17958, model 69 widget_01.adr, scale 0.75, heading -90 degrees: the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key for the live gate actor (its runtime guid is session state)"
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key for the live gate actor (its runtime guid is session state)"
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key for the live gate actor (its runtime guid is session state)"
+          }
+        ],
+        "name": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.17958 reads 'Wildwood Kart Racing' (client locale); it is the NAME_ID of client MiniGameData.txt row 28"
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.17958 reads 'Wildwood Kart Racing' (client locale); it is the NAME_ID of client MiniGameData.txt row 28"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.17958 reads 'Wildwood Kart Racing' (client locale); it is the NAME_ID of client MiniGameData.txt row 28"
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.17958 reads 'Wildwood Kart Racing' (client locale); it is the NAME_ID of client MiniGameData.txt row 28"
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.17958 reads 'Wildwood Kart Racing' (client locale); it is the NAME_ID of client MiniGameData.txt row 28"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 7490422964306 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 7490422964306 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 7490422964306 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 7490422964306 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "client",
+            "evidence": "Live gate actor guid 7490422964306 named 17958, model 69 widget_01.adr, scale 0.75, heading -90 degrees: the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "client",
+            "evidence": "Live gate actor guid 7490422964306 named 17958, model 69 widget_01.adr, scale 0.75, heading -90 degrees: the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The kart race option comes from kart_gates.json, as for every gate"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The kart race option comes from kart_gates.json, as for every gate"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "client",
+            "evidence": "Live gate actor guid 7490422964306 named 17958, model 69 widget_01.adr, scale 0.75, heading -90 degrees: the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 7490422964306 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The kart race option comes from kart_gates.json, as for every gate"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The kart race option comes from kart_gates.json, as for every gate"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The kart race option comes from kart_gates.json, as for every gate"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The kart race option comes from kart_gates.json, as for every gate"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The kart race option comes from kart_gates.json, as for every gate"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The kart race option comes from kart_gates.json, as for every gate"
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The kart race option comes from kart_gates.json, as for every gate"
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The kart race option comes from kart_gates.json, as for every gate"
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The kart race option comes from kart_gates.json, as for every gate"
+          }
+        ],
+        "position": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 7490422964306 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 7490422964306 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Heading from the capture's -90 degrees; a gate actor has no visible facing"
+          }
+        ],
+        "placement": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 7490422964306 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 7490422964306 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 7490422964306 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 7490422964306 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "client",
+            "evidence": "Live gate actor guid 7490422964306 named 17958, model 69 widget_01.adr, scale 0.75, heading -90 degrees: the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng"
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 7490422964306 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ]
+      }
+    },
+    {
+      "npc_id": 9500001021,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Wildwood Demo Derby",
+      "name_reason": null,
+      "name_string_id": 37938,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 37938
+        }
+      ],
+      "name_string_id_reason": null,
+      "zone": "Wilds",
+      "zone_id": 16,
+      "zone_reason": null,
+      "region_pages": [
+        "Wilds"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "The Wildwood Speedway turnstile: the demolition derby entry the live server spawned."
+      ],
+      "roles": [
+        "ambient"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "Live gate actor 65283502899282 at the Wildwood Speedway turnstile."
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [],
+      "quests_accepted": [],
+      "quests_accepted_reason": "A race gate takes no quest hand-ins.",
+      "vendor_stock": null,
+      "vendor_stock_reason": "A race gate sells nothing.",
+      "services": [],
+      "services_reason": "The demolition derby option is listed by derby_gates.json.",
+      "position": [
+        -2268.444,
+        -16.377,
+        588.369
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        -0.7071067811865476,
+        0.0,
+        0.7071067811865476
+      ],
+      "placement": "live_capture",
+      "placement_source": "live_capture_spawn",
+      "placement_confidence": "high",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Live gate actor guid 65283502899282 named 37938, model 271 invisible_cube.adr, scale 1.0, heading -90 degrees: the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) NPC id is a reconstructed package key for the live gate actor (its runtime guid is session state)"
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "client",
+            "evidence": "Live gate actor guid 65283502899282 named 37938, model 271 invisible_cube.adr, scale 1.0, heading -90 degrees: the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key for the live gate actor (its runtime guid is session state)"
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key for the live gate actor (its runtime guid is session state)"
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key for the live gate actor (its runtime guid is session state)"
+          }
+        ],
+        "name": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.37938 reads 'Wildwood Demo Derby' (client locale); it is the NAME_ID of client MiniGameData.txt row 39"
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.37938 reads 'Wildwood Demo Derby' (client locale); it is the NAME_ID of client MiniGameData.txt row 39"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.37938 reads 'Wildwood Demo Derby' (client locale); it is the NAME_ID of client MiniGameData.txt row 39"
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.37938 reads 'Wildwood Demo Derby' (client locale); it is the NAME_ID of client MiniGameData.txt row 39"
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.37938 reads 'Wildwood Demo Derby' (client locale); it is the NAME_ID of client MiniGameData.txt row 39"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 65283502899282 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 65283502899282 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 65283502899282 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 65283502899282 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "client",
+            "evidence": "Live gate actor guid 65283502899282 named 37938, model 271 invisible_cube.adr, scale 1.0, heading -90 degrees: the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "client",
+            "evidence": "Live gate actor guid 65283502899282 named 37938, model 271 invisible_cube.adr, scale 1.0, heading -90 degrees: the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The demolition derby option comes from derby_gates.json, as for every gate"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The demolition derby option comes from derby_gates.json, as for every gate"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "client",
+            "evidence": "Live gate actor guid 65283502899282 named 37938, model 271 invisible_cube.adr, scale 1.0, heading -90 degrees: the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 65283502899282 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The demolition derby option comes from derby_gates.json, as for every gate"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The demolition derby option comes from derby_gates.json, as for every gate"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The demolition derby option comes from derby_gates.json, as for every gate"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The demolition derby option comes from derby_gates.json, as for every gate"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The demolition derby option comes from derby_gates.json, as for every gate"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The demolition derby option comes from derby_gates.json, as for every gate"
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The demolition derby option comes from derby_gates.json, as for every gate"
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The demolition derby option comes from derby_gates.json, as for every gate"
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The demolition derby option comes from derby_gates.json, as for every gate"
+          }
+        ],
+        "position": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 65283502899282 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 65283502899282 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Heading from the capture's -90 degrees; a gate actor has no visible facing"
+          }
+        ],
+        "placement": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 65283502899282 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 65283502899282 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 65283502899282 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 65283502899282 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "client",
+            "evidence": "Live gate actor guid 65283502899282 named 37938, model 271 invisible_cube.adr, scale 1.0, heading -90 degrees: the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng"
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "client",
+            "evidence": "Position of live actor 65283502899282 (the live server spawned it in the community captures packets_4.pcapng, packets_racing_minigame.pcapng and packets_demoderby_minigame.pcapng); the client's Wildwood Speedway turnstile pair stands there in FabledRealms_8_-36.gcnk: sg_turnstyle_02 at (-2268.81, -16.37, 586.81), sg_turnstyle_01 at (-2268.80, -16.47, 587.89)"
+          }
+        ]
+      }
     }
   ]
 }

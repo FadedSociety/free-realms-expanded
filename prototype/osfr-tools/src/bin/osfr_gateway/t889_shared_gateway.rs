@@ -29,6 +29,10 @@ const MAD_JACK: u64 = 9000000391;
 const MAD_JACK_AT: [f32; 3] = [-2253.199, -17.16412, 590.1331];
 const JOHNNY: u64 = 9500000911;
 const JOHNNY_AT: [f32; 3] = [-2255.642, -16.61412, 579.8773];
+/// L096: the Wildwood Speedway turnstile actors the live server spawned (kart race, derby).
+const KART_GATE: u64 = 9500001020;
+const DERBY_GATE: u64 = 9500001021;
+const TURNSTILE_AT: [f32; 3] = [-2268.808, -16.374, 586.806];
 const BRAWLER: i32 = 43;
 /// A job the opening ability table has no basic attack for (the starting job).
 const NO_BASIC: i32 = 1;
@@ -214,14 +218,14 @@ fn the_derby_trainer_grants_the_job_and_the_lobby_becomes_ready_for_both_clients
 
 #[test]
 fn the_kart_race_option_enters_the_race_zone_for_each_client() {
-    let Some(mut table) = table("t889-race", JOHNNY_AT, [BRAWLER, BRAWLER]) else {
+    let Some(mut table) = table("t889-race", TURNSTILE_AT, [BRAWLER, BRAWLER]) else {
         return;
     };
     for index in 0..2 {
         let now = 2_000 + index as u64 * 10_000;
-        let opened = table.send(index, &npc(8, JOHNNY, None), now);
-        let race = fish_option(&opened, RACE_LABEL).expect("the race NPC offers the race row");
-        let entered = table.send(index, &npc(10, JOHNNY, Some(race)), now + 100);
+        let opened = table.send(index, &npc(8, KART_GATE, None), now);
+        let race = fish_option(&opened, RACE_LABEL).expect("the turnstile offers the race row");
+        let entered = table.send(index, &npc(10, KART_GATE, Some(race)), now + 100);
         assert!(
             entered
                 .iter()
@@ -237,6 +241,27 @@ fn the_kart_race_option_enters_the_race_zone_for_each_client() {
         let session = &table.server.sessions[&table.keys[index]];
         assert_eq!(session.gateway.state().zone_id, 48000001);
     }
+}
+
+/// L096 (owner 2026-11-01: the speedway gates, not NPCs, let you into the races): the two actors
+/// the live server stood on the Wildwood turnstile offer the race and the derby; the racer who
+/// stood in for the gate (Johnny Thunder) no longer offers the race.
+#[test]
+fn the_wildwood_turnstile_offers_the_race_and_the_derby() {
+    let Some(mut gates) = table("t889-turnstile", TURNSTILE_AT, [BRAWLER, BRAWLER]) else {
+        return;
+    };
+    let kart = gates.send(0, &npc(8, KART_GATE, None), 2_000);
+    assert!(fish_option(&kart, RACE_LABEL).is_some(), "{kart:?}");
+    let derby = gates.send(0, &npc(8, DERBY_GATE, None), 3_000);
+    assert!(fish_option(&derby, DERBY_LABEL).is_some(), "{derby:?}");
+    assert!(fish_option(&derby, RACE_LABEL).is_none());
+
+    let Some(mut johnny) = table("t889-no-stand-in", JOHNNY_AT, [BRAWLER, BRAWLER]) else {
+        return;
+    };
+    let menu = johnny.send(0, &npc(8, JOHNNY, None), 2_000);
+    assert!(fish_option(&menu, RACE_LABEL).is_none(), "{menu:?}");
 }
 
 /// The Legacy Hooligan (4667) and Hooligan Archer (4675) bodies the playtest clicked were passive

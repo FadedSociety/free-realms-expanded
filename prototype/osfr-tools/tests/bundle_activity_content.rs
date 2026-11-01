@@ -67,7 +67,7 @@ const FROZEN_SHA256: &[(&str, &str)] = &[
     ),
     (
         "kart_gates.json",
-        "0ee62324a0d06234c229fb341d49051078ed03af15b1c3ac0cd32f575537012f",
+        "24ba10d80a37ef783e6c913c94ae97f6649357bb177dba7c27a9062d60f8150f",
     ),
     (
         "derby_entry.json",
@@ -75,7 +75,7 @@ const FROZEN_SHA256: &[(&str, &str)] = &[
     ),
     (
         "derby_gates.json",
-        "f9b8a7910dd29da6a415a0342e01a2e86429be4f970006f9fd66931d6ed892dd",
+        "2b8ae48ae6668cb745a8a2353dfcdf085568deb8d0bf28d22c020f110a8270cc",
     ),
     (
         "mining.json",
@@ -159,7 +159,7 @@ fn bundled_activity_content_loads_without_lab() {
             9000000273u64,
             9000000039,
             9500000759,
-            9500000911,
+            9500001020, // L096: the Wildwood turnstile (was Johnny Thunder)
             9500000630
         ][..]
     );
@@ -169,7 +169,13 @@ fn bundled_activity_content_loads_without_lab() {
         .expect("derby content is present");
     assert_eq!(
         derby.gate_npcs(),
-        &[9000000391u64, 9000000289, 9500000731, 9000000183][..]
+        &[
+            9500001021u64,
+            9000000391,
+            9000000289,
+            9500000731,
+            9000000183
+        ][..]
     );
     assert_eq!(derby.menu_string_id(), 3053);
     assert_eq!(

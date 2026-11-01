@@ -73,6 +73,7 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
                 matches!(
                     placement,
                     "captured"
+                        | "live_capture"
                         | "legacy_data"
                         | "reference_data"
                         | "video_index"
@@ -112,6 +113,37 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
                         "{owner}: extras body is not at the video-index position"
                     );
                 }
+            }
+            if placement == "live_capture" {
+                // L096: a spot the live server's own spawn stood at (the community captures); its
+                // extras body stands there too, since clicks are range-checked against the row.
+                assert_eq!(source, "live_capture_spawn", "{owner}: unexpected source");
+                assert!(
+                    npc["placement_candidates"]
+                        .as_array()
+                        .is_some_and(Vec::is_empty),
+                    "{owner}: live capture row has candidates"
+                );
+                assert!(
+                    npc["field_sources"]["position"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .any(|tag| tag["kind"] == "client"
+                            && tag["evidence"]
+                                .as_str()
+                                .is_some_and(|text| text.contains("community captures"))),
+                    "{owner}: position lacks the live capture tag"
+                );
+                let bodies: Vec<_> = extras
+                    .iter()
+                    .filter(|row| row["content_key"] == npc["npc_id"])
+                    .collect();
+                assert_eq!(bodies.len(), 1, "{owner}: needs exactly one extras body");
+                assert_eq!(
+                    bodies[0]["position"], npc["position"],
+                    "{owner}: body moved"
+                );
             }
             if placement == "unanchored" {
                 assert!(
@@ -291,6 +323,7 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
     // T379 appended two unanchored repair-guy binding rows.
     // T498 appended the Burglz row (1,202); T500 appended Hasti (1,203); T501 Shannon and Sugaboo (1,205).
     // T739 appended four clickable quest props (Planter, Treasure Chest, Sanctuary Postboxes, 1 Way Back Way).
-    assert_eq!(npc_count, 1_209);
+    // L096 appended the two Wildwood turnstile actors (live_capture).
+    assert_eq!(npc_count, 1_211);
     println!("NPC placement sources: {counts:?}");
 }
