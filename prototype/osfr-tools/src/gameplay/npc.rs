@@ -93,8 +93,9 @@ impl Gameplay {
 
     /// Stage one NPC service choice: clone this player's gameplay, run the choice on the
     /// clone, and commit it only when the choice reported a change. A refusal keeps the
-    /// live state, including the open menu and the pending offer.
-    fn commit_if_changed(
+    /// live state, including the open menu and the pending offer. L097: the Games window race
+    /// and derby rows commit through it too.
+    pub(super) fn commit_if_changed(
         &mut self,
         f: impl FnOnce(&mut Gameplay) -> io::Result<Outcome>,
     ) -> io::Result<Outcome> {

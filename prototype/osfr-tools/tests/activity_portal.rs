@@ -5,7 +5,8 @@
 //! byte exactly as the client does. All content is synthetic; no player names or chat appear.
 use osfr_tools::{
     activity_portal::{
-        self, Activity, Catalogue, ChessActivity, Kind, LiveRow, Refusal, Request, Viewer, parse,
+        self, Activity, Catalogue, ChessActivity, Kind, LiveRow, Refusal, Request, Viewer,
+        game_row, parse,
     },
     card_game,
 };
@@ -596,8 +597,11 @@ fn live_rows_publish_the_live_values_and_play_their_service_rows() {
                 live_row(2, 515, 18, 950, 20),
                 live_row(2, 63, 16, 37_933, 37),
                 live_row(2, 8, 17, 409_962, 8),
+                live_row(2, 62, 16, 17_958, 28),
+                live_row(2, 65, 16, 37_938, 39),
             ],
             Some(8),
+            vec![game_row(28, Kind::Kart), game_row(39, Kind::Derby)],
         )
         .unwrap();
 
@@ -634,8 +638,8 @@ fn live_rows_publish_the_live_values_and_play_their_service_rows() {
         .collect();
     assert_eq!(
         joinable,
-        [(515, 1), (63, 0), (8, 1)],
-        "chess, kart closed, wheel"
+        [(515, 1), (63, 0), (8, 1), (62, 1), (65, 1)],
+        "chess, a kart row with no race, wheel, the race and the derby (L097)"
     );
 
     assert_eq!(catalogue.admit(37, FIGHTER, false).unwrap().id, 12_370);
@@ -655,13 +659,24 @@ fn live_rows_publish_the_live_values_and_play_their_service_rows() {
     }
     assert_eq!(catalogue.kind(37), Some(Kind::Battle));
     assert_eq!(catalogue.kind(63), None);
-    assert_eq!(catalogue.live().len(), 4);
+    assert_eq!(catalogue.live().len(), 6);
+    // L097: the race and derby rows start their services by MiniGameData row.
+    assert_eq!(
+        catalogue.admit(62, FIGHTER, true).map(|a| (a.id, a.kind)),
+        Err(Refusal::Busy)
+    );
+    assert_eq!(
+        catalogue.admit(62, FIGHTER, false).unwrap().kind,
+        Kind::Kart
+    );
+    assert_eq!(catalogue.admit(65, FIGHTER, false).unwrap().id, 39);
+    assert_eq!(catalogue.admit(28, FIGHTER, false), Err(Refusal::Unknown));
 }
 
 #[test]
 fn live_rows_refuse_bad_rows_and_a_battle_shadowing_a_live_id() {
     let base = || Catalogue::new(vec![row(96, 0)]).unwrap();
-    let with = |rows: Vec<LiveRow>| base().with_live(rows, None);
+    let with = |rows: Vec<LiveRow>| base().with_live(rows, None, vec![]);
     assert!(with(vec![live_row(1, 5, 10, 1, 5), live_row(2, 5, 18, 2, 6)]).is_err());
     assert!(with(vec![live_row(1, 0, 10, 1, 5)]).is_err(), "zero id");
     assert!(with(vec![live_row(3, 5, 10, 1, 5)]).is_err(), "entry type");
@@ -671,6 +686,9 @@ fn live_rows_refuse_bad_rows_and_a_battle_shadowing_a_live_id() {
     // The client keys rows by id: a hidden battle may not reuse a live id.
     assert!(with(vec![live_row(2, 96, 18, 1, 5)]).is_err());
     assert_eq!(with(vec![]).unwrap(), base(), "no live rows: unchanged");
+    // L097: without live rows nothing lists the race, so it is not added either.
+    let games = vec![game_row(28, Kind::Kart)];
+    assert_eq!(base().with_live(vec![], None, games).unwrap(), base());
 }
 
 /// L095: the shipped live rows cover all 16 Games window tiles with client art names, among them

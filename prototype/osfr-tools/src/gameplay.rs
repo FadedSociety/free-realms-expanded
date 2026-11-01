@@ -77,6 +77,7 @@ mod pet_quest;
 #[allow(dead_code)]
 mod piece_077;
 mod placement_watch;
+mod portal_games;
 mod power_up_use;
 mod profile_outfit;
 /// Progress-driven achievement observation over authoritative gameplay state.
@@ -996,18 +997,12 @@ impl Gameplay {
             None => None,
         };
         let daily_wheel = crate::daily_wheel::DailyWheel::load(npc_content, saved_wheel_day)?;
-        // L095: the live Games window rows, from the first content folder that has them.
-        let live_activities = [directory, bundled_npc_content.as_path()]
-            .into_iter()
-            .find(|base| base.join(crate::activity_portal::CATALOGUE_FILE).is_file())
-            .map_or_else(|| Ok(Vec::new()), crate::activity_portal::load_live)?;
         let activities = crate::activity_portal::Catalogue::assemble(
             content_presence::battle_rows(&battle_file, encounter.is_some()),
             chess.as_ref(),
             soccer_content.as_ref(),
             crate::card_game::Content::load_optional(npc_content)?.as_ref(),
-        )?
-        .with_live(live_activities, daily_wheel.activity_id())?;
+        )?;
         let card_launches = (activities.cards().and_then(|cards| cards.launch()))
             .map(crate::card_game::Launches::new)
             .transpose()?;
@@ -1103,6 +1098,10 @@ impl Gameplay {
                 );
             }
         }
+        let folders = [directory, bundled_npc_content.as_path()];
+        let (kart, derby_ref) = (kart_entry.as_ref(), derby.as_ref());
+        let activities =
+            portal_games::with_live(activities, folders, &daily_wheel, kart, derby_ref)?;
         let fishing_spots = crate::fishing_service::FishingSpots::load(directory)?.map(Arc::new);
         if let (Some(spots), Some(interaction)) = (&fishing_spots, &mut npc_interaction) {
             let unknown = interaction.set_fish_gates(&spots.gate_npcs(), spots.menu_string_id());
@@ -3092,15 +3091,6 @@ impl Gameplay {
         busy.then_some(piece_077::Blocker::Busy)
     }
 
-    /// W150: the portal list for this player (167/1/1).
-    fn append_activity_list(&self, out: &mut Outcome) {
-        let viewer = self.activity_viewer();
-        out.replies.push(self.activities.list_packet(viewer));
-        // L095: the live minigame rows travel in their own entry-type list.
-        out.replies
-            .extend(self.activities.minigame_list_packet(viewer));
-    }
-
     fn activity_viewer(&self) -> crate::activity_portal::Viewer {
         let profile = self.profiles.as_ref().map_or(0, Profiles::active);
         crate::activity_portal::Viewer {
@@ -3290,6 +3280,8 @@ impl Gameplay {
                                 .push(chat::system("You cannot start that activity here.")),
                         }
                     }
+                    // L097: the kart race and derby rows.
+                    Ok((_, kind)) => out = self.begin_portal_game(kind, character, now_ms)?,
                 }
             }
         }

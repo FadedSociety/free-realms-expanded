@@ -822,3 +822,49 @@ fn a_content_set_without_a_derby_package_keeps_the_derby_dormant() {
         );
     }
 }
+
+/// 167/1/2 Games window Play: activity id, then the ignored clock dword.
+fn portal_play(activity: u32) -> Vec<u8> {
+    let mut inner = vec![167, 0, 1, 2];
+    inner.extend(activity.to_le_bytes());
+    inner.extend(0_u32.to_le_bytes());
+    inner
+}
+
+/// L097: Play on the Games window's Wildwood Kart Racing (62) and Wildwood Demo Derby (65) rows
+/// starts the same entries as the turnstile, from anywhere in the open world; a second Play while
+/// racing is refused and changes nothing.
+#[test]
+fn games_window_play_starts_the_wildwood_race_and_derby() {
+    let content = Content::new();
+    content.write_derby_package();
+    let away = npc_position(NOT_A_GATE);
+
+    let mut racer = gateway_at(&content, content.state(), away);
+    let race = racer.handle_at(&wrap(&portal_play(62)), NOW).unwrap();
+    assert!(race.gameplay_changed, "the race entry is saved");
+    assert!(
+        bodies(&race)
+            .iter()
+            .any(|packet| packet.starts_with(&[41, 0, 114, 0])),
+        "the race UI starts with the encounter details"
+    );
+    let racing = save_bytes(&racer);
+    let again = racer.handle_at(&wrap(&portal_play(62)), NOW + 100).unwrap();
+    assert!(!again.gameplay_changed);
+    assert_eq!(
+        save_bytes(&racer),
+        racing,
+        "a live race is not entered twice"
+    );
+
+    let mut driver = gateway_at(&content, content.state(), away);
+    let derby = driver.handle_at(&wrap(&portal_play(65)), NOW).unwrap();
+    assert!(derby.gameplay_changed);
+    assert!(
+        bodies(&derby)
+            .iter()
+            .any(|packet| packet.starts_with(&[39, 0, 16])),
+        "the derby offer is the existing 39/16 packet"
+    );
+}

@@ -68,7 +68,11 @@ impl Gameplay {
                         self.soccer_content.as_ref(),
                         self.activities.cards(),
                     )?
-                    .with_live(self.activities.live(), self.daily_wheel.activity_id())?;
+                    .with_live(
+                        self.activities.live(),
+                        self.daily_wheel.activity_id(),
+                        super::portal_games::games(self.kart_entry.as_ref(), self.derby.as_ref()),
+                    )?;
                     if let Some(visibility) = self.npc_visibility.as_mut() {
                         visibility.add_battle_spawners(encounter);
                     }

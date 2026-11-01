@@ -518,6 +518,12 @@ impl DerbyGateway {
         {
             return Err(DerbyEntryDenied::NotAGate);
         }
+        self.admit_play(busy)
+    }
+
+    /// L097: admission for Play on the default derby's Games window row (ContentId
+    /// [`Self::game_id`]): every gate rule but the gate itself.
+    pub fn admit_play(&self, busy: bool) -> Result<(), DerbyEntryDenied> {
         if self.active() {
             return Err(DerbyEntryDenied::AlreadyPlaying);
         }

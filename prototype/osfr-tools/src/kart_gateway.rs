@@ -54,6 +54,10 @@ pub struct KartGates {
     /// Solo races pay on every finish, so without it racing can be farmed.
     #[serde(default)]
     pub reward_cooldown_s: u64,
+    /// L097: the client `MiniGameData.txt` row the shipped race is (28 = Wildwood Kart Racing for
+    /// the `sg_kt_track` scene); the Games window row with that ContentId starts the race too.
+    #[serde(default)]
+    pub minigame_id: Option<u32>,
 }
 
 /// (R) Sanity bound on the gate cooldown: one day.
@@ -399,6 +403,11 @@ impl KartGateway {
             _ => &[],
         }
     }
+    /// L097: the MiniGameData row the Games window lists for this race, when the race runs.
+    pub fn minigame_id(&self) -> Option<u32> {
+        self.content.race.as_ref()?;
+        self.gates.as_ref()?.minigame_id
+    }
     /// Locale id of the race option's menu label.
     pub fn menu_string_id(&self) -> u32 {
         self.gates
@@ -422,6 +431,16 @@ impl KartGateway {
         {
             return Err(EntryDenied::NotAGate);
         }
+        self.admit_play_at(busy, now_unix)
+    }
+
+    /// L097: admission for Play on the race's Games window row: every gate rule but the gate
+    /// itself (the portal already proved the row is this race).
+    pub fn admit_play(&self, busy: bool) -> Result<(), EntryDenied> {
+        self.admit_play_at(busy, now_unix())
+    }
+
+    fn admit_play_at(&self, busy: bool, now_unix: u64) -> Result<(), EntryDenied> {
         if self.content.race.is_none() {
             return Err(EntryDenied::NoRace);
         }

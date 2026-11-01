@@ -401,7 +401,8 @@ def _check_kart_gates(gates) -> list[int]:
     if (
         not isinstance(gates, dict)
         or gates.get("schema_version") != 1
-        or not set(gates) <= {"schema_version", "menu_string_id", "npcs", "reward_cooldown_s"}
+        or not set(gates)
+        <= {"schema_version", "menu_string_id", "npcs", "reward_cooldown_s", "minigame_id"}
         or not isinstance(npcs, list)
         or len(npcs) > 16
         or any(type(n) is not int or n <= 0 for n in npcs)
@@ -410,6 +411,9 @@ def _check_kart_gates(gates) -> list[int]:
         or not 0 <= cooldown <= 86_400
         or (gates.get("menu_string_id") is not None
             and (type(gates["menu_string_id"]) is not int or gates["menu_string_id"] <= 0))
+        # L097: the MiniGameData row the shipped race is (its Games window row).
+        or (gates.get("minigame_id") is not None
+            and (type(gates["minigame_id"]) is not int or gates["minigame_id"] <= 0))
     ):
         raise ValueError("content/kart_gates.json is invalid")
     return npcs

@@ -126,9 +126,17 @@ const PLAY_LEN: usize = 12;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Kind {
     Battle,
-    Chess { row_id: u32 },
+    Chess {
+        row_id: u32,
+    },
     Soccer,
-    CardGame { minigame_id: u32 },
+    CardGame {
+        minigame_id: u32,
+    },
+    /// L097: the shipped kart race and the default demolition derby; the row's id is their
+    /// MiniGameData row and only a live Games window row lists them.
+    Kart,
+    Derby,
 }
 
 /// One published activity: a battle of the frozen package.
@@ -313,10 +321,19 @@ impl Catalogue {
     }
 
     /// L095: list the live Games window rows, each joined to the service row that runs it (see
-    /// `runs`); `wheel` is the daily wheel's activity id while the wheel is on. Call after the last
-    /// `append`. A service row joins at most one live row.
-    pub fn with_live(mut self, live: Vec<LiveRow>, wheel: Option<u32>) -> io::Result<Self> {
+    /// `runs`); `wheel` is the daily wheel's activity id while the wheel is on. L097: `games` are
+    /// the kart/derby rows, added only with live rows (nothing else lists them). Call after the
+    /// last `append`. A service row joins at most one live row.
+    pub fn with_live(
+        mut self,
+        live: Vec<LiveRow>,
+        wheel: Option<u32>,
+        games: Vec<Activity>,
+    ) -> io::Result<Self> {
         validate_live(&live)?;
+        if !live.is_empty() {
+            self = self.append(games)?;
+        }
         let mut taken = vec![false; self.rows.len()];
         self.live = live
             .into_iter()
@@ -466,6 +483,8 @@ impl Catalogue {
             }
             // (R) Chess needs no job or level; the table is open to every player.
             Kind::Chess { .. } => {}
+            // L097: the race and derby services decide admission at Play.
+            Kind::Kart | Kind::Derby => {}
             // (R) Soccer is a world activity, not a combat-job gate. Its row
             // still honors the configured level floor; the original gate is unknown.
             Kind::Soccer => {
@@ -505,6 +524,7 @@ impl Catalogue {
             Kind::Chess { .. } => true,
             Kind::Soccer => viewer.level >= a.required_level,
             Kind::CardGame { .. } => self.card(a.id).is_some_and(|card| card.can_player_join),
+            Kind::Kart | Kind::Derby => true,
         }
     }
 
@@ -596,6 +616,8 @@ impl Catalogue {
                     ..plain
                 }
             }
+            // Only live rows list them (`with_live`).
+            Kind::Kart | Kind::Derby => return None,
         })
     }
 
@@ -683,13 +705,28 @@ struct Wire<'a> {
 
 /// L095: whether service row `a` runs live row `row`: a battle or soccer row by its tile and
 /// name, chess by its MiniGameData row (an entry-type-2 ContentId), a card row by id (the card
-/// data already carries the live ids).
+/// data already carries the live ids); L097: the kart race and the derby by their MiniGameData
+/// row (the service row's id).
 fn runs(row: &LiveRow, a: &Activity) -> bool {
     match a.kind {
         Kind::Battle => row.category == COMBAT_CATEGORY && row.name_id == a.name_id,
         Kind::Soccer => row.category == SOCCER_CATEGORY && row.name_id == a.name_id,
         Kind::Chess { row_id } => row.entry_type == ENTRY_CLIENT_TUNNEL && row.content_id == row_id,
         Kind::CardGame { .. } => row.id == a.id,
+        Kind::Kart | Kind::Derby => row.entry_type == ENTRY_CLIENT_TUNNEL && row.content_id == a.id,
+    }
+}
+
+/// L097: the service row for a race or derby the server runs, as a Games window join key.
+pub fn game_row(minigame_id: u32, kind: Kind) -> Activity {
+    Activity {
+        id: minigame_id,
+        name_id: 0,
+        description_id: 0,
+        icon_id: 0,
+        difficulty: 1,
+        required_level: 0,
+        kind,
     }
 }
 
