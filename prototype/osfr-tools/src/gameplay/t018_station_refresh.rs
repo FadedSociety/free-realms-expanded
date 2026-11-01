@@ -158,6 +158,33 @@ fn moved_station_changes_recipe_start_and_completion_coordinates() {
     let _ = fs::remove_dir_all(dir);
 }
 
+/// L098 (R): Play on the copper bar's Games window row (516, MiniGameData 77) starts the same
+/// recipe away from every furnace, and that craft completes where it was started; the station
+/// request still refuses there.
+#[test]
+fn the_games_window_row_starts_and_completes_the_recipe_away_from_the_station() {
+    let dir = live_dir();
+    fs::create_dir_all(&dir).unwrap();
+    station::write_placements(&dir, Some(station::AWAY));
+    let mut game = station_game(&dir);
+    let refused = start(&mut game, station::NEAR);
+    assert!(String::from_utf8_lossy(&refused.replies.concat()).contains("Move closer"));
+
+    let mut play = vec![167, 0, 1, 2];
+    play.extend(516_u32.to_le_bytes());
+    play.extend(0_u32.to_le_bytes());
+    let started = game
+        .handle_in_world(&play, &character_at(station::NEAR), 2_500)
+        .unwrap();
+    let text = String::from_utf8_lossy(&started.replies.concat()).into_owned();
+    assert!(!text.contains("Move closer"), "{text}");
+    assert!(game.smelting.as_ref().is_some_and(Smelting::active));
+    complete(&mut game, station::NEAR).expect("a window craft completes where it started");
+    assert!(!game.games_window_craft, "the completion consumes the flag");
+
+    let _ = fs::remove_dir_all(dir);
+}
+
 #[test]
 fn removed_station_changes_recipe_start_and_completion_coordinates() {
     let dir = live_dir();

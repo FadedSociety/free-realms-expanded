@@ -599,9 +599,14 @@ fn live_rows_publish_the_live_values_and_play_their_service_rows() {
                 live_row(2, 8, 17, 409_962, 8),
                 live_row(2, 62, 16, 17_958, 28),
                 live_row(2, 65, 16, 37_938, 39),
+                live_row(2, 516, 21, 15_293, 77),
             ],
             Some(8),
-            vec![game_row(28, Kind::Kart), game_row(39, Kind::Derby)],
+            vec![
+                game_row(28, Kind::Kart),
+                game_row(39, Kind::Derby),
+                game_row(77, Kind::Recipe { recipe_id: 4 }),
+            ],
         )
         .unwrap();
 
@@ -638,7 +643,7 @@ fn live_rows_publish_the_live_values_and_play_their_service_rows() {
         .collect();
     assert_eq!(
         joinable,
-        [(515, 1), (63, 0), (8, 1), (62, 1), (65, 1)],
+        [(515, 1), (63, 0), (8, 1), (62, 1), (65, 1), (516, 1)],
         "chess, a kart row with no race, wheel, the race and the derby (L097)"
     );
 
@@ -659,7 +664,12 @@ fn live_rows_publish_the_live_values_and_play_their_service_rows() {
     }
     assert_eq!(catalogue.kind(37), Some(Kind::Battle));
     assert_eq!(catalogue.kind(63), None);
-    assert_eq!(catalogue.live().len(), 6);
+    assert_eq!(catalogue.live().len(), 7);
+    // L098: a recipe row starts its recipe by MiniGameData row.
+    assert_eq!(
+        catalogue.admit(516, FIGHTER, false).unwrap().kind,
+        Kind::Recipe { recipe_id: 4 }
+    );
     // L097: the race and derby rows start their services by MiniGameData row.
     assert_eq!(
         catalogue.admit(62, FIGHTER, true).map(|a| (a.id, a.kind)),
@@ -727,4 +737,25 @@ fn the_shipped_live_rows_cover_every_games_window_tile() {
             .unwrap()
             .is_empty()
     );
+}
+
+/// L098: every shipped recipe with a MiniGameData row is a live crafting row's ContentId, so its
+/// Games window row starts it: the five smelting bars and the Spunky Scrapper Hammer (Strong Arm
+/// Stew's live row is hidden, category 99). The other cooking recipes carry no MiniGameData row
+/// yet: the cooking movie runs game 46's data for them, so their rows stay closed.
+#[test]
+fn shipped_recipes_join_their_live_crafting_rows() {
+    let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let live = activity_portal::load_live(&dir).unwrap();
+    let recipes: serde_json::Value =
+        serde_json::from_slice(&fs::read(dir.join("recipes.json")).unwrap()).unwrap();
+    let records = recipes["records"].as_array().unwrap();
+    let joined = (records.iter())
+        .filter_map(|recipe| recipe["minigame_id"].as_u64())
+        .filter(|id| {
+            live.iter()
+                .any(|row| matches!(row.category, 12 | 14 | 21) && u64::from(row.content_id) == *id)
+        })
+        .count();
+    assert_eq!(joined, 6);
 }

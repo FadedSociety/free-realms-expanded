@@ -46,6 +46,8 @@ impl Gameplay {
                 self.type8_tick_ms = None;
             }
         }
+        // L098: a cancelled Games window craft leaves no "anywhere" behind for the next one.
+        self.games_window_craft = false;
         Ok(())
     }
 
@@ -308,6 +310,68 @@ impl Gameplay {
     /// answers the 26/24 wrong-job / no-station line (`recipe_book::open_window`).
     /// Read-only, so a refusal changes nothing. Other targets and busy players
     /// fall through to the NPC, opening and movie paths.
+    /// The recipe-book start: client 26/24 at a station, and (L098) Play on the recipe's Games
+    /// window row with `anywhere`. `recipe_book::start` checks learned recipe, active job, idle
+    /// services, a server-known station in range unless `anywhere`, rank and exact inputs before
+    /// the service's own `begin_recipe`; it owns the busy refusal, so there is no second check
+    /// here that a canary could bypass or duplicate. A pack with no class content (supported by
+    /// `load`) has no recipe-book player at all, so refuse before building one.
+    pub(super) fn start_recipe(
+        &mut self,
+        recipe_id: i32,
+        anywhere: bool,
+        character: &CharacterState,
+        now_ms: u64,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        let Some(profile) = self.profiles.as_ref().map(Profiles::active) else {
+            out.replies
+                .push(crate::recipe_book::Refusal::Unavailable.feedback());
+            return Ok(());
+        };
+        let available = self.available_ingredients();
+        let player = crate::recipe_book::Player {
+            zone_id: character.zone_id,
+            position: character.position,
+            active_profile: profile,
+            job_rank: self.recipe_rank(profile),
+            learned: &self.learned_recipes,
+            available: &available,
+            in_activity: self.activity_busy(),
+            anywhere,
+        };
+        let crafting_stations = self.crafting_stations();
+        let started = crate::recipe_book::start(
+            recipe_id,
+            &self.recipe_catalog,
+            &player,
+            &crafting_stations,
+            crate::recipe_book::Services {
+                cooking: self.cooking.as_mut(),
+                smelting: self.smelting.as_mut(),
+                forging: self.forging.as_mut(),
+            },
+        );
+        // Only a started craft owns the flag; a refused start (Busy) leaves the running one's.
+        if started.is_ok() {
+            self.games_window_craft = anywhere;
+        }
+        match started {
+            Ok(crate::recipe_book::Started::Cooking(result)) => {
+                self.apply_craft(CraftingJob::Chef, result, character, out)?
+            }
+            Ok(crate::recipe_book::Started::Smelting(result)) => {
+                self.apply_craft(CraftingJob::Miner, result, character, out)?
+            }
+            Ok(crate::recipe_book::Started::Forging(result)) => {
+                self.forging_tick_ms = Some(now_ms);
+                self.apply_craft(CraftingJob::Blacksmith, result, character, out)?
+            }
+            Err(refusal) => out.replies.push(refusal.feedback()),
+        }
+        Ok(())
+    }
+
     pub(super) fn station_interaction_26_8(
         &self,
         inner: &[u8],
@@ -417,9 +481,11 @@ impl Gameplay {
     ) -> io::Result<()> {
         if let Some(transaction) = result.transaction {
             // (R) A recipe-book run has no tutorial objective; the profile and
-            // station checks still bind the completion.
+            // station checks still bind the completion (L098: a Games window craft
+            // completes where it was started).
+            let anywhere = std::mem::take(&mut self.games_window_craft);
             if self.profiles.as_ref().unwrap().active() != job.profile_id()
-                || !self.near_craft_station(character, job)
+                || (!anywhere && !self.near_craft_station(character, job))
             {
                 return Err(invalid(format!(
                     "{} completion is outside a {} station",

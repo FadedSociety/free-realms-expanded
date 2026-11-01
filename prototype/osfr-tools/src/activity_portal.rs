@@ -137,6 +137,11 @@ pub enum Kind {
     /// MiniGameData row and only a live Games window row lists them.
     Kart,
     Derby,
+    /// L098: a recipe's minigame (cooking, forging, smelting); the row's id is its MiniGameData
+    /// row and Play starts `recipe_id` through the recipe book, anywhere (R).
+    Recipe {
+        recipe_id: u32,
+    },
 }
 
 /// One published activity: a battle of the frozen package.
@@ -332,6 +337,11 @@ impl Catalogue {
     ) -> io::Result<Self> {
         validate_live(&live)?;
         if !live.is_empty() {
+            // A game whose MiniGameData row is already a service id stays unlisted (the tests
+            // prove every live row that should run is joined).
+            let games = (games.into_iter())
+                .filter(|game| !self.rows.iter().any(|row| row.id == game.id))
+                .collect::<Vec<_>>();
             self = self.append(games)?;
         }
         let mut taken = vec![false; self.rows.len()];
@@ -484,7 +494,7 @@ impl Catalogue {
             // (R) Chess needs no job or level; the table is open to every player.
             Kind::Chess { .. } => {}
             // L097: the race and derby services decide admission at Play.
-            Kind::Kart | Kind::Derby => {}
+            Kind::Kart | Kind::Derby | Kind::Recipe { .. } => {}
             // (R) Soccer is a world activity, not a combat-job gate. Its row
             // still honors the configured level floor; the original gate is unknown.
             Kind::Soccer => {
@@ -524,7 +534,7 @@ impl Catalogue {
             Kind::Chess { .. } => true,
             Kind::Soccer => viewer.level >= a.required_level,
             Kind::CardGame { .. } => self.card(a.id).is_some_and(|card| card.can_player_join),
-            Kind::Kart | Kind::Derby => true,
+            Kind::Kart | Kind::Derby | Kind::Recipe { .. } => true,
         }
     }
 
@@ -617,7 +627,7 @@ impl Catalogue {
                 }
             }
             // Only live rows list them (`with_live`).
-            Kind::Kart | Kind::Derby => return None,
+            Kind::Kart | Kind::Derby | Kind::Recipe { .. } => return None,
         })
     }
 
@@ -713,7 +723,9 @@ fn runs(row: &LiveRow, a: &Activity) -> bool {
         Kind::Soccer => row.category == SOCCER_CATEGORY && row.name_id == a.name_id,
         Kind::Chess { row_id } => row.entry_type == ENTRY_CLIENT_TUNNEL && row.content_id == row_id,
         Kind::CardGame { .. } => row.id == a.id,
-        Kind::Kart | Kind::Derby => row.entry_type == ENTRY_CLIENT_TUNNEL && row.content_id == a.id,
+        Kind::Kart | Kind::Derby | Kind::Recipe { .. } => {
+            row.entry_type == ENTRY_CLIENT_TUNNEL && row.content_id == a.id
+        }
     }
 }
 

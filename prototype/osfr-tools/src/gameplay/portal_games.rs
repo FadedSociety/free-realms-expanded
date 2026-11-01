@@ -6,6 +6,7 @@ use crate::{
     activity_portal::{Activity, Catalogue, Kind, game_row},
     derby_gateway::{DerbyEntryDenied, DerbyGateway},
     kart_gateway::{EntryDenied, KartGateway},
+    recipes::RecipeCatalog,
 };
 
 /// The live Games window rows (from the first of `folders` that has them) over `catalogue`, with
@@ -16,19 +17,37 @@ pub(super) fn with_live(
     wheel: &crate::daily_wheel::DailyWheel,
     kart: Option<&KartGateway>,
     derby: Option<&DerbyGateway>,
+    recipes: &RecipeCatalog,
 ) -> io::Result<Catalogue> {
     let live = (folders.into_iter())
         .find(|base| base.join(crate::activity_portal::CATALOGUE_FILE).is_file())
         .map_or_else(|| Ok(Vec::new()), crate::activity_portal::load_live)?;
-    catalogue.with_live(live, wheel.activity_id(), games(kart, derby))
+    catalogue.with_live(live, wheel.activity_id(), games(kart, derby, recipes))
 }
 
-/// The kart race and the default derby as Games window join rows, keyed by their MiniGameData rows.
-pub(super) fn games(kart: Option<&KartGateway>, derby: Option<&DerbyGateway>) -> Vec<Activity> {
+/// The kart race, the default derby and (L098) every recipe with a client recipe id and a
+/// MiniGameData row, as Games window join rows keyed by their MiniGameData rows.
+pub(super) fn games(
+    kart: Option<&KartGateway>,
+    derby: Option<&DerbyGateway>,
+    recipes: &RecipeCatalog,
+) -> Vec<Activity> {
     let kart = kart.and_then(KartGateway::minigame_id);
     let derby = derby.and_then(|derby| u32::try_from(derby.game_id()).ok());
+    let mut seen = std::collections::BTreeSet::new();
+    let crafts = [
+        CraftingJob::Chef,
+        CraftingJob::Miner,
+        CraftingJob::Blacksmith,
+    ]
+    .into_iter()
+    .flat_map(|job| recipes.by_job(job))
+    .filter_map(|recipe| Some((recipe.minigame_id?, recipe.recipe_id?)))
+    .filter(|(minigame, _)| seen.insert(*minigame))
+    .map(|(minigame, recipe_id)| game_row(minigame, Kind::Recipe { recipe_id }));
     (kart.map(|id| game_row(id, Kind::Kart)).into_iter())
         .chain(derby.map(|id| game_row(id, Kind::Derby)))
+        .chain(crafts)
         .collect()
 }
 
@@ -43,7 +62,8 @@ impl Gameplay {
     }
 
     /// L097: Play on the kart race's or the derby's Games window row: the gate's admission without
-    /// the gate, then the gate's entry. A refusal answers with one chat line and changes nothing.
+    /// the gate, then the gate's entry; L098: a recipe row through the recipe book. A refusal
+    /// answers with one chat line and changes nothing.
     pub(super) fn begin_portal_game(
         &mut self,
         kind: Kind,
@@ -68,7 +88,14 @@ impl Gameplay {
                 Some(Err(denied)) => Ok(refused(denied.message())),
                 None => Ok(refused(DerbyEntryDenied::Unavailable.message())),
             },
-            _ => Err(invalid("not a Games window race row")),
+            // L098: a recipe row starts the recipe book anywhere (R).
+            Kind::Recipe { recipe_id } => {
+                let mut out = Outcome::default();
+                let recipe = i32::try_from(recipe_id).map_err(|_| invalid("recipe id"))?;
+                self.start_recipe(recipe, true, character, now_ms, &mut out)?;
+                Ok(out)
+            }
+            _ => Err(invalid("not a Games window game row")),
         }
     }
 }

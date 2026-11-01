@@ -120,6 +120,7 @@ struct World {
     position: [f32; 3],
     zone: u32,
     in_activity: bool,
+    anywhere: bool,
 }
 impl World {
     fn new() -> Self {
@@ -148,6 +149,7 @@ impl World {
             position: HERE,
             zone: ZONE,
             in_activity: false,
+            anywhere: false,
         }
     }
     fn start(&mut self, recipe: i32) -> Result<Started, Refusal> {
@@ -159,6 +161,7 @@ impl World {
             learned: &self.learned,
             available: &self.available,
             in_activity: self.in_activity,
+            anywhere: self.anywhere,
         };
         recipe_book::start(
             recipe,
@@ -335,6 +338,23 @@ fn distant_recipe_is_refused() {
     w.refuse(GUMBO, Refusal::NoStation(CraftingJob::Chef));
 }
 
+/// L098 (R): a Games window Play needs no station; every other gate still holds.
+#[test]
+fn a_games_window_start_needs_no_station_but_keeps_the_other_gates() {
+    let mut w = World::new();
+    w.position = [0.0, 0.0, 0.0];
+    w.zone = ZONE + 1;
+    w.refuse(GUMBO, Refusal::NoStation(CraftingJob::Chef));
+    w.anywhere = true;
+    w.in_activity = true;
+    w.refuse(GUMBO, Refusal::Busy);
+    w.in_activity = false;
+    assert!(
+        w.start(GUMBO).is_ok(),
+        "the window starts the recipe away from any station"
+    );
+}
+
 #[test]
 fn other_zone_station_does_not_count() {
     let mut w = World::new();
@@ -405,6 +425,7 @@ fn missing_service_is_unavailable_not_a_panic() {
         learned: &w.learned,
         available: &w.available,
         in_activity: false,
+        anywhere: false,
     };
     let result = recipe_book::start(
         GUMBO,

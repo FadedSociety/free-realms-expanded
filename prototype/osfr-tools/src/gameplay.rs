@@ -211,6 +211,8 @@ pub struct Gameplay {
     mining: Option<Type8Engine>,
     harvesting: Option<Type8Engine>,
     forging_tick_ms: Option<u64>,
+    /// L098 (R): the running craft came from its Games window row, so it completes anywhere.
+    games_window_craft: bool,
     type8_tick_ms: Option<u64>,
     disappearing_actors: Vec<DisappearingActor>,
     /// Developer-only chat commands stay off unless the launcher opts in.
@@ -1100,8 +1102,9 @@ impl Gameplay {
         }
         let folders = [directory, bundled_npc_content.as_path()];
         let (kart, derby_ref) = (kart_entry.as_ref(), derby.as_ref());
+        let recipes = &recipe_catalog;
         let activities =
-            portal_games::with_live(activities, folders, &daily_wheel, kart, derby_ref)?;
+            portal_games::with_live(activities, folders, &daily_wheel, kart, derby_ref, recipes)?;
         let fishing_spots = crate::fishing_service::FishingSpots::load(directory)?.map(Arc::new);
         if let (Some(spots), Some(interaction)) = (&fishing_spots, &mut npc_interaction) {
             let unknown = interaction.set_fish_gates(&spots.gate_npcs(), spots.menu_string_id());
@@ -1202,6 +1205,7 @@ impl Gameplay {
             mining,
             harvesting,
             forging_tick_ms: None,
+            games_window_craft: false,
             type8_tick_ms: None,
             disappearing_actors,
             dev_tools: false,
@@ -4114,54 +4118,9 @@ impl Gameplay {
             }
             return Ok(out);
         }
-        // Recipe-book start (client 26/24): recipe_book.rs decodes it and checks
-        // learned recipe, active job, idle services, a server-known station in
-        // range, rank and exact inputs before the service's own `begin_recipe`.
+        // Recipe-book start (client 26/24) at a station: `crafting::start_recipe`.
         if let Some(recipe_id) = crate::recipe_book::decode(inner)? {
-            // `recipe_book::start` owns the busy refusal, so there is no second
-            // check here that a canary could bypass or duplicate. A pack with no
-            // class content (supported by `load`) has no recipe-book player at
-            // all, so refuse before building one.
-            let Some(profile) = self.profiles.as_ref().map(Profiles::active) else {
-                out.replies
-                    .push(crate::recipe_book::Refusal::Unavailable.feedback());
-                return Ok(out);
-            };
-            let available = self.available_ingredients();
-            let player = crate::recipe_book::Player {
-                zone_id: character.zone_id,
-                position: character.position,
-                active_profile: profile,
-                job_rank: self.recipe_rank(profile),
-                learned: &self.learned_recipes,
-                available: &available,
-                in_activity: self.activity_busy(),
-            };
-            let crafting_stations = self.crafting_stations();
-            let started = crate::recipe_book::start(
-                recipe_id,
-                &self.recipe_catalog,
-                &player,
-                &crafting_stations,
-                crate::recipe_book::Services {
-                    cooking: self.cooking.as_mut(),
-                    smelting: self.smelting.as_mut(),
-                    forging: self.forging.as_mut(),
-                },
-            );
-            match started {
-                Ok(crate::recipe_book::Started::Cooking(result)) => {
-                    self.apply_craft(CraftingJob::Chef, result, character, &mut out)?
-                }
-                Ok(crate::recipe_book::Started::Smelting(result)) => {
-                    self.apply_craft(CraftingJob::Miner, result, character, &mut out)?
-                }
-                Ok(crate::recipe_book::Started::Forging(result)) => {
-                    self.forging_tick_ms = Some(now_ms);
-                    self.apply_craft(CraftingJob::Blacksmith, result, character, &mut out)?
-                }
-                Err(refusal) => out.replies.push(refusal.feedback()),
-            }
+            self.start_recipe(recipe_id, false, character, now_ms, &mut out)?;
             return Ok(out);
         }
         if let Some(result) = self.handle_item_bar(inner, character, now_ms, None)? {

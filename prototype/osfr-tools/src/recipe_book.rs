@@ -196,6 +196,9 @@ pub struct Player<'a> {
     pub available: &'a [(i32, u32)],
     /// Any live activity that owns the character, including chess and battles.
     pub in_activity: bool,
+    /// L098 (R): Play on the recipe's Games window row; no station needed (the live list made
+    /// every recipe row joinable by rank, and the window works anywhere). Every other gate holds.
+    pub anywhere: bool,
 }
 
 /// The three crafting services; `None` when that movie is not loaded.
@@ -365,7 +368,7 @@ pub fn start(
     {
         return Err(Refusal::Busy);
     }
-    if !near_any(stations, recipe.job, player.zone_id, player.position) {
+    if !player.anywhere && !near_any(stations, recipe.job, player.zone_id, player.position) {
         return Err(Refusal::NoStation(recipe.job));
     }
     if recipe

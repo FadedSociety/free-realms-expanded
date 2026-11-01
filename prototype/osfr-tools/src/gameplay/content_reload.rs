@@ -71,7 +71,11 @@ impl Gameplay {
                     .with_live(
                         self.activities.live(),
                         self.daily_wheel.activity_id(),
-                        super::portal_games::games(self.kart_entry.as_ref(), self.derby.as_ref()),
+                        super::portal_games::games(
+                            self.kart_entry.as_ref(),
+                            self.derby.as_ref(),
+                            &self.recipe_catalog,
+                        ),
                     )?;
                     if let Some(visibility) = self.npc_visibility.as_mut() {
                         visibility.add_battle_spawners(encounter);
