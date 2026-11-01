@@ -28,7 +28,7 @@ pub(super) fn with_live(
 /// The kart race, the default derby, (L098) every recipe with a client recipe id and a
 /// MiniGameData row, (L100) every game the mining, harvesting and (L103) mail sorting engines
 /// (`type8`, in that order) offer and (L102) every fishing hole, as Games window join rows keyed
-/// by their MiniGameData rows.
+/// by their MiniGameData rows, and (L104) the checkers table.
 pub(super) fn games(
     kart: Option<&KartGateway>,
     derby: Option<&DerbyGateway>,
@@ -75,6 +75,7 @@ pub(super) fn games(
         .chain(crafts)
         .chain(gathers)
         .chain(holes)
+        .chain([game_row(crate::checkers::GAME_ID as u32, Kind::Checkers)])
         .collect()
 }
 
@@ -156,6 +157,8 @@ impl Gameplay {
             Kind::Fishing { guide } => {
                 self.commit_if_changed(|staged| staged.begin_fishing(guide, character))
             }
+            // L104: the checkers table (it stages itself).
+            Kind::Checkers => self.begin_checkers(),
             _ => Err(invalid("not a Games window game row")),
         }
     }

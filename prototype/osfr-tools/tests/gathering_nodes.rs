@@ -1429,6 +1429,39 @@ fn games_window_play_sorts_mail_for_the_postman() {
     );
 }
 
+/// L104: Play on the live checkers row (514, MiniGameData 21) offers the table; after the
+/// movie's handshake a player move is answered by the server's own computer move.
+#[test]
+fn games_window_play_opens_a_checkers_table_against_the_server() {
+    let fixture = Fixture::new(PLOT);
+    let mut gateway = fixture.gateway_at(fixture.state(false, true), &fixture.node, 60.0);
+    tick(&mut gateway, 1_500);
+    let offered = play(&mut gateway, 514, 2_000);
+    let offer = inners(&offered)
+        .into_iter()
+        .find(|p| p.starts_with(&[39, 0, 16]))
+        .expect("the 39/16 offer")
+        .to_vec();
+    assert_eq!(i32::from_le_bytes(offer[11..15].try_into().unwrap()), 21);
+    let id = i32::from_le_bytes(offer[3..7].try_into().unwrap());
+    send(&mut gateway, &frame(5, id, -1), 2_100);
+    for (step, text) in ["OnConnectMsg", "OnStartGameMsg\t0", "OnReadyMsg"]
+        .iter()
+        .enumerate()
+    {
+        send(&mut gateway, &payload(id, text), 2_200 + step as u64);
+    }
+    let moved = send(&mut gateway, &payload(id, "OnMoveMsg\t21\t17"), 2_300);
+    assert!(
+        said(&moved, "OnCheckersEventMsg\t10\t21\t17"),
+        "the player's move"
+    );
+    assert!(
+        said(&moved, "OnCheckersEventMsg\t2\t1"),
+        "the computer's turn ended"
+    );
+}
+
 #[test]
 fn each_farm_plot_starts_its_own_region_game_and_pays_its_own_produce() {
     for (region, outputs) in REGION_OUTPUTS {

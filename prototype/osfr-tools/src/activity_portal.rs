@@ -166,6 +166,8 @@ pub enum Kind {
     Fishing {
         guide: u64,
     },
+    /// L104: the checkers table against the server; the row's id is MiniGameData 21.
+    Checkers,
 }
 
 /// One published activity: a battle of the frozen package.
@@ -525,7 +527,8 @@ impl Catalogue {
             | Kind::Derby
             | Kind::Recipe { .. }
             | Kind::Gather { .. }
-            | Kind::Fishing { .. } => {}
+            | Kind::Fishing { .. }
+            | Kind::Checkers => {}
             // (R) Soccer is a world activity, not a combat-job gate. Its row
             // still honors the configured level floor; the original gate is unknown.
             Kind::Soccer => {
@@ -568,7 +571,11 @@ impl Catalogue {
             Kind::Soccer => viewer.level >= a.required_level,
             Kind::CardGame { .. } => self.card(a.id).is_some_and(|card| card.can_player_join),
             Kind::Recipe { job, .. } => viewer.crafts[job as usize] >= a.required_level,
-            Kind::Kart | Kind::Derby | Kind::Gather { .. } | Kind::Fishing { .. } => true,
+            Kind::Kart
+            | Kind::Derby
+            | Kind::Gather { .. }
+            | Kind::Fishing { .. }
+            | Kind::Checkers => true,
         }
     }
 
@@ -665,7 +672,8 @@ impl Catalogue {
             | Kind::Derby
             | Kind::Recipe { .. }
             | Kind::Gather { .. }
-            | Kind::Fishing { .. } => return None,
+            | Kind::Fishing { .. }
+            | Kind::Checkers => return None,
         })
     }
 
@@ -765,7 +773,8 @@ fn runs(row: &LiveRow, a: &Activity) -> bool {
         | Kind::Derby
         | Kind::Recipe { .. }
         | Kind::Gather { .. }
-        | Kind::Fishing { .. } => row.entry_type == ENTRY_CLIENT_TUNNEL && row.content_id == a.id,
+        | Kind::Fishing { .. }
+        | Kind::Checkers => row.entry_type == ENTRY_CLIENT_TUNNEL && row.content_id == a.id,
     }
 }
 
