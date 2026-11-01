@@ -63,6 +63,7 @@ const FIGHTER: Viewer = Viewer {
     combat_job: true,
     level: 5,
     crafts: [0; 3],
+    postman: 0,
 };
 
 /// Bounded little-endian reader that mirrors the client stream (flag on short read).
@@ -176,6 +177,7 @@ fn can_join_is_per_player() {
             combat_job: true,
             level: 9,
             crafts: [0; 3],
+            postman: 0,
         }),
         [1, 1]
     );
@@ -184,6 +186,7 @@ fn can_join_is_per_player() {
             combat_job: false,
             level: 20,
             crafts: [0; 3],
+            postman: 0,
         }),
         [0, 0],
         "a non-combat job joins nothing"
@@ -284,6 +287,7 @@ fn admission_follows_the_rules_in_order() {
         combat_job: true,
         level: 9,
         crafts: [0; 3],
+        postman: 0,
     };
     assert_eq!(catalogue.admit(12302, nine, false).unwrap().id, 12302);
 }
@@ -295,6 +299,7 @@ fn forged_ids_never_admit_and_reveal_nothing() {
         combat_job: false,
         level: 0,
         crafts: [0; 3],
+        postman: 0,
     };
     for id in [0, 1, 95, 97, 0x8000_0000, u32::MAX] {
         for busy in [false, true] {
@@ -417,6 +422,7 @@ fn chess_rows_follow_battles_and_open_without_a_combat_job() {
         combat_job: false,
         level: 0,
         crafts: [0; 3],
+        postman: 0,
     };
     let list = decode_list(&catalogue.list_packet(civilian));
     assert_eq!(list.rows.len(), 3);
@@ -478,6 +484,7 @@ fn card_rows_match_the_client_reader() {
         combat_job: false,
         level: 0,
         crafts: [0; 3],
+        postman: 0,
     }));
     assert_eq!(list.rows.len(), 17);
     for (n, data) in cards.rows().iter().enumerate() {
@@ -750,6 +757,37 @@ fn recipe_rows_open_at_their_rank_and_gather_rows_join_their_game() {
         Err(Refusal::Unknown),
         "an offered game with no live row is not listed"
     );
+}
+
+/// L106: a mail town's row opens at its Postman rank floor (Seaside 415, game 377: rank 5).
+#[test]
+fn a_mail_row_opens_at_its_postman_rank() {
+    let seaside = Activity {
+        required_level: 5,
+        ..game_row(
+            377,
+            Kind::Gather {
+                gather: Gather::Mail,
+            },
+        )
+    };
+    let catalogue = Catalogue::new(vec![row(96, 0)])
+        .unwrap()
+        .with_live(
+            vec![live_row(2, 415, 18, 102_033, 377)],
+            None,
+            vec![seaside],
+        )
+        .unwrap();
+    let joins = |postman: u32| {
+        let list = decode_list(
+            &catalogue
+                .minigame_list_packet(Viewer { postman, ..FIGHTER })
+                .unwrap(),
+        );
+        list.flags[0].0
+    };
+    assert_eq!((joins(4), joins(5)), (0, 1));
 }
 
 #[test]

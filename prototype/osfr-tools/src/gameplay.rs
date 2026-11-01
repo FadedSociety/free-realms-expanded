@@ -3136,6 +3136,7 @@ impl Gameplay {
                 .is_some_and(|a| a.supports_basic(profile)),
             level: self.job_level(profile),
             crafts: CraftingJob::ALL.map(|job| self.job_level(job.profile_id())),
+            postman: self.job_level(crate::mail_sorting::POSTMAN_PROFILE_ID),
         }
     }
 

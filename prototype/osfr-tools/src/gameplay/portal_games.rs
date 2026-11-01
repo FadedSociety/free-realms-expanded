@@ -64,7 +64,17 @@ pub(super) fn games(
         .filter_map(|(gather, engine)| Some((gather, engine?)))
         .flat_map(|(gather, engine)| {
             (engine.games()).filter_map(move |(game, _)| {
-                Some(game_row(u32::try_from(game).ok()?, Kind::Gather { gather }))
+                let row = game_row(u32::try_from(game).ok()?, Kind::Gather { gather });
+                // L106: a mail town's row asks its Postman rank floor.
+                let floor = if gather == Gather::Mail {
+                    crate::mail_sorting::rank_floor(game)
+                } else {
+                    0
+                };
+                Some(Activity {
+                    required_level: floor,
+                    ..row
+                })
             })
         });
     let holes = (fishing.into_iter().flat_map(FishingSpots::games)).filter_map(|(guide, game)| {
@@ -140,6 +150,11 @@ impl Gameplay {
                 };
                 if let Err(denied) = admitted {
                     return Ok(refused(&denied.message()));
+                }
+                if gather == Gather::Mail
+                    && self.job_level(gather.job()) < crate::mail_sorting::rank_floor(game)
+                {
+                    return Ok(refused("Your Postman rank is too low for that route."));
                 }
                 let Some(spec) = self.type8(gather).and_then(|e| e.spec_for(Some(game))) else {
                     return Ok(refused("Gathering is not available in this campaign."));

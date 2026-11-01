@@ -291,6 +291,8 @@ pub struct Viewer {
     /// L100: rank of each crafting job, active or not, in `CraftingJob` order (Chef, Blacksmith,
     /// Miner).
     pub crafts: [u32; 3],
+    /// L106: the Postman rank, for the Mail Sorting rows' floors.
+    pub postman: u32,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -571,6 +573,10 @@ impl Catalogue {
             Kind::Soccer => viewer.level >= a.required_level,
             Kind::CardGame { .. } => self.card(a.id).is_some_and(|card| card.can_player_join),
             Kind::Recipe { job, .. } => viewer.crafts[job as usize] >= a.required_level,
+            // L106: a mail town opens at its Postman rank floor.
+            Kind::Gather {
+                gather: Gather::Mail,
+            } => viewer.postman >= a.required_level,
             Kind::Kart
             | Kind::Derby
             | Kind::Gather { .. }

@@ -226,6 +226,7 @@ fn the_battle_loads_and_is_published_with_the_expected_values() {
                     combat_job: true,
                     level: REQUIRED_LEVEL,
                     crafts: [0; 3],
+                    postman: 0,
                 },
                 false
             )
@@ -240,6 +241,7 @@ fn the_battle_loads_and_is_published_with_the_expected_values() {
                 combat_job: true,
                 level: REQUIRED_LEVEL - 1,
                 crafts: [0; 3],
+                postman: 0,
             },
             false
         ),
@@ -252,6 +254,7 @@ fn the_battle_loads_and_is_published_with_the_expected_values() {
                 combat_job: false,
                 level: 20,
                 crafts: [0; 3],
+                postman: 0,
             },
             false
         ),
@@ -263,6 +266,7 @@ fn the_battle_loads_and_is_published_with_the_expected_values() {
         combat_job: true,
         level: REQUIRED_LEVEL,
         crafts: [0; 3],
+        postman: 0,
     }));
     let published = rows.iter().find(|row| row.id == THUGAMUG).unwrap();
     assert_eq!(published.title, TITLE);
@@ -273,6 +277,7 @@ fn the_battle_loads_and_is_published_with_the_expected_values() {
         combat_job: true,
         level: REQUIRED_LEVEL - 1,
         crafts: [0; 3],
+        postman: 0,
     }));
     assert!(
         !refused

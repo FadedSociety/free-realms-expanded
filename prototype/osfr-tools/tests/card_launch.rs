@@ -44,6 +44,7 @@ const CHARACTER: u64 = 7_000_123;
 const VIEWER: Viewer = Viewer {
     level: 1,
     crafts: [0; 3],
+    postman: 0,
     combat_job: true,
 };
 

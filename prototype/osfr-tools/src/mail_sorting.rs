@@ -13,8 +13,21 @@
 //!
 //! Reconstructed (R): which four items each town asks for, the board tuning (the farming
 //! board's) and the payout, which is no item and Postman XP per sorted run like the Miner's and
-//! Chef's. Only the Games window starts it (no world node), and a row joins at any Postman rank:
-//! the live rows' requirement sets 7-9 (Postman rank 5/9/13) are not enforced yet.
+//! Chef's. Only the Games window starts it (no world node); L106: its rows ask the live Postman rank
+//! floors (`rank_floor`).
+
+/// L106: the Postman rank a town's sorting asks. The live Games window rows carried
+/// RequirementSets 7/8/9 (Seaside 415 and Merry Vale 1038: 7; Wugachug 416: 8; Snowhill 567 and
+/// Shrouded Glade 1037: 9), client Requirements 9/10/11 = `CheckRankLastProfileByType` profile
+/// type 3 at rank 5/9/13; Sanctuary 414 carried none. (R) Type 3 is the Postman.
+pub fn rank_floor(game: i32) -> u32 {
+    match game {
+        377 | 381 => 5,
+        378 => 9,
+        379 | 380 => 13,
+        _ => 0,
+    }
+}
 
 /// The content file; absent means no Mail Sorting.
 pub const CONTENT_FILE: &str = "mail_sorting.json";
