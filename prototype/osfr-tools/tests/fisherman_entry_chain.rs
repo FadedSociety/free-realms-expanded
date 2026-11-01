@@ -523,6 +523,32 @@ fn leave_round(rig: &mut Rig, instance: i32) -> Outcome {
 
 // ---- gates --------------------------------------------------------------------------------
 
+/// L102: the Games window's Sacred Grove Shallows row (live row 563, game 599) starts Reed's
+/// round 500 m from Reed with no menu: the same 39/16 offer the guide's Fish option returns. A
+/// second Play while the round is open meets the window's own busy refusal and changes nothing.
+#[test]
+fn the_games_window_row_starts_the_holes_round_without_the_guide() {
+    let mut rig = Rig::new();
+    rig.character.position[0] += 500.0;
+    let mut play = vec![167, 0, 1, 2];
+    play.extend(563_u32.to_le_bytes());
+    play.extend(0_u32.to_le_bytes());
+    let started = rig.send(&play);
+    assert!(started.changed);
+    let offer = find(&started.replies, &[39, 0, 16]).expect("the row's Play offers the round");
+    assert_eq!(
+        i32::from_le_bytes(offer[11..15].try_into().unwrap()),
+        SACRED_GROVE_GAME_ID
+    );
+
+    let before = rig.game.state();
+    let again = rig.send(&play);
+    let text = String::from_utf8_lossy(&again.replies.concat()).into_owned();
+    assert!(text.contains("Finish what you are doing"), "{text}");
+    assert!(!again.changed);
+    assert_eq!(rig.game.state(), before);
+}
+
 #[test]
 fn a_normal_character_learns_fisherman_and_reaches_the_chapter() {
     let mut rig = Rig::new();

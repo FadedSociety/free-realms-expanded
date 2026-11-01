@@ -1720,6 +1720,11 @@ impl FishingSpots {
         self.spots.iter().map(|s| s.npc).collect()
     }
 
+    /// L102: each spot's guide with its MiniGameData row, the live Games window's ContentId.
+    pub fn games(&self) -> impl Iterator<Item = (u64, i32)> + '_ {
+        self.spots.iter().map(|s| (s.npc, s.game_id))
+    }
+
     pub fn menu_string_id(&self) -> u32 {
         self.menu_string_id
     }

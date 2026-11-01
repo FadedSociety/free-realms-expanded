@@ -5,6 +5,7 @@ use super::*;
 use crate::{
     activity_portal::{Activity, Catalogue, Kind, game_row},
     derby_gateway::{DerbyEntryDenied, DerbyGateway},
+    fishing_service::FishingSpots,
     harvest_nodes::{Denied, payout_fits},
     kart_gateway::{EntryDenied, KartGateway},
     recipes::RecipeCatalog,
@@ -25,13 +26,15 @@ pub(super) fn with_live(
 }
 
 /// The kart race, the default derby, (L098) every recipe with a client recipe id and a
-/// MiniGameData row and (L100) every game the mining and harvesting engines (`type8`, in that
-/// order) offer, as Games window join rows keyed by their MiniGameData rows.
+/// MiniGameData row, (L100) every game the mining and harvesting engines (`type8`, in that
+/// order) offer and (L102) every fishing hole, as Games window join rows keyed by their
+/// MiniGameData rows.
 pub(super) fn games(
     kart: Option<&KartGateway>,
     derby: Option<&DerbyGateway>,
     recipes: &RecipeCatalog,
     type8: [Option<&Type8Engine>; 2],
+    fishing: Option<&FishingSpots>,
 ) -> Vec<Activity> {
     let kart = kart.and_then(KartGateway::minigame_id);
     let derby = derby.and_then(|derby| u32::try_from(derby.game_id()).ok());
@@ -64,10 +67,14 @@ pub(super) fn games(
                 Some(game_row(u32::try_from(game).ok()?, Kind::Gather { gather }))
             })
         });
+    let holes = (fishing.into_iter().flat_map(FishingSpots::games)).filter_map(|(guide, game)| {
+        Some(game_row(u32::try_from(game).ok()?, Kind::Fishing { guide }))
+    });
     (kart.map(|id| game_row(id, Kind::Kart)).into_iter())
         .chain(derby.map(|id| game_row(id, Kind::Derby)))
         .chain(crafts)
         .chain(gathers)
+        .chain(holes)
         .collect()
 }
 
@@ -83,7 +90,8 @@ impl Gameplay {
 
     /// L097: Play on the kart race's or the derby's Games window row: the gate's admission without
     /// the gate, then the gate's entry; L098: a recipe row through the recipe book; L100: game
-    /// `id` of a gather row. A refusal answers with one chat line and changes nothing.
+    /// `id` of a gather row; L102: a fishing hole. A refusal answers with one chat line and changes
+    /// nothing.
     pub(super) fn begin_portal_game(
         &mut self,
         id: u32,
@@ -143,6 +151,10 @@ impl Gameplay {
                     staged.begin_gather(gather, Some(game), now_ms, &mut out)?;
                     Ok(out)
                 })
+            }
+            // L102 (R): the guide's round without the guide; `begin_fishing` stages itself.
+            Kind::Fishing { guide } => {
+                self.commit_if_changed(|staged| staged.begin_fishing(guide, character))
             }
             _ => Err(invalid("not a Games window game row")),
         }

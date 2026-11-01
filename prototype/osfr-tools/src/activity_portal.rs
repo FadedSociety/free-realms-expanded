@@ -65,6 +65,8 @@
 //!   rows asked Miner rank 5/9/13/17 (`RequirementSets.txt` 15-18) and the capturing player could
 //!   join exactly the rows under its ranks, while iron, silver and gold smelting carried no set
 //!   and were closed too, so the live server kept its own recipe ranks.
+//! * L102: each `fishing_spots.json` hole is a fishing row joined by its MiniGameData row (the six
+//!   live rows 560-565 name 596-601); Play starts the round its guide offers, without the guide.
 //! * Only activities backed by a running battle or a configured native soccer match are published:
 //!   one row per `field_battles.json` battle (category 10, Battles) and one per `soccer.json` game
 //!   (category 22, art `Soccer_Briarwood.dds`; both values are the client `ActivityCategories.txt`
@@ -158,6 +160,11 @@ pub enum Kind {
     /// row and Play starts that game's board, anywhere (R).
     Gather {
         gather: Gather,
+    },
+    /// L102: a fishing hole; the row's id is its MiniGameData row and Play starts the round its
+    /// `guide` offers, anywhere (R).
+    Fishing {
+        guide: u64,
     },
 }
 
@@ -514,7 +521,11 @@ impl Catalogue {
             // (R) Chess needs no job or level; the table is open to every player.
             Kind::Chess { .. } => {}
             // L097: the race and derby services decide admission at Play.
-            Kind::Kart | Kind::Derby | Kind::Recipe { .. } | Kind::Gather { .. } => {}
+            Kind::Kart
+            | Kind::Derby
+            | Kind::Recipe { .. }
+            | Kind::Gather { .. }
+            | Kind::Fishing { .. } => {}
             // (R) Soccer is a world activity, not a combat-job gate. Its row
             // still honors the configured level floor; the original gate is unknown.
             Kind::Soccer => {
@@ -557,7 +568,7 @@ impl Catalogue {
             Kind::Soccer => viewer.level >= a.required_level,
             Kind::CardGame { .. } => self.card(a.id).is_some_and(|card| card.can_player_join),
             Kind::Recipe { job, .. } => viewer.crafts[job as usize] >= a.required_level,
-            Kind::Kart | Kind::Derby | Kind::Gather { .. } => true,
+            Kind::Kart | Kind::Derby | Kind::Gather { .. } | Kind::Fishing { .. } => true,
         }
     }
 
@@ -650,7 +661,11 @@ impl Catalogue {
                 }
             }
             // Only live rows list them (`with_live`).
-            Kind::Kart | Kind::Derby | Kind::Recipe { .. } | Kind::Gather { .. } => return None,
+            Kind::Kart
+            | Kind::Derby
+            | Kind::Recipe { .. }
+            | Kind::Gather { .. }
+            | Kind::Fishing { .. } => return None,
         })
     }
 
@@ -746,9 +761,11 @@ fn runs(row: &LiveRow, a: &Activity) -> bool {
         Kind::Soccer => row.category == SOCCER_CATEGORY && row.name_id == a.name_id,
         Kind::Chess { row_id } => row.entry_type == ENTRY_CLIENT_TUNNEL && row.content_id == row_id,
         Kind::CardGame { .. } => row.id == a.id,
-        Kind::Kart | Kind::Derby | Kind::Recipe { .. } | Kind::Gather { .. } => {
-            row.entry_type == ENTRY_CLIENT_TUNNEL && row.content_id == a.id
-        }
+        Kind::Kart
+        | Kind::Derby
+        | Kind::Recipe { .. }
+        | Kind::Gather { .. }
+        | Kind::Fishing { .. } => row.entry_type == ENTRY_CLIENT_TUNNEL && row.content_id == a.id,
     }
 }
 
