@@ -67,11 +67,10 @@ pub(super) fn run(
                     Err(r) => format!("Cannot give that: {}.", r.trim_end_matches('.')),
                 }
             }
-            GmAction::Role(role) => set_role(options, session.account_guid, target, role)
-                .map_or_else(
-                    |r| format!("Cannot do that: {r}."),
-                    |()| "Role saved.".into(),
-                ),
+            GmAction::Role(role) => match set_role(options, session.account_guid, target, role) {
+                Ok(owner) => audit_role(world, session.account_guid, owner, role),
+                Err(r) => format!("Cannot do that: {r}."),
+            },
         };
         session
             .sender
@@ -164,14 +163,34 @@ fn gift(
     result
 }
 
-/// `realm role`'s store change for the account that owns `target`; an online target reads it
-/// back on its next message (`Gateway::refresh_role`).
+/// L090: the security-log row for a saved role change. Best effort like every L9 row: a log
+/// failure is told to the admin and never undoes the change.
+fn audit_role(world: &SharedWorld, actor: u64, owner: u64, role: AccountRole) -> String {
+    let mut security = world
+        .security
+        .lock()
+        .unwrap_or_else(|error| error.into_inner());
+    match security
+        .log
+        .as_mut()
+        .map(|log| log.record_role_change(actor, owner, role))
+    {
+        Some(Ok(())) | None => "Role saved.".into(),
+        Some(Err(error)) => {
+            eprintln!("security log: {error}");
+            "Role saved. The security log row was NOT written.".into()
+        }
+    }
+}
+
+/// `realm role`'s store change for the account that owns `target`, returning that account; an
+/// online target reads it back on its next message (`Gateway::refresh_role`).
 fn set_role(
     options: &Options,
     actor: u64,
     target: u64,
     role: AccountRole,
-) -> Result<(), &'static str> {
+) -> Result<u64, &'static str> {
     let path = options
         .account_store
         .as_ref()
@@ -190,5 +209,6 @@ fn set_role(
     store
         .set_account_role(actor, owner, role)
         .map_err(|_| "admin role required")?;
-    store.save(path).map_err(|_| "the role was not saved")
+    store.save(path).map_err(|_| "the role was not saved")?;
+    Ok(owner)
 }

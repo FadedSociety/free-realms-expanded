@@ -188,6 +188,21 @@ impl SecurityLog {
         }))
     }
 
+    /// L090: one row per role change an admin makes from the GM wheel, written at once.
+    /// Server-owned account ids and the role's stored name only.
+    pub fn record_role_change(
+        &mut self,
+        actor_account_id: u64,
+        target_account_id: u64,
+        role: crate::account_store::AccountRole,
+    ) -> io::Result<()> {
+        self.append(serde_json::json!({
+            "timestamp_ms": timestamp_ms(), "kind": "role_change",
+            "account_id": actor_account_id, "target_account_id": target_account_id,
+            "action": "set_role", "role": role, "outcome": "applied",
+        }))
+    }
+
     /// The one write path for every row (refusal batches, admin moves, moderation): append one
     /// JSON row, rotating to `.previous` first when the row would pass the cap.
     fn append(&mut self, row: serde_json::Value) -> io::Result<()> {
@@ -404,6 +419,23 @@ mod tests {
         log.record_at(event(EventKind::AuthFailure), now + Duration::from_secs(1))
             .unwrap();
         assert_eq!(rows(&scratch.path())[0]["count"], 3);
+    }
+
+    /// L090: a GM-wheel role change is its own row with the two account ids and the role name.
+    #[test]
+    fn role_changes_are_written_at_once_with_ids_only() {
+        let scratch = Scratch::new();
+        let mut log = SecurityLog::open(scratch.path()).unwrap();
+        log.record_role_change(7, 9, crate::account_store::AccountRole::Admin)
+            .unwrap();
+        let rows = rows(&scratch.path());
+        assert_eq!(rows.len(), 1);
+        assert_eq!(rows[0]["kind"], "role_change");
+        assert_eq!(
+            (&rows[0]["account_id"], &rows[0]["target_account_id"]),
+            (&serde_json::json!(7), &serde_json::json!(9))
+        );
+        assert_eq!(rows[0]["role"], "admin");
     }
 
     /// L043: every admin move is its own row at once, even two in the same instant, and the

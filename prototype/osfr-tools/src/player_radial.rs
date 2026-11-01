@@ -311,8 +311,11 @@ impl PlayerRadial {
     }
 
     /// L081: queue a chosen GM action for the post-commit host.
+    /// L090: at most 16 wait for one commit (a menu sends one choice per message).
     pub fn queue_gm(&mut self, target: u64, action: crate::player_gm_menu::GmAction, now_ms: u64) {
-        self.pending_gm.push((target, action, now_ms));
+        if self.pending_gm.len() < 16 {
+            self.pending_gm.push((target, action, now_ms));
+        }
     }
 
     /// L081: the queued GM actions, emptied.

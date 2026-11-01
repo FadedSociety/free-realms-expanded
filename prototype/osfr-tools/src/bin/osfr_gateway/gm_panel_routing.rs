@@ -96,7 +96,9 @@ fn queue_move(
     action: GmAction,
     now_ms: u64,
 ) -> Vec<String> {
-    if !can_run_realm_command(session.gateway.role(), "move") {
+    // L090: the host carries out a move for an admin only, so nobody else may queue one (a
+    // Tester holds the `move` key for its own realm command, not for these).
+    if session.gateway.role() != osfr_tools::account_store::AccountRole::Admin {
         return vec!["Cannot do that: admins only.".to_owned()];
     }
     let name = name.trim().to_lowercase();
@@ -242,5 +244,14 @@ mod tests {
                 format!("{token}|end"),
             ]
         );
+
+        // L090: a Tester reaches the panel but not its moves: told so, and nothing is queued.
+        scene.session.gateway.set_role(AccountRole::Tester);
+        let refused = system_lines(&scene.exchange(&options, &typed("!gm goto Referee Rae"), 700));
+        assert!(
+            refused.iter().any(|line| line.contains("admins only")),
+            "{refused:?}"
+        );
+        assert!(scene.session.radial.take_gm().is_empty());
     }
 }
