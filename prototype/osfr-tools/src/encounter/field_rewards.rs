@@ -87,6 +87,7 @@ pub(super) struct FieldReward {
 }
 
 impl FieldReward {
+    #[cfg(test)]
     pub(super) fn pair(&self) -> (u32, u32) {
         (self.coins, self.job_xp)
     }

@@ -1,4 +1,5 @@
 use osfr_tools::{
+    consumable_effects::Boost,
     inventory::Inventory,
     profiles::ProfileState,
     rewards::{ItemGrant, RewardBundleRow, RewardDisplay, RewardGrant, RewardState, apply_grant},
@@ -210,6 +211,19 @@ fn retry_with_same_key_returns_same_state_and_no_packets() {
     assert_eq!(retried.inventory.state(), committed.inventory.state());
     assert_eq!(retried.profiles, committed.profiles);
     assert_eq!(retried.applied_grant_keys, committed.applied_grant_keys);
+}
+
+/// L087: a live booster raises the coins and every job's stars a grant pays (half rounds up).
+#[test]
+fn a_live_booster_raises_what_a_grant_pays() {
+    let (_fixture, state) = state(10);
+    let state = state.with_boost(Boost {
+        stars: 50,
+        coins: 25,
+    });
+    let (next, _) = apply_grant(&state, &grant(), "boosted").unwrap();
+    assert_eq!(next.inventory.state().coins, 10 + 6, "5 coins + 25%");
+    assert_eq!(next.profiles.experience[&1], 20 + 23, "15 stars + 50%");
 }
 
 #[test]

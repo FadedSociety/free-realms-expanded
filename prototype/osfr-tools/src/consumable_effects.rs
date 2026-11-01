@@ -32,6 +32,7 @@ pub const MAX_DURATION_MS: u64 = 86_400_000;
 pub const MAX_DELAY_MS: u64 = 10_000;
 pub const MIN_SCALE: f32 = 0.25;
 pub const MAX_SCALE: f32 = 5.0;
+pub const MAX_BOOST_PERCENT: u32 = 1_000;
 
 // (R) Buff ids and world tags live in their own id ranges, far above the captured startup tags
 // (2 and 4), the job tags (composite ids such as 15255) and the power-up tags (definition ids).
@@ -93,6 +94,43 @@ pub enum Kind {
     Scale {
         scale: f32,
     },
+    /// L087: a coin or star booster scroll. It changes no look; the reward paths read
+    /// [`EffectStack::boost`].
+    Boost {
+        raises: Boosted,
+        percent: u32,
+    },
+}
+
+/// L087: what a booster raises.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Boosted {
+    Stars,
+    Coins,
+}
+
+/// L087: the live booster percents (0 is none). Sanctuary's `Player.ApplyPercentBoost` (BubbaJoeX fork,
+/// AGPL-3.0-or-later) rounds half away from zero; so does this.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct Boost {
+    pub stars: u32,
+    pub coins: u32,
+}
+
+impl Boost {
+    pub fn stars(self, amount: u32) -> u32 {
+        raise(amount, self.stars)
+    }
+
+    pub fn coins(self, amount: u32) -> u32 {
+        raise(amount, self.coins)
+    }
+}
+
+fn raise(amount: u32, percent: u32) -> u32 {
+    let raised = (u64::from(amount) * u64::from(100 + percent) + 50) / 100;
+    u32::try_from(raised).unwrap_or(u32::MAX)
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -110,6 +148,8 @@ pub enum Refusal {
     Scale,
     /// A transform model or aura composite effect id that is not positive.
     Id,
+    /// L087: a booster percent outside `1..=MAX_BOOST_PERCENT`.
+    Percent,
 }
 
 /// Packets for one `apply`, `tick` or `strip`. 38/16 and 38/17 go to the owner only because the
@@ -153,11 +193,13 @@ struct Live {
 const TRANSFORM: usize = 0;
 const AURA: usize = 1;
 const SCALE: usize = 2;
+const STARS: usize = 3;
+const COINS: usize = 4;
 
 /// One player's live effects. Session-only: nothing here is saved.
 #[derive(Clone, Debug, PartialEq)]
 pub struct EffectStack {
-    slots: [Option<Live>; 3],
+    slots: [Option<Live>; 5],
     next_buff_id: i32,
     next_world_tag: i32,
 }
@@ -165,7 +207,7 @@ pub struct EffectStack {
 impl Default for EffectStack {
     fn default() -> Self {
         Self {
-            slots: [None; 3],
+            slots: [None; 5],
             next_buff_id: BUFF_ID_BASE,
             next_world_tag: WORLD_TAG_BASE,
         }
@@ -200,6 +242,9 @@ pub fn admits(spec: &Spec) -> Result<(), Refusal> {
         } if composite_effect_id <= 0 => Err(Refusal::Id),
         Kind::Aura { delay_ms, .. } if delay_ms > MAX_DELAY_MS => Err(Refusal::Delay),
         Kind::Scale { scale } if !(MIN_SCALE..=MAX_SCALE).contains(&scale) => Err(Refusal::Scale),
+        Kind::Boost { percent, .. } if !(1..=MAX_BOOST_PERCENT).contains(&percent) => {
+            Err(Refusal::Percent)
+        }
         _ => Ok(()),
     }
 }
@@ -214,6 +259,18 @@ impl EffectStack {
     /// is (R, OSFR: a treat never replaces a transform).
     pub fn has_transform(&self) -> bool {
         self.slots[TRANSFORM].is_some()
+    }
+
+    /// L087: the live boosters. The tick ends one on time, so no clock is needed here.
+    pub fn boost(&self) -> Boost {
+        let percent = |slot: usize| match self.slots[slot].map(|l| l.spec.kind) {
+            Some(Kind::Boost { percent, .. }) => percent,
+            _ => 0,
+        };
+        Boost {
+            stars: percent(STARS),
+            coins: percent(COINS),
+        }
     }
 
     /// Adds `spec`, replacing the live effect of its kind, and returns the new buff id.
@@ -231,6 +288,14 @@ impl EffectStack {
             Kind::Transform { .. } => TRANSFORM,
             Kind::Aura { .. } => AURA,
             Kind::Scale { .. } => SCALE,
+            Kind::Boost {
+                raises: Boosted::Stars,
+                ..
+            } => STARS,
+            Kind::Boost {
+                raises: Boosted::Coins,
+                ..
+            } => COINS,
         };
         if let Some(old) = self.slots[slot].take() {
             retire(guid, old, false, &mut emit);
@@ -273,6 +338,10 @@ impl EffectStack {
                 emit.to_self.push(row);
                 self.slots[SCALE] = Some(live);
             }
+            Kind::Boost { .. } => {
+                emit.to_self.push(row);
+                self.slots[slot] = Some(live);
+            }
         }
         Ok((buff_id, emit))
     }
@@ -297,6 +366,11 @@ impl EffectStack {
         }
         if due(&self.slots[SCALE]) {
             self.end(guid, SCALE, &mut emit);
+        }
+        for slot in [STARS, COINS] {
+            if due(&self.slots[slot]) {
+                self.end(guid, slot, &mut emit);
+            }
         }
         emit
     }

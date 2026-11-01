@@ -721,13 +721,16 @@ impl KartGateway {
         inventory: &mut crate::inventory::Inventory,
         profiles: &mut crate::profiles::Profiles,
     ) -> io::Result<Vec<Vec<u8>>> {
-        Ok(self.claim_reward_with_event(inventory, profiles)?.replies)
+        Ok(self
+            .claim_reward_with_event(inventory, profiles, Default::default())?
+            .replies)
     }
     /// Claim a finished race once and report the race id for quest events.
     pub fn claim_reward_with_event(
         &mut self,
         inventory: &mut crate::inventory::Inventory,
         profiles: &mut crate::profiles::Profiles,
+        boost: crate::consumable_effects::Boost,
     ) -> io::Result<KartRewardClaim> {
         if !self.race.as_ref().is_some_and(|race| race.finish_flag()) {
             return Ok(KartRewardClaim::default());
@@ -756,6 +759,7 @@ impl KartGateway {
             &mut staged_profiles,
             guid,
             guid,
+            boost,
         ) {
             Ok(payout) => payout,
             // A bank/XP limit is a refused payout, not a transport failure.

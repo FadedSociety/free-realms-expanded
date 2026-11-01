@@ -559,7 +559,8 @@ impl Gameplay {
             // limit is lower; any new slot still has to fit within that existing floor.
             let bag_capacity = self.inventory.state().items.len().max(100);
             let reward_state =
-                RewardState::new(self.inventory.clone(), profile_state.clone(), bag_capacity);
+                RewardState::new(self.inventory.clone(), profile_state.clone(), bag_capacity)
+                    .with_boost(self.consumable_effects.boost());
             let mut staged_engine = engine.clone();
             let (quest, next_state) = staged_engine.finish_turnin(quest_id, &reward_state)?;
             let next_profiles = if self.profiles.is_some() {

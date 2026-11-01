@@ -80,13 +80,15 @@ impl Gameplay {
     /// Snapshot the inventory and profiles for a staged reward transaction. The Station Cash
     /// wallet is deliberately absent: a snapshot can outlive the request (fishing keeps one per
     /// round), and adopting a stale wallet would restore a spent balance. Only
-    /// [`Self::pay_earned_station_cash`] stages the wallet, and it adopts in the same call.
+    /// [`Self::pay_earned_station_cash`] stages the wallet, and it adopts in the same call. L087: the
+    /// live boosters ride along (a fishing round keeps the ones live when it began).
     pub(super) fn reward_snapshot(&self) -> RewardState {
         RewardState::new(
             self.inventory.clone(),
             self.reward_profiles(),
             self.reward_bag_capacity(),
         )
+        .with_boost(self.consumable_effects.boost())
     }
 
     /// Adopt the inventory, profiles and Station Cash wallet from a staged minigame transaction.

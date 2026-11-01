@@ -255,6 +255,7 @@ fn a_finished_registered_race_pays_once_with_real_coins_xp_and_the_recovered_toa
         &mut profiles,
         SOURCE_GUID,
         PLAYER_GUID,
+        Default::default(),
     )
     .unwrap();
 
@@ -293,6 +294,7 @@ fn a_forged_or_unfinished_race_aborts_without_a_payout() {
             &mut profiles,
             SOURCE_GUID,
             PLAYER_GUID,
+            Default::default(),
         )
         .unwrap_err(),
         RewardError::Racing(KartRacingError::NotFinished)
@@ -308,6 +310,7 @@ fn a_forged_or_unfinished_race_aborts_without_a_payout() {
             &mut profiles,
             SOURCE_GUID,
             PLAYER_GUID,
+            Default::default(),
         )
         .unwrap_err(),
         RewardError::ScheduleNotRegistered {
@@ -337,6 +340,7 @@ fn an_unregistered_speedway_is_refused() {
             &mut profiles,
             SOURCE_GUID,
             PLAYER_GUID,
+            Default::default(),
         )
         .unwrap_err(),
         RewardError::Unregistered {
@@ -363,6 +367,7 @@ fn experience_can_never_land_on_another_job() {
             &mut profiles,
             SOURCE_GUID,
             PLAYER_GUID,
+            Default::default(),
         )
         .unwrap_err(),
         RewardError::MissingKartDriverJob { active: OTHER_JOB }
@@ -387,6 +392,7 @@ fn unpriced_and_zero_schedules_are_refused() {
             &mut profiles,
             SOURCE_GUID,
             PLAYER_GUID,
+            Default::default(),
         )
         .unwrap_err(),
         RewardError::Unpriced { speedway: WILDWOOD }
@@ -425,6 +431,7 @@ fn coin_overflow_rolls_back_the_whole_payout() {
             &mut profiles,
             SOURCE_GUID,
             PLAYER_GUID,
+            Default::default(),
         )
         .unwrap_err(),
         RewardError::CoinOverflow {
@@ -453,6 +460,7 @@ fn experience_overflow_rolls_back_the_staged_coin_grant() {
             &mut profiles,
             SOURCE_GUID,
             PLAYER_GUID,
+            Default::default(),
         )
         .unwrap_err(),
         RewardError::ExperienceOverflow {
@@ -487,6 +495,7 @@ fn a_serialized_restart_does_not_pay_twice() {
         &mut profiles,
         SOURCE_GUID,
         PLAYER_GUID,
+        Default::default(),
     )
     .unwrap();
 
@@ -506,6 +515,7 @@ fn a_serialized_restart_does_not_pay_twice() {
             &mut restored_profiles,
             SOURCE_GUID,
             PLAYER_GUID,
+            Default::default(),
         )
         .unwrap_err(),
         RewardError::Racing(KartRacingError::RewardAlreadyClaimed)
@@ -564,6 +574,7 @@ fn the_payout_emits_the_recovered_38_and_50_replies() {
         &mut profiles,
         SOURCE_GUID,
         PLAYER_GUID,
+        Default::default(),
     )
     .unwrap();
 

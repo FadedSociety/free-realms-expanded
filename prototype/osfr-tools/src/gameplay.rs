@@ -1960,7 +1960,11 @@ impl Gameplay {
                 return Ok(returned);
             }
             let claim = if let Some(profiles) = &mut staged.profiles {
-                kart.claim_reward_with_event(&mut staged.inventory, profiles)?
+                kart.claim_reward_with_event(
+                    &mut staged.inventory,
+                    profiles,
+                    staged.consumable_effects.boost(),
+                )?
             } else {
                 crate::kart_gateway::KartRewardClaim::default()
             };
@@ -2315,7 +2319,8 @@ impl Gameplay {
             self.inventory.clone(),
             self.reward_profiles(),
             self.inventory.state().items.len().max(100),
-        );
+        )
+        .with_boost(self.consumable_effects.boost());
         let mut staged = self.progression_extras.clone();
         let change = staged.handle(inner, &rewards)?;
         if !change.handled {
@@ -2554,7 +2559,11 @@ impl Gameplay {
             out.replies = kart.handle(inner, now_ms)?;
             let mut minigame = None;
             if let Some(profiles) = &mut self.profiles {
-                let claim = kart.claim_reward_with_event(&mut self.inventory, profiles)?;
+                let claim = kart.claim_reward_with_event(
+                    &mut self.inventory,
+                    profiles,
+                    self.consumable_effects.boost(),
+                )?;
                 minigame = claim.minigame_id.map(|id| (id, claim.elapsed_seconds));
                 out.replies.extend(claim.replies);
             }
@@ -4796,8 +4805,9 @@ impl Gameplay {
     }
 
     /// Experience for the active job; a level that unlocks a job ability
-    /// refreshes the ability bar at once.
+    /// refreshes the ability bar at once. L087: a live star booster raises it.
     fn award_job_xp(&mut self, amount: u32, out: &mut Outcome) -> io::Result<()> {
+        let amount = self.consumable_effects.boost().stars(amount);
         let profile = self.profiles.as_ref().unwrap().active();
         let before = self.job_level(profile);
         let profiles = self.profiles.as_mut().unwrap();
@@ -5050,7 +5060,8 @@ impl Gameplay {
         for reward in quest.rewards {
             let mut inventory = self.inventory.clone();
             let mut quests = self.quests.clone();
-            match inventory.grant_bundle(reward.coins, &reward.items) {
+            let coins = self.consumable_effects.boost().coins(reward.coins);
+            match inventory.grant_bundle(coins, &reward.items) {
                 Ok(result) => {
                     if reward.quest_id != 0 {
                         quests.acknowledge_reward(reward.quest_id)?;

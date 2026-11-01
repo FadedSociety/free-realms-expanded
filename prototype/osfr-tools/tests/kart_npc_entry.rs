@@ -690,7 +690,7 @@ fn ordinary_entry_finishes_pays_exactly_once_and_returns_in_the_prior_job() {
 
     let end = drive(&mut g, green);
     let paid = g
-        .claim_reward_with_event(&mut inventory, &mut profiles)
+        .claim_reward_with_event(&mut inventory, &mut profiles, Default::default())
         .unwrap();
     assert!(
         !paid.replies.is_empty(),
@@ -719,7 +719,7 @@ fn ordinary_entry_finishes_pays_exactly_once_and_returns_in_the_prior_job() {
         );
     }
     assert_eq!(
-        g.claim_reward_with_event(&mut inventory, &mut profiles)
+        g.claim_reward_with_event(&mut inventory, &mut profiles, Default::default())
             .unwrap()
             .minigame_id,
         None

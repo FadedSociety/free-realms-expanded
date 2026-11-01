@@ -84,7 +84,7 @@ pub struct Effect {
     pub source: String,
 }
 
-/// The five row effects. A heal is applied by the caller to health; the aura, transform and scale
+/// The six row effects. A heal is applied by the caller to health; the aura, transform, scale and boost
 /// become a [`consumable_effects::Spec`] that the caller applies through the shared effect stack;
 /// a placed cake is put in the world by the host (T557).
 #[derive(Clone, Copy, Debug, PartialEq, Deserialize)]
@@ -113,6 +113,13 @@ pub enum EffectKind {
     },
     Scale {
         scale: f32,
+        duration_ms: u64,
+        icon_id: i32,
+    },
+    /// L087: a coin or star booster scroll: rewards pay `percent` more for `duration_ms`.
+    Boost {
+        raises: consumable_effects::Boosted,
+        percent: u32,
         duration_ms: u64,
         icon_id: i32,
     },
@@ -170,6 +177,16 @@ impl Effect {
                         && duration(duration_ms)
                         && (consumable_effects::MIN_SCALE..=consumable_effects::MAX_SCALE)
                             .contains(&scale)
+                }
+                EffectKind::Boost {
+                    percent,
+                    duration_ms,
+                    icon_id,
+                    ..
+                } => {
+                    icon_id > 0
+                        && duration(duration_ms)
+                        && (1..=consumable_effects::MAX_BOOST_PERCENT).contains(&percent)
                 }
             }
     }
@@ -242,6 +259,16 @@ impl Effect {
                 icon_id,
             } => (
                 consumable_effects::Kind::Scale { scale },
+                duration_ms,
+                icon_id,
+            ),
+            EffectKind::Boost {
+                raises,
+                percent,
+                duration_ms,
+                icon_id,
+            } => (
+                consumable_effects::Kind::Boost { raises, percent },
                 duration_ms,
                 icon_id,
             ),

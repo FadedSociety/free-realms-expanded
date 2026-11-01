@@ -7,7 +7,7 @@
 mod piece_056;
 
 use osfr_tools::consumable_effects::{
-    EffectStack, Emit, Kind, MAX_DELAY_MS, MAX_DURATION_MS, Refusal, Spec,
+    Boost, Boosted, EffectStack, Emit, Kind, MAX_DELAY_MS, MAX_DURATION_MS, Refusal, Spec,
     encode_remove_temporary_appearance, encode_temporary_appearance, encode_update_scale,
 };
 use piece_056::{
@@ -50,6 +50,70 @@ fn scale(scale: f32, duration_ms: u64) -> Spec {
         icon_id: 3845,
         name_id: 102,
     }
+}
+
+/// L087: a booster takes a buff row and raises rewards until it ends; a second one of its kind
+/// replaces it, and the other kind runs beside it.
+#[test]
+fn a_booster_raises_rewards_until_it_ends() {
+    let booster = |raises, percent| Spec {
+        kind: Kind::Boost { raises, percent },
+        duration_ms: 30 * MIN,
+        icon_id: 1157,
+        name_id: 2440,
+    };
+    let mut stack = EffectStack::default();
+    let (_, emit) = stack
+        .apply(GUID, POS, booster(Boosted::Stars, 50), 0)
+        .unwrap();
+    assert_eq!(heads(&emit.to_self), [(38, 16)]);
+    assert!(emit.to_nearby.is_empty(), "a booster changes no look");
+    stack
+        .apply(GUID, POS, booster(Boosted::Coins, 25), 0)
+        .unwrap();
+    assert_eq!(
+        stack.boost(),
+        Boost {
+            stars: 50,
+            coins: 25
+        }
+    );
+    assert_eq!(
+        (stack.boost().coins(10), stack.boost().stars(15)),
+        (13, 23),
+        "half rounds up"
+    );
+    let (_, emit) = stack
+        .apply(GUID, POS, booster(Boosted::Stars, 25), MIN)
+        .unwrap();
+    assert_eq!(
+        heads(&emit.to_self),
+        [(38, 17), (38, 16)],
+        "the new one replaces the old"
+    );
+    assert_eq!(
+        stack.boost(),
+        Boost {
+            stars: 25,
+            coins: 25
+        }
+    );
+    assert_eq!(
+        heads(&stack.tick(GUID, 30 * MIN).to_self),
+        [(38, 17)],
+        "the coin booster ends on time"
+    );
+    assert_eq!(
+        stack.boost(),
+        Boost {
+            stars: 25,
+            coins: 0
+        }
+    );
+    assert_eq!(
+        stack.admits(&booster(Boosted::Coins, 0)),
+        Err(Refusal::Percent)
+    );
 }
 
 /// (family, sub) of each packet.

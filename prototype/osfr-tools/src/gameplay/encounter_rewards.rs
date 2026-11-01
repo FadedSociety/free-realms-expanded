@@ -76,12 +76,15 @@ impl Gameplay {
         reward: crate::encounter::EncounterReward,
         out: &mut Outcome,
     ) -> io::Result<()> {
-        let coins_fit = self.inventory.can_grant_coins(reward.coins);
+        // L087: a live coin booster raises the coins here; `award_job_xp` raises the stars.
+        let boost = self.consumable_effects.boost();
+        let coins = boost.coins(reward.coins);
+        let coins_fit = self.inventory.can_grant_coins(coins);
         let xp_fit = reward.job_xp == 0
             || self
                 .profiles
                 .as_ref()
-                .is_some_and(|profiles| profiles.can_add_experience(reward.job_xp));
+                .is_some_and(|profiles| profiles.can_add_experience(boost.stars(reward.job_xp)));
         if !coins_fit || !xp_fit {
             eprintln!(
                 "encounter reward refused: coins={} job_xp={}",
@@ -90,7 +93,7 @@ impl Gameplay {
             out.replies.push(chat::system(REWARD_UNREPRESENTABLE));
             return Ok(());
         }
-        self.grant_reward(reward.coins, &reward.items, out)?;
+        self.grant_reward(coins, &reward.items, out)?;
         if reward.job_xp > 0 {
             self.award_job_xp(reward.job_xp, out)?;
         }

@@ -48,6 +48,38 @@
       "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 660 (Can of Beans); item 36 ActivatableAbilityId 660 (Legacy@9e08202 ClientItemDefinitions Id 36 NameId 2951 DescriptionId 2952 SingleUse true); effect 5343 PFX_smoke_green_pelvis_fart-m; duration 1800000 (R) OSFR default; cooldown 1800000 (R, OSFR #125); EffectDelayMs 300; QuickChatId 3340 ignored; the effect is not a loop, so it plays once (R); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
     },
     {
+      "definition": 78,
+      "name_id": 2440,
+      "description_id": 2446,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "boost": {
+          "raises": "stars",
+          "percent": 50,
+          "duration_ms": 1800000,
+          "icon_id": 1157
+        }
+      },
+      "source": "Wiki: the Super Star Booster page and item tooltip read 'Activatable Effects: + 50% Stars' (SC Shop, 200 SC; Cannot Sell, Cannot Trade). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 78 NameId 2440 DescriptionId 2446 Icon 1157 ActivatableAbilityId 203 SingleUse true). Duration 1800000 (R): the client and the wiki say only 'for a while'; the BubbaJoeX fork's ItemAbilities.json picks 30 minutes. Cooldown 5000 (R, the fork's buff cooldown). The buff row shows the item's own icon (R). L087."
+    },
+    {
+      "definition": 841,
+      "name_id": 3630,
+      "description_id": 3631,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "boost": {
+          "raises": "stars",
+          "percent": 50,
+          "duration_ms": 1800000,
+          "icon_id": 1157
+        }
+      },
+      "source": "AAA Star Booster: the Super Star Booster's ability 203 in the client data, so its effect. Wiki: the Super Star Booster page and item tooltip read 'Activatable Effects: + 50% Stars' (SC Shop, 200 SC; Cannot Sell, Cannot Trade). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 841 NameId 3630 DescriptionId 3631 Icon 1157 ActivatableAbilityId 203 SingleUse true). Duration 1800000 (R): the client and the wiki say only 'for a while'; the BubbaJoeX fork's ItemAbilities.json picks 30 minutes. Cooldown 5000 (R, the fork's buff cooldown). The buff row shows the item's own icon (R). L087."
+    },
+    {
       "definition": 2939,
       "name_id": 234,
       "description_id": 2740,
@@ -1557,6 +1589,38 @@
       "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3072 (Necro Wart Zombie); item 15961 ActivatableAbilityId 3072 (Legacy@9e08202 ClientItemDefinitions Id 15961 NameId 1231 DescriptionId 3118 SingleUse true); model 71 necrowartzombie_01.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3118: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
     },
     {
+      "definition": 65821,
+      "name_id": 4533,
+      "description_id": 4534,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "boost": {
+          "raises": "stars",
+          "percent": 25,
+          "duration_ms": 1800000,
+          "icon_id": 1157
+        }
+      },
+      "source": "Wiki: the Wheeler Star Booster Scroll page reads 'Activatable Effects +25% Stars' (Daily Wheel, Potions and Scrolls wedge; Cannot Trade). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 65821 NameId 4533 DescriptionId 4534 Icon 1157 ActivatableAbilityId 240 SingleUse true). Duration 1800000 (R): the client and the wiki say only 'for a while'; the BubbaJoeX fork's ItemAbilities.json picks 30 minutes. Cooldown 5000 (R, the fork's buff cooldown). The buff row shows the item's own icon (R). L087."
+    },
+    {
+      "definition": 65822,
+      "name_id": 4535,
+      "description_id": 4536,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "boost": {
+          "raises": "coins",
+          "percent": 25,
+          "duration_ms": 1800000,
+          "icon_id": 1156
+        }
+      },
+      "source": "Wiki: the Wheeler Coin Booster Scroll page and item tooltip read '+ 25% Coins' (Daily Wheel, Potions and Scrolls wedge; Cannot Trade). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 65822 NameId 4535 DescriptionId 4536 Icon 1156 ActivatableAbilityId 239 SingleUse true). Duration 1800000 (R): the client and the wiki say only 'for a while'; the BubbaJoeX fork's ItemAbilities.json picks 30 minutes. Cooldown 5000 (R, the fork's buff cooldown). The buff row shows the item's own icon (R). L087."
+    },
+    {
       "definition": 69839,
       "name_id": 16639,
       "description_id": 16652,
@@ -1571,6 +1635,22 @@
         }
       },
       "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 4373 (Boss Cake - Cakenstein); item 69839 ActivatableAbilityId 4373 (Legacy@9e08202 ClientItemDefinitions Id 69839 NameId 16639 DescriptionId 16652 SingleUse true); model 22 cakenstein.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 70327,
+      "name_id": 393502,
+      "description_id": 1114,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "boost": {
+          "raises": "stars",
+          "percent": 50,
+          "duration_ms": 1800000,
+          "icon_id": 1157
+        }
+      },
+      "source": "Members Only Star Booster: the Super Star Booster's ability 203 in the client data, so its effect. Wiki: the Super Star Booster page and item tooltip read 'Activatable Effects: + 50% Stars' (SC Shop, 200 SC; Cannot Sell, Cannot Trade). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 70327 NameId 393502 DescriptionId 1114 Icon 1157 ActivatableAbilityId 203 SingleUse true). Duration 1800000 (R): the client and the wiki say only 'for a while'; the BubbaJoeX fork's ItemAbilities.json picks 30 minutes. Cooldown 5000 (R, the fork's buff cooldown). The buff row shows the item's own icon (R). L087."
     },
     {
       "definition": 77418,

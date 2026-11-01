@@ -256,6 +256,7 @@ pub fn claim_race_reward(
     profiles: &mut Profiles,
     source_guid: u64,
     player_guid: u64,
+    boost: crate::consumable_effects::Boost,
 ) -> Result<RewardPayout, RewardError> {
     let snapshot = session.snapshot();
     let speedway = snapshot.speedway;
@@ -288,6 +289,8 @@ pub fn claim_race_reward(
     if coins == 0 && xp == 0 {
         return Err(RewardError::EmptySchedule { speedway });
     }
+    // L087: a live booster raises the registered price this race pays and shows.
+    let (coins, xp) = (boost.coins(coins), boost.stars(xp));
 
     // Stage the economy on clones. Nothing is committed until every grant and every reply exists.
     let mut staged_inventory = inventory.clone();

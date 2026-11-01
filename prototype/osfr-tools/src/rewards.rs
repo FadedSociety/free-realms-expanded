@@ -7,6 +7,7 @@
 //! its save snapshot.
 
 use crate::{
+    consumable_effects::Boost,
     inventory::{Inventory, MAX_ITEMS},
     profiles::ProfileState,
     station_cash::{self, Wallet},
@@ -82,6 +83,8 @@ pub struct RewardState {
     pub bag_capacity: usize,
     pub wallet: Option<Wallet>,
     pub wallet_ceiling: u32,
+    /// L087: the live coin and star boosters; every grant through this state pays and shows them.
+    pub boost: Boost,
 }
 
 impl RewardState {
@@ -93,6 +96,7 @@ impl RewardState {
             bag_capacity,
             wallet: None,
             wallet_ceiling: 0,
+            boost: Boost::default(),
         }
     }
 
@@ -100,6 +104,11 @@ impl RewardState {
     pub fn with_wallet(mut self, wallet: Wallet, ceiling: u32) -> Self {
         self.wallet = Some(wallet);
         self.wallet_ceiling = ceiling;
+        self
+    }
+
+    pub fn with_boost(mut self, boost: Boost) -> Self {
+        self.boost = boost;
         self
     }
 }
@@ -178,6 +187,8 @@ pub fn apply_grant(
     if state.applied_grant_keys.contains(grant_key) {
         return Ok((state.clone(), Vec::new()));
     }
+    // L087: a live booster raises the coins and stars this grant pays and shows.
+    let grant = &boosted(grant, state.boost);
     if state.inventory.state().items.len() > state.bag_capacity {
         return Err(GrantFailure::BagFull);
     }
@@ -290,6 +301,15 @@ pub fn apply_grant(
     outgoing.extend(sc_replies);
     next.applied_grant_keys.insert(grant_key.to_owned());
     Ok((next, outgoing))
+}
+
+fn boosted(grant: &RewardGrant, boost: Boost) -> RewardGrant {
+    let mut grant = grant.clone();
+    grant.coins = boost.coins(grant.coins);
+    for xp in grant.job_xp.values_mut() {
+        *xp = boost.stars(*xp);
+    }
+    grant
 }
 
 fn experience_packets(profile_id: i32, previous: u32, updated: u32) -> Vec<Vec<u8>> {

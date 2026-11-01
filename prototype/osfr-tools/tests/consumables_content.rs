@@ -4,6 +4,7 @@
 //! Sanctuary/Legacy item definitions and the client asset tables. These checks pin the
 //! loader contract (the production `ItemBar::load` path), the two potion rows, the two
 //! named rows the brief calls out, the exclusions and every row's provenance.
+use osfr_tools::consumable_effects::Boosted;
 use osfr_tools::item_bar::{EffectKind, Effects, ItemBar};
 use std::path::PathBuf;
 
@@ -101,7 +102,7 @@ fn the_shipped_rows_load_through_the_real_loader_with_their_client_checked_value
 
     // The retained joins: 23 food items and 69 transformation items after the exclusions, and
     // the nine birthday cakes (T557).
-    let (mut heals, mut auras, mut transforms, mut cakes) = (0, 0, 0, 0);
+    let (mut heals, mut auras, mut transforms, mut cakes, mut boosts) = (0, 0, 0, 0, 0);
     for row in rows {
         match row.effect {
             EffectKind::Heal { .. } => heals += 1,
@@ -109,12 +110,26 @@ fn the_shipped_rows_load_through_the_real_loader_with_their_client_checked_value
             EffectKind::Transform { .. } => transforms += 1,
             EffectKind::Scale { .. } => {}
             EffectKind::PlacedCake { .. } => cakes += 1,
+            EffectKind::Boost { .. } => boosts += 1,
         }
     }
     assert_eq!(heals, 2);
     assert_eq!(auras, 23);
     assert_eq!(transforms, 69);
     assert_eq!(cakes, 9);
+    // L087: three +50% star boosters (ability 203), the Wheeler star and coin scrolls (wiki).
+    assert_eq!(boosts, 5);
+    let booster = effects.get(78).expect("Super Star Booster");
+    assert!(matches!(
+        booster.effect,
+        EffectKind::Boost {
+            raises: Boosted::Stars,
+            percent: 50,
+            duration_ms: 1_800_000,
+            icon_id: 1157,
+        }
+    ));
+    assert_eq!((booster.name_id, booster.description_id), (2440, 2446));
 
     // The boss cake: never spent, its recast is the cake row's (placed_cakes.json), and its row
     // is its own definition.
