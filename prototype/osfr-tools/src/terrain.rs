@@ -14,7 +14,7 @@
 //! objects with their own collision, so `height_at` reports the ground under them.
 //! T534: `obstacles()` loads the `zone_<id>.obs` files the bake writes beside the
 //! grids, so a mover can refuse a wall and stand on a bridge deck.
-use crate::obstacles::Obstacles;
+use crate::{le, obstacles::Obstacles};
 use std::{
     collections::HashMap,
     fs,
@@ -43,8 +43,9 @@ impl HeightGrid {
         if !(cell > 0.0) || !(max[0] > min[0]) || !(max[1] > min[1]) {
             return Err("terrain grid needs positive cell and extent".into());
         }
-        let cols = ((max[0] - min[0]) / cell).ceil() as u32 + 1;
-        let rows = ((max[1] - min[1]) / cell).ceil() as u32 + 1;
+        // A span too wide for u32 saturates and is refused as too large just below.
+        let cols = (((max[0] - min[0]) / cell).ceil() as u32).saturating_add(1);
+        let rows = (((max[1] - min[1]) / cell).ceil() as u32).saturating_add(1);
         if cols as u64 * rows as u64 > 64 << 20 {
             return Err(format!("terrain grid {cols}x{rows} is too large"));
         }
@@ -110,14 +111,17 @@ impl HeightGrid {
         let fz = (z - self.min_z) / self.cell;
         let (c, r) = (fx.floor() as i64, fz.floor() as i64);
         let (tx, tz) = (fx - c as f32, fz - r as f32);
+        // Saturating: a far-off client position past i64 is just outside the grid.
+        let (c1, r1) = (c.saturating_add(1), r.saturating_add(1));
         let corners = [
             (self.node(c, r), (1.0 - tx) * (1.0 - tz)),
-            (self.node(c + 1, r), tx * (1.0 - tz)),
-            (self.node(c, r + 1), (1.0 - tx) * tz),
-            (self.node(c + 1, r + 1), tx * tz),
+            (self.node(c1, r), tx * (1.0 - tz)),
+            (self.node(c, r1), (1.0 - tx) * tz),
+            (self.node(c1, r1), tx * tz),
         ];
-        if corners.iter().all(|(h, _)| h.is_some()) {
-            return Some(corners.iter().map(|(h, w)| h.unwrap() * w).sum());
+        let weighted = corners.iter().map(|(h, w)| h.map(|h| h * w));
+        if let Some(height) = weighted.sum::<Option<f32>>() {
+            return Some(height);
         }
         let present: Vec<f32> = corners.iter().filter_map(|(h, _)| *h).collect();
         (!present.is_empty()).then(|| present.iter().sum::<f32>() / present.len() as f32)
@@ -152,20 +156,28 @@ impl HeightGrid {
     }
 
     pub fn from_bytes(bytes: &[u8]) -> Result<Self, String> {
-        if bytes.len() < HEADER || &bytes[..8] != MAGIC {
+        // The last header field ends at HEADER, so a short file fails its read.
+        let (true, Some(min_x), Some(min_z), Some(cell), Some(cols), Some(rows)) = (
+            bytes.starts_with(MAGIC),
+            le::f32(bytes, 8),
+            le::f32(bytes, 12),
+            le::f32(bytes, 16),
+            le::u32(bytes, 20),
+            le::u32(bytes, 24),
+        ) else {
             return Err("not an OSFRHGT1 height grid".into());
-        }
-        let f = |at: usize| f32::from_le_bytes(bytes[at..at + 4].try_into().unwrap());
-        let u = |at: usize| u32::from_le_bytes(bytes[at..at + 4].try_into().unwrap());
-        let (cols, rows) = (u(20), u(24));
-        let count = cols as usize * rows as usize;
-        if bytes.len() != HEADER + count * 2 || !(f(16) > 0.0) {
+        };
+        // Checked: a corrupt header's cols x rows x 2 can overflow usize.
+        let size = (cols as usize)
+            .checked_mul(rows as usize)
+            .and_then(|count| count.checked_mul(2)?.checked_add(HEADER));
+        if size != Some(bytes.len()) || !(cell > 0.0) {
             return Err("height grid size does not match its header".into());
         }
         Ok(Self {
-            min_x: f(8),
-            min_z: f(12),
-            cell: f(16),
+            min_x,
+            min_z,
+            cell,
             cols,
             rows,
             heights: bytes[HEADER..]
@@ -289,6 +301,19 @@ mod tests {
         assert_eq!(HeightGrid::from_bytes(&bytes).unwrap(), grid);
         assert!(HeightGrid::from_bytes(&bytes[..bytes.len() - 1]).is_err());
         assert!(HeightGrid::from_bytes(b"OSFRHGT0").is_err());
+    }
+
+    /// Hygiene L116: hostile sizes and far positions are refusals, never overflow panics.
+    #[test]
+    fn huge_headers_extents_and_positions_are_refused() {
+        let mut header = slope().to_bytes();
+        header.truncate(HEADER);
+        header[20..28].fill(0xff); // cols = rows = u32::MAX
+        assert!(HeightGrid::from_bytes(&header).is_err());
+        assert!(HeightGrid::new([0.0, 0.0], [f32::MAX, 1.0], f32::MIN_POSITIVE).is_err());
+        let grid = slope();
+        assert_eq!(grid.height_at(f32::MAX, f32::MAX), None);
+        assert_eq!(grid.height_at(-f32::MAX, 3.0), None);
     }
 
     #[test]

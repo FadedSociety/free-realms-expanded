@@ -521,15 +521,6 @@ impl NpcVisibility {
             if !npc.drawn() {
                 continue;
             }
-            let zone_id = anchors
-                .iter()
-                .min_by(|left, right| {
-                    distance_squared(npc.position, left.1)
-                        .total_cmp(&distance_squared(npc.position, right.1))
-                        .then_with(|| left.0.cmp(&right.0))
-                })
-                .map(|anchor| anchor.0)
-                .expect("anchors checked above");
             let mut spawn = NpcSpawn {
                 actor_id: npc.spawn_guid,
                 name_string_id: npc.name_string_id.unwrap_or(0) as i32,
@@ -559,7 +550,6 @@ impl NpcVisibility {
             if let Some(content_key) = npc.content_key {
                 result.content_keys.insert(npc.spawn_guid, content_key);
             }
-            let _ = zone_id; // nearest-anchor label kept for diagnostics only
             let mut notifications = npc.notifications;
             let cursor = presentation.apply(&mut spawn, &mut notifications);
             Arc::make_mut(&mut result.by_zone)
@@ -688,14 +678,21 @@ impl NpcVisibility {
     /// Add or replace a placed NPC in the open world. Call [`Self::remove`]
     /// first when it may already be visible, so the client drops the old one.
     pub fn place(&mut self, placement: &Placement) {
+        // Like a non-finite position, an id the AddNpc i32 cannot carry is not drawn.
+        let (Ok(name_string_id), Ok(model_id)) = (
+            i32::try_from(placement.name_string_id),
+            i32::try_from(placement.model_id),
+        ) else {
+            return;
+        };
         if !placement.position.iter().all(|v| v.is_finite()) {
             return;
         }
         self.revision = self.revision.wrapping_add(1);
         let mut spawn = NpcSpawn {
             actor_id: placement.guid,
-            name_string_id: placement.name_string_id as i32,
-            model_id: placement.model_id as i32,
+            name_string_id,
+            model_id,
             ..content_spawn_template()
         };
         let p = placement.position;
@@ -1159,14 +1156,17 @@ pub fn read_placements(path: &Path) -> io::Result<Vec<Placement>> {
 }
 
 pub(crate) fn unframe_tunnel(bytes: &[u8]) -> io::Result<Vec<u8>> {
-    if bytes.len() < 7 || bytes[..3] != [5, 0, 1] {
+    let (Some([5, 0, 1]), Some(length), Some(body)) = (
+        bytes.first_chunk::<3>(),
+        crate::le::u32(bytes, 3),
+        bytes.get(7..),
+    ) else {
         return Err(invalid("NPC builder returned an invalid tunnel"));
-    }
-    let length = u32::from_le_bytes(bytes[3..7].try_into().unwrap()) as usize;
-    if length != bytes.len() - 7 {
+    };
+    if length as usize != body.len() {
         return Err(invalid("NPC builder tunnel length differs"));
     }
-    Ok(bytes[7..].to_vec())
+    Ok(body.to_vec())
 }
 
 fn invalid(message: impl Into<String>) -> io::Error {
@@ -1433,7 +1433,7 @@ impl World {
             .expect("constant public scene is valid");
         let public = world
             .make_instance(0, 0, InstanceKind::Public, None, 0)
-            .unwrap();
+            .expect("zone 0 is registered just above");
         world.instances.insert(0, public);
         world.public_instances.insert(0, 0);
         world
@@ -1826,7 +1826,10 @@ impl World {
                 }
             }
         }
-        let instance = self.instances.get_mut(&target).unwrap();
+        let instance = self
+            .instances
+            .get_mut(&target)
+            .ok_or(WorldError::UnknownInstance(target))?;
         instance.members.insert(player);
         instance.ready_members.remove(&player);
         instance.empty_since_ms = None;
@@ -1853,7 +1856,7 @@ impl World {
     ) -> Result<bool, WorldError> {
         let location = self
             .players
-            .get(&player)
+            .get_mut(&player)
             .ok_or(WorldError::PlayerNotInInstance(player))?;
         if location.instance_id != instance_id {
             return Err(WorldError::PlayerNotInInstance(player));
@@ -1863,7 +1866,7 @@ impl World {
             .get_mut(&instance_id)
             .ok_or(WorldError::UnknownInstance(instance_id))?;
         instance.ready_members.insert(player);
-        self.players.get_mut(&player).unwrap().ready = true;
+        location.ready = true;
         // (R) Require every current member; original multi-session policy is unknown.
         Ok(!instance.members.is_empty() && instance.ready_members == instance.members)
     }

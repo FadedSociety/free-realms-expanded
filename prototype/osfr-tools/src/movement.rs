@@ -315,28 +315,31 @@ pub fn validate(
     let soft_vertical = vertical_speed * dt * VERTICAL_SOFT_MULTIPLIER + VERTICAL_GRACE;
     let hard_vertical = vertical_speed * dt * VERTICAL_HARD_MULTIPLIER + VERTICAL_GRACE;
 
-    let hard_h = horizontal > hard_horizontal;
-    let hard_v = vertical > hard_vertical;
-    if hard_h || hard_v {
-        let reason = match (hard_h, hard_v) {
-            (true, true) => Reason::GrossHorizontalAndVerticalOverspeed,
-            (true, false) => Reason::GrossHorizontalOverspeed,
-            (false, true) => Reason::GrossVerticalOverspeed,
-            (false, false) => unreachable!(),
-        };
+    let gross = match (horizontal > hard_horizontal, vertical > hard_vertical) {
+        (true, true) => Some(Reason::GrossHorizontalAndVerticalOverspeed),
+        (true, false) => Some(Reason::GrossHorizontalOverspeed),
+        (false, true) => Some(Reason::GrossVerticalOverspeed),
+        (false, false) => None,
+    };
+    if let Some(reason) = gross {
         return rejected(previous, reason, expected_discontinuity);
     }
 
     let soft_h = horizontal > soft_horizontal;
     let soft_v = vertical > soft_vertical;
-    if !soft_h && !soft_v {
-        return ValidationResult {
-            decision: Decision::Accept,
-            state: accepted_state(server_zone_id, update, previous.direction),
-            reason: Reason::WithinAllowance,
-            expected_discontinuity: None,
-        };
-    }
+    let reason = match (soft_h, soft_v) {
+        (true, true) => Reason::SoftHorizontalAndVerticalOverspeed,
+        (true, false) => Reason::SoftHorizontalOverspeed,
+        (false, true) => Reason::SoftVerticalOverspeed,
+        (false, false) => {
+            return ValidationResult {
+                decision: Decision::Accept,
+                state: accepted_state(server_zone_id, update, previous.direction),
+                reason: Reason::WithinAllowance,
+                expected_discontinuity: None,
+            };
+        }
+    };
 
     let mut clamped = update;
     if soft_h && horizontal > 0.0 {
@@ -351,12 +354,7 @@ pub fn validate(
     ValidationResult {
         decision: Decision::Clamp,
         state: accepted_state(server_zone_id, clamped, previous.direction),
-        reason: match (soft_h, soft_v) {
-            (true, true) => Reason::SoftHorizontalAndVerticalOverspeed,
-            (true, false) => Reason::SoftHorizontalOverspeed,
-            (false, true) => Reason::SoftVerticalOverspeed,
-            (false, false) => unreachable!(),
-        },
+        reason,
         // (R) A clamped ordinary pose supersedes a stale one-use relocation.
         expected_discontinuity: None,
     }

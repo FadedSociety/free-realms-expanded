@@ -91,13 +91,19 @@ struct Request {
 
 fn parse(inner: &[u8]) -> Option<Request> {
     let body = inner.strip_prefix(&[FAMILY as u8, 0, REQUEST])?;
-    let word = |at: usize| u32::from_le_bytes(body[at..at + 4].try_into().unwrap());
-    let vec4 = |at: usize| std::array::from_fn(|i| f32::from_bits(word(at + 4 * i)));
-    (body.len() == BODY).then(|| Request {
-        kind: word(8),
-        aux: word(12),
-        from: vec4(16),
-        to: vec4(32),
+    if body.len() != BODY {
+        return None;
+    }
+    let word = |at: usize| crate::le::u32(body, at);
+    let vec4 = |at: usize| {
+        let [x, y, z, w] = [at, at + 4, at + 8, at + 12].map(|at| word(at).map(f32::from_bits));
+        Some([x?, y?, z?, w?])
+    };
+    Some(Request {
+        kind: word(8)?,
+        aux: word(12)?,
+        from: vec4(16)?,
+        to: vec4(32)?,
     })
 }
 

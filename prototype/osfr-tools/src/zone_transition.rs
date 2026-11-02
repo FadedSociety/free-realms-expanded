@@ -151,20 +151,27 @@ impl<'a> Cursor<'a> {
         Ok(slice)
     }
 
+    fn array<const N: usize>(&mut self, what: &str) -> io::Result<[u8; N]> {
+        self.take(N, what)?
+            .first_chunk()
+            .copied()
+            .ok_or_else(|| invalid(format!("zone transition {what} runs past the frame")))
+    }
+
     fn u8(&mut self, what: &str) -> io::Result<u8> {
-        Ok(self.take(1, what)?[0])
+        Ok(u8::from_le_bytes(self.array(what)?))
     }
 
     fn u16(&mut self, what: &str) -> io::Result<u16> {
-        Ok(u16::from_le_bytes(self.take(2, what)?.try_into().unwrap()))
+        Ok(u16::from_le_bytes(self.array(what)?))
     }
 
     fn i32(&mut self, what: &str) -> io::Result<i32> {
-        Ok(i32::from_le_bytes(self.take(4, what)?.try_into().unwrap()))
+        Ok(i32::from_le_bytes(self.array(what)?))
     }
 
     fn f32(&mut self, what: &str) -> io::Result<f32> {
-        let value = f32::from_le_bytes(self.take(4, what)?.try_into().unwrap());
+        let value = f32::from_le_bytes(self.array(what)?);
         if !value.is_finite() {
             return Err(invalid(format!("zone transition {what} is not finite")));
         }
@@ -188,26 +195,28 @@ impl<'a> Cursor<'a> {
 /// Parse one complete opcode-31 frame, refusing malformed lengths, non-finite
 /// floats, oversized or truncated strings and trailing bytes.
 pub fn decode(bytes: &[u8]) -> io::Result<ZoneTransition> {
-    if bytes.len() < HEADER_BYTES + 2 {
+    let (true, Some(family), Some(&envelope_flag), Some(declared)) = (
+        bytes.len() >= HEADER_BYTES + 2,
+        osfr_tools::le::u16(bytes, 0),
+        bytes.get(2),
+        osfr_tools::le::u32(bytes, 3),
+    ) else {
         return Err(invalid(format!(
             "zone transition frame is {} bytes, under the 9-byte minimum",
             bytes.len()
         )));
-    }
-    let family = u16::from_le_bytes(bytes[0..2].try_into().unwrap());
+    };
     if family != OUTER_FAMILY {
         return Err(invalid(format!(
             "zone transition outer family {family} is not {OUTER_FAMILY}"
         )));
     }
-    let declared = u32::from_le_bytes(bytes[3..7].try_into().unwrap()) as usize;
-    if declared != bytes.len() - HEADER_BYTES {
+    if declared as usize != bytes.len() - HEADER_BYTES {
         return Err(invalid(format!(
             "zone transition declares {declared} inner bytes but the frame holds {}",
             bytes.len() - HEADER_BYTES
         )));
     }
-    let envelope_flag = bytes[2];
     let mut cursor = Cursor {
         bytes,
         offset: HEADER_BYTES,

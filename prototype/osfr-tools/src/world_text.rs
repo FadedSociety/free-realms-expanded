@@ -39,15 +39,15 @@ fn mix(mut a: u32, mut b: u32, mut c: u32) -> (u32, u32, u32) {
 
 /// Bob Jenkins' lookup2 with an initial value of 0.
 pub fn jenkins_lookup2(key: &[u8]) -> u32 {
-    let word = |p: &[u8]| u32::from_le_bytes(p[..4].try_into().unwrap());
     let (mut a, mut b, mut c) = (0x9e37_79b9_u32, 0x9e37_79b9_u32, 0_u32);
     let mut rest = key;
-    while rest.len() >= 12 {
-        a = a.wrapping_add(word(&rest[0..]));
-        b = b.wrapping_add(word(&rest[4..]));
-        c = c.wrapping_add(word(&rest[8..]));
+    while let Some((block, tail)) = rest.split_first_chunk::<12>() {
+        let [a0, a1, a2, a3, b0, b1, b2, b3, c0, c1, c2, c3] = *block;
+        a = a.wrapping_add(u32::from_le_bytes([a0, a1, a2, a3]));
+        b = b.wrapping_add(u32::from_le_bytes([b0, b1, b2, b3]));
+        c = c.wrapping_add(u32::from_le_bytes([c0, c1, c2, c3]));
         (a, b, c) = mix(a, b, c);
-        rest = &rest[12..];
+        rest = tail;
     }
     c = c.wrapping_add(key.len() as u32);
     for (i, shift) in [(10, 24), (9, 16), (8, 8)] {
@@ -189,16 +189,20 @@ impl TextPool {
         if let Some(entry) = self.entries.iter().find(|e| e.text == text) {
             return Ok(entry.id);
         }
+        // A text.json whose next_id reached i32::MAX refuses instead of wrapping to a negative id.
+        let exhausted =
+            || io::Error::new(io::ErrorKind::InvalidData, "world text ids are exhausted");
         let mut id = self.next_id;
         while stock.is_some_and(|hashes| hashes.contains(&locale_hash(id))) {
-            id += 1;
+            id = id.checked_add(1).ok_or_else(exhausted)?;
         }
+        let next_id = id.checked_add(1).ok_or_else(exhausted)?;
         self.entries.push(TextEntry {
             id,
             text: text.to_owned(),
             author: author.map(str::to_owned),
         });
-        self.next_id = id + 1;
+        self.next_id = next_id;
         self.save()?;
         Ok(id)
     }
@@ -244,6 +248,19 @@ mod tests {
         assert_eq!(reloaded.get(hunt), Some("Find Bob!"));
         assert_eq!(reloaded.entries[0].author.as_deref(), Some("alice"));
         fs::remove_dir_all(&dir).unwrap();
+    }
+
+    /// Hygiene L116: the last id is refused before anything is stored or saved.
+    #[test]
+    fn a_pool_at_the_end_of_the_id_range_refuses_instead_of_wrapping() {
+        let mut pool = TextPool {
+            path: std::env::temp_dir().join("osfr-text-never-written.json"),
+            next_id: i32::MAX,
+            entries: Vec::new(),
+        };
+        assert!(pool.add("One more line", None, None).is_err());
+        assert!(pool.entries.is_empty());
+        assert_eq!(pool.next_id, i32::MAX);
     }
 
     #[test]

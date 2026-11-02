@@ -57,7 +57,7 @@ pub(super) struct Slot {
 }
 
 /// A validated schedule.
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Schedule {
     slot: Slot,
     season: Option<String>,
@@ -118,7 +118,7 @@ impl Schedule {
             .collect();
         let find = |key: &String| slots.iter().find(|(k, _)| k == key).map(|(_, slot)| *slot);
         let entry = |event: WorldEvent| {
-            let schedule = event.schedule.as_ref()?;
+            let schedule = event.schedule.clone()?;
             let skips = schedule.skip_keys.iter().map(find).collect::<Option<_>>();
             let Some(skips) = skips else {
                 println!(
@@ -130,6 +130,7 @@ impl Schedule {
             };
             Some(Entry {
                 event: Arc::new(event),
+                schedule,
                 instance,
                 skips,
                 next: None,
@@ -199,6 +200,8 @@ impl Slot {
 #[derive(Clone, Debug, PartialEq)]
 pub(super) struct Entry {
     pub(super) event: Arc<WorldEvent>,
+    /// The event's own schedule, held here so no lookup can find it missing.
+    schedule: Schedule,
     /// Where the event runs and its line is heard.
     pub(super) instance: ZoneInstance,
     /// Slots of the events this one skips for.
@@ -218,17 +221,10 @@ pub(super) enum Due {
 }
 
 impl Entry {
-    fn schedule(&self) -> &Schedule {
-        self.event
-            .schedule
-            .as_ref()
-            .expect("entries carry a schedule")
-    }
-
     /// Whether the slot starting at `start_ms` runs: in season, and not on a skipped event's start.
     fn runs_at(&self, start_ms: u64, areas: &ClientAreas) -> bool {
         let offset = areas.utc_offset_minutes();
-        let season = self.schedule().season.as_deref();
+        let season = self.schedule.season.as_deref();
         season.is_none_or(|name| areas.is_season_active(name, start_ms))
             && !self
                 .skips
@@ -239,7 +235,7 @@ impl Entry {
     /// The first slot after `after_ms` that runs.
     fn next_running(&self, mut after_ms: u64, areas: &ClientAreas) -> Option<u64> {
         let offset = areas.utc_offset_minutes();
-        let slot = self.schedule().slot;
+        let slot = self.schedule.slot;
         for _ in 0..MAX_SEARCH {
             let start = slot.next_start(after_ms, offset)?;
             if self.runs_at(start, areas) {
@@ -247,7 +243,7 @@ impl Entry {
             }
             // Out of season, the rest of the local day is too (seasons are whole dates).
             let out = self
-                .schedule()
+                .schedule
                 .season
                 .as_deref()
                 .is_some_and(|name| !areas.is_season_active(name, start));
@@ -267,7 +263,7 @@ impl Entry {
     /// past the moment it was due (a restart inside the lead does not announce late).
     fn choose(&mut self, after_ms: u64, now_ms: u64, areas: &ClientAreas) {
         self.next = self.next_running(after_ms, areas);
-        let lead = self.schedule().announce.as_ref().map(|(lead, _)| *lead);
+        let lead = self.schedule.announce.as_ref().map(|(lead, _)| *lead);
         self.announced = match (self.next, lead) {
             (Some(next), Some(lead)) => now_ms.saturating_add(lead) >= next,
             _ => true,
@@ -287,7 +283,7 @@ impl Entry {
 
     /// The unix ms this entry next needs the tick: its line's moment, else its slot's start.
     pub(super) fn wake_ms(&self) -> u64 {
-        let lead = self.schedule().announce.as_ref().map(|(lead, _)| *lead);
+        let lead = self.schedule.announce.as_ref().map(|(lead, _)| *lead);
         match (self.next, lead) {
             (Some(next), Some(lead)) if !self.announced => next.saturating_sub(lead),
             (Some(next), _) => next,
@@ -304,14 +300,14 @@ impl Entry {
         };
         if now_ms >= next {
             let latest = self
-                .schedule()
+                .schedule
                 .slot
                 .latest_start(now_ms, areas.utc_offset_minutes());
             let start = latest.is_some_and(|slot| self.runs_at(slot, areas));
             self.choose(now_ms, now_ms, areas);
             return if start { Due::Start } else { Due::Idle };
         }
-        match &self.schedule().announce {
+        match &self.schedule.announce {
             Some((lead, line)) if !self.announced && now_ms.saturating_add(*lead) >= next => {
                 let line = line.clone();
                 self.announced = true;

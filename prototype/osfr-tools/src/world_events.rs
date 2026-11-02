@@ -1447,14 +1447,14 @@ impl WorldEvents {
             .map(|team| team.team)?;
         let instance_ok = run.instance == instance;
         let box_guid = run.guid(dance.voting_box);
-        let box_live = run
+        let box_at = run
             .actors
             .get(dance.voting_box)
-            .is_some_and(|actor| actor.live);
-        let box_at = run.actors[dance.voting_box].position;
+            .filter(|actor| actor.live)
+            .map(|actor| actor.position);
         let live = run.dance_off.as_mut()?;
         let reach = crate::npc_interaction::INTERACTION_RADIUS as f32;
-        if !instance_ok || !box_live || !within(position, box_at, reach, false) {
+        if !instance_ok || !box_at.is_some_and(|at| within(position, at, reach, false)) {
             // A refusal changes nothing: no close, so the client keeps the prompt.
             return Some(Vec::new());
         }
@@ -1671,9 +1671,8 @@ impl Run {
                 deliver(out, heard, || crate::chat::string_say(guid, string_id));
                 return Ok(());
             }
-            Op::Broadcast(_) | Op::Area(..) | Op::Cycle(_) | Op::OneOf(_) => {
-                unreachable!("handled above")
-            }
+            // The ops that name no actor returned from the first match.
+            Op::Broadcast(_) | Op::Area(..) | Op::Cycle(_) | Op::OneOf(_) => return Ok(()),
         };
         let seen_by = &self.actors[index].seen_by;
         out.extend(seen_by.iter().map(|session| (*session, packet.clone())));

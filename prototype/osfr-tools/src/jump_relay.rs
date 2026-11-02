@@ -8,6 +8,7 @@
 //! before relaying; position and direction still pass through
 //! `movement::validate`, exactly like the opcode-125 position path.
 
+use crate::le;
 use crate::movement::{MAX_POSITION_COMPONENT, MovementState, MovementUpdate};
 use std::io;
 
@@ -85,24 +86,29 @@ fn invalid(message: &str) -> io::Error {
 }
 
 fn checked_float(bytes: &[u8], offset: usize, what: &str) -> io::Result<f32> {
-    let value = f32::from_le_bytes(bytes[offset..offset + 4].try_into().unwrap());
-    if !value.is_finite() || value.abs() > MAX_POSITION_COMPONENT {
-        return Err(invalid(what));
-    }
-    Ok(value)
+    le::f32(bytes, offset)
+        .filter(|value| value.is_finite() && value.abs() <= MAX_POSITION_COMPONENT)
+        .ok_or_else(|| invalid(what))
 }
 
 /// Decode exactly one untrusted opcode-164 body. `guid` is the session-bound
 /// character; a body naming any other actor is refused, so a client cannot
 /// publish motion on behalf of another player.
 pub fn decode(body: &[u8], guid: u64) -> io::Result<JumpUpdate> {
-    if body.len() != BODY_LEN {
+    let (BODY_LEN, Some(opcode), Some(actor), Some(&state), Some(&unknown), Some(vertical)) = (
+        body.len(),
+        le::u16(body, 0),
+        le::u64(body, 2),
+        body.get(34),
+        body.get(35),
+        le::f32(body, 36),
+    ) else {
         return Err(invalid("jump body must be exactly 40 bytes"));
-    }
-    if u16::from_le_bytes(body[..2].try_into().unwrap()) != OPCODE {
+    };
+    if opcode != OPCODE {
         return Err(invalid("jump body has the wrong opcode"));
     }
-    if u64::from_le_bytes(body[2..10].try_into().unwrap()) != guid {
+    if actor != guid {
         return Err(invalid("jump selects another character"));
     }
     let mut position = [0.0; 3];
@@ -113,17 +119,15 @@ pub fn decode(body: &[u8], guid: u64) -> io::Result<JumpUpdate> {
     for (index, value) in direction.iter_mut().enumerate() {
         *value = checked_float(body, 22 + index * 4, "invalid jump direction")?;
     }
-    let vertical_velocity = f32::from_le_bytes(body[36..40].try_into().unwrap());
-    if !vertical_velocity.is_finite() {
+    if !vertical.is_finite() {
         return Err(invalid("non-finite jump velocity"));
     }
-    let vertical_velocity = vertical_velocity.clamp(-MAX_VERTICAL_SPEED, MAX_VERTICAL_SPEED);
     Ok(JumpUpdate {
         position,
         direction,
-        state: body[34],
-        unknown: body[35],
-        vertical_velocity,
+        state,
+        unknown,
+        vertical_velocity: vertical.clamp(-MAX_VERTICAL_SPEED, MAX_VERTICAL_SPEED),
     })
 }
 
