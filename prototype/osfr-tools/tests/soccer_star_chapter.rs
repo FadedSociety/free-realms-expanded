@@ -470,14 +470,11 @@ fn learning_soccer_star_unlocks_and_activates_profile_52() {
     let refused = busy.send(&npc_select(LANDON, learn));
     assert!(!refused.changed, "a busy Learn changes nothing");
     assert_eq!(saved(&busy.game), before);
-    assert!(
-        !busy
-            .game
-            .state()
-            .profiles
-            .unwrap()
-            .unlocked
-            .contains(&SOCCER_STAR)
+    // L936: the match itself switched the player into Soccer Star (unlocking it on first use).
+    assert_eq!(
+        busy.game.state().profiles.unwrap().active,
+        SOCCER_STAR,
+        "the match switched into Soccer Star"
     );
 }
 

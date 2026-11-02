@@ -1136,14 +1136,19 @@ fn two_players_finish_their_own_matches_independently() {
         &npc_select(MAD_JACK, option),
         now,
     );
-    // The live job is the temporary Derby Driver; the save keeps the job it replaced (T313).
+    // L936: the live job is Demo Derby Driver and the save records it too (it replaced T313's
+    // "the temporary job is never saved": there is no prior job to keep).
     assert_eq!(
         a.active_profile(),
         Some(DEMO_DERBY_DRIVER_PROFILE),
         "{}",
         replies_text(&started)
     );
-    assert_eq!(active_job(&a), BRAWLER, "the temporary job is never saved");
+    assert_eq!(
+        active_job(&a),
+        DEMO_DERBY_DRIVER_PROFILE,
+        "the derby job is saved; no prior job is kept"
+    );
     let outfit = a.profile_attachments(DEMO_DERBY_DRIVER_PROFILE).unwrap();
     assert!(
         !outfit.starts_with(&0i32.to_le_bytes()),

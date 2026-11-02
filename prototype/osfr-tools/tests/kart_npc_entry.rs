@@ -1194,10 +1194,11 @@ fn an_observation_commits_the_persisted_budget_without_a_save() {
         "a reconnect returns the player to the pre-race location"
     );
     let abandoned = restored.state();
+    // L936: the race remembers no prior job, so a reconnect leaves the player a Kart Driver.
     assert_eq!(
         abandoned.profiles.as_ref().map(|profiles| profiles.active),
-        Some(PRIOR_JOB),
-        "a reconnect restores the prior job"
+        Some(KART_JOB),
+        "a reconnect keeps the Kart Driver job; no prior job is restored"
     );
     assert!(
         abandoned
@@ -1232,6 +1233,7 @@ fn clock_only_racing_ticks_do_not_request_a_character_save() {
     game.set_dev_tools(true);
     game.set_role(osfr_tools::account_store::AccountRole::Admin);
     let prior_job = game.state().profiles.unwrap().active;
+    assert_ne!(prior_job, KART_JOB);
     let green = enter_to_green(&mut game, &character);
     assert_eq!(game.state().profiles.unwrap().active, KART_JOB);
     // The green tick requested a save, so this is the last persisted snapshot. The next two
@@ -1266,8 +1268,9 @@ fn clock_only_racing_ticks_do_not_request_a_character_save() {
     );
 
     // A server save/restore checkpoint between two clock-only ticks restores the last persisted
-    // snapshot: the older clock and the prior job survive, and the next racing ticks still request
-    // no save. A login is different: it abandons the race (F231).
+    // snapshot: the older clock and the Kart Driver job survive (L936: the race keeps no prior job),
+    // and the next racing ticks still request no save. A login is different: it abandons the race
+    // (F231).
     let mut restored = fixture.load(Some(saved));
     assert_eq!(race_phase(&restored), RacePhase::Racing);
     assert_eq!(
@@ -1283,8 +1286,10 @@ fn clock_only_racing_ticks_do_not_request_a_character_save() {
             .active
             .unwrap()
             .previous_job,
-        Some(prior_job)
+        None,
+        "the race remembers no prior job"
     );
+    assert_eq!(restored.state().profiles.unwrap().active, KART_JOB);
     restored.tick(&character, green + 120).unwrap();
     let resumed = restored.tick(&character, green + 150).unwrap();
     assert!(
@@ -1430,6 +1435,7 @@ fn a_timed_out_race_still_reports_the_abort_for_saving() {
     game.set_dev_tools(true);
     game.set_role(osfr_tools::account_store::AccountRole::Admin);
     let prior_job = game.state().profiles.unwrap().active;
+    assert_ne!(prior_job, KART_JOB);
     enter_to_green(&mut game, &character);
     let snapshot = game.state().kart_entry.unwrap().race.unwrap();
     let timeout = snapshot.race_started_ms + snapshot.bounds.max_race_ms + 1;
@@ -1442,7 +1448,8 @@ fn a_timed_out_race_still_reports_the_abort_for_saving() {
     let entry = game.state().kart_entry.unwrap();
     assert!(entry.active.is_none());
     assert_eq!(entry.race.unwrap().phase, RacePhase::Aborted);
-    assert_eq!(game.state().profiles.unwrap().active, prior_job);
+    // L936: the abort leaves the player a Kart Driver; nothing restores the prior job.
+    assert_eq!(game.state().profiles.unwrap().active, KART_JOB);
 }
 
 // ---- T392: the client's mid-race quit ----------------------------------------------------------
@@ -1457,10 +1464,11 @@ fn quit(instance: u32) -> Vec<u8> {
 
 /// The race start sends what the client's Exit needs (41/107 names the instance the quit
 /// carries; GameState 8 runs `Countdown:Show`, which shows `MinigameTitleBar` and its Exit), and
-/// the quit it sends ends the race unpaid, answered with 41/121 first, in the prior job, back at
-/// the world pose. Foreign, malformed and replayed quits change nothing.
+/// the quit it sends ends the race unpaid, answered with 41/121 first, in the Kart Driver job
+/// (L936: no prior job is restored), back at the world pose. Foreign, malformed and replayed
+/// quits change nothing.
 #[test]
-fn the_client_quit_mid_race_ends_it_unpaid_in_the_prior_job_and_a_replay_changes_nothing() {
+fn the_client_quit_mid_race_ends_it_unpaid_in_the_kart_job_and_a_replay_changes_nothing() {
     let fixture = GameplayFixture::new();
     let character = character();
     let mut game = fixture.load(None);
@@ -1535,8 +1543,14 @@ fn the_client_quit_mid_race_ends_it_unpaid_in_the_prior_job_and_a_replay_changes
         "a quit pays nothing"
     );
     assert_eq!(
-        after.profiles, before_race.profiles,
-        "the prior job is back"
+        after.profiles, racing.profiles,
+        "the quit changes no profile field: the job stays Kart Driver"
+    );
+    assert_eq!(after.profiles.as_ref().unwrap().active, KART_JOB);
+    assert_eq!(
+        after.profiles.as_ref().unwrap().experience,
+        before_race.profiles.as_ref().unwrap().experience,
+        "a quit pays no job XP"
     );
 
     // The capture's client follows 41/121 with 39/7, a second 41/109 and 26/42: all inert now.
@@ -1546,7 +1560,7 @@ fn the_client_quit_mid_race_ends_it_unpaid_in_the_prior_job_and_a_replay_changes
         }
         assert_eq!(game.state(), after);
     }
-    // A reload keeps the finished quit: no race, the prior job.
+    // A reload keeps the finished quit: no race, the Kart Driver job.
     let reloaded = fixture.load(Some(after.clone()));
     assert!(reloaded.state().kart_entry.unwrap().active.is_none());
     assert_eq!(reloaded.state().profiles, after.profiles);

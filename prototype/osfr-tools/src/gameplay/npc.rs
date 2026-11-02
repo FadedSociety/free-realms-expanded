@@ -1188,8 +1188,8 @@ impl Gameplay {
         let previous_job = profiles.active();
         let outfit_before = self.inventory.profile_attachments(previous_job)?;
         // (R) First use still unlocks Kart Driver for saves that predate trainers; the
-        // option is idempotent. W176 also offers the job from a trainer. The prior job is
-        // restored on exit.
+        // option is idempotent. W176 also offers the job from a trainer. L936: the player
+        // stays a Kart Driver after the race (client 101319; the retail race clips).
         let first_time = profiles.unlock(48)?;
         profiles.activate(48)?;
         if first_time {
@@ -1211,7 +1211,6 @@ impl Gameplay {
             return Err(invalid("kart entry requires kart content"));
         };
         let (replies, scene) = kart.begin(character)?;
-        kart.set_previous_job(previous_job);
         out.replies.extend(replies);
         out.scene_zoning = Some(scene);
         out.changed = true;
@@ -1233,15 +1232,17 @@ impl Gameplay {
                 .push(chat::system(EntryDenied::Unavailable.message()));
             return Ok(out);
         };
-        let Some(profiles) = self.profiles.as_mut() else {
+        if self.profiles.is_none() {
             out.replies
                 .push(chat::system(EntryDenied::Unavailable.message()));
             return Ok(out);
-        };
-        // (R) The Fisherman chapter is built (quests/fisherman.json) and gated on the
-        // active job by its content. The trip unlocks 137; the player activates it from
-        // the job list (26/13), whose starter outfit the active play package supplies.
-        let _ = profiles.unlock(FISHERMAN_PROFILE);
+        }
+        // L936: the trip switches the player into Fisherman (unlocking it on first use) and the
+        // job stays after the trip. The switch comes before the reward snapshot, so the round's
+        // payout adopts the Fisherman as the active job; a refused entry below changes nothing,
+        // because the caller stages `self` and `out.changed` stays false.
+        let mut switch = Outcome::default();
+        self.enter_activity_job(FISHERMAN_PROFILE, character.guid, &mut switch)?;
         let level = self.job_level(FISHERMAN_PROFILE);
         // (R) Same bag floor as quest turn-ins: never below what the player already holds.
         let rewards = self.reward_snapshot();
@@ -1255,7 +1256,11 @@ impl Gameplay {
             level,
             rewards,
         ) {
-            Ok(change) => self.start_fishing_trip(change, character, &mut out),
+            Ok(change) => {
+                out.replies.extend(switch.replies);
+                out.nearby.extend(switch.nearby);
+                self.start_fishing_trip(change, character, &mut out)
+            }
             Err(denied) => out.replies.push(chat::system(denied.message())),
         }
         Ok(out)

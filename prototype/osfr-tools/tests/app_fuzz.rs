@@ -1416,16 +1416,18 @@ fn a_refused_derby_completion_payout_changes_nothing() {
     follow_up(&mut gateway);
 }
 
+// L936: the derby no longer remembers a prior job, so the match's job is the saved job and a reset
+// leaves it (client 101319: "you automatically switch to the right Job"; the retail clips keep it).
 #[test]
-fn reset_during_a_running_derby_retires_it_and_restores_the_job() {
+fn reset_during_a_running_derby_retires_it_and_the_job_stays() {
     let fixture = Fixture::new();
     let (mut gateway, _, _) = fixture.active_derby();
     let before = gateway.snapshot();
     let before_game = before.gameplay.as_ref().unwrap();
-    let prior_job = before_game.profiles.as_ref().unwrap().active;
-    assert_ne!(
-        prior_job,
-        osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE
+    assert_eq!(
+        before_game.profiles.as_ref().unwrap().active,
+        osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE,
+        "the save records the derby job, with no prior job to restore"
     );
     assert!(gateway.gameplay().unwrap().derby_active());
     assert_eq!(
@@ -1439,8 +1441,12 @@ fn reset_during_a_running_derby_retires_it_and_restores_the_job() {
     assert!(!gateway.gameplay().unwrap().derby_active());
     assert_eq!(
         after_game.profiles.as_ref().unwrap().active,
-        prior_job,
-        "reset restores the job the derby replaced"
+        osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE,
+        "reset keeps the derby job; nothing restores another one"
+    );
+    assert_eq!(
+        gateway.gameplay().unwrap().active_profile(),
+        Some(osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE)
     );
     assert_eq!(after_game.inventory.coins, before_game.inventory.coins);
 
@@ -1448,13 +1454,19 @@ fn reset_during_a_running_derby_retires_it_and_restores_the_job() {
     assert_eq!(gateway.gameplay().unwrap().derby_phase(), None);
 }
 
+// L936: entering the derby switches to Demo Derby Driver and a cancel leaves the player in it
+// (client 101319), so the job is the one thing the cancel does not undo.
 #[test]
-fn gateway_offer_cancel_restores_state_and_rejects_a_stale_quit() {
+fn gateway_offer_cancel_restores_coins_keeps_the_derby_job_and_rejects_a_stale_quit() {
     let fixture = Fixture::new();
     let mut gateway = fixture.gateway(true, false);
     let before = gateway.snapshot();
     let before_coins = before.gameplay.as_ref().unwrap().inventory.coins;
     let before_job = gateway.gameplay().unwrap().active_profile();
+    assert_ne!(
+        before_job,
+        Some(osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE)
+    );
     let mut menu = vec![26, 0, 8, 0];
     menu.extend(NPC.to_le_bytes());
     menu.push(0);
@@ -1471,10 +1483,18 @@ fn gateway_offer_cancel_restores_state_and_rejects_a_stale_quit() {
         .map(|packet| i32::from_le_bytes(packet[3..7].try_into().unwrap()))
         .expect("derby offer");
     assert!(gateway.gameplay().unwrap().derby_active());
+    assert_eq!(
+        gateway.gameplay().unwrap().active_profile(),
+        Some(osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE)
+    );
 
     let cancelled = gateway.handle_at(&wrap(&[26, 0, 42, 0]), 1_200).unwrap();
     assert!(!gateway.gameplay().unwrap().derby_active());
-    assert_eq!(gateway.gameplay().unwrap().active_profile(), before_job);
+    assert_eq!(
+        gateway.gameplay().unwrap().active_profile(),
+        Some(osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE),
+        "the cancel does not switch back to the prior job"
+    );
     assert_eq!(
         gateway
             .snapshot()
@@ -1493,10 +1513,8 @@ fn gateway_offer_cancel_restores_state_and_rejects_a_stale_quit() {
             .any(|packet| packet.starts_with(&[39, 0, 19]))
     );
     assert!(
-        cancelled
-            .nearby
-            .iter()
-            .any(|packet| packet.starts_with(&[35, 0, 7, 0]))
+        cancelled.nearby.is_empty(),
+        "nobody nearby is told of an outfit change: the job did not change"
     );
 
     let after = gateway.snapshot();
@@ -1520,6 +1538,11 @@ fn gateway_pending_game_cancel_retires_without_rewards() {
         .unwrap()
         .active;
     let phase = gateway.gameplay().unwrap().derby_phase();
+    // L936: the saved job is already the derby job, and the cancel leaves it.
+    assert_eq!(
+        before_job,
+        osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE
+    );
 
     gateway
         .handle_at(&wrap(&derby_cancel_request(instance + 1)), 4_100)
@@ -1553,10 +1576,8 @@ fn gateway_pending_game_cancel_retires_without_rewards() {
             .any(|packet| packet.starts_with(&[39, 0, 19]))
     );
     assert!(
-        cancelled
-            .nearby
-            .iter()
-            .any(|packet| packet.starts_with(&[35, 0, 7, 0]))
+        cancelled.nearby.is_empty(),
+        "nobody nearby is told of an outfit change: the job did not change"
     );
     let after = gateway.snapshot();
     gateway
@@ -1587,6 +1608,15 @@ fn unstarted_derby_offer_times_out_without_rewards() {
     choice.extend(NPC.to_le_bytes());
     choice.extend(3_i32.to_le_bytes());
     gateway.handle_at(&wrap(&choice), 1_100).unwrap();
+    // L936: the offer already switched the job; the timeout leaves it (no prior job to restore).
+    assert_ne!(
+        before_job,
+        osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE
+    );
+    assert_eq!(
+        gateway.gameplay().unwrap().active_profile(),
+        Some(osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE)
+    );
 
     gateway.tick_at(2_099).unwrap();
     assert!(gateway.gameplay().unwrap().derby_active());
@@ -1594,7 +1624,8 @@ fn unstarted_derby_offer_times_out_without_rewards() {
     assert!(!gateway.gameplay().unwrap().derby_active());
     assert_eq!(
         gateway.gameplay().unwrap().active_profile(),
-        Some(before_job)
+        Some(osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE),
+        "the timeout does not switch back to the prior job"
     );
     assert_eq!(
         gateway
@@ -1614,10 +1645,8 @@ fn unstarted_derby_offer_times_out_without_rewards() {
             .any(|packet| packet.starts_with(&[39, 0, 19]))
     );
     assert!(
-        timed_out
-            .nearby
-            .iter()
-            .any(|packet| packet.starts_with(&[35, 0, 7, 0]))
+        timed_out.nearby.is_empty(),
+        "nobody nearby is told of an outfit change: the job did not change"
     );
     let after = gateway.snapshot();
     gateway.tick_at(2_200).unwrap();

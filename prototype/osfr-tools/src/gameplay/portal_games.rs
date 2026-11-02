@@ -135,8 +135,8 @@ impl Gameplay {
                 self.start_recipe(recipe, true, character, now_ms, &mut out)?;
                 Ok(out)
             }
-            // L100 (R): a node's gates without the node: idle, the gather job unlocked and
-            // active, the game offered and its whole payout fitting the bag.
+            // L100 (R): a node's gates without the node: idle, the gather job unlocked, the game
+            // offered and its whole payout fitting the bag. L936: the start switches into the job.
             Kind::Gather { gather } => {
                 let game = i32::try_from(id).map_err(|_| invalid("gather game id"))?;
                 let profiles = self
@@ -146,7 +146,7 @@ impl Gameplay {
                 let admitted = if busy {
                     Err(Denied::Busy)
                 } else {
-                    gather.admit_job(profiles.active(), &profiles.state().unlocked)
+                    gather.admit_job(&profiles.state().unlocked)
                 };
                 if let Err(denied) = admitted {
                     return Ok(refused(&denied.message()));
@@ -164,6 +164,7 @@ impl Gameplay {
                 }
                 self.commit_if_changed(|staged| {
                     let mut out = Outcome::default();
+                    staged.enter_activity_job(gather.job(), character.guid, &mut out)?;
                     staged.begin_gather(gather, Some(game), now_ms, &mut out)?;
                     Ok(out)
                 })

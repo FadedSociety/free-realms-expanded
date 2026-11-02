@@ -988,15 +988,27 @@ fn ordinary_mining_node_advances_gather_and_minigame_through_gameplay() {
         .unwrap()
         .select(1, &game.inventory)
         .unwrap();
-    let before = game.state();
-    let refused = send(&mut game, &character, &node_click(node_guid), 1_100);
+    // L936: an unlocked-but-inactive Miner click no longer refuses ("Switch to the Miner job"): it
+    // switches the player into Miner (38/21 activation sent) and starts the run, which reports
+    // nothing to the quest until it finishes.
+    assert_eq!(game.profiles.as_ref().unwrap().active(), 1);
+    let switched = send(&mut game, &character, &node_click(node_guid), 1_100);
+    assert_eq!(
+        game.profiles.as_ref().unwrap().active(),
+        crate::mining::MINER_PROFILE_ID
+    );
     assert!(
-        refused
+        switched
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[38, 0, 21, 0]))
+    );
+    assert!(
+        !switched
             .replies
             .iter()
             .any(|packet| { String::from_utf8_lossy(packet).contains("Switch to the Miner job") })
     );
-    assert_eq!(game.state(), before);
     assert_eq!(
         game.npc_quests
             .as_ref()
@@ -1007,8 +1019,6 @@ fn ordinary_mining_node_advances_gather_and_minigame_through_gameplay() {
         vec![0, 0]
     );
 
-    select(&mut game, crate::mining::MINER_PROFILE_ID);
-    send(&mut game, &character, &node_click(node_guid), 1_200);
     let instance = game
         .mining
         .as_ref()

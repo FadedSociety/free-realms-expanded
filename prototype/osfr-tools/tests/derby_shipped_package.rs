@@ -612,10 +612,13 @@ fn a_finished_match_pays_the_flat_reward_once() {
     assert!(closed.gameplay_changed);
     let after = gateway.snapshot().gameplay.unwrap();
     assert!(!gateway.gameplay().unwrap().derby_active());
+    // L936: Close leaves the player a Demo Derby Driver (client 101319); nothing restores the job
+    // that was active before entry.
+    assert_ne!(before_job, DEMO_DERBY_DRIVER_PROFILE);
     assert_eq!(
         after.profiles.as_ref().unwrap().active,
-        before_job,
-        "Close restores the job active before entry"
+        DEMO_DERBY_DRIVER_PROFILE,
+        "Close keeps the derby job; the prior job is not restored"
     );
     assert_eq!(after.inventory.coins, before_coins + COMPLETION_COINS);
     assert_eq!(
@@ -642,13 +645,16 @@ fn a_finished_match_pays_the_flat_reward_once() {
     );
 }
 
+// L936: the save records the derby job itself (it used to record the replaced job), and a reload
+// keeps it.
 #[test]
-fn the_paid_ledger_and_prior_job_survive_a_reconnect() {
+fn the_paid_ledger_and_the_derby_job_survive_a_reconnect() {
     let content = Shipped::new();
     let state = Gameplay::load(&content.0, None).unwrap().state();
     let before = state.clone();
     let before_coins = before.inventory.coins;
     let before_job = before.profiles.as_ref().unwrap().active;
+    assert_ne!(before_job, DEMO_DERBY_DRIVER_PROFILE);
 
     let mut gateway = gateway_at(&content, state, npc_position(MAD_JACK));
     let instance = enter_derby(&mut gateway, MAD_JACK, NOW);
@@ -660,15 +666,18 @@ fn the_paid_ledger_and_prior_job_survive_a_reconnect() {
         before_coins + COMPLETION_COINS
     );
 
-    // The save encoding (not just the live struct) carries the ledger and the prior job.
+    // The save encoding (not just the live struct) carries the ledger and the derby job.
     let encoded = serde_json::to_vec(&paid).unwrap();
     let reloaded: Snapshot = serde_json::from_slice(&encoded).unwrap();
     let saved = reloaded.gameplay.unwrap();
     assert_eq!(saved.derby.as_ref().unwrap().paid_matches, vec![instance]);
-    assert_eq!(saved.profiles.as_ref().unwrap().active, before_job);
+    assert_eq!(
+        saved.profiles.as_ref().unwrap().active,
+        DEMO_DERBY_DRIVER_PROFILE
+    );
 
     let mut game = Gameplay::load(&content.0, Some(saved)).unwrap();
-    assert_eq!(game.active_profile(), Some(before_job));
+    assert_eq!(game.active_profile(), Some(DEMO_DERBY_DRIVER_PROFILE));
     assert!(!game.derby_active());
     assert_eq!(
         game.state().inventory.coins,

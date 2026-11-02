@@ -988,7 +988,7 @@ fn busy_derby_refusal_keeps_the_exact_menu_for_a_retry() {
 }
 
 #[test]
-fn offer_cancel_through_gameplay_restores_the_job_and_keeps_stale_quit_inert() {
+fn offer_cancel_through_gameplay_keeps_the_derby_job_and_keeps_stale_quit_inert() {
     let fixture = GameplayFixture::new();
     let mut game = Gameplay::load(&fixture.path, None).unwrap();
     let character = CharacterState {
@@ -1017,7 +1017,9 @@ fn offer_cancel_through_gameplay_restores_the_job_and_keeps_stale_quit_inert() {
         .unwrap();
     assert!(cancelled.changed);
     assert!(!game.derby_active());
-    assert_eq!(game.active_profile(), Some(before_job));
+    // L936: the cancel keeps the job the entry switched to (client 101319).
+    assert_ne!(before_job, DEMO_DERBY_DRIVER_PROFILE);
+    assert_eq!(game.active_profile(), Some(DEMO_DERBY_DRIVER_PROFILE));
     assert_eq!(game.state().inventory.coins, before_coins);
     assert!(
         cancelled
@@ -1173,16 +1175,16 @@ fn gameplay_routes_the_offer_pays_one_completion_and_ignores_replays() {
     let saved = game.state();
     assert_eq!(
         saved.profiles.as_ref().unwrap().active,
-        before_job,
-        "the temporary Derby Driver job is never persisted"
+        DEMO_DERBY_DRIVER_PROFILE,
+        "L936: the Derby Driver job the entry switched to is saved"
     );
     assert!(saved.derby.is_none(), "an unpaid match writes no ledger");
     let restored = Gameplay::load(&fixture.path, Some(saved)).unwrap();
     assert!(!restored.derby_active());
     assert_eq!(
         restored.state().profiles.as_ref().unwrap().active,
-        before_job,
-        "a mid-match save restores the job and drops only the match"
+        DEMO_DERBY_DRIVER_PROFILE,
+        "L936: a mid-match save keeps the derby job and drops only the match"
     );
 
     let started = game
@@ -1294,8 +1296,8 @@ fn gameplay_routes_the_offer_pays_one_completion_and_ignores_replays() {
     assert!(!game.derby_active());
     assert_eq!(
         game.state().profiles.as_ref().unwrap().active,
-        before_job,
-        "leaving restores the job active before entry"
+        DEMO_DERBY_DRIVER_PROFILE,
+        "L936: leaving keeps the derby job"
     );
     assert_eq!(
         game.state().inventory.coins,
@@ -1309,18 +1311,13 @@ fn gameplay_routes_the_offer_pays_one_completion_and_ignores_replays() {
             .any(|packet| packet.starts_with(&[50, 0, 1])),
         "the close sends no reward bundle"
     );
-    let restored_outfit = game.profile_attachments(before_job).unwrap();
-    let close_switch = closed
-        .nearby
-        .iter()
-        .find(|packet| {
+    // L936: no job switch on the close, so no outfit change is announced to neighbours.
+    assert!(
+        !closed.nearby.iter().any(|packet| {
             packet.starts_with(&[35, 0, 7, 0])
                 && packet.get(4..12) == Some(&OWNER.raw().to_le_bytes()[..])
-        })
-        .expect("an accepted derby close announces the restored visible outfit");
-    assert_eq!(
-        &close_switch[12..close_switch.len() - 4],
-        &restored_outfit[..]
+        }),
+        "an accepted derby close announces no outfit change"
     );
     assert!(
         closed
@@ -1328,12 +1325,7 @@ fn gameplay_routes_the_offer_pays_one_completion_and_ignores_replays() {
             .iter()
             .any(|packet| packet.starts_with(&[35, 0, 20]))
     );
-    assert!(
-        closed
-            .nearby
-            .iter()
-            .any(|packet| packet.starts_with(&[35, 0, 7, 0]))
-    );
+    // L936: no 35/7 to neighbours on the close (asserted above); the job and outfit stay.
 
     let replay_close = game
         .handle_in_world(&[26, 0, 42, 0], &character, 5_200)
@@ -1341,7 +1333,11 @@ fn gameplay_routes_the_offer_pays_one_completion_and_ignores_replays() {
     assert!(!replay_close.changed);
     let reloaded = Gameplay::load(&fixture.path, Some(game.state())).unwrap();
     assert!(!reloaded.derby_active());
-    assert_eq!(reloaded.active_profile(), Some(before_job));
+    assert_eq!(
+        reloaded.active_profile(),
+        Some(DEMO_DERBY_DRIVER_PROFILE),
+        "L936: the reload keeps the derby job"
+    );
     assert_eq!(
         reloaded.state().inventory.coins,
         before_coins + COMPLETION_COINS

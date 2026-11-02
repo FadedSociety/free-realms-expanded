@@ -231,14 +231,13 @@ impl Gather {
         }
     }
 
-    /// The job lines every gather start shares (a node click, L100 a Games window row): the job
-    /// unlocked, then active.
-    pub fn admit_job(self, active_job: i32, unlocked_jobs: &BTreeSet<i32>) -> Result<(), Denied> {
+    /// The job line every gather start shares (a node click, L100 a Games window row): the job
+    /// unlocked. L936: the caller then switches the player into it (client 76669: "Whenever you
+    /// interact with something that requires a specific Job, whether it's a harvesting node ...
+    /// you'll automatically switch into the necessary Job").
+    pub fn admit_job(self, unlocked_jobs: &BTreeSet<i32>) -> Result<(), Denied> {
         if !unlocked_jobs.contains(&self.job()) {
             return Err(Denied::NoJob(self));
-        }
-        if active_job != self.job() {
-            return Err(Denied::WrongJob(self));
         }
         Ok(())
     }
@@ -390,7 +389,6 @@ pub enum Denied {
     Busy,
     TooFar,
     NoJob(Gather),
-    WrongJob(Gather),
     /// No active quest has an open collect step for this pickup's node type (T503).
     NotNeeded,
 }
@@ -409,7 +407,6 @@ impl Denied {
                     .into()
             }
             Self::NoJob(g) => format!("You need to be a {} to gather that.", g.word()),
-            Self::WrongJob(g) => format!("Switch to the {} job to gather that.", g.word()),
         }
     }
 }
@@ -420,7 +417,6 @@ pub struct Visitor<'a> {
     pub zone: u32,
     pub position: [f32; 3],
     pub busy: bool,
-    pub active_job: i32,
     pub unlocked_jobs: &'a BTreeSet<i32>,
 }
 
@@ -510,7 +506,7 @@ impl GatheringNodes {
         let SiteKind::Gather(gather) = &site.kind else {
             return Err(Denied::NotNeeded);
         };
-        gather.admit_job(who.active_job, who.unlocked_jobs)?;
+        gather.admit_job(who.unlocked_jobs)?;
         Ok(*gather)
     }
 

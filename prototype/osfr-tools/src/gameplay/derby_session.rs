@@ -145,8 +145,8 @@ impl Gameplay {
             .derby
             .as_mut()
             .ok_or_else(|| invalid("derby entry requires the derby service"))?;
+        // L936: the player stays a Demo Derby Driver after the match (client 101319).
         let offer = derby.begin_row(character, now_ms, row)?;
-        derby.set_previous_job(previous_job);
         out.replies.push(offer);
         out.replies.extend(derby.ready_packet());
         out.changed = true;
@@ -175,9 +175,7 @@ impl Gameplay {
                 return Ok(out);
             }
             let previous_job = derby.exit();
-            if let Some(job) = previous_job {
-                self.restore_job(job, character.guid, &mut out)?;
-            }
+            self.leave_activity_job(previous_job, character.guid, &mut out)?;
             out.replies
                 .push(crate::kart_gateway::player_status(character.guid, 1));
             out.changed = true;
@@ -292,9 +290,7 @@ impl Gameplay {
         }
         let previous_job = derby.exit();
         out.replies = removals;
-        if let Some(job) = previous_job {
-            self.restore_job(job, character.guid, &mut out)?;
-        }
+        self.leave_activity_job(previous_job, character.guid, &mut out)?;
         out.replies
             .push(crate::kart_gateway::player_status(character.guid, 1));
         out.changed = true;

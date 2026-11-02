@@ -24,6 +24,59 @@ impl Gameplay {
             .unwrap_or(fallback)
     }
 
+    /// L936: entering a job's game switches the player into that job, and the job stays after the
+    /// game (client 101319: "When you start the minigame, you automatically switch to the right
+    /// Job"; 76669 says the same for harvesting nodes). First entry unlocks the job and hands its
+    /// starter outfit (everything is free). A job whose outfit cannot dress Chest and Legs is not
+    /// switched, because the client's `ProcessProfileSwap` (`0x00bfb620`) rejects it: the game
+    /// still starts, in the current job.
+    pub(super) fn enter_activity_job(
+        &mut self,
+        job: i32,
+        guid: u64,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        let Some(profiles) = self.profiles.as_mut() else {
+            return Ok(());
+        };
+        if profiles.active() == job {
+            return Ok(());
+        }
+        if profiles.unlock(job)? {
+            self.give_starter_outfit(job, false, out)?;
+        }
+        let mut staged = self.clone();
+        let mut switch = Outcome::default();
+        staged.restore_job(job, guid, &mut switch)?;
+        if !staged.inventory.has_required_profile_slots(job) {
+            return Ok(());
+        }
+        *self = staged;
+        out.changed = true;
+        out.replies.extend(switch.replies);
+        out.nearby.extend(switch.nearby);
+        Ok(())
+    }
+
+    /// L936: leaving a race or match keeps the activity's job; only a race or match saved before
+    /// L936 still names a prior job to go back to. Either way the on-foot action bar is sent for
+    /// the job the player ends in, as the old exit's `restore_job` did.
+    pub(super) fn leave_activity_job(
+        &mut self,
+        previous: Option<i32>,
+        guid: u64,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        if let Some(job) = previous {
+            return self.restore_job(job, guid, out);
+        }
+        if let (Some(_), Some(profiles)) = (&self.abilities, &self.profiles) {
+            out.replies
+                .extend(self.ability_activation_for(profiles.active())?);
+        }
+        Ok(())
+    }
+
     /// Grant and equip a job's starter outfit from the content's starter table.
     /// With `reuse_owned`, a piece the player already owns is equipped instead
     /// of granting a duplicate. (R) Pieces the catalogue lacks are skipped.

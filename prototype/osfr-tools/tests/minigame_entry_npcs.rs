@@ -601,7 +601,9 @@ fn the_wildwood_turnstile_offers_and_starts_the_kart_race_for_two_players() {
     );
     let after = first.snapshot().gameplay.unwrap();
     assert!(after.kart_entry.unwrap().active.is_none());
-    assert_eq!(after.profiles.unwrap().active, prior_job);
+    // L936: the close keeps Kart Driver (48), the job the turnstile switched to.
+    assert_ne!(prior_job, 48);
+    assert_eq!(after.profiles.unwrap().active, 48);
     assert_eq!(after.inventory.coins, coins);
 }
 

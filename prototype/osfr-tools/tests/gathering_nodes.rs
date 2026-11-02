@@ -958,15 +958,12 @@ fn refusals_leave_no_trace() {
         assert!(said(&out, "closer"), "{}", game.node);
         assert_eq!(far.snapshot(), before);
 
-        // Job not unlocked, or unlocked but not the active job.
+        // Job not unlocked. L936: an unlocked job that is not the active one is no refusal any
+        // more (the click switches into it): see `unlocked_but_inactive_job_switches_on_a_node_*`.
         let mut none = fixture.near(fixture.state(false, false));
         let before = none.snapshot();
         assert!(said(&click(&mut none, guid, 2_000), "You need to be a"));
         assert_eq!(none.snapshot(), before);
-        let mut wrong = fixture.near(fixture.state(false, true));
-        let before = wrong.snapshot();
-        assert!(said(&click(&mut wrong, guid, 2_000), "Switch to the"));
-        assert_eq!(wrong.snapshot(), before);
 
         // Busy: a run is under way, so a second node (even in range) and a repeat click do nothing.
         let mut gateway = fixture.ready();
@@ -1091,8 +1088,11 @@ fn begin_gather_stamps_the_clock_only_after_begin() {
     }
 }
 
+/// L936 (client 76669, "you'll automatically switch into the necessary Job"): a node click from an
+/// unlocked-but-inactive job switches into the node's job and starts the run; the developer
+/// command keeps its own "Switch to the X job" refusal.
 #[test]
-fn unlocked_but_inactive_job_is_refused_on_both_paths() {
+fn unlocked_but_inactive_job_switches_on_a_node_click_and_the_dev_command_refuses() {
     for game in GAMES {
         let fixture = Fixture::new(game);
         let guid = fixture.node.guid;
@@ -1102,17 +1102,35 @@ fn unlocked_but_inactive_job_is_refused_on_both_paths() {
             ("Chef", "harvesting")
         };
 
-        // The node admission names the job.
+        // The node click switches into the job (38/21 activation) and starts the run.
         let mut gateway = fixture.near(fixture.state(false, true));
-        let before = gateway.snapshot();
-        let node = click(&mut gateway, guid, 2_000);
-        assert_eq!(
-            chat_text(&node).trim_end(),
-            format!("Switch to the {word} job to gather that."),
+        assert_ne!(
+            gateway.gameplay().unwrap().active_profile(),
+            Some(game.profile),
             "{}",
             game.node
         );
-        assert_eq!(gateway.snapshot(), before);
+        let node = click(&mut gateway, guid, 2_000);
+        assert!(node.gameplay_changed, "{}", game.node);
+        assert_eq!(
+            gateway.gameplay().unwrap().active_profile(),
+            Some(game.profile),
+            "{}",
+            game.node
+        );
+        assert!(
+            inners(&node).iter().any(|p| p.starts_with(&[38, 0, 21, 0])),
+            "{}: the job switch sends an activation",
+            game.node
+        );
+        assert!(!said(&node, "Switch to the"), "{}", chat_text(&node));
+        assert!(active(&gateway, game).is_some(), "{}", game.node);
+        assert_eq!(
+            gameplay_json(&gateway)["profiles"]["active"],
+            game.profile,
+            "{}: the save records the new job",
+            game.node
+        );
 
         // The developer command names the same job and its own test.
         let mut gateway = fixture.dev_near(fixture.state(false, true));
@@ -1134,8 +1152,11 @@ fn unlocked_but_inactive_job_is_refused_on_both_paths() {
     }
 }
 
+/// L936: the developer command stays refused for a missing or inactive job and changes nothing;
+/// a node click is refused (and changes nothing) only without the job unlocked. With the job
+/// unlocked but inactive it switches into the job and starts the run instead.
 #[test]
-fn a_refused_developer_gather_and_node_click_change_nothing() {
+fn a_refused_developer_gather_and_a_jobless_node_click_change_nothing() {
     for game in GAMES {
         let fixture = Fixture::new(game);
         let guid = fixture.node.guid;
@@ -1150,25 +1171,9 @@ fn a_refused_developer_gather_and_node_click_change_nothing() {
             let before = gateway.snapshot();
             let before_bytes = serde_json::to_vec(&before).unwrap();
 
-            // A node click refused by the node admission changes nothing, including
-            // the save bytes.
-            let refused = click(&mut gateway, guid, 2_000);
-            assert!(
-                !refused.gameplay_changed,
-                "{}: node refusal saved",
-                game.node
-            );
-            assert_eq!(gateway.snapshot(), before, "{}: node refusal", game.node);
-            assert_eq!(
-                serde_json::to_vec(&gateway.snapshot()).unwrap(),
-                before_bytes,
-                "{}: node refusal bytes",
-                game.node
-            );
-
-            // The developer command is refused by the same eligibility and also
-            // changes nothing.
-            let refused = send(&mut gateway, &chat_inner(command), 2_100);
+            // The developer command is refused by the same eligibility and changes nothing,
+            // including the save bytes.
+            let refused = send(&mut gateway, &chat_inner(command), 2_000);
             assert!(
                 !refused.gameplay_changed,
                 "{}: command refusal saved",
@@ -1179,6 +1184,36 @@ fn a_refused_developer_gather_and_node_click_change_nothing() {
                 serde_json::to_vec(&gateway.snapshot()).unwrap(),
                 before_bytes,
                 "{}: command refusal bytes",
+                game.node
+            );
+            assert!(active(&gateway, game).is_none(), "{}", game.node);
+
+            if unlocked {
+                // L936: an unlocked job is admitted and switched into, not refused.
+                let started = click(&mut gateway, guid, 2_100);
+                assert!(started.gameplay_changed, "{}: switch saved", game.node);
+                assert_eq!(
+                    gateway.gameplay().unwrap().active_profile(),
+                    Some(game.profile),
+                    "{}",
+                    game.node
+                );
+                assert!(active(&gateway, game).is_some(), "{}", game.node);
+                continue;
+            }
+
+            // A node click without the job unlocked changes nothing, including the save bytes.
+            let refused = click(&mut gateway, guid, 2_100);
+            assert!(
+                !refused.gameplay_changed,
+                "{}: node refusal saved",
+                game.node
+            );
+            assert_eq!(gateway.snapshot(), before, "{}: node refusal", game.node);
+            assert_eq!(
+                serde_json::to_vec(&gateway.snapshot()).unwrap(),
+                before_bytes,
+                "{}: node refusal bytes",
                 game.node
             );
             assert!(active(&gateway, game).is_none(), "{}", game.node);
@@ -1325,18 +1360,45 @@ fn play(gateway: &mut Gateway, row: u32, now_ms: u64) -> GatewayOutcome {
 /// L100: Play on a live harvest row starts that row's game 60 m from every node, under the
 /// node's own job lines, and pays its produce; a live row no engine offers stays closed. With
 /// the shipped `mining.json`, Copper Mining (row 400) starts game 91 on the copper board.
+/// L936: Play from an unlocked-but-inactive job switches into it and starts the game; Play without
+/// the job unlocked is the refusal that changes nothing.
 #[test]
 fn games_window_play_starts_the_rows_gather_game_away_from_every_node() {
     let fixture = Fixture::new(PLOT);
-    let mut idle = fixture.gateway_at(fixture.state(false, true), &fixture.node, 60.0);
-    let before = idle.snapshot();
-    let refused = play(&mut idle, 410, 2_000);
+    let mut none = fixture.gateway_at(fixture.state(false, false), &fixture.node, 60.0);
+    let before = none.snapshot();
+    let refused = play(&mut none, 410, 2_000);
     assert!(
-        said(&refused, "Switch to the Chef job"),
+        said(&refused, "You need to be a Chef"),
         "{}",
         chat_text(&refused)
     );
-    assert_eq!(idle.snapshot(), before, "a refused Play changes nothing");
+    assert_eq!(none.snapshot(), before, "a refused Play changes nothing");
+
+    let mut idle = fixture.gateway_at(fixture.state(false, true), &fixture.node, 60.0);
+    assert_ne!(
+        idle.gameplay().unwrap().active_profile(),
+        Some(CHEF_PROFILE_ID)
+    );
+    tick(&mut idle, 1_500);
+    let switched = play(&mut idle, 410, 2_000);
+    assert!(
+        !said(&switched, "Switch to the"),
+        "{}",
+        chat_text(&switched)
+    );
+    assert_eq!(
+        idle.gameplay().unwrap().active_profile(),
+        Some(CHEF_PROFILE_ID)
+    );
+    assert!(
+        inners(&switched)
+            .iter()
+            .any(|p| p.starts_with(&[38, 0, 21, 0])),
+        "the job switch sends an activation"
+    );
+    assert_eq!(started_game(&switched).0, 109);
+    assert!(active(&idle, PLOT).is_some(), "the row's run is offered");
 
     let mut gateway = fixture.gateway_at(fixture.state(true, true), &fixture.node, 60.0);
     tick(&mut gateway, 1_500);
@@ -1367,9 +1429,10 @@ fn games_window_play_starts_the_rows_gather_game_away_from_every_node() {
 }
 
 /// L103: Mail Sorting runs on a third Type8 engine for the Postman. Play on the live Sanctuary
-/// row (414, game 376) tells an inactive Postman to switch and changes nothing; as the Postman it
-/// starts the board 60 m from every node, and a won run pays Postman XP once and no item. The
-/// board is the synthetic W171 one with no outputs, the shipped file's payout shape.
+/// row (414, game 376) refuses a player without the job unlocked and changes nothing; L936: an
+/// unlocked-but-inactive Postman is switched into the job; as the Postman it starts the board
+/// 60 m from every node, and a won run pays Postman XP once and no item. The board is the
+/// synthetic W171 one with no outputs, the shipped file's payout shape.
 #[test]
 fn games_window_play_sorts_mail_for_the_postman() {
     const POSTMAN: i32 = mail_sorting::POSTMAN_PROFILE_ID;
@@ -1391,6 +1454,12 @@ fn games_window_play_sorts_mail_for_the_postman() {
     });
     let path = fixture.directory.join(mail_sorting::CONTENT_FILE);
     fs::write(path, serde_json::to_vec(&content).unwrap()).unwrap();
+    // L936: the switch needs a job it can dress (Chest and Legs). The reference campaign has no
+    // Postman starter row, so give it the play package's two pieces (`postman_trainer.rs`).
+    let profiles_path = fixture.directory.join("profiles.json");
+    let mut profiles = json::read(&profiles_path);
+    profiles["starter_items"]["4"] = json!([12_827, 13_197]);
+    json::write_pretty(&profiles_path, &profiles);
     let state = |active: bool| {
         let mut state = fixture.state(false, false);
         let profiles = state.profiles.as_mut().unwrap();
@@ -1401,15 +1470,34 @@ fn games_window_play_sorts_mail_for_the_postman() {
         state
     };
 
-    let mut idle = fixture.gateway_at(state(false), &fixture.node, 60.0);
-    let before = idle.snapshot();
-    let refused = play(&mut idle, 414, 2_000);
+    let mut none = fixture.gateway_at(fixture.state(false, false), &fixture.node, 60.0);
+    let before = none.snapshot();
+    let refused = play(&mut none, 414, 2_000);
     assert!(
-        said(&refused, "Switch to the Postman job"),
+        said(&refused, "You need to be a Postman"),
         "{}",
         chat_text(&refused)
     );
-    assert_eq!(idle.snapshot(), before, "a refused Play changes nothing");
+    assert_eq!(none.snapshot(), before, "a refused Play changes nothing");
+
+    let mut idle = fixture.gateway_at(state(false), &fixture.node, 60.0);
+    assert_ne!(idle.gameplay().unwrap().active_profile(), Some(POSTMAN));
+    tick(&mut idle, 1_500);
+    let switched = play(&mut idle, 414, 2_000);
+    assert!(
+        !said(&switched, "Switch to the"),
+        "{}",
+        chat_text(&switched)
+    );
+    assert_eq!(idle.gameplay().unwrap().active_profile(), Some(POSTMAN));
+    assert!(
+        inners(&switched)
+            .iter()
+            .any(|p| p.starts_with(&[38, 0, 21, 0])),
+        "the job switch sends an activation"
+    );
+    assert_eq!(started_game(&switched), (376, 102030, 35611));
+    assert!(active(&idle, mail).is_some(), "the mail run is offered");
 
     let mut gateway = fixture.gateway_at(state(true), &fixture.node, 60.0);
     tick(&mut gateway, 1_500);

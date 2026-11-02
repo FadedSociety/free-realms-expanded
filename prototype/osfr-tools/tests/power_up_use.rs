@@ -976,9 +976,12 @@ fn a_shared_field_use_skips_an_enemy_outside_the_senders_interest() {
 }
 
 /// F263 blocker: a derby return used to send the raw job bar, hiding a held
-/// kind while the server still held it.
+/// kind while the server still held it. L936: the cancel no longer returns the player
+/// to a prior job (they stay a Demo Derby Driver); leaving still resends the bar for the
+/// job they end in, through the power-up seam, and the server keeps the held kind; the
+/// player's own switch back to the Brawler shows it on its slot again.
 #[test]
-fn a_derby_return_keeps_the_held_power_up_on_its_slot() {
+fn a_derby_cancel_keeps_the_held_power_up_and_the_switch_back_keeps_its_slot() {
     let fixture = Fixture::new();
     let (mut game, location, _) = fresh_game(&fixture, 0);
     let kill = hold(&mut game, &location);
@@ -998,16 +1001,39 @@ fn a_derby_return_keeps_the_held_power_up_on_its_slot() {
         game.derby_active() && entered.replies.iter().any(|p| p.starts_with(&[39, 0, 16])),
         "the gate's derby choice opens the offer"
     );
+    assert_eq!(
+        game.held_power_up(),
+        Some("flame_wave"),
+        "the derby entry keeps the held kind"
+    );
     let cancelled = game
         .handle_in_world(&[26, 0, 42, 0], &near, kill + 500)
         .unwrap();
     assert!(!game.derby_active());
     assert_eq!(
+        game.active_profile(),
+        Some(osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE),
+        "the cancel leaves the derby job"
+    );
+    assert_eq!(
         game.held_power_up(),
         Some("flame_wave"),
-        "the job switch keeps the held kind"
+        "no job switch on the cancel: the held kind stays"
     );
-    let bar = toolbar(&cancelled).expect("the derby return resends the toolbar");
+    // L936: leaving resends the bar of the job the player ends in. Demo Derby Driver is a
+    // noncombat job, which cannot use a combat kind, so its bar leaves the slot empty while
+    // the server keeps holding the kind (asserted above).
+    let left = toolbar(&cancelled).expect("leaving the derby resends the job's bar (L936)");
+    assert_eq!(
+        slot_ids(left)[2],
+        None,
+        "a noncombat job's bar does not offer the held combat kind"
+    );
+    let back = game
+        .handle_in_world(&command(26, 13, &[43]), &near, kill + 600)
+        .unwrap();
+    assert_eq!(game.held_power_up(), Some("flame_wave"));
+    let bar = toolbar(&back).expect("the switch back resends the toolbar");
     assert_eq!(
         slot_ids(bar)[2],
         Some(slot.definition_id),

@@ -593,11 +593,11 @@ fn play_a_paid_win(fixture: &Fixture, xp: u32, ticket: &str) -> (Gateway, Vec<Ve
     (gateway, packets, now)
 }
 
-/// L927: a won match pays the Soccer Star's `activity_xp` (72, `job_xp_curve.json`) while that job is
-/// unlocked; a character without the job still gets the coins and no refusal.
+/// L927: a won match pays the Soccer Star's `activity_xp` (72, `job_xp_curve.json`). L936: entering the
+/// match unlocks and switches into Soccer Star, so a character who did not have the job is paid too.
 #[test]
-fn a_won_match_pays_the_soccer_stars_activity_xp_only_while_the_job_is_unlocked() {
-    for (unlocked, paid) in [(vec![52], Some(72)), (vec![], None)] {
+fn a_won_match_pays_the_soccer_stars_activity_xp_with_or_without_the_job_before() {
+    for (unlocked, paid) in [(vec![52], Some(72)), (vec![], Some(72))] {
         let fixture = Fixture::new();
         let release = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/release");
         fs::copy(
@@ -612,6 +612,7 @@ fn a_won_match_pays_the_soccer_stars_activity_xp_only_while_the_job_is_unlocked(
         settle_win(&mut gateway, loaded_at + 100);
         let profiles = gateway.snapshot().gameplay.unwrap().profiles.unwrap();
         assert_eq!(profiles.experience.get(&52), paid.as_ref(), "{unlocked:?}");
+        assert!(profiles.unlocked.contains(&52), "L936: the match unlocked Soccer Star");
         assert!(
             coins(&gateway) > coins_before,
             "the match still pays its coins"

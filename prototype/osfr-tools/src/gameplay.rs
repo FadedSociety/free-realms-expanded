@@ -2408,7 +2408,6 @@ impl Gameplay {
             zone: character.zone_id,
             position: character.position,
             busy: self.activity_busy(),
-            active_job: profiles.active(),
             unlocked_jobs: &profiles.state().unlocked,
         };
         let gather = match nodes.admit(target, &visitor) {
@@ -2434,6 +2433,8 @@ impl Gameplay {
         if let Some(nodes) = staged.gathering_nodes.as_mut() {
             nodes.begin(target);
         }
+        // L936: the node switches the player into its job before the run's reward snapshot.
+        staged.enter_activity_job(gather.job(), character.guid, &mut out)?;
         staged.begin_gather(gather, game, now_ms, &mut out)?;
         *self = staged;
         Ok(Some(out))
@@ -2534,9 +2535,7 @@ impl Gameplay {
             out.replies.extend(quit);
             let previous_job = kart.previous_job();
             let return_location = kart.exit().ok_or_else(|| invalid("no kart race"))?;
-            if let Some(job) = previous_job {
-                self.restore_job(job, character.guid, &mut out)?;
-            }
+            self.leave_activity_job(previous_job, character.guid, &mut out)?;
             // Captured return frame44446 clears racing bit10 (0x401 ->1).
             out.replies
                 .push(crate::kart_gateway::player_status(return_location.guid, 1));
@@ -3101,16 +3100,23 @@ impl Gameplay {
                 .push(chat::system("Soccer is not available right now."));
             return Ok(());
         };
-        // L927: the Soccer Star's per-match `activity_xp`, only while that job is unlocked (the
-        // payout refuses an XP row for a locked job whole).
+        // L936: the match switches the player into Soccer Star (client 101319), staged so a
+        // refused start changes nothing. L927: the per-match `activity_xp`, only while that job
+        // is unlocked (the payout refuses an XP row for a locked job whole).
         let star = crate::soccer_entry::SOCCER_STAR_PROFILE;
-        let xp = self
+        let mut staged = self.clone();
+        let mut switch = Outcome::default();
+        staged.enter_activity_job(star, character.guid, &mut switch)?;
+        let xp = staged
             .profiles
             .as_ref()
             .filter(|p| p.state().unlocked.contains(&star))
             .and_then(|p| p.activity_xp(star));
         match crate::soccer_entry::Session::begin(&content, activity, character, xp) {
             Ok(session) => {
+                *self = staged;
+                out.replies.extend(switch.replies);
+                out.nearby.extend(switch.nearby);
                 out.scene_zoning = Some(session.scene().clone());
                 self.soccer = Some(session);
                 out.changed = true;

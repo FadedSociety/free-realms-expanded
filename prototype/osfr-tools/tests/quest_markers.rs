@@ -41,6 +41,7 @@ const ROAD_GIVER: u64 = 9_000_000_295;
 const ROAD_NEXT_GIVER: u64 = 9_000_000_289;
 const RULES_OF_THE_ROAD: u32 = 3_060_004;
 const DERBY_PROFILE: i32 = 49;
+const KART_PROFILE: i32 = 48;
 /// A derby arena driver; `derby_gates.json` lists it and it stands in `wilds.json` beside the
 /// Rules of the Road giver, whose quest is gated on the Demo Derby Driver job.
 const CRASH: u64 = ROAD_NEXT_GIVER;
@@ -415,8 +416,9 @@ fn derby_entry_settles_markers_in_its_own_packet() {
 }
 
 /// Every kart switch settles eligibility where the job changes: the race clears the derby job's
-/// '!' in its own reply, the exit puts it back in its own reply, and a refused request after the
-/// exit sends no marker and moves nothing.
+/// '!' in its own reply, and a refused request after the exit sends no marker and moves nothing.
+/// L936: the exit changes no job (the player stays a Kart Driver, client 101319), so its reply
+/// puts nothing back; the player's next switch (into the derby) shows the '!' in that reply.
 #[test]
 fn kart_race_switches_settle_markers_in_their_own_packets() {
     let (_fixture, mut game, character) = race_fixture(DERBY_PROFILE, KART_GATE);
@@ -440,10 +442,27 @@ fn kart_race_switches_settle_markers_in_their_own_packets() {
         &gateway_packets::chat("realm exit"),
         3_000,
     );
+    assert_eq!(game.active_profile(), Some(KART_PROFILE));
     assert!(
-        shown(&back.replies).contains(&(ROAD_GIVER, AVAILABLE)),
-        "the restored job's quest returns in the exit reply"
+        !shown(&back.replies).contains(&(ROAD_GIVER, AVAILABLE)),
+        "the exit keeps the Kart Driver job, so the derby quest stays hidden"
     );
+    let driver = at(CRASH, "wilds.json");
+    let menu = archer_entry::interact(&mut game, &driver, CRASH, 3_400);
+    let option = archer_entry::menu_option(&menu, DERBY_LABEL);
+    let derby = send(
+        &mut game,
+        &driver,
+        &archer_entry::npc_select(CRASH, option),
+        3_500,
+    );
+    assert_eq!(game.active_profile(), Some(DERBY_PROFILE));
+    assert!(
+        shown(&derby.replies).contains(&(ROAD_GIVER, AVAILABLE)),
+        "the switch into the derby job shows its quest in the entry reply"
+    );
+    send(&mut game, &driver, &[26, 0, 42, 0], 3_600);
+    assert!(!game.derby_active());
     let settled = game.quest_marker_revision();
     let before = saved(&game);
     let refused = game.handle_in_world(&quest_reply(RULES_OF_THE_ROAD, true), &character, 4_000);
