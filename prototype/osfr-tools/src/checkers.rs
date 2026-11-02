@@ -502,9 +502,7 @@ fn payload_packet(instance: i32, text: &str) -> io::Result<Vec<u8>> {
 }
 
 fn read_payload(instance: i32, packet: &[u8]) -> io::Result<String> {
-    let at = |offset: usize| {
-        (packet.get(offset..offset + 4)).map(|b| i32::from_le_bytes(b.try_into().unwrap()))
-    };
+    let at = |offset: usize| crate::le::i32(packet, offset);
     let length = at(15).and_then(|n| usize::try_from(n).ok()).unwrap_or(0);
     if at(3) != Some(instance)
         || !matches!(at(11), Some(-1 | GAME_ID))
@@ -750,6 +748,15 @@ mod tests {
         assert_eq!(result[15], 1, "won");
         let again = table.route(&over, 9_100).unwrap();
         assert!(again.is_none_or(|out| !out.replies.iter().any(|p| p.starts_with(&[39, 0, 18]))));
+    }
+
+    #[test]
+    fn a_cut_payload_is_refused_not_a_panic() {
+        let packet = payload_packet(7, "OnReadyMsg").unwrap();
+        assert_eq!(read_payload(7, &packet).unwrap(), "OnReadyMsg");
+        for end in 0..packet.len() {
+            assert!(read_payload(7, &packet[..end]).is_err(), "cut at {end}");
+        }
     }
 
     #[test]

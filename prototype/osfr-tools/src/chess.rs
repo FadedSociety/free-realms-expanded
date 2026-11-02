@@ -130,6 +130,8 @@ pub const EVENT_LOCAL_AI: u8 = 42;
 
 // Server-side bound (R); the reviewed guide asks for payload strings under 128 characters.
 const MAX_TEXT_BYTES: usize = 127;
+/// A seat the table's mode always fills was empty: a broken table, refused.
+const EMPTY_SEAT: &str = "chess seat is empty";
 /// (R) Default window, in `score_move` units, for the computer's near-equal move choice.
 pub const DEFAULT_NEAR_EQUAL_MARGIN: i64 = 25;
 /// (R) Content sanity bound for [`DEFAULT_NEAR_EQUAL_MARGIN`]. A window must
@@ -276,7 +278,8 @@ pub struct MoveOutcome {
 
 impl Position {
     pub fn start() -> Position {
-        Position::from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1").unwrap()
+        Position::from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+            .expect("the standard start FEN is valid")
     }
 
     pub fn from_fen(fen: &str) -> Result<Position, ChessError> {
@@ -805,7 +808,8 @@ impl Position {
     }
 
     fn apply_unchecked(&mut self, m: &ChessMove) -> Option<Kind> {
-        let p = self.squares[m.from as usize].unwrap();
+        // Every caller passes a generated move, which starts on a piece; anything else is a no-op.
+        let p = self.piece_at(m.from)?;
         let mut capture_square = if self.squares[m.to as usize].is_some() {
             Some(m.to)
         } else {
@@ -834,14 +838,18 @@ impl Position {
             kind: m.promote.unwrap_or(p.kind),
             side: p.side,
         });
-        if p.kind == Kind::King && (i16::from(m.from % 8) - i16::from(m.to % 8)).abs() == 2 {
-            let (rf, rt) = match m.to {
-                6 => (7, 5),
-                2 => (0, 3),
-                62 => (63, 61),
-                58 => (56, 59),
-                _ => unreachable!(),
-            };
+        // A king moves two files only by castling, onto one of these four squares.
+        let castle_rook = match m.to {
+            6 => Some((7, 5)),
+            2 => Some((0, 3)),
+            62 => Some((63, 61)),
+            58 => Some((56, 59)),
+            _ => None,
+        };
+        if p.kind == Kind::King
+            && (i16::from(m.from % 8) - i16::from(m.to % 8)).abs() == 2
+            && let Some((rf, rt)) = castle_rook
+        {
             self.squares[rt] = self.squares[rf].take()
         }
         if p.kind == Kind::King {
@@ -1193,6 +1201,12 @@ impl ChessTable {
         }
     }
 
+    /// The human's seat, or either seat in a two-player game.
+    fn seat(&self, side: Side) -> io::Result<ChessParticipant> {
+        self.participant_for_side(side)
+            .ok_or_else(|| invalid(EMPTY_SEAT))
+    }
+
     fn emit(&self, out: &mut ChessOutcome, player_id: u64, text: String) -> io::Result<()> {
         let Some(participant) = self.participant(player_id) else {
             return Err(invalid("chess message recipient is not seated at table"));
@@ -1251,7 +1265,7 @@ impl ChessTable {
                 computer_side,
                 ..
             } => {
-                let player = self.participant_for_side(human_side).unwrap();
+                let player = self.seat(human_side)?;
                 // Equality selects white. The actual meaning of INIT values is unknown (R).
                 self.event(
                     &mut out,
@@ -1274,7 +1288,7 @@ impl ChessTable {
             }
             TableMode::TwoPlayer => {
                 for side in [Side::White, Side::Black] {
-                    let participant = self.participant_for_side(side).unwrap();
+                    let participant = self.seat(side)?;
                     self.event(
                         &mut out,
                         participant.player_id,
@@ -1498,8 +1512,8 @@ impl ChessTable {
         };
 
         if computer_move {
-            let participant = self.participant(mover_id).unwrap();
-            self.send_move_event(&mut out, participant.player_id, &mv, captured_at_target)?;
+            // `emit` refuses a recipient who is not seated.
+            self.send_move_event(&mut out, mover_id, &mv, captured_at_target)?;
         } else if matches!(self.mode, TableMode::Single { .. }) {
             self.event(
                 &mut out,
@@ -1512,7 +1526,7 @@ impl ChessTable {
                 .players()
                 .into_iter()
                 .find(|player| player.player_id != mover_id)
-                .unwrap();
+                .ok_or_else(|| invalid(EMPTY_SEAT))?;
             self.send_move_event(&mut out, recipient.player_id, &mv, captured_at_target)?;
         }
 
@@ -1562,12 +1576,12 @@ impl ChessTable {
                         computer_side,
                         ..
                     } if self.position.side_to_move() == computer_side => {
-                        let player = self.participant_for_side(human_side).unwrap();
+                        let player = self.seat(human_side)?;
                         let reply = self.play_computer_turn(player.player_id)?;
                         append_outcome(&mut out, reply);
                     }
                     TableMode::Single { human_side, .. } => {
-                        let player = self.participant_for_side(human_side).unwrap();
+                        let player = self.seat(human_side)?;
                         self.event(&mut out, player.player_id, EVENT_TURN_START, &[])?;
                     }
                     TableMode::TwoPlayer => self.event_all(&mut out, EVENT_TURN_START, &[])?,
@@ -1584,7 +1598,10 @@ impl ChessTable {
         mv: &ChessMove,
         captured_at_target: bool,
     ) -> io::Result<()> {
-        let piece = self.position.piece_at(mv.to).unwrap();
+        let piece = self
+            .position
+            .piece_at(mv.to)
+            .ok_or_else(|| invalid("moved chess piece is missing"))?;
         if piece.kind == Kind::King && (i16::from(mv.from % 8) - i16::from(mv.to % 8)).abs() == 2 {
             self.event(out, player_id, EVENT_CASTLE, &[mv.to.to_string()])
         } else if let Some(kind) = mv.promote {
@@ -1999,13 +2016,14 @@ fn parse_payload_packet(instance_id: i32, packet: &[u8]) -> io::Result<String> {
     if packet.len() < 20 || packet[..3] != [39, 0, SUB_PAYLOAD] {
         return Err(invalid("not a family 39/14 chess payload"));
     }
-    let read_i32 =
-        |offset: usize| i32::from_le_bytes(packet[offset..offset + 4].try_into().unwrap());
-    if read_i32(3) != instance_id || read_i32(7) != -1 || !matches!(read_i32(11), -1 | GAME_ID) {
+    let read_i32 = |offset: usize| {
+        crate::le::i32(packet, offset).ok_or_else(|| invalid("not a family 39/14 chess payload"))
+    };
+    if read_i32(3)? != instance_id || read_i32(7)? != -1 || !matches!(read_i32(11)?, -1 | GAME_ID) {
         return Err(invalid("chess payload header does not match table"));
     }
     let length =
-        usize::try_from(read_i32(15)).map_err(|_| invalid("negative chess payload length"))?;
+        usize::try_from(read_i32(15)?).map_err(|_| invalid("negative chess payload length"))?;
     if length == 0
         || length > MAX_TEXT_BYTES + 1
         || packet.len() != 19 + length
@@ -2037,7 +2055,8 @@ fn init_args(side: Side) -> Vec<String> {
 
 fn parse_human_move(position: &Position, fields: &[&str]) -> Option<ChessMove> {
     let number = |index: usize| fields.get(index)?.parse::<u8>().ok();
-    let (from, to) = match fields[0] {
+    let name = *fields.first()?;
+    let (from, to) = match name {
         "OnMoveMsg" if fields.len() == 3 => (number(1)?, number(2)?),
         "OnCastleMsg" if fields.len() == 2 => {
             let from = match position.side_to_move() {
@@ -2054,7 +2073,7 @@ fn parse_human_move(position: &Position, fields: &[&str]) -> Option<ChessMove> {
         return None;
     }
     let piece = position.piece_at(from)?;
-    let mv = match fields[0] {
+    let mv = match name {
         "OnCastleMsg" => {
             if piece.kind != Kind::King || (i16::from(from % 8) - i16::from(to % 8)).abs() != 2 {
                 return None;
@@ -2186,6 +2205,22 @@ mod tests {
             }),
             "content piece values decide the capture"
         );
+    }
+
+    #[test]
+    fn malformed_client_payloads_are_refused_not_panics() {
+        let packet = payload_packet(5, "OnConnectMsg").unwrap();
+        assert_eq!(parse_payload_packet(5, &packet).unwrap(), "OnConnectMsg");
+        for end in 0..packet.len() {
+            assert!(
+                parse_payload_packet(5, &packet[..end]).is_err(),
+                "cut at {end}"
+            );
+        }
+        let mut padded = packet;
+        padded.push(0);
+        assert!(parse_payload_packet(5, &padded).is_err());
+        assert_eq!(parse_human_move(&Position::start(), &[]), None);
     }
 
     #[test]
