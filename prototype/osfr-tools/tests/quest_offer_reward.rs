@@ -51,7 +51,7 @@ const EMPTY_REWARD_GIVER: u64 = 9_000_000_479;
 const DISABLED_PREREQUISITE: u32 = 3_020_013;
 /// One Talk, 5 coins and 20 Adventurer XP, no items and no display rows.
 const REWARD_QUEST: u32 = 3_000_021;
-/// Enabled record with empty `rewards`, so its bundle is the 69-byte base.
+/// Enabled record with no coins or items; since L926 its only reward is 200 Blacksmith job XP, so its bundle is still the 69-byte base.
 const EMPTY_REWARD_QUEST: u32 = 3_020_014;
 /// Greenwood Forest giver 9000000444; quest 3000024 pays 13 coins and 25 Adventurer XP.
 const SECOND_GIVER: u64 = 9_000_000_444;
@@ -221,8 +221,8 @@ fn an_empty_reward_quest_still_sends_the_69_byte_base() {
     );
     assert_eq!(
         i32::from_le_bytes(bundle[5..9].try_into().unwrap()),
-        0,
-        "no stars"
+        200, // L926: wiki stars (3020014 pays 200 Blacksmith XP)
+        "the stars word is the 200 wiki-star job XP"
     );
     assert_eq!(
         u64::from_le_bytes(bundle[37..45].try_into().unwrap()),

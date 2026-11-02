@@ -236,12 +236,16 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "14": 15
+            "14": 75
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T334: 5 coins and 15 Miner (profile 14) XP mirror T300's first Miner rung (3100002); the guide's reward cell is unknown. No item is granted, so this referral creates no free, sellable or re-grantable gear. The explicit {\"14\": 15} map pays profile 14 even if the active job changes before turn-in."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 75 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/miner.json, record 3100003)"
             }
           ]
         }
@@ -389,12 +393,16 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "14": 20
+            "14": 100
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T411: 5 coins and 20 Miner (profile 14) XP follow the T202/T300 small follow-up rate, one step above 3100003's 15; the guide's reward cell is unknown. No item is granted, so the chapter creates no free, sellable or re-grantable gear. The explicit {\"14\": 20} map pays profile 14 even if the active job changes before turn-in."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/miner.json, record 3100004)"
             }
           ]
         }
@@ -466,7 +474,21 @@
         3100004
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "14": 125
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 125 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/miner.json, record 3100005)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -619,7 +641,21 @@
         3100006
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "14": 500
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 500 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/miner.json, record 3100007)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -675,7 +711,21 @@
         3100007
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "14": 500
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 500 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/miner.json, record 3100008)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -727,7 +777,21 @@
         3100008
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "14": 500
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 500 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/miner.json, record 3100009)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -779,7 +843,21 @@
         3100009
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "14": 500
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 500 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/miner.json, record 3100010)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -831,7 +909,21 @@
         3100010
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "14": 500
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 500 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/miner.json, record 3100011)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -987,12 +1079,16 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "14": 15
+            "14": 750
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T729: 5 coins and 15 Miner (profile 14) XP mirror T334's Miner referral 3100003 (Trixi); the guide reward cell is unknown (quest-lines/quests.json q3100013: rewards empty). No item is granted, so this creates no free, sellable or re-grantable gear."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 750 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/miner.json, record 3100013)"
             }
           ]
         }
@@ -1048,7 +1144,21 @@
         3100013
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "14": 750
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 750 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/miner.json, record 3100014)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1100,7 +1210,21 @@
         3100014
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "14": 750
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 750 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/miner.json, record 3100015)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1152,7 +1276,21 @@
         3100015
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "14": 750
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 750 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/miner.json, record 3100016)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1204,7 +1342,21 @@
         3100016
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "14": 750
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 750 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/miner.json, record 3100017)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1256,7 +1408,21 @@
         3100017
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "14": 750
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 750 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/miner.json, record 3100018)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1409,12 +1575,16 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "14": 15
+            "14": 1917
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T729: 5 coins and 15 Miner (profile 14) XP mirror T334's Miner referral 3100003 and 3100013 (the quest is one Talk at Silverray); the guide reward cell is unknown (quest-lines/quests.json q3100020: rewards empty). No item is granted, so this creates no free, sellable or re-grantable gear. It had no reward and no `job`; enabling its prerequisite 3100019 made it reachable, and the reachability gate refuses an empty reward."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 1917 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/miner.json, record 3100020)"
             }
           ]
         }

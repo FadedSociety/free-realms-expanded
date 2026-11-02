@@ -4,12 +4,12 @@
 //! 3100003 is the Trixi gear referral: the record's own description 76088 ("Visit Trixi in
 //! the Singing Crystal Mines and find out if she has any better mining gear for you.") and
 //! its one Talk-to-Trixi objective are the authority; the guide's row-2 title match is
-//! reconstructed (R). Its job gate (14), prerequisite (3100002) and 5-coin / 15-Miner-XP
+//! reconstructed (R). Its job gate (14), prerequisite (3100002) and 5-coin / 75-Miner-XP (L926 wiki stars)
 //! reward mirror the first rung.
 //!
 //! 3100004 is Trixi's "Rush Order": Talk to Smitty (the video tracker's first goal "Speak
 //! with Smitty"), mine six Copper Ore at a live copper vein, then return to Trixi
-//! (description 76210). Quantity 6 (one shipped Mining18 goal row), the 5-coin / 20-Miner-XP
+//! (description 76210). Quantity 6 (one shipped Mining18 goal row), the 5-coin / 100-Miner-XP (L926 wiki stars)
 //! reward and the deferred smelting/coal step are (R). This suite's synthetic board pays one
 //! ore per win, so the Rush Order tests patch only their private fixture copy to pay six.
 //!
@@ -179,7 +179,7 @@ fn complete_all_i_got(game: &mut Gameplay, character: &CharacterState, now: u64)
         ALL_I_GOT_END_TEXT,
         now + 200,
     );
-    finish_quest(game, &at_trixi, ALL_I_GOT, MINER, 5, 15, now + 300);
+    finish_quest(game, &at_trixi, ALL_I_GOT, MINER, 5, 75, now + 300); // L926: wiki stars
     now + 400
 }
 
@@ -1195,7 +1195,7 @@ fn all_i_got_is_offered_after_the_first_ore() {
 }
 
 /// T334: the Talk to Trixi completes the one objective, opens the held 49/13 and the 49/14
-/// pays exactly 5 coins + 15 Miner XP with no item. Both replayed replies are inert.
+/// pays exactly 5 coins + 75 Miner XP with no item. Both replayed replies are inert.
 #[test]
 fn talking_to_trixi_completes_and_pays_once() {
     let fixture = Fixture::new();
@@ -1218,18 +1218,18 @@ fn talking_to_trixi_completes_and_pays_once() {
         ALL_I_GOT_END_TEXT,
         now + 200,
     );
-    assert_eq!(end_screen_reward(&end), (5, 15), "49/13 reward bundle");
+    assert_eq!(end_screen_reward(&end), (5, 75), "49/13 reward bundle"); // L926: wiki stars
     assert_eq!(counts(&game, ALL_I_GOT), [1], "the Talk completed the step");
     assert_eq!(pending_turnin(&game), Some(ALL_I_GOT));
     assert_eq!(coins(&game), coins_before, "the end screen pays nothing");
 
-    finish_quest(&mut game, &at_trixi, ALL_I_GOT, MINER, 5, 15, now + 300);
+    finish_quest(&mut game, &at_trixi, ALL_I_GOT, MINER, 5, 75, now + 300); // L926: wiki stars
     assert_eq!(quest_status(&game, ALL_I_GOT), QuestStatus::Completed);
     assert_eq!(coins(&game), coins_before + 5, "exactly 5 coins");
     assert_eq!(
         profile_xp(&game, MINER),
-        xp_before + 15,
-        "exactly 15 Miner XP"
+        xp_before + 75, // L926: wiki stars
+        "exactly 75 Miner XP"
     );
     assert_eq!(
         item_ledger(&game),
@@ -1253,10 +1253,10 @@ fn talking_to_trixi_completes_and_pays_once() {
         "a replayed 49/2",
     );
     assert_eq!(coins(&game), coins_before + 5);
-    assert_eq!(profile_xp(&game, MINER), xp_before + 15);
+    assert_eq!(profile_xp(&game, MINER), xp_before + 75); // L926: wiki stars
 }
 
-/// T334: the explicit `{"14": 15}` map pays profile 14 even when the active job changed
+/// T334: the explicit `{"14": 75}` map pays profile 14 even when the active job changed
 /// between accept and turn-in.
 #[test]
 fn the_reward_goes_to_profile_14_after_a_job_switch() {
@@ -1283,11 +1283,11 @@ fn the_reward_goes_to_profile_14_after_a_job_switch() {
         ALL_I_GOT_END_TEXT,
         now + 300,
     );
-    assert_eq!(end_screen_reward(&end), (5, 15));
-    finish_quest(&mut game, &at_trixi, ALL_I_GOT, MINER, 5, 15, now + 400);
+    assert_eq!(end_screen_reward(&end), (5, 75)); // L926: wiki stars
+    finish_quest(&mut game, &at_trixi, ALL_I_GOT, MINER, 5, 75, now + 400); // L926: wiki stars
     assert_eq!(
         profile_xp(&game, MINER),
-        miner_before + 15,
+        miner_before + 75, // L926: wiki stars
         "the quest pays profile 14"
     );
     assert_eq!(
@@ -1390,7 +1390,7 @@ fn refusals_wrong_target_and_replay_change_nothing() {
     assert_eq!(saved(&game), before);
     assert_eq!(fixture.saved_bytes(&game, &character), before_save);
 
-    finish_quest(&mut game, &at_trixi, ALL_I_GOT, MINER, 5, 15, now + 600);
+    finish_quest(&mut game, &at_trixi, ALL_I_GOT, MINER, 5, 75, now + 600); // L926: wiki stars
     let finished = saved(&game);
     let finished_save = fixture.saved_bytes(&game, &character);
     assert_packet_changes_nothing(
@@ -1443,7 +1443,7 @@ fn progress_survives_a_reload() {
         ALL_I_GOT_END_TEXT,
         now + 200,
     );
-    assert_eq!(end_screen_reward(&end), (5, 15));
+    assert_eq!(end_screen_reward(&end), (5, 75)); // L926: wiki stars
     assert_eq!(counts(&game, ALL_I_GOT), [1]);
     let mut game = fixture.save_and_reload(&game, &at_trixi);
     assert_eq!(counts(&game, ALL_I_GOT), [1], "the Talk counter survives");
@@ -1463,11 +1463,11 @@ fn progress_survives_a_reload() {
     );
 
     // The saved turn-in pays once; a later reload keeps the completed history.
-    finish_quest(&mut game, &at_trixi, ALL_I_GOT, MINER, 5, 15, now + 300);
+    finish_quest(&mut game, &at_trixi, ALL_I_GOT, MINER, 5, 75, now + 300); // L926: wiki stars
     let mut game = fixture.save_and_reload(&game, &at_trixi);
     assert_eq!(quest_status(&game, ALL_I_GOT), QuestStatus::Completed);
     assert_eq!(coins(&game), coins_before + 5);
-    assert_eq!(profile_xp(&game, MINER), xp_before + 15);
+    assert_eq!(profile_xp(&game, MINER), xp_before + 75); // L926: wiki stars
     assert_packet_changes_nothing(
         &mut game,
         &at_trixi,
@@ -1530,14 +1530,14 @@ fn two_miners_progress_independently_on_all_i_got() {
         ALL_I_GOT_END_TEXT,
         now + 400,
     );
-    assert_eq!(end_screen_reward(&end_a), (5, 15));
+    assert_eq!(end_screen_reward(&end_a), (5, 75)); // L926: wiki stars
     assert_eq!(counts(&a, ALL_I_GOT), [1]);
     assert_eq!(counts(&b, ALL_I_GOT), [0], "A's Talk touched B's quest");
     assert_eq!(pending_turnin(&a), Some(ALL_I_GOT));
     assert_eq!(pending_turnin(&b), None);
 
     // A's forged replay cannot touch B's progress while B is still at the Talk step.
-    finish_quest(&mut a, &at_trixi_a, ALL_I_GOT, MINER, 5, 15, now + 500);
+    finish_quest(&mut a, &at_trixi_a, ALL_I_GOT, MINER, 5, 75, now + 500); // L926: wiki stars
     let b_progress = saved(&b);
     assert_packet_changes_nothing(
         &mut a,
@@ -1557,15 +1557,15 @@ fn two_miners_progress_independently_on_all_i_got() {
         ALL_I_GOT_END_TEXT,
         now + 700,
     );
-    assert_eq!(end_screen_reward(&end_b), (5, 15));
-    finish_quest(&mut b, &at_trixi_b, ALL_I_GOT, MINER, 5, 15, now + 800);
+    assert_eq!(end_screen_reward(&end_b), (5, 75)); // L926: wiki stars
+    finish_quest(&mut b, &at_trixi_b, ALL_I_GOT, MINER, 5, 75, now + 800); // L926: wiki stars
     assert_eq!(quest_status(&a, ALL_I_GOT), QuestStatus::Completed);
     assert_eq!(quest_status(&b, ALL_I_GOT), QuestStatus::Completed);
     // Each also finished T300's first Miner quest, so each wallet holds both 5-coin rungs.
     assert_eq!(coins(&a), 10);
     assert_eq!(coins(&b), 10);
-    assert_eq!(profile_xp(&a, MINER), MINING_XP_PER_WIN + 30);
-    assert_eq!(profile_xp(&b, MINER), MINING_XP_PER_WIN + 30);
+    assert_eq!(profile_xp(&a, MINER), MINING_XP_PER_WIN + 90); // L926: wiki stars (15 + 75)
+    assert_eq!(profile_xp(&b, MINER), MINING_XP_PER_WIN + 90); // L926: wiki stars (15 + 75)
 }
 
 /// T334: the record and both NPCs resolve through the production content parser and the
@@ -1592,7 +1592,7 @@ fn the_record_and_both_npcs_resolve() {
     assert_eq!(rewards.len(), 1);
     assert_eq!(rewards[0]["coins"], json!(5));
     assert_eq!(rewards[0]["items"], json!([]));
-    assert_eq!(rewards[0]["job_xp"], json!({"14": 15}));
+    assert_eq!(rewards[0]["job_xp"], json!({"14": 75})); // L926: wiki stars
     assert!(has_source(&rewards[0], "reconstructed"));
     assert!(has_source(quest, "reconstructed"));
     assert!(
@@ -1731,7 +1731,7 @@ fn a_near_cap_coin_balance_refuses_the_turn_in_without_paying_xp_or_item() {
     let mut state = game.state();
     state.inventory.coins = 0;
     let mut game = fixture.game_with_state(state);
-    finish_quest(&mut game, &at_trixi, ALL_I_GOT, MINER, 5, 15, now + 400);
+    finish_quest(&mut game, &at_trixi, ALL_I_GOT, MINER, 5, 75, now + 400); // L926: wiki stars
     assert_eq!(coins(&game), 5);
 }
 
@@ -1792,7 +1792,7 @@ fn rush_order_is_offered_after_all_i_got() {
 }
 
 /// T411: Smitty Talk, one six-ore copper-vein win, Trixi Talk; the 49/14 pays exactly 5 coins
-/// + 20 profile-14 XP once from the live state (after a job switch), grants no item, and the
+/// + 100 profile-14 XP once from the live state (after a job switch), grants no item, and the
 /// counters, coins and XP survive `game_store` reloads.
 #[test]
 fn smitty_then_copper_then_trixi_pays_once() {
@@ -1868,11 +1868,11 @@ fn smitty_then_copper_then_trixi_pays_once() {
         RUSH_ORDER_END_TEXT,
         at + 200,
     );
-    assert_eq!(end_screen_reward(&end), (5, 20), "49/13 reward bundle");
+    assert_eq!(end_screen_reward(&end), (5, 100), "49/13 reward bundle"); // L926: wiki stars
     assert_eq!(counts(&game, RUSH_ORDER), [1, RUSH_ORE, 1]);
     assert_eq!(coins(&game), coins_before, "the end screen pays nothing");
-    finish_quest(&mut game, &at_trixi, RUSH_ORDER, MINER, 5, 20, at + 300);
-    assert_eq!(profile_xp(&game, MINER), xp_after_mining + 20);
+    finish_quest(&mut game, &at_trixi, RUSH_ORDER, MINER, 5, 100, at + 300); // L926: wiki stars
+    assert_eq!(profile_xp(&game, MINER), xp_after_mining + 100); // L926: wiki stars
     assert_eq!(profile_xp(&game, BRAWLER), brawler_before);
     assert_eq!(
         item_ledger(&game),
@@ -1884,7 +1884,7 @@ fn smitty_then_copper_then_trixi_pays_once() {
     let mut game = fixture.save_and_reload(&game, &at_trixi);
     assert_eq!(quest_status(&game, RUSH_ORDER), QuestStatus::Completed);
     assert_eq!(coins(&game), coins_before + 5);
-    assert_eq!(profile_xp(&game, MINER), xp_after_mining + 20);
+    assert_eq!(profile_xp(&game, MINER), xp_after_mining + 100); // L926: wiki stars
     assert_inert(
         &fixture,
         &mut game,
@@ -2075,7 +2075,7 @@ fn the_objective_is_produced_by_the_shipped_mining_board() {
     assert_eq!(rewards.len(), 1);
     assert_eq!(rewards[0]["coins"], json!(5));
     assert_eq!(rewards[0]["items"], json!([]));
-    assert_eq!(rewards[0]["job_xp"], json!({"14": 20}));
+    assert_eq!(rewards[0]["job_xp"], json!({"14": 100})); // L926: wiki stars
     assert!(has_source(&rewards[0], "reconstructed"));
     let evidence: Vec<&str> = quest["source"]
         .as_array()
@@ -2187,7 +2187,7 @@ fn two_miners_progress_independently_on_rush_order() {
         RUSH_ORDER_END_TEXT,
         ms + 100,
     );
-    assert_eq!(end_screen_reward(&end), (5, 20));
+    assert_eq!(end_screen_reward(&end), (5, 100)); // L926: wiki stars
     assert_eq!(pending_turnin(&b), None, "A's end screen opened B's");
     finish_quest(
         &mut a,
@@ -2195,7 +2195,7 @@ fn two_miners_progress_independently_on_rush_order() {
         RUSH_ORDER,
         MINER,
         5,
-        20,
+        100, // L926: wiki stars
         ms + 200,
     );
     assert_eq!(counts(&b, RUSH_ORDER), [0, 0, 0]);
@@ -2217,15 +2217,15 @@ fn two_miners_progress_independently_on_rush_order() {
         RUSH_ORDER,
         MINER,
         5,
-        20,
+        100, // L926: wiki stars
         ms + 200,
     );
 
-    // Each wallet holds its three 5-coin rungs; each Miner profile two wins plus 15/15/20.
+    // Each wallet holds its three 5-coin rungs; each Miner profile two wins plus 15/75/100.
     for game in [&a, &b] {
         assert_eq!(quest_status(game, RUSH_ORDER), QuestStatus::Completed);
         assert_eq!(coins(game), 15);
-        assert_eq!(profile_xp(game, MINER), 2 * MINING_XP_PER_WIN + 50);
+        assert_eq!(profile_xp(game, MINER), 2 * MINING_XP_PER_WIN + 190); // L926: wiki stars (15 + 75 + 100)
     }
 }
 
@@ -2254,7 +2254,7 @@ fn the_chapter_uses_no_dev_commands() {
         RUSH_ORDER_END_TEXT,
         at + 100,
     ));
-    replies.extend(finish_quest(&mut game, &at_trixi, RUSH_ORDER, MINER, 5, 20, at + 200).replies);
+    replies.extend(finish_quest(&mut game, &at_trixi, RUSH_ORDER, MINER, 5, 100, at + 200).replies); // L926: wiki stars
     assert!(
         !replies
             .iter()

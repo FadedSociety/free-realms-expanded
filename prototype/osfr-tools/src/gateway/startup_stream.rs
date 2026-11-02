@@ -85,7 +85,7 @@ impl Gateway {
             let current = game.state();
             data.inventory = current.inventory;
             collections = current.progression_extras.unwrap_or_default().collections;
-            self.apply_profile_state(&mut data, current.profiles.as_ref())?;
+            self.apply_profile_state(&mut data, current.profiles.as_ref(), game)?;
             data.jobs.profiles.extend(game.staff_job_rows());
         }
         crate::progression_extras::apply_collected_flags(&mut data.collections, &collections);
@@ -105,6 +105,7 @@ impl Gateway {
         &self,
         data: &mut SelfData,
         profiles: Option<&ProfileState>,
+        game: &Gameplay,
     ) -> io::Result<()> {
         if let Some(profiles) = profiles {
             data.jobs.active_profile_id = profiles.active as u32;
@@ -125,7 +126,8 @@ impl Gateway {
             let xp = profiles
                 .and_then(|profiles| profiles.experience.get(&id).copied())
                 .unwrap_or(0);
-            opaque[offset..offset + 12].copy_from_slice(&crate::profiles::progression_bytes(xp));
+            opaque[offset..offset + 12]
+                .copy_from_slice(&crate::profiles::progression_bytes(xp, &game.job_curve(id)));
         }
         Ok(())
     }

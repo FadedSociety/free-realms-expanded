@@ -292,7 +292,21 @@
       "giver_npc_id": 9000000538,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 300
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080003)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -340,7 +354,21 @@
       "giver_npc_id": 9000000539,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 300
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080004)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -387,7 +415,21 @@
       "giver_npc_id": 9500000956,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 500
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 500 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080005)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -433,7 +475,21 @@
       "giver_npc_id": 9500000164,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 188
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 188 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080006)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -502,7 +558,7 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "48": 15
+            "48": 188
           },
           "source": [
             {
@@ -512,6 +568,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T202: one-talk referral rung = 15 Kart Driver (profile 48) job XP. The quest answer and the client locale record no coin or XP figure for this quest, so the value is reconstructed, not recovered."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 188 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080007)"
             }
           ]
         }
@@ -542,7 +602,21 @@
       "giver_npc_id": 9000000540,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 525
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 525 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080008)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -657,7 +731,21 @@
       "giver_npc_id": 9500000872,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 300
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080010)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -703,7 +791,21 @@
       "giver_npc_id": 9500000872,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 300
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080011)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -749,7 +851,21 @@
       "giver_npc_id": 9500000872,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 338
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 338 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080012)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -792,7 +908,21 @@
       "giver_npc_id": 9000000026,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 338
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 338 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080013)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -838,7 +968,21 @@
       "giver_npc_id": 9000000239,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 375
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 375 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080014)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -877,7 +1021,21 @@
       "giver_npc_id": 9000000475,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 375
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 375 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080015)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -923,7 +1081,21 @@
       "giver_npc_id": 9000000541,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 275
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 275 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080016)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -966,7 +1138,21 @@
       "giver_npc_id": 9000000542,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 275
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 275 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080017)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1016,7 +1202,21 @@
       "giver_npc_id": 9000000543,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 275
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 275 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080018)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1145,7 +1345,21 @@
       "giver_npc_id": 9500000613,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 488
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 488 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080020)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1191,7 +1405,21 @@
       "giver_npc_id": 9500000613,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 488
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 488 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080021)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1237,7 +1465,21 @@
       "giver_npc_id": 9500000613,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 350
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 350 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080022)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1276,7 +1518,21 @@
       "giver_npc_id": 9500000613,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 350
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 350 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080023)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1322,7 +1578,21 @@
       "giver_npc_id": 9500000613,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 350
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 350 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080024)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1361,7 +1631,21 @@
       "giver_npc_id": 9500000164,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 375
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 375 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080025)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1407,7 +1691,21 @@
       "giver_npc_id": 9500000164,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 375
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 375 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080026)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1446,7 +1744,21 @@
       "giver_npc_id": 9000000273,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 375
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 375 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080027)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1500,7 +1812,21 @@
       "giver_npc_id": 9000000273,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 1200
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 1200 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080028)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1599,7 +1925,21 @@
       "giver_npc_id": 9500000943,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 638
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 638 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080030)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1645,7 +1985,21 @@
       "giver_npc_id": 9500000943,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 638
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 638 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080031)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1691,7 +2045,21 @@
       "giver_npc_id": 9500000943,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 500
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 500 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080032)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1773,7 +2141,21 @@
       "giver_npc_id": 9500000943,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 167
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 167 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080034)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1819,7 +2201,21 @@
       "giver_npc_id": 9500000943,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 167
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 167 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080035)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1858,7 +2254,21 @@
       "giver_npc_id": 9500000086,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 175
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 175 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080036)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1904,7 +2314,21 @@
       "giver_npc_id": 9500000164,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 175
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 175 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080037)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1943,7 +2367,21 @@
       "giver_npc_id": 9000000409,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 167
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 167 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080038)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1989,7 +2427,21 @@
       "giver_npc_id": 9000000409,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 183
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 183 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080039)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2082,7 +2534,21 @@
       "giver_npc_id": 9500000210,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 183
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 183 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080041)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2132,7 +2598,21 @@
       "giver_npc_id": 9500000210,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 192
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 192 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080042)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2182,7 +2662,21 @@
       "giver_npc_id": 9500000210,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 192
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 192 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080043)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2221,7 +2715,21 @@
       "giver_npc_id": 9500000210,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 192
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 192 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080044)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2271,7 +2779,21 @@
       "giver_npc_id": 9500000153,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 150
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 150 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080045)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2314,7 +2836,21 @@
       "giver_npc_id": 9500000153,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 150
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 150 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080046)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2360,7 +2896,21 @@
       "giver_npc_id": 9500000153,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 150
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 150 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080047)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2399,7 +2949,21 @@
       "giver_npc_id": 9500000153,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "48": 150
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 150 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080048)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",

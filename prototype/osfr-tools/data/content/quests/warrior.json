@@ -96,7 +96,21 @@
         3150001
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "32": 47
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 47 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/warrior.json, record 3150002)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -148,7 +162,21 @@
         3150002
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "32": 47
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 47 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/warrior.json, record 3150003)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -226,12 +254,16 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "32": 25
+            "32": 47
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T257: every W4 reward cell in the guide is unknown. Five coins use the W110/T202 small-quest fallback and 25 Warrior (profile 32) job XP follows the T202/T242 first-chapter rate. No item is granted; the T201 trainer's starter outfit remains the only free gear."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 47 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/warrior.json, record 3150004)"
             }
           ]
         }
@@ -385,7 +417,21 @@
         3150005
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "32": 75
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 75 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/warrior.json, record 3150006)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -476,12 +522,16 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "32": 25
+            "32": 47
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T665: the reward is an unnamed substitute from Tumbolina (locale 70997 'I suppose I should at least reward you'; answer lab/references/quest-lines/quests.json q3150007); no item id is recorded, so no item is granted. 5 coins and 25 Warrior (profile 32) XP repeat the T257 rung of 3150001/3150004."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 47 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/warrior.json, record 3150007)"
             }
           ]
         }
@@ -576,12 +626,16 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "32": 25
+            "32": 209
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T672: five coins and 25 Warrior (profile 32) job XP, the rung the shipped Warrior step quests Dewey (3150001) and Steele (3150004) pay (T257: the W110 five-coin fallback plus the T202 small-quest XP). The answer records no reward (quest-lines/quests.json q3150008: unknown), and the end text 71038 hints at a weapon from Tumbolina that no source names, so no item is granted; the numbers are ours and live in data."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 209 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/warrior.json, record 3150008)"
             }
           ]
         }
@@ -637,7 +691,21 @@
         3150008
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "32": 100
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/warrior.json, record 3150009)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -739,7 +807,21 @@
         3150010
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "32": 100
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/warrior.json, record 3150011)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -791,7 +873,21 @@
         3150010
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "32": 163
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 163 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/warrior.json, record 3150012)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -847,7 +943,21 @@
         3150012
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "32": 282
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 282 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/warrior.json, record 3150013)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -899,7 +1009,21 @@
         3150013
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "32": 282
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 282 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/warrior.json, record 3150014)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -944,7 +1068,21 @@
         3150014
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "32": 360
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 360 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/warrior.json, record 3150015)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1087,7 +1225,21 @@
         3150016
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "32": 375
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 375 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/warrior.json, record 3150017)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1139,7 +1291,21 @@
         3150016
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "32": 282
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 282 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/warrior.json, record 3150018)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1246,12 +1412,16 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "32": 25
+            "32": 360
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T675: the answer lab/references/quest-lines/quests.json q3150019 records no reward ('rewards_missing'). 5 coins and 25 Warrior (profile 32) XP repeat the T257 talk-quest rung of 3150001, 3150004, 3150007 and 3150008; no item, and the values live in data."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 360 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/warrior.json, record 3150019)"
             }
           ]
         }
@@ -1307,7 +1477,21 @@
         3150019
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "32": 360
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 360 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/warrior.json, record 3150020)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1357,7 +1541,21 @@
       "giver_npc_id": 9000000085,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "32": 360
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 360 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/warrior.json, record 3150021)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1452,7 +1650,21 @@
         3150022
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "32": 350
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 350 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/warrior.json, record 3150023)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",

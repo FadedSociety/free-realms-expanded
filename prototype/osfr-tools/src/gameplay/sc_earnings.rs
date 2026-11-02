@@ -89,6 +89,7 @@ impl Gameplay {
             self.reward_bag_capacity(),
         )
         .with_boost(self.consumable_effects.boost())
+        .with_curves(self.profiles.as_ref().map(Profiles::curves).unwrap_or_default())
     }
 
     /// Adopt the inventory, profiles and Station Cash wallet from a staged minigame transaction.

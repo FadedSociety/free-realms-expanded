@@ -275,12 +275,16 @@
           "coins": 10,
           "items": [],
           "job_xp": {
-            "137": 25
+            "137": 10
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T244 playtest values: 10 coins and 25 Fisherman (profile 137) XP. The guides record no original Fisherman reward table; no item is granted because Reed's 'extra gear' item (2663118808) is unknown."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 10 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/fisherman.json, record 3070004)"
             }
           ]
         }
@@ -527,7 +531,21 @@
       "giver_npc_id": 9000000117,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "137": 40
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 40 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/fisherman.json, record 3070009)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -579,7 +597,21 @@
         3070009
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "137": 60
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 60 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/fisherman.json, record 3070010)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -675,7 +707,21 @@
         3070011
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "137": 40
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 40 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/fisherman.json, record 3070012)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -723,7 +769,21 @@
         3070011
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "137": 80
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 80 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/fisherman.json, record 3070013)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",

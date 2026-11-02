@@ -70,7 +70,7 @@ const ADVENTURER: i32 = 1;
 const MINER: i32 = 14;
 const BRAWLER: i32 = 43;
 const REWARD_COINS: u32 = 8;
-const REWARD_XP: u32 = 20;
+const REWARD_XP: u32 = 225; // L926: wiki stars (3000033 and 3000034 both pay 225)
 const RUMORS_INTRO: u32 = 90_725;
 const RUMORS_TITLE: u32 = 90_726;
 const RUMORS_DESCRIPTION: u32 = 90_727;
@@ -365,7 +365,13 @@ fn rumors_of_briarwood_is_offered_after_thugamugs_thievery() {
         let row = quest_record(skipped);
         assert_eq!(row["enabled"], json!(false), "{skipped} must stay disabled");
         assert_eq!(row["objectives"], json!([]));
-        assert_eq!(row["rewards"], json!([]));
+        // L926: wiki stars. A hollow stub gains only its star reward: 225 Adventurer XP, no
+        // coins or items.
+        let rewards = row["rewards"].as_array().unwrap();
+        assert_eq!(rewards.len(), 1);
+        assert_eq!(rewards[0]["coins"], json!(0));
+        assert_eq!(rewards[0]["items"], json!([]));
+        assert_eq!(rewards[0]["job_xp"], json!({"1": 225}));
     }
 
     // Before E4 completes, Geoffrey's next tell is E4 itself, never E5.

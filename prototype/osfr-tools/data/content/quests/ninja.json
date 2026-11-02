@@ -194,7 +194,21 @@
         3110002
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "2": 37
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 37 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/ninja.json, record 3110003)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -333,7 +347,7 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "2": 20
+            "2": 100
           },
           "source": [
             {
@@ -343,6 +357,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T202: Silence is Golden... and Deadly is a four-talk mentor chain. Ninja.md gives no per-quest XP; 20 Ninja (profile 2) job XP is the T202 (R) multi-step rung and the existing five-coin amount is unchanged."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/ninja.json, record 3110004)"
             }
           ]
         }
@@ -402,7 +420,21 @@
         3110004
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "2": 125
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 125 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/ninja.json, record 3110005)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -458,7 +490,21 @@
         3110005
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "2": 125
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 125 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/ninja.json, record 3110006)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -596,7 +642,21 @@
         3110007
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "2": 75
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 75 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/ninja.json, record 3110008)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -648,7 +708,21 @@
         3110007
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "2": 89
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 89 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/ninja.json, record 3110009)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -700,7 +774,21 @@
         3110009
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "2": 88
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 88 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/ninja.json, record 3110010)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -756,7 +844,21 @@
         3110010
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "2": 100
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/ninja.json, record 3110011)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -966,7 +1068,21 @@
         3110013
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "2": 175
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 175 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/ninja.json, record 3110014)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1018,7 +1134,21 @@
         3110013
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "2": 282
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 282 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/ninja.json, record 3110015)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1070,7 +1200,21 @@
         3110015
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "2": 163
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 163 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/ninja.json, record 3110016)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1122,7 +1266,21 @@
         3110016
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "2": 175
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 175 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/ninja.json, record 3110017)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1223,7 +1381,21 @@
         3110018
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "2": 250
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 250 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/ninja.json, record 3110019)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1275,7 +1447,21 @@
         3110018
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "2": 188
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 188 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/ninja.json, record 3110020)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1320,7 +1506,21 @@
         3110020
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "2": 188
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 188 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/ninja.json, record 3110021)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1372,7 +1572,21 @@
         3110021
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "2": 189
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 189 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/ninja.json, record 3110022)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1451,11 +1665,17 @@
         {
           "coins": 15,
           "items": [],
-          "job_xp": {},
+          "job_xp": {
+            "2": 593
+          },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T665: no reward line in the client for this quest (fixed spec q3110023: rewards remain empty); 15 coins is the T361 level-gate payout rung, no item and no job XP."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 593 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/ninja.json, record 3110023)"
             }
           ]
         }
@@ -1613,7 +1833,21 @@
         3110024
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "2": 350
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 350 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/ninja.json, record 3110025)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",

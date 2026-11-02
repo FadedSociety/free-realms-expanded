@@ -157,12 +157,16 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "16": 20
+            "16": 75
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T274: the retained guide and video give no quest reward; five coins follows the existing small final-era fallback and 20 Blacksmith (profile 16) job XP is a small local rung."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 75 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020003)"
             }
           ]
         }
@@ -226,7 +230,21 @@
         3020003
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "16": 498
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 498 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020004)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -329,12 +347,16 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "16": 20
+            "16": 100
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T274: the retained guide and video give no quest reward; five coins follows the existing small final-era fallback and 20 Blacksmith (profile 16) job XP is a small local rung."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020005)"
             }
           ]
         }
@@ -394,7 +416,21 @@
         3020005
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "16": 500
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 500 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020006)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -469,12 +505,16 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "16": 20
+            "16": 444
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T675: the answer lab/references/quest-lines/quests.json q3020007 records no reward (only Derp's promise of new recipes, locale 91267, which no item id backs). 5 coins and 20 Blacksmith (profile 16) XP repeat the rung of the shipped Blacksmith steps 3020003 and 3020005; no item, and the values live in data."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 444 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020007)"
             }
           ]
         }
@@ -625,7 +665,21 @@
         3020008
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "16": 799
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 799 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020009)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -677,7 +731,21 @@
         3020009
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "16": 888
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 888 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020010)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -729,7 +797,21 @@
         3020010
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "16": 1024
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 1024 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020011)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -831,7 +913,21 @@
         3020012
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "16": 664
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 664 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020013)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -904,7 +1000,21 @@
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "16": 200
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 200 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020014)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -955,7 +1065,21 @@
         3020014
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "16": 1496
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 1496 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020015)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1007,7 +1131,21 @@
         3020015
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "16": 501
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 501 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020016)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1059,7 +1197,21 @@
         3020016
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "16": 800
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 800 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020017)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1111,7 +1263,21 @@
         3020017
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "16": 1313
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 1313 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020018)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1256,7 +1422,21 @@
         3020019
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "16": 300
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020020)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1315,7 +1495,21 @@
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "16": 878
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 878 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020021)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "reconstructed",
@@ -1362,7 +1556,21 @@
       "giver_npc_id": 9000000203,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "16": 819
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 819 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020022)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1407,7 +1615,21 @@
         3020021
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "16": 700
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 700 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020023)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1892,7 +2114,21 @@
       "giver_npc_id": 9000000179,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "16": 75
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 75 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020033)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1942,7 +2178,21 @@
       "giver_npc_id": 9000000179,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "16": 100
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020034)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",

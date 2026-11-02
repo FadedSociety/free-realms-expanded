@@ -161,7 +161,21 @@
       "giver_npc_id": 9000000187,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 300
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040004)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -263,7 +277,21 @@
       "giver_npc_id": 9000000187,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 300
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040006)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -313,7 +341,21 @@
       "giver_npc_id": 9000000187,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 300
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040007)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -413,7 +455,21 @@
       "giver_npc_id": 9000000170,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 300
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040009)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -623,7 +679,21 @@
       "giver_npc_id": 9000000170,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 500
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 500 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040012)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -673,7 +743,21 @@
       "giver_npc_id": 9000000035,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 500
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 500 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040013)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -723,7 +807,21 @@
       "giver_npc_id": 9000000035,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 1000
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 1000 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040014)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -827,7 +925,21 @@
       "giver_npc_id": 9000000094,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 1000
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 1000 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040016)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -877,7 +989,21 @@
       "giver_npc_id": 9000000094,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 1000
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 1000 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040017)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -927,7 +1053,21 @@
       "giver_npc_id": 9000000094,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 1000
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 1000 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040018)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -977,7 +1117,21 @@
       "giver_npc_id": 9000000198,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 1800
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 1800 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040019)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -1027,7 +1181,21 @@
       "giver_npc_id": 9000000191,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 1800
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 1800 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040020)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -1081,7 +1249,21 @@
       "giver_npc_id": 9000000172,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 1800
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 1800 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040021)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -1135,7 +1317,21 @@
       "giver_npc_id": 9000000112,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 1800
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 1800 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040022)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -1185,7 +1381,21 @@
       "giver_npc_id": 9000000112,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 1800
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 1800 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040023)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -1235,7 +1445,21 @@
       "giver_npc_id": 9000000112,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 2300
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 2300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040024)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -1285,7 +1509,21 @@
       "giver_npc_id": 9500000869,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 2300
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 2300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040025)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -1335,7 +1573,21 @@
       "giver_npc_id": 9500000869,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 2300
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 2300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040026)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -1385,7 +1637,21 @@
       "giver_npc_id": 9000000347,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 2300
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 2300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040027)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -1439,7 +1705,21 @@
       "giver_npc_id": 9000000141,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 2500
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 2500 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040028)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -1543,7 +1823,21 @@
       "giver_npc_id": 9000000074,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 100
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040030)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1593,7 +1887,21 @@
       "giver_npc_id": 9000000074,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 100
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040031)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1839,7 +2147,21 @@
       "giver_npc_id": 9000000082,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 100
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040035)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1885,7 +2207,21 @@
       "giver_npc_id": 9000000084,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 100
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040036)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1931,7 +2267,21 @@
       "giver_npc_id": 9000000005,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 100
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040037)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2077,7 +2427,21 @@
       "giver_npc_id": 9000000519,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 100
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040040)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2127,7 +2491,21 @@
       "giver_npc_id": 9000000224,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 100
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040041)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2996,7 +3374,21 @@
       "giver_npc_id": 9000000370,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 2000
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 2000 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040059)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3050,7 +3442,21 @@
       "giver_npc_id": 9000000408,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 2000
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 2000 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040060)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3104,7 +3510,21 @@
       "giver_npc_id": 9000000176,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 2000
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 2000 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040061)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3158,7 +3578,21 @@
       "giver_npc_id": 9000000109,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "120": 2000
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 2000 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040062)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",

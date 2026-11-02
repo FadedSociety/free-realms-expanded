@@ -167,7 +167,7 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "49": 10
+            "49": 188
           },
           "source": [
             {
@@ -177,6 +177,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T202/T369: Rules of the Road is a one-talk first step. Demolition Derby Driver.md records no quest XP or coin figure, so 10 Demo Derby Driver (profile 49) job XP is the T202 first-step rung; the existing five-coin amount is unchanged."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 188 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060004)"
             }
           ]
         }
@@ -281,7 +285,7 @@
           "coins": 20,
           "items": [],
           "job_xp": {
-            "49": 25
+            "49": 188
           },
           "source": [
             {
@@ -291,6 +295,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T202/T369: License to Drive finishes a derby and returns to Crash Davis. Demolition Derby Driver.md records no quest XP or coin figure, so 20 coins and 25 Demo Derby Driver (profile 49) job XP are the T202 chapter step; the flat 25 coin / 10 profile-49 XP match completion (T313) is unchanged and paid separately."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 188 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060005)"
             }
           ]
         }
@@ -341,7 +349,21 @@
       "giver_npc_id": 9000000289,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060006)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -380,7 +402,21 @@
       "giver_npc_id": 9000000313,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 263
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 263 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060007)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -419,7 +455,21 @@
       "giver_npc_id": 9000000529,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 375
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 375 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060008)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -462,7 +512,21 @@
       "giver_npc_id": 9000000289,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 338
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 338 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060009)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -501,7 +565,21 @@
       "giver_npc_id": 9000000289,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 300
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060010)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -569,12 +647,16 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "49": 10
+            "49": 300
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T727: quest-lines/quests.json q3060011 cites no reward (the only reward-like text, 402847, is a news line with no coin, XP or item amount). The one-goal siblings 3060004 and 3060024 pay 5 coins and 10 Demo Derby Driver (profile 49) job XP on the T202 first-step rung, so this one-goal quest pays the same."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060011)"
             }
           ]
         }
@@ -627,7 +709,21 @@
       "giver_npc_id": 9000000289,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 200
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 200 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060012)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -695,12 +791,16 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "49": 10
+            "49": 400
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T727: quest-lines/quests.json q3060013 cites no reward (402845 is a completion line with no coin, XP or item amount). The one-goal siblings 3060004 and 3060024 pay 5 coins and 10 Demo Derby Driver (profile 49) job XP on the T202 first-step rung, so this one-goal quest pays the same."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 400 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060013)"
             }
           ]
         }
@@ -757,7 +857,21 @@
       "giver_npc_id": 9000000495,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 338
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 338 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060014)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -796,7 +910,21 @@
       "giver_npc_id": 9000000495,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 375
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 375 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060015)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -885,12 +1013,16 @@
           "coins": 20,
           "items": [],
           "job_xp": {
-            "49": 25
+            "49": 375
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T674: quest-lines/quests.json q3060016 cites no coin, XP or item amount (the sponsorship is a relationship, repo:notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md:158). 20 coins and 25 Demo Derby Driver (profile 49) job XP are what 3060005 pays for the same shape (finish one derby, then a Talk); the flat per-match completion payout is separate and unchanged."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 375 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060016)"
             }
           ]
         }
@@ -970,7 +1102,21 @@
       "giver_npc_id": 9000000124,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 825
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 825 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060018)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1009,7 +1155,21 @@
       "giver_npc_id": 9000000530,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 175
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 175 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060019)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1052,7 +1212,21 @@
       "giver_npc_id": 9000000354,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 175
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 175 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060020)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1091,7 +1265,21 @@
       "giver_npc_id": 9000000354,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 263
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 263 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060021)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1169,7 +1357,21 @@
       "giver_npc_id": 9000000356,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 188
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 188 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060023)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1241,12 +1443,16 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "49": 10
+            "49": 188
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T661: quest-lines/quests.json q3060024 cites no reward (no client, wiki or article source); the one-goal sibling 3060004 pays 5 coins and 10 Demo Derby Driver (profile 49) job XP, so this one-goal quest pays the same."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 188 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060024)"
             }
           ]
         }
@@ -1291,7 +1497,21 @@
       "giver_npc_id": 9000000375,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 200
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 200 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060025)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1412,7 +1632,21 @@
       "giver_npc_id": 9000000004,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 200
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 200 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060028)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1451,7 +1685,21 @@
       "giver_npc_id": 9000000270,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 192
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 192 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060029)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1519,12 +1767,16 @@
           "coins": 20,
           "items": [],
           "job_xp": {
-            "49": 25
+            "49": 213
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T666: no reward in any source (quest-lines/quests.json q3060030 rewards empty). 20 coins and 25 Demo Derby Driver (profile 49) job XP are the T202/T369 chapter-step rung 3060005 pays for the same shape (finish one derby, then hand in). The flat per-match completion payout is separate and unchanged."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 213 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060030)"
             }
           ]
         }
@@ -1579,7 +1831,21 @@
       "giver_npc_id": 9000000357,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 167
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 167 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060031)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1618,7 +1884,21 @@
       "giver_npc_id": 9000000482,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 167
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 167 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060032)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1657,7 +1937,21 @@
       "giver_npc_id": 9000000482,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 167
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 167 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060033)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1696,7 +1990,21 @@
       "giver_npc_id": 9000000486,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 175
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 175 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060034)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1735,7 +2043,21 @@
       "giver_npc_id": 9000000482,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 175
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 175 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060035)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1774,7 +2096,21 @@
       "giver_npc_id": 9000000482,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 175
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 175 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060036)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1813,7 +2149,21 @@
       "giver_npc_id": 9000000532,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 213
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 213 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060037)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1856,7 +2206,21 @@
       "giver_npc_id": 9000000482,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 183
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 183 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060038)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1934,7 +2298,21 @@
       "giver_npc_id": 9000000111,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 192
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 192 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060040)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1973,7 +2351,21 @@
       "giver_npc_id": 9000000111,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 183
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 183 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060041)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2012,7 +2404,21 @@
       "giver_npc_id": 9000000111,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 192
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 192 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060042)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2098,7 +2504,21 @@
       "giver_npc_id": 9000000289,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 200
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 200 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060044)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2137,7 +2557,21 @@
       "giver_npc_id": 9000000534,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 183
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 183 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060045)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2180,7 +2614,21 @@
       "giver_npc_id": 9000000535,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "49": 163
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 163 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060046)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",

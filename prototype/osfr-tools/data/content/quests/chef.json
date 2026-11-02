@@ -329,7 +329,21 @@
       "giver_npc_id": 9000000467,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "45": 250
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 250 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050006)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -404,12 +418,16 @@
           "coins": 0,
           "items": [],
           "job_xp": {
-            "45": 20
+            "45": 250
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T670: pays the Chef one-talk referral rung of T202 (Chef: Ranger Requisition 3050011): zero coins and 20 Chef (profile 45) job XP, in data and tunable. quest-lines/quests.json records no reward for this quest."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 250 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050007)"
             }
           ]
         }
@@ -461,7 +479,21 @@
         3050007
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "45": 125
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 125 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050008)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -513,7 +545,21 @@
         3050008
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "45": 100
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050009)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -565,7 +611,21 @@
         3050009
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "45": 250
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 250 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050010)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -638,12 +698,16 @@
           "coins": 0,
           "items": [],
           "job_xp": {
-            "45": 20
+            "45": 100
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T202: Chef: Ranger Requisition is a one-talk referral and had no reward row. Chef.md says Chef quests give experience but gives no number. Zero coins and 20 Chef (profile 45) job XP make the line advance the job without inventing a coin payout."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050011)"
             }
           ]
         }
@@ -702,7 +766,21 @@
         3050011
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "45": 125
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 125 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050012)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -758,7 +836,21 @@
         3050012
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "45": 100
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050013)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -810,7 +902,21 @@
         3050013
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "45": 75
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 75 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050014)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -864,7 +970,21 @@
       "giver_npc_id": 9000000103,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "45": 250
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 250 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050015)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -936,12 +1056,16 @@
           "coins": 0,
           "items": [],
           "job_xp": {
-            "45": 20
+            "45": 100
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T670: pays the Chef one-talk referral rung of T202 (Chef: Ranger Requisition 3050011): zero coins and 20 Chef (profile 45) job XP, in data and tunable. quest-lines/quests.json records no reward for this quest."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050016)"
             }
           ]
         }
@@ -993,7 +1117,21 @@
         3050016
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "45": 125
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 125 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050017)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1045,7 +1183,21 @@
         3050017
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "45": 100
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050018)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1095,7 +1247,21 @@
       "giver_npc_id": 9000000107,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "45": 175
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 175 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050019)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1244,7 +1410,21 @@
         3050020
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "45": 113
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 113 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050021)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1293,7 +1473,21 @@
         3050021
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "45": 113
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 113 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050022)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1463,12 +1657,16 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "45": 25
+            "45": 1250
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T672: five coins and 25 Chef (profile 45) job XP, the rung Cooking 101 (3050004, T202) and the Chef talk-step quests use (the W110 five-coin fallback plus the T202 small-quest XP). The answer for this quest records no reward (quest-lines/quests.json q3050024: none evidenced), so the numbers are ours and live in data."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 1250 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050024)"
             }
           ]
         }
@@ -1524,7 +1722,21 @@
         3050024
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "45": 1250
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 1250 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050025)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1598,12 +1810,16 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "45": 25
+            "45": 1250
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T669: the retail payout is unknown (quest-lines/quests.json q3050026 rewards []). Five coins and 25 Chef (profile 45) XP follow the other enabled Chef quest with a job gate (3050004); no item, so no free sellable gear."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 1250 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050026)"
             }
           ]
         }
@@ -1659,7 +1875,21 @@
         3050026
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "45": 1250
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 1250 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050027)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1760,7 +1990,21 @@
         3050028
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "45": 2000
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 2000 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050029)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1811,7 +2055,21 @@
         3050029
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "45": 2000
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 2000 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050030)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",

@@ -33,11 +33,11 @@ pub const SUNFLOWER: u64 = 9_500_000_536;
 pub const EXAM_COINS: u32 = 5;
 pub const EXAM_XP: u32 = 15;
 pub const HOUSE_COINS: u32 = 10;
-pub const HOUSE_XP: u32 = 20;
+pub const HOUSE_XP: u32 = 47; // L926: wiki stars
 pub const PILL_COINS: u32 = 5;
-pub const PILL_XP: u32 = 20;
+pub const PILL_XP: u32 = 31; // L926: wiki stars
 pub const VITAMIN_COINS: u32 = 15;
-pub const VITAMIN_XP: u32 = 25;
+pub const VITAMIN_XP: u32 = 47; // L926: wiki stars
 pub const LEVEL_COINS: u32 = 5;
 pub const LEVEL_XP: u32 = 25;
 /// Client title and text ids for the two level-five records; every value resolves

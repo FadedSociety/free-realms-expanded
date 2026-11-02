@@ -85,6 +85,8 @@ pub struct RewardState {
     pub wallet_ceiling: u32,
     /// L087: the live coin and star boosters; every grant through this state pays and shows them.
     pub boost: Boost,
+    /// L926: the jobs' XP curves, so a payout's 38/14 and 38/18 show the job's real rank.
+    pub curves: std::sync::Arc<std::collections::BTreeMap<i32, crate::profiles::RankCurve>>,
 }
 
 impl RewardState {
@@ -97,6 +99,7 @@ impl RewardState {
             wallet: None,
             wallet_ceiling: 0,
             boost: Boost::default(),
+            curves: Default::default(),
         }
     }
 
@@ -109,6 +112,14 @@ impl RewardState {
 
     pub fn with_boost(mut self, boost: Boost) -> Self {
         self.boost = boost;
+        self
+    }
+
+    pub fn with_curves(
+        mut self,
+        curves: std::sync::Arc<std::collections::BTreeMap<i32, crate::profiles::RankCurve>>,
+    ) -> Self {
+        self.curves = curves;
         self
     }
 }
@@ -232,7 +243,12 @@ pub fn apply_grant(
             .checked_add(amount)
             .ok_or(GrantFailure::WireRange)?;
         next.profiles.experience.insert(profile_id, updated);
-        outgoing.extend(experience_packets(profile_id, previous, updated));
+        let curve = next
+            .curves
+            .get(&profile_id)
+            .cloned()
+            .unwrap_or_else(crate::profiles::RankCurve::flat);
+        outgoing.extend(experience_packets(profile_id, previous, updated, &curve));
     }
     for item in &grant.items {
         if item.definition_id <= 0 || item.count == 0 {
@@ -312,10 +328,15 @@ fn boosted(grant: &RewardGrant, boost: Boost) -> RewardGrant {
     grant
 }
 
-fn experience_packets(profile_id: i32, previous: u32, updated: u32) -> Vec<Vec<u8>> {
-    // This 100-XP rank curve and rank-20 cap are reconstructed in profiles.rs (R).
-    let rank = (1 + updated / 100).min(20) as i32;
-    let old_rank = (1 + previous / 100).min(20) as i32;
+fn experience_packets(
+    profile_id: i32,
+    previous: u32,
+    updated: u32,
+    curve: &crate::profiles::RankCurve,
+) -> Vec<Vec<u8>> {
+    // L926: the job's curve (profiles.rs RankCurve); without one, the local 100-XP curve.
+    let rank = curve.level(updated) as i32;
+    let old_rank = curve.level(previous) as i32;
     let mut packets = Vec::with_capacity(2);
     if rank > old_rank {
         let mut packet = vec![38, 0, 18, 0];
@@ -323,11 +344,7 @@ fn experience_packets(profile_id: i32, previous: u32, updated: u32) -> Vec<Vec<u
         packet.extend(rank.to_le_bytes());
         packets.push(packet);
     }
-    let progress = if rank == 20 {
-        0
-    } else {
-        (updated % 100) as i32
-    };
+    let progress = curve.percent(updated) as i32;
     let mut packet = vec![38, 0, 14, 0];
     for value in [profile_id, rank, progress, 0, 0, 0] {
         packet.extend(value.to_le_bytes());

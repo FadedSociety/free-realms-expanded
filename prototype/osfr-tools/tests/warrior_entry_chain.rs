@@ -75,6 +75,12 @@ const W4_DESCRIPTION: u32 = 22_581;
 const W4_INTRO: u32 = 22_579;
 const REWARD_COINS: u32 = 5;
 const REWARD_XP: u32 = 25;
+/// L926: W4 pays the fanbyte wiki star reward (47); W1 still pays 25.
+const W4_XP: u32 = 47;
+
+fn chapter_xp(quest: u32) -> u32 {
+    if quest == W4 { W4_XP } else { REWARD_XP }
+}
 const LEARN_LABEL: u32 = 412_471;
 /// The open continent is world zone 0; regional zone ids are content labels. The
 /// regional Snowhill NPC rows accept a zone-0 player for range checks, and the
@@ -188,7 +194,7 @@ fn unlocked(game: &Gameplay, profile: i32) -> bool {
         .contains(&profile)
 }
 
-/// The 49/13 end screen for W1/W4: both carry the same small-quest reward. The
+/// The 49/13 end screen for W1/W4: W1 and W4 carry their wiki-star job XP (L926). The
 /// reward bundle starts at byte 26; 27..31 is the coin row, 31..35 the job-XP row,
 /// 63..71 the display source GUID (the giver), 71..79 the player, 83..87 the title.
 fn assert_reward_bundle(end: &[u8], quest_id: u32, player: u64) {
@@ -205,7 +211,7 @@ fn assert_reward_bundle(end: &[u8], quest_id: u32, player: u64) {
     );
     assert_eq!(
         i32::from_le_bytes(end[31..35].try_into().unwrap()),
-        REWARD_XP as i32,
+        chapter_xp(quest_id) as i32, // L926: wiki stars
         "the 49/13 reward bundle carries the job-XP row"
     );
     assert_eq!(
@@ -582,7 +588,7 @@ fn morninglory_offers_w4_after_w1_and_steele_completes_it() {
         W4,
         WARRIOR,
         REWARD_COINS,
-        REWARD_XP,
+        chapter_xp(W4), // L926: wiki stars (W4 pays 47)
         now,
     );
     assert_eq!(
@@ -590,7 +596,7 @@ fn morninglory_offers_w4_after_w1_and_steele_completes_it() {
         coins_before + 2 * REWARD_COINS,
         "the two chapter rewards"
     );
-    assert_eq!(profile_xp(&game, WARRIOR), xp_before + 2 * REWARD_XP);
+    assert_eq!(profile_xp(&game, WARRIOR), xp_before + REWARD_XP + chapter_xp(W4)); // L926: wiki stars
     assert_eq!(quest_status(&game, W1), QuestStatus::Completed);
     assert_eq!(quest_status(&game, W4), QuestStatus::Completed);
 
@@ -930,7 +936,7 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
         assert_eq!(rewards[0]["coins"].as_u64(), Some(u64::from(REWARD_COINS)));
         assert_eq!(
             rewards[0]["job_xp"]["32"].as_u64(),
-            Some(u64::from(REWARD_XP))
+            Some(u64::from(chapter_xp(record["id"].as_u64().unwrap() as u32))) // L926: wiki stars
         );
         assert_eq!(rewards[0]["items"], serde_json::json!([]));
         assert!(
@@ -1023,7 +1029,41 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
         }
         assert_eq!(record["enabled"].as_bool(), Some(false), "quest {id}");
         assert_eq!(record["objectives"], serde_json::json!([]), "quest {id}");
-        assert_eq!(record["rewards"], serde_json::json!([]), "quest {id}");
+        // L926: wiki stars. A stub gains only its fanbyte star reward (Warrior XP, no coins or
+        // items); the three the wiki has no row for stay empty.
+        let wiki_xp = [
+            (3_150_002_u64, 47_u64),
+            (3_150_003, 47),
+            (3_150_006, 75),
+            (3_150_009, 100),
+            (3_150_011, 100),
+            (3_150_012, 163),
+            (3_150_013, 282),
+            (3_150_014, 282),
+            (3_150_015, 360),
+            (3_150_017, 375),
+            (3_150_018, 282),
+            (3_150_020, 360),
+            (3_150_021, 360),
+            (3_150_023, 350),
+        ]
+        .iter()
+        .find(|(stub, _)| *stub == id)
+        .map(|(_, xp)| *xp);
+        match wiki_xp {
+            Some(xp) => {
+                let rewards = record["rewards"].as_array().unwrap();
+                assert_eq!(rewards.len(), 1, "quest {id}");
+                assert_eq!(rewards[0]["coins"], serde_json::json!(0), "quest {id}");
+                assert_eq!(rewards[0]["items"], serde_json::json!([]), "quest {id}");
+                assert_eq!(
+                    rewards[0]["job_xp"],
+                    serde_json::json!({ "32": xp }),
+                    "quest {id}"
+                );
+            }
+            None => assert_eq!(record["rewards"], serde_json::json!([]), "quest {id}"),
+        }
     }
     for (id, title, giver, prerequisites) in [
         // T898: the unresolved Dewey slot 9000000302 is Drill Sergeant Dewey's row.

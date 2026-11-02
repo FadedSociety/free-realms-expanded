@@ -223,7 +223,21 @@
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "121": 210
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 210 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/pet-trainer.json, record 3120005)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "reconstructed",
@@ -277,7 +291,21 @@
       "giver_npc_id": 9000000368,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "121": 79
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 79 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/pet-trainer.json, record 3120006)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -349,7 +377,21 @@
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "121": 226
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 226 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/pet-trainer.json, record 3120007)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "reconstructed",
@@ -425,7 +467,21 @@
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "121": 226
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 226 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/pet-trainer.json, record 3120008)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "reconstructed",
@@ -542,7 +598,21 @@
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "121": 105
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 105 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/pet-trainer.json, record 3120010)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "reconstructed",
@@ -638,7 +708,21 @@
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "121": 230
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 230 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/pet-trainer.json, record 3120011)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "reconstructed",
@@ -714,7 +798,21 @@
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "121": 230
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 230 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/pet-trainer.json, record 3120012)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "reconstructed",
@@ -790,7 +888,21 @@
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "121": 241
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 241 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/pet-trainer.json, record 3120013)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "reconstructed",
@@ -844,7 +956,21 @@
       "giver_npc_id": 9000000231,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "121": 241
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 241 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/pet-trainer.json, record 3120014)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -953,7 +1079,21 @@
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "121": 125
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 125 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/pet-trainer.json, record 3120016)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "reconstructed",
@@ -1033,7 +1173,21 @@
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "121": 250
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 250 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/pet-trainer.json, record 3120017)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "reconstructed",
@@ -1109,7 +1263,21 @@
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "121": 250
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 250 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/pet-trainer.json, record 3120018)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "reconstructed",
@@ -1163,7 +1331,21 @@
       "giver_npc_id": 9000000228,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "121": 250
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 250 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/pet-trainer.json, record 3120019)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1260,7 +1442,21 @@
       "giver_npc_id": 9000000228,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "121": 250
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 250 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/pet-trainer.json, record 3120021)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",

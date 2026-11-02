@@ -237,7 +237,21 @@
         3010003
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "35": 84
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 84 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/archer.json, record 3010004)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -288,7 +302,21 @@
         3010004
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "35": 100
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/archer.json, record 3010005)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -424,7 +452,21 @@
         3010006
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "35": 71
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 71 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/archer.json, record 3010007)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -476,7 +518,21 @@
         3010007
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "35": 63
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 63 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/archer.json, record 3010008)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -627,7 +683,21 @@
         3010009
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "35": 63
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 63 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/archer.json, record 3010010)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -734,12 +804,16 @@
           "coins": 10,
           "items": [],
           "job_xp": {
-            "35": 25
+            "35": 88
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T895: no client, wiki or repo source names a reward (quest-lines/quests.json q3010011 rewards: none found). 10 coins follows the Archer step ladder (Oath of Honor 3010006, Archer Departure 3010012); 25 Archer (profile 35) XP is the shipped combat-quest rung (Brawler 3000009, Ninja 3110002). The numbers are ours and live in data."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 88 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/archer.json, record 3010011)"
             }
           ]
         }
@@ -844,12 +918,16 @@
           "coins": 10,
           "items": [],
           "job_xp": {
-            "35": 20
+            "35": 88
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T671: quest-lines/quests.json q3010012 states no reward ('none confirmed'). 10 coins and 20 Archer (profile 35) XP follow the shipped Archer step ladder (Oath of Honor 3010006, T194); the numbers are ours and live in data."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 88 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/archer.json, record 3010012)"
             }
           ]
         }
@@ -903,7 +981,21 @@
         3010012
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "35": 113
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 113 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/archer.json, record 3010013)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -955,7 +1047,21 @@
         3010013
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "35": 113
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 113 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/archer.json, record 3010014)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1007,7 +1113,21 @@
         3010014
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "35": 84
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 84 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/archer.json, record 3010015)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1059,7 +1179,21 @@
         3010015
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "35": 75
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 75 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/archer.json, record 3010016)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1161,7 +1295,21 @@
         3010017
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "35": 75
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 75 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/archer.json, record 3010018)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1206,7 +1354,21 @@
         3010017
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "35": 185
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 185 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/archer.json, record 3010019)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1258,7 +1420,21 @@
         3010019
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "35": 184
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 184 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/archer.json, record 3010020)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1310,7 +1486,21 @@
         3010020
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "35": 198
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 198 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/archer.json, record 3010021)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1362,7 +1552,21 @@
         3010021
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "35": 198
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 198 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/archer.json, record 3010022)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1414,7 +1618,21 @@
         3010022
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "35": 213
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 213 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/archer.json, record 3010023)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1509,7 +1727,21 @@
         3010024
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "35": 188
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 188 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/archer.json, record 3010025)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1606,7 +1838,21 @@
         3010026
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "35": 360
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 360 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/archer.json, record 3010027)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1658,7 +1904,21 @@
         3010027
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "35": 360
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 360 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/archer.json, record 3010028)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1710,7 +1970,21 @@
         3010028
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "35": 360
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 360 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/archer.json, record 3010029)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1812,7 +2086,21 @@
         3010030
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "35": 263
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 263 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/archer.json, record 3010031)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",

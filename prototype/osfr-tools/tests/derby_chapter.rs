@@ -72,9 +72,9 @@ const BRAWLER: i32 = 43;
 const RULES_OF_THE_ROAD: u32 = 3_060_004;
 const LICENSE_TO_DRIVE: u32 = 3_060_005;
 const RULES_COINS: u32 = 5;
-const RULES_XP: u32 = 10;
+const RULES_XP: u32 = 188; // L926: wiki stars
 const LICENSE_COINS: u32 = 20;
-const LICENSE_XP: u32 = 25;
+const LICENSE_XP: u32 = 188; // L926: wiki stars
 /// T313's shipped flat completion reward for one finished match.
 const COMPLETION_COINS: u32 = 25;
 const COMPLETION_XP: u32 = 10;

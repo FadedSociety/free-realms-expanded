@@ -393,7 +393,21 @@
       "giver_npc_id": 9000000053,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "52": 25
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 25 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/soccer-star.json, record 3140006)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -485,7 +499,21 @@
       "giver_npc_id": 9000000053,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "52": 105
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 105 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/soccer-star.json, record 3140008)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -524,7 +552,21 @@
       "giver_npc_id": 9000000053,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "52": 105
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 105 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/soccer-star.json, record 3140009)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -563,7 +605,21 @@
       "giver_npc_id": 9000000053,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "52": 184
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 184 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/soccer-star.json, record 3140010)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -613,7 +669,21 @@
       "giver_npc_id": 9000000053,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "52": 105
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 105 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/soccer-star.json, record 3140011)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",

@@ -30,7 +30,7 @@ mod s6;
 
 use gateway_vendor::count_definition;
 use npc_quest_chain::{
-    ADVENTURER, CHARACTER, Fixture, TALK_LABEL, character_at_for, coins, content_dir,
+    CHARACTER, Fixture, TALK_LABEL, character_at_for, coins, content_dir,
     content_position, counts, finish_quest, gateway_send, gateway_talk, has_family, interact,
     menu_option, menu_option_bytes, npc_interact, npc_select, pending_turnin, quest_abandon,
     quest_status, read_json, release_end_screen, saved, seed_quest, send, talk,
@@ -47,6 +47,9 @@ use std::fs;
 
 /// The shipped Blacksmith record under test (`data/content/quests/blacksmith.json`).
 const QUEST: u32 = 3_020_021;
+/// L926: the record's job XP is its fanbyte wiki star reward, paid to the Blacksmith profile.
+const BLACKSMITH: i32 = 16;
+const QUEST_XP: u32 = 878;
 /// Silverray, the record's giver, its turn-in row and the delivery step's NPC.
 const GIVER: u64 = 9_000_000_203;
 /// The item the shipped step names: the wand its craft step points at (30480).
@@ -169,7 +172,10 @@ fn hand_in(game: &mut Gameplay, now: u64) -> osfr_tools::gameplay::Outcome {
 #[test]
 fn hand_in_takes_the_items_and_credits_the_step() {
     let fixture = fixture();
-    let mut game = armed(&fixture, FIXTURE_ITEM, 1, &[(2, false)]);
+    // L926: the record pays 878 Blacksmith wiki-star XP, and a reward to a locked job is refused.
+    let mut game = armed_with(&fixture, FIXTURE_ITEM, 1, &[(2, false)], |state| {
+        state.profiles.as_mut().unwrap().unlocked.insert(BLACKSMITH);
+    });
     let who = at(GIVER);
 
     let handed = hand_in(&mut game, NOW);
@@ -207,15 +213,15 @@ fn hand_in_takes_the_items_and_credits_the_step() {
         "the one-count step completes"
     );
 
-    // The record's reward rows are unrecovered: the end screen pays nothing, but the turn-in
-    // path still completes the quest end to end.
+    // The record's coin reward is unrecovered (0 coins); its job XP is the wiki star reward. The
+    // turn-in path completes the quest end to end.
     let end = release_end_screen(&mut game, &who, QUEST, GIVER, 0, NOW + 2);
     assert!(
         has_family(&end, 49, 13, Some(QUEST)),
         "the held 49/13 names the quest"
     );
     let before_coins = coins(&game);
-    finish_quest(&mut game, &who, QUEST, ADVENTURER, 0, 0, NOW + 4);
+    finish_quest(&mut game, &who, QUEST, BLACKSMITH, 0, QUEST_XP, NOW + 4); // L926: wiki stars
     assert_eq!(coins(&game), before_coins, "no coin reward is invented");
     assert_eq!(quest_status(&game, QUEST), QuestStatus::Completed);
 }

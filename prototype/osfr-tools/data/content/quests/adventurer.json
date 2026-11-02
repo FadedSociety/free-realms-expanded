@@ -1191,11 +1191,17 @@
         {
           "coins": 5,
           "items": [],
-          "job_xp": {},
+          "job_xp": {
+            "45": 50
+          },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 50 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3000015)"
             }
           ]
         }
@@ -1390,11 +1396,17 @@
         {
           "coins": 5,
           "items": [],
-          "job_xp": {},
+          "job_xp": {
+            "16": 50
+          },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 50 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3000017)"
             }
           ]
         }
@@ -2453,7 +2465,7 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "1": 25
+            "1": 225
           },
           "source": [
             {
@@ -2463,6 +2475,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T279: the 25 Adventurer (profile 1) XP is a playtest payout in the existing local 25-XP step scale; the guide gives no reward amount, so XP is reconstructed. The reward map is explicit and pays profile 1 even when another job is active."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000029)"
             }
           ]
         }
@@ -2538,7 +2554,21 @@
         3000029
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "1": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000030)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2590,7 +2620,21 @@
         3000030
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "1": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000031)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2696,12 +2740,16 @@
           "coins": 13,
           "items": [],
           "job_xp": {
-            "1": 25
+            "1": 225
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T330: the guide gives no amount; 13 coins reuse T277's Local Hero chapter rung and 25 Adventurer (profile 1) XP uses the local 25-XP step scale. No free item is granted, and the explicit map pays profile 1 even when another job is active."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000032)"
             }
           ]
         }
@@ -2817,12 +2865,16 @@
           "coins": 8,
           "items": [],
           "job_xp": {
-            "1": 20
+            "1": 225
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T377: the guide's E5 reward cell is unknown; this row uses the existing W110/T202 small-referral fallback: 8 coins and 20 Adventurer (profile 1) job XP, no item. The explicit job_xp map pays profile 1 even when another job is active."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000033)"
             }
           ]
         }
@@ -2932,12 +2984,16 @@
           "coins": 8,
           "items": [],
           "job_xp": {
-            "1": 20
+            "1": 225
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T377: the guide's E6 reward cell is unknown; this row uses the existing W110/T202 small-referral fallback: 8 coins and 20 Adventurer (profile 1) job XP, no item. The explicit job_xp map pays profile 1 even when another job is active."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000034)"
             }
           ]
         }
@@ -2997,7 +3053,21 @@
         3000034
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "1": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000035)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3042,7 +3112,21 @@
         3000035
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "1": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000036)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3094,7 +3178,21 @@
         3000036
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "1": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000037)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3146,7 +3244,21 @@
         3000037
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "1": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000038)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3198,7 +3310,21 @@
         3000038
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "1": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000039)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3250,7 +3376,21 @@
         3000039
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "1": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000040)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3306,7 +3446,21 @@
         3000040
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "1": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000041)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3362,7 +3516,21 @@
         3000041
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "1": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000042)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3418,7 +3586,21 @@
         3000042
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "1": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000043)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3474,7 +3656,21 @@
         3000043
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "1": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000044)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3526,7 +3722,21 @@
         3000044
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "1": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000045)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3578,7 +3788,21 @@
         3000045
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "1": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000046)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3630,7 +3854,21 @@
         3000046
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "1": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000047)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3682,7 +3920,21 @@
         3000047
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "1": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000048)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3738,7 +3990,21 @@
         3000048
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "1": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000049)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3794,7 +4060,21 @@
         3000049
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "1": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000050)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",

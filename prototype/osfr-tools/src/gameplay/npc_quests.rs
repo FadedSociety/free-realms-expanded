@@ -126,11 +126,8 @@ impl Gameplay {
                 {
                     return None;
                 }
-                // (R) Reuse Profiles' existing local rank curve: one base rank,
-                // one rank per 100 XP, capped at rank 20. Native quest gates do
-                // not establish this XP-to-rank mapping.
-                let xp = state.experience.get(&profile_id).copied().unwrap_or(0);
-                Some((job_id.to_owned(), (1 + xp / 100).min(20) as u8))
+                // L926: the job's own rank curve (Profiles::rank), as every other level read.
+                Some((job_id.to_owned(), self.job_level(profile_id) as u8))
             })
             .collect();
         let limits = &self.game_rules.policy.quest_limits;

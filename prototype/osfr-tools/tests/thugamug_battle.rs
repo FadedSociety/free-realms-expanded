@@ -845,10 +845,10 @@ const THIEVERY: u32 = 3_000_032;
 const INTRO_TEXT: u32 = 90_702;
 const END_TEXT: u32 = 90_705;
 const QUEST_COINS: u32 = 13;
-const QUEST_XP: u32 = 25;
+const QUEST_XP: u32 = 225; // L926: wiki stars (3000032)
 const MISSING_SISTERS_END_TEXT: u32 = 90_624;
 const MISSING_SISTERS_COINS: u32 = 5;
-const MISSING_SISTERS_XP: u32 = 25;
+const MISSING_SISTERS_XP: u32 = 225; // L926: wiki stars (3000029)
 const GEOFFREY: u64 = 9_000_000_330;
 /// A drawable `legacy_data` Sanctuary quest giver who offers no enabled quest.
 const HARRY: u64 = 9_500_000_493;
@@ -1403,7 +1403,7 @@ fn geoffrey_offers_thugamugs_thievery_after_the_missing_sisters() {
 }
 
 /// The chapter's dungeon step is the T282 bridge battle; the results Close leaves
-/// 1/1 on it and the Talk step open, and 49/14 pays 13 coins + 25 Adventurer XP once.
+/// 1/1 on it and the Talk step open, and 49/14 pays 13 coins + 225 Adventurer XP once.
 #[test]
 fn winning_the_bridge_battle_completes_the_chapter_and_pays_once() {
     let fixture = Fixture::new();
@@ -1815,7 +1815,13 @@ fn the_chapter_text_giver_battle_and_reward_resolve() {
             .unwrap_or_else(|| panic!("the {disabled} record"));
         assert_eq!(row["enabled"], false, "{disabled} must stay disabled");
         assert_eq!(row["objectives"], json!([]));
-        assert_eq!(row["rewards"], json!([]));
+        // L926: wiki stars. A hollow stub gains only its star reward: 225 Adventurer XP, no
+        // coins or items.
+        let rewards = row["rewards"].as_array().unwrap();
+        assert_eq!(rewards.len(), 1);
+        assert_eq!(rewards[0]["coins"], json!(0));
+        assert_eq!(rewards[0]["items"], json!([]));
+        assert_eq!(rewards[0]["job_xp"], json!({"1": 225}));
     }
 
     // The engine resolves the same ids, and the 49/13 packet carries the bundle.

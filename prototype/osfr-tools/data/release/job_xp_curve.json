@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "exponent": 1.5,
+  "source": [
+    "L926 (owner 2026-11-02: a decently hard but rewarding XP system; players keep one character).",
+    "(R) The server owns the thresholds: the client only draws the rank and the percent toward the next one.",
+    "(R) total_to_20 per job: max(the job's one-time quest stars in the archived fanbyte wiki / 0.45, 7,500), so the one-time quests reach about level 14; jobs with fast repeatable quests (combat contracts at one repeat per 15 minutes) are raised so about 12 hours of repeatables plus the job's main activity finish level 20. Level n -> n+1 needs total * n^1.5 / sum(1..19 of n^1.5).",
+    "Inputs: lab/references/fanbyte-wiki-20261102/quests.json (stars per quest, repeatable flag); lab/autopilot/opus/RESUME.md 2026-11-02 XP proposal."
+  ],
+  "jobs": [
+    {"profile_id": 1, "job": "Adventurer", "total_to_20": 9000, "source": "one-time quest stars 4,050"},
+    {"profile_id": 2, "job": "Ninja", "total_to_20": 17700, "source": "one-time 2,429; 4 repeatables x 212"},
+    {"profile_id": 4, "job": "Postman", "total_to_20": 30300, "source": "one-time 13,631"},
+    {"profile_id": 11, "job": "Medic", "total_to_20": 15800, "source": "one-time 3,196; 3 repeatables x 175"},
+    {"profile_id": 12, "job": "Wizard", "total_to_20": 28500, "source": "one-time 3,281; 2 repeatables x 350"},
+    {"profile_id": 14, "job": "Miner", "total_to_20": 20600, "source": "one-time 9,267"},
+    {"profile_id": 16, "job": "Blacksmith", "total_to_20": 25300, "source": "one-time 11,405; its one 819-star repeatable treated as a daily (R)"},
+    {"profile_id": 32, "job": "Warrior", "total_to_20": 10500, "source": "one-time 3,321; 3 repeatables x 100"},
+    {"profile_id": 35, "job": "Archer", "total_to_20": 19200, "source": "one-time 2,937; 2 repeatables x 225"},
+    {"profile_id": 43, "job": "Brawler", "total_to_20": 22600, "source": "one-time 3,273; 4 repeatables x 269"},
+    {"profile_id": 45, "job": "Chef", "total_to_20": 28100, "source": "one-time 12,626"},
+    {"profile_id": 48, "job": "Kart Driver", "total_to_20": 31700, "source": "one-time 14,272"},
+    {"profile_id": 49, "job": "Demo Derby Driver", "total_to_20": 20400, "source": "one-time 9,194"},
+    {"profile_id": 52, "job": "Soccer Star", "total_to_20": 7500, "source": "one-time 574 (harvest gaps): floor"},
+    {"profile_id": 120, "job": "Card Duelist", "total_to_20": 81300, "source": "one-time 36,600"},
+    {"profile_id": 121, "job": "Pet Trainer", "total_to_20": 7500, "source": "job removed 2009-12-14: floor"},
+    {"profile_id": 137, "job": "Fisherman", "total_to_20": 7500, "source": "one-time 240; 10 repeatables x 32 (harvest gaps): floor"}
+  ]
+}

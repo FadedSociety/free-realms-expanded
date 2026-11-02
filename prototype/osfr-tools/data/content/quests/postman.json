@@ -193,7 +193,21 @@
       "giver_npc_id": 9000000086,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "4": 76
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 76 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130004)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -247,7 +261,21 @@
       "giver_npc_id": 9000000086,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "4": 101
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 101 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130005)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -297,7 +325,21 @@
       "giver_npc_id": 9000000091,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "4": 64
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 64 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130006)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -347,7 +389,21 @@
       "giver_npc_id": 9000000091,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "4": 64
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 64 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130007)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -397,7 +453,21 @@
       "giver_npc_id": 9000000091,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "4": 63
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 63 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130008)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -447,7 +517,21 @@
       "giver_npc_id": 9000000086,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "4": 63
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 63 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130009)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -559,7 +643,21 @@
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "4": 300
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130011)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "reconstructed",
@@ -621,7 +719,21 @@
       "giver_npc_id": 9000000174,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "4": 300
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130012)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -675,7 +787,21 @@
       "giver_npc_id": 9000000174,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "4": 300
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130013)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -725,7 +851,21 @@
       "giver_npc_id": 9000000174,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "4": 300
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130014)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -775,7 +915,21 @@
       "giver_npc_id": 9000000545,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "4": 300
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130015)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -825,7 +979,21 @@
       "giver_npc_id": 9000000079,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "4": 300
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130016)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -968,7 +1136,21 @@
       "giver_npc_id": 9000000079,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "4": 950
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 950 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130018)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1022,7 +1204,21 @@
       "giver_npc_id": 9000000079,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "4": 950
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 950 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130019)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1076,7 +1272,21 @@
       "giver_npc_id": 9000000172,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "4": 950
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 950 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130020)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1126,7 +1336,21 @@
       "giver_npc_id": 9000000172,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "4": 950
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 950 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130021)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1226,7 +1450,21 @@
       "giver_npc_id": 9000000172,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "4": 950
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 950 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130023)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1276,7 +1514,21 @@
       "giver_npc_id": 9000000132,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "4": 950
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 950 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130024)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1326,7 +1578,21 @@
       "giver_npc_id": 9000000132,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "4": 950
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 950 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130025)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1376,7 +1642,21 @@
       "giver_npc_id": 9000000132,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "4": 950
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 950 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130026)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1426,7 +1706,21 @@
       "giver_npc_id": 9000000132,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "4": 950
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 950 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130027)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1476,7 +1770,21 @@
       "giver_npc_id": 9000000031,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "4": 950
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 950 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130028)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1526,7 +1834,21 @@
       "giver_npc_id": 9000000031,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "4": 950
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 950 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130029)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",

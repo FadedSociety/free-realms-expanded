@@ -98,7 +98,21 @@
         3090001
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "11": 47
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 47 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090002)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -170,12 +184,16 @@
           "coins": 10,
           "items": [],
           "job_xp": {
-            "11": 20
+            "11": 47
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T197: row 3 reward cell is unknown. Ten coins use the existing W110/T194 referral fallback and 20 Medic (profile 11) job XP follows the same policy. No item, membership bonus or random loot is inferred."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 47 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090003)"
             }
           ]
         }
@@ -299,12 +317,16 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "11": 20
+            "11": 31
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T278: the guide row 4 reward cell is unknown. Five coins and 20 Medic (profile 11) job XP follow the existing W110/T194 referral fallback. No item is granted; the 'ten of each' fruit/vegetable list has no proven item definitions and the retail vitamins are not a recovered inventory item."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 31 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090004)"
             }
           ]
         }
@@ -395,12 +417,16 @@
           "coins": 15,
           "items": [],
           "job_xp": {
-            "11": 25
+            "11": 47
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T197: row 5 reward cell is unknown. Fifteen coins use the existing W110/T194 referral fallback and 25 Medic (profile 11) job XP follows the same policy. The wiki's Amateur Medic Scalpel (level 1 weapon) is not proven in the shipped item definitions, so no item is granted; the scalpel remains a later-slice gap."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 47 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090005)"
             }
           ]
         }
@@ -564,7 +590,21 @@
         3090006
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "11": 75
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 75 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090007)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -609,7 +649,21 @@
         3090006
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "11": 125
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 125 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090008)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -661,7 +715,21 @@
         3090008
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "11": 88
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 88 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090009)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -713,7 +781,21 @@
         3090009
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "11": 100
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090010)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -769,7 +851,21 @@
         3090010
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "11": 100
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090011)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -821,7 +917,21 @@
         3090011
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "11": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090012)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -920,7 +1030,21 @@
         3090013
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "11": 175
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 175 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090014)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -965,7 +1089,21 @@
         3090013
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "11": 188
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 188 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090015)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -1010,7 +1148,21 @@
         3090015
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "11": 188
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 188 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090016)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1062,7 +1214,21 @@
         3090016
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "11": 188
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 188 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090017)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1166,7 +1332,21 @@
         3090018
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "11": 188
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 188 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090019)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1218,7 +1398,21 @@
         3090019
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "11": 188
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 188 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090020)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1268,7 +1462,21 @@
       "giver_npc_id": 9000000071,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "11": 6
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 6 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090021)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1365,7 +1573,21 @@
         3090021
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "11": 360
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 360 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090023)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1417,7 +1639,21 @@
         3090023
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "11": 360
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 360 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090024)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1469,7 +1705,21 @@
         3090024
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "11": 360
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 360 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090025)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1521,7 +1771,21 @@
         3090025
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "11": 360
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 360 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090026)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1679,7 +1943,21 @@
         3090027
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "11": 350
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 350 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090028)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",

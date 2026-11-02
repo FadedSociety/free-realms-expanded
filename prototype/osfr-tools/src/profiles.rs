@@ -71,13 +71,109 @@ fn dwords(values: &[i32]) -> impl Iterator<Item = u8> + '_ {
     values.iter().flat_map(|value| value.to_le_bytes())
 }
 
-/// A job record's rank, XP percent and stars for `xp` experience: rank `1 + xp / 100` up to 20,
-/// the percent toward the next rank (0 at 20), no stars. L107: the startup self data uses it too.
-pub(crate) fn progression_bytes(xp: u32) -> [u8; 12] {
-    let rank = (1 + xp / 100).min(20) as i32;
+/// L926: a job's cumulative XP to reach each level 1..=20. The server owns the curve: the client
+/// only draws the rank and the percent toward the next one (38/14, the self-data job record).
+/// `job_xp_curve.json` gives a job its own curve (level n -> n+1 weighted n^exponent); a job without
+/// one, and content without the file, keeps the local (R) 100-XP-per-level curve.
+#[derive(Clone, Debug, PartialEq)]
+pub struct RankCurve([u32; 20]);
+
+impl RankCurve {
+    pub fn flat() -> Self {
+        Self(std::array::from_fn(|level| level as u32 * 100))
+    }
+
+    fn shaped(total: u32, exponent: f64) -> io::Result<Self> {
+        if !(19..=10_000_000).contains(&total) || !(0.0..=4.0).contains(&exponent) {
+            return Err(invalid("job xp curve out of bounds"));
+        }
+        let weights: Vec<f64> = (1..20).map(|n| f64::from(n).powf(exponent)).collect();
+        let sum: f64 = weights.iter().sum();
+        let (mut levels, mut done) = ([0u32; 20], 0.0);
+        for (step, weight) in weights.iter().enumerate() {
+            done += weight;
+            let at = (f64::from(total) * done / sum).round() as u32;
+            levels[step + 1] = at.max(levels[step] + 1);
+        }
+        Ok(Self(levels))
+    }
+
+    /// The level `xp` reaches, 1 to 20.
+    pub fn level(&self, xp: u32) -> u32 {
+        1 + self.0[1..]
+            .iter()
+            .take_while(|&&needed| xp >= needed)
+            .count() as u32
+    }
+
+    /// Percent of the way from this level to the next (0 at 20).
+    pub fn percent(&self, xp: u32) -> u32 {
+        let level = self.level(xp) as usize;
+        if level >= 20 {
+            return 0;
+        }
+        let (low, high) = (self.0[level - 1], self.0[level]);
+        ((u64::from(xp - low) * 100) / u64::from(high - low)) as u32
+    }
+
+    /// The XP a job holds at the start of `level` (clamped to 1..=20).
+    pub fn xp_for(&self, level: u32) -> u32 {
+        self.0[(level.clamp(1, 20) - 1) as usize]
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct CurveFile {
+    schema_version: u32,
+    exponent: f64,
+    #[serde(default)]
+    source: serde_json::Value,
+    jobs: Vec<CurveRow>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct CurveRow {
+    profile_id: i32,
+    #[serde(default)]
+    job: String,
+    total_to_20: u32,
+    #[serde(default)]
+    source: String,
+}
+
+/// The per-job curves of `directory/job_xp_curve.json`; none when the file is absent.
+pub fn load_curves(directory: &Path) -> io::Result<BTreeMap<i32, RankCurve>> {
+    let path = directory.join("job_xp_curve.json");
+    if !path.is_file() {
+        return Ok(BTreeMap::new());
+    }
+    let bytes = fs::read(path)?;
+    if bytes.len() > 65_536 {
+        return Err(invalid("job xp curve file exceeds bounds"));
+    }
+    let file: CurveFile = serde_json::from_slice(&bytes).map_err(invalid)?;
+    if file.schema_version != 1 {
+        return Err(invalid("unsupported job xp curve file"));
+    }
+    let mut curves = BTreeMap::new();
+    for row in file.jobs {
+        let curve = RankCurve::shaped(row.total_to_20, file.exponent)?;
+        if curves.insert(row.profile_id, curve).is_some() {
+            return Err(invalid("job xp curve names a profile twice"));
+        }
+    }
+    Ok(curves)
+}
+
+/// A job record's rank, XP percent and stars for `xp` experience on `curve`: the rank, the
+/// percent toward the next rank (0 at 20), no stars. L107: the startup self data uses it too.
+pub(crate) fn progression_bytes(xp: u32, curve: &RankCurve) -> [u8; 12] {
+    let rank = curve.level(xp) as i32;
     let mut bytes = [0; 12];
     bytes[..4].copy_from_slice(&rank.to_le_bytes());
-    bytes[4..8].copy_from_slice(&(if rank == 20 { 0 } else { (xp % 100) as i32 }).to_le_bytes());
+    bytes[4..8].copy_from_slice(&(curve.percent(xp) as i32).to_le_bytes());
     // The third native field is StarsAvailable, not total experience.
     // Ability-star spending is not implemented in this opening slice.
     bytes[8..].copy_from_slice(&0i32.to_le_bytes());
@@ -183,6 +279,7 @@ pub struct Profiles {
     content: Arc<Content>,
     state: ProfileState,
     staff: StaffSession,
+    curves: Arc<BTreeMap<i32, RankCurve>>,
 }
 
 /// W176: one job a trainer NPC teaches (`job_trainers.json`). The job, trainer pointer and
@@ -329,7 +426,21 @@ impl Profiles {
             content: Arc::new(content),
             state,
             staff: StaffSession::default(),
+            curves: Arc::new(load_curves(directory)?),
         })
+    }
+
+    /// The job's XP curve: its own from `job_xp_curve.json`, else the local 100-XP curve.
+    /// Every job's own curve, shared (reward payouts carry it to rank their packets).
+    pub fn curves(&self) -> Arc<BTreeMap<i32, RankCurve>> {
+        Arc::clone(&self.curves)
+    }
+
+    pub fn curve(&self, profile: i32) -> RankCurve {
+        self.curves
+            .get(&profile)
+            .cloned()
+            .unwrap_or_else(RankCurve::flat)
     }
 
     /// Load a reward's progression snapshot, keeping `current`'s staff jobs (granted and
@@ -434,9 +545,10 @@ impl Profiles {
         self.content.profiles.iter().any(|p| p.id == profile)
     }
 
-    /// The job's level on the local (R) 100-XP curve, 1 to 20.
+    /// The job's level on its curve, 1 to 20.
     pub fn rank(&self, profile: i32) -> u32 {
-        (1 + self.state.experience.get(&profile).copied().unwrap_or(0) / 100).min(20)
+        self.curve(profile)
+            .level(self.state.experience.get(&profile).copied().unwrap_or(0))
     }
 
     /// (R) Any unlocked job at `rank` or higher; the client locale's guild-creation rule.
@@ -539,7 +651,7 @@ impl Profiles {
     }
 
     /// Native readers FUN_008d86e0 (38/14) and FUN_008d8910 (38/18).
-    /// The local 100-XP rank curve is reconstructed; native star balances stay0.
+    /// Ranks come from the job's curve (L926); native star balances stay 0.
     pub fn experience_packets(&self, previous_xp: u32) -> Vec<Vec<u8>> {
         let xp = self
             .state
@@ -547,8 +659,9 @@ impl Profiles {
             .get(&self.state.active)
             .copied()
             .unwrap_or(0);
-        let rank = (1 + xp / 100).min(20) as i32;
-        let old_rank = (1 + previous_xp / 100).min(20) as i32;
+        let curve = self.curve(self.state.active);
+        let rank = curve.level(xp) as i32;
+        let old_rank = curve.level(previous_xp) as i32;
         let mut packets = Vec::new();
         // Rank notification must precede the full update, which installs rank.
         if rank > old_rank {
@@ -558,14 +671,7 @@ impl Profiles {
             packets.push(packet);
         }
         let mut packet = vec![38, 0, 14, 0];
-        for value in [
-            self.state.active,
-            rank,
-            if rank == 20 { 0 } else { (xp % 100) as i32 },
-            0,
-            0,
-            0,
-        ] {
+        for value in [self.state.active, rank, curve.percent(xp) as i32, 0, 0, 0] {
             packet.extend(value.to_le_bytes());
         }
         packets.push(packet);
@@ -573,7 +679,10 @@ impl Profiles {
     }
 
     fn progression_bytes(&self, id: i32) -> [u8; 12] {
-        progression_bytes(self.state.experience.get(&id).copied().unwrap_or(0))
+        progression_bytes(
+            self.state.experience.get(&id).copied().unwrap_or(0),
+            &self.curve(id),
+        )
     }
 
     /// Apply before inventory splices, while original profile offsets are valid.
@@ -660,6 +769,63 @@ impl Profiles {
 
 #[cfg(test)]
 mod tests {
+    use super::RankCurve;
+
+    #[test]
+    fn the_flat_curve_keeps_one_level_per_hundred_xp() {
+        let flat = RankCurve::flat();
+        for (xp, level, percent) in [
+            (0, 1, 0),
+            (99, 1, 99),
+            (100, 2, 0),
+            (1_850, 19, 50),
+            (1_900, 20, 0),
+            (9_999, 20, 0),
+        ] {
+            assert_eq!(
+                (flat.level(xp), flat.percent(xp)),
+                (level, percent),
+                "xp {xp}"
+            );
+        }
+        assert_eq!(flat.xp_for(5), 400);
+    }
+
+    #[test]
+    fn a_shaped_curve_rises_and_ends_at_its_total() {
+        let curve = RankCurve::shaped(22_600, 1.5).unwrap();
+        assert_eq!(curve.level(0), 1);
+        assert_eq!(curve.xp_for(20), 22_600);
+        assert_eq!(curve.level(22_600), 20);
+        assert_eq!(curve.level(22_599), 19);
+        let steps: Vec<u32> = (2..=20)
+            .map(|l| curve.xp_for(l) - curve.xp_for(l - 1))
+            .collect();
+        assert!(
+            steps.windows(2).all(|w| w[0] <= w[1]),
+            "each level costs at least the last"
+        );
+        for xp in [0, 500, 7_777, 22_000] {
+            let level = curve.level(xp);
+            assert!(curve.xp_for(level) <= xp && curve.percent(xp) < 100);
+        }
+        assert!(RankCurve::shaped(10, 1.5).is_err() && RankCurve::shaped(9_000, 9.0).is_err());
+    }
+
+    #[test]
+    fn the_release_curves_cover_every_job_once() {
+        let release = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("data/release");
+        let curves = super::load_curves(&release).unwrap();
+        assert_eq!(curves.len(), 17);
+        assert_eq!(curves[&137].xp_for(20), 7_500, "Fisherman");
+        assert_eq!(curves[&120].xp_for(20), 81_300, "Card Duelist");
+        assert!(
+            super::load_curves(&release.join("no-such-dir"))
+                .unwrap()
+                .is_empty()
+        );
+    }
+
     #[test]
     fn bundled_staff_jobs_load() {
         let ids: Vec<i32> = super::STAFF_JOBS.iter().map(|job| job.id).collect();

@@ -242,11 +242,11 @@ fn ranger_requisition(game: &mut Gameplay, now: &mut u64) {
         RANGER_REQUISITION,
         RICARDO,
         RANGER_END_TEXT,
-        20,
+        100, // L926: wiki stars
         *now,
     );
     *now += 10;
-    finish_quest(game, &ricardo, RANGER_REQUISITION, CHEF, 0, 20, *now);
+    finish_quest(game, &ricardo, RANGER_REQUISITION, CHEF, 0, 100, *now); // L926: wiki stars
 }
 
 fn ninja_path(game: &mut Gameplay, now: &mut u64) {
@@ -332,7 +332,7 @@ fn chef_trainer_unlock_opens_the_job_gate_and_pays() {
     switch_job(&mut game, &simone, CHEF, now + 1);
 
     ranger_requisition(&mut game, &mut now);
-    assert_eq!(profile_xp(&game, CHEF), 20);
+    assert_eq!(profile_xp(&game, CHEF), 100); // L926: wiki stars
     assert_eq!(active_job(&game), CHEF, "the turn-in must not switch jobs");
 }
 
@@ -703,7 +703,7 @@ fn refused_turn_in_changes_nothing() {
         RANGER_REQUISITION,
         RICARDO,
         RANGER_END_TEXT,
-        20,
+        100, // L926: wiki stars
         now,
     );
     let held = saved(&game);
@@ -729,7 +729,7 @@ fn refused_turn_in_changes_nothing() {
     assert_eq!(saved(&game), held);
 
     now += 10;
-    finish_quest(&mut game, &ricardo, RANGER_REQUISITION, CHEF, 0, 20, now);
+    finish_quest(&mut game, &ricardo, RANGER_REQUISITION, CHEF, 0, 100, now); // L926: wiki stars
     let finished = saved(&game);
     let finished_coins = coins(&game);
     let finished_xp = profile_xp(&game, CHEF);
@@ -1073,10 +1073,10 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             0,
             Some(CHEF),
             CHEF,
-            20,
+            100, // L926: wiki stars
         ),
         // T669: Chef: The Food Reviewer (M8), band 3 gate (min_level 10 replaces the disabled
-        // 3050025 prerequisite); the guide's reward cell is unknown, so the small-quest rung.
+        // 3050025 prerequisite); the guide's reward cell is unknown, so the small-quest rung (L926: now the wiki stars).
         (
             "chef.json",
             3_050_026,
@@ -1085,7 +1085,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             5,
             Some(CHEF),
             CHEF,
-            25,
+            1250, // L926: wiki stars
         ),
         (
             "kart_driver.json",
@@ -1130,7 +1130,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             5,
             Some(KART_DRIVER),
             KART_DRIVER,
-            15,
+            188, // L926: wiki stars
         ),
         (
             "kart_driver.json",
@@ -1161,7 +1161,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             5,
             Some(NINJA),
             NINJA,
-            20,
+            100, // L926: wiki stars
         ),
         // T241: the live Farnum starting pair. Fighting the Pack is a playtest entry
         // (the disabled 3000008 predecessor is dropped); Copper Collection listens to the
@@ -1187,7 +1187,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             15,
         ),
         // T279: the second story beat. It is an independent playtest entry (no
-        // prerequisite and no job gate); its 25 XP pays the explicit Adventurer profile.
+        // prerequisite and no job gate); its 225 XP (L926) pays the explicit Adventurer profile.
         (
             "adventurer.json",
             3_000_029,
@@ -1196,7 +1196,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             5,
             None,
             ADVENTURER,
-            25,
+            225, // L926: wiki stars
         ),
         // T277: the Royal Courier's independent Local Hero entry. Like T279 it has
         // no prerequisite and no job gate; its 25 XP pays the explicit Adventurer
@@ -1222,7 +1222,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             13,
             None,
             ADVENTURER,
-            25,
+            225, // L926: wiki stars
         ),
         // T377: the next two chapter records. The disabled E2/E3 are skipped, so E5
         // chains from the playable E4 and E6 from E5. Both keep the small-referral
@@ -1235,7 +1235,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             8,
             None,
             ADVENTURER,
-            20,
+            225, // L926: wiki stars
         ),
         (
             "adventurer.json",
@@ -1245,7 +1245,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             8,
             None,
             ADVENTURER,
-            20,
+            225, // L926: wiki stars
         ),
         // T252's two Cobblestone Brawler records; T331's C6 is the hand-off they lead to.
         // The table now covers every job-gated Brawler record in `brawler.json`, so the
@@ -1268,7 +1268,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             5,
             Some(BRAWLER),
             BRAWLER,
-            25,
+            75, // L926: wiki stars
         ),
         // T331: C6 keeps the Brawler hand-off gate and the small-chapter 5-coin rung.
         (
@@ -1279,7 +1279,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             5,
             Some(BRAWLER),
             BRAWLER,
-            25,
+            32, // L926: wiki stars
         ),
         // T724: Brawler: IOU! (M8), a playtest entry behind the band gate (min_level 5 replaces the
         // disabled 3030026 prerequisite); the guide's reward cell is unknown, so the small-quest rung.
@@ -1303,7 +1303,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             5,
             Some(BRAWLER),
             BRAWLER,
-            25,
+            125, // L926: wiki stars
         ),
         // T334: the second Miner chapter, after T300's playable 3100002. 5 coins
         // and 15 Miner XP mirror the first rung; the guide's reward cell is unknown
@@ -1316,7 +1316,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             5,
             Some(MINER),
             MINER,
-            15,
+            75, // L926: wiki stars
         ),
         // T411: the third Miner chapter, Trixi's Rush Order after 3100003. 5 coins and
         // 20 Miner XP follow the small follow-up rate; no item is granted.
@@ -1328,7 +1328,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             5,
             Some(MINER),
             MINER,
-            20,
+            100, // L926: wiki stars
         ),
     ];
 
@@ -1441,7 +1441,8 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
         );
     }
 
-    // Only the listed IDs gained XP or a job gate in these five files.
+    // Only the listed IDs gained a job gate in these five files, and no unlisted record pays XP
+    // except its wiki star reward (L926).
     for file in [
         "adventurer.json",
         "brawler.json",
@@ -1486,10 +1487,23 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             if file == "ninja.json" && [3_110_023, 3_110_024].contains(&id) {
                 continue;
             }
+            // L926: wiki stars. A record outside the table pays no XP, or exactly one profile's
+            // fanbyte wiki star reward, whose source tag states the same amount.
             for reward in record["rewards"].as_array().into_iter().flatten() {
-                assert_eq!(
-                    reward["job_xp"],
-                    json!({}),
+                let paid = reward["job_xp"].as_object().unwrap();
+                if paid.is_empty() {
+                    continue;
+                }
+                assert_eq!(paid.len(), 1, "{file}: quest {id} pays one profile");
+                let xp = paid.values().next().unwrap().as_u64().unwrap();
+                let wiki = format!("L926: job XP {xp} = the fanbyte wiki star reward");
+                assert!(
+                    reward["source"].as_array().is_some_and(|source| source.iter().any(|tag| {
+                        tag["kind"] == "wiki"
+                            && tag["evidence"]
+                                .as_str()
+                                .is_some_and(|text| text.starts_with(&wiki))
+                    })),
                     "{file}: quest {id} gained unexpected job XP"
                 );
             }

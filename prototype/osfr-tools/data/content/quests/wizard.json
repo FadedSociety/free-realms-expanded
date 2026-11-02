@@ -392,7 +392,21 @@
         3160005
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "12": 75
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 75 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/wizard.json, record 3160006)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -444,7 +458,21 @@
         3160006
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "12": 100
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/wizard.json, record 3160007)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -496,7 +524,21 @@
         3160007
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "12": 47
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 47 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/wizard.json, record 3160008)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -548,7 +590,21 @@
         3160008
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "12": 47
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 47 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/wizard.json, record 3160009)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -715,7 +771,21 @@
         3160010
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "12": 63
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 63 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/wizard.json, record 3160011)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -767,7 +837,21 @@
         3160010
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "12": 157
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 157 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/wizard.json, record 3160012)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -819,7 +903,21 @@
         3160012
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "12": 157
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 157 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/wizard.json, record 3160013)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -923,7 +1021,21 @@
         3160014
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "12": 100
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/wizard.json, record 3160015)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -975,7 +1087,21 @@
         3160015
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "12": 157
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 157 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/wizard.json, record 3160016)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1124,7 +1250,21 @@
         3160017
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "12": 275
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 275 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/wizard.json, record 3160018)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1199,12 +1339,16 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "12": 25
+            "12": 225
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T723: no source gives this quest a reward (quest-lines/quests.json q3160019: none). 5 coins and 25 Wizard (profile 12) job XP are the pay of the enabled sibling rows 3160003 to 3160005; the numbers live in data and are tunable."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/wizard.json, record 3160019)"
             }
           ]
         }
@@ -1259,7 +1403,21 @@
         3160019
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "12": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/wizard.json, record 3160020)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1309,7 +1467,21 @@
         3160020
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "12": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/wizard.json, record 3160021)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1361,7 +1533,21 @@
         3160021
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "12": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/wizard.json, record 3160022)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1413,7 +1599,21 @@
         3160022
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "12": 225
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/wizard.json, record 3160023)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1564,7 +1764,21 @@
         3160024
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "12": 425
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 425 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/wizard.json, record 3160025)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1616,7 +1830,21 @@
         3160024
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "12": 167
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 167 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/wizard.json, record 3160026)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1666,7 +1894,21 @@
         3160026
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "12": 360
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 360 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/wizard.json, record 3160027)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1716,7 +1958,21 @@
         3160027
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "12": 360
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 360 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/wizard.json, record 3160028)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1766,7 +2022,21 @@
         3160028
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "12": 360
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 360 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/wizard.json, record 3160029)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1816,7 +2086,21 @@
       "giver_npc_id": 9000000209,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "12": 6
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 6 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/wizard.json, record 3160030)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1868,7 +2152,21 @@
         3160030
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "12": 600
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 600 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/wizard.json, record 3160031)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",

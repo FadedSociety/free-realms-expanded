@@ -84,6 +84,10 @@ fn fixture(count: Option<u32>) -> Fixture {
         .find(|record| record["id"].as_u64() == Some(u64::from(QUEST)))
         .expect("the shipped Pet Trainer record exists");
     record["enabled"] = json!(true);
+    // L926: the stub now carries 226 Pet Trainer (profile 121) wiki stars, but that job was removed
+    // and the opening profile content ships no profile 121, so the reward can never be paid. This
+    // objective test drops the reward row; the turn-in then pays nothing, as it always did here.
+    record["rewards"] = json!([]);
     if let Some(count) = count {
         for goal in record["objectives"]
             .as_array_mut()
@@ -172,7 +176,7 @@ fn end_trick(game: &mut Gameplay, who: &CharacterState, started: u64) {
 }
 
 /// The whole walk: one accepted trick credits, then the held 49/13 and the 49/14 turn it in. The
-/// record ships with no reward rows, so the end screen's coin and star words are 0.
+/// fixture drops the record's reward rows (L926), so the end screen's coin and star words are 0.
 fn turn_in(game: &mut Gameplay, who: &CharacterState, now: u64) {
     let talked = talk(game, who, GIVER, now);
     assert!(talked.changed, "the final Talk opens the held end screen");

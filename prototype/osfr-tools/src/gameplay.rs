@@ -1531,7 +1531,7 @@ impl Gameplay {
         self.profiles
             .as_ref()
             .and_then(|profiles| profiles.state().experience.get(&profile_id))
-            .map_or(1, |xp| (1 + xp / 100).min(20) as u8)
+            .map_or(1, |_| self.job_level(profile_id) as u8)
     }
 
     fn available_ingredients(&self) -> Vec<(i32, u32)> {

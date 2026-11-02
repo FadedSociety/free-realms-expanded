@@ -37,7 +37,7 @@ const SEARCH_BLACKSPORE: u32 = 3_030_008;
 const GIVEN_TO_GUARD: u32 = 3_030_009;
 const HOOLIGAN_DEFINITION: u32 = 930_050;
 const QUEST_REWARD_COINS: u32 = 5;
-const QUEST_REWARD_JOB_XP: u32 = 25;
+const QUEST_REWARD_JOB_XP: u32 = 32; // L926: wiki stars (quest 3030009)
 const BRAWLER: i32 = 43;
 const ADVENTURER: i32 = 1;
 const PETRA_MODEL: i32 = 356;
@@ -1520,7 +1520,7 @@ fn sabastian_offers_given_to_guard_after_honor_lost() {
 }
 
 /// T331: the C6 delivery is the real Petra actor: the Talk completes the only objective, the
-/// 49/13 names the drawn actor, and 49/14 pays exactly five coins and 25 Brawler XP once.
+/// 49/13 names the drawn actor, and 49/14 pays exactly five coins and 32 Brawler XP once.
 #[test]
 fn delivering_the_offer_to_petra_completes_and_pays_once() {
     let (mut game, character) = fresh_game();
@@ -1568,7 +1568,7 @@ fn delivering_the_offer_to_petra_completes_and_pays_once() {
     assert_eq!(
         profile_xp(&game, BRAWLER),
         xp_before + QUEST_REWARD_JOB_XP,
-        "C6 must pay 25 Brawler XP"
+        "C6 must pay 32 Brawler XP"
     );
     assert_eq!(
         state.inventory.items, inventory_before.items,
@@ -1610,7 +1610,7 @@ fn delivering_the_offer_to_petra_completes_and_pays_once() {
     );
 }
 
-/// T331 edge case 1: the explicit `{"43": 25}` map pays profile 43 even after a job switch.
+/// T331 edge case 1: the explicit `{"43": 32}` map pays profile 43 even after a job switch.
 #[test]
 fn the_reward_goes_to_profile_43_after_a_job_switch() {
     let (mut game, character) = fresh_game();
@@ -2141,6 +2141,6 @@ fn the_spawn_and_content_are_reachable() {
     assert_eq!(
         i32::from_le_bytes(end[31..35].try_into().unwrap()),
         i32::try_from(QUEST_REWARD_JOB_XP).unwrap(),
-        "the end screen displays the 25 Brawler XP reward"
+        "the end screen displays the 32 Brawler XP reward"
     );
 }

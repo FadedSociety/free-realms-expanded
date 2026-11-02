@@ -68,6 +68,7 @@ const BATTLE_COINS: u32 = 19;
 const QUEST_COINS: u32 = 5;
 const BATTLE_XP: u32 = 50;
 const QUEST_XP: u32 = 25;
+const SECOND_XP: u32 = 75; // L926: wiki stars (C2, 3030005; C1 still pays 25)
 const FIRST_END_TEXT: u32 = 140_533;
 const SECOND_END_TEXT: u32 = 94_285;
 const ATTACK_CHOICE: i32 = 103;
@@ -865,7 +866,7 @@ fn honor_lost_requires_the_first_quest_and_reuses_the_fight() {
         SECOND,
         BRAWLER,
         QUEST_COINS,
-        QUEST_XP,
+        SECOND_XP,
         at,
     );
     assert_eq!(
@@ -874,10 +875,10 @@ fn honor_lost_requires_the_first_quest_and_reuses_the_fight() {
     );
     assert_eq!(
         profile_xp(&game, BRAWLER),
-        before_second_run.brawler_xp + BATTLE_XP + QUEST_XP
+        before_second_run.brawler_xp + BATTLE_XP + SECOND_XP
     );
     assert_eq!(
-        after_second_run.brawler_xp + QUEST_XP,
+        after_second_run.brawler_xp + SECOND_XP,
         profile_xp(&game, BRAWLER)
     );
     assert_eq!(quest_status(&game, SECOND), QuestStatus::Completed);
@@ -1279,7 +1280,7 @@ fn the_battle_and_quest_content_load_with_real_targets() {
         assert_eq!(rewards.len(), 1);
         assert_eq!(rewards[0]["coins"], QUEST_COINS);
         assert_eq!(rewards[0]["items"].as_array().unwrap().len(), 0);
-        assert_eq!(rewards[0]["job_xp"]["43"], QUEST_XP);
+        assert_eq!(rewards[0]["job_xp"]["43"], if id == FIRST { QUEST_XP } else { SECOND_XP }); // L926: wiki stars
         assert!(
             !record["source"].as_array().unwrap().is_empty(),
             "quest {id} has no provenance"

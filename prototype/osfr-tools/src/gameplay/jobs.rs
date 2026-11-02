@@ -5,6 +5,16 @@
 use super::*;
 
 impl Gameplay {
+    /// L926: the job's XP curve (`job_xp_curve.json`), or the local 100-XP curve without
+    /// profile content. The startup self data reads it for each job record.
+    pub fn job_curve(&self, profile: i32) -> crate::profiles::RankCurve {
+        self.profiles
+            .as_ref()
+            .map_or_else(crate::profiles::RankCurve::flat, |profiles| {
+                profiles.curve(profile)
+            })
+    }
+
     /// Grant and equip a job's starter outfit from the content's starter table.
     /// With `reuse_owned`, a piece the player already owns is equipped instead
     /// of granting a duplicate. (R) Pieces the catalogue lacks are skipped.
@@ -293,7 +303,8 @@ impl Gameplay {
             .get(&profile)
             .copied()
             .unwrap_or(0);
-        out.changed |= profiles.set_experience((level - 1) * 100);
+        let start = profiles.curve(profile).xp_for(level);
+        out.changed |= profiles.set_experience(start);
         out.replies.extend(profiles.experience_packets(previous));
         if self.abilities.as_ref().is_some_and(|abilities| {
             abilities.unlocks_between(profile, before, level) || level < before

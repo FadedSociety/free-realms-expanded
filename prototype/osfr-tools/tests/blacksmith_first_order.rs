@@ -230,11 +230,11 @@ fn finish_merchandise(game: &mut Gameplay, smitty: &CharacterState, now: &mut u6
     );
     assert_eq!(
         end_screen_reward(&end),
-        (5, 20),
-        "the end screen displays the configured 5 coins and 20 Blacksmith job-XP total"
+        (5, 75), // L926: wiki stars
+        "the end screen displays the configured 5 coins and 75 Blacksmith job-XP total"
     );
     *now += 10;
-    finish_quest(game, smitty, MERCHANDISE, BLACKSMITH, 5, 20, *now);
+    finish_quest(game, smitty, MERCHANDISE, BLACKSMITH, 5, 75, *now); // L926: wiki stars
 }
 
 #[test]
@@ -343,7 +343,7 @@ fn the_supply_visit_and_the_vendor_purchase_pay_once() {
     let coins_before = coins(&game);
     finish_merchandise(&mut game, &smitty, &mut now);
     assert_eq!(coins(&game), coins_before + 5);
-    assert_eq!(profile_xp(&game, BLACKSMITH), 20);
+    assert_eq!(profile_xp(&game, BLACKSMITH), 75); // L926: wiki stars
     assert_eq!(profile_xp(&game, BRAWLER), 0, "XP stays on profile 16");
     assert_eq!(counts(&game, MERCHANDISE), [1, 1]);
     assert_eq!(
@@ -420,9 +420,9 @@ fn the_cancelation_talk_chain_pays_once() {
         now,
     );
     now += 10;
-    finish_quest(&mut game, &smitty, CANCELATION, BLACKSMITH, 5, 20, now);
+    finish_quest(&mut game, &smitty, CANCELATION, BLACKSMITH, 5, 100, now); // L926: wiki stars
     assert_eq!(coins(&game), coins_before + 5);
-    assert_eq!(profile_xp(&game, BLACKSMITH), 40);
+    assert_eq!(profile_xp(&game, BLACKSMITH), 175); // L926: wiki stars (75 + 100)
     assert_eq!(quest_status(&game, CANCELATION), QuestStatus::Completed);
 
     now += 10;
@@ -650,7 +650,7 @@ fn refusals_and_reconnect_change_nothing() {
     let smitty_at = spot(CHARACTER + 7, SMITTY);
     finish_merchandise(&mut reconnect, &smitty_at, &mut now);
     assert_eq!(coins(&reconnect), coins_before + 5);
-    assert_eq!(profile_xp(&reconnect, BLACKSMITH), 20);
+    assert_eq!(profile_xp(&reconnect, BLACKSMITH), 75); // L926: wiki stars
 }
 
 #[test]
@@ -824,8 +824,8 @@ fn a_second_blacksmith_does_not_share_quest_or_vendor_state() {
     // Each session pays its own single reward.
     let mut b_now = now + 20;
     finish_merchandise(&mut b, &smitty_b, &mut b_now);
-    assert_eq!(profile_xp(&a, BLACKSMITH), 20);
-    assert_eq!(profile_xp(&b, BLACKSMITH), 20);
+    assert_eq!(profile_xp(&a, BLACKSMITH), 75); // L926: wiki stars
+    assert_eq!(profile_xp(&b, BLACKSMITH), 75); // L926: wiki stars
     assert_eq!(coins(&a), 100 - 8 * UNIT_PRICE + 5);
     assert_eq!(coins(&b), 100 - 2 * UNIT_PRICE + 5);
 }
@@ -880,6 +880,6 @@ fn a_failing_quest_event_for_one_player_does_not_stop_the_other() {
     let mut b_now = now + 10;
     finish_merchandise(&mut b, &smitty_b, &mut b_now);
     assert_eq!(quest_status(&b, MERCHANDISE), QuestStatus::Completed);
-    assert_eq!(profile_xp(&b, BLACKSMITH), 20);
+    assert_eq!(profile_xp(&b, BLACKSMITH), 75); // L926: wiki stars
     assert_eq!(coins(&b), 100 - 8 * UNIT_PRICE + 5);
 }

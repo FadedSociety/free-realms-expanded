@@ -302,12 +302,16 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "43": 25
+            "43": 75
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T252: the retail quest payout is unknown; five coins and 25 Brawler (profile 43) XP follow the W110/T101/T202 small-quest fallback. No item is granted because the Brawler trainer already grants the starter outfit, so a second free grant would be a sellable duplicate."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 75 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030005)"
             }
           ]
         }
@@ -370,11 +374,17 @@
         {
           "coins": 5,
           "items": [],
-          "job_xp": {},
+          "job_xp": {
+            "43": 50
+          },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T101: five-coin fallback for an unknown quest payout, matching the W110/W114 small final-era coin-reward policy; no item or XP reward is inferred."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 50 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030006)"
             }
           ]
         }
@@ -460,11 +470,17 @@
         {
           "coins": 5,
           "items": [],
-          "job_xp": {},
+          "job_xp": {
+            "43": 50
+          },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T101: five-coin fallback for an unknown quest payout, matching the W110/W114 small final-era coin-reward policy; no item or XP reward is inferred."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 50 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030007)"
             }
           ]
         }
@@ -544,11 +560,17 @@
         {
           "coins": 5,
           "items": [],
-          "job_xp": {},
+          "job_xp": {
+            "43": 63
+          },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T101: five-coin fallback for an unknown quest payout, matching the W110/W114 small final-era coin-reward policy; no item or XP reward is inferred."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 63 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030008)"
             }
           ]
         }
@@ -634,12 +656,16 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "43": 25
+            "43": 32
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T331: the retail quest payout is unknown; five coins and 25 Brawler (profile 43) XP follow the T101/T252 small-chapter rung used by 3030004/3030005. No item is granted: the Brawler trainer already grants the starter outfit, so a second free grant would be a sellable duplicate."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 32 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030009)"
             }
           ]
         }
@@ -689,7 +715,21 @@
       "giver_npc_id": 9000000015,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 75
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 75 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030010)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -745,7 +785,21 @@
         3030010
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 50
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 50 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030011)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -797,7 +851,21 @@
         3030011
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 50
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 50 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030012)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -849,7 +917,21 @@
         3030012
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 63
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 63 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030013)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -901,7 +983,21 @@
         3030013
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 63
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 63 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030014)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -951,7 +1047,21 @@
       "giver_npc_id": 9000000038,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 75
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 75 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030015)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1003,7 +1113,21 @@
         3030015
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 50
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 50 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030016)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1055,7 +1179,21 @@
         3030016
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 50
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 50 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030017)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1111,7 +1249,21 @@
         3030017
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 63
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 63 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030018)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1163,7 +1315,21 @@
         3030018
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 32
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 32 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030019)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1213,7 +1379,21 @@
       "giver_npc_id": 9000000428,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 63
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 63 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030020)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1369,7 +1549,21 @@
         3030021
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 63
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 63 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030022)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1421,7 +1615,21 @@
         3030021
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 125
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 125 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030023)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1497,12 +1705,16 @@
           "coins": 5,
           "items": [],
           "job_xp": {
-            "43": 25
+            "43": 125
           },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T669: the retail payout is unknown (quest-lines/quests.json q3030024 rewards [] and no client reward line). Five coins and 25 Brawler (profile 43) XP follow the T252 small-quest rung and T724's Brawler: IOU! (same band), paid once by the quest grant key; no item, so no free sellable gear."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 125 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030024)"
             }
           ]
         }
@@ -1558,7 +1770,21 @@
         3030024
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 125
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 125 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030025)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1608,7 +1834,21 @@
         3030025
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 125
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 125 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030026)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1893,7 +2133,21 @@
         3030030
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 275
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 275 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030031)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1938,7 +2192,21 @@
         3030030
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 184
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 184 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030032)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1990,7 +2258,21 @@
         3030032
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 184
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 184 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030033)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2042,7 +2324,21 @@
         3030033
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 396
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 396 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030034)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2147,7 +2443,21 @@
         3030035
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 375
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 375 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030036)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2192,7 +2502,21 @@
         3030035
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 360
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 360 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030037)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2248,7 +2572,21 @@
         3030037
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 360
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 360 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030038)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2355,7 +2693,21 @@
         3030039
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 360
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 360 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030040)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2447,7 +2799,21 @@
         3030041
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "43": 263
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "L926: job XP 263 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030042)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
