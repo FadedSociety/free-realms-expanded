@@ -43,6 +43,8 @@ fn invalid(message: &str) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, message)
 }
 
+const UNREGISTERED_PLAYER: &str = "soccer intent from an unregistered player";
+
 fn finite3(value: [f32; 3]) -> bool {
     value.iter().all(|v| v.is_finite())
 }
@@ -614,7 +616,7 @@ impl Authority {
         let state = self
             .players
             .get(&player)
-            .ok_or_else(|| invalid("soccer intent from an unregistered player"))?;
+            .ok_or_else(|| invalid(UNREGISTERED_PLAYER))?;
         if sequence <= state.sequence {
             return Err(invalid("stale soccer intent"));
         }
@@ -655,7 +657,10 @@ impl Authority {
                     // A first position is bounded from the kickoff spawn too.
                     return Err(invalid("soccer position step too large"));
                 }
-                let state = self.players.get_mut(&player).expect("checked above");
+                let state = self
+                    .players
+                    .get_mut(&player)
+                    .ok_or_else(|| invalid(UNREGISTERED_PLAYER))?;
                 state.position = Some(position);
                 state.position_at = trusted_now;
                 state.sequence = sequence;
@@ -673,7 +678,7 @@ impl Authority {
                 // advisory input and are never decoded as kick/pass.
                 self.players
                     .get_mut(&player)
-                    .expect("checked above")
+                    .ok_or_else(|| invalid(UNREGISTERED_PLAYER))?
                     .sequence = sequence;
             }
             Intent::Kick {
@@ -694,7 +699,10 @@ impl Authority {
                 if self.possession != Some(player) {
                     return Err(invalid("soccer kick without possession"));
                 }
-                let kicker = self.players[&player];
+                let kicker = *self
+                    .players
+                    .get(&player)
+                    .ok_or_else(|| invalid(UNREGISTERED_PLAYER))?;
                 let kicker_position = kicker
                     .position
                     .ok_or_else(|| invalid("soccer kicker has no verified position"))?;
@@ -749,7 +757,7 @@ impl Authority {
                 self.toucher_clear = false;
                 self.players
                     .get_mut(&player)
-                    .expect("checked above")
+                    .ok_or_else(|| invalid(UNREGISTERED_PLAYER))?
                     .sequence = sequence;
             }
         }

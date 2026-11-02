@@ -660,9 +660,11 @@ impl SoccerService {
         encounter_id: i32,
         grant: RewardGrant,
     ) -> io::Result<RunOutcome> {
+        let Some(team) = self.sessions.get(&session).map(|entry| entry.team) else {
+            return Err(invalid("soccer minigame offer is invalid"));
+        };
         if self.cancelled
             || self.authority.phase() != MatchPhase::Kickoff
-            || !self.sessions.contains_key(&session)
             || self.runs.contains_key(&session)
             || game_id <= 0
             || encounter_id <= 0
@@ -684,7 +686,6 @@ impl SoccerService {
         if !offered.accepted {
             return Err(invalid("soccer minigame offer was refused"));
         }
-        let team = self.sessions[&session].team;
         self.runs.insert(
             session,
             ParticipantRun {

@@ -56,23 +56,23 @@ fn take<'a>(payload: &mut &'a [u8], count: usize) -> io::Result<&'a [u8]> {
 }
 
 fn read_u8(payload: &mut &[u8]) -> io::Result<u8> {
-    Ok(take(payload, 1)?[0])
+    read_bytes(payload).map(u8::from_le_bytes)
 }
 
 fn read_u16(payload: &mut &[u8]) -> io::Result<u16> {
-    Ok(u16::from_le_bytes(take(payload, 2)?.try_into().unwrap()))
+    read_bytes(payload).map(u16::from_le_bytes)
 }
 
 fn read_u32(payload: &mut &[u8]) -> io::Result<u32> {
-    Ok(u32::from_le_bytes(take(payload, 4)?.try_into().unwrap()))
+    read_bytes(payload).map(u32::from_le_bytes)
 }
 
 fn read_u64(payload: &mut &[u8]) -> io::Result<u64> {
-    Ok(u64::from_le_bytes(take(payload, 8)?.try_into().unwrap()))
+    read_bytes(payload).map(u64::from_le_bytes)
 }
 
 fn read_f32(payload: &mut &[u8]) -> io::Result<f32> {
-    Ok(f32::from_le_bytes(take(payload, 4)?.try_into().unwrap()))
+    read_bytes(payload).map(f32::from_le_bytes)
 }
 
 fn read_f32s<const N: usize>(payload: &mut &[u8]) -> io::Result<[f32; N]> {
@@ -92,7 +92,12 @@ fn read_u32s<const N: usize>(payload: &mut &[u8]) -> io::Result<[u32; N]> {
 }
 
 fn read_bytes<const N: usize>(payload: &mut &[u8]) -> io::Result<[u8; N]> {
-    Ok(take(payload, N)?.try_into().unwrap())
+    let current = *payload;
+    let (head, rest) = current
+        .split_first_chunk()
+        .ok_or_else(|| invalid("truncated soccer payload"))?;
+    *payload = rest;
+    Ok(*head)
 }
 
 fn end(payload: &[u8]) -> io::Result<()> {
@@ -461,20 +466,20 @@ pub fn decode(bytes: &[u8]) -> io::Result<Message> {
     if bytes.len() < 11 {
         return Err(invalid("truncated soccer envelope"));
     }
-    let outer = u16::from_le_bytes(bytes[0..2].try_into().unwrap());
+    let mut inner = bytes;
+    let outer = read_u16(&mut inner)?;
     if !matches!(outer, 5 | 6) {
         return Err(invalid("expected gateway tunnel"));
     }
-    let flag = match bytes[2] {
+    let flag = match read_u8(&mut inner)? {
         0 => false,
         1 => true,
         _ => return Err(invalid("invalid tunnel flag")),
     };
-    let size = u32::from_le_bytes(bytes[3..7].try_into().unwrap()) as usize;
-    if size != bytes.len() - 7 {
+    let size = read_u32(&mut inner)? as usize;
+    if size != inner.len() {
         return Err(invalid("soccer envelope length mismatch"));
     }
-    let mut inner = &bytes[7..];
     let op = read_u16(&mut inner)?;
     if op != TUNNEL_OPCODE {
         return Err(invalid("not a soccer tunnel"));
@@ -609,22 +614,20 @@ fn decode_client_config(payload: &[u8]) -> io::Result<SoccerPacket> {
     if payload.len() < CONFIG_BALL_SPAWN_OFFSET + 16 {
         return Err(invalid("truncated client config"));
     }
-    let length = u32::from_le_bytes(
-        payload[CONFIG_ASSET_LENGTH_OFFSET..CONFIG_ASSET_LENGTH_OFFSET + 4]
-            .try_into()
-            .unwrap(),
-    ) as usize;
-    let asset_end = CONFIG_ASSET_OFFSET + length;
-    if asset_end > payload.len() {
-        return Err(invalid("client config ball asset length"));
-    }
-    let ball_asset = std::str::from_utf8(&payload[CONFIG_ASSET_OFFSET..asset_end])
+    let truncated = || invalid("truncated client config");
+    let length =
+        crate::le::u32(payload, CONFIG_ASSET_LENGTH_OFFSET).ok_or_else(truncated)? as usize;
+    let asset = payload
+        .get(CONFIG_ASSET_OFFSET..)
+        .and_then(|rest| rest.get(..length))
+        .ok_or_else(|| invalid("client config ball asset length"))?;
+    let ball_asset = std::str::from_utf8(asset)
         .map_err(|_| invalid("client config ball asset not utf-8"))?
         .to_string();
     let mut spawn = [0.0f32; 4];
     for (index, value) in spawn.iter_mut().enumerate() {
         let offset = CONFIG_BALL_SPAWN_OFFSET + index * 4;
-        *value = f32::from_le_bytes(payload[offset..offset + 4].try_into().unwrap());
+        *value = crate::le::f32(payload, offset).ok_or_else(truncated)?;
     }
     Ok(SoccerPacket::SetClientConfig {
         raw: payload.to_vec(),
@@ -995,17 +998,18 @@ impl Match {
         if self.phase != Phase::Running {
             return Err(invalid("soccer goal outside a running half"));
         }
-        if fields[2] != fields[0] + fields[1] {
+        if fields[0].checked_add(fields[1]) != Some(fields[2]) {
             return Err(invalid("soccer goal scoreboard inconsistent"));
         }
         let next = [fields[0], fields[1]];
-        let scoring_team = if next[1] == self.score[1] + 1 && next[0] == self.score[0] {
-            1
-        } else if next[0] == self.score[0] + 1 && next[1] == self.score[1] {
-            0
-        } else {
-            return Err(invalid("soccer goal did not advance the scoreboard"));
-        };
+        let scoring_team =
+            if Some(next[1]) == self.score[1].checked_add(1) && next[0] == self.score[0] {
+                1
+            } else if Some(next[0]) == self.score[0].checked_add(1) && next[1] == self.score[1] {
+                0
+            } else {
+                return Err(invalid("soccer goal did not advance the scoreboard"));
+            };
         self.score = next;
         self.goals.push(Goal {
             scoring_team,

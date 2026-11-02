@@ -144,10 +144,10 @@ pub struct ClientFrame<'a> {
 /// Split the next client frame off `buffer`: `Ok(None)` until the whole frame has arrived,
 /// else the bytes consumed and the frame.
 pub fn client_frame(buffer: &[u8]) -> io::Result<Option<(usize, ClientFrame<'_>)>> {
-    let Some(length) = buffer.get(..4) else {
+    let Some(length) = crate::le::bytes(buffer, 0).map(u32::from_be_bytes) else {
         return Ok(None);
     };
-    let length = u32::from_be_bytes(length.try_into().unwrap()) as usize;
+    let length = length as usize;
     if length > MAX_FRAME {
         return Err(invalid("card frame is too large"));
     }
@@ -162,13 +162,16 @@ pub fn client_frame(buffer: &[u8]) -> io::Result<Option<(usize, ClientFrame<'_>)
             body: payload,
         }
     } else {
-        let words = payload
-            .get(..12)
-            .ok_or_else(|| invalid("card frame has no routing words"))?;
-        let word = |at: usize| u32::from_be_bytes(words[at..at + 4].try_into().unwrap());
+        let no_routing = || invalid("card frame has no routing words");
+        let (words, body) = payload.split_at_checked(12).ok_or_else(no_routing)?;
+        let word = |at| {
+            crate::le::bytes(words, at)
+                .map(u32::from_be_bytes)
+                .ok_or_else(no_routing)
+        };
         ClientFrame {
-            routing: Some([word(0), word(4), word(8)]),
-            body: &payload[12..],
+            routing: Some([word(0)?, word(4)?, word(8)?]),
+            body,
         }
     };
     Ok(Some((4 + length, frame)))

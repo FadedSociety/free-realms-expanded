@@ -840,7 +840,8 @@ pub fn parse(inner: &[u8]) -> io::Result<Option<Request>> {
         SUB_REFRESH if inner.len() == 4 => Ok(Some(Request::Refresh)),
         SUB_PLAY if inner.len() == PLAY_LEN => Ok(Some(Request::Play {
             // The trailing dword is the client clock offset; ignored on purpose.
-            activity: u32::from_le_bytes(inner[4..8].try_into().unwrap()),
+            activity: crate::le::u32(inner, 4)
+                .ok_or_else(|| invalid("malformed activity request"))?,
         })),
         SUB_REFRESH | SUB_PLAY => Err(invalid("malformed activity request")),
         _ => Ok(None),

@@ -1,6 +1,7 @@
 //! Derby gameplay integration: job switching, completion payout, cancellation and session ticking.
 use super::*;
-use crate::derby_gateway::DerbyGateway;
+
+const NO_CLASS_CONTENT: &str = "derby entry requires class content";
 
 /// Predecessor saves recorded the job a connection-local match replaced. Current saves keep the
 /// profile itself on that job (`saved_profile_state`), so only an older save carries this marker.
@@ -42,9 +43,11 @@ impl Gameplay {
         let Some(job) = self.derby.as_mut().and_then(|derby| derby.exit()) else {
             return;
         };
-        if let Some(profiles) = &mut self.profiles {
-            // Self data at login carries the job, so the activation reply is not needed.
-            let _ = profiles.activate(job);
+        // Self data at login carries the job, so the activation reply is not needed.
+        if let Some(profiles) = &mut self.profiles
+            && let Err(error) = profiles.activate(job)
+        {
+            eprintln!("derby: could not restore job {job} on reset ({error})");
         }
     }
 
@@ -71,13 +74,11 @@ impl Gameplay {
         now_ms: u64,
     ) -> io::Result<Outcome> {
         let mut staged = self.clone();
-        let replies = staged.derby.as_mut().unwrap().tick(now_ms)?;
-        let previous_job = (!staged
-            .derby
-            .as_ref()
-            .is_some_and(crate::derby_gateway::DerbyGateway::active))
-        .then(|| staged.derby.as_mut().unwrap().exit())
-        .flatten();
+        let Some(derby) = staged.derby.as_mut() else {
+            return Ok(Outcome::default());
+        };
+        let replies = derby.tick(now_ms)?;
+        let previous_job = if derby.active() { None } else { derby.exit() };
         let mut out = Outcome {
             changed: !replies.is_empty(),
             replies,
@@ -108,7 +109,7 @@ impl Gameplay {
         let profiles = self
             .profiles
             .as_mut()
-            .ok_or_else(|| invalid("derby entry requires class content"))?;
+            .ok_or_else(|| invalid(NO_CLASS_CONTENT))?;
         let previous_job = profiles.active();
         let outfit_before = self.inventory.profile_attachments(previous_job)?;
         let first_time = profiles.unlock(crate::derby_gateway::DEMO_DERBY_DRIVER_PROFILE)?;
@@ -124,10 +125,14 @@ impl Gameplay {
         self.refresh_npc_quest_eligibility(current_unix_seconds());
         // Last, after the outfit repair: the 38/21 attachment list comes from what
         // the player wears now (client reader `0x0091b080`).
-        let activation = self.profiles.as_ref().unwrap().activation(
-            crate::derby_gateway::DEMO_DERBY_DRIVER_PROFILE,
-            &self.inventory,
-        )?;
+        let activation = self
+            .profiles
+            .as_ref()
+            .ok_or_else(|| invalid(NO_CLASS_CONTENT))?
+            .activation(
+                crate::derby_gateway::DEMO_DERBY_DRIVER_PROFILE,
+                &self.inventory,
+            )?;
         out.replies.insert(0, activation);
         self.announce_profile_outfit(
             character.guid,
@@ -135,7 +140,11 @@ impl Gameplay {
             previous_job != crate::derby_gateway::DEMO_DERBY_DRIVER_PROFILE,
             &mut out,
         )?;
-        let derby = self.derby.as_mut().unwrap();
+        // Both callers stage this call, so a refusal here discards the job switch above.
+        let derby = self
+            .derby
+            .as_mut()
+            .ok_or_else(|| invalid("derby entry requires the derby service"))?;
         let offer = derby.begin_row(character, now_ms, row)?;
         derby.set_previous_job(previous_job);
         out.replies.push(offer);
@@ -154,16 +163,18 @@ impl Gameplay {
         now_ms: u64,
     ) -> io::Result<Outcome> {
         let mut out = Outcome::default();
+        // The caller routes here only while `derby_active()`.
+        let Some(derby) = self.derby.as_mut() else {
+            return Ok(out);
+        };
         if inner == [26, 0, 42, 0] {
-            if self.derby.as_ref().and_then(|derby| derby.phase())
-                != Some(crate::derby::DerbyPhase::CloseEnabled)
-            {
+            if derby.phase() != Some(crate::derby::DerbyPhase::CloseEnabled) {
                 return self.cancel_derby(inner, character);
             }
-            if !self.derby.as_mut().unwrap().close(inner)? {
+            if !derby.close(inner)? {
                 return Ok(out);
             }
-            let previous_job = self.derby.as_mut().unwrap().exit();
+            let previous_job = derby.exit();
             if let Some(job) = previous_job {
                 self.restore_job(job, character.guid, &mut out)?;
             }
@@ -178,13 +189,13 @@ impl Gameplay {
             return self.cancel_derby(inner, character);
         }
         if inner.starts_with(&[39, 0, 5]) {
-            let before = self.derby.as_ref().unwrap().phase();
-            out.replies = self.derby.as_mut().unwrap().start(inner)?;
-            out.changed = self.derby.as_ref().unwrap().phase() != before;
+            let before = derby.phase();
+            out.replies = derby.start(inner)?;
+            out.changed = derby.phase() != before;
             return Ok(out);
         }
         if inner.starts_with(&[34, 0]) {
-            out.replies = self.derby.as_mut().unwrap().handle(inner, now_ms)?;
+            out.replies = derby.handle(inner, now_ms)?;
             out.changed = !out.replies.is_empty();
             self.pay_derby_completion(character, &mut out)?;
         }
@@ -216,12 +227,14 @@ impl Gameplay {
         character: &CharacterState,
         out: &mut Outcome,
     ) -> io::Result<()> {
-        let Some(instance) = self.derby.as_mut().and_then(DerbyGateway::take_completion) else {
+        let Some(derby) = self.derby.as_mut() else {
+            return Ok(());
+        };
+        let Some(instance) = derby.take_completion() else {
             return Ok(());
         };
         // The ledger row is taken: persist it with the quest credit, whatever the payout does.
         out.changed = true;
-        let derby = self.derby.as_ref().unwrap();
         let (minigame_id, grant) = (derby.game_id(), derby.completion_grant(character.guid));
         // T787: this participant's own score, placement and knock-outs, never another
         // driver's. A missing result (a phase race) claims no fact, so no bound the
@@ -263,11 +276,14 @@ impl Gameplay {
 
     fn cancel_derby(&mut self, inner: &[u8], character: &CharacterState) -> io::Result<Outcome> {
         let mut out = Outcome::default();
-        let removals = self.derby.as_mut().unwrap().cancel(inner)?;
+        let Some(derby) = self.derby.as_mut() else {
+            return Ok(out);
+        };
+        let removals = derby.cancel(inner)?;
         if removals.is_empty() {
             return Ok(out);
         }
-        let previous_job = self.derby.as_mut().unwrap().exit();
+        let previous_job = derby.exit();
         out.replies = removals;
         if let Some(job) = previous_job {
             self.restore_job(job, character.guid, &mut out)?;

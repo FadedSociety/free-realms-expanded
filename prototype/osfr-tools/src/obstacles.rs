@@ -394,21 +394,11 @@ impl ZoneObstacles {
         if bytes.len() < HEADER || &bytes[..8] != MAGIC {
             return Err("not an OSFROBS1 obstacle file".into());
         }
-        let f = |at: usize| -> Result<f32, String> {
-            let raw = bytes
-                .get(at..at + 4)
-                .ok_or_else(|| "truncated obstacle header".to_string())?
-                .try_into()
-                .map_err(|_| "truncated obstacle header".to_string())?;
-            Ok(f32::from_le_bytes(raw))
+        let f = |at: usize| {
+            crate::le::f32(bytes, at).ok_or_else(|| "truncated obstacle header".to_string())
         };
-        let u = |at: usize| -> Result<u32, String> {
-            let raw = bytes
-                .get(at..at + 4)
-                .ok_or_else(|| "truncated obstacle header".to_string())?
-                .try_into()
-                .map_err(|_| "truncated obstacle header".to_string())?;
-            Ok(u32::from_le_bytes(raw))
+        let u = |at: usize| {
+            crate::le::u32(bytes, at).ok_or_else(|| "truncated obstacle header".to_string())
         };
         let version = u(8)?;
         if version != VERSION {
@@ -448,10 +438,8 @@ impl ZoneObstacles {
             let mut triangle = [[0.0f32; 3]; 3];
             for vertex in &mut triangle {
                 for value in vertex {
-                    let raw: [u8; 4] = bytes[offset..offset + 4]
-                        .try_into()
-                        .map_err(|_| "truncated obstacle triangle".to_string())?;
-                    *value = f32::from_le_bytes(raw);
+                    *value = crate::le::f32(bytes, offset)
+                        .ok_or_else(|| "truncated obstacle triangle".to_string())?;
                     if !value.is_finite() {
                         return Err("obstacle triangle is not finite".into());
                     }

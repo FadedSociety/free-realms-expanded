@@ -192,8 +192,7 @@ trait Read: Sized {
 
 impl Read for u32 {
     fn read(body: &[u8], offset: usize) -> Result<Self, Error> {
-        let raw = body.get(offset..offset + 4).ok_or(Error::Truncated)?;
-        Ok(Self::from_le_bytes(raw.try_into().unwrap()))
+        crate::le::u32(body, offset).ok_or(Error::Truncated)
     }
 }
 
@@ -342,13 +341,13 @@ fn frame(sub: Sub, body: &[u8]) -> Vec<u8> {
 }
 
 fn unframe(bytes: &[u8]) -> Result<(Sub, &[u8]), Error> {
-    let code = u16::from_le_bytes(bytes.get(..2).ok_or(Error::Truncated)?.try_into().unwrap());
+    let code = crate::le::u16(bytes, 0).ok_or(Error::Truncated)?;
     if code != OPCODE {
         return Err(Error::WrongOpcode);
     }
-    let sub = u16::from_le_bytes(bytes.get(2..4).ok_or(Error::Truncated)?.try_into().unwrap());
+    let sub = crate::le::u16(bytes, 2).ok_or(Error::Truncated)?;
     let sub = Sub::from_u16(sub).ok_or(Error::UnknownSub(sub))?;
-    Ok((sub, bytes.get(4..).unwrap()))
+    Ok((sub, bytes.get(4..).ok_or(Error::Truncated)?))
 }
 
 /// Server-to-client `FishingPacketFishingResult` (sub 14) body.
@@ -852,7 +851,8 @@ impl Session {
                 _ => Err(Error::OutOfOrder),
             },
             ClientRequest::Special { .. } => Ok(Outcome::Applied),
-            ClientRequest::RegisterPlayer { .. } => unreachable!("handled by the caller"),
+            // `request` answers registration before it routes here.
+            ClientRequest::RegisterPlayer { .. } => Err(Error::OutOfOrder),
         }
     }
 

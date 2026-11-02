@@ -256,6 +256,21 @@ fn goal_sets_scoreboard_holds_clock_and_restarts() {
 }
 
 #[test]
+fn goal_whose_scoreboard_sum_overflows_is_refused() {
+    let mut game = match_session();
+    game.handle(Direction::ServerToClient, &vec_time(0.0, 0.5))
+        .unwrap();
+    game.handle(Direction::ServerToClient, &vec_time(120.0, 1.0))
+        .unwrap();
+    let overflow = frame(SoccerPacket::GoalMade {
+        fields: [u32::MAX, 1, 0],
+    });
+    assert!(game.handle(Direction::ServerToClient, &overflow).is_err());
+    assert_eq!(game.phase(), Phase::Running);
+    assert_eq!(game.score(), [0, 0]);
+}
+
+#[test]
 fn client_direction_cannot_change_authoritative_state() {
     let mut game = match_session();
     game.handle(Direction::ServerToClient, &vec_time(120.0, 1.0))

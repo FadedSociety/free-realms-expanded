@@ -634,8 +634,11 @@ impl FishingService {
         for (species, sizes) in &spots.items {
             for (index, definition) in sizes.iter().enumerate() {
                 if *definition > 0 {
-                    // Idempotent; the file validated every key and id.
-                    let _ = self.bind_item_definition(species, index as u8 + 1, *definition);
+                    // Idempotent; the file validated every key and id, so a refusal is a bug.
+                    let grade = index as u8 + 1;
+                    if let Err(error) = self.bind_item_definition(species, grade, *definition) {
+                        eprintln!("fishing: item for {species} size {grade} not bound: {error}");
+                    }
                 }
             }
         }
@@ -882,7 +885,8 @@ impl FishingService {
             ClientRequest::Special { .. } => {
                 // The native client has a handle-only writer but no sender.
             }
-            ClientRequest::RegisterPlayer { .. } => unreachable!(),
+            // Registration is answered above, before `advance`.
+            ClientRequest::RegisterPlayer { .. } => {}
         }
         Ok(change)
     }
@@ -960,15 +964,15 @@ fn settle_catch(
     change: &mut Change,
 ) -> Result<(), Error> {
     let attempt = tracked.attempt.clone().ok_or(Error::OutOfOrder)?;
+    // `handle` refused any reel-in whose actor is not the session's bound actor.
+    let actor = tracked.session.actor().ok_or(Error::OutOfOrder)?;
     let fish = species(&attempt.species_key).ok_or(Error::InvalidValue)?;
     let seed = mix64(guid ^ u64::from(attempt.fish_key) ^ u64::from(now_ms as u32));
     let roll = unit(seed);
     if roll < CONTENT.timing.line_snap_chance
         || roll >= CONTENT.timing.line_snap_chance + CONTENT.timing.catch_chance
     {
-        change
-            .replies
-            .extend(escape(tracked, tracked.session.actor().unwrap()));
+        change.replies.extend(escape(tracked, actor));
         change.changed = true;
         return Ok(());
     }
@@ -977,9 +981,7 @@ fn settle_catch(
     // of a catch that would pay nothing.
     let bound = [1u8, 2, 3, 4].map(|g| item_definitions.contains_key(&(fish.key.clone(), g)));
     let Some(grade) = choose_grade(fish, bound, seed.rotate_left(17)) else {
-        change
-            .replies
-            .extend(escape(tracked, tracked.session.actor().unwrap()));
+        change.replies.extend(escape(tracked, actor));
         change.changed = true;
         return Ok(());
     };
@@ -989,9 +991,7 @@ fn settle_catch(
     let cap = tracked.cap.clone();
     let ledger = paid.entry(guid).or_default();
     if !cap_allows(cap.as_ref(), ledger, now_ms) {
-        change
-            .replies
-            .extend(escape(tracked, tracked.session.actor().unwrap()));
+        change.replies.extend(escape(tracked, actor));
         change.notices.push(CATCH_CAP_NOTICE);
         change.changed = true;
         return Ok(());
@@ -1002,13 +1002,16 @@ fn settle_catch(
         .as_ref()
         .and_then(|table| table.for_grade(grade))
         .copied();
-    let definition_id = item_definitions[&(fish.key.clone(), grade)];
+    // `choose_grade` picks only a grade with a bound item.
+    let definition_id = *item_definitions
+        .get(&(fish.key.clone(), grade))
+        .ok_or(Error::InvalidValue)?;
     let weight_roll = unit(seed.rotate_left(31));
     let weight = fish.weight_kg[0] + (fish.weight_kg[1] - fish.weight_kg[0]) * weight_roll;
     let elapsed = now_ms.saturating_sub(attempt.cast_at_ms) as f32 / 1000.0;
     let score = fish.difficulty.saturating_mul(fish.rarity);
     let result = ResultBody {
-        actor: tracked.session.actor().ok_or(Error::OutOfOrder)?,
+        actor,
         at_18: 5,
         at_1c: false,
         at_20: fish.name_id,
@@ -1062,9 +1065,7 @@ fn settle_catch(
     let Ok((next_rewards, reward_packets)) = apply_grant(&tracked.rewards, &grant, &grant_key)
     else {
         // A full bag (or an item the catalogue lacks): the fish is released and nothing is paid.
-        change
-            .replies
-            .extend(escape(tracked, tracked.session.actor().unwrap()));
+        change.replies.extend(escape(tracked, actor));
         change
             .notices
             .push("Your bag is full, so the fish got away.");
@@ -1374,9 +1375,10 @@ fn select_species(tracked: &Tracked, seed: u32) -> Result<&'static Species, Erro
             continue;
         }
         let mut weight = u64::from(fish.selection_weight);
-        if lure.is_some_and(|l| l.fish.iter().any(|boosted| boosted == key)) {
-            let bonus = lure.unwrap().bonus_percent;
-            weight += weight * u64::from(bonus) / 100;
+        if let Some(lure) = lure
+            && lure.fish.iter().any(|boosted| boosted == key)
+        {
+            weight += weight * u64::from(lure.bonus_percent) / 100;
         }
         total = total.checked_add(weight).ok_or(Error::InvalidValue)?;
         choices.push((fish, weight));

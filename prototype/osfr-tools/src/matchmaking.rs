@@ -316,7 +316,10 @@ impl<C: Clock, R: RandomSource> Matchmaking<C, R> {
         }
         let request_id = self.unique_request_id();
         let now = self.now();
-        let queue = self.queues.get_mut(&queue_id).unwrap();
+        let queue = self
+            .queues
+            .get_mut(&queue_id)
+            .ok_or(MatchmakingError::UnknownQueue)?;
         queue.waiting.push_back(Party {
             request_id,
             joined_at_ms: now,
@@ -364,7 +367,9 @@ impl<C: Clock, R: RandomSource> Matchmaking<C, R> {
         };
         let now = self.now();
         let (launch_id, member_index, changed, recipients) = {
-            let queue = self.queues.get_mut(&queue_id).unwrap();
+            let Some(queue) = self.queues.get_mut(&queue_id) else {
+                return Ok(Vec::new());
+            };
             let Some(check) = queue.ready.as_mut() else {
                 return Ok(Vec::new());
             };
@@ -474,19 +479,23 @@ impl<C: Clock, R: RandomSource> Matchmaking<C, R> {
         let mut out = Vec::new();
         match reservation {
             Reservation::Waiting { queue_id } => {
-                let queue = self.queues.get_mut(&queue_id).unwrap();
-                for party in &mut queue.waiting {
-                    party
-                        .entry
-                        .members
-                        .retain(|member| member.session_id != session_id);
+                if let Some(queue) = self.queues.get_mut(&queue_id) {
+                    for party in &mut queue.waiting {
+                        party
+                            .entry
+                            .members
+                            .retain(|member| member.session_id != session_id);
+                    }
+                    queue
+                        .waiting
+                        .retain(|party| !party.entry.members.is_empty());
                 }
-                queue
-                    .waiting
-                    .retain(|party| !party.entry.members.is_empty());
             }
             Reservation::Ready { queue_id } => {
-                let check = self.queues.get_mut(&queue_id).unwrap().ready.take();
+                let check = self
+                    .queues
+                    .get_mut(&queue_id)
+                    .and_then(|queue| queue.ready.take());
                 if let Some(check) = check {
                     out.extend(self.cancel_ready_and_requeue(queue_id, check, Some(session_id))?);
                 }
@@ -517,13 +526,14 @@ impl<C: Clock, R: RandomSource> Matchmaking<C, R> {
         &mut self,
         queue_id: u32,
     ) -> Result<Vec<SessionOutbound>, MatchmakingError> {
-        let check = self
+        // `tick` calls this only for a queue whose ready check has timed out.
+        let Some(check) = self
             .queues
             .get_mut(&queue_id)
-            .unwrap()
-            .ready
-            .take()
-            .unwrap();
+            .and_then(|queue| queue.ready.take())
+        else {
+            return Ok(Vec::new());
+        };
         self.cancel_ready_and_requeue(queue_id, check, None)
     }
 
@@ -558,7 +568,10 @@ impl<C: Clock, R: RandomSource> Matchmaking<C, R> {
             .iter()
             .map(|_| self.unique_request_id())
             .collect();
-        let queue = self.queues.get_mut(&queue_id).unwrap();
+        let queue = self
+            .queues
+            .get_mut(&queue_id)
+            .ok_or(MatchmakingError::UnknownQueue)?;
         for (participant, request_id) in ready_members.into_iter().zip(request_ids).rev() {
             let entry = QueueEntry {
                 group_id: None,
@@ -651,12 +664,15 @@ impl<C: Clock, R: RandomSource> Matchmaking<C, R> {
         formation: Formation,
         now: u64,
     ) -> Result<Vec<SessionOutbound>, MatchmakingError> {
-        let definition = &self.queues[&queue_id].definition;
         let launch_id = self.next_launch_id;
         self.next_launch_id = self
             .next_launch_id
             .checked_add(1)
             .ok_or(MatchmakingError::InvalidQueue)?;
+        let queue = self
+            .queues
+            .get_mut(&queue_id)
+            .ok_or(MatchmakingError::UnknownQueue)?;
         let members: Vec<_> = formation
             .members
             .into_iter()
@@ -670,26 +686,25 @@ impl<C: Clock, R: RandomSource> Matchmaking<C, R> {
                 bytes: packet.clone(),
             })
             .collect();
-        let timeout = definition.ready_timeout_ms;
-        let spec = definition.run_spec.clone();
-        self.queues.get_mut(&queue_id).unwrap().ready = Some(ReadyCheck {
+        queue.ready = Some(ReadyCheck {
             launch_id,
-            deadline_ms: now.saturating_add(timeout),
+            deadline_ms: now.saturating_add(queue.definition.ready_timeout_ms),
             phase: ReadyPhase::Checking,
             members,
-            run_spec: spec,
+            run_spec: queue.definition.run_spec.clone(),
         });
         Ok(out)
     }
 
     fn start_match(&mut self, queue_id: u32) -> Result<Vec<SessionOutbound>, MatchmakingError> {
-        let check = self
+        // `tick` calls this only for a queue whose countdown has finished.
+        let Some(check) = self
             .queues
             .get_mut(&queue_id)
-            .unwrap()
-            .ready
-            .take()
-            .unwrap();
+            .and_then(|queue| queue.ready.take())
+        else {
+            return Ok(Vec::new());
+        };
         let participants: Vec<_> = check.members.iter().map(|(p, _, _)| *p).collect();
         let instance_id = self.next_instance_id;
         let next_id = instance_id
@@ -1574,28 +1589,17 @@ fn checked_count(count: u32) -> Result<usize, MatchmakingError> {
 }
 
 fn read_u16(bytes: &[u8], offset: usize) -> Result<u16, MatchmakingError> {
-    let slice = bytes
-        .get(offset..offset + 2)
-        .ok_or(MatchmakingError::InvalidPacket)?;
-    Ok(u16::from_le_bytes([slice[0], slice[1]]))
+    crate::le::u16(bytes, offset).ok_or(MatchmakingError::InvalidPacket)
 }
 
 fn read_u32(bytes: &[u8], offset: usize) -> Result<u32, MatchmakingError> {
-    let slice = bytes
-        .get(offset..offset + 4)
-        .ok_or(MatchmakingError::InvalidPacket)?;
-    Ok(u32::from_le_bytes([slice[0], slice[1], slice[2], slice[3]]))
+    crate::le::u32(bytes, offset).ok_or(MatchmakingError::InvalidPacket)
 }
 
 fn read_i32(bytes: &[u8], offset: usize) -> Result<i32, MatchmakingError> {
-    Ok(read_u32(bytes, offset)? as i32)
+    crate::le::i32(bytes, offset).ok_or(MatchmakingError::InvalidPacket)
 }
 
 fn read_u64(bytes: &[u8], offset: usize) -> Result<u64, MatchmakingError> {
-    let slice = bytes
-        .get(offset..offset + 8)
-        .ok_or(MatchmakingError::InvalidPacket)?;
-    Ok(u64::from_le_bytes([
-        slice[0], slice[1], slice[2], slice[3], slice[4], slice[5], slice[6], slice[7],
-    ]))
+    crate::le::u64(bytes, offset).ok_or(MatchmakingError::InvalidPacket)
 }
