@@ -133,6 +133,41 @@ fn use_active_starter_tables(fixture: &Fixture) {
     fs::copy(&source, fixture.path().join("profiles.json")).unwrap();
 }
 
+/// L933: the released starter table instead (`data/release/profiles.json`: hat, shirt, waders,
+/// boots and the Simple Bamboo rod for 137), with the release item table that defines the rod.
+fn use_release_starter_tables(fixture: &Fixture) {
+    let release = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/release");
+    fs::copy(
+        release.join("profiles.json"),
+        fixture.path().join("profiles.json"),
+    )
+    .unwrap();
+    fs::copy(
+        release.join("item-table.json"),
+        fixture.path().join("item-table.json"),
+    )
+    .unwrap();
+}
+
+/// The item behind `profile`'s `slot`, by definition id; `None` when the slot is empty.
+fn equipped_definition(
+    game: &osfr_tools::gameplay::Gameplay,
+    profile: i32,
+    slot: i32,
+) -> Option<i32> {
+    let state = game.state();
+    let entry =
+        state.inventory.equipment.iter().find(|entry| {
+            entry.profile_id == profile && entry.slot == slot && entry.item_id != 0
+        })?;
+    state
+        .inventory
+        .items
+        .iter()
+        .find(|item| item.id == entry.item_id)
+        .map(|item| item.definition_id)
+}
+
 // ---- forged / server-shaped completion frames ---------------------------------------------
 
 /// A forged framework game-over, the full server writer shape (39/18): instance, -1,
@@ -214,13 +249,28 @@ impl Rig {
     /// fishing spot file and fish definitions; the profile/inventory `initial_state` is
     /// the reviewed opening snapshot.
     fn for_character(guid: u64) -> Self {
+        Self::build(guid, use_active_starter_tables)
+    }
+
+    /// L933: the rig on the released Fisherman kit, the one players get.
+    fn release_kit() -> Self {
+        Self::build(CHARACTER, use_release_starter_tables)
+    }
+
+    fn build(guid: u64, starter_tables: fn(&Fixture)) -> Self {
         let fixture = Fixture::for_character(guid);
-        use_active_starter_tables(&fixture);
-        fs::copy(
-            content_dir().join("fishing_spots.json"),
-            fixture.path().join("fishing_spots.json"),
-        )
-        .unwrap();
+        starter_tables(&fixture);
+        // L923: every shipped hole zones into its scene (`tests/fishing_scene.rs`). This chain
+        // drives Reed's round in place, so the copy marks his hole (563) not cached.
+        let spots_path = fixture.path().join("fishing_spots.json");
+        let mut spots = read_json(&content_dir().join("fishing_spots.json"));
+        spots["spots"]
+            .as_array_mut()
+            .unwrap()
+            .iter_mut()
+            .find(|spot| spot["npc"] == json!(REED))
+            .expect("Reed has a fishing spot")["scene"]["client_scene_cached"] = json!(false);
+        fs::write(&spots_path, serde_json::to_vec(&spots).unwrap()).unwrap();
         add_fish_definitions(fixture.path());
         // T542: Reed's menu also offers the ungated Become a Fisherman (3070001);
         // complete it in the fixture state so each Talk sees only the chapter quests.
@@ -526,6 +576,144 @@ fn leave_round(rig: &mut Rig, instance: i32) -> Outcome {
 /// L102: the Games window's Sacred Grove Shallows row (live row 563, game 599) starts Reed's
 /// round 500 m from Reed with no menu: the same 39/16 offer the guide's Fish option returns. A
 /// second Play while the round is open meets the window's own busy refusal and changes nothing.
+/// L933: the released kit. Reed's trainer choice equips the hat, shirt, waders, boots and the
+/// Simple Bamboo rod on the Fisherman, so the 26/13 switch succeeds (Chest and Legs) and the
+/// client has something in slot 7, the only state in which its fishing aim runs.
+#[test]
+fn reeds_trainer_choice_hands_over_the_released_kit_with_a_rod() {
+    let mut rig = Rig::release_kit();
+    rig.learn_fisherman();
+    for (slot, definition) in [
+        (1, 68_430),
+        (3, 68_360),
+        (4, 68_465),
+        (5, 68_395),
+        (7, 68_185),
+    ] {
+        assert_eq!(
+            equipped_definition(&rig.game, FISHERMAN_PROFILE, slot),
+            Some(definition),
+            "slot {slot}"
+        );
+    }
+}
+
+/// L933: the trip itself arms a Fisherman who lost the rod (sold, or a save from before the rod
+/// was in the kit): entering puts the starter rod back in slot 7 and grants no second one.
+#[test]
+fn the_trip_hands_a_fisherman_without_a_rod_the_starter_rod() {
+    let mut rig = Rig::release_kit();
+    rig.learn_fisherman();
+    let mut state = rig.game.state();
+    let rod = state
+        .inventory
+        .equipment
+        .iter_mut()
+        .find(|entry| entry.profile_id == FISHERMAN_PROFILE && entry.slot == 7)
+        .unwrap();
+    let rod_item = std::mem::replace(&mut rod.item_id, 0);
+    state.inventory.items.retain(|item| item.id != rod_item);
+    rig.game = rig.fixture.game_as(CHARACTER, Some(state));
+    assert_eq!(equipped_definition(&rig.game, FISHERMAN_PROFILE, 7), None);
+
+    enter_fishing(&mut rig);
+    assert_eq!(
+        equipped_definition(&rig.game, FISHERMAN_PROFILE, 7),
+        Some(68_185),
+        "the starter rod is in hand"
+    );
+    let state = rig.game.state();
+    let rods = state
+        .inventory
+        .items
+        .iter()
+        .filter(|item| item.definition_id == 68_185)
+        .count();
+    assert_eq!(rods, 1, "one rod, not one per trip");
+}
+
+/// L933: a first trip without the trainer unlocks the job (existing policy) and dresses and arms
+/// it, so the job switch the activity rule makes can succeed: after the round, 26/13 activates
+/// the Fisherman.
+#[test]
+fn a_first_trip_without_the_trainer_leaves_the_job_dressed_and_switchable() {
+    let mut rig = Rig::release_kit();
+    assert_eq!(equipped_definition(&rig.game, FISHERMAN_PROFILE, 7), None);
+    let (_, instance) = enter_fishing(&mut rig);
+    for (slot, definition) in [
+        (1, 68_430),
+        (3, 68_360),
+        (4, 68_465),
+        (5, 68_395),
+        (7, 68_185),
+    ] {
+        assert_eq!(
+            equipped_definition(&rig.game, FISHERMAN_PROFILE, slot),
+            Some(definition),
+            "slot {slot}"
+        );
+    }
+    leave_round(&mut rig, instance);
+    rig.send(&select_job(FISHERMAN_PROFILE));
+    assert_eq!(active_job(&rig.game), FISHERMAN_PROFILE);
+}
+
+/// L933: a bag with no room for the gear refuses the trip whole: one chat line, no round, no
+/// unlock, nothing equipped or granted.
+#[test]
+fn a_full_bag_refuses_the_trip_and_changes_nothing() {
+    let mut rig = Rig::release_kit();
+    let mut state = rig.game.state();
+    let first = state
+        .inventory
+        .items
+        .iter()
+        .map(|item| item.id)
+        .max()
+        .unwrap_or(0)
+        + 1;
+    let room = osfr_tools::inventory::MAX_ITEMS - state.inventory.items.len();
+    for id in first..first + room as i32 {
+        state
+            .inventory
+            .items
+            .push(osfr_tools::inventory::InventoryItem {
+                definition_id: 68_185,
+                tint: 0,
+                id,
+                count: 1,
+                consumed_count: 0,
+                stored_count: 0,
+                last_cast_time: 0,
+                rental: None,
+                ability_count: 0,
+                activate_enabled: false,
+            });
+    }
+    rig.game = rig.fixture.game_as(CHARACTER, Some(state));
+    let before = rig.game.state();
+
+    let menu = rig.interact_at(REED);
+    let fish = menu_option(&menu, fish_menu_label());
+    let refused = rig.send(&npc_select(REED, fish));
+    let text = String::from_utf8_lossy(&refused.replies.concat()).into_owned();
+    assert!(text.contains("Make room in your bag"), "{text}");
+    assert!(
+        find(&refused.replies, &[39, 0, 16]).is_none(),
+        "no round offered"
+    );
+    let after = rig.game.state();
+    assert_eq!(after.inventory, before.inventory);
+    assert_eq!(after.profiles, before.profiles);
+    assert!(
+        !after
+            .profiles
+            .unwrap()
+            .unlocked
+            .contains(&FISHERMAN_PROFILE)
+    );
+}
+
 #[test]
 fn the_games_window_row_starts_the_holes_round_without_the_guide() {
     let mut rig = Rig::new();

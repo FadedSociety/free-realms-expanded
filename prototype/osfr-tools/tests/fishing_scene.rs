@@ -32,18 +32,21 @@ use std::{
 };
 
 const GUID: u64 = 1;
-/// Selvi Slowreel: Rainbow Lake (spot 598, hole 562, scene cached), drawn since T385.
+/// Selvi Slowreel: Rainbow Lake (spot 598, hole 563 since L933, scene cached), drawn since T385.
 const SELVI: u64 = 9_000_000_194;
-/// Reed Stillwater: Sacred Grove Shallows (hole 563, scene not cached).
+/// Reed Stillwater: Sacred Grove Shallows (hole 562 since L933; uncached in [`Content::uncached`]).
 const REED: u64 = 9_000_000_181;
-/// Lila Darklure: Darklit Lagoon (hole 560, scene not cached), drawable.
+/// Lila Darklure: Darklit Lagoon (hole 560; uncached in [`Content::uncached`]), drawable.
 const LILA: u64 = 9_000_000_377;
 /// Big J: Wintery Basin (spot 600, hole 564, scene cached). The native check arrived here.
 const BIG_J: u64 = 9_000_000_024;
 const WINTER: u32 = 564;
-const WINTER_SPAWN: [f32; 3] = [202.42, 5.74, 290.33];
-const HOLE: u32 = 562;
-const SPAWN: [f32; 3] = [441.42, -60.31, 475.08];
+// L933: each hole's arrival point next to its schools; Rainbow Lake is the pond scene 563.
+const WINTER_SPAWN: [f32; 3] = [345.0, 0.48, 259.0];
+const HOLE: u32 = 563;
+const SPAWN: [f32; 3] = [419.0, -62.17, 321.0];
+/// Rainbow Lake's arrival heading -0.165 rad as a Y-axis quaternion (R).
+const SPAWN_ROTATION: [f32; 4] = [0.0, -0.082406, 0.0, 0.996599];
 const ACTOR: Handle = Handle {
     id: 0x1122_3344,
     seq: 0x5566_7788,
@@ -88,6 +91,23 @@ impl Content {
             content.0.join("houses.json"),
         )
         .unwrap();
+        content
+    }
+
+    /// The same content with one guide's hole marked not cached. Every shipped hole zones since
+    /// L923; a hole without its scene files must still fish in place at the guide.
+    fn uncached(guide: u64) -> Self {
+        let content = Self::new();
+        let path = content.0.join("fishing_spots.json");
+        let mut spots = read_json(&path);
+        let spot = spots["spots"]
+            .as_array_mut()
+            .unwrap()
+            .iter_mut()
+            .find(|spot| spot["npc"] == guide)
+            .expect("the guide has a spot");
+        spot["scene"]["client_scene_cached"] = false.into();
+        fs::write(&path, serde_json::to_vec(&spots).unwrap()).unwrap();
         content
     }
 
@@ -230,10 +250,10 @@ fn go_fish_at_a_cached_hole_zones_in_starts_after_the_load_and_comes_back_once()
         scene,
         ZoneTransition {
             envelope_flag: 1,
-            scene: "sg_fishing_stream".into(),
+            scene: "sg_fishing_medpond".into(),
             type_id: 2,
             position: [SPAWN[0], SPAWN[1], SPAWN[2], 1.0],
-            rotation: [0.0, 0.0, 0.0, 1.0],
+            rotation: SPAWN_ROTATION,
             unknown: 1,
             id: HOLE as i32,
             geometry_id: 214,
@@ -245,7 +265,7 @@ fn go_fish_at_a_cached_hole_zones_in_starts_after_the_load_and_comes_back_once()
     let zone = game.current_zone().unwrap();
     assert_eq!(
         (zone.zone_id, zone.name.as_str()),
-        (HOLE, "sg_fishing_stream")
+        (HOLE, "sg_fishing_medpond")
     );
     assert_eq!((zone.position, zone.geometry_id), (SPAWN, 214));
     assert!(game.supports_location(&in_hole(SPAWN)));
@@ -367,6 +387,24 @@ fn wintery_basin_arrival_lists_its_fish_and_accepts_a_cast() {
         .expect("the register answer");
     assert_eq!(rows, registered_rows);
     assert_eq!(rows.len(), 7, "Wintery Basin's fish");
+    // L933: the scene path sends the area's schools, each with a model and the school effect,
+    // and the finder rows point at them.
+    let schools: Vec<_> = registered
+        .replies
+        .iter()
+        .filter(|reply| reply.starts_with(&[138, 0, 11, 0]))
+        .map(|reply| fishing_packets::school(reply))
+        .collect();
+    assert!(!schools.is_empty(), "the hole shows its water spots");
+    assert!(
+        schools
+            .iter()
+            .all(|school| school.models.len() == 1 && school.effects.len() == 1)
+    );
+    assert!(
+        rows.iter()
+            .all(|row| schools.iter().any(|school| school.id == row.school_id))
+    );
     for row in &rows {
         assert!(
             row.name_id > 0 && row.name_id < 6_000_000,
@@ -449,11 +487,11 @@ fn a_hole_zone_id_must_fit_the_wire_id() {
 
 #[test]
 fn an_uncached_hole_keeps_the_in_place_round() {
-    let content = Content::new();
+    let content = Content::uncached(REED);
     let mut game = content.game();
     let world = game.current_zone().unwrap();
     let out = go_fish(&mut game, REED, &at(REED), 1_000);
-    assert!(out.scene_zoning.is_none(), "563's scene is not cached");
+    assert!(out.scene_zoning.is_none(), "562's scene is not cached");
     assert!(starts(&out.replies, &[39, 0, 16]), "the offer goes at once");
     assert_eq!(game.scene_return(), None);
     assert_eq!(game.current_zone(), Some(world));
@@ -471,7 +509,7 @@ fn an_uncached_hole_keeps_the_in_place_round() {
 
 #[test]
 fn a_refused_go_fish_zones_nothing_and_keeps_no_pose() {
-    let content = Content::new();
+    let content = Content::uncached(LILA);
     let mut game = content.game();
     let menu = game
         .handle_in_world(&npc(8, SELVI, None), &at(SELVI), 1_000)
@@ -612,10 +650,10 @@ fn the_gateway_zones_into_the_hole_saves_the_world_pose_and_brings_the_player_ba
         scene,
         ZoneTransition {
             envelope_flag: 1,
-            scene: "sg_fishing_stream".to_string(),
+            scene: "sg_fishing_medpond".to_string(),
             type_id: 2,
             position: [SPAWN[0], SPAWN[1], SPAWN[2], 1.0],
-            rotation: [0.0, 0.0, 0.0, 1.0],
+            rotation: SPAWN_ROTATION,
             sky: String::new(),
             tutorial: false,
             unknown: 1,

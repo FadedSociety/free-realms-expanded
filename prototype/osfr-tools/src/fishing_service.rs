@@ -66,6 +66,8 @@ const LEASH_M: f32 = 50.0;
 const SPOTS_FILE: &str = "fishing_spots.json";
 const MAX_SPOTS_FILE: usize = 64 * 1024;
 const MAX_SPOTS: usize = 16;
+/// (R) Sanity bound on the schools of one area; the shipped areas have four.
+const MAX_SCHOOLS: usize = 8;
 const MAX_CATCH_XP: u32 = 1_000;
 /// Sanity ceilings for the optional payout/cap content (R). They are not gameplay values: the
 /// shipped cap is disabled, and these only reject an operator file no live catch rate can reach.
@@ -230,6 +232,8 @@ impl FishingService {
                     && !area.source.is_empty()
                     && !area.fish.is_empty()
                     && area.fish.iter().all(|key| species(key).is_some())
+                    && (1..=MAX_SCHOOLS).contains(&area.schools.len())
+                    && area.schools.iter().all(School::valid)
             })
             && CONTENT.species.iter().all(|fish| {
                 !fish.name.is_empty()
@@ -788,7 +792,8 @@ impl FishingService {
                     .schools
                     .iter()
                     .zip(&tracked.school_ids)
-                    .map(|(position, id)| school_reply(*id, tracked.anchor, *position)),
+                    .enumerate()
+                    .map(|(index, (school, id))| school_reply(*id, school, index)),
             );
             return Ok(Change {
                 replies,
@@ -1158,8 +1163,14 @@ fn registration_reply(tracked: &Tracked) -> Result<Vec<u8>, Error> {
     // 138/3 integer list: `0x008dab40` reads a count then that many u32, and the client creates
     // one model actor at the origin for each. Send the distinct fish shapes; a played register
     // response carries exactly these (Lxzxrus `FishModelIds`).
+    // L933: the school models are preloaded the same way (the played server lists them too).
     let mut models: Vec<i32> = Vec::new();
-    for id in CONTENT.models.fish_by_grade {
+    for id in CONTENT
+        .models
+        .fish_by_grade
+        .into_iter()
+        .chain(area.schools.iter().map(|school| school.model))
+    {
         if !models.contains(&id) {
             models.push(id);
         }
@@ -1168,36 +1179,48 @@ fn registration_reply(tracked: &Tracked) -> Result<Vec<u8>, Error> {
     for value in models {
         out.extend((value as u32).to_le_bytes());
     }
-    let visible = area
-        .fish
-        .iter()
-        .filter_map(|key| species(key))
-        .collect::<Vec<_>>();
-    push_count(&mut out, visible.len());
-    for fish in visible {
-        push_fish_entry(&mut out, fish, tracked.fisherman_level);
-    }
+    push_fish_entries(&mut out, tracked, area);
     Ok(out)
 }
 
 fn fish_info_reply(tracked: &Tracked) -> Result<Vec<u8>, Error> {
     let area = area(&tracked.area_key).ok_or(Error::InvalidValue)?;
+    let mut out = packet(Sub::FishInfoUpdate, Vec::new());
+    push_fish_entries(&mut out, tracked, area);
+    Ok(out)
+}
+
+/// The Fish Finder's rows (a count, then one entry per fish of the area).
+fn push_fish_entries(out: &mut Vec<u8>, tracked: &Tracked, area: &Area) {
     let fish = area
         .fish
         .iter()
         .filter_map(|key| species(key))
         .collect::<Vec<_>>();
-    let mut out = packet(Sub::FishInfoUpdate, Vec::new());
-    push_count(&mut out, fish.len());
-    for fish in fish {
-        push_fish_entry(&mut out, fish, tracked.fisherman_level);
+    push_count(out, fish.len());
+    for (index, fish) in fish.into_iter().enumerate() {
+        // L933 (R): the roster is dealt round-robin over the area's schools; the finder points
+        // at the fish's school and plays the rarity's highlight on it. No school, no pointer.
+        let school = tracked
+            .school_ids
+            .get(index % tracked.school_ids.len().max(1))
+            .copied()
+            .unwrap_or(0);
+        let effect = CONTENT.models.finder_effects[fish.rarity.clamp(1, 3) as usize - 1];
+        push_fish_entry(out, fish, tracked.fisherman_level, school, effect as u32);
     }
-    Ok(out)
 }
 
-fn push_fish_entry(out: &mut Vec<u8>, fish: &Species, fisherman_level: u32) {
-    // Field widths/order are recovered. Which flag/text field drives each
-    // Fish Finder column is unresolved; these assignments are R.
+fn push_fish_entry(
+    out: &mut Vec<u8>,
+    fish: &Species,
+    fisherman_level: u32,
+    school_id: u32,
+    finder_effect: u32,
+) {
+    // Field widths/order are recovered (the played fork names three of them: SchoolId, Catchable,
+    // FishFinderEffectId). Which flag/text field drives each Fish Finder column is unresolved;
+    // the rest of these assignments are R.
     out.extend(fish.type_id.to_le_bytes());
     out.extend(fish.name_id.to_le_bytes());
     out.extend(fish.icon_id.to_le_bytes());
@@ -1205,9 +1228,9 @@ fn push_fish_entry(out: &mut Vec<u8>, fish: &Species, fisherman_level: u32) {
     out.push(0); // R: FishSpecial candidate
     out.extend(0u32.to_le_bytes()); // R: unresolved lure-hint text id
     push_string(out, "");
-    out.extend(0u32.to_le_bytes());
+    out.extend(school_id.to_le_bytes());
     out.push(u8::from(fisherman_level >= fish.minimum_level));
-    out.extend(0u32.to_le_bytes());
+    out.extend(finder_effect.to_le_bytes());
 }
 
 fn update_data_reply(actor: Handle, position: Vec4) -> Vec<u8> {
@@ -1216,14 +1239,18 @@ fn update_data_reply(actor: Handle, position: Vec4) -> Vec<u8> {
     packet(Sub::UpdateData, body)
 }
 
-fn school_reply(school_id: u32, anchor: Vec4, position: [f32; 3]) -> Vec<u8> {
-    let mut body = Vec::with_capacity(48);
+/// 138/11: one school at its scene position. The client draws nothing for a school without a
+/// model, so each carries one model (id, heading, animation speed: 12 bytes) and the school's
+/// bubble effect, which the client plays on the first model. Fields: `0x00b69130`; the model
+/// and effect lists are named by the played fork (`FishingSchoolModel`, `CompositeEffectIds`).
+fn school_reply(school_id: u32, school: &School, index: usize) -> Vec<u8> {
+    let mut body = Vec::with_capacity(72);
     body.extend(school_id.to_le_bytes());
     body.extend(
         Vec4 {
-            x: anchor.x + position[0],
-            y: anchor.y + position[1],
-            z: anchor.z + position[2],
+            x: school.position[0],
+            y: school.position[1],
+            z: school.position[2],
             w: 1.0,
         }
         .encode(),
@@ -1237,8 +1264,13 @@ fn school_reply(school_id: u32, anchor: Vec4, position: [f32; 3]) -> Vec<u8> {
         }
         .encode(),
     );
-    push_count(&mut body, 0); // R: no recovered school model assignment
-    push_count(&mut body, 0); // R: no recovered school path assignment
+    push_count(&mut body, 1);
+    body.extend(school.model.to_le_bytes());
+    // (R) A spread of headings so the schools do not all face one way; animation parameter 1.
+    body.extend((index as f32 * 1.3 % std::f32::consts::TAU).to_le_bytes());
+    body.extend(1.0f32.to_le_bytes());
+    push_count(&mut body, 1);
+    body.extend(CONTENT.models.school_effect.to_le_bytes());
     body.extend(0u32.to_le_bytes());
     body.extend(0u32.to_le_bytes());
     packet(Sub::SpawnSchool, body)
@@ -1615,8 +1647,9 @@ struct Scene {
     /// reconstruction: `bbe_FishingZoneConfig.txt` is lost. With RunScale 1 and word 4 at 0 the
     /// fish X runs from bed X to bed X + (cast distance - BobberMinDistanceFromPlayer).
     underwater_bed_x: f32,
-    /// The scene's .gzne and Areas.xml are in our extracted client catalogue. T514: only then is
-    /// the round fished in this scene; otherwise it stays in place at the guide (R).
+    /// The scene's .gzne, Areas.xml and every terrain chunk reach the client, from its packs or
+    /// the community CDN its launcher downloads from. T514: only then is the round fished in this
+    /// scene; otherwise it stays in place at the guide (R).
     client_scene_cached: bool,
     source: String,
 }
@@ -1798,15 +1831,21 @@ struct Models {
     fish_by_grade: [i32; 4],
     fish_motion: [f32; 10],
     fish_motion_tail: f32,
+    /// The composite effect played on a school's first model (`BBE_PFX_fishing_school`).
+    school_effect: i32,
+    /// The Fish Finder's highlight on a picked fish's school by rarity 1, 2 and 3 or more:
+    /// green, yellow, red (`BBE_PFX_fishing_fishfinder_*`).
+    finder_effects: [i32; 3],
 }
 
 impl Models {
     /// The client looks every id up unchecked, so each must be positive; motion is a sanity
     /// bound (R), which also refuses NaN and infinities.
     fn valid(&self) -> bool {
-        [self.bobber, self.run_header]
+        [self.bobber, self.run_header, self.school_effect]
             .iter()
             .chain(&self.fish_by_grade)
+            .chain(&self.finder_effects)
             .all(|id| *id > 0)
             && self
                 .fish_motion
@@ -1828,8 +1867,27 @@ struct Area {
     key: String,
     name: String,
     fish: Vec<String>,
-    schools: Vec<[f32; 3]>,
+    /// Where the area's fish schools float, in the coordinates of the area's own client scene
+    /// (one scene per area, `fishing_spots.json`). A round fished in place at a guide (an
+    /// uncached scene) gets the same coordinates, which mean nothing there (R).
+    schools: Vec<School>,
     source: String,
+}
+
+/// One fish school: a point on the water and the client model drawn there.
+#[derive(Deserialize)]
+struct School {
+    position: [f32; 3],
+    /// A client `Models.txt` id. The client reads it unchecked, so an unknown id crashes it.
+    model: i32,
+}
+
+impl School {
+    /// A finite point and a positive model id (the position is checked against the scene's water
+    /// by the tests that read `fishing_spots.json`).
+    fn valid(&self) -> bool {
+        self.position.iter().all(|value| value.is_finite()) && self.model > 0
+    }
 }
 
 #[derive(Deserialize)]

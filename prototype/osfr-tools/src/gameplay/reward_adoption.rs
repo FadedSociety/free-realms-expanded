@@ -37,6 +37,12 @@ fn start(game: &mut Gameplay, at: u64) {
 
 fn begin(game: &mut Gameplay) {
     let mut spots: serde_json::Value = serde_json::from_str(SPOTS_JSON).unwrap();
+    // L923: every shipped hole zones into its scene; this round runs in place at the gate.
+    for spot in spots["spots"].as_array_mut().unwrap() {
+        if spot["npc"] == FISHING_GATE {
+            spot["scene"]["client_scene_cached"] = json!(false);
+        }
+    }
     for sizes in spots["items"].as_object_mut().unwrap().values_mut() {
         for item in sizes.as_array_mut().unwrap() {
             if item.as_i64().unwrap() > 0 {

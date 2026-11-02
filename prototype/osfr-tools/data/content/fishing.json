@@ -63,7 +63,15 @@
       1.0
     ],
     "fish_motion_tail": 3.0,
+    "school_effect": 15777,
+    "finder_effects": [
+      16086,
+      16087,
+      16085
+    ],
     "source_tags": {
+      "school_effect": "client ActorCompositeEffectDefinitions.xml 15777 BBE_PFX_fishing_school; the played Sanctuary fork (BubbaJoeX 1ff876a FishingRules.SchoolEffectId) sends it in 138/11 so the client plays it on the school's first model",
+      "finder_effects": "client ActorCompositeEffectDefinitions.xml 16086 BBE_PFX_fishing_fishfinder_green, 16087 _yellow, 16085 _red; R: the rarity pairing 1 green, 2 yellow, 3 and up red is the played fork's FishFinderEffectId",
       "bobber": "client compiled FishingPlayerConfig default 0x0107b6d0 sets BobberModelId (+0x54) to 0x427; client Models.txt 1063 fishing_bobber_bbe.adr. Sent in 138/8; 0x00ccfdb0 looks it up unchecked",
       "run_header": "R: 138/18 header model, the lure drawn at the hook and read unchecked at 0x00b6da36 when the head record +0x30 (on_hook) is 0, so unused while we send 1; client Models.txt 1673 sg_fishing_lure_bbe.adr; the lure choice is a hint from Lxzxrus 75f7d95 FishingSession.cs HookLureModelId",
       "fish_by_grade": "R: client Models.txt 1670 fishing_thin_fish_bbe, 1671 fishing_medium_fish_bbe, 1672 fishing_fat_fish_bbe, for size grades 1-4; the grade pairing is not recovered. The 138/3 integer list is the distinct ids here: the client creates each model actor at the origin on registration (played register response, Lxzxrus FishingSession.FishModelIds).",
@@ -109,18 +117,40 @@
         "baconfish"
       ],
       "schools": [
-        [
-          5.0,
-          0.0,
-          5.0
-        ],
-        [
-          15.0,
-          0.0,
-          -5.0
-        ]
+        {
+          "position": [
+            467.0,
+            -66.19,
+            267.0
+          ],
+          "model": 1605
+        },
+        {
+          "position": [
+            509.0,
+            -66.19,
+            323.0
+          ],
+          "model": 1617
+        },
+        {
+          "position": [
+            449.0,
+            -66.19,
+            313.0
+          ],
+          "model": 1597
+        },
+        {
+          "position": [
+            465.0,
+            -66.19,
+            225.0
+          ],
+          "model": 1609
+        }
       ],
-      "source": "area and roster: client locale; levels: wiki; school layout: R"
+      "source": "area and roster: client locale; levels: wiki; schools: L933 (R) positions (scene coordinates, y at the water surface -65.88) and models from the Sanctuary community fork BubbaJoeX 1ff876a src/Resources/Fishing.json pond sg_fishing_medpond (AGPL-3.0 data, credited in NOTICE). Models 1597, 1605, 1609 and 1617 are sg_2fish_trout_big, sg_2fish_trout_med, sg_3fish_trout_big and sg_3fish_trout_med in the client Models.txt (description: fishing models). Checked against the client terrain of this scene (osfr-terrain 2 m height grid of its .gcnk chunks): all 4 positions are over submerged ground, 1.7 to 15.4 m below that water surface (the fork's WaterHeight). L933 (lead): schools follow their scene after the Sacred Grove pairing swap."
     },
     {
       "key": "bramblebacks_bayou",
@@ -136,18 +166,40 @@
         "briar_nibbler"
       ],
       "schools": [
-        [
-          6.0,
-          0.0,
-          4.0
-        ],
-        [
-          14.0,
-          0.0,
-          -6.0
-        ]
+        {
+          "position": [
+            305.0,
+            -3.48,
+            247.0
+          ],
+          "model": 1605
+        },
+        {
+          "position": [
+            263.0,
+            -3.48,
+            191.0
+          ],
+          "model": 1617
+        },
+        {
+          "position": [
+            347.0,
+            -3.48,
+            303.0
+          ],
+          "model": 1597
+        },
+        {
+          "position": [
+            365.0,
+            -3.48,
+            211.0
+          ],
+          "model": 1609
+        }
       ],
-      "source": "area and roster: client locale; levels: wiki except marked R; school layout: R"
+      "source": "area and roster: client locale; levels: wiki except marked R; schools: L933 (R) positions (scene coordinates, y at the water surface -3.48) and models from the Sanctuary community fork BubbaJoeX 1ff876a src/Resources/Fishing.json pond bw_fishing_stream (AGPL-3.0 data, credited in NOTICE). Models 1597, 1605, 1609 and 1617 are sg_2fish_trout_big, sg_2fish_trout_med, sg_3fish_trout_big and sg_3fish_trout_med in the client Models.txt (description: fishing models). Checked against the client terrain of this scene (osfr-terrain 2 m height grid of its .gcnk chunks): all 4 positions are over submerged ground, 5.3 to 6.5 m below that water surface (the fork's WaterHeight)."
     },
     {
       "key": "darklit_lagoon",
@@ -162,18 +214,40 @@
         "roach_loach"
       ],
       "schools": [
-        [
-          4.0,
-          0.0,
-          7.0
-        ],
-        [
-          16.0,
-          0.0,
-          -4.0
-        ]
+        {
+          "position": [
+            213.0,
+            -3.03,
+            237.0
+          ],
+          "model": 1605
+        },
+        {
+          "position": [
+            269.0,
+            -3.03,
+            217.0
+          ],
+          "model": 1617
+        },
+        {
+          "position": [
+            225.0,
+            -3.03,
+            285.0
+          ],
+          "model": 1597
+        },
+        {
+          "position": [
+            195.0,
+            -3.03,
+            267.0
+          ],
+          "model": 1609
+        }
       ],
-      "source": "area and roster: client locale; levels: wiki; school layout: R"
+      "source": "area and roster: client locale; levels: wiki; schools: L933 (R) positions (scene coordinates, y at the water surface -3.03) and models from the Sanctuary community fork BubbaJoeX 1ff876a src/Resources/Fishing.json pond bw_fishing_medpond (AGPL-3.0 data, credited in NOTICE). Models 1597, 1605, 1609 and 1617 are sg_2fish_trout_big, sg_2fish_trout_med, sg_3fish_trout_big and sg_3fish_trout_med in the client Models.txt (description: fishing models). Checked against the client terrain of this scene (osfr-terrain 2 m height grid of its .gcnk chunks): all 4 positions are over submerged ground, 4.0 to 5.8 m below that water surface (the fork's WaterHeight)."
     },
     {
       "key": "rainbow_lake",
@@ -189,18 +263,40 @@
         "toothy_tetra"
       ],
       "schools": [
-        [
-          5.0,
-          0.0,
-          6.0
-        ],
-        [
-          15.0,
-          0.0,
-          -5.0
-        ]
+        {
+          "position": [
+            357.0,
+            -65.88,
+            369.0
+          ],
+          "model": 1605
+        },
+        {
+          "position": [
+            413.0,
+            -65.88,
+            411.0
+          ],
+          "model": 1617
+        },
+        {
+          "position": [
+            417.0,
+            -65.88,
+            333.0
+          ],
+          "model": 1597
+        },
+        {
+          "position": [
+            313.0,
+            -65.88,
+            361.0
+          ],
+          "model": 1609
+        }
       ],
-      "source": "area and roster: client locale; levels: wiki; school layout: R"
+      "source": "area and roster: client locale; levels: wiki; schools: L933 (R) positions (scene coordinates, y at the water surface -66.19) and models from the Sanctuary community fork BubbaJoeX 1ff876a src/Resources/Fishing.json pond sg_fishing_stream (AGPL-3.0 data, credited in NOTICE). Models 1597, 1605, 1609 and 1617 are sg_2fish_trout_big, sg_2fish_trout_med, sg_3fish_trout_big and sg_3fish_trout_med in the client Models.txt (description: fishing models). Checked against the client terrain of this scene (osfr-terrain 2 m height grid of its .gcnk chunks): all 4 positions are over submerged ground, 3.5 to 10.2 m below that water surface (the fork's WaterHeight). L933 (lead): schools follow their scene after the Sacred Grove pairing swap."
     },
     {
       "key": "wintery_basin",
@@ -215,18 +311,40 @@
         "spineless_stickleback"
       ],
       "schools": [
-        [
-          6.0,
-          0.0,
-          5.0
-        ],
-        [
-          14.0,
-          0.0,
-          -5.0
-        ]
+        {
+          "position": [
+            351.0,
+            -0.9,
+            323.0
+          ],
+          "model": 1605
+        },
+        {
+          "position": [
+            287.0,
+            -0.9,
+            295.0
+          ],
+          "model": 1617
+        },
+        {
+          "position": [
+            337.0,
+            -0.9,
+            267.0
+          ],
+          "model": 1597
+        },
+        {
+          "position": [
+            311.0,
+            -0.9,
+            327.0
+          ],
+          "model": 1609
+        }
       ],
-      "source": "area and roster: client locale; levels: wiki; school layout: R"
+      "source": "area and roster: client locale; levels: wiki; schools: L933 (R) positions (scene coordinates, y at the water surface -0.9) and models from the Sanctuary community fork BubbaJoeX 1ff876a src/Resources/Fishing.json pond sh_fishing_medpond (AGPL-3.0 data, credited in NOTICE). Models 1597, 1605, 1609 and 1617 are sg_2fish_trout_big, sg_2fish_trout_med, sg_3fish_trout_big and sg_3fish_trout_med in the client Models.txt (description: fishing models). Checked against the client terrain of this scene (osfr-terrain 2 m height grid of its .gcnk chunks): all 4 positions are over submerged ground, 5.1 to 8.4 m below that water surface (the fork's WaterHeight)."
     },
     {
       "key": "frostbitten_banks",
@@ -244,18 +362,40 @@
         "plattypus"
       ],
       "schools": [
-        [
-          5.0,
-          0.0,
-          5.0
-        ],
-        [
-          15.0,
-          0.0,
-          -5.0
-        ]
+        {
+          "position": [
+            463.0,
+            23.24,
+            409.0
+          ],
+          "model": 1605
+        },
+        {
+          "position": [
+            393.0,
+            23.24,
+            409.0
+          ],
+          "model": 1617
+        },
+        {
+          "position": [
+            517.0,
+            23.24,
+            453.0
+          ],
+          "model": 1597
+        },
+        {
+          "position": [
+            507.0,
+            23.24,
+            413.0
+          ],
+          "model": 1609
+        }
       ],
-      "source": "area and roster: client locale; levels: wiki; school layout: R"
+      "source": "area and roster: client locale; levels: wiki; schools: L933 (R) positions (scene coordinates, y at the water surface 23.24) and models from the Sanctuary community fork BubbaJoeX 1ff876a src/Resources/Fishing.json pond sh_fishing_stream (AGPL-3.0 data, credited in NOTICE). Models 1597, 1605, 1609 and 1617 are sg_2fish_trout_big, sg_2fish_trout_med, sg_3fish_trout_big and sg_3fish_trout_med in the client Models.txt (description: fishing models). Checked against the client terrain of this scene (osfr-terrain 2 m height grid of its .gcnk chunks): all 4 positions are over submerged ground, 6.3 to 20.2 m below that water surface (the fork's WaterHeight)."
     }
   ],
   "species": [

@@ -678,7 +678,7 @@ fn fish_variant_catch_credits_any_of() {
         .unwrap()
         .expect("the shipped fishing spots load");
     let mut service = FishingService::new();
-    service
+    let entered = service
         .enter(
             &spots,
             REED,
@@ -690,6 +690,10 @@ fn fish_variant_catch_credits_any_of() {
             rewards.clone(),
         )
         .expect("the shipped fishing entry commits");
+    // L923: Reed's hole zones into its scene, so the player casts from the scene spawn.
+    let from: [f32; 3] = entered
+        .scene
+        .map_or([0.0; 3], |scene| scene.position[..3].try_into().unwrap());
     let instance = service.instance_id(PLAYER).unwrap();
     service
         .handle_minigame_lifecycle(PLAYER, &lifecycle(5, instance))
@@ -713,7 +717,7 @@ fn fish_variant_catch_credits_any_of() {
         service
             .route(
                 PLAYER,
-                &cast_at(ACTOR, [0.0, 0.0, 0.0], 10.0),
+                &cast_at(ACTOR, from, 10.0),
                 now,
                 &rewards.inventory,
                 &rewards.profiles,

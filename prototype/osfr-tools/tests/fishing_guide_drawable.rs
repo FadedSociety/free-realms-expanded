@@ -483,9 +483,10 @@ fn a_far_or_wrong_guide_changes_nothing() {
     player.refused(&interact(u64::MAX), "an unknown actor");
     player.refused(&[26, 0, 8, 0, 1, 2, 3], "a malformed 26/8");
     player.refused(&select(CHIP, (option + 99) as u32), "an unoffered choice");
-    // Nothing above consumed the menu or started a trip: the real choice still offers it.
-    let offer = player.send(&select(CHIP, option as u32));
-    assert!(find(&offer.replies, &[39, 0, 16]).is_some());
+    // Nothing above consumed the menu or started a trip: the real choice still offers it
+    // (after the scene load, since L923 zones Chip's hole).
+    let choice = player.send(&select(CHIP, option as u32));
+    player.offer(choice);
 }
 
 #[test]
@@ -533,8 +534,8 @@ fn two_players_see_the_same_guides() {
 #[test]
 fn a_trip_can_be_quit_and_a_reconnect_releases_the_round() {
     let mut player = Player::new(CHARACTER);
-    player.at(SELVI);
-    let round = player.start(SELVI);
+    player.at(GUNTHER);
+    let round = player.start(GUNTHER);
     let registered = player.send(&register(ACTOR));
     assert!(find(&registered.replies, &[138, 0, 3, 0]).is_some());
     player.cast_and_hook();
@@ -549,29 +550,28 @@ fn a_trip_can_be_quit_and_a_reconnect_releases_the_round() {
     let xp = profile_xp(&player.game, FISHERMAN_PROFILE);
     player.quit(round);
     assert!(
-        player.is_free(SELVI),
+        player.is_free(GUNTHER),
         "the ordinary quit frees the player"
     );
 
     // Start again and drop the connection mid-attempt; reconnect through the saved state.
-    player.start(SELVI);
+    player.start(GUNTHER);
     player.send(&register(ACTOR));
     player.cast_and_hook();
     // The save taken in the hole stores the world pose; the reconnect resumes there.
     player.character = player
         .game
         .scene_return()
-        .expect("Selvi's hole is a scene");
+        .expect("Gunther's hole is a scene");
     player.game.reset_session();
     player.game = player.fixture.reload_serialized(&player.game);
     let late = player.try_send(&reel(ACTOR));
     assert!(!late.is_ok_and(|out| find(&out.replies, &[138, 0, 14, 0]).is_some()));
     assert_eq!(player.fish_held(), 1, "the dropped cast pays nothing");
     assert_eq!(profile_xp(&player.game, FISHERMAN_PROFILE), xp);
-    assert!(player.is_free(SELVI), "no stuck trip after the reconnect");
-    let (_, _, game_id) = player.take_trip(SELVI);
-    // L919: Gunther's Briarwood stream (561) now fishes in place, so the scene hole is Selvi's.
-    assert_eq!(game_id, 598, "a fresh Rainbow Lake trip");
+    assert!(player.is_free(GUNTHER), "no stuck trip after the reconnect");
+    let (_, _, game_id) = player.take_trip(GUNTHER);
+    assert_eq!(game_id, 597, "a fresh Brambleback's Bayou trip");
 }
 
 #[test]

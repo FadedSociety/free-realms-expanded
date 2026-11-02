@@ -606,6 +606,11 @@ impl Inventory {
         self.content.definitions.contains_key(&definition_id)
     }
 
+    /// L933: the equipment slot the catalogue puts this item in; `None` when it is not defined.
+    pub fn definition_slot(&self, definition_id: i32) -> Option<i32> {
+        Some(self.content.definitions.get(&definition_id)?.slot)
+    }
+
     /// How the catalogue draws this item (the fields `write_attachment` sends); `None` when the
     /// loaded catalogue does not define it.
     pub fn look(&self, definition_id: i32) -> Option<ItemLook> {

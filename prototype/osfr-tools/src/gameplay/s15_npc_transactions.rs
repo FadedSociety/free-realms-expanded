@@ -137,6 +137,17 @@ impl Fixture {
             )
             .unwrap();
         }
+        // L923: every shipped hole zones into its scene (`tests/fishing_scene.rs`). These pins
+        // drive the fish entry in place, so the copy marks the gate's hole not cached.
+        let spots_path = fixture.0.join("fishing_spots.json");
+        let mut spots: serde_json::Value =
+            serde_json::from_slice(&fs::read(&spots_path).unwrap()).unwrap();
+        for spot in spots["spots"].as_array_mut().unwrap() {
+            if spot["npc"] == FISH_GATE {
+                spot["scene"]["client_scene_cached"] = false.into();
+            }
+        }
+        fs::write(&spots_path, serde_json::to_vec(&spots).unwrap()).unwrap();
         fixture
     }
 

@@ -1240,9 +1240,20 @@ impl Gameplay {
         // L936: the trip switches the player into Fisherman (unlocking it on first use) and the
         // job stays after the trip. The switch comes before the reward snapshot, so the round's
         // payout adopts the Fisherman as the active job; a refused entry below changes nothing,
-        // because the caller stages `self` and `out.changed` stays false.
+        // because the caller stages `self` and `out.changed` stays false. L933: the switch dresses
+        // the job from the release's Fisherman kit (`ensure_outfit`); `ensure_job_gear` below arms it.
         let mut switch = Outcome::default();
-        self.enter_activity_job(FISHERMAN_PROFILE, character.guid, &mut switch)?;
+        // A first switch hands the starter kit; a bag with no room refuses the trip whole (the
+        // caller drops the staged clone, so nothing commits).
+        if self
+            .enter_activity_job(FISHERMAN_PROFILE, character.guid, &mut switch)
+            .is_err()
+        {
+            out.replies.push(chat::system(
+                "Make room in your bag for your fishing gear first.",
+            ));
+            return Ok(out);
+        }
         let level = self.job_level(FISHERMAN_PROFILE);
         // (R) Same bag floor as quest turn-ins: never below what the player already holds.
         let rewards = self.reward_snapshot();
@@ -1257,9 +1268,19 @@ impl Gameplay {
             rewards,
         ) {
             Ok(change) => {
-                out.replies.extend(switch.replies);
+                // The trip start may set an in-place round's replies wholesale, so the switch's
+                // activation goes in front afterwards.
+                self.start_fishing_trip(change, character, &mut out);
+                out.replies.splice(0..0, switch.replies);
                 out.nearby.extend(switch.nearby);
-                self.start_fishing_trip(change, character, &mut out)
+                // L933: the cast needs a rod in slot 7 of the active job (client 00b6c290). A bag
+                // with no room for the gear refuses the trip whole (nothing commits).
+                if self.ensure_job_gear(FISHERMAN_PROFILE, &mut out).is_err() {
+                    out = Outcome::default();
+                    out.replies.push(chat::system(
+                        "Make room in your bag for your fishing gear first.",
+                    ));
+                }
             }
             Err(denied) => out.replies.push(chat::system(denied.message())),
         }

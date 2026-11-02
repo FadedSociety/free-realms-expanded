@@ -41,23 +41,23 @@
       "description_id": 5235,
       "icon_id": 9870,
       "scene": {
-        "name": "sg_fishing_medpond",
-        "zone_id": 563,
+        "name": "sg_fishing_stream",
+        "zone_id": 562,
         "spawn_position": [
-          435.05676,
-          -64.46508,
-          370.70682
+          447,
+          -64.68,
+          325
         ],
         "spawn_rotation": [
           0,
+          0.996574,
           0,
-          0,
-          1
+          0.082702
         ],
-        "water_y": -64.46508,
-        "underwater_bed_x": 68,
-        "client_scene_cached": false,
-        "source": "Spawn, water height and bed X: Lxzxrus-Free-Realms-Server origin/fishing/lure-and-spawns@75f7d95 src/Resources/Zones/sg_fishing_medpond.json (spawn read in game upstream, R). R: bed X 68 has no client source here; sg_fishing_medpondAreas.xml and sg_fishing_medpond.gzne are not in our client catalogue. R: the water height equals that file's spawn height. Zone 563 pairs with MiniGameData 599 (the 'Unknown' field of ClientActivityDefinitions in Lxzxrus-Free-Realms-Server 75f7d95, AGPL data only). R: rotation (0, 0, 0, 1)."
+        "water_y": -66,
+        "underwater_bed_x": 58,
+        "client_scene_cached": true,
+        "source": "Spawn: Lxzxrus-Free-Realms-Server origin/fishing/lure-and-spawns@75f7d95 src/Resources/Zones/sg_fishing_stream.json, read in game on 2026-10-19 (R). Bed X and water: our sg_fishing_streamAreas.xml (pack_09/001475), UnderWater_Bed id 4117 at (58, -1, 483) and Water id 3917 with its child spheres at y -66. Zone 562 pairs with MiniGameData 598 (the 'Unknown' field of ClientActivityDefinitions in Lxzxrus-Free-Realms-Server 75f7d95, AGPL data only). R: rotation (0, 0, 0, 1). L933 (lead): Rainbow Lake (598) is the pond scene sg_fishing_medpond 563 and Sacred Grove Shallows (599) the stream scene sg_fishing_stream 562: the client's sg_fishing_medpondAreas.xml names the Rainbow areas, the Sanctuary fork (BubbaJoeX, AGPL) src/Resources/Fishing.json Ponds comments pair them so, and every other hole pairs pond = lake/lagoon/basin. L933 (lead): spawn = the Sanctuary fork (BubbaJoeX, AGPL) src/Resources/Fishing.json Ponds Arrival [447, -64.68, 325] heading 2.976 (R), 11-16 m from a school, so the player arrives at the fishing spots."
       },
       "source": "Reed Stillwater (Stillwater Crossing). Client text 408571: 'When you're ready to head out, just use the boat behind me' and 'Interact with the boat behind Reed Stillwater to enter Sacred Grove Shallows'. The boat object is not a routed interaction, so the guide's menu stands in for it (R)."
     },
@@ -69,23 +69,23 @@
       "description_id": 5235,
       "icon_id": 9870,
       "scene": {
-        "name": "sg_fishing_stream",
-        "zone_id": 562,
+        "name": "sg_fishing_medpond",
+        "zone_id": 563,
         "spawn_position": [
-          441.42,
-          -60.31,
-          475.08
+          419,
+          -62.17,
+          321
         ],
         "spawn_rotation": [
           0,
+          -0.082406,
           0,
-          0,
-          1
+          0.996599
         ],
-        "water_y": -66,
-        "underwater_bed_x": 58,
+        "water_y": -64.46508,
+        "underwater_bed_x": 68,
         "client_scene_cached": true,
-        "source": "Spawn: Lxzxrus-Free-Realms-Server origin/fishing/lure-and-spawns@75f7d95 src/Resources/Zones/sg_fishing_stream.json, read in game on 2026-10-19 (R). Bed X and water: our sg_fishing_streamAreas.xml (pack_09/001475), UnderWater_Bed id 4117 at (58, -1, 483) and Water id 3917 with its child spheres at y -66. Zone 562 pairs with MiniGameData 598 (the 'Unknown' field of ClientActivityDefinitions in Lxzxrus-Free-Realms-Server 75f7d95, AGPL data only). R: rotation (0, 0, 0, 1)."
+        "source": "L923: zone files present on the community CDN (gzne, Areas, all 16 terrain chunks), so Go fish! zones here. Spawn, water height and bed X:Lxzxrus-Free-Realms-Server origin/fishing/lure-and-spawns@75f7d95 src/Resources/Zones/sg_fishing_medpond.json (spawn read in game upstream, R). Bed X: the community CDN's sg_fishing_medpondAreas.xml, Underwater_Bed id 4115 at (68, -2, 476). R: the water height equals that file's spawn height. Zone 563 pairs with MiniGameData 599 (the 'Unknown' field of ClientActivityDefinitions in Lxzxrus-Free-Realms-Server 75f7d95, AGPL data only). R: rotation (0, 0, 0, 1). L933 (lead): Rainbow Lake (598) is the pond scene sg_fishing_medpond 563 and Sacred Grove Shallows (599) the stream scene sg_fishing_stream 562: the client's sg_fishing_medpondAreas.xml names the Rainbow areas, the Sanctuary fork (BubbaJoeX, AGPL) src/Resources/Fishing.json Ponds comments pair them so, and every other hole pairs pond = lake/lagoon/basin. L933 (lead): spawn = the Sanctuary fork (BubbaJoeX, AGPL) src/Resources/Fishing.json Ponds Arrival [419, -62.17, 321] heading -0.165 (R), 11-16 m from a school, so the player arrives at the fishing spots."
       },
       "source": "Selvi Slowreel (Lakeshore docks). Client text: 'Selvi Slowreel on the docks in Lakeshore can show you the way to Rainbow Lake' (3685316205); guide line 408566 'Rainbow Lake ... Are you ready to head out?'."
     },
@@ -100,20 +100,20 @@
         "name": "bw_fishing_medpond",
         "zone_id": 560,
         "spawn_position": [
-          200,
-          0,
-          200
+          231,
+          -0.24,
+          295
         ],
         "spawn_rotation": [
           0,
+          -0.963692,
           0,
-          0,
-          1
+          0.267017
         ],
         "water_y": -2,
         "underwater_bed_x": 74,
-        "client_scene_cached": false,
-        "source": "R: the spawn is the upstream PR #31 placeholder, kept because it lands on the bank (Lxzxrus-Free-Realms-Server origin/fishing/lure-and-spawns@75f7d95 src/Resources/Zones/bw_fishing_medpond.json). Bed X and water: our bw_fishing_medpondAreas.xml (pack_18/003763), UnderWater_Bed id 4116 at (74, -2, 482) and Water id 3905 with its child spheres at y -2. bw_fishing_medpond.gzne is not in our client catalogue. Zone 560 pairs with MiniGameData 596 (the 'Unknown' field of ClientActivityDefinitions in Lxzxrus-Free-Realms-Server 75f7d95, AGPL data only). R: rotation (0, 0, 0, 1)."
+        "client_scene_cached": true,
+        "source": "L923: zone files present on the community CDN (gzne, Areas, all 4 terrain chunks), so Go fish! zones here. R: the spawn is the upstream PR #31 placeholder, kept because it lands on the bank (Lxzxrus-Free-Realms-Server origin/fishing/lure-and-spawns@75f7d95 src/Resources/Zones/bw_fishing_medpond.json). Bed X and water: our bw_fishing_medpondAreas.xml (pack_18/003763), UnderWater_Bed id 4116 at (74, -2, 482) and Water id 3905 with its child spheres at y -2. bw_fishing_medpond.gzne is not in our client catalogue. Zone 560 pairs with MiniGameData 596 (the 'Unknown' field of ClientActivityDefinitions in Lxzxrus-Free-Realms-Server 75f7d95, AGPL data only). R: rotation (0, 0, 0, 1). L933 (lead): spawn = the Sanctuary fork (BubbaJoeX, AGPL) src/Resources/Fishing.json Ponds Arrival [231, -0.24, 295] heading -2.601 (R), 11-16 m from a school, so the player arrives at the fishing spots."
       },
       "source": "Lila Darklure (Briarwood, beside a boat). Client text 'Only Lila Darklure knows the way' (1194232508); guide line 408605 'Darklit Lagoon ... Are you ready to head out?'."
     },
@@ -128,20 +128,20 @@
         "name": "bw_fishing_stream",
         "zone_id": 561,
         "spawn_position": [
-          226.38,
-          -2.04,
-          227.88
+          279,
+          0.48,
+          187
         ],
         "spawn_rotation": [
           0,
+          -0.615484,
           0,
-          0,
-          1
+          0.788149
         ],
         "water_y": -2,
         "underwater_bed_x": 58,
-        "client_scene_cached": false,
-        "source": "L919 (owner playtest 2026-11-02): no copy of its terrain chunks is known (client, CDN mirrors, 2011 dump), so the zone loads forever; fished in place until one is found. Spawn: Lxzxrus-Free-Realms-Server origin/fishing/lure-and-spawns@75f7d95 src/Resources/Zones/bw_fishing_stream.json, read in game on 2026-10-19 (R); it sits 4 cm below the water. Bed X and water: our bw_fishing_streamAreas.xml (pack_14/003861), Underwater_Bed id 4118 at (58, -2, 484) and Water id 3908 with its child spheres at y -2. Zone 561 pairs with MiniGameData 597 (the 'Unknown' field of ClientActivityDefinitions in Lxzxrus-Free-Realms-Server 75f7d95, AGPL data only). R: rotation (0, 0, 0, 1)."
+        "client_scene_cached": true,
+        "source": "L923: zone files present on the community CDN (gzne, Areas, all 4 terrain chunks), so Go fish! zones here. Spawn: Lxzxrus-Free-Realms-Server origin/fishing/lure-and-spawns@75f7d95 src/Resources/Zones/bw_fishing_stream.json, read in game on 2026-10-19 (R); it sits 4 cm below the water. Bed X and water: our bw_fishing_streamAreas.xml (pack_14/003861), Underwater_Bed id 4118 at (58, -2, 484) and Water id 3908 with its child spheres at y -2. Zone 561 pairs with MiniGameData 597 (the 'Unknown' field of ClientActivityDefinitions in Lxzxrus-Free-Realms-Server 75f7d95, AGPL data only). R: rotation (0, 0, 0, 1). L933 (lead): spawn = the Sanctuary fork (BubbaJoeX, AGPL) src/Resources/Fishing.json Ponds Arrival [279, 0.48, 187] heading -1.326 (R), 11-16 m from a school, so the player arrives at the fishing spots."
       },
       "source": "Gunther (Briarwood). R: the Bayou guide line 408596 has no named speaker; Gunther is the Fisherman quest giver at Brambleback's Bayou."
     },
@@ -156,20 +156,20 @@
         "name": "sh_fishing_medpond",
         "zone_id": 564,
         "spawn_position": [
-          202.42,
-          5.74,
-          290.33
+          345,
+          0.48,
+          259
         ],
         "spawn_rotation": [
           0,
+          -0.382499,
           0,
-          0,
-          1
+          0.923956
         ],
         "water_y": 0,
         "underwater_bed_x": 55,
         "client_scene_cached": true,
-        "source": "Spawn: Lxzxrus-Free-Realms-Server origin/fishing/lure-and-spawns@75f7d95 src/Resources/Zones/sh_fishing_medpond.json, read in game on 2026-10-19 (R). Bed X and water: our sh_fishing_medpondAreas.xml (pack_14/003874), Underwater_Bed id 4119 at (55, 0, 486) and Water id 3932 with its child spheres at y 0. Zone 564 pairs with MiniGameData 600 (the 'Unknown' field of ClientActivityDefinitions in Lxzxrus-Free-Realms-Server 75f7d95, AGPL data only). R: rotation (0, 0, 0, 1)."
+        "source": "Spawn: Lxzxrus-Free-Realms-Server origin/fishing/lure-and-spawns@75f7d95 src/Resources/Zones/sh_fishing_medpond.json, read in game on 2026-10-19 (R). Bed X and water: our sh_fishing_medpondAreas.xml (pack_14/003874), Underwater_Bed id 4119 at (55, 0, 486) and Water id 3932 with its child spheres at y 0. Zone 564 pairs with MiniGameData 600 (the 'Unknown' field of ClientActivityDefinitions in Lxzxrus-Free-Realms-Server 75f7d95, AGPL data only). R: rotation (0, 0, 0, 1). L933 (lead): spawn = the Sanctuary fork (BubbaJoeX, AGPL) src/Resources/Fishing.json Ponds Arrival [345, 0.48, 259] heading -0.785 (R), 11-16 m from a school, so the player arrives at the fishing spots."
       },
       "source": "Big J (Snowhill). Client text 379035497: 'Head to the Wintery Basin for further instructions' (Big J's ice fishing crew). R: the Wintery Basin guide line has no named speaker."
     },
@@ -184,20 +184,20 @@
         "name": "sh_fishing_stream",
         "zone_id": 565,
         "spawn_position": [
-          538.99,
-          30.28,
-          578.01
+          507,
+          25.36,
+          465
         ],
         "spawn_rotation": [
           0,
+          0.940296,
           0,
-          0,
-          1
+          0.340357
         ],
         "water_y": 23,
         "underwater_bed_x": 69,
-        "client_scene_cached": false,
-        "source": "Spawn: Lxzxrus-Free-Realms-Server origin/fishing/lure-and-spawns@75f7d95 src/Resources/Zones/sh_fishing_stream.json, read in game on 2026-10-19 (R). Bed X and water: our sh_fishing_streamAreas.xml (pack_18/003769), Underwater_Bed id 4120 at (69, -1, 484); the water is 23 from the child Water spheres (3945-3956), where the parent sphere 3944 says 27. sh_fishing_stream.gzne is not in our client catalogue. Zone 565 pairs with MiniGameData 601 (the 'Unknown' field of ClientActivityDefinitions in Lxzxrus-Free-Realms-Server 75f7d95, AGPL data only). R: rotation (0, 0, 0, 1)."
+        "client_scene_cached": true,
+        "source": "L923: zone files present on the community CDN (gzne, Areas, all 16 terrain chunks), so Go fish! zones here. Spawn: Lxzxrus-Free-Realms-Server origin/fishing/lure-and-spawns@75f7d95 src/Resources/Zones/sh_fishing_stream.json, read in game on 2026-10-19 (R). Bed X and water: our sh_fishing_streamAreas.xml (pack_18/003769), Underwater_Bed id 4120 at (69, -1, 484); the water is 23 from the child Water spheres (3945-3956), where the parent sphere 3944 says 27. sh_fishing_stream.gzne is not in our client catalogue. Zone 565 pairs with MiniGameData 601 (the 'Unknown' field of ClientActivityDefinitions in Lxzxrus-Free-Realms-Server 75f7d95, AGPL data only). R: rotation (0, 0, 0, 1). L933 (lead): spawn = the Sanctuary fork (BubbaJoeX, AGPL) src/Resources/Fishing.json Ponds Arrival [507, 25.36, 465] heading 2.447 (R), 11-16 m from a school, so the player arrives at the fishing spots."
       },
       "source": "Chip Numbwing (Snowhill). Client text 216811999 / 4011916228: 'Chip Numbwing can show you the way' to Lenore's cabin at Frostbitten Banks; guide line 408641 'Frostbitten Banks ... Are you ready to head out?'."
     }

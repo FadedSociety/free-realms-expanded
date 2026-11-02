@@ -191,9 +191,10 @@ pub fn encounter_close(instance: i32) -> Vec<u8> {
 }
 
 /// One Fish Finder row, as the client reads it (`0x00b673b0`): three u32, a skip byte, the
-/// FishSpecial byte, the lure-hint id, an i32-length string, then a u32, the catchable byte
-/// and a u32. The first u32 is the row's type; the client drops a row whose type it has
-/// already listed (`0x00b65ed0`).
+/// FishSpecial byte, the lure-hint id, an i32-length string, then the school id (L933: the school
+/// the finder points at, 0 for none), the catchable byte and the finder effect id (the composite
+/// effect played on that school). The first u32 is the row's type; the client drops a row whose
+/// type it has already listed (`0x00b65ed0`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FishRow {
     pub type_id: u32,
@@ -203,20 +204,36 @@ pub struct FishRow {
     pub lure_hint_id: u32,
     /// `fisherman_level >= minimum_level`; the client's FishCatchable column.
     pub catchable: bool,
+    pub school_id: u32,
+    pub finder_effect: u32,
 }
 
 /// The fish rows of a 138/3: the list follows the 16 player words, the underwater-sky string,
 /// the 5 zone words and the u32 model-id array (`0x00b65880`, `0x00b67240`, `0x008dab40`,
 /// `0x00b691d0`).
 pub fn register_fish_rows(packet: &[u8]) -> Vec<FishRow> {
+    let (_, at) = register_models_and_rows_at(packet);
+    fish_rows(&packet[4 + at..])
+}
+
+/// The model ids a 138/3 preloads (`0x008dab40`): the fish shapes and, since L933, the school
+/// models.
+pub fn register_models(packet: &[u8]) -> Vec<u32> {
+    register_models_and_rows_at(packet).0
+}
+
+/// The preload model ids and the body offset where the fish rows start.
+fn register_models_and_rows_at(packet: &[u8]) -> (Vec<u32>, usize) {
     let body = &packet[4..];
+    let word = |at: usize| u32::from_le_bytes(body[at..at + 4].try_into().unwrap());
     let mut at = 16 * 4;
-    let sky = u32::from_le_bytes(body[at..at + 4].try_into().unwrap()) as usize;
-    at += 4 + sky;
+    at += 4 + word(at) as usize;
     at += 5 * 4;
-    let models = u32::from_le_bytes(body[at..at + 4].try_into().unwrap()) as usize;
-    at += 4 + models * 4;
-    fish_rows(&body[at..])
+    let models = (0..word(at) as usize)
+        .map(|i| word(at + 4 + i * 4))
+        .collect::<Vec<_>>();
+    at += 4 + models.len() * 4;
+    (models, at)
 }
 
 /// The fish rows of a 138/4 FishInfoUpdate: a count then the same rows.
@@ -238,6 +255,8 @@ fn fish_rows(body: &[u8]) -> Vec<FishRow> {
         let next = at + 22 + string;
         let catchable = body[next + 4] != 0;
         rows.push(FishRow {
+            school_id: word(next),
+            finder_effect: word(next + 5),
             type_id: word(at),
             name_id,
             icon_id,
@@ -249,4 +268,42 @@ fn fish_rows(body: &[u8]) -> Vec<FishRow> {
     }
     assert_eq!(at, body.len(), "the fish rows consume the body");
     rows
+}
+
+/// One 138/11 school as the client reads it (`0x00b69130`): the school id, its position and
+/// facing vectors, the model records (id, heading, animation speed), the composite effect ids
+/// and 8 trailing bytes.
+#[derive(Clone, Debug, PartialEq)]
+pub struct School {
+    pub id: u32,
+    pub position: [f32; 3],
+    pub models: Vec<(i32, f32, f32)>,
+    pub effects: Vec<i32>,
+}
+
+pub fn school(packet: &[u8]) -> School {
+    assert_eq!(&packet[..4], &[138, 0, 11, 0], "a 138/11 school");
+    let body = &packet[4..];
+    let word = |at: usize| u32::from_le_bytes(body[at..at + 4].try_into().unwrap());
+    let float = |at: usize| f32::from_bits(word(at));
+    let position = [float(4), float(8), float(12)];
+    let mut at = 4 + 16 + 16;
+    let models = (0..word(at) as usize)
+        .map(|i| {
+            let row = at + 4 + i * 12;
+            (word(row) as i32, float(row + 4), float(row + 8))
+        })
+        .collect::<Vec<_>>();
+    at += 4 + models.len() * 12;
+    let effects = (0..word(at) as usize)
+        .map(|i| word(at + 4 + i * 4) as i32)
+        .collect::<Vec<_>>();
+    at += 4 + effects.len() * 4 + 8;
+    assert_eq!(at, body.len(), "the school consumes the body");
+    School {
+        id: word(0),
+        position,
+        models,
+        effects,
+    }
 }

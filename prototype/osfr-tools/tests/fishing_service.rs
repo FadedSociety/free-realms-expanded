@@ -78,6 +78,21 @@ fn packet_ids(change: &Change) -> Vec<(u16, u16)> {
         .collect()
 }
 
+/// L933: how many schools the first area (the one `running` fishes) floats; the finder and the
+/// despawns follow the data, not a pinned number.
+fn schools() -> usize {
+    let content: Value = serde_json::from_str(FishingService::content_json()).unwrap();
+    content["areas"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|area| area["key"] == "sacred_grove_shallows")
+        .unwrap()["schools"]
+        .as_array()
+        .unwrap()
+        .len()
+}
+
 fn running() -> (InventoryFixture, FishingService) {
     let fixture = InventoryFixture::new();
     let mut service = FishingService::new();
@@ -124,10 +139,10 @@ fn running() -> (InventoryFixture, FishingService) {
 fn registration_cast_bite_reel_catch_has_exact_messages_and_one_item() {
     let (_fixture, mut service) = running();
     let registered = service.handle(&register_request(), PLAYER, T0).unwrap();
-    assert_eq!(
-        packet_ids(&registered),
-        vec![(138, 3), (138, 1), (138, 4), (138, 11), (138, 11)]
-    );
+    // L933: one 138/11 per school of the area's data (was a pinned two).
+    let mut expected = vec![(138, 3), (138, 1), (138, 4)];
+    expected.extend(vec![(138, 11); schools()]);
+    assert_eq!(packet_ids(&registered), expected);
 
     let cast = service.handle(&cast_request(), PLAYER, T0 + 10).unwrap();
     assert_eq!(packet_ids(&cast), vec![(138, 8), (138, 18)]);
@@ -334,6 +349,118 @@ fn registration_followed_by_the_fish_finder_lists_the_areas_fish() {
     );
 }
 
+/// L933: the client draws a school only from its model records (a school with none was the
+/// owner's "no water spots"), plays the school effect on the first model, and the Fish Finder
+/// points at the school ids the server sent. Positions and models are the area's data.
+#[test]
+fn schools_carry_their_model_and_effect_and_the_finder_points_at_them() {
+    let (_fixture, mut service) = running();
+    let registered = service.handle(&register_request(), PLAYER, T0).unwrap();
+    let content: Value = serde_json::from_str(FishingService::content_json()).unwrap();
+    let area = content["areas"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["key"] == "sacred_grove_shallows")
+        .unwrap();
+    let data = area["schools"].as_array().unwrap();
+    let sent: Vec<_> = registered
+        .replies
+        .iter()
+        .filter(|reply| reply.starts_with(&[138, 0, 11, 0]))
+        .map(|reply| fishing_packets::school(reply))
+        .collect();
+    assert_eq!(sent.len(), data.len());
+    let school_effect = content["models"]["school_effect"].as_i64().unwrap() as i32;
+    let mut ids = BTreeSet::new();
+    for (school, row) in sent.iter().zip(data) {
+        let position: Vec<f32> = row["position"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|axis| axis.as_f64().unwrap() as f32)
+            .collect();
+        assert_eq!(school.position.to_vec(), position, "the area's position");
+        assert_eq!(school.models.len(), 1, "one model record");
+        assert_eq!(school.models[0].0 as i64, row["model"].as_i64().unwrap());
+        assert_eq!(school.effects, vec![school_effect], "the school effect");
+        assert!(school.id != 0 && ids.insert(school.id), "unique school ids");
+    }
+    // The 138/3 preload list names every school model the round will draw.
+    let preload = fishing_packets::register_models(&registered.replies[0]);
+    for row in data {
+        assert!(preload.contains(&(row["model"].as_u64().unwrap() as u32)));
+    }
+    // Every Fish Finder row points at one of those schools and plays a finder effect; every
+    // school is pointed at by some fish (the roster is dealt over the schools).
+    let finder_effects: Vec<u32> = content["models"]["finder_effects"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|effect| effect.as_u64().unwrap() as u32)
+        .collect();
+    let rows = fishing_packets::register_fish_rows(&registered.replies[0]);
+    for row in &rows {
+        assert!(
+            ids.contains(&row.school_id),
+            "{row:?} points at a sent school"
+        );
+        assert!(finder_effects.contains(&row.finder_effect), "{row:?}");
+    }
+    let pointed: BTreeSet<u32> = rows.iter().map(|row| row.school_id).collect();
+    assert_eq!(pointed, ids);
+}
+
+/// L933: every area's schools float on the water of its own scene (`fishing_spots.json`): within
+/// 2 m of the scene's water height, and not in the underwater strip the client keeps near z 485
+/// (each scene's Underwater_Bed area). Positions are scene coordinates, so the area and its
+/// scene must be one pair.
+#[test]
+fn every_areas_schools_float_on_the_water_of_its_scene() {
+    let content: Value = serde_json::from_str(FishingService::content_json()).unwrap();
+    let spots: Value = serde_json::from_slice(
+        &fs::read(
+            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/fishing_spots.json"),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    for spot in spots["spots"].as_array().unwrap() {
+        let key = spot["area"].as_str().unwrap();
+        let water = spot["scene"]["water_y"].as_f64().unwrap();
+        let area = content["areas"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["key"] == key)
+            .unwrap_or_else(|| panic!("{key} has an area"));
+        let schools = area["schools"].as_array().unwrap();
+        assert!(!schools.is_empty(), "{key} floats at least one school");
+        let mut seen = BTreeSet::new();
+        for school in schools {
+            let at: Vec<f64> = school["position"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|axis| axis.as_f64().unwrap())
+                .collect();
+            assert!(
+                (at[1] - water).abs() <= 2.0,
+                "{key}: {at:?} is off the water"
+            );
+            assert!(
+                !(at[0] < 160.0 && (420.0..560.0).contains(&at[2])),
+                "{key}: {at:?} sits in the underwater strip"
+            );
+            assert!(
+                seen.insert(format!("{at:?}")),
+                "{key}: two schools share {at:?}"
+            );
+            assert!(school["model"].as_i64().unwrap() > 0);
+        }
+    }
+}
+
 #[test]
 fn a_refused_cast_sends_nothing_and_changes_nothing() {
     let (fixture, mut service) = running();
@@ -405,7 +532,7 @@ fn disconnect_mid_fight_clears_ephemeral_state_without_grant() {
     service.tick(PLAYER, T0 + 1501).unwrap();
     let disconnected = service.disconnect(PLAYER);
     assert!(disconnected.changed);
-    assert_eq!(packet_ids(&disconnected), vec![(138, 12), (138, 12)]);
+    assert_eq!(packet_ids(&disconnected), vec![(138, 12); schools()]);
     assert!(disconnected.quest_events.is_empty());
     assert_eq!(service.phase(PLAYER), None);
     assert_eq!(service.len(), 0);
@@ -415,10 +542,10 @@ fn disconnect_mid_fight_clears_ephemeral_state_without_grant() {
 fn leave_despawns_schools_and_drops_attempt_without_reward() {
     let (_fixture, mut service) = running();
     let registered = service.handle(&register_request(), PLAYER, T0).unwrap();
-    assert_eq!(registered.replies.len(), 5);
+    assert_eq!(registered.replies.len(), 3 + schools());
     service.handle(&cast_request(), PLAYER, T0 + 1).unwrap();
     let left = service.leave(PLAYER).unwrap();
-    assert_eq!(packet_ids(&left), vec![(138, 12), (138, 12)]);
+    assert_eq!(packet_ids(&left), vec![(138, 12); schools()]);
     assert!(left.quest_events.is_empty());
     assert_eq!(service.len(), 0);
 }
@@ -434,7 +561,9 @@ fn minigame_cancel_despawns_schools_and_drops_attempt_without_reward() {
     cancel.extend((-1i32).to_le_bytes());
     cancel.extend((-1i32).to_le_bytes());
     let cancelled = service.handle_minigame_lifecycle(PLAYER, &cancel).unwrap();
-    assert_eq!(packet_ids(&cancelled), vec![(39, 19), (138, 12), (138, 12)]);
+    let mut expected = vec![(39, 19)];
+    expected.extend(vec![(138, 12); schools()]);
+    assert_eq!(packet_ids(&cancelled), expected);
     assert!(cancelled.quest_events.is_empty());
     assert_eq!(service.len(), 0);
 }

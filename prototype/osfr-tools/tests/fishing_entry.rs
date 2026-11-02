@@ -44,6 +44,19 @@ fn spots() -> FishingSpots {
     FishingSpots::parse(SPOTS_JSON.as_bytes()).unwrap()
 }
 
+/// The shipped spots with Reed's hole (563) marked not cached, so a `Round` runs in place at
+/// `SPOT`. Every shipped hole zones into its scene since L923 (`tests/fishing_scene.rs`).
+fn in_place_json() -> Value {
+    let mut json: Value = serde_json::from_str(SPOTS_JSON).unwrap();
+    json["spots"]
+        .as_array_mut()
+        .unwrap()
+        .iter_mut()
+        .find(|spot| spot["npc"] == REED)
+        .unwrap()["scene"]["client_scene_cached"] = json!(false);
+    json
+}
+
 /// Every item id the spots file binds, so the fixture inventory knows them all.
 fn bound_item_ids() -> BTreeSet<i32> {
     let json: Value = serde_json::from_str(SPOTS_JSON).unwrap();
@@ -203,7 +216,7 @@ impl Round {
         let fixture = Fixture::new();
         Self {
             service: FishingService::new(),
-            spots: spots(),
+            spots: spots_with(|_| {}),
             inventory: fixture.inventory(),
             profiles: profiles(fisherman),
             curves: Default::default(),
@@ -241,7 +254,7 @@ impl Round {
 
     /// Entry, the client's Go (39/5) and the registration: the round is ready to cast.
     fn started(fisherman: bool) -> Self {
-        Self::started_with(spots(), fisherman)
+        Self::started_with(spots_with(|_| {}), fisherman)
     }
 
     fn started_with(spots: FishingSpots, fisherman: bool) -> Self {
@@ -366,8 +379,11 @@ fn edited(mutate: impl FnOnce(&mut Value)) -> Vec<u8> {
     serde_json::to_vec(&json).unwrap()
 }
 
+/// A `Round`'s spots ([`in_place_json`]) after `mutate`.
 fn spots_with(mutate: impl FnOnce(&mut Value)) -> FishingSpots {
-    FishingSpots::parse(&edited(mutate)).unwrap()
+    let mut json = in_place_json();
+    mutate(&mut json);
+    FishingSpots::parse(&serde_json::to_vec(&json).unwrap()).unwrap()
 }
 
 #[test]
@@ -614,16 +630,18 @@ fn every_guide_opens_its_own_area() {
 
 // ---- each hole's own scene (T513) ---------------------------------------------------------
 
-/// The six holes: guide, scene, zone id, spawn, water Y, underwater bed X, scene in our client
-/// catalogue. Bed X and water come from each scene's Areas.xml (sg_fishing_medpond: (R)).
+/// The six holes: guide, scene, zone id, spawn, water Y, underwater bed X, scene files on the
+/// client or its CDN (L923: all six). Bed X and water come from each scene's Areas.xml
+/// (sg_fishing_medpond: (R)). L933: Rainbow Lake (Selvi) is the pond scene and Sacred Grove
+/// Shallows (Reed) the stream; every spawn is the hole's arrival point next to its schools.
 #[rustfmt::skip]
 const SCENES: [(u64, &str, u32, [f32; 3], f32, f32, bool); 6] = [
-    (9_000_000_377, "bw_fishing_medpond", 560, [200.0, 0.0, 200.0], -2.0, 74.0, false),
-    (9_000_000_339, "bw_fishing_stream", 561, [226.38, -2.04, 227.88], -2.0, 58.0, false),
-    (SELVI, "sg_fishing_stream", 562, [441.42, -60.31, 475.08], -66.0, 58.0, true),
-    (REED, "sg_fishing_medpond", 563, [435.05676, -64.46508, 370.70682], -64.46508, 68.0, false),
-    (9_000_000_024, "sh_fishing_medpond", 564, [202.42, 5.74, 290.33], 0.0, 55.0, true),
-    (9_500_000_736, "sh_fishing_stream", 565, [538.99, 30.28, 578.01], 23.0, 69.0, false),
+    (9_000_000_377, "bw_fishing_medpond", 560, [231.0, -0.24, 295.0], -2.0, 74.0, true),
+    (9_000_000_339, "bw_fishing_stream", 561, [279.0, 0.48, 187.0], -2.0, 58.0, true),
+    (REED, "sg_fishing_stream", 562, [447.0, -64.68, 325.0], -66.0, 58.0, true),
+    (SELVI, "sg_fishing_medpond", 563, [419.0, -62.17, 321.0], -64.46508, 68.0, true),
+    (9_000_000_024, "sh_fishing_medpond", 564, [345.0, 0.48, 259.0], 0.0, 55.0, true),
+    (9_500_000_736, "sh_fishing_stream", 565, [507.0, 25.36, 465.0], 23.0, 69.0, true),
 ];
 
 #[test]
@@ -645,10 +663,12 @@ fn the_shipped_spots_carry_the_six_hole_scenes() {
         assert_eq!(scene["name"], json!(name));
         assert_eq!(scene["zone_id"], json!(zone));
         assert_eq!(floats(&scene["spawn_position"]), spawn, "{name}");
-        assert_eq!(
-            floats(&scene["spawn_rotation"]),
-            [0.0, 0.0, 0.0, 1.0],
-            "{name} (R)"
+        // L933: the arrival heading as a Y-axis quaternion (R).
+        let rotation = floats(&scene["spawn_rotation"]);
+        assert_eq!((rotation[0], rotation[2]), (0.0, 0.0), "{name} (R)");
+        assert!(
+            (rotation[1].powi(2) + rotation[3].powi(2) - 1.0).abs() < 1e-4,
+            "{name}: a unit Y-axis rotation"
         );
         assert_eq!(scene["water_y"].as_f64().unwrap() as f32, water, "{name}");
         assert_eq!(
@@ -1061,7 +1081,7 @@ fn only_sizes_with_an_item_are_caught() {
     // Bind only the medium size: every catch must be a medium (grade 2), never a missing size.
     let fixture = Fixture::new();
     let mut service = FishingService::new();
-    let json: Value = serde_json::from_str(SPOTS_JSON).unwrap();
+    let json = in_place_json();
     let mut items = serde_json::Map::new();
     for key in json["items"].as_object().unwrap().keys() {
         let id = json["items"][key]
@@ -1381,7 +1401,7 @@ mod gateway_route {
             let path = content.join("fishing_spots.json");
             let _ = fs::remove_file(&path);
             if with_spots {
-                fs::write(&path, SPOTS_JSON).unwrap();
+                fs::write(&path, serde_json::to_vec(&in_place_json()).unwrap()).unwrap();
             }
             let mut character = Gateway::reference_state(&reference).unwrap();
             character.position = GATE_POSITION;

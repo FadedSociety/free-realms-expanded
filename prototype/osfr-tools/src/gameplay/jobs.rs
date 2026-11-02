@@ -103,7 +103,6 @@ impl Gameplay {
         out: &mut Outcome,
     ) -> io::Result<()> {
         let items = self.profiles.as_ref().unwrap().starter_items(job).to_vec();
-        let inactive = job != self.profiles.as_ref().unwrap().active();
         for definition in items {
             // The inherited Chef defaults include the same hat that
             // this local story awards at Cooking101 turn-in. Defer only
@@ -112,31 +111,80 @@ impl Gameplay {
             if job == 45 && definition == 14794 && self.cooking.is_some() {
                 continue;
             }
-            if !self.inventory.has_definition(definition) {
-                continue;
-            }
-            let owned = if reuse_owned {
-                self.inventory.equip_owned_definition(definition, job).ok()
-            } else {
-                None
-            };
-            let result = match owned {
-                Some(result) => result,
-                None => {
-                    out.replies
-                        .extend(self.inventory.grant(0, definition, 1)?.replies);
-                    self.inventory.equip_owned_definition(definition, job)?
-                }
-            };
-            out.changed = true;
-            out.replies.extend(
-                result
-                    .replies
-                    .into_iter()
-                    .filter(|r| !(inactive && r.starts_with(&[35, 0, 6, 0]))),
-            );
+            self.give_starter_piece(job, definition, reuse_owned, out)?;
         }
         Ok(())
+    }
+
+    /// One starter piece: equipped from the bag when owned (`reuse_owned`), else granted and
+    /// equipped. A piece the catalogue lacks is skipped.
+    fn give_starter_piece(
+        &mut self,
+        job: i32,
+        definition: i32,
+        reuse_owned: bool,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        if !self.inventory.has_definition(definition) {
+            return Ok(());
+        }
+        let inactive = job != self.profiles.as_ref().unwrap().active();
+        let owned = if reuse_owned {
+            self.inventory.equip_owned_definition(definition, job).ok()
+        } else {
+            None
+        };
+        let result = match owned {
+            Some(result) => result,
+            None => {
+                out.replies
+                    .extend(self.inventory.grant(0, definition, 1)?.replies);
+                self.inventory.equip_owned_definition(definition, job)?
+            }
+        };
+        out.changed = true;
+        out.replies.extend(
+            result
+                .replies
+                .into_iter()
+                .filter(|r| !(inactive && r.starts_with(&[35, 0, 6, 0]))),
+        );
+        Ok(())
+    }
+
+    /// L933: a job at its work is dressed and armed. An outfit without the Chest and Legs the
+    /// client's profile swap needs gets the whole starter outfit (owned pieces equipped, none
+    /// granted twice); a complete outfit is left alone, then the tool slot is checked. Inventory
+    /// quest events are the request boundary's, as for the trainer path.
+    pub(super) fn ensure_job_gear(&mut self, job: i32, out: &mut Outcome) -> io::Result<()> {
+        if !self.inventory.has_required_profile_slots(job) {
+            self.grant_starter_outfit(job, true, out)?;
+        }
+        self.ensure_tool(job, out)
+    }
+
+    /// L933: a job at its work has its tool in hand. The Fisherman's fishing aim runs only
+    /// while the local player has an item in equipment slot 7 (`FishingProcessor::Update`
+    /// `0x00b6c290`), so a Fisherman who sold or never got the rod could not cast. When
+    /// `job` has nothing in slot 7, equip the starter tool from the content's starter table:
+    /// an owned one, else a new grant. A job whose starter table has no slot-7 piece is left
+    /// as it is.
+    pub(super) fn ensure_tool(&mut self, job: i32, out: &mut Outcome) -> io::Result<()> {
+        if self.inventory.state().equipped_weapon_item(job) != 0 {
+            return Ok(());
+        }
+        // Slot 7 is the weapon/tool slot (`InventoryState::equipped_weapon_item`).
+        let tool = self.profiles.as_ref().and_then(|profiles| {
+            profiles
+                .starter_items(job)
+                .iter()
+                .copied()
+                .find(|&definition| self.inventory.definition_slot(definition) == Some(7))
+        });
+        match tool {
+            Some(definition) => self.give_starter_piece(job, definition, true, out),
+            None => Ok(()),
+        }
     }
 
     /// (R) A job never stays bare: when a job with a completely empty outfit

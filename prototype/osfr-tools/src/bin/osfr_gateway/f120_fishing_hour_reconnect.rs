@@ -252,6 +252,12 @@ fn an_hour_cap_survives_reconnect_save_reload_and_a_blocked_catch_writes_nothing
     for sizes in spots["items"].as_object_mut().unwrap().values_mut() {
         *sizes = json!([68_001, 0, 0, 0]);
     }
+    // L923: every shipped hole zones into its scene; this round casts in place at Reed.
+    for spot in spots["spots"].as_array_mut().unwrap() {
+        if spot["npc"] == json!(REED) {
+            spot["scene"]["client_scene_cached"] = json!(false);
+        }
+    }
     fs::write(
         content.join("fishing_spots.json"),
         serde_json::to_vec(&spots).unwrap(),

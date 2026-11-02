@@ -109,6 +109,14 @@ const QUEST_REWARD_DEFINITION_ID: i64 = 1843;
 /// from the same tagged catalogue.
 const HARVESTING_REWARD_DEFINITION_ID: i64 = 2881;
 
+/// L933: the Fisherman's starter kit (hat, shirt, waders, boots, Simple Bamboo rod), the only
+/// `profiles.json` `starter_items` entry in the release overlay.
+const FISHERMAN_KIT: [i64; 5] = [68430, 68360, 68465, 68395, 68185];
+
+fn fisherman_starter_items() -> Value {
+    json!({ "137": FISHERMAN_KIT })
+}
+
 /// The community catalogue's full source tags (NOTICE; upload-policy rule 6). The release keeps
 /// them on the supplement blocks, the six rows and quest 1617's reward row.
 const COMMUNITY_REPOSITORY: &str = "https://github.com/raisingkaines/FreeRealms-Legacy";
@@ -640,16 +648,20 @@ fn export_release_content() {
     json::write_pretty(&release.join("quests.json"), &quests);
 
     // Profile rows are capture game data. The starter kit map and its community license
-    // provenance are removed; T846 moves the kit into start-quest rewards (R).
+    // provenance are removed; T846 moves the kits into start-quest rewards (R). L933: the
+    // Fisherman keeps its kit, the one job the fishing aim cannot start without.
     let mut profiles = read_json(&source.join("profiles.json"));
     scrub_json(&mut profiles);
-    profiles["starter_items"] = json!({});
+    profiles["starter_items"] = fisherman_starter_items();
     profiles["provenance"]
         .as_object_mut()
         .unwrap()
         .remove("starter_definitions");
+    profiles["provenance"]["fisherman_kit"] = json!(
+        "L933 (R): the Fisherman is the one job with a starter kit: the client's fishing aim runs only with an item in equipment slot 7, and the job switch needs a Chest and Legs piece. Hat 68430, shirt 68360, waders 68465 and boots 68395 are the default items of job 137 in the FreeRealms-Legacy server project (AGPL-3.0, credited in NOTICE); the client item table defines all four at rank 1 for class 137. Rod 68185 is the Simple Bamboo Fishing Rod (item table: class 137, slot 7, rank 1), the starter rod of the Sanctuary community fork's fishing definition. The other jobs' kits stay with the start-quest rewards (T846)."
+    );
     profiles["provenance"]["release"] = json!(
-        "T853 overlay: the 16 captured job rows, active/default progression and profile bytes stay; starter_items is empty (R) and T846 moves the starter kit to start-quest rewards."
+        "T853 overlay: the 16 captured job rows, active/default progression and profile bytes stay; starter_items holds only the Fisherman kit (L933, see fisherman_kit) and T846 moves the other jobs' kits to start-quest rewards."
     );
     json::write_pretty(&release.join("profiles.json"), &profiles);
 
@@ -879,6 +891,11 @@ fn every_release_file_loads_through_its_real_loader() {
     let profiles = Profiles::load(&release, None).unwrap();
     assert_eq!(profiles.active(), 1);
     assert!(profiles.starter_items(1).is_empty());
+    // L933: the Fisherman's hat, shirt, waders, boots and rod; no other job has a kit here.
+    assert_eq!(
+        profiles.starter_items(137),
+        [68430, 68360, 68465, 68395, 68185]
+    );
     let combat = Combat::load(&release, None).unwrap();
     assert_eq!(combat.state().enemy_health, 100);
     let quests = QuestEngine::load(&release, None).unwrap();
@@ -988,7 +1005,8 @@ fn the_release_overlay_is_publishable() {
     assert!(combat.get("template_file").is_none());
 
     let profiles = read_json(&release.join("profiles.json"));
-    assert_eq!(profiles["starter_items"], json!({}));
+    // L933: was `{}`; the Fisherman's kit is the one starter entry (T846 moves the rest).
+    assert_eq!(profiles["starter_items"], fisherman_starter_items());
     assert!(profiles["provenance"].get("starter_definitions").is_none());
 
     let inventory = read_json(&release.join("inventory.json"));
