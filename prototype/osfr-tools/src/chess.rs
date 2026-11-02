@@ -111,6 +111,10 @@ pub const DESCRIPTION_ID: i32 = 951;
 pub const ICON_ID: i32 = 917;
 /// Flash movie loaded by `26/12` for the chess start screen (pack manifest).
 pub const MOVIE: &str = "game_chess.gfx";
+/// L918: the client's own preload list for the movie (manifest `ChessAssets.txt.z`). Type 6 is not one
+/// the client readies by itself (`009beb70`: 1, 2, 17, 22), so without it the start screen stays on
+/// "Loading..." (owner playtest 2026-11-02).
+pub const PRELOAD_FILE: &str = "ChessAssets.txt";
 
 pub const EVENT_INIT: u8 = 0;
 pub const EVENT_TURN_START: u8 = 1;

@@ -656,6 +656,7 @@ fn run_spec(row: &ChessRow) -> RunSpec {
     spec.icon_id = chess::ICON_ID;
     spec.description_id = chess::DESCRIPTION_ID;
     spec.difficulty = row.difficulty as i32;
+    spec.preload_file = chess::PRELOAD_FILE.to_owned();
     spec
 }
 

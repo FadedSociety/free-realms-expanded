@@ -277,6 +277,10 @@ pub const NAME_ID: i32 = 900;
 pub const DESCRIPTION_ID: i32 = 901;
 pub const ICON_ID: i32 = 917;
 pub const MOVIE: &str = "game_checkers.gfx";
+/// L918: the client's own preload list for the movie (manifest `CheckersAssets.txt.z`). Type 7 is not
+/// one the client readies by itself (`009beb70`: 1, 2, 17, 22), so without it the start screen stays
+/// on "Loading..." (owner playtest 2026-11-02).
+pub const PRELOAD_FILE: &str = "CheckersAssets.txt";
 const MAX_TEXT: usize = 256;
 /// (R) Run ids of its own, apart from chess's and every other minigame's.
 pub const FIRST_INSTANCE_ID: i32 = 21_000_001;
@@ -364,6 +368,7 @@ impl CheckersTable {
         spec.name_id = NAME_ID;
         spec.description_id = DESCRIPTION_ID;
         spec.icon_id = ICON_ID;
+        spec.preload_file = PRELOAD_FILE.into();
         let mut staged = self.clone();
         let offered = staged.runs.offer(spec)?;
         if !offered.accepted {
