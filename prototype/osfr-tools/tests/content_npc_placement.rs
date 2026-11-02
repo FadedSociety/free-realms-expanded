@@ -324,6 +324,7 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
     // T498 appended the Burglz row (1,202); T500 appended Hasti (1,203); T501 Shannon and Sugaboo (1,205).
     // T739 appended four clickable quest props (Planter, Treasure Chest, Sanctuary Postboxes, 1 Way Back Way).
     // L096 appended the two Wildwood turnstile actors (live_capture).
-    assert_eq!(npc_count, 1_211);
+    // L925 appended twelve fanbyte-wiki quest givers (poi_anchor, 1,223).
+    assert_eq!(npc_count, 1_223);
     println!("NPC placement sources: {counts:?}");
 }

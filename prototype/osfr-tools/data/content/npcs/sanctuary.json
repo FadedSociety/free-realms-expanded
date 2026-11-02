@@ -62371,6 +62371,959 @@
       "objective_ids": [
         "q3130003-o1"
       ]
+    },
+    {
+      "npc_id": 9600000005,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Britta Autumnkiss",
+      "name_reason": null,
+      "name_string_id": 37018,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 37018
+        }
+      ],
+      "name_string_id_reason": null,
+      "zone": "Sanctuary",
+      "zone_id": 10,
+      "zone_reason": null,
+      "region_pages": [
+        "Sanctuary"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "Pixie Female, quest giver (fanbyte wiki)"
+      ],
+      "roles": [
+        "quest_giver"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "On the road west of Sanctuary, near the tunnel."
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [],
+      "quests_accepted": [],
+      "quests_accepted_reason": null,
+      "vendor_stock": null,
+      "vendor_stock_reason": null,
+      "services": [],
+      "services_reason": null,
+      "position": [
+        -1121.956,
+        -9.551,
+        311.17
+      ],
+      "position_w": 1.0,
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "placement": "poi_anchor",
+      "placement_source": "reconstructed_poi_name_match",
+      "placement_confidence": "low",
+      "placement_candidates": [
+        {
+          "poi_id": 5,
+          "poi_name": "Sanctuary",
+          "match_score": 9
+        }
+      ],
+      "capture_match": null,
+      "position_reason": null,
+      "heading": 0.0,
+      "model_id": 456,
+      "model_file_name": "fairy_druid_f.adr",
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob:Britta_Autumnkiss (Wayback 20240524050709)"
+        },
+        {
+          "kind": "client",
+          "evidence": "client npc_name Global.Text 37018"
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new content key above every shipped npc_id"
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for id_kind"
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for reference_ids"
+          }
+        ],
+        "name": [
+          {
+            "kind": "client",
+            "evidence": "client npc_name Global.Text 37018 'Britta Autumnkiss'"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob:Britta_Autumnkiss (Wayback 20240524050709)"
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for name_reason"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "client",
+            "evidence": "client npc_name Global.Text 37018"
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "client",
+            "evidence": "client npc_name Global.Text 37018"
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for name_string_id_reason"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob:Britta_Autumnkiss (Wayback 20240524050709): Wilds Central, Sanctuary, Wilds Central, Sanctuary"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob:Britta_Autumnkiss (Wayback 20240524050709)"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for zone_reason"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob:Britta_Autumnkiss (Wayback 20240524050709)"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for presence"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob:Britta_Autumnkiss (Wayback 20240524050709)"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob:Britta_Autumnkiss (Wayback 20240524050709) quests given"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for enemy_kind"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob:Britta_Autumnkiss (Wayback 20240524050709)"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for quests_given"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for quest_ids_given"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for quests_given_text"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for quests_accepted"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for quests_accepted_reason"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for vendor_stock"
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for vendor_stock_reason"
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for services"
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for services_reason"
+          }
+        ],
+        "position": [
+          {
+            "kind": "legacy-data",
+            "evidence": "centroid of legacy spawns at the same wiki place: Anura, Arnie, Barin Battlerock, Belladonna, Bordon Cloo, Clover, Commander Kiggle, Doctor Gordon"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) the giver stands among the NPCs the wiki puts at the same place"
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for position_w"
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) identity yaw: the wiki gives no facing (heading 0.0)"
+          }
+        ],
+        "placement": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for placement"
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for placement_source"
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) low: the position is a neighbour centroid, not a POI position"
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) (R) whole-name POI matches in the wiki location text and places, sorted by normalized label length descending then POI id ascending; the row stands at a neighbour centroid, not at the POI"
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for capture_match"
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for position_reason"
+          }
+        ],
+        "heading": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for heading"
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: most common model of drawn pixie female NPCs"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: most common model of drawn pixie female NPCs"
+          }
+        ]
+      }
+    },
+    {
+      "npc_id": 9600000009,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Vereni",
+      "name_reason": null,
+      "name_string_id": 74542,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 74542
+        }
+      ],
+      "name_string_id_reason": null,
+      "zone": "Sanctuary",
+      "zone_id": 10,
+      "zone_reason": null,
+      "region_pages": [
+        "Sanctuary"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "Pixie Male, quest giver (fanbyte wiki)"
+      ],
+      "roles": [
+        "quest_giver"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "On the northern side of the hill above Sunrise St., facing the medical clinic."
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [],
+      "quests_accepted": [],
+      "quests_accepted_reason": null,
+      "vendor_stock": null,
+      "vendor_stock_reason": null,
+      "services": [],
+      "services_reason": null,
+      "position": [
+        -1121.146,
+        -9.551,
+        312.432
+      ],
+      "position_w": 1.0,
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "placement": "poi_anchor",
+      "placement_source": "reconstructed_poi_name_match",
+      "placement_confidence": "low",
+      "placement_candidates": [
+        {
+          "poi_id": 5,
+          "poi_name": "Sanctuary",
+          "match_score": 9
+        }
+      ],
+      "capture_match": null,
+      "position_reason": null,
+      "heading": 0.0,
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr",
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob%3AVereni (Wayback 20240520162643)"
+        },
+        {
+          "kind": "client",
+          "evidence": "client npc_name Global.Text 74542"
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new content key above every shipped npc_id"
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for id_kind"
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for reference_ids"
+          }
+        ],
+        "name": [
+          {
+            "kind": "client",
+            "evidence": "client npc_name Global.Text 74542 'Vereni'"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob%3AVereni (Wayback 20240520162643)"
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for name_reason"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "client",
+            "evidence": "client npc_name Global.Text 74542"
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "client",
+            "evidence": "client npc_name Global.Text 74542"
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for name_string_id_reason"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob%3AVereni (Wayback 20240520162643): Sanctuary, Sanctuary"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob%3AVereni (Wayback 20240520162643)"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for zone_reason"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob%3AVereni (Wayback 20240520162643)"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for presence"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob%3AVereni (Wayback 20240520162643)"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob%3AVereni (Wayback 20240520162643) quests given"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for enemy_kind"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob%3AVereni (Wayback 20240520162643)"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for quests_given"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for quest_ids_given"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for quests_given_text"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for quests_accepted"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for quests_accepted_reason"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for vendor_stock"
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for vendor_stock_reason"
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for services"
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for services_reason"
+          }
+        ],
+        "position": [
+          {
+            "kind": "legacy-data",
+            "evidence": "centroid of legacy spawns at the same wiki place: Anura, Arnie, Barin Battlerock, Belladonna, Bordon Cloo, Clover, Commander Kiggle, Doctor Gordon"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) the giver stands among the NPCs the wiki puts at the same place"
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for position_w"
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) identity yaw: the wiki gives no facing (heading 0.0)"
+          }
+        ],
+        "placement": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for placement"
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for placement_source"
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) low: the position is a neighbour centroid, not a POI position"
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) (R) whole-name POI matches in the wiki location text and places, sorted by normalized label length descending then POI id ascending; the row stands at a neighbour centroid, not at the POI"
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for capture_match"
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for position_reason"
+          }
+        ],
+        "heading": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for heading"
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: most common model of drawn pixie male NPCs"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: most common model of drawn pixie male NPCs"
+          }
+        ]
+      }
+    },
+    {
+      "npc_id": 9600000010,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Auralie",
+      "name_reason": null,
+      "name_string_id": 10207,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 10207
+        }
+      ],
+      "name_string_id_reason": null,
+      "zone": "Sanctuary",
+      "zone_id": 10,
+      "zone_reason": null,
+      "region_pages": [
+        "Sanctuary"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "Pixie Female, quest giver (fanbyte wiki)"
+      ],
+      "roles": [
+        "quest_giver"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "Behind the houses west of Sanctuary."
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [],
+      "quests_accepted": [],
+      "quests_accepted_reason": null,
+      "vendor_stock": null,
+      "vendor_stock_reason": null,
+      "services": [],
+      "services_reason": null,
+      "position": [
+        -1415.923,
+        -35.308,
+        231.144
+      ],
+      "position_w": 1.0,
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "placement": "poi_anchor",
+      "placement_source": "reconstructed_poi_name_match",
+      "placement_confidence": "low",
+      "placement_candidates": [
+        {
+          "poi_id": 24,
+          "poi_name": "Queensfields",
+          "match_score": 12
+        },
+        {
+          "poi_id": 5,
+          "poi_name": "Sanctuary",
+          "match_score": 9
+        }
+      ],
+      "capture_match": null,
+      "position_reason": null,
+      "heading": 0.0,
+      "model_id": 456,
+      "model_file_name": "fairy_druid_f.adr",
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/fr_mob:Auralie (Wayback 20240518143035)"
+        },
+        {
+          "kind": "client",
+          "evidence": "client npc_name Global.Text 10207"
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new content key above every shipped npc_id"
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for id_kind"
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for reference_ids"
+          }
+        ],
+        "name": [
+          {
+            "kind": "client",
+            "evidence": "client npc_name Global.Text 10207 'Auralie'"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/fr_mob:Auralie (Wayback 20240518143035)"
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for name_reason"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "client",
+            "evidence": "client npc_name Global.Text 10207"
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "client",
+            "evidence": "client npc_name Global.Text 10207"
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for name_string_id_reason"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/fr_mob:Auralie (Wayback 20240518143035): Queensfields, Queensfields"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/fr_mob:Auralie (Wayback 20240518143035)"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for zone_reason"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/fr_mob:Auralie (Wayback 20240518143035)"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for presence"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/fr_mob:Auralie (Wayback 20240518143035)"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/fr_mob:Auralie (Wayback 20240518143035) quests given"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for enemy_kind"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/fr_mob:Auralie (Wayback 20240518143035)"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for quests_given"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for quest_ids_given"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for quests_given_text"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for quests_accepted"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for quests_accepted_reason"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for vendor_stock"
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for vendor_stock_reason"
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for services"
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for services_reason"
+          }
+        ],
+        "position": [
+          {
+            "kind": "legacy-data",
+            "evidence": "centroid of legacy spawns at the same wiki place: Greyli Dustywings, Honey, Seafoam, Sunflower, Yuri Petaldancer"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) the giver stands among the NPCs the wiki puts at the same place"
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for position_w"
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) identity yaw: the wiki gives no facing (heading 0.0)"
+          }
+        ],
+        "placement": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for placement"
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for placement_source"
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) low: the position is a neighbour centroid, not a POI position"
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) (R) whole-name POI matches in the wiki location text and places, sorted by normalized label length descending then POI id ascending; the row stands at a neighbour centroid, not at the POI"
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for capture_match"
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for position_reason"
+          }
+        ],
+        "heading": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for heading"
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: most common model of drawn pixie female NPCs"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: most common model of drawn pixie female NPCs"
+          }
+        ]
+      }
     }
   ]
 }

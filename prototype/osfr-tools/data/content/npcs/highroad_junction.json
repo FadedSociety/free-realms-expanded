@@ -11075,6 +11075,327 @@
           }
         ]
       }
+    },
+    {
+      "npc_id": 9600000012,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Lenard",
+      "name_reason": null,
+      "name_string_id": 37016,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 37016
+        }
+      ],
+      "name_string_id_reason": null,
+      "zone": "Highroad Junction",
+      "zone_id": 7,
+      "zone_reason": null,
+      "region_pages": [
+        "Highroad Junction"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "Human Male, quest giver (fanbyte wiki)"
+      ],
+      "roles": [
+        "quest_giver"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "On top of a hill overlooking the path between Queensfields and Highroad Junction."
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [],
+      "quests_accepted": [],
+      "quests_accepted_reason": null,
+      "vendor_stock": null,
+      "vendor_stock_reason": null,
+      "services": [],
+      "services_reason": null,
+      "position": [
+        -455.301,
+        -5.606,
+        192.291
+      ],
+      "position_w": 1.0,
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "placement": "poi_anchor",
+      "placement_source": "reconstructed_poi_name_match",
+      "placement_confidence": "low",
+      "placement_candidates": [
+        {
+          "poi_id": 17,
+          "poi_name": "Highroad Junction",
+          "match_score": 17
+        },
+        {
+          "poi_id": 24,
+          "poi_name": "Queensfields",
+          "match_score": 12
+        }
+      ],
+      "capture_match": null,
+      "position_reason": null,
+      "heading": 0.0,
+      "model_id": 312,
+      "model_file_name": "human_m_freestyle_03.agr",
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob:Leonard (Wayback 20240911230455)"
+        },
+        {
+          "kind": "client",
+          "evidence": "client npc_name Global.Text 37016"
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new content key above every shipped npc_id"
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for id_kind"
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for reference_ids"
+          }
+        ],
+        "name": [
+          {
+            "kind": "client",
+            "evidence": "client npc_name Global.Text 37016 'Lenard'"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob:Leonard (Wayback 20240911230455)"
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for name_reason"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "client",
+            "evidence": "client npc_name Global.Text 37016"
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "client",
+            "evidence": "client npc_name Global.Text 37016"
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for name_string_id_reason"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob:Leonard (Wayback 20240911230455): Wilds Central, Queensfields, Highroad Junction, Wilds Central, Queensfields, Highroad Junction"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob:Leonard (Wayback 20240911230455)"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for zone_reason"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob:Leonard (Wayback 20240911230455)"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for presence"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob:Leonard (Wayback 20240911230455)"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob:Leonard (Wayback 20240911230455) quests given"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for enemy_kind"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte wiki https://fr.fanbyte.com/wiki/FR_Mob:Leonard (Wayback 20240911230455)"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for quests_given"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for quest_ids_given"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for quests_given_text"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for quests_accepted"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for quests_accepted_reason"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for vendor_stock"
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for vendor_stock_reason"
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for services"
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for services_reason"
+          }
+        ],
+        "position": [
+          {
+            "kind": "legacy-data",
+            "evidence": "centroid of legacy spawns at the same wiki place: Assistant Archy, Auguste Frydaze, Bowawow, Cillian, Harold, Merigold, Raina Rush, Ranger Ricardo"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) the giver stands among the NPCs the wiki puts at the same place"
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for position_w"
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) identity yaw: the wiki gives no facing (heading 0.0)"
+          }
+        ],
+        "placement": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for placement"
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for placement_source"
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) low: the position is a neighbour centroid, not a POI position"
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) (R) whole-name POI matches in the wiki location text and places, sorted by normalized label length descending then POI id ascending; the row stands at a neighbour centroid, not at the POI"
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for capture_match"
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for position_reason"
+          }
+        ],
+        "heading": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) new wiki giver row; no data for heading"
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: most common model of drawn human male NPCs"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: most common model of drawn human male NPCs"
+          }
+        ]
+      }
     }
   ]
 }

@@ -223,7 +223,8 @@ const OTHER_REGIONS: [(&str, u32, &str, u64); 15] = [
     ("wugachug.json", 1, "Wugachug", 17),
 ];
 
-const HIGHROAD_RECORDS: usize = 23;
+// L925: twelve wiki quest givers appended (Lenard stands in highroad_junction.json: 23 -> 24)
+const HIGHROAD_RECORDS: usize = 24;
 const FARNUM_RECORDS: usize = 24;
 
 /// The loader spawns a row only when it is `legacy_data`, positioned with a

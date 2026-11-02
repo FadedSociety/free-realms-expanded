@@ -260,7 +260,8 @@ const LATER_GREETINGS: [(&str, u64, u32); 4] = [
 /// He stays blank, and a blank row must not inherit another row's body.
 const BLANK: u64 = 9500000364;
 
-const LAKESHORE_RECORDS: usize = 39;
+// L925: twelve wiki quest givers appended (Ginger stands in lakeshore.json: 39 -> 40)
+const LAKESHORE_RECORDS: usize = 40;
 /// T498 appended the Burglz row (a quest hand-in with no greeting), so 119; L096 the two Wildwood
 /// turnstile actors (no greeting), so 121.
 const WILDS_RECORDS: usize = 121;
