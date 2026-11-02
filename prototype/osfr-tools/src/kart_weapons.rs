@@ -369,21 +369,30 @@ impl<'a> Reader<'a> {
         })
     }
 
-    fn u32(&mut self) -> u32 {
-        let value = u32::from_le_bytes(self.bytes[self.at..self.at + 4].try_into().unwrap());
-        self.at += 4;
-        value
+    /// The next `N` bytes. `new` checked the exact width, so a read past it (a layout bug) is the
+    /// same typed width error instead of a panic.
+    fn take<const N: usize>(&mut self) -> Result<[u8; N], WeaponError> {
+        let Some(bytes) = crate::le::bytes::<N>(self.bytes, self.at) else {
+            return Err(WeaponError::PayloadLength {
+                subtype: self.subtype,
+                expected: self.at.saturating_add(N),
+                actual: self.bytes.len(),
+            });
+        };
+        self.at += N;
+        Ok(bytes)
     }
 
-    fn u64(&mut self) -> u64 {
-        let value = u64::from_le_bytes(self.bytes[self.at..self.at + 8].try_into().unwrap());
-        self.at += 8;
-        value
+    fn u32(&mut self) -> Result<u32, WeaponError> {
+        self.take().map(u32::from_le_bytes)
+    }
+
+    fn u64(&mut self) -> Result<u64, WeaponError> {
+        self.take().map(u64::from_le_bytes)
     }
 
     fn f32(&mut self, field: &'static str) -> Result<f32, WeaponError> {
-        let value = f32::from_le_bytes(self.bytes[self.at..self.at + 4].try_into().unwrap());
-        self.at += 4;
+        let value = f32::from_le_bytes(self.take()?);
         if !value.is_finite() {
             return Err(WeaponError::NonFinite {
                 subtype: self.subtype,
@@ -504,12 +513,12 @@ pub fn encode_missile_create(value: &MissileCreate) -> Vec<u8> {
 pub fn decode_missile_create(payload: &[u8]) -> Result<MissileCreate, WeaponError> {
     let mut reader = Reader::new(MISSILE_CREATE_SUBTYPE, payload, MISSILE_CREATE_PAYLOAD_LEN)?;
     let value = MissileCreate {
-        id: reader.u32(),
-        model: reader.u32(),
+        id: reader.u32()?,
+        model: reader.u32()?,
         matrix: reader.f32s("matrix")?,
         scalar_0x60: reader.f32("scalar_0x60")?,
-        field_0x68: reader.u64(),
-        field_0x70: reader.u32(),
+        field_0x68: reader.u64()?,
+        field_0x70: reader.u32()?,
     };
     reader.finish()?;
     Ok(value)
@@ -529,12 +538,12 @@ pub fn encode_missile_update(value: &MissileUpdate) -> Vec<u8> {
 pub fn decode_missile_update(payload: &[u8]) -> Result<MissileUpdate, WeaponError> {
     let mut reader = Reader::new(MISSILE_UPDATE_SUBTYPE, payload, MISSILE_UPDATE_PAYLOAD_LEN)?;
     let value = MissileUpdate {
-        id: reader.u32(),
-        field_0x10: reader.u64(),
+        id: reader.u32()?,
+        field_0x10: reader.u64()?,
         matrix: reader.f32s("matrix")?,
         tail_0x60: reader.f32s("tail_0x60")?,
         tail_0x70: reader.f32s("tail_0x70")?,
-        field_0x80: reader.u64(),
+        field_0x80: reader.u64()?,
     };
     reader.finish()?;
     Ok(value)
@@ -560,9 +569,9 @@ pub fn decode_explosion_create(payload: &[u8]) -> Result<ExplosionCreate, Weapon
         EXPLOSION_CREATE_PAYLOAD_LEN,
     )?;
     let value = ExplosionCreate {
-        id: reader.u32(),
-        field_0x10: reader.u32(),
-        field_0x18: reader.u64(),
+        id: reader.u32()?,
+        field_0x10: reader.u32()?,
+        field_0x18: reader.u64()?,
         block_0x20: reader.f32s("block_0x20")?,
         scalar_0x30: reader.f32("scalar_0x30")?,
         scalar_0x34: reader.f32("scalar_0x34")?,
@@ -585,10 +594,10 @@ pub fn encode_mine_create(value: &MineCreate) -> Vec<u8> {
 pub fn decode_mine_create(payload: &[u8]) -> Result<MineCreate, WeaponError> {
     let mut reader = Reader::new(MINE_CREATE_SUBTYPE, payload, MINE_CREATE_PAYLOAD_LEN)?;
     let value = MineCreate {
-        id: reader.u32(),
-        model: reader.u32(),
+        id: reader.u32()?,
+        model: reader.u32()?,
         matrix: reader.f32s("matrix")?,
-        field_0x60: reader.u64(),
+        field_0x60: reader.u64()?,
     };
     reader.finish()?;
     Ok(value)
@@ -604,7 +613,7 @@ pub fn encode_mine_update(value: &MineUpdate) -> Vec<u8> {
 pub fn decode_mine_update(payload: &[u8]) -> Result<MineUpdate, WeaponError> {
     let mut reader = Reader::new(MINE_UPDATE_SUBTYPE, payload, MINE_UPDATE_PAYLOAD_LEN)?;
     let value = MineUpdate {
-        id: reader.u32(),
+        id: reader.u32()?,
         matrix: reader.f32s("matrix")?,
     };
     reader.finish()?;
@@ -617,7 +626,7 @@ pub fn encode_destroy(value: &WeaponDestroy) -> Vec<u8> {
 
 pub fn decode_destroy(subtype: u16, payload: &[u8]) -> Result<WeaponDestroy, WeaponError> {
     let mut reader = Reader::new(subtype, payload, MISSILE_DESTROY_PAYLOAD_LEN)?;
-    let value = WeaponDestroy { id: reader.u32() };
+    let value = WeaponDestroy { id: reader.u32()? };
     reader.finish()?;
     Ok(value)
 }
@@ -1128,29 +1137,30 @@ impl WeaponState {
                         weapon.position[axis] += heading[axis] * step;
                     }
                 }
-                if weapon.kind == WeaponKind::Mine && accepted.is_none() {
-                    // A static mine has nothing new to say without a valid owner pose.
-                    weapon.next_update_ms = now_ms
-                        .saturating_add(MISSILE_UPDATE_INTERVAL_MS)
-                        .min(weapon.expires_ms);
-                    survivors.push(weapon);
-                    continue;
-                }
-                let matrix = match weapon.kind {
+                let matrix = match (weapon.kind, accepted) {
                     // Verified: the missile update carries the absolute world matrix.
                     // The lead's deeper `FUN_00fe2850` read (2369967..2370003) consumes the full
                     // matrix (basis indices 1/5/9/2/6/10/4/12/8/13/14) as a direct render
                     // transform, so the missile update carries its WORLD matrix - no owner
                     // multiply and no first-vec4 position shortcut.
-                    WeaponKind::Missile => missile_update_matrix(weapon.basis, weapon.position),
+                    (WeaponKind::Missile, _) => {
+                        missile_update_matrix(weapon.basis, weapon.position)
+                    }
                     // The mine update carries the inverse-owner local position, so a moving owner
                     // does not move the dropped mine in the world.
-                    WeaponKind::Mine => {
-                        let observation = accepted.expect("a mine update requires a valid pose");
+                    (WeaponKind::Mine, Some(observation)) => {
                         let delta = world_delta(weapon.position, observation.pose.position);
                         // The mine update is owner-local: the inverse-owner position with an
                         // identity basis, so a moving owner never moves the dropped mine.
                         local_offset_matrix(inverse_rotate(&observation.pose, delta))
+                    }
+                    // A static mine has nothing new to say without a valid owner pose.
+                    (WeaponKind::Mine, None) => {
+                        weapon.next_update_ms = now_ms
+                            .saturating_add(MISSILE_UPDATE_INTERVAL_MS)
+                            .min(weapon.expires_ms);
+                        survivors.push(weapon);
+                        continue;
                     }
                 };
                 updates.push(match weapon.kind {

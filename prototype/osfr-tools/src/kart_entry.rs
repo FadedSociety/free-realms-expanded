@@ -48,6 +48,7 @@
 //! per-racer simulation. Add a subtype only when a recovered reader names its layout.
 
 use crate::kart_progress_native::{self, ProgressPayload};
+use crate::le;
 use crate::zone_transition::{self, ZoneTransition};
 use serde::{Deserialize, Serialize};
 use std::fmt;
@@ -426,34 +427,50 @@ pub fn encode_inner(subtype: u16, payload: &[u8]) -> Vec<u8> {
     out
 }
 
-fn require_payload(subtype: u16, payload: &[u8], expected: usize) -> Result<(), EntryError> {
-    if payload.len() != expected {
-        return Err(EntryError::PayloadLength {
-            subtype,
-            expected,
-            actual: payload.len(),
-        });
+/// Decodes an exact-width payload with fixed-offset reads. A wrong width is the typed width error,
+/// and so is a read past the end (which the width check already rules out).
+fn decode_exact<T>(
+    subtype: u16,
+    payload: &[u8],
+    expected: usize,
+    decode: impl FnOnce(&[u8]) -> Option<T>,
+) -> Result<T, EntryError> {
+    if payload.len() == expected
+        && let Some(value) = decode(payload)
+    {
+        return Ok(value);
     }
-    Ok(())
+    Err(EntryError::PayloadLength {
+        subtype,
+        expected,
+        actual: payload.len(),
+    })
 }
 
 /// Decodes the `33/9` payload (`u64 session | u32 | u32`).
 pub fn decode_register(payload: &[u8]) -> Result<RegisterVehicleRacePlayer, EntryError> {
-    require_payload(REGISTER_SUBTYPE, payload, REGISTER_PAYLOAD_LEN)?;
-    Ok(RegisterVehicleRacePlayer {
-        session: u64::from_le_bytes(payload[0..8].try_into().unwrap()),
-        word_8: u32::from_le_bytes(payload[8..12].try_into().unwrap()),
-        word_12: u32::from_le_bytes(payload[12..16].try_into().unwrap()),
+    decode_exact(REGISTER_SUBTYPE, payload, REGISTER_PAYLOAD_LEN, |p| {
+        Some(RegisterVehicleRacePlayer {
+            session: le::u64(p, 0)?,
+            word_8: le::u32(p, 8)?,
+            word_12: le::u32(p, 12)?,
+        })
     })
 }
 
 /// Decodes the `33/2` payload (`u64 session | u32`).
 pub fn decode_player_state(payload: &[u8]) -> Result<PlayerState, EntryError> {
-    require_payload(PLAYER_STATE_SUBTYPE, payload, PLAYER_STATE_PAYLOAD_LEN)?;
-    Ok(PlayerState {
-        session: u64::from_le_bytes(payload[0..8].try_into().unwrap()),
-        counter: u32::from_le_bytes(payload[8..12].try_into().unwrap()),
-    })
+    decode_exact(
+        PLAYER_STATE_SUBTYPE,
+        payload,
+        PLAYER_STATE_PAYLOAD_LEN,
+        |p| {
+            Some(PlayerState {
+                session: le::u64(p, 0)?,
+                counter: le::u32(p, 8)?,
+            })
+        },
+    )
 }
 
 fn validate_content(content: &RaceEntryContent) -> Result<(), EntryError> {

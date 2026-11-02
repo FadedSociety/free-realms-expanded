@@ -10,7 +10,7 @@
 use crate::{
     character_store::CharacterState,
     kart_entry::{EntryGate, EntryOutcome, KartEntryHandler, RaceEntryContent, RaceEntryContext},
-    zone_transition,
+    le, zone_transition,
 };
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -171,14 +171,6 @@ pub struct KartGateway {
 fn invalid(message: impl ToString) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, message.to_string())
 }
-fn word(bytes: &[u8], offset: usize) -> u32 {
-    u32::from_le_bytes(bytes[offset..offset + 4].try_into().unwrap())
-}
-fn guid(bytes: &[u8], offset: usize) -> Option<u64> {
-    Some(u64::from_le_bytes(
-        bytes.get(offset..offset.checked_add(8)?)?.try_into().ok()?,
-    ))
-}
 
 /// Same recovered 35/20 layout as the isolated piece056 codec, now usable
 /// by race entry and return without registering its unrelated status ledger.
@@ -269,11 +261,11 @@ impl KartGateway {
         for (frame, state) in [(&content.details_loading, 2), (&content.details_ready, 4)] {
             if !(65..=4096).contains(&frame.len())
                 || frame[..4] != [41, 0, 114, 0]
-                || word(frame, 4) != content.context.encounter_id
-                || word(frame, 8) != content.context.instance_id
-                || word(frame, 12) != content.context.encounter_id
-                || word(frame, 16) != state
-                || guid(frame, 32) != Some(content.context.session)
+                || le::u32(frame, 4) != Some(content.context.encounter_id)
+                || le::u32(frame, 8) != Some(content.context.instance_id)
+                || le::u32(frame, 12) != Some(content.context.encounter_id)
+                || le::u32(frame, 16) != Some(state)
+                || le::u64(frame, 32) != Some(content.context.session)
             {
                 return Err(invalid("kart encounter template proof differs"));
             }
@@ -285,7 +277,7 @@ impl KartGateway {
                 }
             }
         }
-        if guid(
+        if le::u64(
             &content.entry.entry_vehicles[0].attribute_block,
             content.vehicle_guid_offset,
         ) != Some(content.context.session)
@@ -475,11 +467,9 @@ impl KartGateway {
         if inner.len() != 15 {
             return Err(invalid("invalid kart close width"));
         }
-        Ok(self
-            .state
-            .active
-            .as_ref()
-            .is_some_and(|a| word(inner, 3) == a.context.encounter_id && inner[7..15] == [255; 8]))
+        Ok(self.state.active.as_ref().is_some_and(|a| {
+            le::u32(inner, 3) == Some(a.context.encounter_id) && inner[7..15] == [255; 8]
+        }))
     }
     /// ORIGINAL mid-race quit (T392). The title-bar Exit runs `Ui.QuitMiniGame`
     /// (`00939100`): the race's MiniGameState is in progress (`+0x61`, set by the
@@ -501,7 +491,7 @@ impl KartGateway {
         let Some(a) = &self.state.active else {
             return Ok(None);
         };
-        if word(inner, 4) != 0 || word(inner, 8) != a.context.instance_id {
+        if le::u32(inner, 4) != Some(0) || le::u32(inner, 8) != Some(a.context.instance_id) {
             return Ok(None);
         }
         let mut reply = vec![41, 0, 121, 0];
@@ -580,6 +570,7 @@ impl KartGateway {
         context.session = character.guid;
         context.instance_id = staged.state.next_instance;
         context.scene.id = context.instance_id as i32;
+        let scene = context.scene.clone();
         staged.state.active = Some(ActiveKartEntry {
             context,
             return_location: character.clone(),
@@ -595,7 +586,6 @@ impl KartGateway {
             staged.sync_race();
         }
         let replies = vec![staged.details(true)?];
-        let scene = staged.scene().unwrap().clone();
         *self = staged;
         Ok((replies, scene))
     }
@@ -666,9 +656,9 @@ impl KartGateway {
                 return Ok(Vec::new());
             };
             let context = &active.context;
-            if word(inner, 4) != context.encounter_id
-                || word(inner, 8) != context.instance_id
-                || guid(inner, 12) != Some(context.session)
+            if le::u32(inner, 4) != Some(context.encounter_id)
+                || le::u32(inner, 8) != Some(context.instance_id)
+                || le::u64(inner, 12) != Some(context.session)
                 || !self.entry.as_ref().is_some_and(|e| {
                     matches!(
                         e.phase(),
@@ -700,8 +690,8 @@ impl KartGateway {
         let replies = if matches!(subtype, 9 | 2) {
             let replies = self.handle_entry(inner)?;
             if subtype == 9 && !replies.is_empty() {
-                if let Some(race) = &mut self.race {
-                    let context = &self.state.active.as_ref().unwrap().context;
+                if let (Some(race), Some(active)) = (&mut self.race, &self.state.active) {
+                    let context = &active.context;
                     race.prepare(
                         crate::kart_service::RaceContext {
                             session: context.session,
@@ -759,18 +749,24 @@ impl KartGateway {
         let mut staged = self.clone();
         let mut staged_inventory = inventory.clone();
         let mut staged_profiles = profiles.clone();
-        let race = staged.race.as_mut().unwrap();
+        let Some(race) = staged.race.as_mut() else {
+            return Ok(KartRewardClaim::default());
+        };
         if !race.reward_priced() {
             return Ok(KartRewardClaim::default());
         }
-        let guid = race.player_guid().unwrap();
+        let Some(guid) = race.player_guid() else {
+            return Ok(KartRewardClaim::default());
+        };
         // T787: read the elapsed fact from the session's own finish time before the
         // one-shot handover consumes the finish offer.
         let elapsed_seconds = race
             .session()
             .and_then(crate::kart_racing::RaceSession::finish_elapsed_seconds)
             .filter(|seconds| *seconds <= crate::content::MAX_MINIGAME_ELAPSED_SECONDS);
-        let finished = race.take_finished_session().unwrap();
+        let Some(finished) = race.take_finished_session() else {
+            return Ok(KartRewardClaim::default());
+        };
         let payout = match crate::kart_rewards::claim_race_reward(
             &staged.rewards,
             finished,

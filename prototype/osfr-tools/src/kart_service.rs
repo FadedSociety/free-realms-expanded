@@ -124,6 +124,7 @@ use crate::kart_racing::{
     TrackLayout,
 };
 use crate::kart_weapons::{WeaponKind, WeaponObservation, WeaponPose, WeaponState};
+use crate::le;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
@@ -922,7 +923,9 @@ impl ServiceSnapshot {
     }
 }
 
-/// The bounded race service. One race at a time; the gate defaults off.
+/// The bounded race service. One race at a time; the gate defaults off. A clone keeps the gate (a
+/// clone of an enabled service stays enabled).
+#[derive(Clone)]
 pub struct KartService {
     content: KartServiceContent,
     layout: TrackLayout,
@@ -1299,7 +1302,8 @@ fn validate_content(
             field: "max_observations",
         });
     }
-    let minimum = content.gates.len() as u32 * content.laps.max(1);
+    // `laps` is only range-checked by `TrackLayout::new` below, so a broken file must not overflow.
+    let minimum = (content.gates.len() as u32).saturating_mul(content.laps.max(1));
     if content.bounds.max_claims < minimum {
         return Err(ServiceError::Bounds {
             field: "max_claims",
@@ -1391,44 +1395,6 @@ impl fmt::Debug for KartService {
                     .map(|session| session.laps_completed()),
             )
             .finish()
-    }
-}
-
-/// The racing session is not `Clone`, so a clone rehydrates it from its own snapshot. The gate is
-/// preserved (a clone of an enabled service stays enabled) and nothing is validated against content
-/// here because the snapshot came from this very service.
-impl Clone for KartService {
-    fn clone(&self) -> Self {
-        Self {
-            content: self.content.clone(),
-            layout: self.layout.clone(),
-            band: self.band.clone(),
-            curtains: self.curtains.clone(),
-            gate: self.gate,
-            phase: self.phase,
-            context: self.context,
-            session: self.session.as_ref().map(|session| {
-                RaceSession::restore(session.snapshot()).expect("own session snapshot restores")
-            }),
-            schedule_cursor: self.schedule_cursor,
-            countdown_started_ms: self.countdown_started_ms,
-            countdown_offset_ms: self.countdown_offset_ms,
-            race_started_ms: self.race_started_ms,
-            last_position: self.last_position,
-            last_claim_ms: self.last_claim_ms,
-            attempts: self.attempts,
-            observations: self.observations,
-            countdown_sent: self.countdown_sent,
-            last_boost_epoch: self.last_boost_epoch,
-            claim_credit_m: self.claim_credit_m,
-            queued_items: self.queued_items.clone(),
-            pickups: self.pickups.clone(),
-            pickups_spawned: self.pickups_spawned,
-            shield_expiry: self.shield_expiry,
-            weapons: self.weapons.clone(),
-            weapon_pose: self.weapon_pose,
-            reward_taken: self.reward_taken,
-        }
     }
 }
 
@@ -1959,7 +1925,12 @@ impl KartService {
                 })
             }
             SERVER_DATA_SUBTYPE => {
-                self.require_payload(SERVER_DATA_SUBTYPE, payload, SERVER_DATA_PAYLOAD_LEN)?;
+                self.decode_exact(
+                    SERVER_DATA_SUBTYPE,
+                    payload,
+                    SERVER_DATA_PAYLOAD_LEN,
+                    |_| Some(()),
+                )?;
                 if self.phase != RacePhase::Racing {
                     return Ok(ServiceOutcome::Refused(ServiceRefusal::InvalidPhase {
                         phase: self.phase,
@@ -1977,9 +1948,9 @@ impl KartService {
                     if self.race_elapsed(now_ms).is_err() {
                         return Ok(ServiceOutcome::Refused(ServiceRefusal::WeaponUnavailable));
                     }
-                    let read = |offset: usize| {
-                        f32::from_le_bytes(payload[offset..offset + 4].try_into().unwrap())
-                    };
+                    // The width is checked above; a read past it would be NaN, which the
+                    // finiteness check below refuses.
+                    let read = |offset: usize| le::f32(payload, offset).unwrap_or(f32::NAN);
                     let pose = WeaponPose {
                         basis: [
                             [read(0), read(4), read(8)],
@@ -1991,7 +1962,7 @@ impl KartService {
                     if (0..19).any(|i| !read(i * 4).is_finite())
                         || pose.validate().is_err()
                         || payload[76] & !(1 | 2 | 4 | 64 | 128) != 0
-                        || u32::from_le_bytes(payload[81..85].try_into().unwrap()) != 1
+                        || le::u32(payload, 81) != Some(1)
                     {
                         return Ok(ServiceOutcome::Refused(ServiceRefusal::WeaponUnavailable));
                     }
@@ -2028,9 +1999,10 @@ impl KartService {
                 })
             }
             COUNTDOWN_SUBTYPE => {
-                self.require_payload(COUNTDOWN_SUBTYPE, payload, COUNTDOWN_PAYLOAD_LEN)?;
-                let guid = u64::from_le_bytes(payload[0..8].try_into().unwrap());
-                let value = u32::from_le_bytes(payload[8..12].try_into().unwrap());
+                let (guid, value) =
+                    self.decode_exact(COUNTDOWN_SUBTYPE, payload, COUNTDOWN_PAYLOAD_LEN, |p| {
+                        Some((le::u64(p, 0)?, le::u32(p, 8)?))
+                    })?;
                 if let Err(refusal) = self.own_guid(guid) {
                     return Ok(ServiceOutcome::Refused(refusal));
                 }
@@ -2481,48 +2453,41 @@ impl KartService {
         Ok(())
     }
 
-    fn require_payload(
+    /// Decodes an exact-width payload with fixed-offset reads. A wrong width is the typed width
+    /// error, and so is a read past the end (which the width check already rules out).
+    fn decode_exact<T>(
         &self,
         subtype: u16,
         payload: &[u8],
         expected: usize,
-    ) -> Result<(), ServiceError> {
-        if payload.len() != expected {
-            return Err(ServiceError::PayloadLength {
-                subtype,
-                expected,
-                actual: payload.len(),
-            });
+        decode: impl FnOnce(&[u8]) -> Option<T>,
+    ) -> Result<T, ServiceError> {
+        if payload.len() == expected
+            && let Some(value) = decode(payload)
+        {
+            return Ok(value);
         }
-        Ok(())
+        Err(ServiceError::PayloadLength {
+            subtype,
+            expected,
+            actual: payload.len(),
+        })
     }
 
     /// The owned racer id pair `racer+0xe60 | racer+0xe64` that `33/19` and `33/22` both send as
     /// one little-endian u64. Width is checked first so a malformed frame is a typed error.
     fn owned_id(&self, subtype: u16, payload: &[u8]) -> Result<u64, ServiceError> {
-        self.require_payload(subtype, payload, OWNED_ID_PAYLOAD_LEN)?;
-        Ok(u64::from_le_bytes(
-            payload.try_into().expect("checked width"),
-        ))
+        self.decode_exact(subtype, payload, OWNED_ID_PAYLOAD_LEN, |p| le::u64(p, 0))
     }
 
     /// The `33/7` gate claim and the `33/17` pickup claim share one layout, so the caller's subtype
     /// is carried into the width error instead of always naming the gate hit.
     fn decode_claim(&self, subtype: u16, payload: &[u8]) -> Result<Claim, ServiceError> {
-        if payload.len() != GATE_HIT_PAYLOAD_LEN {
-            return Err(ServiceError::PayloadLength {
-                subtype,
-                expected: GATE_HIT_PAYLOAD_LEN,
-                actual: payload.len(),
-            });
-        }
-        Ok(Claim {
-            guid: u64::from_le_bytes(payload[0..8].try_into().unwrap()),
-            position: [
-                f32::from_le_bytes(payload[8..12].try_into().unwrap()),
-                f32::from_le_bytes(payload[12..16].try_into().unwrap()),
-                f32::from_le_bytes(payload[16..20].try_into().unwrap()),
-            ],
+        self.decode_exact(subtype, payload, GATE_HIT_PAYLOAD_LEN, |p| {
+            Some(Claim {
+                guid: le::u64(p, 0)?,
+                position: [le::f32(p, 8)?, le::f32(p, 12)?, le::f32(p, 16)?],
+            })
         })
     }
 
@@ -2583,11 +2548,12 @@ impl KartService {
             }
         }
         let got = expected;
-        let outcome = self
-            .session
-            .as_mut()
-            .expect("racing phase has a session")
-            .on_checkpoint(now_ms, got);
+        let (Some(context), Some(session)) = (self.context, self.session.as_mut()) else {
+            return Ok(ServiceOutcome::Refused(ServiceRefusal::NoOpenRace));
+        };
+        let outcome = session.on_checkpoint(now_ms, got);
+        let (laps_completed, best_lap_ms) = (session.laps_completed(), session.best_lap_ms());
+        let finished = session.phase() == Phase::Finished;
         let refusal = match outcome {
             CheckpointOutcome::CheckpointAccepted { .. }
             | CheckpointOutcome::LapCompleted { .. } => None,
@@ -2604,16 +2570,12 @@ impl KartService {
             return Ok(ServiceOutcome::Refused(refusal));
         }
         self.accept_movement(position, now_ms, &charge);
-        let finished = self
-            .session
-            .as_ref()
-            .is_some_and(|session| session.phase() == Phase::Finished);
         if finished {
             self.phase = RacePhase::Finished;
             // A finished race keeps its last progress frame; no effect expires after it.
             self.shield_expiry = None;
         }
-        let reply = self.progress_frame(now_ms);
+        let reply = self.progress_frame(context.player_guid, laps_completed, best_lap_ms, now_ms);
         let mut replies = vec![reply];
         if finished {
             replies.extend(self.weapons.clear());
@@ -2690,15 +2652,19 @@ impl KartService {
 
     /// Builds the local racer's `33/14` block: the unmapped template fields plus this session's
     /// authoritative guid, laps, best lap and total time.
-    fn progress_frame(&self, now_ms: u64) -> Vec<u8> {
-        let context = self.context.expect("progress without context");
-        let session = self.session.as_ref().expect("progress without session");
+    fn progress_frame(
+        &self,
+        player_guid: u64,
+        laps_completed: u32,
+        best_lap_ms: Option<u64>,
+        now_ms: u64,
+    ) -> Vec<u8> {
         let mut payload = self.content.progress_template;
-        payload.racer_guid = context.player_guid;
-        payload.laps_completed = session.laps_completed() as i32;
+        payload.racer_guid = player_guid;
+        payload.laps_completed = laps_completed as i32;
         payload.lap_limit = self.content.laps as i32;
         payload.local_racer = 1;
-        payload.best_lap_bits = (session.best_lap_ms().unwrap_or(0) as f32 / 1_000.0).to_bits();
+        payload.best_lap_bits = (best_lap_ms.unwrap_or(0) as f32 / 1_000.0).to_bits();
         let elapsed = now_ms.saturating_sub(self.race_started_ms) as f32 / 1_000.0;
         payload.total_time_bits = elapsed.to_bits();
         kart_entry::encode_inner(

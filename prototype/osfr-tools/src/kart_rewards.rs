@@ -218,15 +218,15 @@ pub fn reward_bundle_toast(
     if coins == 0 && xp == 0 {
         return Err(invalid("reward toast must carry coins or XP"));
     }
-    if coins > i32::MAX as u32 || xp > i32::MAX as u32 {
+    let (Ok(coins), Ok(xp)) = (i32::try_from(coins), i32::try_from(xp)) else {
         return Err(invalid("reward toast award exceeds the wire field"));
-    }
+    };
     let mut bytes = Vec::with_capacity(72);
     bytes.extend_from_slice(&REWARD_FAMILY.to_le_bytes());
     bytes.push(REWARD_SUBTYPE_BUNDLE);
     bytes.push(1); // success
-    bytes.extend_from_slice(&(coins as i32).to_le_bytes()); // body offset 1, inner offset 4
-    bytes.extend_from_slice(&(xp as i32).to_le_bytes()); // body offset 5, inner offset 8
+    bytes.extend_from_slice(&coins.to_le_bytes()); // body offset 1, inner offset 4
+    bytes.extend_from_slice(&xp.to_le_bytes()); // body offset 5, inner offset 8
     bytes.extend_from_slice(&0i32.to_le_bytes()); // unresolved, zero
     bytes.extend_from_slice(&REWARD_KIND_CURRENCY.to_le_bytes()); // body offset 13
     bytes.extend_from_slice(&0i32.to_le_bytes()); // unresolved, zero

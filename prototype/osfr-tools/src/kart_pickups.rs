@@ -668,17 +668,18 @@ impl PickupSet {
             if !set.specs.iter().any(|spec| spec.handle == handle) {
                 return Err(PickupError::UnknownHandle { handle });
             }
+            // Counted in `usize`: a save-sized count must not wrap below the policy.
             let used = snapshot
                 .respawned
                 .iter()
                 .filter(|respawned| **respawned == handle)
-                .count() as u32
+                .count()
                 + snapshot
                     .pending
                     .iter()
                     .filter(|pending| pending.handle == handle)
-                    .count() as u32;
-            if used > policy.max_respawns {
+                    .count();
+            if used > policy.max_respawns as usize {
                 return Err(PickupError::IncoherentRespawn { handle });
             }
         }

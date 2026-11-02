@@ -429,6 +429,7 @@ pub struct RaceResultProposal {
 }
 
 /// One kart-racing session for one player. Progress is accepted only from ordered checkpoint ids.
+#[derive(Clone)]
 pub struct RaceSession {
     session_id: u32,
     layout: TrackLayout,
