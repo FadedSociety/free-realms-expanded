@@ -24,8 +24,9 @@
 use crate::{
     minigame::{Activity, ActivityFinish, MinigameRuns, RunMode, RunOutcome, RunSpec, RunState},
     power_ups::Rng,
+    rewards::{RewardDisplay, RewardGrant, RewardState},
 };
-use std::io;
+use std::{collections::BTreeMap, io};
 
 pub const TURN_START: u8 = 1;
 pub const TURN_END: u8 = 2;
@@ -284,13 +285,19 @@ pub const PRELOAD_FILE: &str = "CheckersAssets.txt";
 const MAX_TEXT: usize = 256;
 /// (R) Run ids of its own, apart from chess's and every other minigame's.
 pub const FIRST_INSTANCE_ID: i32 = 21_000_001;
+/// L920 (R, owner playtest 2026-11-02: "no rewards"): a win pays chess's easiest-row award.
+// ponytail: a constant; move it to content with any other checkers tuning.
+pub const WIN_COINS: u32 = 10;
 
 /// What one packet did at the table, for gameplay to apply.
-#[derive(Debug, Default)]
+#[derive(Default)]
 pub struct TableOutcome {
     pub accepted: bool,
     pub changed: bool,
     pub replies: Vec<Vec<u8>>,
+    /// L920: a won game's payout, to adopt before sending `reward_packets`, as for chess.
+    pub reward_packets: Vec<Vec<u8>>,
+    pub reward_state: Option<RewardState>,
 }
 
 impl TableOutcome {
@@ -299,7 +306,26 @@ impl TableOutcome {
             accepted: run.accepted,
             changed: run.changed,
             replies: run.replies,
+            reward_packets: run.reward_packets,
+            reward_state: run.reward_state,
         }
+    }
+}
+
+fn win_grant(player_id: u64) -> RewardGrant {
+    RewardGrant {
+        coins: WIN_COINS,
+        items: Vec::new(),
+        job_xp: BTreeMap::new(),
+        sc: 0,
+        display: RewardDisplay {
+            source_guid: player_id,
+            player_guid: player_id,
+            reward_kind: 0,
+            icon_id: ICON_ID,
+            name_id: NAME_ID,
+            rows: Vec::new(),
+        },
     }
 }
 
@@ -381,13 +407,23 @@ impl CheckersTable {
     /// One client packet while a run is open; `None` for a packet that is not the table's. A
     /// refused or stale packet changes nothing.
     pub fn route(&mut self, packet: &[u8], now_ms: u64) -> io::Result<Option<TableOutcome>> {
+        self.route_with(packet, now_ms, None)
+    }
+
+    /// `route`, where a won game pays [`WIN_COINS`] to `payer` (player guid and reward state).
+    pub fn route_with(
+        &mut self,
+        packet: &[u8],
+        now_ms: u64,
+        payer: Option<(u64, &RewardState)>,
+    ) -> io::Result<Option<TableOutcome>> {
         let Some(instance) = self.runs.current_instance_id() else {
             return Ok(None);
         };
         let lifecycle = packet.len() >= 3 && packet[..2] == [39, 0] && matches!(packet[2], 5..=7);
         let mut staged = self.clone();
         let out = if packet.len() >= 3 && packet[..3] == [39, 0, 14] {
-            staged.movie(instance, packet, now_ms)?
+            staged.movie(instance, packet, now_ms, payer)?
         } else if lifecycle || packet == [26, 0, 42, 0] {
             let mut out = TableOutcome::from_run(staged.runs.handle_client(packet)?);
             if lifecycle && packet[2] == 5 && out.accepted {
@@ -411,7 +447,13 @@ impl CheckersTable {
         Ok(Some(out))
     }
 
-    fn movie(&mut self, instance: i32, packet: &[u8], now_ms: u64) -> io::Result<TableOutcome> {
+    fn movie(
+        &mut self,
+        instance: i32,
+        packet: &[u8],
+        now_ms: u64,
+        payer: Option<(u64, &RewardState)>,
+    ) -> io::Result<TableOutcome> {
         let mut out = TableOutcome::default();
         if self.runs.state(instance) != Some(RunState::Playing) {
             return Ok(out);
@@ -436,10 +478,13 @@ impl CheckersTable {
                 won,
                 elapsed_seconds: u32::try_from(elapsed).unwrap_or(u32::MAX),
             };
-            let run = if won {
-                self.runs.finish_win_without_reward(instance, &finish)?
-            } else {
-                self.runs.finish(instance, &finish, None)?
+            let run = match (won, payer) {
+                (true, Some((player, rewards))) => {
+                    self.runs
+                        .finish(instance, &finish, Some((rewards, &win_grant(player))))?
+                }
+                (true, None) => self.runs.finish_win_without_reward(instance, &finish)?,
+                (false, _) => self.runs.finish(instance, &finish, None)?,
             };
             self.board = None;
             return Ok(TableOutcome::from_run(run));
@@ -778,5 +823,57 @@ mod tests {
         assert_eq!(parse("OnMoveMsg\t21\tx"), None);
         assert_eq!(Event::Move(21, 17).text(), "OnCheckersEventMsg\t10\t21\t17");
         assert_eq!(message(TURN_START, &[0]), "OnCheckersEventMsg\t1\t0");
+    }
+
+    /// An empty bag with 0 coins, as `Inventory::load` reads it (the chess tests' fixture).
+    fn rewards(player: u64) -> RewardState {
+        use sha2::{Digest, Sha256};
+        let directory =
+            std::env::temp_dir().join(format!("osfr-checkers-pay-{}", std::process::id()));
+        std::fs::create_dir_all(&directory).unwrap();
+        let zero = 0_i32.to_le_bytes();
+        let span = |kind: &str, offset: usize, profile_id: i32| {
+            serde_json::json!({"kind": kind, "offset": offset, "length": 4, "profile_id": profile_id,
+                "sha256": format!("{:x}", Sha256::digest(zero))})
+        };
+        let manifest = serde_json::json!({
+            "schema_version": 1,
+            "player_guid": player,
+            "default_state": {"coins": 0, "items": [], "equipment": [], "next_instance_id": null},
+            "profiles": [{"id": 1, "allowed_classes": [1], "slots": [3]}],
+            "spans": [span("coins", 13, 0), span("items", 17, 0), span("equipment", 21, 1)],
+            "definitions": []
+        });
+        std::fs::write(directory.join("inventory.json"), manifest.to_string()).unwrap();
+        let inventory = crate::inventory::Inventory::load(&directory, None).unwrap();
+        let _ = std::fs::remove_dir_all(&directory);
+        let profiles = crate::profiles::ProfileState {
+            version: 1,
+            active: 1,
+            unlocked: [1].into(),
+            experience: BTreeMap::new(),
+        };
+        RewardState::new(inventory, profiles, 8)
+    }
+
+    /// L920: a won game settled with a payer pays `WIN_COINS`; a lost one pays nothing.
+    #[test]
+    fn a_win_pays_its_coins_and_a_loss_pays_nothing() {
+        let player = 7;
+        let state = rewards(player);
+        for (won, coins) in [(true, WIN_COINS), (false, 0)] {
+            let (mut table, instance) = opened(9);
+            table.won = Some(won);
+            let over = payload_packet(instance, "FRServer_GameOver").unwrap();
+            let out = table
+                .route_with(&over, 9_000, Some((player, &state)))
+                .unwrap()
+                .unwrap();
+            let paid = out
+                .reward_state
+                .map_or(0, |next| next.inventory.state().coins);
+            assert_eq!(paid, coins, "won {won}");
+            assert_eq!(out.reward_packets.is_empty(), !won);
+        }
     }
 }

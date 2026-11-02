@@ -21,12 +21,18 @@ impl Gameplay {
 
     /// One packet while the table is open (`None` otherwise). As for chess, only the lifecycle
     /// result (39/18) credits the minigame, once.
+    /// L920: a won game pays its coins on the results page, adopted before the reward packets.
     pub(super) fn handle_checkers(
         &mut self,
         inner: &[u8],
+        player_id: u64,
         now_ms: u64,
     ) -> io::Result<Option<Outcome>> {
-        let Some(table) = self.checkers.route(inner, now_ms)? else {
+        let rewards = self.reward_snapshot();
+        let Some(table) = self
+            .checkers
+            .route_with(inner, now_ms, Some((player_id, &rewards)))?
+        else {
             return Ok(None);
         };
         let mut out = Outcome {
@@ -34,6 +40,10 @@ impl Gameplay {
             replies: table.replies.clone(),
             ..Outcome::default()
         };
+        if let Some(next) = table.reward_state {
+            self.adopt_reward_state(next, &mut out)?;
+        }
+        out.replies.extend(table.reward_packets);
         if table.replies.iter().any(|p| p.starts_with(&[39, 0, 18])) {
             self.npc_minigame_win(&table.replies, &mut out)?;
         }

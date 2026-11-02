@@ -2155,7 +2155,7 @@ impl Gameplay {
         if let Some(out) = self.handle_chess(inner, character, now_ms)? {
             return Ok(out);
         }
-        if let Some(out) = self.handle_checkers(inner, now_ms)? {
+        if let Some(out) = self.handle_checkers(inner, character.guid, now_ms)? {
             return Ok(out);
         }
         if self.chess.as_ref().is_some_and(ChessService::is_active)
