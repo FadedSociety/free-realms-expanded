@@ -615,7 +615,7 @@ fn every_guide_opens_its_own_area() {
 #[rustfmt::skip]
 const SCENES: [(u64, &str, u32, [f32; 3], f32, f32, bool); 6] = [
     (9_000_000_377, "bw_fishing_medpond", 560, [200.0, 0.0, 200.0], -2.0, 74.0, false),
-    (9_000_000_339, "bw_fishing_stream", 561, [226.38, -2.04, 227.88], -2.0, 58.0, true),
+    (9_000_000_339, "bw_fishing_stream", 561, [226.38, -2.04, 227.88], -2.0, 58.0, false),
     (SELVI, "sg_fishing_stream", 562, [441.42, -60.31, 475.08], -66.0, 58.0, true),
     (REED, "sg_fishing_medpond", 563, [435.05676, -64.46508, 370.70682], -64.46508, 68.0, false),
     (9_000_000_024, "sh_fishing_medpond", 564, [202.42, 5.74, 290.33], 0.0, 55.0, true),

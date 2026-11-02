@@ -140,8 +140,8 @@
         ],
         "water_y": -2,
         "underwater_bed_x": 58,
-        "client_scene_cached": true,
-        "source": "Spawn: Lxzxrus-Free-Realms-Server origin/fishing/lure-and-spawns@75f7d95 src/Resources/Zones/bw_fishing_stream.json, read in game on 2026-10-19 (R); it sits 4 cm below the water. Bed X and water: our bw_fishing_streamAreas.xml (pack_14/003861), Underwater_Bed id 4118 at (58, -2, 484) and Water id 3908 with its child spheres at y -2. Zone 561 pairs with MiniGameData 597 (the 'Unknown' field of ClientActivityDefinitions in Lxzxrus-Free-Realms-Server 75f7d95, AGPL data only). R: rotation (0, 0, 0, 1)."
+        "client_scene_cached": false,
+        "source": "L919 (owner playtest 2026-11-02): no copy of its terrain chunks is known (client, CDN mirrors, 2011 dump), so the zone loads forever; fished in place until one is found. Spawn: Lxzxrus-Free-Realms-Server origin/fishing/lure-and-spawns@75f7d95 src/Resources/Zones/bw_fishing_stream.json, read in game on 2026-10-19 (R); it sits 4 cm below the water. Bed X and water: our bw_fishing_streamAreas.xml (pack_14/003861), Underwater_Bed id 4118 at (58, -2, 484) and Water id 3908 with its child spheres at y -2. Zone 561 pairs with MiniGameData 597 (the 'Unknown' field of ClientActivityDefinitions in Lxzxrus-Free-Realms-Server 75f7d95, AGPL data only). R: rotation (0, 0, 0, 1)."
       },
       "source": "Gunther (Briarwood). R: the Bayou guide line 408596 has no named speaker; Gunther is the Fisherman quest giver at Brambleback's Bayou."
     },

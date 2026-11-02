@@ -533,8 +533,8 @@ fn two_players_see_the_same_guides() {
 #[test]
 fn a_trip_can_be_quit_and_a_reconnect_releases_the_round() {
     let mut player = Player::new(CHARACTER);
-    player.at(GUNTHER);
-    let round = player.start(GUNTHER);
+    player.at(SELVI);
+    let round = player.start(SELVI);
     let registered = player.send(&register(ACTOR));
     assert!(find(&registered.replies, &[138, 0, 3, 0]).is_some());
     player.cast_and_hook();
@@ -549,28 +549,29 @@ fn a_trip_can_be_quit_and_a_reconnect_releases_the_round() {
     let xp = profile_xp(&player.game, FISHERMAN_PROFILE);
     player.quit(round);
     assert!(
-        player.is_free(GUNTHER),
+        player.is_free(SELVI),
         "the ordinary quit frees the player"
     );
 
     // Start again and drop the connection mid-attempt; reconnect through the saved state.
-    player.start(GUNTHER);
+    player.start(SELVI);
     player.send(&register(ACTOR));
     player.cast_and_hook();
     // The save taken in the hole stores the world pose; the reconnect resumes there.
     player.character = player
         .game
         .scene_return()
-        .expect("Gunther's hole is a scene");
+        .expect("Selvi's hole is a scene");
     player.game.reset_session();
     player.game = player.fixture.reload_serialized(&player.game);
     let late = player.try_send(&reel(ACTOR));
     assert!(!late.is_ok_and(|out| find(&out.replies, &[138, 0, 14, 0]).is_some()));
     assert_eq!(player.fish_held(), 1, "the dropped cast pays nothing");
     assert_eq!(profile_xp(&player.game, FISHERMAN_PROFILE), xp);
-    assert!(player.is_free(GUNTHER), "no stuck trip after the reconnect");
-    let (_, _, game_id) = player.take_trip(GUNTHER);
-    assert_eq!(game_id, 597, "a fresh Brambleback's Bayou trip");
+    assert!(player.is_free(SELVI), "no stuck trip after the reconnect");
+    let (_, _, game_id) = player.take_trip(SELVI);
+    // L919: Gunther's Briarwood stream (561) now fishes in place, so the scene hole is Selvi's.
+    assert_eq!(game_id, 598, "a fresh Rainbow Lake trip");
 }
 
 #[test]

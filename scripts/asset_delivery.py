@@ -203,6 +203,25 @@ class AssetDelivery:
                 self._add_community_source(name, source)
                 self.sources.setdefault(name, source)
 
+        # L919 (owner 2026-11-02: "use the old files"): an older client's copy of a raw file nothing
+        # above can serve (`references/older-client-substitutes`) replaces that manifest row, so the
+        # client asks for and accepts the older bytes. Fishing and soccer zone terrain exists only so.
+        self.substituted = {}
+        substitutes = (references / "older-client-substitutes").resolve()
+        if substitutes.is_dir():
+            for path in sorted(substitutes.iterdir()):
+                name = path.name.lower()
+                if name not in self.raw_names or name in self.sources or not path.is_file():
+                    continue
+                raw = path.read_bytes()
+                # An empty or zero-filled copy is a failed download in the older dump, not the file.
+                if len(raw) > MAX_ASSET or not raw.strip(b"\0"):
+                    continue
+                crc = zlib.crc32(raw)
+                self.manifest[name] = (crc, len(raw))
+                self.sources[name] = (path, len(raw), crc, hashlib.sha256(raw).hexdigest())
+                self.substituted[name] = (crc, len(raw))
+
         self.client_rows = 0
         self.extra_rows = []
         if client is not None:
@@ -288,6 +307,15 @@ class AssetDelivery:
         return None
 
     def _merge_manifest(self, manifest: bytes) -> bytes:
+        if self.substituted:
+            lines = manifest.split(b"\n")
+            for index, line in enumerate(lines):
+                name = line.split(b",", 1)[0].decode("utf-8", "replace")
+                row = self.substituted.get(_canonical_name(name))
+                if row is not None:
+                    end = b"\r" if line.endswith(b"\r") else b""
+                    lines[index] = f"{name.strip()},{row[0]},{row[1]}".encode("utf-8") + end
+            manifest = b"\n".join(lines)
         if not self.extra_rows:
             return manifest
         separator = b"\r\n" if b"\r\n" in manifest else b"\n"

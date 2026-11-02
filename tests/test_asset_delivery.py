@@ -71,6 +71,29 @@ class AssetDeliveryTests(unittest.TestCase):
         body, _ = self.delivery.get(self.request('wall1&2.dds'))
         self.assertEqual(zlib.decompress(body[8:]), self.raw['wall1&2.dds'])
 
+    def test_an_older_client_copy_replaces_only_a_row_nothing_else_serves(self):
+        # L919: today's pond chunk is lost; an older client's differs, so its CRC and length replace the row.
+        older = self.root / 'references/older-client-substitutes'
+        older.mkdir(parents=True)
+        (older / 'pond.gcnk').write_bytes(b'older pond terrain')
+        (older / 'track.gcnk').write_bytes(b'an older track')
+        # A zero-filled copy is a failed download in the older dump: its row stays as it was.
+        (older / 'lake.gcnk').write_bytes(bytes(12))
+        lake = f'lake.gcnk,{zlib.crc32(b"lost lake")},9'
+        manifest = self.manifest + f'\npond.gcnk,{zlib.crc32(b"lost pond")},9\n{lake}'.encode()
+        delivery = AssetDelivery(self.root, manifest)
+        crc = zlib.crc32(b'older pond terrain')
+        body, _ = delivery.get(f'/1/pond.gcnk?{crc}')
+        self.assertEqual(body, b'older pond terrain')
+        self.assertIn(f'pond.gcnk,{crc},18'.encode(), delivery.served_manifest)
+        self.assertIsNone(delivery.get(f'/1/pond.gcnk?{zlib.crc32(b"lost pond")}'))
+        self.assertIn(lake.encode(), delivery.served_manifest)
+        self.assertIsNone(delivery.get(f'/1/lake.gcnk?{zlib.crc32(bytes(12))}'))
+        # A file today's sources serve keeps its own row and bytes.
+        self.assertEqual(delivery.get(self.request('track.gcnk'))[0], self.raw['track.gcnk'])
+        track = self.raw['track.gcnk']
+        self.assertIn(f'track.gcnk,{zlib.crc32(track)},{len(track)}'.encode(), delivery.served_manifest)
+
     def test_wrong_crc_unknown_asset_and_path_escape_are_refused(self):
         for request in ['/562/track.gcnk?0', '/562/missing.gcnk?1', '/562/../track.gcnk?1', '/562/%2e%2e%2ftrack.gcnk?1', '/x/track.gcnk?1']:
             self.assertIsNone(self.delivery.get(request))
