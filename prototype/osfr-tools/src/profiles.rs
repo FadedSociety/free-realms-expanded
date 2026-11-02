@@ -71,6 +71,19 @@ fn dwords(values: &[i32]) -> impl Iterator<Item = u8> + '_ {
     values.iter().flat_map(|value| value.to_le_bytes())
 }
 
+/// A job record's rank, XP percent and stars for `xp` experience: rank `1 + xp / 100` up to 20,
+/// the percent toward the next rank (0 at 20), no stars. L107: the startup self data uses it too.
+pub(crate) fn progression_bytes(xp: u32) -> [u8; 12] {
+    let rank = (1 + xp / 100).min(20) as i32;
+    let mut bytes = [0; 12];
+    bytes[..4].copy_from_slice(&rank.to_le_bytes());
+    bytes[4..8].copy_from_slice(&(if rank == 20 { 0 } else { (xp % 100) as i32 }).to_le_bytes());
+    // The third native field is StarsAvailable, not total experience.
+    // Ability-star spending is not implemented in this opening slice.
+    bytes[8..].copy_from_slice(&0i32.to_le_bytes());
+    bytes
+}
+
 impl StaffJob {
     /// The record up to its equipment list, in the layout of the 16 captured records: eight
     /// header dwords, the members-only byte, (R) a zero tenth dword (a per-job index in the
@@ -560,16 +573,7 @@ impl Profiles {
     }
 
     fn progression_bytes(&self, id: i32) -> [u8; 12] {
-        let xp = self.state.experience.get(&id).copied().unwrap_or(0);
-        let rank = (1 + xp / 100).min(20) as i32;
-        let mut bytes = [0; 12];
-        bytes[..4].copy_from_slice(&rank.to_le_bytes());
-        bytes[4..8]
-            .copy_from_slice(&(if rank == 20 { 0 } else { (xp % 100) as i32 }).to_le_bytes());
-        // The third native field is StarsAvailable, not total experience.
-        // Ability-star spending is not implemented in this opening slice.
-        bytes[8..].copy_from_slice(&0i32.to_le_bytes());
-        bytes
+        progression_bytes(self.state.experience.get(&id).copied().unwrap_or(0))
     }
 
     /// Apply before inventory splices, while original profile offsets are valid.

@@ -85,9 +85,7 @@ impl Gateway {
             let current = game.state();
             data.inventory = current.inventory;
             collections = current.progression_extras.unwrap_or_default().collections;
-            if let Some(profiles) = current.profiles {
-                self.apply_profile_state(&mut data, &profiles)?;
-            }
+            self.apply_profile_state(&mut data, current.profiles.as_ref())?;
             data.jobs.profiles.extend(game.staff_job_rows());
         }
         crate::progression_extras::apply_collected_flags(&mut data.collections, &collections);
@@ -98,35 +96,49 @@ impl Gateway {
         Ok(startup_selfdata::build_self(&data))
     }
 
-    fn apply_profile_state(&self, data: &mut SelfData, profiles: &ProfileState) -> io::Result<()> {
-        data.jobs.active_profile_id = profiles.active as u32;
-        for (id, rank_offset) in &self.profile_rank_offsets {
-            let row = data
-                .jobs
-                .profiles
-                .iter_mut()
-                .find(|row| row.map_key == *id as u32)
-                .ok_or_else(|| invalid("self-data is missing a configured job profile"))?;
-            // The content offset includes the four-byte profile-map key; the
-            // typed row stores its opaque prefix after that key.
-            let offset = rank_offset
-                .checked_sub(4)
-                .ok_or_else(|| invalid("invalid job progression offset"))?;
-            let end = offset
-                .checked_add(12)
-                .ok_or_else(|| invalid("job progression offset overflow"))?;
-            let progression = row
-                .opaque_before_equipment_without_key
-                .get_mut(offset..end)
-                .ok_or_else(|| invalid("self-data job progression field is truncated"))?;
-            let xp = profiles.experience.get(id).copied().unwrap_or(0);
-            let rank = (1 + xp / 100).min(20) as i32;
-            let progress = if rank == 20 { 0 } else { (xp % 100) as i32 };
-            // (R) The local rank curve and zero-star policy match Profiles.
-            progression[..4].copy_from_slice(&rank.to_le_bytes());
-            progression[4..8].copy_from_slice(&progress.to_le_bytes());
-            progression[8..12].copy_from_slice(&0i32.to_le_bytes());
+    /// L107: every captured job record carries the captured player's rank, XP percent and stars;
+    /// each is rewritten from this character's profiles, or as rank 1 with nothing earned when no
+    /// profile state exists (the shipped content has no `profiles.json`, so its fresh characters
+    /// used to show the capture's half-full Adventurer bar).
+    fn apply_profile_state(
+        &self,
+        data: &mut SelfData,
+        profiles: Option<&ProfileState>,
+    ) -> io::Result<()> {
+        if let Some(profiles) = profiles {
+            data.jobs.active_profile_id = profiles.active as u32;
+        }
+        for row in &mut data.jobs.profiles {
+            let id =
+                i32::try_from(row.map_key).map_err(|_| invalid("job profile id out of range"))?;
+            let opaque = &mut row.opaque_before_equipment_without_key;
+            let offset = progression_offset(opaque)
+                .ok_or_else(|| invalid("self-data job record is truncated"))?;
+            if let Some(configured) = self.profile_rank_offsets.get(&id)
+                && configured.checked_sub(4) != Some(offset)
+            {
+                return Err(invalid(
+                    "profiles.json rank offset disagrees with the job record",
+                ));
+            }
+            let xp = profiles
+                .and_then(|profiles| profiles.experience.get(&id).copied())
+                .unwrap_or(0);
+            opaque[offset..offset + 12].copy_from_slice(&crate::profiles::progression_bytes(xp));
         }
         Ok(())
     }
+}
+
+/// L107: where a job record's rank, XP percent and stars sit in its bytes after the map key: seven
+/// header dwords, the members-only byte, an index dword, the item-class count and its 12-byte rows,
+/// then five unnamed fields (14 bytes); layout as `profiles.rs` `StaffJob::prefix` writes it.
+/// `None` when the record is too short to hold them.
+fn progression_offset(opaque: &[u8]) -> Option<usize> {
+    let classes = u32::from_le_bytes(opaque.get(33..37)?.try_into().ok()?);
+    let offset = usize::try_from(classes)
+        .ok()?
+        .checked_mul(12)?
+        .checked_add(51)?;
+    (opaque.len() >= offset.checked_add(12)?).then_some(offset)
 }

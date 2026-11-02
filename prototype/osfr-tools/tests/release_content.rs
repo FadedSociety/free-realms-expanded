@@ -786,6 +786,66 @@ fn the_release_overlay_reaches_world_entry_with_the_opening_active() {
     let _ = fs::remove_dir_all(merged);
 }
 
+/// L107: `(job id, rank/XP/stars bytes)` for every job record of a startup self-data message,
+/// walking the record layout (`profiles.rs` `StaffJob::prefix`): the item-class count at 33,
+/// its 12-byte rows from 37, five fields (14 bytes), then rank, XP percent and stars.
+fn job_progressions(message: &[u8]) -> Vec<(u32, usize, Vec<u8>)> {
+    startup_selfdata::parse_self(message)
+        .jobs
+        .profiles
+        .iter()
+        .map(|row| {
+            let opaque = &row.opaque_before_equipment_without_key;
+            let classes = u32::from_le_bytes(opaque[33..37].try_into().unwrap()) as usize;
+            let offset = 51 + classes * 12;
+            (row.map_key, offset, opaque[offset..offset + 12].to_vec())
+        })
+        .collect()
+}
+
+/// L107: a fresh character's job records start at rank 1 with no XP and no stars, with or without
+/// `profiles.json`; before, they carried the captured player's progress (a half-full Adventurer
+/// bar). The overlay's configured rank offsets are the walked ones.
+#[test]
+fn a_fresh_character_starts_every_job_at_rank_one() {
+    let fresh = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    let merged = merged_content("ranks");
+    let configured: Vec<(u32, usize)> = read_json(&merged.join("profiles.json"))["profiles"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|row| {
+            let id = row["id"].as_u64().unwrap() as u32;
+            (id, row["rank_offset"].as_u64().unwrap() as usize - 4)
+        })
+        .collect();
+    let bare = merged_content("ranks-bare");
+    fs::remove_file(bare.join("profiles.json")).unwrap();
+    let version = content_version(&content());
+    // The captured template itself carries progress, so the checks below can fail.
+    let state = Gateway::content_state(&merged).unwrap();
+    let mut capture = Gateway::load_from_content(&merged, state.clone()).unwrap();
+    let captured = job_progressions(&startup_and_world(&mut capture, &state, &version)[7]);
+    assert!(captured.iter().any(|(_, _, bytes)| bytes[..] != fresh));
+    for directory in [&merged, &bare] {
+        let mut gateway =
+            Gateway::load_gameplay_from_content(state.clone(), directory, None).unwrap();
+        let jobs = job_progressions(&startup_and_world(&mut gateway, &state, &version)[7]);
+        assert!(jobs.len() >= captured.len());
+        for (id, _) in &configured {
+            assert!(jobs.iter().any(|(job, _, _)| job == id), "job {id} has no record");
+        }
+        for (id, offset, bytes) in jobs {
+            if let Some(&(_, rank_offset)) = configured.iter().find(|(job, _)| *job == id) {
+                assert_eq!(offset, rank_offset, "job {id} rank offset");
+            }
+            assert_eq!(bytes, fresh, "job {id} in {}", directory.display());
+        }
+    }
+    let _ = fs::remove_dir_all(merged);
+    let _ = fs::remove_dir_all(bare);
+}
+
 #[test]
 fn every_release_file_loads_through_its_real_loader() {
     let release = release_dir();
