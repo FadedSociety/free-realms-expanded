@@ -271,12 +271,8 @@ fn put_i32(bytes: &mut Vec<u8>, value: i32) {
     bytes.extend_from_slice(&value.to_le_bytes());
 }
 
-fn read_i32(bytes: &[u8], offset: usize) -> i32 {
-    i32::from_le_bytes(
-        bytes[offset..offset + 4]
-            .try_into()
-            .expect("checked length"),
-    )
+fn read_i32(bytes: &[u8], offset: usize) -> io::Result<i32> {
+    osfr_tools::le::i32(bytes, offset).ok_or_else(|| invalid("action bar field is truncated"))
 }
 
 /// One parsed native action-bar assign request (42/6).
@@ -304,21 +300,21 @@ pub enum AssignParse {
 
 /// Classify an inventory-family message without touching any state.
 pub fn parse_assign(inner: &[u8]) -> io::Result<AssignParse> {
-    if inner.len() < 4 {
+    let (Some(main), Some(sub)) = (osfr_tools::le::u16(inner, 0), osfr_tools::le::u16(inner, 2))
+    else {
         return Err(invalid("inventory request is shorter than its header"));
-    }
-    if u16::from_le_bytes(inner[..2].try_into().expect("checked length")) != ASSIGN_MAIN {
+    };
+    if main != ASSIGN_MAIN {
         return Err(invalid("not an inventory request"));
     }
-    let sub = u16::from_le_bytes(inner[2..4].try_into().expect("checked length"));
     match sub {
         ASSIGN_SUB => {
             if inner.len() != ASSIGN_REQUEST_BYTES {
                 return Err(invalid("action bar assign must be exactly 12 bytes"));
             }
             Ok(AssignParse::Request(AssignRequest {
-                slot: read_i32(inner, 4),
-                item_instance_id: read_i32(inner, 8),
+                slot: read_i32(inner, 4)?,
+                item_instance_id: read_i32(inner, 8)?,
             }))
         }
         ASSIGN_BY_RECORD_SUB => Ok(AssignParse::ByRecordUnrecovered {
@@ -450,30 +446,27 @@ impl ActionBarSlot {
         if bytes.len() != SLOT_BYTES {
             return Err(invalid("action bar slot must be exactly 51 bytes"));
         }
-        let targeting_parameter = f32::from_le_bytes(
-            bytes[slot_field::TARGETING_PARAMETER..slot_field::TARGETING_PARAMETER + 4]
-                .try_into()
-                .expect("checked length"),
-        );
+        let targeting_parameter = osfr_tools::le::f32(bytes, slot_field::TARGETING_PARAMETER)
+            .ok_or_else(|| invalid("action bar field is truncated"))?;
         if targeting_parameter.is_nan() {
             return Err(invalid("action bar targeting parameter is not a number"));
         }
         Ok(Self {
             is_empty: bytes[slot_field::IS_EMPTY] != 0,
-            icon_id: read_i32(bytes, slot_field::ICON_ID),
-            icon_tint_id: read_i32(bytes, slot_field::ICON_TINT_ID),
-            name_id: read_i32(bytes, slot_field::NAME_ID),
-            selector_a: read_i32(bytes, slot_field::SELECTOR_A),
-            target_selector: read_i32(bytes, slot_field::TARGET_SELECTOR),
+            icon_id: read_i32(bytes, slot_field::ICON_ID)?,
+            icon_tint_id: read_i32(bytes, slot_field::ICON_TINT_ID)?,
+            name_id: read_i32(bytes, slot_field::NAME_ID)?,
+            selector_a: read_i32(bytes, slot_field::SELECTOR_A)?,
+            target_selector: read_i32(bytes, slot_field::TARGET_SELECTOR)?,
             targeting_parameter,
-            mana_cost: read_i32(bytes, slot_field::MANA_COST),
+            mana_cost: read_i32(bytes, slot_field::MANA_COST)?,
             enabled: bytes[slot_field::ENABLED] != 0,
-            unknown_10: read_i32(bytes, slot_field::UNKNOWN_10),
-            total_refresh_time: read_i32(bytes, slot_field::TOTAL_REFRESH_TIME),
-            unknown_12: read_i32(bytes, slot_field::UNKNOWN_12),
-            quantity: read_i32(bytes, slot_field::QUANTITY),
+            unknown_10: read_i32(bytes, slot_field::UNKNOWN_10)?,
+            total_refresh_time: read_i32(bytes, slot_field::TOTAL_REFRESH_TIME)?,
+            unknown_12: read_i32(bytes, slot_field::UNKNOWN_12)?,
+            quantity: read_i32(bytes, slot_field::QUANTITY)?,
             force_dismount: bytes[slot_field::FORCE_DISMOUNT] != 0,
-            cast_age: read_i32(bytes, slot_field::CAST_AGE),
+            cast_age: read_i32(bytes, slot_field::CAST_AGE)?,
         })
     }
 }

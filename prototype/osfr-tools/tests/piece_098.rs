@@ -109,6 +109,7 @@ struct GcnkOptions {
     first_index: u16,
     first_position_x: f32,
     collision_expanded: Option<u32>,
+    batch_index_offset: i32,
 }
 
 /// Minimal `GCNK` file: one tile, one runtime object, one render batch, three vertices.
@@ -157,7 +158,7 @@ fn build_gcnk(options: GcnkOptions) -> Vec<u8> {
     push_i32(&mut chunk, 9); // Unknown13
     push_i32(&mut chunk, 0); // trailing skipped word
     push_i32(&mut chunk, 1); // render batch count
-    for value in [0, 3, 0, 3] {
+    for value in [options.batch_index_offset, 3, 0, 3] {
         push_i32(&mut chunk, value);
     }
     push_i32(&mut chunk, 0); // height map bits per pixel
@@ -434,6 +435,17 @@ fn terrain_rejects_malformed_and_unsupported_input() {
         ..Default::default()
     });
     let result = load_terrain(&out_of_range);
+    assert!(
+        matches!(result, Err(LoadError::IndexOutOfRange(_))),
+        "{result:?}"
+    );
+
+    // Batch offset plus count past i32::MAX is refused, not overflowed into a bad slice.
+    let overflow = build_gcnk(GcnkOptions {
+        batch_index_offset: i32::MAX,
+        ..Default::default()
+    });
+    let result = load_terrain(&overflow);
     assert!(
         matches!(result, Err(LoadError::IndexOutOfRange(_))),
         "{result:?}"

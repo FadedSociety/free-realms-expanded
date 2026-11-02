@@ -977,9 +977,10 @@ fn check(bytes: &[u8], expected: (u16, u16), length: usize) -> Result<(), Status
             got: bytes.len(),
         });
     }
+    // Every caller's length is at least 8, so the defaults never apply; (0, 0) would be refused.
     let got = (
-        u16::from_le_bytes(bytes[..2].try_into().unwrap()),
-        u16::from_le_bytes(bytes[2..4].try_into().unwrap()),
+        osfr_tools::le::u16(bytes, 0).unwrap_or_default(),
+        osfr_tools::le::u16(bytes, 2).unwrap_or_default(),
     );
     if got != expected {
         return Err(StatusError::BadOpcode { expected, got });
@@ -998,31 +999,24 @@ fn read_bool(bytes: &[u8], offset: usize) -> Result<bool, StatusError> {
 }
 
 fn read_i32(bytes: &[u8], offset: usize) -> Result<i32, StatusError> {
-    let slice = bytes
-        .get(offset..offset + 4)
-        .ok_or(StatusError::BadLength {
-            expected: offset + 4,
-            got: bytes.len(),
-        })?;
-    Ok(i32::from_le_bytes(slice.try_into().unwrap()))
+    osfr_tools::le::i32(bytes, offset).ok_or(StatusError::BadLength {
+        expected: offset + 4,
+        got: bytes.len(),
+    })
 }
 
 fn read_i64(bytes: &[u8], offset: usize) -> Result<i64, StatusError> {
-    let slice = bytes
-        .get(offset..offset + 8)
+    osfr_tools::le::bytes(bytes, offset)
+        .map(i64::from_le_bytes)
         .ok_or(StatusError::BadLength {
             expected: offset + 8,
             got: bytes.len(),
-        })?;
-    Ok(i64::from_le_bytes(slice.try_into().unwrap()))
+        })
 }
 
 fn read_u64(bytes: &[u8], offset: usize) -> Result<u64, StatusError> {
-    let slice = bytes
-        .get(offset..offset + 8)
-        .ok_or(StatusError::BadLength {
-            expected: offset + 8,
-            got: bytes.len(),
-        })?;
-    Ok(u64::from_le_bytes(slice.try_into().unwrap()))
+    osfr_tools::le::u64(bytes, offset).ok_or(StatusError::BadLength {
+        expected: offset + 8,
+        got: bytes.len(),
+    })
 }

@@ -93,12 +93,12 @@ fn read_i32(body: &[u8], offset: &mut usize) -> Result<i32, WarpCodecError> {
         expected: usize::MAX,
         got: body.len(),
     })?;
-    let slice = body.get(*offset..end).ok_or(WarpCodecError::Truncated {
+    let value = osfr_tools::le::i32(body, *offset).ok_or(WarpCodecError::Truncated {
         expected: end,
         got: body.len(),
     })?;
     *offset = end;
-    Ok(i32::from_le_bytes(slice.try_into().unwrap()))
+    Ok(value)
 }
 
 fn read_f32(body: &[u8], offset: &mut usize) -> Result<f32, WarpCodecError> {
@@ -106,12 +106,12 @@ fn read_f32(body: &[u8], offset: &mut usize) -> Result<f32, WarpCodecError> {
         expected: usize::MAX,
         got: body.len(),
     })?;
-    let slice = body.get(*offset..end).ok_or(WarpCodecError::Truncated {
+    let value = osfr_tools::le::f32(body, *offset).ok_or(WarpCodecError::Truncated {
         expected: end,
         got: body.len(),
     })?;
     *offset = end;
-    Ok(f32::from_le_bytes(slice.try_into().unwrap()))
+    Ok(value)
 }
 
 /// Strict body-length failures. Every request below states its exact length,
@@ -172,8 +172,9 @@ impl ZoneTeleportRequest {
 
     pub fn decode(body: &[u8]) -> Result<Self, WarpCodecError> {
         expect_exact(body, Self::BODY_LEN)?;
+        let mut offset = 0;
         Ok(Self {
-            destination_id: i32::from_le_bytes(body.try_into().unwrap()),
+            destination_id: read_i32(body, &mut offset)?,
         })
     }
 
@@ -208,7 +209,10 @@ impl WorldTeleportRequest {
     pub fn decode(body: &[u8]) -> Result<Self, WarpCodecError> {
         expect_exact(body, Self::BODY_LEN)?;
         Ok(Self {
-            player_guid: u64::from_le_bytes(body.try_into().unwrap()),
+            player_guid: osfr_tools::le::u64(body, 0).ok_or(WarpCodecError::Truncated {
+                expected: Self::BODY_LEN,
+                got: body.len(),
+            })?,
         })
     }
 
@@ -277,7 +281,10 @@ impl UpdateLocation {
 
     pub fn decode_message(message: &[u8]) -> Result<Self, WarpCodecError> {
         expect_exact(message, Self::MESSAGE_LEN)?;
-        let sub = u16::from_le_bytes(message[..2].try_into().unwrap());
+        let sub = osfr_tools::le::u16(message, 0).ok_or(WarpCodecError::Truncated {
+            expected: Self::MESSAGE_LEN,
+            got: message.len(),
+        })?;
         if sub != UPDATE_LOCATION_SUB_OPCODE {
             return Err(WarpCodecError::UnexpectedSubOpcode {
                 expected: UPDATE_LOCATION_SUB_OPCODE,
@@ -369,7 +376,10 @@ pub fn decode_point_of_interest_message(
             got: sub,
         });
     }
-    let declared = i32::from_le_bytes(message[2..6].try_into().unwrap());
+    let declared = osfr_tools::le::i32(message, 2).ok_or(WarpCodecError::Truncated {
+        expected: 6,
+        got: message.len(),
+    })?;
     if declared < 0 || declared as usize != message.len() - 6 {
         return Err(WarpCodecError::LengthMismatch {
             declared,
@@ -415,9 +425,8 @@ pub fn decode_point_of_interest_reply(
 }
 
 fn strip_optional_length_prefix(body: &[u8]) -> &[u8] {
-    if body.len() >= 4 {
-        let declared = u32::from_le_bytes(body[..4].try_into().unwrap()) as usize;
-        if declared == body.len() - 4 {
+    if let Some(declared) = osfr_tools::le::u32(body, 0) {
+        if declared as usize == body.len() - 4 {
             let inner = &body[4..];
             if inner
                 .first()

@@ -379,24 +379,28 @@ impl<'a> Reader<'a> {
         }
     }
 
+    fn array<const N: usize>(&mut self, field: &'static str) -> Result<[u8; N], InitError> {
+        osfr_tools::le::bytes(self.take(N, field)?, 0).ok_or(InitError::Truncated(field))
+    }
+
     fn u16(&mut self, field: &'static str) -> Result<u16, InitError> {
-        Ok(u16::from_le_bytes(self.take(2, field)?.try_into().unwrap()))
+        Ok(u16::from_le_bytes(self.array(field)?))
     }
 
     fn u32(&mut self, field: &'static str) -> Result<u32, InitError> {
-        Ok(u32::from_le_bytes(self.take(4, field)?.try_into().unwrap()))
+        Ok(u32::from_le_bytes(self.array(field)?))
     }
 
     fn i32(&mut self, field: &'static str) -> Result<i32, InitError> {
-        Ok(i32::from_le_bytes(self.take(4, field)?.try_into().unwrap()))
+        Ok(i32::from_le_bytes(self.array(field)?))
     }
 
     fn i64(&mut self, field: &'static str) -> Result<i64, InitError> {
-        Ok(i64::from_le_bytes(self.take(8, field)?.try_into().unwrap()))
+        Ok(i64::from_le_bytes(self.array(field)?))
     }
 
     fn f32(&mut self, field: &'static str) -> Result<f32, InitError> {
-        let value = f32::from_le_bytes(self.take(4, field)?.try_into().unwrap());
+        let value = f32::from_le_bytes(self.array(field)?);
         if value.is_finite() {
             Ok(value)
         } else {
@@ -843,7 +847,7 @@ pub fn split_frame(frame: &[u8]) -> Result<&[u8], InitError> {
     if frame.len() < 7 {
         return Err(InitError::Truncated("tunnel"));
     }
-    let outer = u16::from_le_bytes(frame[..2].try_into().unwrap());
+    let outer = osfr_tools::le::u16(frame, 0).ok_or(InitError::Truncated("tunnel"))?;
     if outer != TUNNEL_OUTER {
         return Err(InitError::TunnelOuter(outer));
     }
@@ -851,7 +855,7 @@ pub fn split_frame(frame: &[u8]) -> Result<&[u8], InitError> {
         0 | 1 => {}
         value => return Err(InitError::TunnelFlag(value)),
     }
-    let declared = u32::from_le_bytes(frame[3..7].try_into().unwrap()) as usize;
+    let declared = osfr_tools::le::u32(frame, 3).ok_or(InitError::Truncated("tunnel"))? as usize;
     let actual = frame.len() - 7;
     if declared != actual {
         return Err(InitError::LengthMismatch { declared, actual });

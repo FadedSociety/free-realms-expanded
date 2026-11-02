@@ -545,7 +545,7 @@ pub fn load_terrain(bytes: &[u8]) -> Result<TerrainTile, LoadError> {
         if batch.index_offset < 0
             || batch.index_count < 0
             || batch.vertex_offset < 0
-            || batch.index_offset + batch.index_count > indices.len() as i32
+            || i64::from(batch.index_offset) + i64::from(batch.index_count) > indices.len() as i64
         {
             return Err(LoadError::IndexOutOfRange("GCNK render batch"));
         }
