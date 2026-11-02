@@ -1227,7 +1227,7 @@
       "reference_ids": [],
       "name": "Bud Grimyfoot",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 439488,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -1373,11 +1373,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part B. The Thoroughfare, the farm and the cooking tents, row 69; source cell: [client][video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part B. The Thoroughfare, the farm and the cooking tents, row 69; source cell: [client][video]"
+            "evidence": "client locale npc_name 'Bud Grimyfoot' = Global.Text 439488 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -3951,7 +3947,7 @@
       "reference_ids": [],
       "name": "Durple",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 394989,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -4095,11 +4091,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part A. The entrance, the Sasparilla Brewery and the Party Tent, row 37; source cell: [client name][video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part A. The entrance, the Sasparilla Brewery and the Party Tent, row 37; source cell: [client name][video]"
+            "evidence": "client locale npc_name 'Durple' = Global.Text 394989 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -5689,7 +5681,7 @@
       "reference_ids": [],
       "name": "Gertrude",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 47378,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -5813,7 +5805,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part A. The entrance, the Sasparilla Brewery and the Party Tent, row 43; source cell: [client]"
+            "evidence": "client locale npc_name 'Gertrude' = Global.Text 47378 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -6442,7 +6434,7 @@
       "reference_ids": [],
       "name": "Glugalug",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 442909,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -6586,11 +6578,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part D. The Heroes story, the Chug-a-Mug Challenge and Sweetwater Climb, row 93; source cell: [client name][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part D. The Heroes story, the Chug-a-Mug Challenge and Sweetwater Climb, row 93; source cell: [client name][wiki]"
+            "evidence": "client locale npc_name 'Glugalug' = Global.Text 442909 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -9974,7 +9962,7 @@
       "reference_ids": [],
       "name": "Ninjawug Archer",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 442612,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": "Wugachug",
@@ -10111,11 +10099,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part D. The Heroes story, the Chug-a-Mug Challenge and Sweetwater Climb, row 91; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part D. The Heroes story, the Chug-a-Mug Challenge and Sweetwater Climb, row 91; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Ninjawug Archer' = Global.Text 442612 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -10375,8 +10359,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3320 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3320 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 4464,
+      "model_file_name": "chugawug_m_ninja_archer_01.adr"
     },
     {
       "npc_id": 9500000990,
@@ -10384,7 +10382,7 @@
       "reference_ids": [],
       "name": "Ninjawug Bixie-rider",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 442613,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -10546,11 +10544,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part D. The Heroes story, the Chug-a-Mug Challenge and Sweetwater Climb, row 91; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part D. The Heroes story, the Chug-a-Mug Challenge and Sweetwater Climb, row 91; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Ninjawug Bixie-rider' = Global.Text 442613 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -10810,8 +10804,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3325 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3325 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 4467,
+      "model_file_name": "chugawug_m_ninjawug_bixie_rider_01.adr"
     },
     {
       "npc_id": 9500000991,
@@ -10819,7 +10827,7 @@
       "reference_ids": [],
       "name": "Ninjawug Blademaster",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 442611,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": "Wugachug",
@@ -10956,11 +10964,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part D. The Heroes story, the Chug-a-Mug Challenge and Sweetwater Climb, row 91; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part D. The Heroes story, the Chug-a-Mug Challenge and Sweetwater Climb, row 91; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Ninjawug Blademaster' = Global.Text 442611 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -11220,8 +11224,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3318 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3318 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 4465,
+      "model_file_name": "chugawug_m_ninja_blademaster_01.adr"
     },
     {
       "npc_id": 9500000992,
@@ -12800,7 +12818,7 @@
       "reference_ids": [],
       "name": "Rebel Mage Pollentine",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 74022,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -12975,15 +12993,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part D. The Heroes story, the Chug-a-Mug Challenge and Sweetwater Climb, row 92; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part D. The Heroes story, the Chug-a-Mug Challenge and Sweetwater Climb, row 92; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part D. The Heroes story, the Chug-a-Mug Challenge and Sweetwater Climb, row 92; source cell: [client][video][wiki]"
+            "evidence": "client locale npc_name 'Rebel Mage Pollentine' = Global.Text 74022 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -13299,8 +13309,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46095 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46095 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 211,
+      "model_file_name": "bixie_f_mage.adr"
     },
     {
       "npc_id": 9500000995,
@@ -13308,7 +13332,7 @@
       "reference_ids": [],
       "name": "Rumple",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 442908,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -13452,11 +13476,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part D. The Heroes story, the Chug-a-Mug Challenge and Sweetwater Climb, row 94; source cell: [client name][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part D. The Heroes story, the Chug-a-Mug Challenge and Sweetwater Climb, row 94; source cell: [client name][wiki]"
+            "evidence": "client locale npc_name 'Rumple' = Global.Text 442908 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -14069,7 +14089,7 @@
       "reference_ids": [],
       "name": "Sandscale Spectator",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 442915,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -14213,11 +14233,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part D. The Heroes story, the Chug-a-Mug Challenge and Sweetwater Climb, row 96; source cell: [client name][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part D. The Heroes story, the Chug-a-Mug Challenge and Sweetwater Climb, row 96; source cell: [client name][wiki]"
+            "evidence": "client locale npc_name 'Sandscale Spectator' = Global.Text 442915 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -16222,7 +16238,7 @@
       "reference_ids": [],
       "name": "Sunspotter",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 442910,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -16366,11 +16382,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part D. The Heroes story, the Chug-a-Mug Challenge and Sweetwater Climb, row 95; source cell: [client name][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part D. The Heroes story, the Chug-a-Mug Challenge and Sweetwater Climb, row 95; source cell: [client name][wiki]"
+            "evidence": "client locale npc_name 'Sunspotter' = Global.Text 442910 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [

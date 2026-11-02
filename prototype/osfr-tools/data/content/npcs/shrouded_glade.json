@@ -9,7 +9,7 @@
       "reference_ids": [],
       "name": "Adrian Treebreeze",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 722,
       "name_string_ids": [
         {
           "table": "ugdt",
@@ -155,11 +155,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part F. The Gloam invasion cast, row 124; source cell: [client] [wiki Shrouded Gloam]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part F. The Gloam invasion cast, row 124; source cell: [client] [wiki Shrouded Gloam]"
+            "evidence": "client locale npc_name 'Adrian Treebreeze' = Global.Text 722 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -3108,7 +3104,7 @@
       "reference_ids": [],
       "name": "Branchlord",
       "name_reason": null,
-      "name_string_id": 524662094,
+      "name_string_id": 815,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -3250,11 +3246,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part F. The Gloam invasion cast, row 124; source cell: [client] [wiki Shrouded Gloam]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part F. The Gloam invasion cast, row 124; source cell: [client] [wiki Shrouded Gloam]"
+            "evidence": "client locale npc_name 'Branchlord' = Global.Text 815 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -3523,7 +3515,7 @@
       "reference_ids": [],
       "name": "Brickface",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 438530,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -3667,11 +3659,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part G. Misty Mountain and the creatures of the glade, row 142; source cell: [client] [wiki Shrouded Gloam]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part G. Misty Mountain and the creatures of the glade, row 142; source cell: [client] [wiki Shrouded Gloam]"
+            "evidence": "client locale npc_name 'Brickface' = Global.Text 438530 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -11193,7 +11181,7 @@
       "reference_ids": [],
       "name": "Druid Guard",
       "name_reason": null,
-      "name_string_id": 412806155,
+      "name_string_id": 437560,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -11355,15 +11343,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part F. The Gloam invasion cast, row 130; source cell: [client] [video] [wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part F. The Gloam invasion cast, row 130; source cell: [client] [video] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part F. The Gloam invasion cast, row 130; source cell: [client] [video] [wiki]"
+            "evidence": "client locale npc_name 'Druid Guard' = Global.Text 437560 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -12662,7 +12642,7 @@
       "reference_ids": [],
       "name": "Druid Rally Officer",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 437163,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -12832,15 +12812,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part F. The Gloam invasion cast, row 129; source cell: [client] [video] [wiki Shrouded Gloam, Dwarves]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part F. The Gloam invasion cast, row 129; source cell: [client] [video] [wiki Shrouded Gloam, Dwarves]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part F. The Gloam invasion cast, row 129; source cell: [client] [video] [wiki Shrouded Gloam, Dwarves]"
+            "evidence": "client locale npc_name 'Druid Rally Officer' = Global.Text 437163 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -13165,7 +13137,7 @@
       "reference_ids": [],
       "name": "Dwarf Rally Officer",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 437168,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -13335,15 +13307,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part F. The Gloam invasion cast, row 129; source cell: [client] [video] [wiki Shrouded Gloam, Dwarves]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part F. The Gloam invasion cast, row 129; source cell: [client] [video] [wiki Shrouded Gloam, Dwarves]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part F. The Gloam invasion cast, row 129; source cell: [client] [video] [wiki Shrouded Gloam, Dwarves]"
+            "evidence": "client locale npc_name 'Dwarf Rally Officer' = Global.Text 437168 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -15417,7 +15381,7 @@
       "reference_ids": [],
       "name": "Embir Clearwell",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 45379,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -15537,7 +15501,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part B. Teachers, students and Academy townsfolk, row 68; source cell: [client]"
+            "evidence": "client locale npc_name 'Embir Clearwell' = Global.Text 45379 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -15741,8 +15705,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AEmbir_Clearwell"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AEmbir_Clearwell"
+          }
         ]
-      }
+      },
+      "model_id": 456,
+      "model_file_name": "fairy_druid_f.adr"
     },
     {
       "npc_id": 9500000679,
@@ -18417,7 +18395,7 @@
       "reference_ids": [],
       "name": "Gloamtooth",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 438529,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -18561,11 +18539,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part G. Misty Mountain and the creatures of the glade, row 142; source cell: [client] [wiki Shrouded Gloam]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part G. Misty Mountain and the creatures of the glade, row 142; source cell: [client] [wiki Shrouded Gloam]"
+            "evidence": "client locale npc_name 'Gloamtooth' = Global.Text 438529 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -19784,7 +19758,7 @@
       "reference_ids": [],
       "name": "Halister Richfrond",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 45455,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -19928,11 +19902,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part C. Warpstone greeters, Pet Park and townsfolk, row 78; source cell: [client] [video, partial nameplate]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part C. Warpstone greeters, Pet Park and townsfolk, row 78; source cell: [client] [video, partial nameplate]"
+            "evidence": "client locale npc_name 'Halister Richfrond' = Global.Text 45455 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -20188,8 +20158,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Halister_Richfrond"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Halister_Richfrond"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9500000689,
@@ -21491,22 +21475,19 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
-        ]
-      ,
+        ],
         "heading": [
           {
             "kind": "legacy-data",
             "evidence": "../lab/references/Lxzxrus-Free-Realms-Server/src/Scripts/Zone/FabledRealms.lua:2325 spawn definition 3841; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=3841 (NameId=45386, ModelId=3952, ModelFileName=fairy_druid_m_factionleader.adr)"
           }
-        ]
-      ,
+        ],
         "model_id": [
           {
             "kind": "legacy-data",
             "evidence": "../lab/references/Lxzxrus-Free-Realms-Server/src/Scripts/Zone/FabledRealms.lua:2325 spawn definition 3841; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=3841 (NameId=45386, ModelId=3952, ModelFileName=fairy_druid_m_factionleader.adr)"
           }
-        ]
-      ,
+        ],
         "model_file_name": [
           {
             "kind": "legacy-data",
@@ -24374,7 +24355,7 @@
       "reference_ids": [],
       "name": "Leek Thistleore",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 45407,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -24494,7 +24475,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part C. Warpstone greeters, Pet Park and townsfolk, row 82; source cell: [client]"
+            "evidence": "client locale npc_name 'Leek Thistleore' = Global.Text 45407 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -24698,8 +24679,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ALeek_Thistleore"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ALeek_Thistleore"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9500000699,
@@ -25461,7 +25456,7 @@
       "reference_ids": [],
       "name": "Marius Shadetree",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 438531,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -25605,11 +25600,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part G. Misty Mountain and the creatures of the glade, row 142; source cell: [client] [wiki Shrouded Gloam]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part G. Misty Mountain and the creatures of the glade, row 142; source cell: [client] [wiki Shrouded Gloam]"
+            "evidence": "client locale npc_name 'Marius Shadetree' = Global.Text 438531 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -26298,7 +26289,7 @@
       "reference_ids": [],
       "name": "Milla",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 45451,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -26442,11 +26433,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part B. Teachers, students and Academy townsfolk, row 63; source cell: [client] [wiki Bruce]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part B. Teachers, students and Academy townsfolk, row 63; source cell: [client] [wiki Bruce]"
+            "evidence": "client locale npc_name 'Milla' = Global.Text 45451 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -26702,8 +26689,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob:Milla"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob:Milla"
+          }
         ]
-      }
+      },
+      "model_id": 456,
+      "model_file_name": "fairy_druid_f.adr"
     },
     {
       "npc_id": 9500000704,
@@ -26711,7 +26712,7 @@
       "reference_ids": [],
       "name": "Milwind",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 140920,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -26831,7 +26832,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part B. Teachers, students and Academy townsfolk, row 64; source cell: [client]"
+            "evidence": "client locale npc_name 'Milwind' = Global.Text 140920 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -27035,8 +27036,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AMilwind"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AMilwind"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9500000705,
@@ -27044,7 +27059,7 @@
       "reference_ids": [],
       "name": "Misty Mountain Hermit",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 140363,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -27188,11 +27203,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part G. Misty Mountain and the creatures of the glade, row 139; source cell: [client name] [wiki Fairies]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part G. Misty Mountain and the creatures of the glade, row 139; source cell: [client name] [wiki Fairies]"
+            "evidence": "client locale npc_name 'Misty Mountain Hermit' = Global.Text 140363 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -27448,8 +27459,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn fairy male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AMisty_Mountain_Hermit"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn fairy male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AMisty_Mountain_Hermit"
+          }
         ]
-      }
+      },
+      "model_id": 454,
+      "model_file_name": "sprite_basic_m.adr"
     },
     {
       "npc_id": 9500000706,
@@ -30859,7 +30884,7 @@
       "reference_ids": [],
       "name": "Shelby",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 390204,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -30987,7 +31012,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part C. Warpstone greeters, Pet Park and townsfolk, row 80; source cell: [client]"
+            "evidence": "client locale npc_name 'Shelby' = Global.Text 390204 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -31191,8 +31216,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AShelby"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AShelby"
+          }
         ]
-      }
+      },
+      "model_id": 456,
+      "model_file_name": "fairy_druid_f.adr"
     },
     {
       "npc_id": 9500000714,
@@ -31200,7 +31239,7 @@
       "reference_ids": [],
       "name": "Snowface",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 103637,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -31350,11 +31389,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part G. Misty Mountain and the creatures of the glade, row 137; source cell: [client] [wiki Snowface]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part G. Misty Mountain and the creatures of the glade, row 137; source cell: [client] [wiki Snowface]"
+            "evidence": "client locale npc_name 'Snowface' = Global.Text 103637 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -31618,8 +31653,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46087 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46087 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 3956,
+      "model_file_name": "gloam_m_boss.adr"
     },
     {
       "npc_id": 9500000715,

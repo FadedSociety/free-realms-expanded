@@ -980,7 +980,7 @@
       "reference_ids": [],
       "name": "Argo",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 5113,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -1100,7 +1100,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part B. The Greenwood Camp (chugawug archer camp) and the merchants around it, row 64; source cell: [client]"
+            "evidence": "client locale npc_name 'Argo' = Global.Text 5113 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -9871,7 +9871,7 @@
       "reference_ids": [],
       "name": "Cyndreela",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 91662,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -9992,7 +9992,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part C. The forest, the dig site and the wildlife camp, row 90; source cell: [client]"
+            "evidence": "client locale npc_name 'Cyndreela' = Global.Text 91662 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -10196,8 +10196,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Cyndreela"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Cyndreela"
+          }
         ]
-      }
+      },
+      "model_id": 456,
+      "model_file_name": "fairy_druid_f.adr"
     },
     {
       "npc_id": 9500000305,
@@ -10629,7 +10643,7 @@
       "reference_ids": [],
       "name": "Gerald Gemcutter",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 442435,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -10749,7 +10763,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part E. Southvale Quarry and Outpost, row 115; source cell: [client]"
+            "evidence": "client locale npc_name 'Gerald Gemcutter' = Global.Text 442435 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -11960,7 +11974,7 @@
       "reference_ids": [],
       "name": "Golden Bear",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 71599,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -12104,11 +12118,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part C. The forest, the dig site and the wildlife camp, row 88; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part C. The forest, the dig site and the wildlife camp, row 88; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Golden Bear' = Global.Text 71599 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -14871,7 +14881,7 @@
       "reference_ids": [],
       "name": "Jason Maskface",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 437129,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -15017,11 +15027,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part C. The forest, the dig site and the wildlife camp, row 92; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part C. The forest, the dig site and the wildlife camp, row 92; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Jason Maskface' = Global.Text 437129 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -15795,7 +15801,7 @@
       ],
       "name": "Jormajorm",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 5115,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -15940,11 +15946,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part B. The Greenwood Camp (chugawug archer camp) and the merchants around it, row 68; source cell: [client name][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part B. The Greenwood Camp (chugawug archer camp) and the merchants around it, row 68; source cell: [client name][wiki]"
+            "evidence": "client locale npc_name 'Jormajorm' = Global.Text 5115 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -16212,8 +16214,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn chugawug male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AJormajorm"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn chugawug male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AJormajorm"
+          }
         ]
-      }
+      },
+      "model_id": 221,
+      "model_file_name": "chugawug_m_02.adr"
     },
     {
       "npc_id": 9500000313,
@@ -18560,7 +18576,7 @@
       "reference_ids": [],
       "name": "Muggenstomp",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 7058,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -18751,15 +18767,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part D. The bandit roads, the Bandit Hideout and Fleetfoot Ninja, row 102; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part D. The bandit roads, the Bandit Hideout and Fleetfoot Ninja, row 102; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part D. The bandit roads, the Bandit Hideout and Fleetfoot Ninja, row 102; source cell: [client][video][wiki]"
+            "evidence": "client locale npc_name 'Muggenstomp' = Global.Text 7058 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -19087,8 +19095,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46001 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46001 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 200,
+      "model_file_name": "chugawug_f_bandit_01.adr"
     },
     {
       "npc_id": 9500000316,
@@ -19096,7 +19118,7 @@
       "reference_ids": [],
       "name": "Niobe",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 76013,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -19242,11 +19264,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part D. The bandit roads, the Bandit Hideout and Fleetfoot Ninja, row 104; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part D. The bandit roads, the Bandit Hideout and Fleetfoot Ninja, row 104; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Niobe' = Global.Text 76013 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -19506,8 +19524,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46146 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46146 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 354,
+      "model_file_name": "human_f_ninja_01.agr"
     },
     {
       "npc_id": 9500000317,
@@ -22897,7 +22929,7 @@
       "reference_ids": [],
       "name": "Thugamug",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 103031,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -23079,15 +23111,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part D. The bandit roads, the Bandit Hideout and Fleetfoot Ninja, row 101; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part D. The bandit roads, the Bandit Hideout and Fleetfoot Ninja, row 101; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part D. The bandit roads, the Bandit Hideout and Fleetfoot Ninja, row 101; source cell: [client][video][wiki]"
+            "evidence": "client locale npc_name 'Thugamug' = Global.Text 103031 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -23415,8 +23439,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46151 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46151 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 199,
+      "model_file_name": "chugawug_m_bandit_01.adr"
     },
     {
       "npc_id": 9500000323,

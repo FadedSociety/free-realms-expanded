@@ -9,7 +9,7 @@
       "reference_ids": [],
       "name": "Acade Vulgari",
       "name_reason": null,
-      "name_string_id": 2311959119,
+      "name_string_id": 74851,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -125,7 +125,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Seaside.md#Part B. Cafe, school, post office, trainers and job-linked NPCs, row 52; source cell: [client]"
+            "evidence": "client locale npc_name 'Acade Vulgari' = Global.Text 74851 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -329,8 +329,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AAcade_Vulgari"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AAcade_Vulgari"
+          }
         ]
-      }
+      },
+      "model_id": 312,
+      "model_file_name": "human_m_freestyle_03.agr"
     },
     {
       "npc_id": 9500000547,
@@ -338,7 +352,7 @@
       "reference_ids": [],
       "name": "Admiral Fishfinder",
       "name_reason": null,
-      "name_string_id": 1719553458,
+      "name_string_id": 427718,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -478,11 +492,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Seaside.md#Part H. Event, guest and cross-zone NPCs, row 172; source cell: [client] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Seaside.md#Part H. Event, guest and cross-zone NPCs, row 172; source cell: [client] [wiki]"
+            "evidence": "client locale npc_name 'Admiral Fishfinder' = Global.Text 427718 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -738,8 +748,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/briarwood.json npc_id=9500000083 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/briarwood.json npc_id=9500000083 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 2116,
+      "model_file_name": "fairy_f_pirate_01.agr"
     },
     {
       "npc_id": 9500000548,
@@ -7635,7 +7659,7 @@
       "reference_ids": [],
       "name": "Burglz",
       "name_reason": null,
-      "name_string_id": 2236112843,
+      "name_string_id": 441415,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -7775,11 +7799,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Seaside.md#Part E. Merchants and shops, row 133; source cell: [client] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Seaside.md#Part E. Merchants and shops, row 133; source cell: [client] [wiki]"
+            "evidence": "client locale npc_name 'Burglz' = Global.Text 441415 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -8053,9 +8073,23 @@
             "kind": "reconstructed",
             "evidence": "(R) W126: use this verified speaker's locale speech as the fixed Talk greeting. The original server greeting/phase binding is not recovered; no text is invented."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/wilds.json npc_id=9500001007 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/wilds.json npc_id=9500001007 (same name)"
+          }
         ]
       },
-      "greeting_string_id": 441432
+      "greeting_string_id": 441432,
+      "model_id": 167,
+      "model_file_name": "troll_peasant_02.adr"
     },
     {
       "npc_id": 9500000564,
@@ -10201,7 +10235,7 @@
       "reference_ids": [],
       "name": "Cragara",
       "name_reason": null,
-      "name_string_id": 3495164671,
+      "name_string_id": 440941,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -10339,11 +10373,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Seaside.md#Part H. Event, guest and cross-zone NPCs, row 178; source cell: [client name] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Seaside.md#Part H. Event, guest and cross-zone NPCs, row 178; source cell: [client name] [wiki]"
+            "evidence": "client locale npc_name 'Cragara' = Global.Text 440941 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -10595,8 +10625,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npc_spawns_extra.json spawn_guid=9500000739 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npc_spawns_extra.json spawn_guid=9500000739 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 4103,
+      "model_file_name": "sogg_f_vendor.adr"
     },
     {
       "npc_id": 9500000570,
@@ -11800,7 +11844,7 @@
       "reference_ids": [],
       "name": "Diana Jones",
       "name_reason": null,
-      "name_string_id": 724789155,
+      "name_string_id": 442434,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -11916,7 +11960,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Seaside.md#Part H. Event, guest and cross-zone NPCs, row 173; source cell: [client]"
+            "evidence": "client locale npc_name 'Diana Jones' = Global.Text 442434 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -13563,7 +13607,7 @@
       "reference_ids": [],
       "name": "Doctor Gordon",
       "name_reason": null,
-      "name_string_id": 823955810,
+      "name_string_id": 7610,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -13704,11 +13748,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Seaside.md#Part H. Event, guest and cross-zone NPCs, row 171; source cell: [client] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Seaside.md#Part H. Event, guest and cross-zone NPCs, row 171; source cell: [client] [wiki]"
+            "evidence": "client locale npc_name 'Doctor Gordon' = Global.Text 7610 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -13964,8 +14004,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/sanctuary.json npc_id=9000000073 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/sanctuary.json npc_id=9000000073 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 506,
+      "model_file_name": "human_m_doctor_gordon.agr"
     },
     {
       "npc_id": 9500000575,
@@ -28822,7 +28876,7 @@
       ],
       "name": "Moanna",
       "name_reason": null,
-      "name_string_id": 2616881711,
+      "name_string_id": 78666,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -29033,7 +29087,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Seaside.md#Part B. Cafe, school, post office, trainers and job-linked NPCs, row 59; source cell: [client]"
+            "evidence": "client locale npc_name 'Moanna' = Global.Text 78666 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -29321,8 +29375,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AMoanna"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AMoanna"
+          }
         ]
-      }
+      },
+      "model_id": 7,
+      "model_file_name": "humanchild_f_skirtandtunic.adr"
     },
     {
       "npc_id": 9500000604,
@@ -36040,7 +36108,7 @@
       "reference_ids": [],
       "name": "Rokuro",
       "name_reason": null,
-      "name_string_id": 2368533985,
+      "name_string_id": 417408,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -36166,7 +36234,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 41; source cell: [client]"
+            "evidence": "client locale npc_name 'Rokuro' = Global.Text 417408 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -42724,7 +42792,7 @@
       ],
       "name": "Teaspoon Tarisa",
       "name_reason": null,
-      "name_string_id": 2495247435,
+      "name_string_id": 400026,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -42867,11 +42935,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Seaside.md#Part B. Cafe, school, post office, trainers and job-linked NPCs, row 48; source cell: [client] [video `w-9vtebjou4/00074`, `506rO_mhaSs/00046`]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Seaside.md#Part B. Cafe, school, post office, trainers and job-linked NPCs, row 48; source cell: [client] [video `w-9vtebjou4/00074`, `506rO_mhaSs/00046`]"
+            "evidence": "client locale npc_name 'Teaspoon Tarisa' = Global.Text 400026 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -43135,8 +43199,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ATeaspoon_Tarisa"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ATeaspoon_Tarisa"
+          }
         ]
-      }
+      },
+      "model_id": 456,
+      "model_file_name": "fairy_druid_f.adr"
     },
     {
       "npc_id": 9500000634,
@@ -46798,8 +46876,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/lakeshore.json npc_id=9000000223 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/lakeshore.json npc_id=9000000223 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 907,
+      "model_file_name": "human_m_ty_downtrodden.agr"
     },
     {
       "npc_id": 9500000642,

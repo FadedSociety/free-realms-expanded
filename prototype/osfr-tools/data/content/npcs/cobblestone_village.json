@@ -9,7 +9,7 @@
       "reference_ids": [],
       "name": "Amara Hearthsong",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 46076,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -134,7 +134,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Cobblestone Village.md#Part C. Other quest givers and residents, row 59; source cell: [client]"
+            "evidence": "client locale npc_name 'Amara Hearthsong' = Global.Text 46076 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -347,7 +347,7 @@
       "reference_ids": [],
       "name": "Aunt Daisy",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 41222,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -549,7 +549,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md#Part A. The Farnum family, farmhands and opening-arc NPCs, row 43; source cell: [client]"
+            "evidence": "client locale npc_name 'Aunt Daisy' = Global.Text 41222 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -753,8 +753,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/farnum_farmstead.json npc_id=9500000267 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/farnum_farmstead.json npc_id=9500000267 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 491,
+      "model_file_name": "human_f_aunt_daisy.agr"
     },
     {
       "npc_id": 9000000021,
@@ -4895,7 +4909,7 @@
       "reference_ids": [],
       "name": "Lulani Sunflare",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 78659,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -5017,7 +5031,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Cobblestone Village.md#Part C. Other quest givers and residents, row 57; source cell: [client]"
+            "evidence": "client locale npc_name 'Lulani Sunflare' = Global.Text 78659 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -5583,7 +5597,7 @@
       ],
       "name": "Majorie",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 78658,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -5730,11 +5744,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Cobblestone Village.md#Part B. Job trainers and job NPCs, row 48; source cell: [client] [wiki Pet Trainer, Cobblestone Village]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Cobblestone Village.md#Part B. Job trainers and job NPCs, row 48; source cell: [client] [wiki Pet Trainer, Cobblestone Village]"
+            "evidence": "client locale npc_name 'Majorie' = Global.Text 78658 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -5994,8 +6004,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AMajorie"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AMajorie"
+          }
         ]
-      }
+      },
+      "model_id": 7,
+      "model_file_name": "humanchild_f_skirtandtunic.adr"
     },
     {
       "npc_id": 9500000251,
@@ -6420,7 +6444,7 @@
       "reference_ids": [],
       "name": "Olivia",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 418494,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -6545,7 +6569,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Cobblestone Village.md#Part C. Other quest givers and residents, row 58; source cell: [client]"
+            "evidence": "client locale npc_name 'Olivia' = Global.Text 418494 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -8673,7 +8697,7 @@
       "reference_ids": [],
       "name": "Spot",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 18848,
       "name_string_ids": [
         {
           "table": "ugdt",
@@ -8828,11 +8852,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Cobblestone Village.md#Part B. Job trainers and job NPCs, row 48; source cell: [client] [wiki Pet Trainer, Cobblestone Village]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Cobblestone Village.md#Part B. Job trainers and job NPCs, row 48; source cell: [client] [wiki Pet Trainer, Cobblestone Village]"
+            "evidence": "client locale npc_name 'Spot' = Global.Text 18848 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -9092,8 +9112,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn dog male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ASpot"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn dog male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ASpot"
+          }
         ]
-      }
+      },
+      "model_id": 171,
+      "model_file_name": "dog_large_shortears.adr"
     },
     {
       "npc_id": 9000002048,

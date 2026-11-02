@@ -190,20 +190,22 @@ const VIDEO_DRAW_CONFIDENCE: [&str; 2] = ["high", "medium"];
 impl RegionalNpc {
     /// Whether the row spawns. `legacy_data` rows carry a recovered spawn transform. A
     /// `video_index` row stands at a position solved from original-game footage, so it also
-    /// needs the confidence floor and a body: a model and a name id (AddNpc reader
-    /// `0x00921a10`; a zero of either draws nothing usable). Reconstructed POI/zone-centre
-    /// positions are build scaffolding, not NPC transforms, and never spawn.
+    /// needs the confidence floor. Every other positioned row spawns once it has a body: a
+    /// model and a name id (AddNpc reader `0x00921a10`; a zero of either draws nothing
+    /// usable). L924 (owner 2026-11-02): a known NPC stands in the world even at a
+    /// reconstructed POI or zone-centre spot; the quest marker guides the player there (R).
     fn drawn(&self) -> bool {
+        let body = self.model_id.is_some_and(|model| model > 0)
+            && self.name_string_id.is_some_and(|name| name > 0);
         match self.placement.as_deref() {
             Some("legacy_data") => true,
             Some("video_index") => {
                 self.placement_confidence
                     .as_deref()
                     .is_some_and(|confidence| VIDEO_DRAW_CONFIDENCE.contains(&confidence))
-                    && self.model_id.is_some_and(|model| model > 0)
-                    && self.name_string_id.is_some_and(|name| name > 0)
+                    && body
             }
-            _ => false,
+            _ => body,
         }
     }
 }
@@ -450,6 +452,14 @@ impl NpcVisibility {
             ..Self::default()
         };
         let presentation = read_presentation(content_dir)?;
+        let extras: Rows<ExtraNpc> = read_rows(&content_dir.join("npc_spawns_extra.json"))?;
+        // L924: a regional row whose NPC already has a bound extra spawn (its content key) is
+        // drawn by that spawn; drawing the row too would create the NPC twice.
+        let bound: BTreeSet<u64> = extras
+            .records
+            .iter()
+            .filter_map(|extra| extra.content_key)
+            .collect();
         let mut anchors = Vec::new();
         for npc in regional {
             let Some(position) = npc.position.filter(|p| p.iter().all(|v| v.is_finite())) else {
@@ -466,7 +476,9 @@ impl NpcVisibility {
                 // part of the shared open-world coordinate space.
                 .unwrap_or(OPEN_WORLD_ZONE);
             anchors.push((zone_id, position));
-            if !npc.drawn() {
+            let bound_elsewhere =
+                npc.placement.as_deref() != Some("legacy_data") && bound.contains(&npc.npc_id);
+            if !npc.drawn() || bound_elsewhere {
                 continue;
             }
             // Content `rotation` is a Y-axis quaternion; AddNpc wants a facing
@@ -510,7 +522,6 @@ impl NpcVisibility {
             return Err(invalid("NPC content has no positioned regional anchors"));
         }
 
-        let extras: Rows<ExtraNpc> = read_rows(&content_dir.join("npc_spawns_extra.json"))?;
         for npc in extras.records {
             if let Some(reason) = npc.display_error() {
                 return Err(invalid(format!(
@@ -2118,6 +2129,29 @@ mod tests {
             row.kind = InstanceKind::Encounter { encounter_id: 0 };
             world.instances.insert(id, row);
         }
+    }
+
+    #[test]
+    fn a_positioned_row_draws_once_it_has_a_body_whatever_its_placement() {
+        let row = |placement: &str, model: u32, name: u32| -> RegionalNpc {
+            serde_json::from_value(serde_json::json!({
+                "npc_id": 1, "placement": placement, "model_id": model,
+                "name_string_id": name, "position": [0.0, 0.0, 0.0],
+            }))
+            .unwrap()
+        };
+        assert!(row("poi_anchor", 964, 20671).drawn());
+        assert!(row("unanchored", 964, 20671).drawn());
+        assert!(
+            !row("poi_anchor", 0, 20671).drawn(),
+            "no model draws nothing"
+        );
+        assert!(!row("poi_anchor", 964, 0).drawn(), "no name draws nothing");
+        assert!(row("legacy_data", 0, 0).drawn());
+        assert!(
+            !row("video_index", 964, 20671).drawn(),
+            "a video row keeps its confidence floor"
+        );
     }
 
     #[test]

@@ -9,7 +9,7 @@
       "reference_ids": [],
       "name": "'Tip Top' Tommy",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 407537,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -144,7 +144,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part H. The Sunstone Gateway (client-only quest hub), row 129; source cell: [client]"
+            "evidence": "client locale npc_name ''Tip Top' Tommy' = Global.Text 407537 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -357,7 +357,7 @@
       "reference_ids": [],
       "name": "Amaran Ridgerider",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 407541,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -477,7 +477,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part H. The Sunstone Gateway (client-only quest hub), row 124; source cell: [client]"
+            "evidence": "client locale npc_name 'Amaran Ridgerider' = Global.Text 407541 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -1107,7 +1107,7 @@
       "reference_ids": [],
       "name": "Ben Dawnsun",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 407547,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -1240,7 +1240,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part H. The Sunstone Gateway (client-only quest hub), row 126; source cell: [client]"
+            "evidence": "client locale npc_name 'Ben Dawnsun' = Global.Text 407547 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -1453,7 +1453,7 @@
       "reference_ids": [],
       "name": "Biggs Breakneck",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 409194,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": null,
@@ -1564,7 +1564,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part H. The Sunstone Gateway (client-only quest hub), row 125; source cell: [client]"
+            "evidence": "client locale npc_name 'Biggs Breakneck' = Global.Text 409194 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -1777,7 +1777,7 @@
       "reference_ids": [],
       "name": "Boril Greybeard",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 407539,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -1895,7 +1895,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part H. The Sunstone Gateway (client-only quest hub), row 123; source cell: [client]"
+            "evidence": "client locale npc_name 'Boril Greybeard' = Global.Text 407539 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -2108,7 +2108,7 @@
       "reference_ids": [],
       "name": "Bran Hardtop",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 410328,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -2228,7 +2228,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part H. The Sunstone Gateway (client-only quest hub), row 135; source cell: [client]"
+            "evidence": "client locale npc_name 'Bran Hardtop' = Global.Text 410328 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -3777,7 +3777,7 @@
       "reference_ids": [],
       "name": "Bronzeknuckles",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 410341,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -3921,11 +3921,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part G. The Skullz and the valley bosses, row 105; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part G. The Skullz and the valley bosses, row 105; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Bronzeknuckles' = Global.Text 410341 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -4190,7 +4186,7 @@
       "reference_ids": [],
       "name": "Cactus Jake",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 407534,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -4358,15 +4354,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part G. The Skullz and the valley bosses, row 108; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part G. The Skullz and the valley bosses, row 108; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part G. The Skullz and the valley bosses, row 108; source cell: [client][video][wiki]"
+            "evidence": "client locale npc_name 'Cactus Jake' = Global.Text 407534 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -5515,7 +5503,7 @@
       "reference_ids": [],
       "name": "Cragara",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 440941,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -5684,11 +5672,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part J. Roaming merchant, row 164; source cell: [client name][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part J. Roaming merchant, row 164; source cell: [client name][wiki]"
+            "evidence": "client locale npc_name 'Cragara' = Global.Text 440941 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -5952,8 +5936,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npc_spawns_extra.json spawn_guid=9500000739 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npc_spawns_extra.json spawn_guid=9500000739 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 4103,
+      "model_file_name": "sogg_f_vendor.adr"
     },
     {
       "npc_id": 9500000812,
@@ -6377,7 +6375,7 @@
       "reference_ids": [],
       "name": "Durgin Shaleskull",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 409198,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": null,
@@ -6488,7 +6486,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part H. The Sunstone Gateway (client-only quest hub), row 125; source cell: [client]"
+            "evidence": "client locale npc_name 'Durgin Shaleskull' = Global.Text 409198 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -6701,7 +6699,7 @@
       "reference_ids": [],
       "name": "Dwarf Rally Officer",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 437168,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -6845,11 +6843,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part A. Rumble Ridge: the Freewheelers and Wheelie Pete's Roadhouse, row 39; source cell: [client name][wiki] (weak; no use string)"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part A. Rumble Ridge: the Freewheelers and Wheelie Pete's Roadhouse, row 39; source cell: [client name][wiki] (weak; no use string)"
+            "evidence": "client locale npc_name 'Dwarf Rally Officer' = Global.Text 437168 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -7544,7 +7538,7 @@
       "reference_ids": [],
       "name": "Finnerty Windchaser",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 407542,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -7664,7 +7658,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part H. The Sunstone Gateway (client-only quest hub), row 131; source cell: [client]"
+            "evidence": "client locale npc_name 'Finnerty Windchaser' = Global.Text 407542 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -8301,7 +8295,7 @@
       "reference_ids": [],
       "name": "Garrick Highflyer",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 407544,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -8421,7 +8415,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part H. The Sunstone Gateway (client-only quest hub), row 128; source cell: [client]"
+            "evidence": "client locale npc_name 'Garrick Highflyer' = Global.Text 407544 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -8634,7 +8628,7 @@
       "reference_ids": [],
       "name": "Glandak",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 409197,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": null,
@@ -8745,7 +8739,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part H. The Sunstone Gateway (client-only quest hub), row 125; source cell: [client]"
+            "evidence": "client locale npc_name 'Glandak' = Global.Text 409197 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -8958,7 +8952,7 @@
       "reference_ids": [],
       "name": "Goldcrusher",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 410353,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -9126,15 +9120,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part G. The Skullz and the valley bosses, row 107; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part G. The Skullz and the valley bosses, row 107; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part G. The Skullz and the valley bosses, row 107; source cell: [client][video][wiki]"
+            "evidence": "client locale npc_name 'Goldcrusher' = Global.Text 410353 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -10086,7 +10072,7 @@
       "reference_ids": [],
       "name": "Griff",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 407538,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -10219,7 +10205,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part H. The Sunstone Gateway (client-only quest hub), row 122; source cell: [client]"
+            "evidence": "client locale npc_name 'Griff' = Global.Text 407538 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -11351,7 +11337,7 @@
       "reference_ids": [],
       "name": "Hutch Diggerson",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 407559,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -11471,7 +11457,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part H. The Sunstone Gateway (client-only quest hub), row 130; source cell: [client]"
+            "evidence": "client locale npc_name 'Hutch Diggerson' = Global.Text 407559 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -11686,7 +11672,7 @@
       ],
       "name": "Ironteeth",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 442196,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -11907,15 +11893,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part F. The Rumbledome and the Realmkeeper captives, row 95; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part F. The Rumbledome and the Realmkeeper captives, row 95; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part F. The Rumbledome and the Realmkeeper captives, row 95; source cell: [client][video][wiki]"
+            "evidence": "client locale npc_name 'Ironteeth' = Global.Text 442196 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -13165,7 +13143,7 @@
       ],
       "name": "Junkmaker Jort",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 442194,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -13386,15 +13364,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part F. The Rumbledome and the Realmkeeper captives, row 92; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part F. The Rumbledome and the Realmkeeper captives, row 92; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part F. The Rumbledome and the Realmkeeper captives, row 92; source cell: [client][video][wiki]"
+            "evidence": "client locale npc_name 'Junkmaker Jort' = Global.Text 442194 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -15043,7 +15013,7 @@
       "reference_ids": [],
       "name": "Lieutenant Brock",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 439380,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -15209,11 +15179,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part G. The Skullz and the valley bosses, row 104; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part G. The Skullz and the valley bosses, row 104; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Lieutenant Brock' = Global.Text 439380 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -16310,7 +16276,7 @@
       "reference_ids": [],
       "name": "Mac Gravelfist",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 407543,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -16432,7 +16398,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part H. The Sunstone Gateway (client-only quest hub), row 119; source cell: [client]"
+            "evidence": "client locale npc_name 'Mac Gravelfist' = Global.Text 407543 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -17061,7 +17027,7 @@
       "reference_ids": [],
       "name": "McGubbin",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 409196,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": null,
@@ -17172,7 +17138,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part H. The Sunstone Gateway (client-only quest hub), row 125; source cell: [client]"
+            "evidence": "client locale npc_name 'McGubbin' = Global.Text 409196 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -17387,7 +17353,7 @@
       ],
       "name": "Milo E. Lizardo",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 442193,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -17609,15 +17575,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part F. The Rumbledome and the Realmkeeper captives, row 93; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part F. The Rumbledome and the Realmkeeper captives, row 93; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part F. The Rumbledome and the Realmkeeper captives, row 93; source cell: [client][video][wiki]"
+            "evidence": "client locale npc_name 'Milo E. Lizardo' = Global.Text 442193 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -18022,7 +17980,7 @@
       "reference_ids": [],
       "name": "Mitch Diamondfist",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 407546,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -18142,7 +18100,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part H. The Sunstone Gateway (client-only quest hub), row 120; source cell: [client]"
+            "evidence": "client locale npc_name 'Mitch Diamondfist' = Global.Text 407546 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -18355,7 +18313,7 @@
       "reference_ids": [],
       "name": "Muller the Wolf",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 410327,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -18475,7 +18433,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part H. The Sunstone Gateway (client-only quest hub), row 133; source cell: [client]"
+            "evidence": "client locale npc_name 'Muller the Wolf' = Global.Text 410327 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -20586,7 +20544,7 @@
       "reference_ids": [],
       "name": "Precious",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 407548,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -20708,7 +20666,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part H. The Sunstone Gateway (client-only quest hub), row 127; source cell: [client]"
+            "evidence": "client locale npc_name 'Precious' = Global.Text 407548 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -21778,7 +21736,7 @@
       ],
       "name": "Quizzical Yucca",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 442195,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -21975,11 +21933,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part F. The Rumbledome and the Realmkeeper captives, row 94; source cell: [client][video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part F. The Rumbledome and the Realmkeeper captives, row 94; source cell: [client][video]"
+            "evidence": "client locale npc_name 'Quizzical Yucca' = Global.Text 442195 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -23876,7 +23830,7 @@
       "reference_ids": [],
       "name": "Relk Stonethunder",
       "name_reason": null,
-      "name_string_id": 3882506015,
+      "name_string_id": 409195,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -23992,7 +23946,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part H. The Sunstone Gateway (client-only quest hub), row 125; source cell: [client]"
+            "evidence": "client locale npc_name 'Relk Stonethunder' = Global.Text 409195 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -28868,7 +28822,7 @@
       "reference_ids": [],
       "name": "Silverfist",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 410342,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -29036,15 +28990,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part G. The Skullz and the valley bosses, row 106; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part G. The Skullz and the valley bosses, row 106; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part G. The Skullz and the valley bosses, row 106; source cell: [client][video][wiki]"
+            "evidence": "client locale npc_name 'Silverfist' = Global.Text 410342 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -30666,7 +30612,7 @@
       "reference_ids": [],
       "name": "Tom Hammer",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 410329,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -30786,7 +30732,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part H. The Sunstone Gateway (client-only quest hub), row 134; source cell: [client]"
+            "evidence": "client locale npc_name 'Tom Hammer' = Global.Text 410329 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -30999,7 +30945,7 @@
       "reference_ids": [],
       "name": "Wade Shatterslag",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 407536,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -31121,7 +31067,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part A. Rumble Ridge: the Freewheelers and Wheelie Pete's Roadhouse, row 38; source cell: [client]"
+            "evidence": "client locale npc_name 'Wade Shatterslag' = Global.Text 407536 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -31933,7 +31879,7 @@
       "reference_ids": [],
       "name": "Will Bartley",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 407545,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -32053,7 +31999,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part H. The Sunstone Gateway (client-only quest hub), row 132; source cell: [client]"
+            "evidence": "client locale npc_name 'Will Bartley' = Global.Text 407545 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -33653,7 +33599,7 @@
       "reference_ids": [],
       "name": "Zippy Dustkicker",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 407549,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -33788,7 +33734,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part H. The Sunstone Gateway (client-only quest hub), row 121; source cell: [client]"
+            "evidence": "client locale npc_name 'Zippy Dustkicker' = Global.Text 407549 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [

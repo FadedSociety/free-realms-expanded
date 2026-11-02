@@ -4758,7 +4758,7 @@
       "reference_ids": [],
       "name": "Cragara",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 440941,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -4907,11 +4907,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part G. Other seasonal and roaming NPCs, row 127; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part G. Other seasonal and roaming NPCs, row 127; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Cragara' = Global.Text 440941 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -5175,8 +5171,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npc_spawns_extra.json spawn_guid=9500000739 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npc_spawns_extra.json spawn_guid=9500000739 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 4103,
+      "model_file_name": "sogg_f_vendor.adr"
     },
     {
       "npc_id": 9500000377,
@@ -6268,7 +6278,7 @@
       "reference_ids": [],
       "name": "Diana Jones",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 442434,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -6388,7 +6398,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part D. Townsfolk and visitors, row 88; source cell: [client]"
+            "evidence": "client locale npc_name 'Diana Jones' = Global.Text 442434 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -7563,7 +7573,7 @@
       "reference_ids": [],
       "name": "Fairy Acolyte",
       "name_reason": null,
-      "name_string_id": 2249696127,
+      "name_string_id": 74498,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -7701,11 +7711,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part E. The kidnapping story and the caves under the town, row 106; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part E. The kidnapping story and the caves under the town, row 106; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Fairy Acolyte' = Global.Text 74498 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -8397,7 +8403,7 @@
       "reference_ids": [],
       "name": "Fairy Guard",
       "name_reason": null,
-      "name_string_id": 1971096666,
+      "name_string_id": 384961,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -8535,11 +8541,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part E. The kidnapping story and the caves under the town, row 106; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part E. The kidnapping story and the caves under the town, row 106; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Fairy Guard' = Global.Text 384961 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -9351,7 +9353,7 @@
       "reference_ids": [],
       "name": "Florit",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 41286,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -9497,11 +9499,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part A. Town hosts and the welcome tour, row 34; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part A. Town hosts and the welcome tour, row 34; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Florit' = Global.Text 41286 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -9770,7 +9768,7 @@
       "reference_ids": [],
       "name": "Freddy Slowhands",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 439487,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -9916,11 +9914,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part B. Job trainers and job-line NPCs, row 48; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part B. Job trainers and job-line NPCs, row 48; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Freddy Slowhands' = Global.Text 439487 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -11015,7 +11009,7 @@
       "reference_ids": [],
       "name": "Illusionist Liana",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 74894,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -11189,15 +11183,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part E. The kidnapping story and the caves under the town, row 101; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part E. The kidnapping story and the caves under the town, row 101; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part E. The kidnapping story and the caves under the town, row 101; source cell: [client][video][wiki]"
+            "evidence": "client locale npc_name 'Illusionist Liana' = Global.Text 74894 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -11513,8 +11499,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46009 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46009 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 458,
+      "model_file_name": "sprite_basic_f.adr"
     },
     {
       "npc_id": 9500000391,
@@ -12021,7 +12021,7 @@
       "reference_ids": [],
       "name": "Jazlin",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 74359,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -12165,11 +12165,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part E. The kidnapping story and the caves under the town, row 102; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part E. The kidnapping story and the caves under the town, row 102; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Jazlin' = Global.Text 74359 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -14191,7 +14187,7 @@
       "reference_ids": [],
       "name": "Kendra",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 427384,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -14315,7 +14311,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part D. Townsfolk and visitors, row 82; source cell: [client] (weak)"
+            "evidence": "client locale npc_name 'Kendra' = Global.Text 427384 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -14519,8 +14515,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AKendra"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AKendra"
+          }
         ]
-      }
+      },
+      "model_id": 7,
+      "model_file_name": "humanchild_f_skirtandtunic.adr"
     },
     {
       "npc_id": 9500000398,
@@ -22776,7 +22786,7 @@
       "reference_ids": [],
       "name": "Ole",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 41544,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -22979,11 +22989,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part D. Townsfolk and visitors, row 79; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part D. Townsfolk and visitors, row 79; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Ole' = Global.Text 41544 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -23248,7 +23254,7 @@
       "reference_ids": [],
       "name": "Persipina",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 41260,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -23418,15 +23424,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part C. The Mainstage fairy show, row 62; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part C. The Mainstage fairy show, row 62; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part C. The Mainstage fairy show, row 62; source cell: [client][video][wiki]"
+            "evidence": "client locale npc_name 'Persipina' = Global.Text 41260 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -23742,8 +23740,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn fairy female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3APersipina"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn fairy female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3APersipina"
+          }
         ]
-      }
+      },
+      "model_id": 458,
+      "model_file_name": "sprite_basic_f.adr"
     },
     {
       "npc_id": 9500000417,
@@ -26602,7 +26614,7 @@
       "reference_ids": [],
       "name": "Rylan",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 427589,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -26744,11 +26756,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part F. Festival of Hearts NPCs, row 116; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part F. Festival of Hearts NPCs, row 116; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Rylan' = Global.Text 427589 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -27014,9 +27022,23 @@
             "kind": "reconstructed",
             "evidence": "(R) T894: the reunion-scene line is used as the fixed Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Rylan"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Rylan"
+          }
         ]
       },
-      "greeting_string_id": 427591
+      "greeting_string_id": 427591,
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9500000423,
@@ -27024,7 +27046,7 @@
       "reference_ids": [],
       "name": "Sammy",
       "name_reason": null,
-      "name_string_id": 1740525025,
+      "name_string_id": 74360,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -27164,11 +27186,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part E. The kidnapping story and the caves under the town, row 102; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part E. The kidnapping story and the caves under the town, row 102; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Sammy' = Global.Text 74360 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -27424,8 +27442,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=6470 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=6470 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 4509,
+      "model_file_name": "fairy_f_merchant_brawler_caucasian_skygoddess.agr"
     },
     {
       "npc_id": 9500000424,
@@ -32329,7 +32361,7 @@
       "reference_ids": [],
       "name": "Yaellie",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 41545,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -32528,11 +32560,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part D. Townsfolk and visitors, row 79; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part D. Townsfolk and visitors, row 79; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Yaellie' = Global.Text 41545 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -32797,7 +32825,7 @@
       "reference_ids": [],
       "name": "Yuriah",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 115655,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -32943,11 +32971,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part E. The kidnapping story and the caves under the town, row 105; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part E. The kidnapping story and the caves under the town, row 105; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Yuriah' = Global.Text 115655 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -33215,8 +33239,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn fairy female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AYuriah"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn fairy female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AYuriah"
+          }
         ]
-      }
+      },
+      "model_id": 458,
+      "model_file_name": "sprite_basic_f.adr"
     },
     {
       "npc_id": 9500001009,

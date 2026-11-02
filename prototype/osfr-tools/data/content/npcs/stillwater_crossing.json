@@ -12,7 +12,7 @@
       ],
       "name": "Anna Mudskipper",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 408557,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -176,7 +176,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md#Part E. Sacred Grove Shallows, row 77; source cell: [client]"
+            "evidence": "client locale npc_name 'Anna Mudskipper' = Global.Text 408557 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -1068,7 +1068,7 @@
       ],
       "name": "Callie Kelpcake",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 409739,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -1235,7 +1235,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md#Part E. Sacred Grove Shallows, row 82; source cell: [client]"
+            "evidence": "client locale npc_name 'Callie Kelpcake' = Global.Text 409739 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -1491,8 +1491,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ACallie_Kelpcake"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ACallie_Kelpcake"
+          }
         ]
-      }
+      },
+      "model_id": 7,
+      "model_file_name": "humanchild_f_skirtandtunic.adr"
     },
     {
       "npc_id": 9500000783,
@@ -1500,7 +1514,7 @@
       "reference_ids": [],
       "name": "Derek",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 412133,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -1629,7 +1643,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md#Part E. Sacred Grove Shallows, row 84; source cell: [client]"
+            "evidence": "client locale npc_name 'Derek' = Global.Text 412133 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -1833,8 +1847,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Derek"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Derek"
+          }
         ]
-      }
+      },
+      "model_id": 312,
+      "model_file_name": "human_m_freestyle_03.agr"
     },
     {
       "npc_id": 9500000784,
@@ -1842,7 +1870,7 @@
       "reference_ids": [],
       "name": "Dwight Limburger",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 410046,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -1962,7 +1990,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md#Part E. Sacred Grove Shallows, row 83; source cell: [client]"
+            "evidence": "client locale npc_name 'Dwight Limburger' = Global.Text 410046 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -4172,7 +4200,7 @@
       "reference_ids": [],
       "name": "Gravedigger Dustin",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 116668,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": "Stillwater Crossing",
@@ -4280,8 +4308,8 @@
         ],
         "name_string_id": [
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md#Part C. Other quest givers and residents, row 57; source cell: [wiki Exploration (Collections)]"
+            "kind": "client",
+            "evidence": "client locale npc_name 'Gravedigger Dustin' = Global.Text 116668 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -4494,7 +4522,7 @@
       "reference_ids": [],
       "name": "Graveyard Wraith",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 115827,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -4662,15 +4690,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md#Part F. Enemies, bosses and event NPCs, row 90; source cell: [client] [video] [wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md#Part F. Enemies, bosses and event NPCs, row 90; source cell: [client] [video] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md#Part F. Enemies, bosses and event NPCs, row 90; source cell: [client] [video] [wiki]"
+            "evidence": "client locale npc_name 'Graveyard Wraith' = Global.Text 115827 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -4978,8 +4998,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46177 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46177 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 751,
+      "model_file_name": "wraith_m_cloakedskelly.adr"
     },
     {
       "npc_id": 9000000101,
@@ -6562,7 +6596,7 @@
       ],
       "name": "Jonah Relicreel",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 409729,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -6923,11 +6957,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md#Part E. Sacred Grove Shallows, row 79; source cell: [client] [wiki Fisherman]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md#Part E. Sacred Grove Shallows, row 79; source cell: [client] [wiki Fisherman]"
+            "evidence": "client locale npc_name 'Jonah Relicreel' = Global.Text 409729 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -7327,8 +7357,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AJonah_Relicreel"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AJonah_Relicreel"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9000000124,
@@ -8351,7 +8395,7 @@
       "reference_ids": [],
       "name": "Melanie",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 409732,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -8499,11 +8543,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md#Part E. Sacred Grove Shallows, row 76; source cell: [client] [video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md#Part E. Sacred Grove Shallows, row 76; source cell: [client] [video]"
+            "evidence": "client locale npc_name 'Melanie' = Global.Text 409732 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -8759,8 +8799,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob:Melanie"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob:Melanie"
+          }
         ]
-      }
+      },
+      "model_id": 7,
+      "model_file_name": "humanchild_f_skirtandtunic.adr"
     },
     {
       "npc_id": 9000000157,
@@ -8771,7 +8825,7 @@
       ],
       "name": "Muggup",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 408583,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -8940,7 +8994,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md#Part E. Sacred Grove Shallows, row 78; source cell: [client]"
+            "evidence": "client locale npc_name 'Muggup' = Global.Text 408583 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -12423,7 +12477,7 @@
       ],
       "name": "Vick Sapshot",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 409092,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -12631,7 +12685,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md#Part E. Sacred Grove Shallows, row 81; source cell: [client]"
+            "evidence": "client locale npc_name 'Vick Sapshot' = Global.Text 409092 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -12920,7 +12974,7 @@
       "reference_ids": [],
       "name": "Vince",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 116517,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -13079,11 +13133,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md#Part B. Job trainers and job NPCs, row 48; source cell: [client] [wiki Pet Trainer]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md#Part B. Job trainers and job NPCs, row 48; source cell: [client] [wiki Pet Trainer]"
+            "evidence": "client locale npc_name 'Vince' = Global.Text 116517 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -13343,8 +13393,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn dog male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AVince"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn dog male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AVince"
+          }
         ]
-      }
+      },
+      "model_id": 171,
+      "model_file_name": "dog_large_shortears.adr"
     },
     {
       "npc_id": 9000000235,
@@ -13355,7 +13419,7 @@
       ],
       "name": "Zachery",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 116516,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -13545,11 +13609,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md#Part B. Job trainers and job NPCs, row 48; source cell: [client] [wiki Pet Trainer]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md#Part B. Job trainers and job NPCs, row 48; source cell: [client] [wiki Pet Trainer]"
+            "evidence": "client locale npc_name 'Zachery' = Global.Text 116516 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -13861,8 +13921,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Zachery"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Zachery"
+          }
         ]
-      }
+      },
+      "model_id": 312,
+      "model_file_name": "human_m_freestyle_03.agr"
     }
   ]
 }

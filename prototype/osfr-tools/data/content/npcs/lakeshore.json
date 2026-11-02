@@ -429,7 +429,7 @@
       "reference_ids": [],
       "name": "Archie Tingletoes",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 409941,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -549,7 +549,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#Rainbow Lake and the McScuttle farm, row 64; source cell: [client]"
+            "evidence": "client locale npc_name 'Archie Tingletoes' = Global.Text 409941 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -753,8 +753,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AArchie_Tingletoes"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AArchie_Tingletoes"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9500000341,
@@ -3227,7 +3241,7 @@
       ],
       "name": "Ernest McScuttle",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 409211,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -3395,7 +3409,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#Rainbow Lake and the McScuttle farm, row 63; source cell: [client]"
+            "evidence": "client locale npc_name 'Ernest McScuttle' = Global.Text 409211 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -3651,8 +3665,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AErnest_McScuttle"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AErnest_McScuttle"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9500000344,
@@ -4074,7 +4102,7 @@
       "reference_ids": [],
       "name": "Hanzo",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 73671,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -4198,7 +4226,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 30; source cell: [client]"
+            "evidence": "client locale npc_name 'Hanzo' = Global.Text 73671 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -4411,7 +4439,7 @@
       "reference_ids": [],
       "name": "Ivan Smolderwing",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 40412,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -4555,11 +4583,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 46; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 46; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Ivan Smolderwing' = Global.Text 40412 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -4815,8 +4839,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Ivan_Smolderwing"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Ivan_Smolderwing"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9000000129,
@@ -5160,7 +5198,7 @@
       "reference_ids": [],
       "name": "Kim McScuttle",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 409942,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -5280,7 +5318,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#Rainbow Lake and the McScuttle farm, row 62; source cell: [client]"
+            "evidence": "client locale npc_name 'Kim McScuttle' = Global.Text 409942 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -5484,8 +5522,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AKim_McScuttle"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AKim_McScuttle"
+          }
         ]
-      }
+      },
+      "model_id": 456,
+      "model_file_name": "fairy_druid_f.adr"
     },
     {
       "npc_id": 9500000348,
@@ -6321,7 +6373,7 @@
       "reference_ids": [],
       "name": "Lacy Trembletoes",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 46928,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -6465,11 +6517,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#Shops and gear merchants, row 81; source cell: [client name][wiki Brawler]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#Shops and gear merchants, row 81; source cell: [client name][wiki Brawler]"
+            "evidence": "client locale npc_name 'Lacy Trembletoes' = Global.Text 46928 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -6733,8 +6781,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ALacy_Trembletoes"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ALacy_Trembletoes"
+          }
         ]
-      }
+      },
+      "model_id": 456,
+      "model_file_name": "fairy_druid_f.adr"
     },
     {
       "npc_id": 9500000351,
@@ -7474,7 +7536,7 @@
       "reference_ids": [],
       "name": "Lizzie Larkspur",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 426673,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -7616,11 +7678,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 54; source cell: [client name][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 54; source cell: [client name][wiki]"
+            "evidence": "client locale npc_name 'Lizzie Larkspur' = Global.Text 426673 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -9282,7 +9340,7 @@
       "reference_ids": [],
       "name": "Miles Sourpetal",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 384783,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -9402,7 +9460,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 47; source cell: [client]"
+            "evidence": "client locale npc_name 'Miles Sourpetal' = Global.Text 384783 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -9606,8 +9664,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AMiles_Sourpetal"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AMiles_Sourpetal"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9500000357,
@@ -9615,7 +9687,7 @@
       "reference_ids": [],
       "name": "Mino Tendersole",
       "name_reason": null,
-      "name_string_id": 466237461,
+      "name_string_id": 36449,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -9731,7 +9803,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Thistlerow and the hedge maze, row 36; source cell: [client]"
+            "evidence": "client locale npc_name 'Mino Tendersole' = Global.Text 36449 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -9935,8 +10007,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AMino_Tendersole"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AMino_Tendersole"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9500000358,
@@ -11093,7 +11179,7 @@
       "reference_ids": [],
       "name": "Nick Nick",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 103819,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -11213,7 +11299,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 53; source cell: [client]"
+            "evidence": "client locale npc_name 'Nick Nick' = Global.Text 103819 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -11417,8 +11503,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ANick_Nick"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ANick_Nick"
+          }
         ]
-      }
+      },
+      "model_id": 312,
+      "model_file_name": "human_m_freestyle_03.agr"
     },
     {
       "npc_id": 9500000362,
@@ -11426,7 +11526,7 @@
       "reference_ids": [],
       "name": "Norvin Thickwrench",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 22794,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -11553,7 +11653,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 35; source cell: [client]"
+            "evidence": "client locale npc_name 'Norvin Thickwrench' = Global.Text 22794 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -13672,7 +13772,7 @@
       "reference_ids": [],
       "name": "Sharon",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 103820,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -13792,7 +13892,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 51; source cell: [client]"
+            "evidence": "client locale npc_name 'Sharon' = Global.Text 103820 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -13996,8 +14096,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ASharon"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ASharon"
+          }
         ]
-      }
+      },
+      "model_id": 7,
+      "model_file_name": "humanchild_f_skirtandtunic.adr"
     },
     {
       "npc_id": 9500000366,
@@ -14005,7 +14119,7 @@
       "reference_ids": [],
       "name": "Sunni",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 19673,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -14125,7 +14239,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 34; source cell: [client]"
+            "evidence": "client locale npc_name 'Sunni' = Global.Text 19673 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -14329,8 +14443,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob%3ASunni"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob%3ASunni"
+          }
         ]
-      }
+      },
+      "model_id": 312,
+      "model_file_name": "human_m_freestyle_03.agr"
     },
     {
       "npc_id": 9000000223,

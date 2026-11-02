@@ -6758,7 +6758,7 @@
       "reference_ids": [],
       "name": "Burgl",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 47170,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -6893,7 +6893,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 119; source cell: [client]"
+            "evidence": "client locale npc_name 'Burgl' = Global.Text 47170 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -7097,8 +7097,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn forest troll male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ABurgl"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn forest troll male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ABurgl"
+          }
         ]
-      }
+      },
+      "model_id": 166,
+      "model_file_name": "troll_peasant_01.adr"
     },
     {
       "npc_id": 9500000884,
@@ -7106,7 +7120,7 @@
       "reference_ids": [],
       "name": "Burt 'Wrecking' Crewe",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 100244,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -7253,11 +7267,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Frost Ridge Speedway (Northern Wilds), row 162; source cell: [client][video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Frost Ridge Speedway (Northern Wilds), row 162; source cell: [client][video]"
+            "evidence": "client locale npc_name 'Burt 'Wrecking' Crewe' = Global.Text 100244 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -7517,8 +7527,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/snowhill.json npc_id=9500000731 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/snowhill.json npc_id=9500000731 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 829,
+      "model_file_name": "human_m_burt_crewe.agr"
     },
     {
       "npc_id": 9500000885,
@@ -7526,7 +7550,7 @@
       "reference_ids": [],
       "name": "Cal",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 7273,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -7687,11 +7711,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part A. The Roadhouse and the Tavern Cellar (Northern Wilds), row 44; source cell: [client][video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part A. The Roadhouse and the Tavern Cellar (Northern Wilds), row 44; source cell: [client][video]"
+            "evidence": "client locale npc_name 'Cal' = Global.Text 7273 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -7959,8 +7979,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46004 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46004 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 202,
+      "model_file_name": "human_m_hooligan_boss_01.agr"
     },
     {
       "npc_id": 9000000040,
@@ -7971,7 +8005,7 @@
       ],
       "name": "Caleb Sleepyswing",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 388352,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -8178,11 +8212,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part A. The Roadhouse and the Tavern Cellar (Northern Wilds), row 41; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part A. The Roadhouse and the Tavern Cellar (Northern Wilds), row 41; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Caleb Sleepyswing' = Global.Text 388352 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -8498,8 +8528,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Caleb_Sleepyswing"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Caleb_Sleepyswing"
+          }
         ]
-      }
+      },
+      "model_id": 312,
+      "model_file_name": "human_m_freestyle_03.agr"
     },
     {
       "npc_id": 9500000886,
@@ -8507,7 +8551,7 @@
       "reference_ids": [],
       "name": "Chad Fastflutter",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 104056,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -8651,11 +8695,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Frost Ridge Speedway (Northern Wilds), row 163; source cell: [client][video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Frost Ridge Speedway (Northern Wilds), row 163; source cell: [client][video]"
+            "evidence": "client locale npc_name 'Chad Fastflutter' = Global.Text 104056 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -8911,8 +8951,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/snowhill.json npc_id=9500000735 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/snowhill.json npc_id=9500000735 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 443,
+      "model_file_name": "fairy_m_freestyle_01.agr"
     },
     {
       "npc_id": 9000000273,
@@ -9466,7 +9520,7 @@
       "reference_ids": [],
       "name": "Claudio DeMarco",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 394520,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -9603,7 +9657,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Frost Ridge Speedway (Northern Wilds), row 168; source cell: [client]"
+            "evidence": "client locale npc_name 'Claudio DeMarco' = Global.Text 394520 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -13075,7 +13129,7 @@
       "reference_ids": [],
       "name": "Derp Axemaker",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 77270,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -13251,15 +13305,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part B. Dartmoor Quarry (Northern Wilds), row 55; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part B. Dartmoor Quarry (Northern Wilds), row 55; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part B. Dartmoor Quarry (Northern Wilds), row 55; source cell: [client][video][wiki]"
+            "evidence": "client locale npc_name 'Derp Axemaker' = Global.Text 77270 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -13575,8 +13621,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/snowhill.json npc_id=9000000069 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/snowhill.json npc_id=9000000069 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 574,
+      "model_file_name": "fairy_m_blacksmith_01.agr"
     },
     {
       "npc_id": 9500000893,
@@ -13939,7 +13999,7 @@
       "reference_ids": [],
       "name": "Dore",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 21309,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -14082,7 +14142,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 130; source cell: [client]"
+            "evidence": "client locale npc_name 'Dore' = Global.Text 21309 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -16842,7 +16902,7 @@
       "reference_ids": [],
       "name": "Flowerchild",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 20849,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -16962,7 +17022,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part C. The Pixie Nursery and the Floren Forest (Northern Wilds), row 75; source cell: [client]"
+            "evidence": "client locale npc_name 'Flowerchild' = Global.Text 20849 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -17166,8 +17226,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AFlowerchild"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AFlowerchild"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9500000900,
@@ -17591,7 +17665,7 @@
       "reference_ids": [],
       "name": "General Grexan",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 5357,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -17737,11 +17811,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part I. Bosses and dungeon-only NPCs, row 214; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part I. Bosses and dungeon-only NPCs, row 214; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'General Grexan' = Global.Text 5357 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -18009,8 +18079,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46104 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46104 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 99,
+      "model_file_name": "troll_stone_grey.adr"
     },
     {
       "npc_id": 9500000902,
@@ -20469,7 +20553,7 @@
       "reference_ids": [],
       "name": "Gulsh",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 10087,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -20615,11 +20699,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 128; source cell: [client][video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 128; source cell: [client][video]"
+            "evidence": "client locale npc_name 'Gulsh' = Global.Text 10087 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -20879,8 +20959,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npc_spawns_extra.json spawn_guid=9500000492 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npc_spawns_extra.json spawn_guid=9500000492 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 167,
+      "model_file_name": "troll_peasant_02.adr"
     },
     {
       "npc_id": 9500000907,
@@ -24505,7 +24599,7 @@
       "reference_ids": [],
       "name": "Kade Carmichael",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 101924,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -24651,11 +24745,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Wildwood Speedway (South Sacred Grove), row 149; source cell: [client][video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Wildwood Speedway (South Sacred Grove), row 149; source cell: [client][video]"
+            "evidence": "client locale npc_name 'Kade Carmichael' = Global.Text 101924 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -24915,8 +25005,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/briarwood.json npc_id=9500000153 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/briarwood.json npc_id=9500000153 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 833,
+      "model_file_name": "human_m_kade_carmichael.agr"
     },
     {
       "npc_id": 9500000913,
@@ -26180,7 +26284,7 @@
       "reference_ids": [],
       "name": "Linx Redline",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 394366,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -26317,7 +26421,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Wildwood Speedway (South Sacred Grove), row 146; source cell: [client]"
+            "evidence": "client locale npc_name 'Linx Redline' = Global.Text 394366 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -26521,8 +26625,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/briarwood.json npc_id=9500000164 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/briarwood.json npc_id=9500000164 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 1300,
+      "model_file_name": "fairy_m_linx_redline.agr"
     },
     {
       "npc_id": 9500000917,
@@ -26530,7 +26648,7 @@
       "reference_ids": [],
       "name": "Lucy",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 7508,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -26648,7 +26766,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part A. The Roadhouse and the Tavern Cellar (Northern Wilds), row 43; source cell: [client]"
+            "evidence": "client locale npc_name 'Lucy' = Global.Text 7508 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -27726,7 +27844,7 @@
       "reference_ids": [],
       "name": "Mailbit",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 384257,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -27885,11 +28003,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part E. The PCA Camp (Northern Wilds), row 107; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part E. The PCA Camp (Northern Wilds), row 107; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Mailbit' = Global.Text 384257 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -28497,7 +28611,7 @@
       "reference_ids": [],
       "name": "Mifa",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 21315,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": "Wilds",
@@ -28623,7 +28737,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 130; source cell: [client]"
+            "evidence": "client locale npc_name 'Mifa' = Global.Text 21315 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -29252,7 +29366,7 @@
       "reference_ids": [],
       "name": "Mustang Alli",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 100843,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -29423,15 +29537,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Frost Ridge Speedway (Northern Wilds), row 161; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Frost Ridge Speedway (Northern Wilds), row 161; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Frost Ridge Speedway (Northern Wilds), row 161; source cell: [client][video][wiki]"
+            "evidence": "client locale npc_name 'Mustang Alli' = Global.Text 100843 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -29747,8 +29853,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/snowhill.json npc_id=9500000759 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/snowhill.json npc_id=9500000759 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 820,
+      "model_file_name": "fairy_f_mustang_alli.agr"
     },
     {
       "npc_id": 9500000924,
@@ -31469,7 +31589,7 @@
       "reference_ids": [],
       "name": "Ozymandias",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 16066,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -31615,11 +31735,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part I. Bosses and dungeon-only NPCs, row 211; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part I. Bosses and dungeon-only NPCs, row 211; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Ozymandias' = Global.Text 16066 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -32243,7 +32359,7 @@
       "reference_ids": [],
       "name": "Pear Jam",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 71238,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -32402,11 +32518,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part A. The Roadhouse and the Tavern Cellar (Northern Wilds), row 37; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part A. The Roadhouse and the Tavern Cellar (Northern Wilds), row 37; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Pear Jam' = Global.Text 71238 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -32662,8 +32774,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3APear_Jam"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3APear_Jam"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9500000930,
@@ -32671,7 +32797,7 @@
       "reference_ids": [],
       "name": "Petal Oceanmist",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 394904,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -32793,7 +32919,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Frost Ridge Speedway (Northern Wilds), row 166; source cell: [client]"
+            "evidence": "client locale npc_name 'Petal Oceanmist' = Global.Text 394904 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -32997,8 +33123,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/seaside.json npc_id=9500000613 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/seaside.json npc_id=9500000613 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 36,
+      "model_file_name": "fairy_f_valinda.adr"
     },
     {
       "npc_id": 9500000931,
@@ -33453,7 +33593,7 @@
       "reference_ids": [],
       "name": "Porky",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 21655,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -33586,7 +33726,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 125; source cell: [client]"
+            "evidence": "client locale npc_name 'Porky' = Global.Text 21655 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -33799,7 +33939,7 @@
       "reference_ids": [],
       "name": "Queen Verda",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 17075,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -33960,11 +34100,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part I. Bosses and dungeon-only NPCs, row 209; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part I. Bosses and dungeon-only NPCs, row 209; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Queen Verda' = Global.Text 17075 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -34232,8 +34368,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46078 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46078 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 408,
+      "model_file_name": "troll_queenverda_f.adr"
     },
     {
       "npc_id": 9500000934,
@@ -35519,7 +35669,7 @@
       "reference_ids": [],
       "name": "Sakka",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 21964,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -35665,11 +35815,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part C. The Pixie Nursery and the Floren Forest (Northern Wilds), row 78; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part C. The Pixie Nursery and the Floren Forest (Northern Wilds), row 78; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Sakka' = Global.Text 21964 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -35929,8 +36075,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/snowhill.json npc_id=9500000766 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/snowhill.json npc_id=9500000766 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 428,
+      "model_file_name": "fairy_m_sakka.agr"
     },
     {
       "npc_id": 9500000938,
@@ -37401,7 +37561,7 @@
       "reference_ids": [],
       "name": "Shimmer Shinyaxe",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 76995,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -37545,11 +37705,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part B. Dartmoor Quarry (Northern Wilds), row 56; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part B. Dartmoor Quarry (Northern Wilds), row 56; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Shimmer Shinyaxe' = Global.Text 76995 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -37805,8 +37961,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/snowhill.json npc_id=9000000201 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/snowhill.json npc_id=9000000201 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 33,
+      "model_file_name": "fairy_m_miner_01.adr"
     },
     {
       "npc_id": 9500000943,
@@ -38160,7 +38330,7 @@
       "reference_ids": [],
       "name": "Sir Horace",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 394257,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -38295,7 +38465,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Wildwood Speedway (South Sacred Grove), row 151; source cell: [client]"
+            "evidence": "client locale npc_name 'Sir Horace' = Global.Text 394257 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -39289,7 +39459,7 @@
       "reference_ids": [],
       "name": "Sola",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 21317,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": "Wilds",
@@ -39415,7 +39585,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 130; source cell: [client]"
+            "evidence": "client locale npc_name 'Sola' = Global.Text 21317 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -40864,7 +41034,7 @@
       ],
       "name": "Sydney Spellmerg",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 394256,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -41083,7 +41253,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Wildwood Speedway (South Sacred Grove), row 152; source cell: [client]"
+            "evidence": "client locale npc_name 'Sydney Spellmerg' = Global.Text 394256 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -41355,8 +41525,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Sydney_Spellmerg"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Sydney_Spellmerg"
+          }
         ]
-      }
+      },
+      "model_id": 312,
+      "model_file_name": "human_m_freestyle_03.agr"
     },
     {
       "npc_id": 9500000950,
@@ -41714,7 +41898,7 @@
       "reference_ids": [],
       "name": "Taka the Shadow",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 15570,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -41841,7 +42025,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part I. Bosses and dungeon-only NPCs, row 215; source cell: [client]"
+            "evidence": "client locale npc_name 'Taka the Shadow' = Global.Text 15570 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -42603,7 +42787,7 @@
       "reference_ids": [],
       "name": "Tido",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 21318,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": "Wilds",
@@ -42729,7 +42913,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 130; source cell: [client]"
+            "evidence": "client locale npc_name 'Tido' = Global.Text 21318 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -42942,7 +43126,7 @@
       "reference_ids": [],
       "name": "Tooga",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 70652,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -43075,7 +43259,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 120; source cell: [client]"
+            "evidence": "client locale npc_name 'Tooga' = Global.Text 70652 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -43289,9 +43473,23 @@
             "kind": "reconstructed",
             "evidence": "(R) T894: use this verified speaker's line as the fixed Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn forest troll male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Tooga"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn forest troll male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Tooga"
+          }
         ]
       },
-      "greeting_string_id": 70733
+      "greeting_string_id": 70733,
+      "model_id": 166,
+      "model_file_name": "troll_peasant_01.adr"
     },
     {
       "npc_id": 9500000954,
@@ -47538,7 +47736,7 @@
       "reference_ids": [],
       "name": "Wizard Hildegarde",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 6946,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -47703,11 +47901,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part D. The Robgoblin Camp and the Robgoblin Treasure Trove (Northern Wilds), row 96; source cell: [client][video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part D. The Robgoblin Camp and the Robgoblin Treasure Trove (Northern Wilds), row 96; source cell: [client][video]"
+            "evidence": "client locale npc_name 'Wizard Hildegarde' = Global.Text 6946 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -47967,8 +48161,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46020 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46020 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 188,
+      "model_file_name": "robgoblin_f_mage.adr"
     },
     {
       "npc_id": 9500000964,

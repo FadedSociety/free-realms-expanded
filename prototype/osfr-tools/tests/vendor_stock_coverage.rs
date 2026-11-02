@@ -104,10 +104,11 @@ const SELECTED_HUB_UNRESOLVED_VENDOR_COUNT: usize = 28;
 /// stocked vendor is left unspawned. T470 drew eight more unstocked vendor-role
 /// NPCs at their Sanctuary-main spawns (48: 30 stocked, 18 unstocked). Pin the
 /// stocked/unresolved split too, so a placement swap between the two groups
-/// cannot keep the total while hiding a reachable-stock regression.
-const SELECTED_HUB_SPAWNED_VENDOR_COUNT: usize = 48;
+/// cannot keep the total while hiding a reachable-stock regression. L924 gave six
+/// more unstocked vendor-role NPCs a body, so the world draws them (54: 30 stocked, 24 unstocked).
+const SELECTED_HUB_SPAWNED_VENDOR_COUNT: usize = 54;
 const SELECTED_HUB_SPAWNED_STOCKED_VENDOR_COUNT: usize = 30;
-const SELECTED_HUB_SPAWNED_UNSTOCKED_VENDOR_COUNT: usize = 18;
+const SELECTED_HUB_SPAWNED_UNSTOCKED_VENDOR_COUNT: usize = 24;
 /// Stocked `vendors.json` records whose NPC placement has neither a `legacy_data`
 /// row nor an `npc_spawns_extra` actor, so the production visibility loader never
 /// spawns them. T372 spawned the last ten; this stays zero so a regression that

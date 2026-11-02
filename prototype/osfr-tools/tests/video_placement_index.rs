@@ -490,7 +490,9 @@ fn t896_the_loader_floor_refuses_rows_below_it() {
             row(6, "video_index", "high", json!(7), json!(null)),
             false,
         ),
-        (7, row(7, "poi_anchor", "high", json!(7), json!(8)), false),
+        // L924 (owner 2026-11-02): a positioned row with a body stands in the world even at a
+        // reconstructed POI spot; only video rows keep the confidence floor.
+        (7, row(7, "poi_anchor", "high", json!(7), json!(8)), true),
         (8, row(8, "legacy_data", "low", json!(7), json!(8)), true),
     ];
     let path = scratch.path();

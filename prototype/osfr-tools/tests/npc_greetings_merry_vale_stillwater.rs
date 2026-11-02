@@ -536,6 +536,15 @@ fn is_greeting_only_change_between(old: &Value, new: &Value) -> bool {
     })
 }
 
+/// L924: giving positioned rows a body (model, client name id, a nudge off an overlapping
+/// actor) so the world draws them touches every region; the drawing suites pin the values.
+fn is_npc_body_change_between(old: &Value, new: &Value) -> bool {
+    changed_rows_are(old, new, false, |old, new| {
+        let fields = ["model_id", "model_file_name", "name_string_id", "position"];
+        without_fields(old, &fields) == without_fields(new, &fields)
+    })
+}
+
 /// F745: one foreign row may carry a quest-binding edit and a greeting binding
 /// together (T726's Petal quest metadata plus the T378 greeting fix). Each half is
 /// allowed on its own above, and the owning quest and greeting suites pin the
@@ -984,6 +993,7 @@ fn the_existing_greetings_and_other_regions_are_unchanged() {
         assert!(
             is_quest_binding_change_between(path, &old, &new)
                 || is_greeting_only_change_between(&old, &new)
+                || is_npc_body_change_between(&old, &new)
                 || (working_tree && is_quest_binding_and_greeting_change_between(&old, &new)),
             "{path} changed: this slice owns only merry_vale.json and stillwater_crossing.json"
         );

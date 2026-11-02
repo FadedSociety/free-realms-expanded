@@ -853,7 +853,7 @@
       "reference_ids": [],
       "name": "Andante",
       "name_reason": null,
-      "name_string_id": 569106283,
+      "name_string_id": 73649,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -969,7 +969,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Bristlewood: warpstone, chugawug camps and the roads, row 77; source cell: [client]"
+            "evidence": "client locale npc_name 'Andante' = Global.Text 73649 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -1173,8 +1173,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AAndante"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AAndante"
+          }
         ]
-      }
+      },
+      "model_id": 312,
+      "model_file_name": "human_m_freestyle_03.agr"
     },
     {
       "npc_id": 9000000008,
@@ -2820,7 +2834,7 @@
       "reference_ids": [],
       "name": "Archnos",
       "name_reason": null,
-      "name_string_id": 4143683475,
+      "name_string_id": 23128,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -2936,7 +2950,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Nettleseed, row 164; source cell: [client]"
+            "evidence": "client locale npc_name 'Archnos' = Global.Text 23128 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -3983,7 +3997,7 @@
       "reference_ids": [],
       "name": "Banx",
       "name_reason": null,
-      "name_string_id": 3684541099,
+      "name_string_id": 4017,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -4099,7 +4113,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Farms and the Bayou, row 87; source cell: [client]"
+            "evidence": "client locale npc_name 'Banx' = Global.Text 4017 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -4303,8 +4317,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ABanx"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ABanx"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9500000091,
@@ -5056,7 +5084,7 @@
       "reference_ids": [],
       "name": "Blacksmith Brix",
       "name_reason": null,
-      "name_string_id": 2653420678,
+      "name_string_id": 91744,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -5170,7 +5198,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tanglewood Fort, row 180; source cell: [client]"
+            "evidence": "client locale npc_name 'Blacksmith Brix' = Global.Text 91744 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -5814,7 +5842,7 @@
       "reference_ids": [],
       "name": "Bob",
       "name_reason": null,
-      "name_string_id": 2668050031,
+      "name_string_id": 39843,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -5930,7 +5958,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Thistlerow and the hedge maze, row 39; source cell: [client]"
+            "evidence": "client locale npc_name 'Bob' = Global.Text 39843 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -9079,7 +9107,7 @@
       ],
       "name": "Chef Truffenglug",
       "name_reason": null,
-      "name_string_id": 1483806579,
+      "name_string_id": 91728,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -9198,7 +9226,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tanglewood Fort, row 179; source cell: [client]"
+            "evidence": "client locale npc_name 'Chef Truffenglug' = Global.Text 91728 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -9415,7 +9443,7 @@
       "reference_ids": [],
       "name": "Chicory",
       "name_reason": null,
-      "name_string_id": 1236740789,
+      "name_string_id": 5458,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -9531,7 +9559,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Nettleseed, row 158; source cell: [client]"
+            "evidence": "client locale npc_name 'Chicory' = Global.Text 5458 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -9735,8 +9763,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AChicory"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AChicory"
+          }
         ]
-      }
+      },
+      "model_id": 456,
+      "model_file_name": "fairy_druid_f.adr"
     },
     {
       "npc_id": 9500000102,
@@ -11865,7 +11907,7 @@
       "reference_ids": [],
       "name": "Clancy Blackheart",
       "name_reason": null,
-      "name_string_id": 1470226957,
+      "name_string_id": 439486,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -12007,11 +12049,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Mother Lode Quarry, crafting station and the Vale of the Ancients dig camp, row 119; source cell: [client][wiki Card Duelist page]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Mother Lode Quarry, crafting station and the Vale of the Ancients dig camp, row 119; source cell: [client][wiki Card Duelist page]"
+            "evidence": "client locale npc_name 'Clancy Blackheart' = Global.Text 439486 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -13271,7 +13309,7 @@
       "reference_ids": [],
       "name": "Connor Rush",
       "name_reason": null,
-      "name_string_id": 3808178607,
+      "name_string_id": 19364,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -13411,11 +13449,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
+            "evidence": "client locale npc_name 'Connor Rush' = Global.Text 19364 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -13675,8 +13709,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=47015 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=47015 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 869,
+      "model_file_name": "human_m_verve_mcnichols_incar.agr"
     },
     {
       "npc_id": 9500000111,
@@ -14696,7 +14744,7 @@
       "reference_ids": [],
       "name": "Cragara",
       "name_reason": null,
-      "name_string_id": 3495164671,
+      "name_string_id": 440941,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -14836,11 +14884,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Gear merchants (wiki-era shops, 2013), row 213; source cell: [client name][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Gear merchants (wiki-era shops, 2013), row 213; source cell: [client name][wiki]"
+            "evidence": "client locale npc_name 'Cragara' = Global.Text 440941 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -15104,8 +15148,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npc_spawns_extra.json spawn_guid=9500000739 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npc_spawns_extra.json spawn_guid=9500000739 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 4103,
+      "model_file_name": "sogg_f_vendor.adr"
     },
     {
       "npc_id": 9500000114,
@@ -18244,7 +18302,7 @@
       "reference_ids": [],
       "name": "Dayflower",
       "name_reason": null,
-      "name_string_id": 1450498669,
+      "name_string_id": 38616,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -18384,11 +18442,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Nettleseed, row 167; source cell: [client][wiki Purra]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Nettleseed, row 167; source cell: [client][wiki Purra]"
+            "evidence": "client locale npc_name 'Dayflower' = Global.Text 38616 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -18644,8 +18698,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Dayflower"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Dayflower"
+          }
         ]
-      }
+      },
+      "model_id": 456,
+      "model_file_name": "fairy_druid_f.adr"
     },
     {
       "npc_id": 9500000120,
@@ -18653,7 +18721,7 @@
       "reference_ids": [],
       "name": "Dee Driftcatcher",
       "name_reason": null,
-      "name_string_id": 3281119133,
+      "name_string_id": 19339,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -18793,11 +18861,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
+            "evidence": "client locale npc_name 'Dee Driftcatcher' = Global.Text 19339 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -19066,7 +19130,7 @@
       "reference_ids": [],
       "name": "Dewybloom",
       "name_reason": null,
-      "name_string_id": 2950550390,
+      "name_string_id": 18215,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -19182,7 +19246,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Briar Patch, Bristlewood Glade and the wizard Sven, row 99; source cell: [client]"
+            "evidence": "client locale npc_name 'Dewybloom' = Global.Text 18215 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -19386,8 +19450,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ADewybloom"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ADewybloom"
+          }
         ]
-      }
+      },
+      "model_id": 456,
+      "model_file_name": "fairy_druid_f.adr"
     },
     {
       "npc_id": 9500000122,
@@ -19395,7 +19473,7 @@
       "reference_ids": [],
       "name": "Dimitri",
       "name_reason": null,
-      "name_string_id": 4267795448,
+      "name_string_id": 91260,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -19535,11 +19613,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Nettleseed, row 172; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Nettleseed, row 172; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Dimitri' = Global.Text 91260 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -19795,8 +19869,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ADimitri"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ADimitri"
+          }
         ]
-      }
+      },
+      "model_id": 312,
+      "model_file_name": "human_m_freestyle_03.agr"
     },
     {
       "npc_id": 9500000123,
@@ -19804,7 +19892,7 @@
       "reference_ids": [],
       "name": "Dirk Goldrush",
       "name_reason": null,
-      "name_string_id": 3402878286,
+      "name_string_id": 19333,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -19944,11 +20032,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
+            "evidence": "client locale npc_name 'Dirk Goldrush' = Global.Text 19333 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -22984,7 +23068,7 @@
       "reference_ids": [],
       "name": "Estelle LaFrell",
       "name_reason": null,
-      "name_string_id": 652498336,
+      "name_string_id": 409262,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -23100,7 +23184,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Nettleseed, row 169; source cell: [client]"
+            "evidence": "client locale npc_name 'Estelle LaFrell' = Global.Text 409262 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -25923,7 +26007,7 @@
       "reference_ids": [],
       "name": "Finchel",
       "name_reason": null,
-      "name_string_id": 502047733,
+      "name_string_id": 18319,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -26039,7 +26123,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Thistlerow and the hedge maze, row 34; source cell: [client]"
+            "evidence": "client locale npc_name 'Finchel' = Global.Text 18319 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -26679,7 +26763,7 @@
       "reference_ids": [],
       "name": "General Grexan",
       "name_reason": null,
-      "name_string_id": 3257185804,
+      "name_string_id": 5357,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -26793,7 +26877,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Dungeon and battle NPCs, row 227; source cell: Troll boss. [client]"
+            "evidence": "client locale npc_name 'General Grexan' = Global.Text 5357 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -26997,8 +27081,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46104 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46104 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 99,
+      "model_file_name": "troll_stone_grey.adr"
     },
     {
       "npc_id": 9500000135,
@@ -27429,7 +27527,7 @@
       "reference_ids": [],
       "name": "Geomancer Hailstorm",
       "name_reason": null,
-      "name_string_id": 1473460959,
+      "name_string_id": 16000,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -27551,7 +27649,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Briarheart (Briarheart Palace and the Caverns), row 193; source cell: [client]"
+            "evidence": "client locale npc_name 'Geomancer Hailstorm' = Global.Text 16000 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -27759,8 +27857,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46045 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46045 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 254,
+      "model_file_name": "changeling_elder_m_01.adr"
     },
     {
       "npc_id": 9500000137,
@@ -31212,7 +31324,7 @@
       "reference_ids": [],
       "name": "Hemi Turbodrift",
       "name_reason": null,
-      "name_string_id": 3730629183,
+      "name_string_id": 19334,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -31352,11 +31464,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
+            "evidence": "client locale npc_name 'Hemi Turbodrift' = Global.Text 19334 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -32316,7 +32424,7 @@
       "reference_ids": [],
       "name": "Jellum",
       "name_reason": null,
-      "name_string_id": 3520466970,
+      "name_string_id": 73551,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -32432,7 +32540,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Thistlerow and the hedge maze, row 33; source cell: [client]"
+            "evidence": "client locale npc_name 'Jellum' = Global.Text 73551 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -32636,8 +32744,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn changeling male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob%3AJellum"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn changeling male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob%3AJellum"
+          }
         ]
-      }
+      },
+      "model_id": 666,
+      "model_file_name": "changeling_eggertthemad_m.adr"
     },
     {
       "npc_id": 9500000147,
@@ -33133,7 +33255,7 @@
       "reference_ids": [],
       "name": "Jess Roadrunner",
       "name_reason": null,
-      "name_string_id": 1122040107,
+      "name_string_id": 19342,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -33273,11 +33395,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
+            "evidence": "client locale npc_name 'Jess Roadrunner' = Global.Text 19342 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -33546,7 +33664,7 @@
       "reference_ids": [],
       "name": "Jet Swiftpass",
       "name_reason": null,
-      "name_string_id": 3956688176,
+      "name_string_id": 19363,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -33686,11 +33804,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
+            "evidence": "client locale npc_name 'Jet Swiftpass' = Global.Text 19363 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -33950,8 +34064,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=47012 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=47012 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 891,
+      "model_file_name": "human_m_racer_johnny_thunder_incar.agr"
     },
     {
       "npc_id": 9500000150,
@@ -35561,7 +35689,7 @@
       "reference_ids": [],
       "name": "Kat Darkhollow",
       "name_reason": null,
-      "name_string_id": 2469254831,
+      "name_string_id": 19340,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -35701,11 +35829,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
+            "evidence": "client locale npc_name 'Kat Darkhollow' = Global.Text 19340 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -36479,7 +36603,7 @@
       "reference_ids": [],
       "name": "Kimmy Drophammer",
       "name_reason": null,
-      "name_string_id": 3288534833,
+      "name_string_id": 19335,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -36619,11 +36743,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
+            "evidence": "client locale npc_name 'Kimmy Drophammer' = Global.Text 19335 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -37662,7 +37782,7 @@
       "reference_ids": [],
       "name": "Layla Octane",
       "name_reason": null,
-      "name_string_id": 2776101186,
+      "name_string_id": 19361,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -37802,11 +37922,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
+            "evidence": "client locale npc_name 'Layla Octane' = Global.Text 19361 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -38066,8 +38182,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=47013 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=47013 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 888,
+      "model_file_name": "fairy_f_mustang_alli_incar.agr"
     },
     {
       "npc_id": 9500000160,
@@ -38741,7 +38871,7 @@
       "reference_ids": [],
       "name": "Lenny",
       "name_reason": null,
-      "name_string_id": 2130842094,
+      "name_string_id": 410286,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -38857,7 +38987,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Nettleseed, row 169; source cell: [client]"
+            "evidence": "client locale npc_name 'Lenny' = Global.Text 410286 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -39061,8 +39191,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ALenny"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ALenny"
+          }
         ]
-      }
+      },
+      "model_id": 312,
+      "model_file_name": "human_m_freestyle_03.agr"
     },
     {
       "npc_id": 9500000163,
@@ -40195,7 +40339,7 @@
       "reference_ids": [],
       "name": "Little Jimmy",
       "name_reason": null,
-      "name_string_id": 995012884,
+      "name_string_id": 91419,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -40311,7 +40455,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tanglewood Fort, row 181; source cell: [client]"
+            "evidence": "client locale npc_name 'Little Jimmy' = Global.Text 91419 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -42030,7 +42174,7 @@
       "reference_ids": [],
       "name": "Mai Redline",
       "name_reason": null,
-      "name_string_id": 2967399285,
+      "name_string_id": 19362,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -42170,11 +42314,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
+            "evidence": "client locale npc_name 'Mai Redline' = Global.Text 19362 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -42434,8 +42574,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=47014 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=47014 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 888,
+      "model_file_name": "fairy_f_mustang_alli_incar.agr"
     },
     {
       "npc_id": 9500000171,
@@ -42443,7 +42597,7 @@
       "reference_ids": [],
       "name": "Malarkilanihani",
       "name_reason": null,
-      "name_string_id": 540666395,
+      "name_string_id": 16329,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -42559,7 +42713,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Bristlewood: warpstone, chugawug camps and the roads, row 75; source cell: [client]"
+            "evidence": "client locale npc_name 'Malarkilanihani' = Global.Text 16329 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -42763,8 +42917,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn stone head male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob%3AMalarkilanihani"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn stone head male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob%3AMalarkilanihani"
+          }
         ]
-      }
+      },
+      "model_id": 39,
+      "model_file_name": "tikihead_m_ozymandias.adr"
     },
     {
       "npc_id": 9500000172,
@@ -43194,7 +43362,7 @@
       "reference_ids": [],
       "name": "Marasmius",
       "name_reason": null,
-      "name_string_id": 913187176,
+      "name_string_id": 5506,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -43332,11 +43500,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Dungeon and battle NPCs, row 229; source cell: Boss, fourth shard (wiki spells \"Maramius\"). [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Dungeon and battle NPCs, row 229; source cell: Boss, fourth shard (wiki spells \"Maramius\"). [client][wiki]"
+            "evidence": "client locale npc_name 'Marasmius' = Global.Text 5506 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -43592,8 +43756,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46027 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46027 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 121,
+      "model_file_name": "shroomgiant.adr"
     },
     {
       "npc_id": 9500000174,
@@ -43601,7 +43779,7 @@
       "reference_ids": [],
       "name": "Marcus Dustmaker",
       "name_reason": null,
-      "name_string_id": 929684562,
+      "name_string_id": 19336,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -43741,11 +43919,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
+            "evidence": "client locale npc_name 'Marcus Dustmaker' = Global.Text 19336 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -45870,7 +46044,7 @@
       "reference_ids": [],
       "name": "Mino Tendersole",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 36449,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -45995,7 +46169,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 44; source cell: [client]"
+            "evidence": "client locale npc_name 'Mino Tendersole' = Global.Text 36449 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -46199,8 +46373,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AMino_Tendersole"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AMino_Tendersole"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9000000409,
@@ -46210,7 +46398,7 @@
       ],
       "name": "Mirana Vega",
       "name_reason": null,
-      "name_string_id": 4035238453,
+      "name_string_id": 101923,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -46395,11 +46583,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 134; source cell: [client][video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 134; source cell: [client][video]"
+            "evidence": "client locale npc_name 'Mirana Vega' = Global.Text 101923 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -47049,7 +47233,7 @@
       "reference_ids": [],
       "name": "Morgan",
       "name_reason": null,
-      "name_string_id": 1116075745,
+      "name_string_id": 2291,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -47165,7 +47349,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Farms and the Bayou, row 87; source cell: [client]"
+            "evidence": "client locale npc_name 'Morgan' = Global.Text 2291 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -47369,8 +47553,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AMorgan"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AMorgan"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9500000183,
@@ -47378,7 +47576,7 @@
       "reference_ids": [],
       "name": "Mysterious Stranger",
       "name_reason": null,
-      "name_string_id": 3037787048,
+      "name_string_id": 18891,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -47492,7 +47690,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Dungeon and battle NPCs, row 228; source cell: Boss, second shard. [client]"
+            "evidence": "client locale npc_name 'Mysterious Stranger' = Global.Text 18891 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -47696,8 +47894,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46115 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46115 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 733,
+      "model_file_name": "human_f_gloam_agent.agr"
     },
     {
       "npc_id": 9500000184,
@@ -48036,7 +48248,7 @@
       "reference_ids": [],
       "name": "Nettalie",
       "name_reason": null,
-      "name_string_id": 1777995598,
+      "name_string_id": 7212,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -48174,11 +48386,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Dungeon and battle NPCs, row 224; source cell: Evil wizard boss and his servant (client 1690803369). [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Dungeon and battle NPCs, row 224; source cell: Evil wizard boss and his servant (client 1690803369). [client][wiki]"
+            "evidence": "client locale npc_name 'Nettalie' = Global.Text 7212 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -49868,7 +50076,7 @@
       ],
       "name": "Orson",
       "name_reason": null,
-      "name_string_id": 354235244,
+      "name_string_id": 100866,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -50146,11 +50354,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Bristlewood: warpstone, chugawug camps and the roads, row 66; source cell: [client][wiki Archer page]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Bristlewood: warpstone, chugawug camps and the roads, row 66; source cell: [client][wiki Archer page]"
+            "evidence": "client locale npc_name 'Orson' = Global.Text 100866 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -50534,8 +50738,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AOrson"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AOrson"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9500000190,
@@ -55254,7 +55472,7 @@
       "reference_ids": [],
       "name": "Purra",
       "name_reason": null,
-      "name_string_id": 1013844800,
+      "name_string_id": 38617,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -55394,11 +55612,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Nettleseed, row 167; source cell: [client][wiki Purra]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Nettleseed, row 167; source cell: [client][wiki Purra]"
+            "evidence": "client locale npc_name 'Purra' = Global.Text 38617 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -55654,8 +55868,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3APurra"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3APurra"
+          }
         ]
-      }
+      },
+      "model_id": 456,
+      "model_file_name": "fairy_druid_f.adr"
     },
     {
       "npc_id": 9500000201,
@@ -56007,7 +56235,7 @@
       "reference_ids": [],
       "name": "Queen Arachnia",
       "name_reason": null,
-      "name_string_id": 3247937614,
+      "name_string_id": 3592,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -56121,7 +56349,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Dungeon and battle NPCs, row 221; source cell: Boss; Spinnerette's sister (client 4135858282). [client]"
+            "evidence": "client locale npc_name 'Queen Arachnia' = Global.Text 3592 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -56325,8 +56553,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46048 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46048 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 53,
+      "model_file_name": "blackwidowqueen.adr"
     },
     {
       "npc_id": 9500000203,
@@ -56334,7 +56576,7 @@
       "reference_ids": [],
       "name": "Randall",
       "name_reason": null,
-      "name_string_id": 1579522142,
+      "name_string_id": 91259,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -56474,11 +56716,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Nettleseed, row 172; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Nettleseed, row 172; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Randall' = Global.Text 91259 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -56734,8 +56972,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ARandall"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ARandall"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9500000204,
@@ -58500,7 +58752,7 @@
       "reference_ids": [],
       "name": "Sera / Bella",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 45397,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": null,
@@ -58606,8 +58858,8 @@
         ],
         "name_string_id": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Named in Briarwood quest text only (no name entry), row 263 has no explicit source marker"
+            "kind": "client",
+            "evidence": "client locale npc_name 'Sera / Bella' = Global.Text 45397 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -58811,8 +59063,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/shrouded_glade.json npc_id=9500000712 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/shrouded_glade.json npc_id=9500000712 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 456,
+      "model_file_name": "fairy_druid_f.adr"
     },
     {
       "npc_id": 9500000208,
@@ -58820,7 +59086,7 @@
       "reference_ids": [],
       "name": "Sergeant Brutus",
       "name_reason": null,
-      "name_string_id": 475133449,
+      "name_string_id": 78737,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -58958,11 +59224,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Dungeon and battle NPCs, row 231; source cell: Seventh shard boss; troll watchtower leader. [client][video `IbSE0-r_SC8/00012`, `/00624`]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Dungeon and battle NPCs, row 231; source cell: Seventh shard boss; troll watchtower leader. [client][video `IbSE0-r_SC8/00012`, `/00624`]"
+            "evidence": "client locale npc_name 'Sergeant Brutus' = Global.Text 78737 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -59731,7 +59993,7 @@
       "reference_ids": [],
       "name": "Shamus Sootbender",
       "name_reason": null,
-      "name_string_id": 2904251081,
+      "name_string_id": 395481,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -59897,15 +60159,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 135; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 135; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 135; source cell: [client][video][wiki]"
+            "evidence": "client locale npc_name 'Shamus Sootbender' = Global.Text 395481 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -61519,7 +61773,7 @@
       "reference_ids": [],
       "name": "Smuggler Han",
       "name_reason": null,
-      "name_string_id": 1866171498,
+      "name_string_id": 77317,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -61657,11 +61911,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Dungeon and battle NPCs, row 232; source cell: Smuggling bosses; Hannah holds the third shard. [client][video `pfgmx-YRZD0/00062`, `/00074`]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Dungeon and battle NPCs, row 232; source cell: Smuggling bosses; Hannah holds the third shard. [client][video `pfgmx-YRZD0/00062`, `/00074`]"
+            "evidence": "client locale npc_name 'Smuggler Han' = Global.Text 77317 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -61917,8 +62167,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46120 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46120 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 669,
+      "model_file_name": "human_blackspore_thief_m.adr"
     },
     {
       "npc_id": 9500000215,
@@ -61926,7 +62190,7 @@
       "reference_ids": [],
       "name": "Smuggler Hannah",
       "name_reason": null,
-      "name_string_id": 3657445961,
+      "name_string_id": 77319,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -62064,11 +62328,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Dungeon and battle NPCs, row 232; source cell: Smuggling bosses; Hannah holds the third shard. [client][video `pfgmx-YRZD0/00062`, `/00074`]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Dungeon and battle NPCs, row 232; source cell: Smuggling bosses; Hannah holds the third shard. [client][video `pfgmx-YRZD0/00062`, `/00074`]"
+            "evidence": "client locale npc_name 'Smuggler Hannah' = Global.Text 77319 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -62324,8 +62584,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46119 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46119 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 685,
+      "model_file_name": "human_blackspore_thief_f.adr"
     },
     {
       "npc_id": 9000000470,
@@ -62941,7 +63215,7 @@
       "reference_ids": [],
       "name": "Sorrowspine",
       "name_reason": null,
-      "name_string_id": 1151342291,
+      "name_string_id": 116880,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -63081,11 +63355,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Briarheart (Briarheart Palace and the Caverns), row 191; source cell: [client][wiki Adventurer page]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Briarheart (Briarheart Palace and the Caverns), row 191; source cell: [client][wiki Adventurer page]"
+            "evidence": "client locale npc_name 'Sorrowspine' = Global.Text 116880 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -63341,8 +63611,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn changeling male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Sorrowspine"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn changeling male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Sorrowspine"
+          }
         ]
-      }
+      },
+      "model_id": 666,
+      "model_file_name": "changeling_eggertthemad_m.adr"
     },
     {
       "npc_id": 9500000217,
@@ -64112,7 +64396,7 @@
       "reference_ids": [],
       "name": "Spoon",
       "name_reason": null,
-      "name_string_id": 1502662085,
+      "name_string_id": 18322,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -64228,7 +64512,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Thistlerow and the hedge maze, row 34; source cell: [client]"
+            "evidence": "client locale npc_name 'Spoon' = Global.Text 18322 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -64788,7 +65072,7 @@
       ],
       "name": "Sven",
       "name_reason": null,
-      "name_string_id": 3888625133,
+      "name_string_id": 22278,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -65163,11 +65447,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Briar Patch, Bristlewood Glade and the wizard Sven, row 98; source cell: [client][wiki Wizard page]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Briar Patch, Bristlewood Glade and the wizard Sven, row 98; source cell: [client][wiki Wizard page]"
+            "evidence": "client locale npc_name 'Sven' = Global.Text 22278 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -65619,8 +65899,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ASven"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ASven"
+          }
         ]
-      }
+      },
+      "model_id": 312,
+      "model_file_name": "human_m_freestyle_03.agr"
     },
     {
       "npc_id": 9500000221,
@@ -65628,7 +65922,7 @@
       "reference_ids": [],
       "name": "Sven Fardreamer",
       "name_reason": null,
-      "name_string_id": 148376472,
+      "name_string_id": 115847,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -65775,11 +66069,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Briar Patch, Bristlewood Glade and the wizard Sven, row 98; source cell: [client][wiki Wizard page]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Briar Patch, Bristlewood Glade and the wizard Sven, row 98; source cell: [client][wiki Wizard page]"
+            "evidence": "client locale npc_name 'Sven Fardreamer' = Global.Text 115847 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -67578,7 +67868,7 @@
       "reference_ids": [],
       "name": "Tower Captain",
       "name_reason": null,
-      "name_string_id": 3732086412,
+      "name_string_id": 15524,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -67716,11 +68006,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Dungeon and battle NPCs, row 231; source cell: Seventh shard boss; troll watchtower leader. [client][video `IbSE0-r_SC8/00012`, `/00624`]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Dungeon and battle NPCs, row 231; source cell: Seventh shard boss; troll watchtower leader. [client][video `IbSE0-r_SC8/00012`, `/00624`]"
+            "evidence": "client locale npc_name 'Tower Captain' = Global.Text 15524 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -67985,7 +68271,7 @@
       "reference_ids": [],
       "name": "Treeleaf",
       "name_reason": null,
-      "name_string_id": 4078326081,
+      "name_string_id": 10295,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -68099,7 +68385,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Dungeon and battle NPCs, row 225; source cell: Sentient tree boss; Oakheart's brother (client 1384957314). [client]"
+            "evidence": "client locale npc_name 'Treeleaf' = Global.Text 10295 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -68639,7 +68925,7 @@
       "reference_ids": [],
       "name": "Vicki",
       "name_reason": null,
-      "name_string_id": 2927627945,
+      "name_string_id": 77630,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -68779,11 +69065,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Bristlewood: warpstone, chugawug camps and the roads, row 65; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Bristlewood: warpstone, chugawug camps and the roads, row 65; source cell: [client][wiki]"
+            "evidence": "client locale npc_name 'Vicki' = Global.Text 77630 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -69039,8 +69321,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/farnum_farmstead.json npc_id=9000000230 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/farnum_farmstead.json npc_id=9000000230 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 551,
+      "model_file_name": "human_f_freestyle_10.agr"
     },
     {
       "npc_id": 9000000232,
@@ -70730,7 +71026,7 @@
       "reference_ids": [],
       "name": "Whisperwing",
       "name_reason": null,
-      "name_string_id": 853118336,
+      "name_string_id": 38615,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -70870,11 +71166,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Nettleseed, row 167; source cell: [client][wiki Purra]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Nettleseed, row 167; source cell: [client][wiki Purra]"
+            "evidence": "client locale npc_name 'Whisperwing' = Global.Text 38615 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -71130,8 +71422,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AWhisperwing"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AWhisperwing"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9500000233,
@@ -72734,7 +73040,7 @@
       "reference_ids": [],
       "name": "Wuumba",
       "name_reason": null,
-      "name_string_id": 3726904946,
+      "name_string_id": 2290,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -72848,7 +73154,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Dungeon and battle NPCs, row 222; source cell: Chugawug guard to rescue (client 1578340936). [client]"
+            "evidence": "client locale npc_name 'Wuumba' = Global.Text 2290 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -73052,8 +73358,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn chugawug male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AWuumba"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn chugawug male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AWuumba"
+          }
         ]
-      }
+      },
+      "model_id": 221,
+      "model_file_name": "chugawug_m_02.adr"
     },
     {
       "npc_id": 9500000238,
@@ -73061,7 +73381,7 @@
       "reference_ids": [],
       "name": "Xander",
       "name_reason": null,
-      "name_string_id": 1331385217,
+      "name_string_id": 4018,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -73177,7 +73497,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Farms and the Bayou, row 87; source cell: [client]"
+            "evidence": "client locale npc_name 'Xander' = Global.Text 4018 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -73381,8 +73701,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AXander"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AXander"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9500000239,
@@ -74054,7 +74388,7 @@
       "reference_ids": [],
       "name": "Zargoomi",
       "name_reason": null,
-      "name_string_id": 3173545253,
+      "name_string_id": 73488,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -74170,7 +74504,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Bristlewood: warpstone, chugawug camps and the roads, row 80; source cell: [client]"
+            "evidence": "client locale npc_name 'Zargoomi' = Global.Text 73488 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -74374,8 +74708,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn chugawug female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AZargoomi"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn chugawug female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AZargoomi"
+          }
         ]
-      }
+      },
+      "model_id": 222,
+      "model_file_name": "chugawug_f_02.adr"
     },
     {
       "npc_id": 9500000242,
@@ -74383,7 +74731,7 @@
       "reference_ids": [],
       "name": "Zoomer Rex",
       "name_reason": null,
-      "name_string_id": 2299902980,
+      "name_string_id": 19359,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -74523,11 +74871,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 140; source cell: [client][video]"
+            "evidence": "client locale npc_name 'Zoomer Rex' = Global.Text 19359 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -74787,8 +75131,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=47011 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=47011 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 872,
+      "model_file_name": "human_m_antonio_taurino_incar.agr"
     }
   ]
 }

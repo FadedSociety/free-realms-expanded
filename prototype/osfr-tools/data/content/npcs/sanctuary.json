@@ -9,7 +9,7 @@
       "reference_ids": [],
       "name": "Abacus Coinmiser",
       "name_reason": null,
-      "name_string_id": 2829438350,
+      "name_string_id": 5102532,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -149,11 +149,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part E. Retired NPCs, row 158; source cell: [client name] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part E. Retired NPCs, row 158; source cell: [client name] [wiki]"
+            "evidence": "client locale npc_name 'Abacus Coinmiser' = Global.Text 5102532 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -433,7 +429,7 @@
       "reference_ids": [],
       "name": "Alyssa Eggelyn",
       "name_reason": null,
-      "name_string_id": 672706230,
+      "name_string_id": 5100004,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -599,15 +595,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part D. Seasonal event NPCs that stood in Sanctuary, row 133; source cell: [client] [video `FamA1qX7C38/00072` zone Sanctuary, `yGlsrXeHD7c/00068`] [wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part D. Seasonal event NPCs that stood in Sanctuary, row 133; source cell: [client] [video `FamA1qX7C38/00072` zone Sanctuary, `yGlsrXeHD7c/00068`] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part D. Seasonal event NPCs that stood in Sanctuary, row 133; source cell: [client] [video `FamA1qX7C38/00072` zone Sanctuary, `yGlsrXeHD7c/00068`] [wiki]"
+            "evidence": "client locale npc_name 'Alyssa Eggelyn' = Global.Text 5100004 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -923,8 +911,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob:Alyssa_Eggelyn"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob:Alyssa_Eggelyn"
+          }
         ]
-      }
+      },
+      "model_id": 456,
+      "model_file_name": "fairy_druid_f.adr"
     },
     {
       "npc_id": 9500000437,
@@ -932,7 +934,7 @@
       "reference_ids": [],
       "name": "Amoranth",
       "name_reason": null,
-      "name_string_id": 2953797610,
+      "name_string_id": 40154,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -1072,11 +1074,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part C. Memorial Caverns, Queensfields dungeons and bosses, row 116; source cell: [client] [wiki Forgotten Caves]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part C. Memorial Caverns, Queensfields dungeons and bosses, row 116; source cell: [client] [wiki Forgotten Caves]"
+            "evidence": "client locale npc_name 'Amoranth' = Global.Text 40154 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -1332,8 +1330,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46108 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46108 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 254,
+      "model_file_name": "changeling_elder_m_01.adr"
     },
     {
       "npc_id": 9500000438,
@@ -5220,7 +5232,7 @@
       "reference_ids": [],
       "name": "Bertie",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 22443,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": "Sanctuary",
@@ -5326,8 +5338,8 @@
         ],
         "name_string_id": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part F. Other Sanctuary residents named only in client quest text, row 184 has no explicit source marker"
+            "kind": "client",
+            "evidence": "client locale npc_name 'Bertie' = Global.Text 22443 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -10038,7 +10050,7 @@
       "reference_ids": [],
       "name": "Buzz",
       "name_reason": null,
-      "name_string_id": 776009330,
+      "name_string_id": 7602,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -10157,7 +10169,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 80; source cell: [client]"
+            "evidence": "client locale npc_name 'Buzz' = Global.Text 7602 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -10361,8 +10373,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob:Buzz"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob:Buzz"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9500000458,
@@ -15524,7 +15550,7 @@
       "reference_ids": [],
       "name": "Darvon",
       "name_reason": null,
-      "name_string_id": 524741829,
+      "name_string_id": 17031,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -15664,11 +15690,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part C. Memorial Caverns, Queensfields dungeons and bosses, row 117; source cell: [client] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part C. Memorial Caverns, Queensfields dungeons and bosses, row 117; source cell: [client] [wiki]"
+            "evidence": "client locale npc_name 'Darvon' = Global.Text 17031 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -15924,8 +15946,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46037 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46037 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 240,
+      "model_file_name": "changeling_ninja_m.adr"
     },
     {
       "npc_id": 9000000073,
@@ -16898,7 +16934,7 @@
       "reference_ids": [],
       "name": "Domo",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 6249,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": "Sanctuary",
@@ -17008,8 +17044,8 @@
         ],
         "name_string_id": [
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part D. Seasonal event NPCs that stood in Sanctuary, row 152; source cell: [wiki]"
+            "kind": "client",
+            "evidence": "client locale npc_name 'Domo' = Global.Text 6249 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -17222,7 +17258,7 @@
       "reference_ids": [],
       "name": "Drone Fauzz",
       "name_reason": null,
-      "name_string_id": 3322709969,
+      "name_string_id": 38510,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -17386,15 +17422,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part C. Memorial Caverns, Queensfields dungeons and bosses, row 120; source cell: [client] [video `5_U-uAzDuR4/00188`] [wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part C. Memorial Caverns, Queensfields dungeons and bosses, row 120; source cell: [client] [video `5_U-uAzDuR4/00188`] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part C. Memorial Caverns, Queensfields dungeons and bosses, row 120; source cell: [client] [video `5_U-uAzDuR4/00188`] [wiki]"
+            "evidence": "client locale npc_name 'Drone Fauzz' = Global.Text 38510 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -17702,8 +17730,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46005 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46005 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 218,
+      "model_file_name": "bixie_m_elite_guard.adr"
     },
     {
       "npc_id": 9500000471,
@@ -18111,7 +18153,7 @@
       "reference_ids": [],
       "name": "Eddy McKool",
       "name_reason": null,
-      "name_string_id": 2781302700,
+      "name_string_id": 139814,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -18227,7 +18269,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 72; source cell: [client]"
+            "evidence": "client locale npc_name 'Eddy McKool' = Global.Text 139814 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -23238,7 +23280,7 @@
       "reference_ids": [],
       "name": "Flora",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 7605,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": "Sanctuary",
@@ -23344,8 +23386,8 @@
         ],
         "name_string_id": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part F. Other Sanctuary residents named only in client quest text, row 175 has no explicit source marker"
+            "kind": "client",
+            "evidence": "client locale npc_name 'Flora' = Global.Text 7605 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -23549,8 +23591,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AFlora"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AFlora"
+          }
         ]
-      }
+      },
+      "model_id": 456,
+      "model_file_name": "fairy_druid_f.adr"
     },
     {
       "npc_id": 9500000482,
@@ -24295,7 +24351,7 @@
       "reference_ids": [],
       "name": "Foreman Redd",
       "name_reason": null,
-      "name_string_id": 1951056778,
+      "name_string_id": 429892,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -24435,11 +24491,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part E. Retired NPCs, row 159; source cell: [client name] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part E. Retired NPCs, row 159; source cell: [client name] [wiki]"
+            "evidence": "client locale npc_name 'Foreman Redd' = Global.Text 429892 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -29135,7 +29187,7 @@
       "reference_ids": [],
       "name": "Guard Verbi",
       "name_reason": null,
-      "name_string_id": 854919842,
+      "name_string_id": 91094,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -29280,11 +29332,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 39; source cell: [client name only] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 39; source cell: [client name only] [wiki]"
+            "evidence": "client locale npc_name 'Guard Verbi' = Global.Text 91094 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -29540,8 +29588,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AGuard_Verbi"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AGuard_Verbi"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9500000492,
@@ -30488,7 +30550,7 @@
       "reference_ids": [],
       "name": "Hector",
       "name_reason": null,
-      "name_string_id": 3106487441,
+      "name_string_id": 416161,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -30628,11 +30690,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part D. Seasonal event NPCs that stood in Sanctuary, row 137; source cell: [client] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part D. Seasonal event NPCs that stood in Sanctuary, row 137; source cell: [client] [wiki]"
+            "evidence": "client locale npc_name 'Hector' = Global.Text 416161 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -32900,7 +32958,7 @@
       "reference_ids": [],
       "name": "Jeni Shortfuse",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 22808,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": "Sanctuary",
@@ -33011,8 +33069,8 @@
         ],
         "name_string_id": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part F. Other Sanctuary residents named only in client quest text, row 185 has no explicit source marker"
+            "kind": "client",
+            "evidence": "client locale npc_name 'Jeni Shortfuse' = Global.Text 22808 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -33216,8 +33274,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/snowhill.json npc_id=9000000115 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/snowhill.json npc_id=9000000115 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 548,
+      "model_file_name": "human_f_freestyle_06.agr"
     },
     {
       "npc_id": 9500000499,
@@ -35518,7 +35590,7 @@
       ],
       "name": "Kirill Moonrunner",
       "name_reason": null,
-      "name_string_id": 3270857380,
+      "name_string_id": 78667,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -35753,11 +35825,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 56; source cell: [client] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 56; source cell: [client] [wiki]"
+            "evidence": "client locale npc_name 'Kirill Moonrunner' = Global.Text 78667 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -36101,8 +36169,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AKirill_Moonrunner"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AKirill_Moonrunner"
+          }
         ]
-      }
+      },
+      "model_id": 312,
+      "model_file_name": "human_m_freestyle_03.agr"
     },
     {
       "npc_id": 9500000503,
@@ -36110,7 +36192,7 @@
       "reference_ids": [],
       "name": "Ladyslipper",
       "name_reason": null,
-      "name_string_id": 4225436195,
+      "name_string_id": 103926,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -36250,11 +36332,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 29; source cell: [client] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 29; source cell: [client] [wiki]"
+            "evidence": "client locale npc_name 'Ladyslipper' = Global.Text 103926 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -36510,8 +36588,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Ladyslipper"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Ladyslipper"
+          }
         ]
-      }
+      },
+      "model_id": 456,
+      "model_file_name": "fairy_druid_f.adr"
     },
     {
       "npc_id": 9000000376,
@@ -45021,7 +45113,7 @@
       "reference_ids": [],
       "name": "Pux Frillwillow",
       "name_reason": null,
-      "name_string_id": 593199301,
+      "name_string_id": 140665,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -45137,7 +45229,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 27; source cell: [client]"
+            "evidence": "client locale npc_name 'Pux Frillwillow' = Global.Text 140665 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -45341,8 +45433,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob:Pux_Frillwillow"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob:Pux_Frillwillow"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9500000518,
@@ -49362,7 +49468,7 @@
       "reference_ids": [],
       "name": "Roxana",
       "name_reason": null,
-      "name_string_id": 4136966080,
+      "name_string_id": 103910,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -49502,11 +49608,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 28; source cell: [client] [wiki Sacred Grove list]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 28; source cell: [client] [wiki Sacred Grove list]"
+            "evidence": "client locale npc_name 'Roxana' = Global.Text 103910 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -49762,8 +49864,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ARoxana"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ARoxana"
+          }
         ]
-      }
+      },
+      "model_id": 7,
+      "model_file_name": "humanchild_f_skirtandtunic.adr"
     },
     {
       "npc_id": 9500000527,
@@ -51840,7 +51956,7 @@
       "reference_ids": [],
       "name": "Sampson Idlefist",
       "name_reason": null,
-      "name_string_id": 3480636318,
+      "name_string_id": 22804,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -52009,15 +52125,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 66; source cell: [client] [video `vokALCeGZqY/00020`, `00010`] [wiki says south east of Snowhill]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 66; source cell: [client] [video `vokALCeGZqY/00020`, `00010`] [wiki says south east of Snowhill]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 66; source cell: [client] [video `vokALCeGZqY/00020`, `00010`] [wiki says south east of Snowhill]"
+            "evidence": "client locale npc_name 'Sampson Idlefist' = Global.Text 22804 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -52325,8 +52433,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46075 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46075 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 836,
+      "model_file_name": "human_m_sampson_idlefist.agr"
     },
     {
       "npc_id": 9000000190,
@@ -57484,7 +57606,7 @@
       "reference_ids": [],
       "name": "Tabitha",
       "name_reason": null,
-      "name_string_id": 3435424847,
+      "name_string_id": 416145,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -57624,11 +57746,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part D. Seasonal event NPCs that stood in Sanctuary, row 136; source cell: [client] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part D. Seasonal event NPCs that stood in Sanctuary, row 136; source cell: [client] [wiki]"
+            "evidence": "client locale npc_name 'Tabitha' = Global.Text 416145 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -57893,7 +58011,7 @@
       "reference_ids": [],
       "name": "The Scrutinizer",
       "name_reason": null,
-      "name_string_id": 2907577673,
+      "name_string_id": 5103017,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -58033,11 +58151,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part D. Seasonal event NPCs that stood in Sanctuary, row 147; source cell: [client] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part D. Seasonal event NPCs that stood in Sanctuary, row 147; source cell: [client] [wiki]"
+            "evidence": "client locale npc_name 'The Scrutinizer' = Global.Text 5103017 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -58302,7 +58416,7 @@
       "reference_ids": [],
       "name": "Tiger the Party Animal",
       "name_reason": null,
-      "name_string_id": 2807361043,
+      "name_string_id": 420171,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -58479,15 +58593,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part B. Merchants and shops, row 98; source cell: [client] [video `-MqKL9895kc/00028`, no zone shown] [wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part B. Merchants and shops, row 98; source cell: [client] [video `-MqKL9895kc/00028`, no zone shown] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part B. Merchants and shops, row 98; source cell: [client] [video `-MqKL9895kc/00028`, no zone shown] [wiki]"
+            "evidence": "client locale npc_name 'Tiger the Party Animal' = Global.Text 420171 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -58811,8 +58917,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npc_spawns_extra.json spawn_guid=9500000774 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npc_spawns_extra.json spawn_guid=9500000774 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 1963,
+      "model_file_name": "human_m_tiger_the_party_animal_holiday.agr"
     },
     {
       "npc_id": 9500000541,
@@ -59329,7 +59449,7 @@
       "reference_ids": [],
       "name": "Vladimir",
       "name_reason": null,
-      "name_string_id": 2616161033,
+      "name_string_id": 415600,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -59469,11 +59589,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part D. Seasonal event NPCs that stood in Sanctuary, row 138; source cell: [client] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part D. Seasonal event NPCs that stood in Sanctuary, row 138; source cell: [client] [wiki]"
+            "evidence": "client locale npc_name 'Vladimir' = Global.Text 415600 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -59729,8 +59845,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob%3AVladimir"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob%3AVladimir"
+          }
         ]
-      }
+      },
+      "model_id": 312,
+      "model_file_name": "human_m_freestyle_03.agr"
     },
     {
       "npc_id": 9500000543,

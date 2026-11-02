@@ -511,7 +511,7 @@
       "reference_ids": [],
       "name": "Barnabus",
       "name_reason": null,
-      "name_string_id": 367646246,
+      "name_string_id": 392196,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -651,11 +651,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part D. The swamp, the graveyard and the dig sites, row 76; source cell: [client] [video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part D. The swamp, the graveyard and the dig sites, row 76; source cell: [client] [video]"
+            "evidence": "client locale npc_name 'Barnabus' = Global.Text 392196 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -1829,8 +1825,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46173 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46173 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 1054,
+      "model_file_name": "dwarf_m_blacksporethiefghost.adr"
     },
     {
       "npc_id": 9500000004,
@@ -4973,7 +4983,7 @@
       "reference_ids": [],
       "name": "Ceard Bauchlog",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 45356,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": null,
@@ -5082,7 +5092,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part J. Names in client quest text only, or weakly placed, row 181; source cell: [client]"
+            "evidence": "client locale npc_name 'Ceard Bauchlog' = Global.Text 45356 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -5286,8 +5296,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/shrouded_glade.json npc_id=9500000658 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npcs/shrouded_glade.json npc_id=9500000658 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9000000047,
@@ -6259,7 +6283,7 @@
       "reference_ids": [],
       "name": "Cracked Claw",
       "name_reason": null,
-      "name_string_id": 4053599865,
+      "name_string_id": 76410,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -6400,11 +6424,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part G. Bosses and enemy kinds with NPC pages, row 130; source cell: [client] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part G. Bosses and enemy kinds with NPC pages, row 130; source cell: [client] [wiki]"
+            "evidence": "client locale npc_name 'Cracked Claw' = Global.Text 76410 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -6668,8 +6688,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46008 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46008 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 677,
+      "model_file_name": "cray_boss_swamp.adr"
     },
     {
       "npc_id": 9500000014,
@@ -6677,7 +6711,7 @@
       "reference_ids": [],
       "name": "Cragara",
       "name_reason": null,
-      "name_string_id": 3495164671,
+      "name_string_id": 440941,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -6817,11 +6851,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part E. Merchants and vendors, row 100; source cell: [client] [wiki Cragara]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part E. Merchants and vendors, row 100; source cell: [client] [wiki Cragara]"
+            "evidence": "client locale npc_name 'Cragara' = Global.Text 440941 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -7085,8 +7115,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npc_spawns_extra.json spawn_guid=9500000739 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npc_spawns_extra.json spawn_guid=9500000739 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 4103,
+      "model_file_name": "sogg_f_vendor.adr"
     },
     {
       "npc_id": 9500000015,
@@ -9017,7 +9061,7 @@
       "reference_ids": [],
       "name": "Drake Sullenfangs",
       "name_reason": null,
-      "name_string_id": 2463295492,
+      "name_string_id": 432220,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -9157,11 +9201,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part F. Seasonal and event NPCs that stood in Blackspore, row 113; source cell: [client] [wiki Super Spooktacular]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part F. Seasonal and event NPCs that stood in Blackspore, row 113; source cell: [client] [wiki Super Spooktacular]"
+            "evidence": "client locale npc_name 'Drake Sullenfangs' = Global.Text 432220 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -9826,8 +9866,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=40010 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=40010 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 3311,
+      "model_file_name": "human_m_ed_sullenfangs.agr"
     },
     {
       "npc_id": 9000000315,
@@ -10444,7 +10498,7 @@
       "reference_ids": [],
       "name": "Ethan",
       "name_reason": null,
-      "name_string_id": 2444404965,
+      "name_string_id": 415983,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -10560,7 +10614,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part D. The swamp, the graveyard and the dig sites, row 79; source cell: [client]"
+            "evidence": "client locale npc_name 'Ethan' = Global.Text 415983 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -10764,8 +10818,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AEthan"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AEthan"
+          }
         ]
-      }
+      },
+      "model_id": 312,
+      "model_file_name": "human_m_freestyle_03.agr"
     },
     {
       "npc_id": 9500000023,
@@ -12255,7 +12323,7 @@
       "reference_ids": [],
       "name": "Foreman Ironfist",
       "name_reason": null,
-      "name_string_id": 300046663,
+      "name_string_id": 71199,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -12396,11 +12464,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part G. Bosses and enemy kinds with NPC pages, row 131; source cell: [client] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part G. Bosses and enemy kinds with NPC pages, row 131; source cell: [client] [wiki]"
+            "evidence": "client locale npc_name 'Foreman Ironfist' = Global.Text 71199 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -12664,8 +12728,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46041 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46041 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 10,
+      "model_file_name": "ghostdwarf_m_miner_01.adr"
     },
     {
       "npc_id": 9500000028,
@@ -16760,8 +16838,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=40011 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=40011 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 3296,
+      "model_file_name": "human_m_werewolf_jake_blackforest.agr"
     },
     {
       "npc_id": 9500000037,
@@ -17115,7 +17207,7 @@
       "reference_ids": [],
       "name": "Lon Blackforest",
       "name_reason": null,
-      "name_string_id": 2051463144,
+      "name_string_id": 432270,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -17256,11 +17348,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part F. Seasonal and event NPCs that stood in Blackspore, row 115; source cell: [client] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part F. Seasonal and event NPCs that stood in Blackspore, row 115; source cell: [client] [wiki]"
+            "evidence": "client locale npc_name 'Lon Blackforest' = Global.Text 432270 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -18350,7 +18438,7 @@
       "reference_ids": [],
       "name": "Lucinda",
       "name_reason": null,
-      "name_string_id": 2080820869,
+      "name_string_id": 415091,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -18516,15 +18604,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part F. Seasonal and event NPCs that stood in Blackspore, row 110; source cell: [client] [video `0LoQe5VZ0PY/00034`, `/00074`, `/00106`] [wiki Super Spooktacular]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part F. Seasonal and event NPCs that stood in Blackspore, row 110; source cell: [client] [video `0LoQe5VZ0PY/00034`, `/00074`, `/00106`] [wiki Super Spooktacular]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part F. Seasonal and event NPCs that stood in Blackspore, row 110; source cell: [client] [video `0LoQe5VZ0PY/00034`, `/00074`, `/00106`] [wiki Super Spooktacular]"
+            "evidence": "client locale npc_name 'Lucinda' = Global.Text 415091 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -18840,8 +18920,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Lucinda"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Lucinda"
+          }
         ]
-      }
+      },
+      "model_id": 7,
+      "model_file_name": "humanchild_f_skirtandtunic.adr"
     },
     {
       "npc_id": 9500000042,
@@ -22465,7 +22559,7 @@
       "reference_ids": [],
       "name": "Mucklewhump",
       "name_reason": null,
-      "name_string_id": 2197470590,
+      "name_string_id": 45287,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -22605,11 +22699,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part D. The swamp, the graveyard and the dig sites, row 72; source cell: [client name] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part D. The swamp, the graveyard and the dig sites, row 72; source cell: [client name] [wiki]"
+            "evidence": "client locale npc_name 'Mucklewhump' = Global.Text 45287 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -22865,8 +22955,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1477 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1477 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 25,
+      "model_file_name": "humanelder_m_peacoat.adr"
     },
     {
       "npc_id": 9500000049,
@@ -23367,8 +23471,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46167 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46167 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 677,
+      "model_file_name": "cray_boss_swamp.adr"
     },
     {
       "npc_id": 9500000050,
@@ -24224,7 +24342,7 @@
       "reference_ids": [],
       "name": "Nerek",
       "name_reason": null,
-      "name_string_id": 1286411517,
+      "name_string_id": 41835,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -24338,7 +24456,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part J. Names in client quest text only, or weakly placed, row 178; source cell: [client]"
+            "evidence": "client locale npc_name 'Nerek' = Global.Text 41835 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -24542,8 +24660,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob%3ANerek"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob%3ANerek"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9500000053,
@@ -24551,7 +24683,7 @@
       "reference_ids": [],
       "name": "Norville",
       "name_reason": null,
-      "name_string_id": 3151490498,
+      "name_string_id": 45556,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -24667,7 +24799,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part D. The swamp, the graveyard and the dig sites, row 74; source cell: [client]"
+            "evidence": "client locale npc_name 'Norville' = Global.Text 45556 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -24871,8 +25003,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Norville"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Norville"
+          }
         ]
-      }
+      },
+      "model_id": 312,
+      "model_file_name": "human_m_freestyle_03.agr"
     },
     {
       "npc_id": 9500000054,
@@ -32727,7 +32873,7 @@
       "reference_ids": [],
       "name": "Spectral Guardian",
       "name_reason": null,
-      "name_string_id": 2387529899,
+      "name_string_id": 416067,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -32867,11 +33013,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part F. Seasonal and event NPCs that stood in Blackspore, row 112; source cell: [client name] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part F. Seasonal and event NPCs that stood in Blackspore, row 112; source cell: [client name] [wiki]"
+            "evidence": "client locale npc_name 'Spectral Guardian' = Global.Text 416067 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -33127,8 +33269,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn robgoblin male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ASpectral_Guardian"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn robgoblin male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ASpectral_Guardian"
+          }
         ]
-      }
+      },
+      "model_id": 4,
+      "model_file_name": "robgoblin_m_basic.adr"
     },
     {
       "npc_id": 9500000066,
@@ -34301,7 +34457,7 @@
       "reference_ids": [],
       "name": "Tiger the Party Animal",
       "name_reason": null,
-      "name_string_id": 2807361043,
+      "name_string_id": 420171,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -34559,27 +34715,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part E. Merchants and vendors, row 99; source cell: [client] [video `-MqKL9895kc/00028` nameplate, no zone] [wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part E. Merchants and vendors, row 99; source cell: [client] [video `-MqKL9895kc/00028` nameplate, no zone] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part E. Merchants and vendors, row 99; source cell: [client] [video `-MqKL9895kc/00028` nameplate, no zone] [wiki]"
-          },
-          {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Seaside.md#Part H. Event, guest and cross-zone NPCs, row 177; source cell: [client] [video] [wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Seaside.md#Part H. Event, guest and cross-zone NPCs, row 177; source cell: [client] [video] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Seaside.md#Part H. Event, guest and cross-zone NPCs, row 177; source cell: [client] [video] [wiki]"
+            "evidence": "client locale npc_name 'Tiger the Party Animal' = Global.Text 420171 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -35083,8 +35219,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npc_spawns_extra.json spawn_guid=9500000774 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "data/content/npc_spawns_extra.json spawn_guid=9500000774 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 1963,
+      "model_file_name": "human_m_tiger_the_party_animal_holiday.agr"
     },
     {
       "npc_id": 9500000070,
@@ -36672,7 +36822,7 @@
       "reference_ids": [],
       "name": "Trent Gingertuft",
       "name_reason": null,
-      "name_string_id": 331091467,
+      "name_string_id": 72453,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -36814,11 +36964,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part E. Merchants and vendors, row 101; source cell: [client] [wiki, via Brawler page]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part E. Merchants and vendors, row 101; source cell: [client] [wiki, via Brawler page]"
+            "evidence": "client locale npc_name 'Trent Gingertuft' = Global.Text 72453 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -37091,7 +37237,7 @@
       "reference_ids": [],
       "name": "Troll bone shaman",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 72269,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": "Blackspore Swamp",
@@ -37226,12 +37372,8 @@
         ],
         "name_string_id": [
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part G. Bosses and enemy kinds with NPC pages, row 148; source cell: [wiki] [client]"
-          },
-          {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part G. Bosses and enemy kinds with NPC pages, row 148; source cell: [wiki] [client]"
+            "evidence": "client locale npc_name 'Troll bone shaman' = Global.Text 72269 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -37495,8 +37637,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3149 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3149 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 168,
+      "model_file_name": "troll_shaman.adr"
     },
     {
       "npc_id": 9000000224,
@@ -40229,7 +40385,7 @@
       "reference_ids": [],
       "name": "Waldo Sidewinder",
       "name_reason": null,
-      "name_string_id": 1875894747,
+      "name_string_id": 401703,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -40343,7 +40499,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part J. Names in client quest text only, or weakly placed, row 179; source cell: [client]"
+            "evidence": "client locale npc_name 'Waldo Sidewinder' = Global.Text 401703 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [

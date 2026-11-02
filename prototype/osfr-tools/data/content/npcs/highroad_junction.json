@@ -1416,7 +1416,7 @@
       "reference_ids": [],
       "name": "Bixie Guardian",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 442610,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -1558,11 +1558,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md#Part E. Enemies, bosses and event NPCs, row 79; source cell: [client name] [wiki Bixie Pikeman]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md#Part E. Enemies, bosses and event NPCs, row 79; source cell: [client name] [wiki Bixie Pikeman]"
+            "evidence": "client locale npc_name 'Bixie Guardian' = Global.Text 442610 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -1818,8 +1814,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2914 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2914 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 4474,
+      "model_file_name": "bixie_m_elite_guard_gloamed.adr"
     },
     {
       "npc_id": 9500000327,
@@ -1827,7 +1837,7 @@
       "reference_ids": [],
       "name": "Bixie Magus",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 442609,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -1974,11 +1984,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md#Part E. Enemies, bosses and event NPCs, row 78; source cell: [client name] [wiki Bixie Battlemage]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md#Part E. Enemies, bosses and event NPCs, row 78; source cell: [client name] [wiki Bixie Battlemage]"
+            "evidence": "client locale npc_name 'Bixie Magus' = Global.Text 442609 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -2234,8 +2240,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2916 (same name)"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2916 (same name)"
+          }
         ]
-      }
+      },
+      "model_id": 4473,
+      "model_file_name": "bixie_f_mage_gloamed.adr"
     },
     {
       "npc_id": 9500000328,
@@ -2670,7 +2690,7 @@
       "reference_ids": [],
       "name": "Bugawug Queen",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 442884,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -2814,11 +2834,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md#Part E. Enemies, bosses and event NPCs, row 77; source cell: [client] [wiki Raven]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md#Part E. Enemies, bosses and event NPCs, row 77; source cell: [client] [wiki Raven]"
+            "evidence": "client locale npc_name 'Bugawug Queen' = Global.Text 442884 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -4003,7 +4019,7 @@
       "reference_ids": [],
       "name": "Coin Farmer Goldwupp",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 429170,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -4171,15 +4187,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md#Part D. Merchants, row 67; source cell: [client name] [video] [wiki Muglap, sibling only]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md#Part D. Merchants, row 67; source cell: [client name] [video] [wiki Muglap, sibling only]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md#Part D. Merchants, row 67; source cell: [client name] [video] [wiki Muglap, sibling only]"
+            "evidence": "client locale npc_name 'Coin Farmer Goldwupp' = Global.Text 429170 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -5556,7 +5564,7 @@
       "reference_ids": [],
       "name": "Hewey the Bear",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 5734,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -5724,15 +5732,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md#Part E. Enemies, bosses and event NPCs, row 75; source cell: [client] [video] [wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md#Part E. Enemies, bosses and event NPCs, row 75; source cell: [client] [video] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md#Part E. Enemies, bosses and event NPCs, row 75; source cell: [client] [video] [wiki]"
+            "evidence": "client locale npc_name 'Hewey the Bear' = Global.Text 5734 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -6051,7 +6051,7 @@
       ],
       "name": "Mercy Merrywings",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 103758,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -6222,15 +6222,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md#Part B. Job trainers and job NPCs, row 48; source cell: [client] [video] [wiki Pet Trainer]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md#Part B. Job trainers and job NPCs, row 48; source cell: [client] [video] [wiki Pet Trainer]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md#Part B. Job trainers and job NPCs, row 48; source cell: [client] [video] [wiki Pet Trainer]"
+            "evidence": "client locale npc_name 'Mercy Merrywings' = Global.Text 103758 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -6546,8 +6538,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AMercy_Merrywings"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AMercy_Merrywings"
+          }
         ]
-      }
+      },
+      "model_id": 456,
+      "model_file_name": "fairy_druid_f.adr"
     },
     {
       "npc_id": 9000000402,
@@ -9763,7 +9769,7 @@
       ],
       "name": "Verill Shiverwings",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 78665,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -10187,11 +10193,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md#Part B. Job trainers and job NPCs, row 49; source cell: [client] [wiki Pet Trainer]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md#Part B. Job trainers and job NPCs, row 49; source cell: [client] [wiki Pet Trainer]"
+            "evidence": "client locale npc_name 'Verill Shiverwings' = Global.Text 78665 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
@@ -10639,8 +10641,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AVerill_Shiverwings"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AVerill_Shiverwings"
+          }
         ]
-      }
+      },
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr"
     },
     {
       "npc_id": 9000000236,
@@ -10650,7 +10666,7 @@
       ],
       "name": "Zoren Orecrusher",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 412395,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -10797,11 +10813,7 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md#Part B. Job trainers and job NPCs, row 50; source cell: [client] [video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md#Part B. Job trainers and job NPCs, row 50; source cell: [client] [video]"
+            "evidence": "client locale npc_name 'Zoren Orecrusher' = Global.Text 412395 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
           }
         ],
         "name_string_ids": [
