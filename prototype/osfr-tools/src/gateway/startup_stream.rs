@@ -93,7 +93,8 @@ impl Gateway {
         // (R) Action-bar assignments have no field in the current saved
         // GameplayState, so preserve the captured typed rows until that state exists.
         // The module-owned opaque post-effect tail remains untouched.
-        Ok(startup_selfdata::build_self(&data))
+        // L124: a save the self data cannot carry is refused here instead of panicking at login.
+        startup_selfdata::try_build_self(&data)
     }
 
     /// L107: every captured job record carries the captured player's rank, XP percent and stars;
