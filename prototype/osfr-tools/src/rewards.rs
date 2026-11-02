@@ -122,6 +122,21 @@ impl RewardState {
         self.curves = curves;
         self
     }
+
+    /// L927: what one unit of `profile`'s repeatable activity pays: the job's `activity_xp`
+    /// from the curves, else `fallback` (the activity's own constant).
+    pub fn activity_xp(&self, profile: i32, fallback: u32) -> u32 {
+        let rate = self.curves.get(&profile);
+        rate.and_then(crate::profiles::RankCurve::activity_xp)
+            .unwrap_or(fallback)
+    }
+
+    /// The same for one kill: the job's rate when its unit is a kill, else `fallback`.
+    pub fn kill_xp(&self, profile: i32, fallback: u32) -> u32 {
+        let rate = self.curves.get(&profile);
+        rate.and_then(crate::profiles::RankCurve::kill_xp)
+            .unwrap_or(fallback)
+    }
 }
 
 /// Why [`apply_grant`] refused a grant. The variant is the classification: a caller matches it

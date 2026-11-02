@@ -15,7 +15,8 @@ use osfr_tools::{
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, io, path::Path};
 
-/// (R) Original Harvesting XP has not been recovered; use a small local award.
+/// (R) Original Harvesting XP has not been recovered; use a small local award. L927: the Chef's
+/// `activity_xp` in `job_xp_curve.json` replaces it; this is the fallback without that file.
 pub const RECONSTRUCTED_CHEF_XP_PER_WIN: u32 = 25;
 
 const HARVESTING_TYPE_ID: i32 = 8;
@@ -351,7 +352,12 @@ impl HarvestingLifecycle {
                     let transaction = activity.transaction.as_ref();
                     Some((
                         base,
-                        reward_grant(transaction, self.game_id, self.player_guid)?,
+                        reward_grant(
+                            transaction,
+                            self.game_id,
+                            self.player_guid,
+                            base.activity_xp(CHEF_PROFILE_ID, RECONSTRUCTED_CHEF_XP_PER_WIN),
+                        )?,
                     ))
                 } else {
                     None
@@ -408,6 +414,7 @@ pub fn reward_grant(
     transaction: Option<&Type8Transaction>,
     game_id: i32,
     player_guid: u64,
+    xp: u32,
 ) -> io::Result<RewardGrant> {
     let transaction =
         transaction.ok_or_else(|| invalid("Harvesting win has no produce transaction"))?;
@@ -438,7 +445,7 @@ pub fn reward_grant(
                 count,
             })
             .collect(),
-        job_xp: BTreeMap::from([(CHEF_PROFILE_ID, RECONSTRUCTED_CHEF_XP_PER_WIN)]),
+        job_xp: BTreeMap::from([(CHEF_PROFILE_ID, xp)]),
         sc: 0,
         display: RewardDisplay {
             source_guid: player_guid,

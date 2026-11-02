@@ -664,6 +664,9 @@ pub struct EncounterReward {
     pub bonus_items: Vec<(i32, u32)>,
     /// Experience for the active (combat) job: battles level combat jobs.
     pub job_xp: u32,
+    /// L927: the part of `job_xp` that is one field kill's row XP (0 for a row that pays none). The
+    /// active job's per-kill `activity_xp` takes its place when the payout is applied.
+    pub kill_xp: u32,
 }
 #[derive(Debug, Default)]
 pub struct EncounterOutcome {

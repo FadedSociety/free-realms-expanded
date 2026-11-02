@@ -603,7 +603,10 @@ impl EnemyEngine {
                 if next_player.job_profile <= 0 {
                     return Err(invalid("enemy XP reward requires an active job"));
                 }
-                job_xp.insert(next_player.job_profile, definition.reward.xp);
+                // L927: the job's per-kill `activity_xp` replaces the definition's XP (a definition that
+                // pays none still pays none).
+                let xp = reward_state.kill_xp(next_player.job_profile, definition.reward.xp);
+                job_xp.insert(next_player.job_profile, xp);
             }
             let grant = RewardGrant {
                 coins: definition.reward.coins,

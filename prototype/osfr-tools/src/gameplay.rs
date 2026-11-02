@@ -3101,7 +3101,15 @@ impl Gameplay {
                 .push(chat::system("Soccer is not available right now."));
             return Ok(());
         };
-        match crate::soccer_entry::Session::begin(&content, activity, character) {
+        // L927: the Soccer Star's per-match `activity_xp`, only while that job is unlocked (the
+        // payout refuses an XP row for a locked job whole).
+        let star = crate::soccer_entry::SOCCER_STAR_PROFILE;
+        let xp = self
+            .profiles
+            .as_ref()
+            .filter(|p| p.state().unlocked.contains(&star))
+            .and_then(|p| p.activity_xp(star));
+        match crate::soccer_entry::Session::begin(&content, activity, character, xp) {
             Ok(session) => {
                 out.scene_zoning = Some(session.scene().clone());
                 self.soccer = Some(session);

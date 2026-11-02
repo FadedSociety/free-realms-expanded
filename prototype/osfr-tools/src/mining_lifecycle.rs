@@ -343,7 +343,11 @@ impl MiningLifecycle {
                         .ok_or_else(|| invalid("Mining win requires staged reward state"))?;
                     Some((
                         base,
-                        reward_grant(activity.transaction.as_ref(), self.player_guid)?,
+                        reward_grant(
+                            activity.transaction.as_ref(),
+                            self.player_guid,
+                            base.activity_xp(MINER_PROFILE_ID, RECONSTRUCTED_MINER_XP_PER_WIN),
+                        )?,
                     ))
                 } else {
                     None
@@ -401,6 +405,7 @@ fn run_spec(engine: &Type8Engine) -> RunSpec {
 pub fn reward_grant(
     transaction: Option<&Type8Transaction>,
     player_guid: u64,
+    xp: u32,
 ) -> io::Result<RewardGrant> {
     let mut quantities = BTreeMap::<i32, u32>::new();
     if let Some(transaction) = transaction {
@@ -426,7 +431,7 @@ pub fn reward_grant(
                 count,
             })
             .collect(),
-        job_xp: BTreeMap::from([(MINER_PROFILE_ID, RECONSTRUCTED_MINER_XP_PER_WIN)]),
+        job_xp: BTreeMap::from([(MINER_PROFILE_ID, xp)]),
         sc: 0,
         display: RewardDisplay {
             source_guid: player_guid,

@@ -76,11 +76,19 @@ fn dwords(values: &[i32]) -> impl Iterator<Item = u8> + '_ {
 /// `job_xp_curve.json` gives a job its own curve (level n -> n+1 weighted n^exponent); a job without
 /// one, and content without the file, keeps the local (R) 100-XP-per-level curve.
 #[derive(Clone, Debug, PartialEq)]
-pub struct RankCurve([u32; 20]);
+pub struct RankCurve {
+    levels: [u32; 20],
+    /// L927: what one unit of the job's repeatable activity pays and what that unit is.
+    rate: Option<(u32, String)>,
+}
 
 impl RankCurve {
+    fn of(levels: [u32; 20]) -> Self {
+        Self { levels, rate: None }
+    }
+
     pub fn flat() -> Self {
-        Self(std::array::from_fn(|level| level as u32 * 100))
+        Self::of(std::array::from_fn(|level| level as u32 * 100))
     }
 
     fn shaped(total: u32, exponent: f64) -> io::Result<Self> {
@@ -95,12 +103,12 @@ impl RankCurve {
             let at = (f64::from(total) * done / sum).round() as u32;
             levels[step + 1] = at.max(levels[step] + 1);
         }
-        Ok(Self(levels))
+        Ok(Self::of(levels))
     }
 
     /// The level `xp` reaches, 1 to 20.
     pub fn level(&self, xp: u32) -> u32 {
-        1 + self.0[1..]
+        1 + self.levels[1..]
             .iter()
             .take_while(|&&needed| xp >= needed)
             .count() as u32
@@ -112,13 +120,26 @@ impl RankCurve {
         if level >= 20 {
             return 0;
         }
-        let (low, high) = (self.0[level - 1], self.0[level]);
+        let (low, high) = (self.levels[level - 1], self.levels[level]);
         ((u64::from(xp - low) * 100) / u64::from(high - low)) as u32
     }
 
     /// The XP a job holds at the start of `level` (clamped to 1..=20).
     pub fn xp_for(&self, level: u32) -> u32 {
-        self.0[(level.clamp(1, 20) - 1) as usize]
+        self.levels[(level.clamp(1, 20) - 1) as usize]
+    }
+
+    /// L927: what one unit of the job's repeatable activity pays (`activity_xp` in
+    /// `job_xp_curve.json`); `None` leaves the activity's own constant in force.
+    pub fn activity_xp(&self) -> Option<u32> {
+        self.rate.as_ref().map(|(xp, _)| *xp)
+    }
+
+    /// The same rate, only when one unit is a kill (the combat jobs'; the Adventurer's unit is a
+    /// coin, so its rate never prices a kill).
+    pub fn kill_xp(&self) -> Option<u32> {
+        let (xp, unit) = self.rate.as_ref()?;
+        (unit == "kill").then_some(*xp)
     }
 }
 
@@ -139,6 +160,11 @@ struct CurveRow {
     #[serde(default)]
     job: String,
     total_to_20: u32,
+    /// L927: XP for one unit of the job's repeatable activity, and what that unit is.
+    #[serde(default)]
+    activity_xp: Option<u32>,
+    #[serde(default)]
+    activity: String,
     #[serde(default)]
     source: String,
 }
@@ -159,7 +185,13 @@ pub fn load_curves(directory: &Path) -> io::Result<BTreeMap<i32, RankCurve>> {
     }
     let mut curves = BTreeMap::new();
     for row in file.jobs {
-        let curve = RankCurve::shaped(row.total_to_20, file.exponent)?;
+        let mut curve = RankCurve::shaped(row.total_to_20, file.exponent)?;
+        if let Some(xp) = row.activity_xp {
+            if !(1..=100_000).contains(&xp) || row.activity.trim().is_empty() {
+                return Err(invalid("job xp curve activity rate out of bounds"));
+            }
+            curve.rate = Some((xp, row.activity));
+        }
         if curves.insert(row.profile_id, curve).is_some() {
             return Err(invalid("job xp curve names a profile twice"));
         }
@@ -441,6 +473,17 @@ impl Profiles {
             .get(&profile)
             .cloned()
             .unwrap_or_else(RankCurve::flat)
+    }
+
+    /// L927: what one unit of the job's repeatable activity pays (`job_xp_curve.json`); `None`
+    /// when the job has no rate, and the caller's own constant applies.
+    pub fn activity_xp(&self, profile: i32) -> Option<u32> {
+        self.curves.get(&profile).and_then(RankCurve::activity_xp)
+    }
+
+    /// The job's rate per kill, for the combat jobs.
+    pub fn kill_xp(&self, profile: i32) -> Option<u32> {
+        self.curves.get(&profile).and_then(RankCurve::kill_xp)
     }
 
     /// Load a reward's progression snapshot, keeping `current`'s staff jobs (granted and
@@ -824,6 +867,73 @@ mod tests {
                 .unwrap()
                 .is_empty()
         );
+    }
+
+    /// L927: the file's `activity_xp` and `activity` parse, reach `Profiles`, and a job without one
+    /// (or content without the file) leaves `None`, so each site keeps its own constant.
+    #[test]
+    fn the_activity_rates_parse_reach_profiles_and_fall_back_to_none() {
+        let release = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("data/release");
+        let curves = super::load_curves(&release).unwrap();
+        let rates: Vec<(i32, u32)> = curves
+            .iter()
+            .filter_map(|(id, curve)| Some((*id, curve.activity_xp()?)))
+            .collect();
+        assert_eq!(
+            rates,
+            [
+                (1, 14),
+                (2, 4),
+                (4, 93),
+                (11, 3),
+                (12, 6),
+                (14, 63),
+                (16, 77),
+                (32, 2),
+                (35, 4),
+                (43, 4),
+                (45, 86),
+                (48, 97),
+                (49, 78),
+                (52, 72),
+                (120, 466),
+                (137, 8)
+            ],
+            "Pet Trainer (121) has none"
+        );
+        let profiles = super::Profiles::load(&release, None).unwrap();
+        assert_eq!(profiles.activity_xp(137), Some(8));
+        assert_eq!(profiles.activity_xp(121), None);
+        assert_eq!(profiles.activity_xp(9_999), None, "an unknown job");
+        assert_eq!(
+            profiles.kill_xp(32),
+            Some(2),
+            "the Warrior's unit is a kill"
+        );
+        assert_eq!(profiles.kill_xp(1), None, "the Adventurer's unit is a coin");
+        assert_eq!(profiles.kill_xp(137), None, "a catch is not a kill");
+        let flat = RankCurve::flat();
+        assert_eq!((flat.activity_xp(), flat.kill_xp()), (None, None));
+    }
+
+    #[test]
+    fn a_rate_needs_its_unit_and_a_sane_amount() {
+        let directory = std::env::temp_dir().join(format!("osfr-curve-{}", std::process::id()));
+        std::fs::create_dir_all(&directory).unwrap();
+        let load = |row: &str| {
+            let file = format!(
+                r#"{{"schema_version": 1, "exponent": 1.5, "jobs": [{{"profile_id": 1, "total_to_20": 9000{row}}}]}}"#
+            );
+            std::fs::write(directory.join("job_xp_curve.json"), file).unwrap();
+            super::load_curves(&directory)
+        };
+        let rate = load(r#", "activity_xp": 5, "activity": "kill""#).unwrap();
+        assert_eq!(rate[&1].kill_xp(), Some(5));
+        assert_eq!(load("").unwrap()[&1].activity_xp(), None);
+        assert!(load(r#", "activity_xp": 5"#).is_err(), "no unit");
+        assert!(load(r#", "activity_xp": 0, "activity": "kill""#).is_err());
+        assert!(load(r#", "activity_xp": 100001, "activity": "kill""#).is_err());
+        std::fs::remove_dir_all(&directory).unwrap();
     }
 
     #[test]

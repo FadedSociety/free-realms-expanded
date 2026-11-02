@@ -397,6 +397,7 @@ impl EncounterEngine {
             out.rewards.push(EncounterReward {
                 coins,
                 job_xp,
+                kill_xp: reward.job_xp,
                 bonus_items: loot.items,
                 ..Default::default()
             });

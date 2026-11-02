@@ -308,6 +308,33 @@ fn ability_damage_kills_once_and_respawns_after_its_timer() {
     assert_eq!(alive.mode, EnemyMode::Idle);
 }
 
+/// L927: a state carrying the job curves pays the active job's per-kill rate in place of the
+/// definition's XP (Brawler 4, definition 7).
+#[test]
+fn an_ability_kill_pays_the_active_jobs_per_kill_rate_when_the_curves_carry_one() {
+    let key = ZoneInstanceKey {
+        zone_id: 5,
+        instance_id: 0,
+    };
+    let mut engine = test_engine(500);
+    engine.enter_instance(key, None).unwrap();
+    let mut caster = player(PLAYER_GUID, [1.0, 0.0, 0.0], 100, 100);
+    caster.owned_abilities.insert(77);
+    caster.slots.insert(0, 77);
+    let release = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("data/release");
+    let curves = osfr_tools::profiles::load_curves(&release).unwrap();
+    let state = RewardFixture::new()
+        .state
+        .clone()
+        .with_curves(curves.into());
+    let kill = engine
+        .use_ability_on_enemy(key, &mut caster, 17, &damage_ability(50), 100, &state)
+        .unwrap()
+        .kill
+        .unwrap();
+    assert_eq!(kill.reward_state.profiles.experience[&43], 4);
+}
+
 #[test]
 fn enemy_returns_to_its_spawn_after_player_breaks_leash() {
     let key = ZoneInstanceKey {

@@ -79,23 +79,38 @@ impl Gameplay {
         // L087: a live coin booster raises the coins here; `award_job_xp` raises the stars.
         let boost = self.consumable_effects.boost();
         let coins = boost.coins(reward.coins);
+        // L927: a field kill pays the active job's per-kill `activity_xp` in place of its row's
+        // XP; a row that pays none still pays none.
+        let job_xp = match self.profiles.as_ref() {
+            Some(profiles) if reward.kill_xp > 0 => {
+                profiles
+                    .kill_xp(profiles.active())
+                    .map_or(reward.job_xp, |rate| {
+                        reward
+                            .job_xp
+                            .saturating_sub(reward.kill_xp)
+                            .saturating_add(rate)
+                    })
+            }
+            _ => reward.job_xp,
+        };
         let coins_fit = self.inventory.can_grant_coins(coins);
-        let xp_fit = reward.job_xp == 0
+        let xp_fit = job_xp == 0
             || self
                 .profiles
                 .as_ref()
-                .is_some_and(|profiles| profiles.can_add_experience(boost.stars(reward.job_xp)));
+                .is_some_and(|profiles| profiles.can_add_experience(boost.stars(job_xp)));
         if !coins_fit || !xp_fit {
             eprintln!(
                 "encounter reward refused: coins={} job_xp={}",
-                reward.coins, reward.job_xp
+                reward.coins, job_xp
             );
             out.replies.push(chat::system(REWARD_UNREPRESENTABLE));
             return Ok(());
         }
         self.grant_reward(coins, &reward.items, out)?;
-        if reward.job_xp > 0 {
-            self.award_job_xp(reward.job_xp, out)?;
+        if job_xp > 0 {
+            self.award_job_xp(job_xp, out)?;
         }
         // A chance drop lands only if the bag takes it whole; a full bag loses
         // the drop, never the win's coins, prize or XP (T658).

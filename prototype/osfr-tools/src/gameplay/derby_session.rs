@@ -227,6 +227,10 @@ impl Gameplay {
         character: &CharacterState,
         out: &mut Outcome,
     ) -> io::Result<()> {
+        // L927: the Demo Derby Driver's `activity_xp` per match (`job_xp_curve.json`).
+        let rate = self.profiles.as_ref().and_then(|profiles| {
+            profiles.activity_xp(crate::derby_gateway::DEMO_DERBY_DRIVER_PROFILE)
+        });
         let Some(derby) = self.derby.as_mut() else {
             return Ok(());
         };
@@ -235,7 +239,10 @@ impl Gameplay {
         };
         // The ledger row is taken: persist it with the quest credit, whatever the payout does.
         out.changed = true;
-        let (minigame_id, grant) = (derby.game_id(), derby.completion_grant(character.guid));
+        let (minigame_id, grant) = (
+            derby.game_id(),
+            derby.completion_grant(character.guid, rate),
+        );
         // T787: this participant's own score, placement and knock-outs, never another
         // driver's. A missing result (a phase race) claims no fact, so no bound the
         // producer can report is met by accident; `knocked_out` stays conservative.

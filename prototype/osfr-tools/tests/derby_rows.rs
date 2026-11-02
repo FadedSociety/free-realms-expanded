@@ -460,13 +460,19 @@ fn row_overrides_are_the_effective_package() {
     );
     assert_eq!(gateway.game_id(), BREAK_ER_IN as u32);
     let grant = gateway
-        .completion_grant(character.guid)
+        .completion_grant(character.guid, None)
         .expect("the row pays its own reward");
     assert_eq!(grant.coins, 7);
     assert_eq!(
         grant.job_xp.get(&DEMO_DERBY_DRIVER_PROFILE),
         Some(&3),
         "the row's inherited/overridden XP comes from its effective package"
+    );
+    // L927: the job's activity XP from job_xp_curve.json replaces the package's XP, not its coins.
+    let rated = gateway.completion_grant(character.guid, Some(78)).unwrap();
+    assert_eq!(
+        (rated.coins, rated.job_xp.get(&DEMO_DERBY_DRIVER_PROFILE)),
+        (7, Some(&78))
     );
 }
 

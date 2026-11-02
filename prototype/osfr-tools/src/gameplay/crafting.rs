@@ -549,6 +549,13 @@ impl Gameplay {
             } else {
                 self.npc_minigame_win_id_only(&result.replies, out)?;
             }
+            // L927: a cook or a forge pays the job's `activity_xp` (`job_xp_curve.json`); the
+            // recipes' own XP has never been paid and still is not. Smelting is not paid here:
+            // its ore came from a mining round, which is what the Miner's rate counts.
+            let xp = self.activity_xp(job.profile_id(), 0);
+            if job != CraftingJob::Miner && xp > 0 {
+                self.award_job_xp(xp, out)?;
+            }
         } else {
             // T787: forging defers its winning 39/18 record to the client's
             // `FRServer_GameOver`; the win outcome already credited the id-only event,
@@ -590,14 +597,26 @@ impl Gameplay {
         out: &mut Outcome,
     ) -> io::Result<()> {
         if let Some(transaction) = result.transaction {
+            // L927: the job's activity XP from `job_xp_curve.json`; the constants are the fallback.
             let grant = match gather {
-                Gather::Mining => crate::mining::lifecycle::reward_grant(Some(&transaction), 0)?,
+                Gather::Mining => crate::mining::lifecycle::reward_grant(
+                    Some(&transaction),
+                    0,
+                    self.activity_xp(
+                        gather.job(),
+                        crate::mining::lifecycle::RECONSTRUCTED_MINER_XP_PER_WIN,
+                    ),
+                )?,
                 // T553: the run's own region, not always the file's.
                 Gather::Harvesting => crate::harvesting::lifecycle::reward_grant(
                     Some(&transaction),
                     self.type8(gather)
                         .map_or(HARVESTING_GAME_ID, Type8Engine::game_id),
                     0,
+                    self.activity_xp(
+                        gather.job(),
+                        crate::harvesting::lifecycle::RECONSTRUCTED_CHEF_XP_PER_WIN,
+                    ),
                 )?,
                 Gather::Mail => return Err(invalid("mail sorting pays no items")),
             };
@@ -641,7 +660,11 @@ impl Gameplay {
                 ));
             }
             self.npc_minigame_win(&result.replies, out)?;
-            self.award_job_xp(crate::mail_sorting::RECONSTRUCTED_POSTMAN_XP_PER_WIN, out)?;
+            let xp = self.activity_xp(
+                gather.job(),
+                crate::mail_sorting::RECONSTRUCTED_POSTMAN_XP_PER_WIN,
+            );
+            self.award_job_xp(xp, out)?;
         } else {
             // T787: the client's `FRServer_GameOver` presents the 39/18 record after
             // the win already credited the id-only event; only its facts are new.

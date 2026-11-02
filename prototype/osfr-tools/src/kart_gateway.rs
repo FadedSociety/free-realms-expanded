@@ -237,9 +237,19 @@ impl KartGateway {
         if bytes.len() > MAX {
             return Err(invalid("kart entry content exceeds 512 KiB"));
         }
-        let content: KartGatewayContent = serde_json::from_slice(&bytes).map_err(invalid)?;
+        let mut content: KartGatewayContent = serde_json::from_slice(&bytes).map_err(invalid)?;
         if content.schema_version != 1 {
             return Err(invalid("unsupported kart entry content"));
+        }
+        // L927: the Kart Driver's `activity_xp` per race (`job_xp_curve.json`) replaces the price
+        // row's XP; the race and the reward registry below both read the one price.
+        let rate = crate::profiles::load_curves(directory)?
+            .get(&crate::kart_rewards::KART_DRIVER_JOB_ID)
+            .and_then(crate::profiles::RankCurve::activity_xp);
+        if let Some(price) = content.race.as_mut().and_then(|race| race.reward.as_mut())
+            && let Some(xp) = rate
+        {
+            price.xp = xp;
         }
         if content.race.as_ref().is_some_and(|race| {
             !race

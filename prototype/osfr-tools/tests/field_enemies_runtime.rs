@@ -182,6 +182,10 @@ fn a_kill_reward_row_with_loot_pays_the_rolled_items() {
     }
     assert_eq!(paid.len(), 1, "one kill, one payout");
     assert_eq!((paid[0].coins, paid[0].job_xp), (3, 4));
+    assert_eq!(
+        paid[0].kill_xp, 4,
+        "L927: the row's own XP, which a per-kill rate replaces"
+    );
     assert_eq!(paid[0].bonus_items, vec![(2001, 2)]);
 
     fs::write(f.0.join("field_kill_rewards.json"), rewards("missing")).unwrap();

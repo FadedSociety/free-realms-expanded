@@ -670,6 +670,32 @@ fn gate_cooldown_after_a_paid_race_blocks_entry_until_it_passes() {
     assert!(KartGateway::load(&f.0, None).is_err());
 }
 
+/// L927: the Kart Driver's `activity_xp` per race (`job_xp_curve.json` beside the content) replaces
+/// the price row's XP; the coins stay.
+#[test]
+fn a_finished_race_pays_the_kart_drivers_activity_xp_from_the_curve_file() {
+    let f = Fixture::new(true);
+    f.write_gates(&[GATE_NPC]);
+    let release = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/release");
+    fs::copy(
+        release.join("job_xp_curve.json"),
+        f.0.join("job_xp_curve.json"),
+    )
+    .unwrap();
+    let eco = Economy::new(KART_JOB);
+    let (mut inventory, mut profiles) = eco.banks();
+    let mut g = f.load();
+    enter(&mut g);
+    let (_, green) = start_to_green(&mut g);
+    drive(&mut g, green);
+    assert!(
+        !g.claim_reward(&mut inventory, &mut profiles)
+            .unwrap()
+            .is_empty()
+    );
+    assert_eq!((coins(&inventory), xp(&profiles)), (40, 97));
+}
+
 #[test]
 fn ordinary_entry_finishes_pays_exactly_once_and_returns_in_the_prior_job() {
     let f = Fixture::new(true);

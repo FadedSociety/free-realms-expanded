@@ -435,10 +435,16 @@ fn client_version(reference: &Path) -> String {
 
 /// Login, world entry and world load. The next portal Play opens soccer.
 fn enter_world(fixture: &Fixture, xp: u32, ticket: &str) -> Gateway {
+    enter_world_with(fixture, xp, ticket, &[])
+}
+
+/// `enter_world` with more jobs unlocked (the Adventurer is always active).
+fn enter_world_with(fixture: &Fixture, xp: u32, ticket: &str, unlocked: &[i32]) -> Gateway {
     let mut state = Gameplay::load(&fixture.0, None).unwrap().state();
     let profiles = state.profiles.as_mut().unwrap();
     profiles.active = 1;
     profiles.unlocked.insert(1);
+    profiles.unlocked.extend(unlocked);
     profiles.experience.insert(1, xp);
 
     let reference = reference_dir();
@@ -585,6 +591,32 @@ fn play_a_paid_win(fixture: &Fixture, xp: u32, ticket: &str) -> (Gateway, Vec<Ve
     gateway_send(&mut gateway, &lifecycle(5, instance), loaded_at + 100);
     let (packets, now) = settle_win(&mut gateway, loaded_at + 100);
     (gateway, packets, now)
+}
+
+/// L927: a won match pays the Soccer Star's `activity_xp` (72, `job_xp_curve.json`) while that job is
+/// unlocked; a character without the job still gets the coins and no refusal.
+#[test]
+fn a_won_match_pays_the_soccer_stars_activity_xp_only_while_the_job_is_unlocked() {
+    for (unlocked, paid) in [(vec![52], Some(72)), (vec![], None)] {
+        let fixture = Fixture::new();
+        let release = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/release");
+        fs::copy(
+            release.join("job_xp_curve.json"),
+            fixture.0.join("job_xp_curve.json"),
+        )
+        .unwrap();
+        let mut gateway = enter_world_with(&fixture, 0, "soccer-rate", &unlocked);
+        let coins_before = coins(&gateway);
+        let (instance, loaded_at) = enter_match(&mut gateway, 1_000);
+        gateway_send(&mut gateway, &lifecycle(5, instance), loaded_at + 100);
+        settle_win(&mut gateway, loaded_at + 100);
+        let profiles = gateway.snapshot().gameplay.unwrap().profiles.unwrap();
+        assert_eq!(profiles.experience.get(&52), paid.as_ref(), "{unlocked:?}");
+        assert!(
+            coins(&gateway) > coins_before,
+            "the match still pays its coins"
+        );
+    }
 }
 
 fn adventurer_title_id() -> u32 {

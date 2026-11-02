@@ -193,6 +193,8 @@ struct Round {
     spots: FishingSpots,
     inventory: Inventory,
     profiles: ProfileState,
+    /// L927: the job curves the reward state carries; none keeps the grade rows' XP.
+    curves: std::sync::Arc<std::collections::BTreeMap<i32, osfr_tools::profiles::RankCurve>>,
     _fixture: Fixture,
 }
 
@@ -204,12 +206,14 @@ impl Round {
             spots: spots(),
             inventory: fixture.inventory(),
             profiles: profiles(fisherman),
+            curves: Default::default(),
             _fixture: fixture,
         }
     }
 
     fn rewards(&self, bag: usize) -> RewardState {
         RewardState::new(self.inventory.clone(), self.profiles.clone(), bag)
+            .with_curves(self.curves.clone())
     }
 
     fn enter(&mut self, npc: u64, busy: bool) -> Result<Change, EntryDenied> {
@@ -759,6 +763,17 @@ fn one_catch_is_paid_once_with_the_item_and_fisherman_xp() {
     }
     assert_eq!(round.fish_held(), 1);
     assert_eq!(round.fisherman_xp(), 10);
+}
+
+/// L927: the Fisherman's `activity_xp` (8 per catch, `job_xp_curve.json`) replaces the grade row's 10.
+#[test]
+fn a_catch_pays_the_fishermans_activity_xp_when_the_curves_carry_one() {
+    let mut round = Round::new(true);
+    let release = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("data/release");
+    round.curves = std::sync::Arc::new(osfr_tools::profiles::load_curves(&release).unwrap());
+    round.start();
+    assert!(round.catch(T0 + 100).paid);
+    assert_eq!(round.fisherman_xp(), 8);
 }
 
 #[test]

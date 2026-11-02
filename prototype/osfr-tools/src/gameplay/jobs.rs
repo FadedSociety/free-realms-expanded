@@ -15,6 +15,15 @@ impl Gameplay {
             })
     }
 
+    /// L927: what one unit of `profile`'s repeatable activity pays: the job's `activity_xp`
+    /// (`job_xp_curve.json`), else `fallback`, the activity's own constant.
+    pub(super) fn activity_xp(&self, profile: i32, fallback: u32) -> u32 {
+        let profiles = self.profiles.as_ref();
+        profiles
+            .and_then(|profiles| profiles.activity_xp(profile))
+            .unwrap_or(fallback)
+    }
+
     /// Grant and equip a job's starter outfit from the content's starter table.
     /// With `reuse_owned`, a piece the player already owns is equipped instead
     /// of granting a duplicate. (R) Pieces the catalogue lacks are skipped.

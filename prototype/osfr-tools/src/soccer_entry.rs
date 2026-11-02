@@ -42,6 +42,8 @@ use std::{
 /// otherwise from the server's bundled `data/content`.
 pub const CONTENT_FILE: &str = "soccer.json";
 pub const SCHEMA_VERSION: u32 = 1;
+/// The Soccer Star job (`jobs.json` profile 52): the match's job XP goes here.
+pub const SOCCER_STAR_PROFILE: i32 = 52;
 const MAX_FILE: u64 = 1 << 20;
 const MAX_GAMES: usize = 8;
 
@@ -216,11 +218,15 @@ impl Content {
         }
     }
 
-    fn grant(&self, game: &Game, player_guid: u64) -> RewardGrant {
+    /// L927: `xp` is the Soccer Star's `activity_xp` per match; without one the file's `job_xp` pays.
+    fn grant(&self, game: &Game, player_guid: u64, xp: Option<u32>) -> RewardGrant {
         RewardGrant {
             coins: self.reward.coins,
             items: Vec::new(),
-            job_xp: self.reward.job_xp.clone(),
+            job_xp: xp.map_or_else(
+                || self.reward.job_xp.clone(),
+                |xp| BTreeMap::from([(SOCCER_STAR_PROFILE, xp)]),
+            ),
             sc: 0,
             display: RewardDisplay {
                 source_guid: 0,
@@ -328,6 +334,7 @@ impl Session {
         content: &Content,
         activity_id: u32,
         character: &CharacterState,
+        xp: Option<u32>,
     ) -> io::Result<Self> {
         let game = content
             .game(activity_id)
@@ -341,7 +348,7 @@ impl Session {
             character.guid,
             game.id as i32,
             game.encounter_id,
-            content.grant(&game, character.guid),
+            content.grant(&game, character.guid, xp),
         )?;
         if !offered.accepted {
             return Err(invalid("soccer offer was refused"));
@@ -530,4 +537,24 @@ impl Session {
 
 fn invalid(message: &'static str) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, message)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// L927: a match pays the Soccer Star's `activity_xp` when there is one, else the file's
+    /// `job_xp` (empty in the shipped file: no XP).
+    #[test]
+    fn a_match_pays_the_activity_xp_or_the_files_job_xp() {
+        let shipped = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/soccer.json");
+        let content = Content::load(&shipped).unwrap();
+        let game = content.games.first().unwrap();
+        assert!(content.grant(game, 1, None).job_xp.is_empty());
+        assert_eq!(
+            content.grant(game, 1, Some(72)).job_xp,
+            BTreeMap::from([(SOCCER_STAR_PROFILE, 72)])
+        );
+        assert_eq!(content.grant(game, 1, Some(72)).coins, content.reward.coins);
+    }
 }

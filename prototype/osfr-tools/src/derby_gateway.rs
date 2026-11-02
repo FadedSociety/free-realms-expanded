@@ -729,10 +729,11 @@ impl DerbyGateway {
     /// The flat completion grant the entered row pays. It never carries items and never derives
     /// from a contact report, a score or a match duration; `display` is the ordinary reward toast.
     /// (R) The amounts are content, not recovered retail values. `None` for a 0 coin / 0 XP
-    /// package, which pays nothing and sends no toast.
-    pub fn completion_grant(&self, guid: u64) -> Option<RewardGrant> {
+    /// package, which pays nothing and sends no toast. L927: `activity_xp` is the Demo Derby
+    /// Driver's rate per match (`job_xp_curve.json`); it replaces the package's XP when present.
+    pub fn completion_grant(&self, guid: u64, activity_xp: Option<u32>) -> Option<RewardGrant> {
         let content = self.active_package();
-        let job_xp = match content.completion_reward_xp {
+        let job_xp = match activity_xp.unwrap_or(content.completion_reward_xp) {
             0 if content.completion_reward_coins == 0 => return None,
             0 => BTreeMap::new(),
             xp => BTreeMap::from([(DEMO_DERBY_DRIVER_PROFILE, xp)]),

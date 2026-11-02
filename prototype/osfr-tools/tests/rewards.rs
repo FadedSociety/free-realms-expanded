@@ -306,3 +306,24 @@ fn empty_bundle_is_69_byte_reader_body_after_three_byte_header() {
     assert_eq!(signed(bundle, 64), 0);
     assert_eq!(signed(bundle, 68), 0);
 }
+
+/// L927: a state carrying the job curves prices a repeatable activity from `activity_xp`; without
+/// them (every fixture) the activity's own constant stays in force. A kill takes only a kill rate.
+#[test]
+fn a_reward_state_prices_an_activity_from_the_curves_or_falls_back() {
+    let (_fixture, plain) = state(0);
+    assert_eq!(plain.activity_xp(137, 10), 10);
+    assert_eq!(plain.kill_xp(32, 5), 5);
+
+    let release = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/release");
+    let curves = osfr_tools::profiles::load_curves(&release).unwrap();
+    let rated = plain.with_curves(std::sync::Arc::new(curves));
+    assert_eq!(rated.activity_xp(137, 10), 8, "Fisherman: 8 per catch");
+    assert_eq!(rated.activity_xp(121, 25), 25, "Pet Trainer has no rate");
+    assert_eq!(rated.kill_xp(32, 5), 2, "Warrior: 2 per kill");
+    assert_eq!(
+        rated.kill_xp(1, 5),
+        5,
+        "Adventurer's unit is a coin, not a kill"
+    );
+}

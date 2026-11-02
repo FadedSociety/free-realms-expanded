@@ -186,6 +186,29 @@ fn a_solo_field_kill_pays_once_and_only_the_active_job() {
     assert_eq!(field_view(&field, ENEMY), field_before);
 }
 
+/// L927: with the release `job_xp_curve.json` in the content, a kill pays the active job's
+/// per-kill rate in place of the band's XP (Brawler 4, band 5); a row that pays none stays unpaid.
+#[test]
+fn a_field_kill_pays_the_active_jobs_per_kill_rate_from_the_curve_file() {
+    for (row_xp, paid) in [(5, Some(&4)), (0, None)] {
+        let fixture = RewardFixture::new(vec![actor(ENEMY, LEVEL_ONE, 1, [0.0; 3], 100)]);
+        fixture.write_rewards(&levels(2, row_xp));
+        fs::copy(
+            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/release/job_xp_curve.json"),
+            fixture.dir().join("job_xp_curve.json"),
+        )
+        .unwrap();
+        let at = [1.0, 0.0, 0.0];
+        let character = character_at(101, at);
+        let mut game = player(&fixture, 101, 43, at, 0, None);
+        let mut field = game.take_shared_fields().unwrap();
+        let known = BTreeSet::from([ENEMY]);
+        kill(&mut game, &mut field, &character, &known, ENEMY, 0);
+        let (coins, xp) = bank(&game);
+        assert_eq!((coins, xp.get(&43)), (2, paid), "row xp {row_xp}");
+    }
+}
+
 #[test]
 fn the_mid_level_farnum_camp_pays_the_kind_override_rate() {
     // The level-5 MID-F camp reuses definition 3156. The override exists so the

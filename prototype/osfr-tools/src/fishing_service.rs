@@ -1029,7 +1029,12 @@ fn settle_catch(
     // inventory/display transaction succeeds; the caller persists it with the
     // fishing/minigame session before sending the returned packets.
     // (R) Fisherman XP only while the job is unlocked: the reward transaction refuses a locked one.
-    let xp = payout.map_or(0, |row| row.fisherman_xp);
+    // L927: the Fisherman's `activity_xp` per catch (`job_xp_curve.json`) replaces the grade row.
+    let xp = payout.map_or(0, |row| {
+        tracked
+            .rewards
+            .activity_xp(FISHERMAN_PROFILE, row.fisherman_xp)
+    });
     let job_xp = if xp > 0
         && tracked
             .rewards

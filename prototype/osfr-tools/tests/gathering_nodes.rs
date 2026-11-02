@@ -325,6 +325,13 @@ impl Fixture {
         self
     }
 
+    /// L927: the release `job_xp_curve.json` beside the content, so a win pays the job's `activity_xp`.
+    fn with_activity_rates(self) -> Self {
+        let source = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/release/job_xp_curve.json");
+        fs::copy(source, self.directory.join("job_xp_curve.json")).unwrap();
+        self
+    }
+
     fn with_shipped_mining(self) -> Self {
         let source = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/mining.json");
         fs::copy(source, self.directory.join(mining::CONTENT_FILE)).unwrap();
@@ -1427,6 +1434,21 @@ fn games_window_play_sorts_mail_for_the_postman() {
         xp + u64::from(paid),
         "paid once"
     );
+}
+
+/// L927: with the release `job_xp_curve.json` in the content, a won run pays the job's `activity_xp`
+/// (Miner 63, Chef 86); the (R) 25 of the constants is only the fallback the other tests keep.
+#[test]
+fn a_won_gather_run_pays_the_jobs_activity_xp_from_the_curve_file() {
+    for (game, rate) in [(MINING, 63), (HARVEST, 86), (PLOT, 86)] {
+        let fixture = Fixture::new(game).with_activity_rates();
+        let mut gateway = fixture.ready();
+        tick(&mut gateway, 1_500);
+        click(&mut gateway, fixture.node.guid, 2_000);
+        let id = active(&gateway, game).expect("run offered") as i32;
+        win(&mut gateway, game, id, 2_100);
+        assert_eq!(xp(&gateway, game), rate, "{}", game.node);
+    }
 }
 
 /// L104: Play on the live checkers row (514, MiniGameData 21) offers the table; after the
