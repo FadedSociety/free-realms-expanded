@@ -4,7 +4,7 @@ busy_outside_occupation 18
 hex_outside_trace 3
 hub:src/bin/osfr-gateway.rs 4638
 hub:src/encounter.rs 2930
-hub:src/gameplay.rs 5050
+hub:src/gameplay.rs 5033
 hub:src/gateway.rs 2142
 panic_calls 384
 plain_fs_write 4
