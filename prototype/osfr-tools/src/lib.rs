@@ -78,6 +78,7 @@ pub mod mining;
 pub mod moderation;
 pub mod mounts;
 pub mod movement;
+pub mod music_game;
 pub mod mystery_chest;
 pub mod mystery_chest_loot;
 pub mod net_policy;
