@@ -202,6 +202,9 @@ pub enum DerbyError {
     InvalidIdentity,
 }
 
+/// A driver key the session checked a moment earlier is missing: refuse rather than panic.
+const UNKNOWN_DRIVER: DerbyError = DerbyError::InvalidField("unknown driver");
+
 impl fmt::Display for DerbyError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -1240,7 +1243,13 @@ impl DerbyService {
 
     fn fill_npcs(&mut self, now_ms: u64) -> Result<(), DerbyError> {
         // (R) Solo and short lobbies fill to eight drivers. The retail NPC AI/key allocator is unknown.
-        let template = self.drivers.values().next().unwrap().vehicle.clone();
+        let template = self
+            .drivers
+            .values()
+            .next()
+            .ok_or(UNKNOWN_DRIVER)?
+            .vehicle
+            .clone();
         let mut slot = 1_u32;
         while self.drivers.len() < self.rules.max_drivers {
             let raw = 0xd000_0000_0000_0000 | ((self.instance_id as u64) << 8) | slot as u64;
@@ -1367,7 +1376,7 @@ impl DerbyService {
         if pose_position(&pose).is_none() {
             return Ok(Vec::new());
         }
-        let driver = self.drivers.get_mut(&sender).unwrap();
+        let driver = self.drivers.get_mut(&sender).ok_or(UNKNOWN_DRIVER)?;
         driver.pose = Some(pose);
         driver.pose_at_ms = Some(now_ms);
         let recipients: Vec<_> = self
@@ -1429,7 +1438,7 @@ impl DerbyService {
         {
             return Ok(Vec::new());
         }
-        let attacker = self.drivers.get(&sender).unwrap();
+        let attacker = self.drivers.get(&sender).ok_or(UNKNOWN_DRIVER)?;
         let multiplier = if attacker
             .state
             .ultimate_until_ms
@@ -1482,32 +1491,27 @@ impl DerbyService {
             return Ok(actions);
         }
         let was_leader = self.unique_leader();
-        {
-            let attacker = self.drivers.get_mut(&sender).unwrap();
-            attacker.state.damage_dealt = attacker.state.damage_dealt.saturating_add(damage);
-        }
-        {
-            let victim = self.drivers.get_mut(&report.other).unwrap();
-            victim.state.damage_received = victim.state.damage_received.saturating_add(damage);
-            victim.state.health = victim.state.health.saturating_sub(damage);
-        }
-        let knocked_out = self.drivers[&report.other].state.health == 0;
+        let points = if was_leader == Some(report.other) {
+            self.rules.leader_knockout_points
+        } else {
+            self.rules.knockout_points
+        };
+        let victim = self.drivers.get_mut(&report.other).ok_or(UNKNOWN_DRIVER)?;
+        victim.state.damage_received = victim.state.damage_received.saturating_add(damage);
+        victim.state.health = victim.state.health.saturating_sub(damage);
+        let knocked_out = victim.state.health == 0;
         if knocked_out {
-            let points = if was_leader == Some(report.other) {
-                self.rules.leader_knockout_points
-            } else {
-                self.rules.knockout_points
-            };
-            self.drivers.get_mut(&sender).unwrap().state.score =
-                self.drivers[&sender].state.score.saturating_add(points);
-            self.drivers.get_mut(&report.other).unwrap().state.score = self.drivers[&report.other]
+            victim.state.score = victim
                 .state
                 .score
                 .saturating_sub(self.rules.knockout_point_loss);
-            self.drivers.get_mut(&report.other).unwrap().respawn_at_ms =
-                Some(now_ms.saturating_add(self.rules.respawn_delay_ms));
-            let victim = self.drivers.get_mut(&report.other).unwrap();
+            victim.respawn_at_ms = Some(now_ms.saturating_add(self.rules.respawn_delay_ms));
             victim.state.knockouts_taken = victim.state.knockouts_taken.saturating_add(1);
+        }
+        let attacker = self.drivers.get_mut(&sender).ok_or(UNKNOWN_DRIVER)?;
+        attacker.state.damage_dealt = attacker.state.damage_dealt.saturating_add(damage);
+        if knocked_out {
+            attacker.state.score = attacker.state.score.saturating_add(points);
         }
         self.push_broadcast(&mut actions, self.state_message(sender))?;
         self.push_broadcast(&mut actions, self.state_message(report.other))?;
@@ -1521,13 +1525,15 @@ impl DerbyService {
                     second: report.other,
                 },
             )?;
-            if self.unique_leader().is_some() && self.unique_leader() != was_leader {
+            if let Some(leader) = self.unique_leader()
+                && Some(leader) != was_leader
+            {
                 self.push_broadcast(
                     &mut actions,
                     DerbyMessage::Announcer {
                         kind: 1,
                         sub_kind: 0,
-                        first: self.unique_leader().unwrap(),
+                        first: leader,
                         second: ParticipantKey(0),
                     },
                 )?;
@@ -1582,8 +1588,11 @@ impl DerbyService {
         let Some((_, id)) = nearest else {
             return Ok(Vec::new());
         };
-        let pickup = self.pickups.remove(&id).unwrap();
-        let driver = self.drivers.get_mut(&sender).unwrap();
+        let pickup = self
+            .pickups
+            .remove(&id)
+            .ok_or(DerbyError::InvalidField("unknown pickup"))?;
+        let driver = self.drivers.get_mut(&sender).ok_or(UNKNOWN_DRIVER)?;
         match pickup.kind {
             PickupKind::Health => {
                 driver.state.health = driver
@@ -1751,7 +1760,7 @@ impl DerbyService {
             })
             .collect();
         for key in respawned {
-            let driver = self.drivers.get_mut(&key).unwrap();
+            let driver = self.drivers.get_mut(&key).ok_or(UNKNOWN_DRIVER)?;
             driver.state.health = self.rules.start_health;
             driver.respawn_at_ms = None;
             self.push_broadcast(&mut actions, DerbyMessage::ResetVehicle(key))?;
@@ -1785,12 +1794,11 @@ impl DerbyService {
             })
             .collect();
         for (key, category) in expired {
-            let state = &mut self.drivers.get_mut(&key).unwrap().state;
+            let state = &mut self.drivers.get_mut(&key).ok_or(UNKNOWN_DRIVER)?.state;
             match category {
                 3 => state.shield_until_ms = None,
                 4 => state.attack_until_ms = None,
-                5 => state.ultimate_until_ms = None,
-                _ => unreachable!(),
+                _ => state.ultimate_until_ms = None,
             }
             self.push_broadcast(&mut actions, DerbyMessage::ItemExpired(category))?;
         }
@@ -1967,15 +1975,15 @@ impl<'a> Reader<'a> {
     }
 
     fn u32(&mut self) -> Result<u32, DerbyError> {
-        Ok(u32::from_le_bytes(self.bytes(4)?.try_into().unwrap()))
+        Ok(u32::from_le_bytes(self.array()?))
     }
 
     fn i32(&mut self) -> Result<i32, DerbyError> {
-        Ok(i32::from_le_bytes(self.bytes(4)?.try_into().unwrap()))
+        Ok(i32::from_le_bytes(self.array()?))
     }
 
     fn u64(&mut self) -> Result<u64, DerbyError> {
-        Ok(u64::from_le_bytes(self.bytes(8)?.try_into().unwrap()))
+        Ok(u64::from_le_bytes(self.array()?))
     }
 
     fn key(&mut self) -> Result<ParticipantKey, DerbyError> {
@@ -1983,7 +1991,10 @@ impl<'a> Reader<'a> {
     }
 
     fn array<const N: usize>(&mut self) -> Result<[u8; N], DerbyError> {
-        Ok(self.bytes(N)?.try_into().unwrap())
+        self.bytes(N)?
+            .first_chunk()
+            .copied()
+            .ok_or(DerbyError::TooShort)
     }
 
     fn words<const N: usize>(&mut self) -> Result<[u32; N], DerbyError> {
@@ -2029,5 +2040,10 @@ fn put_words<const N: usize>(out: &mut Vec<u8>, values: &[u32; N]) {
 }
 
 fn read_i32(packet: &[u8], offset: usize) -> i32 {
-    i32::from_le_bytes(packet[offset..offset + 4].try_into().unwrap())
+    i32::from_le_bytes([
+        packet[offset],
+        packet[offset + 1],
+        packet[offset + 2],
+        packet[offset + 3],
+    ])
 }

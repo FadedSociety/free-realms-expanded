@@ -68,6 +68,7 @@ pub mod kart_racing;
 pub mod kart_rewards;
 pub mod kart_service;
 pub mod kart_weapons;
+pub mod le;
 pub mod login;
 pub mod login_auth;
 pub mod mail_sorting;
