@@ -231,16 +231,17 @@ impl StartupSnapshot {
         if bytes.len() > MAX_SNAPSHOT_BYTES {
             return Err(invalid("startup snapshot exceeds its size limit"));
         }
-        let snapshot: Self =
-            serde_json::from_slice(&bytes).map_err(|_| invalid("invalid startup snapshot JSON"))?;
+        let snapshot: Self = serde_json::from_slice(&bytes)
+            .map_err(|error| invalid(format!("invalid startup snapshot JSON: {error}")))?;
         snapshot.validate()?;
         Ok(snapshot)
     }
 
     pub fn export_from_reference(reference: &Path, output: &Path) -> io::Result<Self> {
         let manifest: Value =
-            serde_json::from_slice(&read_file(&reference.join("manifest.json"), 65_536)?)
-                .map_err(|_| invalid("invalid gateway reference manifest JSON"))?;
+            serde_json::from_slice(&read_file(&reference.join("manifest.json"), 65_536)?).map_err(
+                |error| invalid(format!("invalid gateway reference manifest JSON: {error}")),
+            )?;
         let character_guid = manifest["initial_state"]["guid"]
             .as_u64()
             .ok_or_else(|| invalid("reference manifest has no initial character GUID"))?;
@@ -294,9 +295,7 @@ impl StartupSnapshot {
         }
         for definition in &self.catalogues.item_definitions {
             let bytes = decode_hex(&definition.serialized_hex)?;
-            if bytes.len() < 4
-                || i32::from_le_bytes(bytes[..4].try_into().unwrap()) != definition.id
-            {
+            if crate::le::i32(&bytes, 0) != Some(definition.id) {
                 return Err(invalid("startup item record ID differs from its typed key"));
             }
         }
@@ -356,7 +355,11 @@ impl StartupSnapshot {
             ),
             35 => self.build_ability_set()?,
             36 | 37 => {
-                let tag = &self.catalogues.effect_tags[index - 36];
+                let tag = self
+                    .catalogues
+                    .effect_tags
+                    .get(index - 36)
+                    .ok_or_else(|| invalid("startup snapshot is missing an effect tag"))?;
                 let bytes = decode_hex(&tag.definition_blob_hex)?;
                 catalogues::build_effect_tag(catalogues::EffectTag {
                     id: tag.id,
@@ -397,7 +400,8 @@ impl StartupSnapshot {
                 tutorial: zone.tutorial,
                 sky: &zone.sky,
                 zone_id: zone.zone_id,
-                geometry_id: zone.geometry_id as u32,
+                // The wire field is the same 32 bits; content's i32 is reinterpreted, not range-cut.
+                geometry_id: zone.geometry_id.cast_unsigned(),
             }),
             None => startup_messages::build_zone_details(&ZoneDetails {
                 name: &self.login.zone.name,
@@ -491,7 +495,7 @@ impl StartupSnapshot {
             .map(|stat| catalogues::CharacterStat {
                 id: stat.id,
                 value: match stat.kind {
-                    0 => catalogues::StatValue::Integer(stat.value_bits as i32),
+                    0 => catalogues::StatValue::Integer(stat.value_bits.cast_signed()),
                     _ => catalogues::StatValue::Float(f32::from_bits(stat.value_bits)),
                 },
             })
@@ -596,28 +600,34 @@ impl<'a> Reader<'a> {
         Ok(bytes)
     }
 
+    fn array<const N: usize>(&mut self) -> io::Result<[u8; N]> {
+        self.take(N)?
+            .first_chunk()
+            .copied()
+            .ok_or_else(|| invalid("truncated startup capture field"))
+    }
     fn u8(&mut self) -> io::Result<u8> {
-        Ok(self.take(1)?[0])
+        let [byte] = self.array()?;
+        Ok(byte)
     }
     fn u16(&mut self) -> io::Result<u16> {
-        Ok(u16::from_le_bytes(self.take(2)?.try_into().unwrap()))
+        self.array().map(u16::from_le_bytes)
     }
     fn u32(&mut self) -> io::Result<u32> {
-        Ok(u32::from_le_bytes(self.take(4)?.try_into().unwrap()))
+        self.array().map(u32::from_le_bytes)
     }
     fn i32(&mut self) -> io::Result<i32> {
-        Ok(i32::from_le_bytes(self.take(4)?.try_into().unwrap()))
+        self.array().map(i32::from_le_bytes)
     }
     fn u64(&mut self) -> io::Result<u64> {
-        Ok(u64::from_le_bytes(self.take(8)?.try_into().unwrap()))
+        self.array().map(u64::from_le_bytes)
     }
 
     fn count(&mut self) -> io::Result<usize> {
-        let count = self.i32()?;
-        if !(0..=MAX_ROWS as i32).contains(&count) {
-            return Err(invalid("startup capture row count outside limit"));
-        }
-        Ok(count as usize)
+        usize::try_from(self.i32()?)
+            .ok()
+            .filter(|count| *count <= MAX_ROWS)
+            .ok_or_else(|| invalid("startup capture row count outside limit"))
     }
 
     fn string(&mut self) -> io::Result<String> {
@@ -661,14 +671,17 @@ fn read_capture(reference: &Path, index: usize, phase: &str) -> io::Result<Vec<u
 
 fn read_capture_inner(reference: &Path, index: usize, phase: &str) -> io::Result<Vec<u8>> {
     let packet = read_capture(reference, index, phase)?;
-    if packet.len() < 7 || packet[..3] != [5, 0, 1] {
+    let (Some([5, 0, 1]), Some(length)) = (
+        crate::le::bytes::<3>(&packet, 0),
+        crate::le::u32(&packet, 3),
+    ) else {
         return Err(invalid("startup capture has invalid tunnel prefix"));
-    }
-    let length = u32::from_le_bytes(packet[3..7].try_into().unwrap()) as usize;
-    if packet.len() != 7 + length {
-        return Err(invalid("startup capture tunnel length mismatch"));
-    }
-    Ok(packet[7..].to_vec())
+    };
+    packet
+        .get(7..)
+        .filter(|inner| usize::try_from(length) == Ok(inner.len()))
+        .map(<[u8]>::to_vec)
+        .ok_or_else(|| invalid("startup capture tunnel length mismatch"))
 }
 
 fn header(reader: &mut Reader<'_>, family: u16, subtype: Option<u16>) -> io::Result<()> {
@@ -695,11 +708,13 @@ fn parse_environment(bytes: &[u8]) -> io::Result<String> {
     let mut reader = Reader::new(bytes);
     header(&mut reader, 166, None)?;
     let rest = reader.take(bytes.len().saturating_sub(reader.offset))?;
-    if rest.last() != Some(&0) || rest[..rest.len() - 1].contains(&0) {
+    let Some((0, text)) = rest.split_last() else {
+        return Err(invalid("invalid startup environment terminator"));
+    };
+    if text.contains(&0) {
         return Err(invalid("invalid startup environment terminator"));
     }
-    String::from_utf8(rest[..rest.len() - 1].to_vec())
-        .map_err(|_| invalid("invalid startup environment UTF-8"))
+    String::from_utf8(text.to_vec()).map_err(|_| invalid("invalid startup environment UTF-8"))
 }
 
 fn parse_zone(bytes: &[u8]) -> io::Result<ZoneSnapshot> {
@@ -815,7 +830,7 @@ fn parse_catalogues(reference: &Path) -> io::Result<CatalogueSnapshot> {
         .ok_or_else(|| invalid("reference directory has no lab/references parent"))?
         .join("rust-gameplay/inventory.json");
     let inventory: Value = serde_json::from_slice(&read_file(&inventory_path, MAX_SNAPSHOT_BYTES)?)
-        .map_err(|_| invalid("invalid private inventory content JSON"))?;
+        .map_err(|error| invalid(format!("invalid private inventory content JSON: {error}")))?;
     let definitions = inventory["definitions"]
         .as_array()
         .ok_or_else(|| invalid("inventory definitions are missing"))?

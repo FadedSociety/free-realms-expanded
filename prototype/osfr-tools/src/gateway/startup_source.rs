@@ -50,8 +50,8 @@ struct ContentManifest {
 /// The client version and the initial character from `<content>/startup/manifest.json`.
 pub(super) fn content_manifest(content: &Path) -> io::Result<(String, CharacterState)> {
     let bytes = read_bounded(&content.join("startup/manifest.json"), 65_536)?;
-    let manifest: ContentManifest =
-        serde_json::from_slice(&bytes).map_err(|_| invalid("invalid startup manifest JSON"))?;
+    let manifest: ContentManifest = serde_json::from_slice(&bytes)
+        .map_err(|error| invalid(&format!("invalid startup manifest JSON: {error}")))?;
     manifest.initial_state.validate()?;
     if manifest.schema_version != 1
         || manifest.client_version.is_empty()
@@ -67,9 +67,11 @@ impl Source<'_> {
         match self {
             Source::Reference(directory) => {
                 let (manifest, self_bytes) = load_reference(directory)?;
-                let self_data =
-                    std::panic::catch_unwind(|| startup_selfdata::parse_self(&self_bytes))
-                        .map_err(|_| invalid("invalid typed self-data reference template"))?;
+                let self_data = startup_selfdata::try_parse_self(&self_bytes).map_err(|error| {
+                    invalid(&format!(
+                        "invalid typed self-data reference template: {error}"
+                    ))
+                })?;
                 Ok(Base {
                     version: manifest.client_version,
                     initial_state: manifest.initial_state,
@@ -79,11 +81,13 @@ impl Source<'_> {
             Source::Content(content) => {
                 let (version, initial_state) = content_manifest(content)?;
                 let bytes = read_bounded(&content.join("startup/self_data.json"), MAX_REFERENCE)?;
-                let self_data: SelfData = serde_json::from_slice(&bytes)
-                    .map_err(|_| invalid("invalid startup self-data JSON"))?;
-                // A hand-edited file must fail here, not as a panic at the first login.
-                std::panic::catch_unwind(|| startup_selfdata::build_self(&self_data))
-                    .map_err(|_| invalid("startup self-data cannot be serialized"))?;
+                let self_data: SelfData = serde_json::from_slice(&bytes).map_err(|error| {
+                    invalid(&format!("invalid startup self-data JSON: {error}"))
+                })?;
+                // A hand-edited file must fail here, not at the first login.
+                startup_selfdata::try_build_self(&self_data).map_err(|error| {
+                    invalid(&format!("startup self-data cannot be serialized: {error}"))
+                })?;
                 Ok(Base {
                     version,
                     initial_state,

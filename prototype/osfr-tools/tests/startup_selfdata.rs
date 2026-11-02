@@ -614,3 +614,60 @@ fn captured_opcode12_tutorial_keys_are_not_the_npx_mode_flag() {
         captured.tutorial_keys.len()
     );
 }
+
+/// L118: a malformed packet, template or save is refused with `InvalidData`, never a panic.
+#[test]
+fn malformed_self_data_is_refused_not_panicked() {
+    let mut data = sample();
+    data.inventory.items.push(synthetic_item(true, 9));
+    let packet = build_self(&data);
+    let body = body(&packet).to_vec();
+    let wrap = |body: &[u8]| {
+        let mut inner = 12u16.to_le_bytes().to_vec();
+        inner.extend_from_slice(&(body.len() as u32).to_le_bytes());
+        inner.extend_from_slice(body);
+        let mut packet = vec![5, 0, 1];
+        packet.extend_from_slice(&(inner.len() as u32).to_le_bytes());
+        packet.extend_from_slice(&inner);
+        packet
+    };
+    assert_eq!(wrap(&body), packet);
+    // Only the trailing opaque span may be cut short; every earlier field is required.
+    for len in 0..body.len() - data.post_effect_tail.len() {
+        let error = startup_selfdata::try_parse_self_with_quest_bindings(&wrap(&body[..len]), &[])
+            .expect_err("a truncated body is refused");
+        assert_eq!(
+            error.kind(),
+            std::io::ErrorKind::InvalidData,
+            "body cut at {len}"
+        );
+    }
+    assert!(startup_selfdata::try_parse_self(&packet[..12]).is_err());
+
+    // A saved last-cast time outside the native i32 field, and an unmapped reward type.
+    let mut saved = data.clone();
+    saved.inventory.items[0].last_cast_time = i64::from(i32::MAX) + 1;
+    assert!(startup_selfdata::try_build_self(&saved).is_err());
+    let mut content = data.clone();
+    content.collections.push(CollectionRecord {
+        prefix: [0; 7],
+        reward: RewardBundle {
+            entries: vec![RewardEntry {
+                kind: 99,
+                hidden: 0,
+                common_fields: [0; 24],
+                display_bytes: Vec::new(),
+                display_fields: [0; 5],
+                kind_fields: Vec::new(),
+            }],
+            ..empty_reward_bundle(1, 2)
+        },
+        keyed_rows: Vec::new(),
+    });
+    assert!(startup_selfdata::try_build_self(&content).is_err());
+
+    // A malformed server journal span leaves the character's records unchanged.
+    let mut journal = data.clone();
+    assert!(startup_selfdata::replace_quest_journal(&mut journal, &[1, 2, 3]).is_err());
+    assert_eq!(journal, data);
+}

@@ -71,24 +71,33 @@ impl<'a> Reader<'a> {
         Ok(value)
     }
 
+    fn array<const N: usize>(&mut self) -> Result<[u8; N], String> {
+        let offset = self.offset;
+        self.take(N)?
+            .first_chunk()
+            .copied()
+            .ok_or_else(|| format!("short read at {offset} for {N} bytes"))
+    }
+
     fn u8(&mut self) -> Result<u8, String> {
-        Ok(self.take(1)?[0])
+        let [byte] = self.array()?;
+        Ok(byte)
     }
 
     fn u16(&mut self) -> Result<u16, String> {
-        Ok(u16::from_le_bytes(self.take(2)?.try_into().unwrap()))
+        self.array().map(u16::from_le_bytes)
     }
 
     fn i32(&mut self) -> Result<i32, String> {
-        Ok(i32::from_le_bytes(self.take(4)?.try_into().unwrap()))
+        self.array().map(i32::from_le_bytes)
     }
 
     fn u32(&mut self) -> Result<u32, String> {
-        Ok(u32::from_le_bytes(self.take(4)?.try_into().unwrap()))
+        self.array().map(u32::from_le_bytes)
     }
 
     fn u64(&mut self) -> Result<u64, String> {
-        Ok(u64::from_le_bytes(self.take(8)?.try_into().unwrap()))
+        self.array().map(u64::from_le_bytes)
     }
 
     fn f32(&mut self) -> Result<f32, String> {
@@ -97,19 +106,19 @@ impl<'a> Reader<'a> {
 
     fn string(&mut self) -> Result<String, String> {
         let length = self.i32()?;
-        if length < 0 {
+        let Ok(length) = usize::try_from(length) else {
             return Err(format!("negative string length {length}"));
-        }
-        String::from_utf8(self.take(length as usize)?.to_vec())
+        };
+        String::from_utf8(self.take(length)?.to_vec())
             .map_err(|error| format!("invalid UTF-8 string: {error}"))
     }
 
     fn count(&mut self) -> Result<usize, String> {
         let count = self.i32()?;
-        if !(0..=MAX_ROWS as i32).contains(&count) {
-            return Err(format!("invalid row count {count}"));
-        }
-        Ok(count as usize)
+        usize::try_from(count)
+            .ok()
+            .filter(|count| *count <= MAX_ROWS)
+            .ok_or_else(|| format!("invalid row count {count}"))
     }
 
     fn finish(self) -> Result<(), String> {
@@ -289,10 +298,10 @@ pub fn parse_points_of_interest(bytes: &[u8]) -> Result<Vec<PointOfInterest>, St
     let mut reader = Reader::new(bytes);
     expect_opcode(&mut reader, 57)?;
     let payload_length = reader.i32()?;
-    if payload_length < 0 {
+    let Ok(payload_length) = usize::try_from(payload_length) else {
         return Err(format!("negative POI payload length {payload_length}"));
-    }
-    let payload = reader.take(payload_length as usize)?;
+    };
+    let payload = reader.take(payload_length)?;
     reader.finish()?;
 
     let mut payload_reader = Reader::new(payload);
@@ -739,12 +748,12 @@ fn read_effect_tag(reader: &mut Reader<'_>) -> Result<NpcEffectTag, String> {
         field_6: reader.i32()?,
         field_7: reader.i32()?,
         flag_8: reader.u8()?,
-        field_9: i64::from_le_bytes(reader.take(8)?.try_into().unwrap()),
+        field_9: i64::from_le_bytes(reader.array()?),
         field_10: reader.u32()?,
         field_11: reader.u32()?,
         field_12: reader.i32()?,
         composite_effect_id: reader.i32()?,
-        field_14: i64::from_le_bytes(reader.take(8)?.try_into().unwrap()),
+        field_14: i64::from_le_bytes(reader.array()?),
         field_15: reader.i32()?,
         field_16: reader.i32()?,
         flag_17: reader.u8()?,

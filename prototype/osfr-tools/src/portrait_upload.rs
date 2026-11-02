@@ -49,11 +49,11 @@ pub fn request_length(raw: &[u8]) -> Result<Option<usize>, &'static str> {
     let length = header(&raw[..end], "content-length")
         .and_then(|value| value.parse::<usize>().ok())
         .ok_or("no content length")?;
-    let total = end + 4 + length;
-    if total > MAX_REQUEST {
-        return Err("request too large");
+    // The client's length can be up to usize::MAX: add without overflow.
+    match (end + 4).checked_add(length) {
+        Some(total) if total <= MAX_REQUEST => Ok(Some(total)),
+        _ => Err("request too large"),
     }
-    Ok(Some(total))
 }
 
 /// Parse one complete HTTP request (`request_length` bytes) into an upload.
@@ -144,7 +144,7 @@ pub fn rebuild_png(bytes: &[u8], size: (u32, u32)) -> Result<Vec<u8>, &'static s
     let mut rest = bytes.strip_prefix(&PNG_SIGNATURE).ok_or("not a PNG")?;
     let (mut colour, mut data, mut ended) = (None, Vec::new(), false);
     while !rest.is_empty() {
-        let length = u32::from_be_bytes(rest.get(..4).ok_or("bad chunk")?.try_into().unwrap());
+        let length = u32::from_be_bytes(*rest.first_chunk().ok_or("bad chunk")?);
         let length = usize::try_from(length).map_err(|_| "bad chunk")?;
         let kind = rest.get(4..8).ok_or("bad chunk")?;
         let body = rest.get(8..8 + length).ok_or("bad chunk")?;
@@ -155,13 +155,13 @@ pub fn rebuild_png(bytes: &[u8], size: (u32, u32)) -> Result<Vec<u8>, &'static s
         rest = &rest[12 + length..];
         match kind {
             b"IHDR" if colour.is_none() => {
-                let field = |at: usize| u32::from_be_bytes(body[at..at + 4].try_into().unwrap());
-                if length != 13 || (field(0), field(4)) != size {
+                let field = |at: usize| crate::le::bytes(body, at).map(u32::from_be_bytes);
+                if length != 13 || (field(0), field(4)) != (Some(size.0), Some(size.1)) {
                     return Err("wrong image size");
                 }
                 // Bit depth 8; colour type 2 (RGB) or 6 (RGBA); deflate, filter 0, no interlace.
-                match body[8..] {
-                    [8, kind @ (2 | 6), 0, 0, 0] => colour = Some(kind),
+                match body.get(8..) {
+                    Some([8, kind @ (2 | 6), 0, 0, 0]) => colour = Some(*kind),
                     _ => return Err("unsupported PNG format"),
                 }
             }
@@ -299,4 +299,24 @@ fn quoted(value: &str, key: &str) -> Option<String> {
         let (k, v) = item.trim().split_once('=')?;
         (k == key).then(|| v.trim_matches('"').to_owned())
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_client_content_length_cannot_overflow_the_request_total() {
+        let head = |length: &str| format!("POST / HTTP/1.1\r\nContent-Length: {length}\r\n\r\n");
+        assert_eq!(
+            request_length(head("10").as_bytes()),
+            Ok(Some(head("10").len() + 10))
+        );
+        let huge = usize::MAX.to_string();
+        assert_eq!(
+            request_length(head(&huge).as_bytes()),
+            Err("request too large")
+        );
+        assert_eq!(request_length(b"POST / HTTP/1.1\r\n"), Ok(None));
+    }
 }

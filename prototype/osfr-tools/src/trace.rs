@@ -73,20 +73,22 @@ pub struct ProtocolSummary<'a> {
 }
 
 pub fn protocol_summary(message: &[u8]) -> ProtocolSummary<'_> {
-    let top = message.get(..2).map(|b| u16::from_le_bytes([b[0], b[1]]));
+    let top = crate::le::u16(message, 0);
     let mut outer = None;
     let mut body = message;
     let mut sensitive = top == Some(1);
-    if matches!(top, Some(5 | 6)) && message.len() >= 7 {
-        let size = u32::from_le_bytes(message[3..7].try_into().unwrap()) as usize;
-        if message[2] <= 1 && size <= message.len().saturating_sub(7) {
-            outer = top;
-            body = &message[7..7 + size];
-        }
+    // A tunnel header: opcode, a 0/1 byte, then the u32 size of the body that follows it.
+    if matches!(top, Some(5 | 6))
+        && message.get(2).is_some_and(|flag| *flag <= 1)
+        && let Some(size) = crate::le::u32(message, 3).and_then(|size| usize::try_from(size).ok())
+        && let Some(inner) = message.get(7..).and_then(|rest| rest.get(..size))
+    {
+        outer = top;
+        body = inner;
     }
     let combined = body.starts_with(&[0, 25]);
-    let family = body.get(..2).map(|b| u16::from_le_bytes([b[0], b[1]]));
-    let subtype = body.get(2..4).map(|b| u16::from_le_bytes([b[0], b[1]]));
+    let family = crate::le::u16(body, 0);
+    let subtype = crate::le::u16(body, 2);
     sensitive |= family
         .zip(subtype)
         .is_some_and(|(f, s)| sensitive_payload(f, s));
