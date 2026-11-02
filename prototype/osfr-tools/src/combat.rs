@@ -5,6 +5,7 @@
 //! template. The public API consumes/returns INNER gateway packets. A defeat
 //! event is emitted once; the caller owns quest progress, inventory, and saving.
 
+use crate::le;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::fmt;
@@ -196,25 +197,23 @@ impl Combat {
         let Some(content) = &self.content else {
             return Ok(CombatOutcome::default());
         };
-        if inner.len() < 4 {
+        let (Some(opcode), Some(sub)) = (le::u16(inner, 0), le::u16(inner, 2)) else {
             return Ok(CombatOutcome::default());
-        }
-        let opcode = u16::from_le_bytes(inner[..2].try_into().unwrap());
-        let sub = u16::from_le_bytes(inner[2..4].try_into().unwrap());
+        };
         match (opcode, sub) {
             (26, 8) => {
-                if inner.len() != 13 || inner[12] > 1 {
+                let (13, Some(guid), Some(0 | 1)) = (inner.len(), le::u64(inner, 4), inner.get(12))
+                else {
                     return Err(invalid("malformed NPC interact request"));
-                }
-                let guid = u64::from_le_bytes(inner[4..12].try_into().unwrap());
+                };
                 Ok(self.interact(guid, position))
             }
             (26, 10) => {
-                if inner.len() != 16 {
+                let (16, Some(guid), Some(id)) =
+                    (inner.len(), le::u64(inner, 4), le::i32(inner, 12))
+                else {
                     return Err(invalid("malformed NPC interaction selection"));
-                }
-                let guid = u64::from_le_bytes(inner[4..12].try_into().unwrap());
-                let id = i32::from_le_bytes(inner[12..16].try_into().unwrap());
+                };
                 Ok(match (guid, id) {
                     (NPC_GUID, INTERACTION_QUEST)
                         if self.near(content, position, content.npc.position) =>
@@ -230,12 +229,11 @@ impl Combat {
                 })
             }
             (36, 10) => {
-                if inner.len() < 16 {
+                let (Some(id), Some(slot), Some(target)) =
+                    (le::i32(inner, 4), le::i32(inner, 8), le::i32(inner, 12))
+                else {
                     return Err(invalid("truncated ability request"));
-                }
-                let id = i32::from_le_bytes(inner[4..8].try_into().unwrap());
-                let slot = i32::from_le_bytes(inner[8..12].try_into().unwrap());
-                let target = i32::from_le_bytes(inner[12..16].try_into().unwrap());
+                };
                 let expected = if target == 1 { 32 } else { 24 };
                 if inner.len() != expected || id < 0 || !(0..=11).contains(&slot) {
                     return Err(invalid("malformed ability request"));
@@ -243,7 +241,8 @@ impl Combat {
                 if target == 1 {
                     return Ok(CombatOutcome::default());
                 }
-                let guid = u64::from_le_bytes(inner[16..24].try_into().unwrap());
+                let guid =
+                    le::u64(inner, 16).ok_or_else(|| invalid("malformed ability request"))?;
                 // Sandbox basic attack only; this does not implement historical ability definitions.
                 if slot == 0 && guid == ENEMY_GUID {
                     Ok(self.attack(position, now_ms))

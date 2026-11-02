@@ -145,10 +145,11 @@ impl Gameplay {
         // Overworld enemies answer interact/select with the encounter's Attack
         // menu; Legacy also lists their GUIDs as ordinary NPCs (run 002115).
         if (inner.starts_with(&[26, 0, 8, 0]) || inner.starts_with(&[26, 0, 10, 0]))
-            && inner.len() >= 12
-            && self.encounter.as_ref().is_some_and(|encounter| {
-                encounter.is_field_actor(u64::from_le_bytes(inner[4..12].try_into().unwrap()))
-            })
+            && let Some(actor) = crate::le::u64(inner, 4)
+            && self
+                .encounter
+                .as_ref()
+                .is_some_and(|encounter| encounter.is_field_actor(actor))
         {
             // T543: another actor's menu ends the open NPC conversation.
             self.quest_conversation = None;
@@ -210,8 +211,10 @@ impl Gameplay {
             npc_event(serde_json::json!({"event": "dialogue_choice", "value": selected}));
             // T543: an open conversation answers its own 26/3 rows (ids 1..=5) before
             // any explainer or quest-offer handling; those rows never use 300/301/0.
-            if self.quest_conversation.is_some() {
-                return Ok(Some(self.npc_conversation_answer(selected, character)?));
+            if let Some(open) = self.quest_conversation.take() {
+                return Ok(Some(
+                    self.npc_conversation_answer(open, selected, character)?,
+                ));
             }
             // T773: a greeter tips row answers with the same dialogue rows and that
             // page's body. T844: the client only rebuilds the dialog window when
@@ -309,13 +312,10 @@ impl Gameplay {
     /// every arm leaves the dialog closed unless it puts it back.
     fn npc_conversation_answer(
         &mut self,
+        mut open: crate::quest_dialogue::OpenConversation,
         selected: i32,
         character: &CharacterState,
     ) -> io::Result<Outcome> {
-        let mut open = self
-            .quest_conversation
-            .take()
-            .expect("the caller checked an open conversation");
         let in_reach = self.npc_interaction.as_ref().is_some_and(|interaction| {
             interaction.in_reach_of_active(open.npc_id, character.zone_id, character.position)
         });
@@ -615,10 +615,9 @@ impl Gameplay {
     /// 26, u16 subtype 23) and then appends the u32 quest id from `this+0x10` (ctor `0x00c09f60`).
     fn npc_quest_abandon_26_23(&mut self, inner: &[u8]) -> io::Result<Option<Outcome>> {
         if inner.starts_with(&[26, 0, 23, 0]) {
-            if inner.len() != 8 {
+            let (8, Some(quest_id)) = (inner.len(), crate::le::u32(inner, 4)) else {
                 return Err(invalid("invalid quest abandon request"));
-            }
-            let quest_id = u32::from_le_bytes(inner[4..8].try_into().unwrap());
+            };
             let mut out = Outcome::default();
             let result = self
                 .npc_quests
@@ -778,11 +777,13 @@ impl Gameplay {
         now_ms: u64,
     ) -> io::Result<Option<Outcome>> {
         if inner.starts_with(&[26, 0, 10, 0]) {
-            if inner.len() != 16 {
+            let (16, Some(runtime_guid), Some(option_id)) = (
+                inner.len(),
+                crate::le::u64(inner, 4),
+                crate::le::i32(inner, 12),
+            ) else {
                 return Err(invalid("invalid NPC menu selection"));
-            }
-            let runtime_guid = u64::from_le_bytes(inner[4..12].try_into().unwrap());
-            let option_id = i32::from_le_bytes(inner[12..16].try_into().unwrap());
+            };
             let Some(key) = self.content_npc_key(runtime_guid) else {
                 npc_event(select_event_with_reason(
                     runtime_guid,
@@ -983,7 +984,7 @@ impl Gameplay {
         inner: &[u8],
         character: &CharacterState,
     ) -> io::Result<Option<Outcome>> {
-        if matches!(inner, [0xa5, 0, 2 | 4 | 5 | 8 | 12 | 14, 0, ..]) {
+        if let &[0xa5, 0, subtype @ (2 | 4 | 5 | 8 | 12 | 14), 0, ..] = inner {
             if let Some(shop) = &mut self.npc_coin_shop {
                 let Some(interaction) = &mut self.npc_interaction else {
                     return Ok(None);
@@ -993,18 +994,15 @@ impl Gameplay {
                 };
                 // Only buys and sells name a merchant; 165/8 is 4 bytes and 165/2 and 165/12
                 // carry other fields at 4..12, so those are never rewritten (W172).
-                let merchant = inner
-                    .get(4..12)
-                    .map_or(0, |bytes| u64::from_le_bytes(bytes.try_into().unwrap()));
+                let merchant = crate::le::u64(inner, 4).unwrap_or(0);
                 let mut request = inner.to_vec();
-                if matches!(inner[2], 4 | 5) {
-                    if let Some(key) = visibility.content_key(merchant) {
-                        request[4..12].copy_from_slice(&key.to_le_bytes());
-                    }
+                if matches!(subtype, 4 | 5)
+                    && let Some(key) = visibility.content_key(merchant)
+                    && let Some(field) = request.get_mut(4..12)
+                {
+                    field.copy_from_slice(&key.to_le_bytes());
                 }
-                let content_key = request
-                    .get(4..12)
-                    .map_or(0, |bytes| u64::from_le_bytes(bytes.try_into().unwrap()));
+                let content_key = crate::le::u64(&request, 4).unwrap_or(0);
                 // The shop was built with the login-time inventory; without this
                 // a purchase overwrote everything earned since (10-15 audit).
                 shop.sync_inventory(self.inventory.clone());
@@ -1021,7 +1019,7 @@ impl Gameplay {
                             "event": "shop_txn",
                             "guid": merchant,
                             "content_key": content_key,
-                            "subtype": u16::from_le_bytes(inner[2..4].try_into().unwrap()),
+                            "subtype": subtype,
                             "outcome": if outcome.result_code == crate::coin_shop::RESULT_SUCCESS {
                                 "accepted"
                             } else {
@@ -1042,7 +1040,7 @@ impl Gameplay {
                             "event": "shop_txn",
                             "guid": merchant,
                             "content_key": content_key,
-                            "subtype": u16::from_le_bytes(inner[2..4].try_into().unwrap()),
+                            "subtype": subtype,
                             "outcome": "rejected",
                             "reason": format!("{error:?}")
                         }));
@@ -1205,11 +1203,13 @@ impl Gameplay {
             0,
             self.profiles
                 .as_ref()
-                .unwrap()
+                .ok_or_else(|| invalid("kart entry requires class content"))?
                 .activation(48, &self.inventory)?,
         );
         self.announce_profile_outfit(character.guid, &outfit_before, previous_job != 48, &mut out)?;
-        let kart = self.kart_entry.as_mut().unwrap();
+        let Some(kart) = self.kart_entry.as_mut() else {
+            return Err(invalid("kart entry requires kart content"));
+        };
         let (replies, scene) = kart.begin(character)?;
         kart.set_previous_job(previous_job);
         out.replies.extend(replies);
@@ -1302,12 +1302,10 @@ impl Gameplay {
         if let Some(quest_id) = pending_before {
             // Reopening is allowed only at the actor that opened the screen; a
             // different actor gets no packet and the pending state is untouched.
-            let result = self
-                .npc_quests
-                .as_ref()
-                .expect("pending turn-in requires the NPC quest engine")
-                .reopen_turnin(quest_id, key);
-            self.append_npc_quest_outcome(result, out)?;
+            if let Some(engine) = &self.npc_quests {
+                let result = engine.reopen_turnin(quest_id, key);
+                self.append_npc_quest_outcome(result, out)?;
+            }
         } else if pending_after.is_none() {
             // `on_event` opens the screen itself when this Talk completed the
             // quest; beginning the same turn-in again would queue a second 49/13.
@@ -1316,12 +1314,10 @@ impl Gameplay {
                     .as_ref()?
                     .named_target_quest_for_talk(key, engine)
             });
-            if let Some(quest_id) = target_quest {
-                let result = self
-                    .npc_quests
-                    .as_mut()
-                    .unwrap()
-                    .begin_named_target_turnin(quest_id, key);
+            if let Some(quest_id) = target_quest
+                && let Some(engine) = &mut self.npc_quests
+            {
+                let result = engine.begin_named_target_turnin(quest_id, key);
                 self.append_npc_quest_outcome(result, out)?;
             }
         }
@@ -1343,10 +1339,7 @@ impl Gameplay {
                 .into_iter()
                 .partition(|packet| packet.starts_with(&[49, 0, 13, 0]));
             out.replies = rest;
-            let quest_id = held
-                .first()
-                .and_then(|packet| packet.get(14..18))
-                .map(|id| u32::from_le_bytes(id.try_into().unwrap()));
+            let quest_id = held.first().and_then(|packet| crate::le::u32(packet, 14));
             match quest_id {
                 Some(quest_id) => {
                     self.pending_quest_choice = Some((runtime_guid, key, quest_id));

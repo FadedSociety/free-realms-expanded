@@ -387,22 +387,22 @@ impl EncounterEngine {
                 .is_some_and(|s| s.contains(&guid))
         };
         if inner.starts_with(&[36, 0, 10, 0]) {
-            if inner.len() < 16 {
+            let (Some(bar), Some(slot), Some(kind)) = (
+                crate::le::i32(inner, 4),
+                crate::le::i32(inner, 8),
+                crate::le::i32(inner, 12),
+            ) else {
                 return Err(invalid("truncated shared ability"));
-            }
-            let bar = i32::from_le_bytes(inner[4..8].try_into().unwrap());
-            let slot = i32::from_le_bytes(inner[8..12].try_into().unwrap());
-            let kind = i32::from_le_bytes(inner[12..16].try_into().unwrap());
+            };
             if kind == 1 {
                 if inner.len() != 32 {
                     return Err(invalid("malformed shared ground ability"));
                 }
                 return Ok(None);
             }
-            if kind != 0 || inner.len() != 24 {
+            let (0, 24, Some(target)) = (kind, inner.len(), crate::le::u64(inner, 16)) else {
                 return Err(invalid("malformed shared target ability"));
-            }
-            let target = u64::from_le_bytes(inner[16..24].try_into().unwrap());
+            };
             // L088: an item-bar press aimed at a shared field enemy may throw a battle item.
             if bar == 2 && known(target) {
                 return Ok(Some(SharedFieldAction::Item { slot, target }));
@@ -426,10 +426,11 @@ impl EncounterEngine {
         }
         if inner.starts_with(&[26, 0, 8, 0]) || inner.starts_with(&[26, 0, 10, 0]) {
             let interaction = inner[2] == 8;
+            let malformed = || invalid("malformed shared interaction");
             if inner.len() != if interaction { 13 } else { 16 } || interaction && inner[12] > 1 {
-                return Err(invalid("malformed shared interaction"));
+                return Err(malformed());
             }
-            let target = u64::from_le_bytes(inner[4..12].try_into().unwrap());
+            let target = crate::le::u64(inner, 4).ok_or_else(malformed)?;
             if known(target) {
                 return Ok(Some(if interaction {
                     SharedFieldAction::Interact {
@@ -439,7 +440,7 @@ impl EncounterEngine {
                 } else {
                     SharedFieldAction::Select {
                         target,
-                        choice: i32::from_le_bytes(inner[12..16].try_into().unwrap()),
+                        choice: crate::le::i32(inner, 12).ok_or_else(malformed)?,
                     }
                 }));
             }

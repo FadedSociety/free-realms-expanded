@@ -227,7 +227,10 @@ impl EncounterEngine {
             });
             let nearby = self.living_enemies();
             let caster_area = area.is_some_and(|(_, _, caster)| caster);
-            let select_range = if caster_area { area.unwrap().0 } else { range };
+            let select_range = match area {
+                Some((radius, _, true)) => radius,
+                _ => range,
+            };
             // (R) A non-hostile/self target selects the nearest enemy; an explicit
             // hostile target out of reach fails instead of silently hitting another.
             let selected = nearby
@@ -304,7 +307,7 @@ impl EncounterEngine {
             // 1357 / 2372, Damage Scale.md Q3). Healing never revives a knocked-out actor.
             let heal = (ability.heal as f32 * self.damage_scale).round() as u32;
             self.state.player_health = before.saturating_add(heal).min(self.max_health);
-            let healed = (self.state.player_health - before) as i32;
+            let healed = self.state.player_health.saturating_sub(before) as i32;
             self.log_fight(now_ms, "heal", "you", "you", i64::from(healed));
             out.replies.push(build_hitpoint_delta(1, 1, healed));
             out.replies

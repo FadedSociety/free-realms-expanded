@@ -185,10 +185,12 @@ impl Gameplay {
         inner: &[u8],
         character: &CharacterState,
     ) -> io::Result<Option<Outcome>> {
-        if !inner.starts_with(&[26, 0, 8, 0]) || inner.len() < 12 {
+        if !inner.starts_with(&[26, 0, 8, 0]) {
             return Ok(None);
         }
-        let guid = u64::from_le_bytes(inner[4..12].try_into().unwrap());
+        let Some(guid) = crate::le::u64(inner, 4) else {
+            return Ok(None);
+        };
         let Some(world) = self.collections.clone() else {
             return Ok(None);
         };

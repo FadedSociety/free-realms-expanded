@@ -334,8 +334,8 @@ impl CollectionCatalogueContent {
     /// An entry and the collection that owns it.
     pub fn entry(&self, entry_id: i32) -> Option<(&Entry, &Collection)> {
         let &(position, slot) = self.entries.get(&entry_id)?;
-        let collection = &self.collections[position];
-        Some((&collection.entries[slot], collection))
+        let collection = self.collections.get(position)?;
+        Some((collection.entries.get(slot)?, collection))
     }
 
     /// What finishing `collection_id` pays (T480): the captured coins, each reward item fitted to

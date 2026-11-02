@@ -111,7 +111,12 @@ impl EncounterEngine {
             }))
             .chain(self.dungeon().into_iter().flat_map(|d| {
                 // Inside an arena: the enemies currently standing.
-                let states = &self.state.active.as_ref().unwrap().enemies;
+                let states = self
+                    .state
+                    .active
+                    .as_ref()
+                    .map(|active| active.enemies.as_slice())
+                    .unwrap_or_default();
                 d.enemies
                     .iter()
                     .zip(states)
@@ -697,6 +702,10 @@ impl EncounterEngine {
             if flee.is_some() {
                 continue;
             }
+            // A chaser always has a target: one without was sent Returning above.
+            let Some(victim) = player else {
+                continue;
+            };
             if distance(position, f.state.position) <= b.reach {
                 stand(guid, &mut self.field_sim.moving, out);
                 if self
@@ -709,7 +718,6 @@ impl EncounterEngine {
                 }
                 self.field_sim.attacks.insert(guid, now_ms);
                 out.replies.push(animation(guid, 1001, false));
-                let victim = player.expect("a chasing actor has a valid target in reach");
                 let prior = if shared {
                     hits.iter()
                         .filter(|(guid, _)| *guid == victim.guid)

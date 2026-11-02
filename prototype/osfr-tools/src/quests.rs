@@ -269,11 +269,8 @@ impl QuestEngine {
             {
                 return Err(invalid("invalid quest journal binding"));
             }
-            let initial = i32::from_le_bytes(
-                journal[binding.offset..binding.offset + 4]
-                    .try_into()
-                    .unwrap(),
-            );
+            let initial = osfr_tools::le::i32(&journal, binding.offset)
+                .ok_or_else(|| invalid("invalid quest journal binding"))?;
             if initial < 0 || initial as u32 > definition.goals[binding.objective_index].required {
                 return Err(invalid("invalid original objective progress"));
             }
@@ -413,13 +410,14 @@ impl QuestEngine {
         let words: Vec<_> = command.split_whitespace().collect();
         match words.as_slice() {
             ["quest"] | ["quests"] | ["status"] | ["quest", "list"] | ["quest", "status"] => {
-                let messages = content.definitions.iter().map(|definition| {
-                    let progress = &self.state.quests[&definition.id];
+                // `load` gives every definition a progress record.
+                let messages = content.definitions.iter().filter_map(|definition| {
+                    let progress = self.state.quests.get(&definition.id)?;
                     let label = if definition.original { "original record" } else { "reconstructed" };
                     let status = if progress.completed { "completed; reward granted" } else if progress.accepted { "active" } else { "available" };
                     let goals = definition.goals.iter().zip(&progress.counts).map(|(goal,count)| format!("{} {count}/{}{}", goal.text, goal.required,
                         if goal.enemy_definition == 0 { " (target definition not recovered)" } else { "" })).collect::<Vec<_>>().join("; ");
-                    format!("{} [{}; {label}]: {} — {status}. {goals}", definition.id, if definition.original { "Free Realms" } else { "local" }, definition.title)
+                    Some(format!("{} [{}; {label}]: {} — {status}. {goals}", definition.id, if definition.original { "Free Realms" } else { "local" }, definition.title))
                 }).collect();
                 Ok(QuestOutcome { messages, ..QuestOutcome::default() })
             }
@@ -451,7 +449,9 @@ impl QuestEngine {
             .as_ref()
             .and_then(|content| content.definitions.iter().find(|d| d.id == id))
             .cloned();
-        let Some(definition) = definition else {
+        // `load` gives every definition a progress record.
+        let (Some(definition), Some(progress)) = (definition, self.state.quests.get_mut(&id))
+        else {
             return Ok(QuestOutcome {
                 messages: vec![format!(
                     "Quest {id} is unavailable. Use realm quest to list available quests."
@@ -459,7 +459,6 @@ impl QuestEngine {
                 ..QuestOutcome::default()
             });
         };
-        let progress = self.state.quests.get_mut(&id).unwrap();
         if progress.accepted {
             return Ok(QuestOutcome {
                 messages: vec![format!(
@@ -493,7 +492,9 @@ impl QuestEngine {
             .definitions
             .iter()
             .find(|d| {
-                d.giver_guid != 0 && d.giver_guid == guid && !self.state.quests[&d.id].accepted
+                d.giver_guid != 0
+                    && d.giver_guid == guid
+                    && self.state.quests.get(&d.id).is_some_and(|p| !p.accepted)
             })
             .map(|d| d.id);
         match id {
@@ -512,7 +513,9 @@ impl QuestEngine {
         };
         let mut outcome = QuestOutcome::default();
         for definition in &content.definitions {
-            let progress = self.state.quests.get_mut(&definition.id).unwrap();
+            let Some(progress) = self.state.quests.get_mut(&definition.id) else {
+                continue;
+            };
             if !progress.accepted || progress.rewarded {
                 continue;
             }
@@ -679,8 +682,8 @@ impl QuestEngine {
             || message.len() > MAX_JOURNAL
             || message[..3] != [5, 0, 1]
             || message[7..9] != [12, 0]
-            || u32::from_le_bytes(message[3..7].try_into().unwrap()) as usize != message.len() - 7
-            || u32::from_le_bytes(message[9..13].try_into().unwrap()) as usize != message.len() - 13
+            || osfr_tools::le::u32(message, 3).map(|n| n as usize) != Some(message.len() - 7)
+            || osfr_tools::le::u32(message, 9).map(|n| n as usize) != Some(message.len() - 13)
         {
             return Err(invalid("invalid self packet for quest restoration"));
         }
@@ -696,7 +699,13 @@ impl QuestEngine {
         }
         let mut bytes = message.to_vec();
         for binding in &journal.bindings {
-            let progress = self.state.quests[&binding.quest_id].counts[binding.objective_index];
+            let progress = self
+                .state
+                .quests
+                .get(&binding.quest_id)
+                .and_then(|progress| progress.counts.get(binding.objective_index))
+                .copied()
+                .ok_or_else(|| invalid("journal binding has no saved progress"))?;
             let offset = journal.offset + binding.offset;
             bytes[offset..offset + 4].copy_from_slice(&(progress as i32).to_le_bytes());
         }

@@ -316,3 +316,37 @@ fn the_buy_back_predicate_matches_only_the_165_12_header() {
         );
     }
 }
+
+/// Hygiene L114: the fixed-size client decoders read their fields through `osfr_tools::le`. A
+/// valid frame decodes as before, and every truncation of it is refused instead of panicking.
+#[test]
+fn fixed_size_client_decoders_refuse_every_truncation() {
+    use npc_interaction::{
+        NpcInteractRequest, decode_dialogue_response_26_6, decode_npc_interact_26_8,
+        decode_quest_end_reply_49_14, decode_quest_reply_49_2,
+    };
+    let interact = [26, 0, 8, 0, 9, 0, 0, 0, 0, 0, 0, 0, 1];
+    let response = [26, 0, 6, 0, 0x2d, 1, 0, 0];
+    let reply = [49, 0, 2, 0, 0, 0, 0xd5, 0xc6, 0x2d, 0, 1];
+    let end = [49, 0, 14, 0, 0, 0, 0xd5, 0xc6, 0x2d, 0];
+    let target = NpcInteractRequest {
+        target: 9,
+        trailing_flag: true,
+    };
+    assert_eq!(decode_npc_interact_26_8(&interact), Ok(target));
+    assert_eq!(decode_dialogue_response_26_6(&response), Ok(301));
+    assert_eq!(decode_quest_reply_49_2(&reply), Ok((0x2d_c6d5, true)));
+    assert_eq!(decode_quest_end_reply_49_14(&end), Ok(0x2d_c6d5));
+    for cut in 0..interact.len() {
+        assert!(decode_npc_interact_26_8(&interact[..cut]).is_err());
+    }
+    for cut in 0..response.len() {
+        assert!(decode_dialogue_response_26_6(&response[..cut]).is_err());
+    }
+    for cut in 0..reply.len() {
+        assert!(decode_quest_reply_49_2(&reply[..cut]).is_err());
+    }
+    for cut in 0..end.len() {
+        assert!(decode_quest_end_reply_49_14(&end[..cut]).is_err());
+    }
+}

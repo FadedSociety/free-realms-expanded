@@ -421,7 +421,8 @@ impl OpeningEngine {
         self.content
             .stages
             .iter()
-            .find(|s| !self.state.stages[&s.id].completed)
+            // `load` proves every content stage has its progress record.
+            .find(|s| self.state.stages.get(&s.id).is_some_and(|p| !p.completed))
     }
 
     /// Read-only view of every content stage, including completed ones. Callers
@@ -450,9 +451,9 @@ impl OpeningEngine {
         self.content
             .stages
             .iter()
-            .map(|stage| {
-                let progress = &self.state.stages[&stage.id];
-                OpeningJournalEntry {
+            .filter_map(|stage| {
+                let progress = self.state.stages.get(&stage.id)?;
+                Some(OpeningJournalEntry {
                     quest_id: stage.id,
                     title_id: stage.title_id,
                     description_id: stage.description_id,
@@ -474,7 +475,7 @@ impl OpeningEngine {
                             count: *count,
                         })
                         .collect(),
-                }
+                })
             })
             .collect()
     }
@@ -496,8 +497,9 @@ impl OpeningEngine {
             self.state.discoveries.len(),
             self.content.discoveries.len()
         ));
-        if let Some(stage) = self.active_stage() {
-            let progress = &self.state.stages[&stage.id];
+        if let Some(stage) = self.active_stage()
+            && let Some(progress) = self.state.stages.get(&stage.id)
+        {
             outcome.messages.push(format!(
                 "{}: {}",
                 stage.title,
@@ -553,7 +555,7 @@ impl OpeningEngine {
         let command = words.last().copied().unwrap_or("status");
         if matches!(command, "accept" | "turnin") {
             if let Some(stage) = self.active_stage() {
-                let accepted = self.state.stages[&stage.id].accepted;
+                let accepted = self.state.stages.get(&stage.id).is_some_and(|p| p.accepted);
                 if command == "accept" && accepted {
                     return self.status();
                 }
@@ -634,8 +636,10 @@ impl OpeningEngine {
             .find(|a| a.guid == actor_guid)
             .cloned()
             .ok_or_else(|| invalid("unknown opening actor"))?;
-        if actor.required_profile.is_some() && actor.required_profile != self.selected_profile {
-            let job = match actor.required_profile.unwrap() {
+        if let Some(required) = actor.required_profile
+            && actor.required_profile != self.selected_profile
+        {
+            let job = match required {
                 1 => "Adventurer",
                 14 => "Miner",
                 16 => "Blacksmith",
@@ -757,7 +761,9 @@ impl OpeningEngine {
                 return Ok(outcome);
             }
         }
-        let progress = self.state.stages.get_mut(&stage.id).unwrap();
+        let Some(progress) = self.state.stages.get_mut(&stage.id) else {
+            return Ok(outcome);
+        };
         let newly_accepted = !progress.accepted && talking_guid == Some(stage.giver_guid);
         if newly_accepted {
             progress.accepted = true;

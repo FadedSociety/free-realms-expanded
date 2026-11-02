@@ -12,6 +12,7 @@ use osfr_tools::{
         RESULT_SERVICE_UNAVAILABLE,
     },
     content::NpcRole,
+    le,
     profiles::Trainer,
     quest_engine::{QuestEngine, QuestOutcome, QuestStatus},
 };
@@ -583,8 +584,9 @@ impl NpcInteraction {
         if packet.len() != 16 || packet[..4] != [NPC_FAMILY as u8, 0, INTERACTION_SELECT as u8, 0] {
             return Err(NpcInteractionError::InvalidPacket);
         }
-        let npc_id = u64::from_le_bytes(packet[4..12].try_into().unwrap());
-        let choice_id = i32::from_le_bytes(packet[12..16].try_into().unwrap());
+        let (Some(npc_id), Some(choice_id)) = (le::u64(packet, 4), le::i32(packet, 12)) else {
+            return Err(NpcInteractionError::InvalidPacket);
+        };
         let npc = self
             .content
             .npcs
@@ -693,10 +695,8 @@ impl NpcInteraction {
             .get(&active.npc_id)
             .ok_or(NpcInteractionError::UnknownNpc)?;
         check_range(npc, zone_id, position)?;
-        let subtype = match packet.get(..4) {
-            Some(header) if header[..2] == COIN_STORE_FAMILY.to_le_bytes() => {
-                u16::from_le_bytes(header[2..4].try_into().unwrap())
-            }
+        let subtype = match (le::u16(packet, 0), le::u16(packet, 2)) {
+            (Some(COIN_STORE_FAMILY), Some(subtype)) => subtype,
             _ => return Err(NpcInteractionError::InvalidPacket),
         };
         let expected_len = match subtype {
@@ -713,7 +713,7 @@ impl NpcInteraction {
         if subtype == COIN_STORE_BUY_BACK {
             return Ok(());
         }
-        let merchant_id = u64::from_le_bytes(packet[4..12].try_into().unwrap());
+        let merchant_id = le::u64(packet, 4).ok_or(NpcInteractionError::InvalidPacket)?;
         // (R) Content NPC keys are used as the Coin Store merchant ID until an original binding
         // between runtime actor GUIDs and merchant IDs is recovered.
         // Recovered (W148): the NpcMerchantV2 window sells through `00c77030`, which sends the
@@ -727,7 +727,7 @@ impl NpcInteraction {
             return Err(NpcInteractionError::WrongMerchant);
         }
         if subtype == COIN_STORE_BUY {
-            let item_id = i32::from_le_bytes(packet[16..20].try_into().unwrap());
+            let item_id = le::i32(packet, 16).ok_or(NpcInteractionError::InvalidPacket)?;
             if !self
                 .content
                 .vendor_items
@@ -1217,7 +1217,7 @@ pub fn decode_npc_interact_26_8(packet: &[u8]) -> Result<NpcInteractRequest, Npc
         return Err(NpcInteractionError::InvalidPacket);
     }
     Ok(NpcInteractRequest {
-        target: u64::from_le_bytes(packet[4..12].try_into().unwrap()),
+        target: le::u64(packet, 4).ok_or(NpcInteractionError::InvalidPacket)?,
         trailing_flag: packet[12] == 1,
     })
 }
@@ -1322,7 +1322,7 @@ pub fn decode_dialogue_response_26_6(packet: &[u8]) -> Result<i32, NpcInteractio
     if packet.len() != 8 || packet[..4] != [26, 0, 6, 0] {
         return Err(NpcInteractionError::InvalidPacket);
     }
-    Ok(i32::from_le_bytes(packet[4..8].try_into().unwrap()))
+    le::i32(packet, 4).ok_or(NpcInteractionError::InvalidPacket)
 }
 
 /// Server EndDialog command: native constructor `009f5760` has an empty body.
@@ -1389,7 +1389,7 @@ pub fn decode_quest_reply_49_2(packet: &[u8]) -> Result<(u32, bool), NpcInteract
     if packet.len() != 11 || packet[..6] != [49, 0, 2, 0, 0, 0] || packet[10] > 1 {
         return Err(NpcInteractionError::InvalidPacket);
     }
-    let quest_id = u32::from_le_bytes(packet[6..10].try_into().unwrap());
+    let quest_id = le::u32(packet, 6).ok_or(NpcInteractionError::InvalidPacket)?;
     if quest_id == 0 {
         return Err(NpcInteractionError::InvalidPacket);
     }
@@ -1402,7 +1402,7 @@ pub fn decode_quest_end_reply_49_14(packet: &[u8]) -> Result<u32, NpcInteraction
     if packet.len() != 10 || packet[..6] != [49, 0, 14, 0, 0, 0] {
         return Err(NpcInteractionError::InvalidPacket);
     }
-    let quest_id = u32::from_le_bytes(packet[6..10].try_into().unwrap());
+    let quest_id = le::u32(packet, 6).ok_or(NpcInteractionError::InvalidPacket)?;
     (quest_id != 0)
         .then_some(quest_id)
         .ok_or(NpcInteractionError::InvalidPacket)
@@ -1789,7 +1789,7 @@ impl<'a> WireCursor<'a> {
     }
 
     fn u32(&mut self) -> Result<u32, NpcInteractionError> {
-        Ok(u32::from_le_bytes(self.take(4)?.try_into().unwrap()))
+        le::u32(self.take(4)?, 0).ok_or(NpcInteractionError::InvalidPacket)
     }
 
     fn words<const N: usize>(&mut self) -> Result<[u32; N], NpcInteractionError> {

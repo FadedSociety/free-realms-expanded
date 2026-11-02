@@ -71,7 +71,10 @@ impl Gameplay {
         character: &CharacterState,
         out: &mut Outcome,
     ) -> io::Result<bool> {
-        let profile = self.profiles.as_ref().unwrap().active();
+        // The opening route that calls this always has class content loaded.
+        let Some(profile) = self.profiles.as_ref().map(Profiles::active) else {
+            return Ok(false);
+        };
         if let Some(required) = self
             .encounter
             .as_ref()
@@ -93,7 +96,11 @@ impl Gameplay {
             self.refuse_battle(battle, profile, UNAVAILABLE_BATTLE_PRIZE, out);
             return Ok(true);
         }
-        if !self.abilities.as_ref().unwrap().supports_basic(profile) {
+        if !self
+            .abilities
+            .as_ref()
+            .is_some_and(|abilities| abilities.supports_basic(profile))
+        {
             // The start screen hides the HUD; keep it up so Switch Jobs is
             // reachable, then Go again or close.
             self.refuse_battle(
@@ -104,21 +111,18 @@ impl Gameplay {
             );
             return Ok(true);
         }
-        let result =
-            match self
-                .encounter
-                .as_mut()
-                .unwrap()
-                .begin(battle, character.clone(), profile)
-            {
-                Ok(result) => result,
-                // A refused `begin` (knocked out, busy) is a chat refusal with the
-                // same screen, not a session error that ends the connection.
-                Err(error) => {
-                    self.refuse_battle(battle, profile, &error.to_string(), out);
-                    return Ok(true);
-                }
-            };
+        let Some(encounter) = self.encounter.as_mut() else {
+            return Ok(false);
+        };
+        let result = match encounter.begin(battle, character.clone(), profile) {
+            Ok(result) => result,
+            // A refused `begin` (knocked out, busy) is a chat refusal with the
+            // same screen, not a session error that ends the connection.
+            Err(error) => {
+                self.refuse_battle(battle, profile, &error.to_string(), out);
+                return Ok(true);
+            }
+        };
         self.apply_encounter(result, out)?;
         Ok(true)
     }
@@ -169,11 +173,9 @@ impl Gameplay {
 
     fn refuse_battle(&mut self, battle: u32, profile: i32, message: &str, out: &mut Outcome) {
         out.replies.push(chat::system(message));
-        out.replies.extend(
-            self.encounter
-                .as_mut()
-                .unwrap()
-                .reopen_battle_screen(battle, profile),
-        );
+        if let Some(encounter) = self.encounter.as_mut() {
+            out.replies
+                .extend(encounter.reopen_battle_screen(battle, profile));
+        }
     }
 }

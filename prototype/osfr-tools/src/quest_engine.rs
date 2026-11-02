@@ -906,7 +906,7 @@ impl From<OpeningTrigger> for ObjectiveKind {
                 radius,
             },
             OpeningTrigger::Defeat { definition_id } => Self::KillActorKind {
-                actor_kind_id: definition_id as u32,
+                actor_kind_id: definition_id.cast_unsigned(),
             },
             OpeningTrigger::ClassSelected { profile_id } => Self::SelectJob { profile_id },
             OpeningTrigger::CosmeticEquipped { definition_id } => Self::EquipItem { definition_id },
@@ -923,37 +923,34 @@ impl From<OpeningTrigger> for ObjectiveKind {
 
 impl From<OpeningTrigger> for QuestEvent {
     fn from(value: OpeningTrigger) -> Self {
-        match ObjectiveKind::from(value) {
-            ObjectiveKind::TalkToNpc { npc_id } => Self::TalkToNpc { npc_id },
-            ObjectiveKind::InteractNpc { npc_id } => Self::InteractNpc { npc_id },
-            ObjectiveKind::GatherResource { resource_id } => Self::GatherResource {
+        // The same mapping as `ObjectiveKind::from` above, made directly so it is total.
+        match value {
+            OpeningTrigger::Talk { actor_guid } => Self::TalkToNpc { npc_id: actor_guid },
+            OpeningTrigger::Interact { actor_guid } => Self::InteractNpc { npc_id: actor_guid },
+            OpeningTrigger::Gather { resource_id } => Self::GatherResource {
                 resource_id,
                 quantity: 1,
             },
-            ObjectiveKind::CraftRecipe { recipe_id } => Self::CraftRecipe {
+            OpeningTrigger::Craft { recipe_id } => Self::CraftRecipe {
                 recipe_id,
                 quantity: 1,
             },
-            ObjectiveKind::VisitPosition {
+            OpeningTrigger::Visit {
                 zone_id, position, ..
             } => Self::VisitPosition { zone_id, position },
-            ObjectiveKind::KillActorKind { actor_kind_id } => Self::KillActorKind {
-                actor_kind_id,
+            OpeningTrigger::Defeat { definition_id } => Self::KillActorKind {
+                actor_kind_id: definition_id.cast_unsigned(),
                 count: 1,
             },
-            ObjectiveKind::SelectJob { profile_id } => Self::SelectJob { profile_id },
-            ObjectiveKind::EquipItem { definition_id } => Self::EquipItem { definition_id },
-            ObjectiveKind::CompleteDungeon { encounter_id } => {
+            OpeningTrigger::ClassSelected { profile_id } => Self::SelectJob { profile_id },
+            OpeningTrigger::CosmeticEquipped { definition_id } => Self::EquipItem { definition_id },
+            OpeningTrigger::DungeonCompleted { encounter_id } => {
                 Self::CompleteDungeon { encounter_id }
             }
-            ObjectiveKind::UseAbility {
+            OpeningTrigger::AbilityUsed { ability_id } => Self::UseAbility {
                 ability_id,
-                target_actor_kind_id,
-            } => Self::UseAbility {
-                ability_id,
-                target_actor_kind_id,
+                target_actor_kind_id: None,
             },
-            _ => unreachable!("opening trigger adapter only creates opening objective kinds"),
         }
     }
 }
@@ -1238,7 +1235,7 @@ impl QuestEngine {
             let quest = quests
                 .iter()
                 .find(|quest| quest.id == quest_id)
-                .expect("givers were validated against quest_ids");
+                .ok_or_else(|| invalid("split NPC references missing quest definition"))?;
             if quest.giver_npc_id != npc_id {
                 return Err(invalid("split quest and NPC giver bindings disagree"));
             }
@@ -1256,9 +1253,10 @@ impl QuestEngine {
                     .map(|index| {
                         extras
                             .remove(&index)
-                            .unwrap_or_else(|| standard.next().expect("validated objective order"))
+                            .or_else(|| standard.next())
+                            .ok_or_else(|| invalid("quest objective order does not match content"))
                     })
-                    .collect();
+                    .collect::<io::Result<_>>()?;
                 drop(standard);
                 definition.objectives = objectives;
             }
@@ -1835,8 +1833,12 @@ impl QuestEngine {
             .collect();
         let mut packets = Vec::new();
         for quest_id in active {
-            let definition = &self.definitions[&quest_id];
-            let progress = &self.state.quests[&quest_id];
+            let (Some(definition), Some(progress)) = (
+                self.definitions.get(&quest_id),
+                self.state.quests.get(&quest_id),
+            ) else {
+                return Err(invalid("unknown quest add definition"));
+            };
             packets.push(self.quest_add_packet(quest_id)?);
 
             // (R) This mirrors accept(): all unordered goals or the first unfinished ordered goal
@@ -1954,7 +1956,9 @@ impl QuestEngine {
             }
             return outcome;
         }
-        let definition = &self.definitions[&quest_id];
+        let Some(definition) = self.definitions.get(&quest_id) else {
+            return denied(QuestDenial::Unavailable);
+        };
         self.state.quests.insert(
             quest_id,
             QuestProgress {
@@ -2112,7 +2116,9 @@ impl QuestEngine {
             outcome.denial = Some(QuestDenial::Unavailable);
             return outcome;
         }
-        let definition = &self.definitions[&quest_id];
+        let Some(definition) = self.definitions.get(&quest_id) else {
+            return denied(QuestDenial::Unavailable);
+        };
         if let Some(denial) = self
             .requirement_denial(definition)
             .filter(|_| !developer_offer)
@@ -2140,34 +2146,26 @@ impl QuestEngine {
                 }));
             return outcome;
         }
+        // A pending offer always has its Offered record (`offer`, `validate_state`).
+        let Some(progress) = self.state.quests.get_mut(&quest_id) else {
+            return denied(QuestDenial::Unavailable);
+        };
         self.dev_offer = None;
         self.state.pending_offer = None;
-        let progress = self
-            .state
-            .quests
-            .get_mut(&quest_id)
-            .expect("offered quest exists");
         progress.status = QuestStatus::Active;
-        let active_ids: Vec<_> = definition
-            .objectives
-            .iter()
-            .enumerate()
-            .filter(|(index, _)| !definition.ordered || *index == 0)
-            .map(|(_, objective)| objective.id)
-            .collect();
         let mut packets = vec![QuestMessage::QuestAdd { quest_id }];
-        packets.extend(active_ids.into_iter().map(|objective_id| {
-            let objective = definition
+        packets.extend(
+            definition
                 .objectives
                 .iter()
-                .find(|item| item.id == objective_id)
-                .unwrap();
-            QuestMessage::ObjectiveActivated {
-                quest_id,
-                objective_id,
-                required: objective.required,
-            }
-        }));
+                .enumerate()
+                .filter(|(index, _)| !definition.ordered || *index == 0)
+                .map(|(_, objective)| QuestMessage::ObjectiveActivated {
+                    quest_id,
+                    objective_id: objective.id,
+                    required: objective.required,
+                }),
+        );
         self.revision = self.revision.wrapping_add(1); // `definition` still borrows self
         let mut outcome = QuestOutcome {
             changed: true,
@@ -2219,7 +2217,9 @@ impl QuestEngine {
             .map(|(id, _)| *id)
             .collect();
         for quest_id in ids {
-            let definition = self.definitions[&quest_id].clone();
+            let Some(definition) = self.definitions.get(&quest_id).cloned() else {
+                continue;
+            };
             let Some(progress) = self.state.quests.get_mut(&quest_id) else {
                 continue;
             };
@@ -2477,12 +2477,12 @@ impl QuestEngine {
                     return Ok((self.refuse_turnin(quest_id, failure), reward_state.clone()));
                 }
             };
+        // `validate_state` proves a pending turn-in has its Active record.
+        let Some(progress) = self.state.quests.get_mut(&quest_id) else {
+            return Err(invalid("pending quest progress disappeared"));
+        };
+        progress.status = QuestStatus::Completed;
         self.state.clear_pending_turnin();
-        self.state
-            .quests
-            .get_mut(&quest_id)
-            .expect("pending quest exists")
-            .status = QuestStatus::Completed;
         if self.state.selected_quest_id == Some(quest_id) {
             self.state.selected_quest_id = None;
         }
@@ -2516,10 +2516,12 @@ impl QuestEngine {
                 .nth(1)
                 .copied();
             if let Some(next_id) = next {
-                outcome.messages.push(format!(
-                    "Next: {}. Talk to its guide.",
-                    self.definitions[&next_id].title
-                ));
+                // The order lists the opening's own definitions.
+                if let Some(next) = self.definitions.get(&next_id) {
+                    outcome
+                        .messages
+                        .push(format!("Next: {}. Talk to its guide.", next.title));
+                }
             } else {
                 outcome.messages.push(
                     "Opening story complete. Explore your discoveries and return safely.".into(),

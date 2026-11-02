@@ -78,7 +78,9 @@ impl ArenaSim {
         let (position, now_ms, elapsed) = (t.position, t.now_ms, t.elapsed);
         let mut total_damage = 0_u32;
         for actor in actors {
-            let s = states.iter_mut().find(|s| s.guid == actor.guid).unwrap();
+            let Some(s) = states.iter_mut().find(|s| s.guid == actor.guid) else {
+                continue;
+            };
             if s.health == 0 || s.dormant {
                 continue;
             }
@@ -499,7 +501,9 @@ impl EncounterEngine {
         else {
             return out;
         };
-        let d = self.dungeon().unwrap();
+        let Some(d) = self.dungeon() else {
+            return out;
+        };
         let (count, _) = goal_progress(d, active);
         out.replies.push(objective(2, d.objective_id, count));
         out.changed = true;
@@ -512,8 +516,10 @@ impl EncounterEngine {
     /// wheel pick, the member's own reward and quest credit, results and rules off. The solo
     /// hit path and a shared run's other members both end here.
     pub(super) fn win_run(&mut self, now_ms: u64, out: &mut EncounterOutcome) {
-        let active = self.state.active.as_ref().unwrap();
-        let d = self.dungeon().unwrap();
+        // Both callers hold an active run of a content dungeon.
+        let (Some(active), Some(d)) = (self.state.active.as_ref(), self.dungeon()) else {
+            return;
+        };
         // The goal is down: summoned minions still standing leave.
         for (a, s) in d.enemies.iter().zip(&active.enemies) {
             if a.summon_below_percent.is_some() && s.health > 0 && !s.dormant {
@@ -545,7 +551,9 @@ impl EncounterEngine {
         );
         let repeatable = d.guide.is_none();
         reward.bonus_items = self.roll_battle_drops(id);
-        self.state.active.as_mut().unwrap().phase = EncounterPhase::Won;
+        if let Some(active) = self.state.active.as_mut() {
+            active.phase = EncounterPhase::Won;
+        }
         out.win_completed = Some(id);
         // The cave rewards once; overworld battles every win (R).
         // Repeatable battles are never recorded: their ids are not in the

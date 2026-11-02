@@ -274,7 +274,11 @@ impl EnemyEngine {
                 && (group.stage_id.is_none() || group.stage_id == active_stage)
         }) {
             for spawn in &group.spawns {
-                let definition = self.definitions[&spawn.definition].clone();
+                let definition = self
+                    .definitions
+                    .get(&spawn.definition)
+                    .cloned()
+                    .ok_or_else(|| invalid("invalid enemy spawn"))?;
                 let guid = scoped_guid(spawn.guid, key);
                 if instance.enemies.contains_key(&guid) {
                     return Err(invalid("enemy GUID collision in zone instance"));
@@ -367,9 +371,7 @@ impl EnemyEngine {
 
         let mut outcome = EnemyOutcome::default();
         let mut pending_damage = BTreeMap::<u64, i32>::new();
-        let enemy_guids: Vec<_> = instance.enemies.keys().copied().collect();
-        for guid in enemy_guids {
-            let enemy = instance.enemies.get_mut(&guid).unwrap();
+        for enemy in instance.enemies.values_mut() {
             if enemy.mode == EnemyMode::Dead {
                 if enemy.respawn_at_ms.is_some_and(|due| now_ms >= due) {
                     enemy.combat.health = enemy.combat.max_health;
@@ -569,7 +571,7 @@ impl EnemyEngine {
             .ok_or_else(|| invalid("unknown enemy zone instance"))?;
         let enemy = instance
             .enemies
-            .get(&enemy_guid)
+            .get_mut(&enemy_guid)
             .ok_or_else(|| invalid("unknown enemy"))?;
         let before = enemy.combat.health;
         let definition = enemy.definition.clone();
@@ -647,7 +649,6 @@ impl EnemyEngine {
         };
 
         *player = next_player;
-        let enemy = instance.enemies.get_mut(&enemy_guid).unwrap();
         enemy.combat = next_enemy;
         if kill.is_some() {
             enemy.mode = EnemyMode::Dead;
@@ -729,7 +730,7 @@ fn spawn_packets(enemy: &LiveEnemy) -> io::Result<Vec<Vec<u8>>> {
     let framed = startup_world::build_add_npc(&actor);
     if framed.len() < 7
         || framed[..3] != [5, 0, 1]
-        || u32::from_le_bytes(framed[3..7].try_into().unwrap()) as usize != framed.len() - 7
+        || crate::le::u32(&framed, 3).map(|n| n as usize) != Some(framed.len() - 7)
     {
         return Err(invalid("AddNpc writer returned an invalid tunnel"));
     }

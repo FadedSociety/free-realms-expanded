@@ -78,8 +78,11 @@ impl EncounterEngine {
             // A lost instance revives through its existing exit (return
             // location, full health). A header naming another instance is a
             // replay from an earlier one.
-            let encounter = i32::from_le_bytes(inner[4..8].try_into().unwrap());
-            let instance = i32::from_le_bytes(inner[8..12].try_into().unwrap());
+            let (Some(encounter), Some(instance)) =
+                (crate::le::i32(inner, 4), crate::le::i32(inner, 8))
+            else {
+                return Err(invalid("malformed encounter resume"));
+            };
             if a.phase == EncounterPhase::Lost
                 && (encounter == 0 || encounter == a.encounter_id as i32)
                 && (instance == 0 || instance == a.instance_id)
