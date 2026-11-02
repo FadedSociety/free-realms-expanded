@@ -94,6 +94,20 @@ class AssetDeliveryTests(unittest.TestCase):
         track = self.raw['track.gcnk']
         self.assertIn(f'track.gcnk,{zlib.crc32(track)},{len(track)}'.encode(), delivery.served_manifest)
 
+    def test_an_older_copy_of_a_compressed_row_is_announced_by_its_envelope(self):
+        # L922: a `.z` row (here a model) gets the older bytes' CRC and the length of the envelope served.
+        older = self.root / 'references/older-client-substitutes'
+        older.mkdir(parents=True)
+        raw = b'older flag model' * 4
+        (older / 'flag.dme').write_bytes(raw)
+        manifest = self.manifest + f'\nflag.dme.z,{zlib.crc32(b"lost flag")},40'.encode()
+        delivery = AssetDelivery(self.root, manifest)
+        crc = zlib.crc32(raw)
+        body, _ = delivery.get(f'/1/flag.dme.z?{crc}')
+        self.assertEqual(struct.unpack('>II', body[:8]), (0xA1B2C3D4, len(raw)))
+        self.assertEqual(zlib.decompress(body[8:]), raw)
+        self.assertIn(f'flag.dme.z,{crc},{len(body)}'.encode(), delivery.served_manifest)
+
     def test_wrong_crc_unknown_asset_and_path_escape_are_refused(self):
         for request in ['/562/track.gcnk?0', '/562/missing.gcnk?1', '/562/../track.gcnk?1', '/562/%2e%2e%2ftrack.gcnk?1', '/x/track.gcnk?1']:
             self.assertIsNone(self.delivery.get(request))

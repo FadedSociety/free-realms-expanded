@@ -211,16 +211,18 @@ class AssetDelivery:
         if substitutes.is_dir():
             for path in sorted(substitutes.iterdir()):
                 name = path.name.lower()
-                if name not in self.raw_names or name in self.sources or not path.is_file():
+                if name not in self.manifest or name in self.sources or not path.is_file():
                     continue
                 raw = path.read_bytes()
                 # An empty or zero-filled copy is a failed download in the older dump, not the file.
                 if len(raw) > MAX_ASSET or not raw.strip(b"\0"):
                     continue
                 crc = zlib.crc32(raw)
-                self.manifest[name] = (crc, len(raw))
+                # L922: a `.z` row's length is the wire envelope `get` builds (header + level-6 zlib).
+                wire = len(raw) if name in self.raw_names else 8 + len(zlib.compress(raw, 6))
+                self.manifest[name] = (crc, wire)
                 self.sources[name] = (path, len(raw), crc, hashlib.sha256(raw).hexdigest())
-                self.substituted[name] = (crc, len(raw))
+                self.substituted[name] = (crc, wire)
 
         self.client_rows = 0
         self.extra_rows = []
