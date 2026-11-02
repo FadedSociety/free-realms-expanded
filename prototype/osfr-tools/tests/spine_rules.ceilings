@@ -6,5 +6,5 @@ hub:src/bin/osfr-gateway.rs 4638
 hub:src/encounter.rs 2930
 hub:src/gameplay.rs 5129
 hub:src/gateway.rs 2142
-panic_calls 626
+panic_calls 604
 plain_fs_write 4
