@@ -109,6 +109,8 @@ const EXIT: i32 = 101;
 const RETRY: i32 = 102;
 const ATTACK: i32 = 103;
 const START: i32 = 104;
+/// A field read past a length its branch already checked: unreachable, refused, not a panic.
+const SHORT: &str = "encounter request ended early";
 
 fn invalid(s: &str) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, s)
@@ -1427,19 +1429,19 @@ impl EncounterEngine {
             return_location,
             enemies: d.enemies.iter().map(enemy_state).collect(),
         });
+        let (zone, guided) = (d.zone.clone(), d.guide.is_some());
         self.state.next_instance_id = next;
         self.state.player_health = self.max_health;
         self.reset_session();
         self.fight_log.clear();
-        let d = self.dungeon().unwrap();
-        let feedback = if d.guide.is_some() {
+        let feedback = if guided {
             "Entering the opening cave. Combat waves, balance and rewards are locally reconstructed."
         } else {
             "Entering the battle. Enemy behaviour, balance and rewards are locally reconstructed."
         };
         Ok(EncounterOutcome {
             changed: true,
-            zoning: Some(d.zone.clone()),
+            zoning: Some(zone),
             feedback: Some(feedback.into()),
             ..Default::default()
         })
@@ -1501,7 +1503,7 @@ impl EncounterEngine {
     }
 
     pub fn on_zone_ready(&mut self, profile_id: i32, now_ms: u64) -> io::Result<EncounterOutcome> {
-        if !self.active() {
+        let Some(active) = self.state.active.as_mut() else {
             let mut replies = self.world_initialization();
             replies.extend(self.field_initialization());
             if self.state.player_health == 0 {
@@ -1512,21 +1514,22 @@ impl EncounterEngine {
                 replies,
                 ..Default::default()
             });
-        }
-        let loading = self.state.active.as_ref().unwrap().phase == EncounterPhase::Loading;
+        };
+        let loading = active.phase == EncounterPhase::Loading;
         if loading {
-            self.state.active.as_mut().unwrap().phase = EncounterPhase::Fighting;
+            active.phase = EncounterPhase::Fighting;
         }
         self.armed = false;
         self.results_presented = false;
         self.last_tick = Some(now_ms);
-        let active = self.state.active.as_ref().unwrap();
-        let d = self.dungeon().unwrap();
+        let (Some(active), Some(d)) = (self.state.active.as_ref(), self.dungeon()) else {
+            return Err(invalid("unknown encounter"));
+        };
         let mut out = EncounterOutcome {
             changed: loading,
             ..Default::default()
         };
-        out.replies.push(self.details(true, profile_id));
+        out.replies.push(details(d, active, true, profile_id));
         out.replies
             .push(encounter_state(d.id, active.instance_id, 4));
         out.replies
@@ -1596,13 +1599,12 @@ impl EncounterEngine {
         profile_id: i32,
         now_ms: u64,
     ) -> io::Result<EncounterOutcome> {
-        if inner.len() < 2 {
+        let Some(op) = crate::le::u16(inner, 0) else {
             return Ok(EncounterOutcome::default());
-        }
+        };
         if !valid_position(position) {
             return Err(invalid("invalid encounter player position"));
         }
-        let op = u16::from_le_bytes(inner[..2].try_into().unwrap());
         if op == 39 {
             if inner.len() < 3 {
                 return Err(invalid("truncated minigame request"));
@@ -1616,14 +1618,13 @@ impl EncounterEngine {
             }
             return Ok(EncounterOutcome::default());
         }
-        if inner.len() < 4 {
+        let Some(sub) = crate::le::u16(inner, 2) else {
             return if matches!(op, 26 | 36 | 41) {
                 Err(invalid("truncated encounter family header"))
             } else {
                 Ok(EncounterOutcome::default())
             };
-        }
-        let sub = u16::from_le_bytes(inner[2..4].try_into().unwrap());
+        };
         match (op, sub) {
             (26, 42) => {
                 if inner.len() != 4 {
@@ -1653,9 +1654,9 @@ impl EncounterEngine {
                     // Ui.LeaveMiniGameOrEncounter and Ui.QuitMiniGame leave
                     // the first header int zero and send the launch instance
                     // in the second (native 008A31A0 / 009BD240).
-                    let encounter = i32::from_le_bytes(inner[4..8].try_into().unwrap());
-                    if (encounter == 0 || encounter == a.encounter_id as i32)
-                        && i32::from_le_bytes(inner[8..12].try_into().unwrap()) == a.instance_id
+                    let encounter = crate::le::u32(inner, 4);
+                    if (encounter == Some(0) || encounter == Some(a.encounter_id))
+                        && crate::le::i32(inner, 8) == Some(a.instance_id)
                     {
                         return self.exit();
                     }
@@ -1670,7 +1671,7 @@ impl EncounterEngine {
                 if inner.len() != 13 || inner[12] > 1 {
                     return Err(invalid("malformed encounter interaction"));
                 }
-                let guid = u64::from_le_bytes(inner[4..12].try_into().unwrap());
+                let guid = crate::le::u64(inner, 4).ok_or_else(|| invalid(SHORT))?;
                 if self.is_battle_spawner(guid) {
                     return Ok(self.battle_screen(guid, position, profile_id));
                 }
@@ -1680,9 +1681,9 @@ impl EncounterEngine {
                 if inner.len() != 16 {
                     return Err(invalid("malformed encounter selection"));
                 }
-                let guid = u64::from_le_bytes(inner[4..12].try_into().unwrap());
-                let choice = i32::from_le_bytes(inner[12..16].try_into().unwrap());
-                if let Some(d) = self.dungeon() {
+                let guid = crate::le::u64(inner, 4).ok_or_else(|| invalid(SHORT))?;
+                let choice = crate::le::i32(inner, 12).ok_or_else(|| invalid(SHORT))?;
+                if let (Some(d), Some(active)) = (self.dungeon(), &self.state.active) {
                     if d.guide
                         .as_ref()
                         .is_some_and(|g| guid == g.guid && distance(position, g.position) <= 12.0)
@@ -1695,7 +1696,7 @@ impl EncounterEngine {
                         }
                         if choice == START
                             && !self.armed
-                            && self.state.active.as_ref().unwrap().phase == EncounterPhase::Fighting
+                            && active.phase == EncounterPhase::Fighting
                         {
                             self.armed = true;
                             self.last_tick = Some(now_ms);
@@ -1719,9 +1720,9 @@ impl EncounterEngine {
                 if inner.len() < 16 {
                     return Err(invalid("truncated encounter ability"));
                 }
-                let bar = i32::from_le_bytes(inner[4..8].try_into().unwrap());
-                let slot = i32::from_le_bytes(inner[8..12].try_into().unwrap());
-                let target_type = i32::from_le_bytes(inner[12..16].try_into().unwrap());
+                let bar = crate::le::i32(inner, 4).ok_or_else(|| invalid(SHORT))?;
+                let slot = crate::le::i32(inner, 8).ok_or_else(|| invalid(SHORT))?;
+                let target_type = crate::le::i32(inner, 12).ok_or_else(|| invalid(SHORT))?;
                 if target_type == 1 {
                     if inner.len() != 32 {
                         return Err(invalid("malformed ground ability"));
@@ -1734,7 +1735,7 @@ impl EncounterEngine {
                 if bar != 1 || slot != 0 || target_type != 0 {
                     return Ok(EncounterOutcome::default());
                 }
-                let guid = u64::from_le_bytes(inner[16..24].try_into().unwrap());
+                let guid = crate::le::u64(inner, 16).ok_or_else(|| invalid(SHORT))?;
                 if target_type == 0 && guid == player_guid {
                     // The original basic toolbar requests a self-centered attack.
                     // This supported slice resolves one nearby enemy on the server;
@@ -1785,10 +1786,11 @@ impl EncounterEngine {
 
     fn interact(&self, guid: u64, position: [f32; 3]) -> EncounterOutcome {
         if let Some(guide) = self.dungeon().and_then(|d| d.guide.as_ref())
+            && let Some(active) = &self.state.active
             && guid == guide.guid
             && distance(position, guide.position) <= 12.0
         {
-            let phase = &self.state.active.as_ref().unwrap().phase;
+            let phase = &active.phase;
             let entries = if *phase == EncounterPhase::Lost {
                 vec![(RETRY, 432500), (EXIT, 4826)]
             } else if *phase == EncounterPhase::Fighting && !self.armed {
@@ -1831,8 +1833,7 @@ impl EncounterEngine {
             if active.phase != EncounterPhase::Fighting {
                 return None;
             }
-            self.dungeon()
-                .unwrap()
+            self.dungeon()?
                 .enemies
                 .iter()
                 .zip(&active.enemies)
@@ -1981,7 +1982,10 @@ impl EncounterEngine {
             } else {
                 &mut self.state.world_enemies
             };
-            states.iter_mut().find(|s| s.guid == guid).unwrap().health = hp;
+            let Some(target) = states.iter_mut().find(|s| s.guid == guid) else {
+                return Err(invalid("unknown encounter enemy"));
+            };
+            target.health = hp;
         }
         self.log_fight(
             now_ms,
@@ -2033,8 +2037,7 @@ impl EncounterEngine {
                 self.field_sim.attacks.remove(&guid);
                 let f = &mut self.field_sim.enemies[i];
                 f.respawn_at = Some(now_ms.saturating_add(f.respawn_ms));
-            } else if let Some(active) = &self.state.active {
-                let d = self.dungeon().unwrap();
+            } else if let (Some(active), Some(d)) = (&self.state.active, self.dungeon()) {
                 let (count, goal) = goal_progress(d, active);
                 out.replies.push(objective(2, d.objective_id, count));
                 if count >= goal {
@@ -2082,7 +2085,7 @@ impl EncounterEngine {
     fn heal_with_number(&mut self, percent: u32, out: &mut EncounterOutcome) {
         let before = self.state.player_health;
         let replies = self.heal_player_percent(percent);
-        let healed = (self.state.player_health - before) as i32;
+        let healed = self.state.player_health.saturating_sub(before) as i32;
         if healed > 0 {
             out.replies.extend(replies);
             out.replies
@@ -2265,8 +2268,10 @@ impl EncounterEngine {
         }
         let percent = (u64::from(hp) * 100 / u64::from(max_health.max(1))) as u32;
         let content = self.content.clone();
-        let d = content.dungeons.iter().find(|x| x.id == d.id).unwrap();
-        let active = self.state.active.as_mut().unwrap();
+        let found = content.dungeons.iter().find(|x| x.id == d.id);
+        let (Some(d), Some(active)) = (found, self.state.active.as_mut()) else {
+            return;
+        };
         let at = active
             .enemies
             .iter()
@@ -2425,7 +2430,7 @@ impl EncounterEngine {
         if self.results_presented {
             return;
         }
-        let Some(active) = &self.state.active else {
+        let (Some(active), Some(d)) = (&self.state.active, self.dungeon()) else {
             return;
         };
         if matches!(active.phase, EncounterPhase::Won | EncounterPhase::Lost) {
@@ -2433,7 +2438,7 @@ impl EncounterEngine {
                 // The native target listens to the boss registry even over
                 // results. Unregister living bosses without killing/removing
                 // them; Retry's normal spawn registers their display again.
-                for (actor, state) in self.dungeon().unwrap().enemies.iter().zip(&active.enemies) {
+                for (actor, state) in d.enemies.iter().zip(&active.enemies) {
                     if actor.boss && state.health > 0 {
                         out.replies.push(boss_display(actor.guid, false));
                     }
@@ -2481,22 +2486,15 @@ impl EncounterEngine {
     }
 
     pub fn retry(&mut self, _profile_id: i32, _now_ms: u64) -> io::Result<EncounterOutcome> {
-        if self
-            .state
-            .active
-            .as_ref()
-            .is_none_or(|a| a.phase != EncounterPhase::Lost)
-        {
+        // A dungeon exists exactly while an encounter is active (`dungeon`).
+        let Some(d) = self.dungeon() else {
             return Ok(EncounterOutcome::default());
-        }
-        let enemies = self
-            .dungeon()
-            .unwrap()
-            .enemies
-            .iter()
-            .map(enemy_state)
-            .collect();
-        let a = self.state.active.as_mut().unwrap();
+        };
+        let enemies = d.enemies.iter().map(enemy_state).collect();
+        let lost = |a: &&mut ActiveEncounter| a.phase == EncounterPhase::Lost;
+        let Some(a) = self.state.active.as_mut().filter(lost) else {
+            return Ok(EncounterOutcome::default());
+        };
         a.enemies = enemies;
         a.phase = EncounterPhase::Loading;
         self.state.player_health = self.max_health;
@@ -2511,20 +2509,18 @@ impl EncounterEngine {
     fn spawn(&self, a: &Actor, position: [f32; 3], disposition: i32) -> Vec<u8> {
         spawn_actor(&self.content.template, a, position, disposition)
     }
+}
 
-    fn details(&self, launch: bool, profile: i32) -> Vec<u8> {
-        let a = self.state.active.as_ref().unwrap();
-        let d = self.dungeon().unwrap();
-        details_packet(
-            d.id,
-            a.instance_id,
-            [d.title_id, d.icon_id, d.description_id, d.objective_id, 1],
-            d.enemies.len(),
-            profile,
-            launch,
-            &d.prizes,
-        )
-    }
+fn details(d: &Dungeon, a: &ActiveEncounter, launch: bool, profile: i32) -> Vec<u8> {
+    details_packet(
+        d.id,
+        a.instance_id,
+        [d.title_id, d.icon_id, d.description_id, d.objective_id, 1],
+        d.enemies.len(),
+        profile,
+        launch,
+        &d.prizes,
+    )
 }
 
 /// 41/114 EncounterDetailsResponse. `launch = false` opens the minigame start

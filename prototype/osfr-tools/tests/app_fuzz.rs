@@ -1074,7 +1074,7 @@ fn t3_source_inventory_covers_all_gateway_labels_and_gameplay_dispatch_families(
         "handle_mystery_chest(",
         "self.inventory.handle(inner)",
         ".combat.handle(inner,",
-        "self.encounter.as_mut().unwrap().handle(",
+        "self.encounter_mut()?.handle(",
     ] {
         assert!(
             compact.contains(call),

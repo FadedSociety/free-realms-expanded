@@ -15,7 +15,7 @@ use crate::{
     identity::CharacterIdentity,
     inventory::{Inventory, InventoryState},
     item_categories::ItemCategories,
-    kart_lobby_native,
+    kart_lobby_native, le,
     mining::{self, Type8Engine, Type8Outcome, Type8State},
     mystery_chest,
     mystery_chest_loot::MysteryChests,
@@ -96,6 +96,7 @@ mod sc_earnings;
 mod seeds;
 mod startup_health;
 mod style_card_use;
+use self::coin_authoring::unloaded;
 use self::npc::{dialogue_packet, quest_offer_packet_with};
 use crate::station_cash::EarnSource;
 
@@ -560,10 +561,7 @@ impl Gameplay {
                 return Ok(out);
             }
             if !abilities.weapon_matches(&self.inventory, profile, slot, self.job_level(profile)) {
-                self.encounter
-                    .as_mut()
-                    .unwrap()
-                    .refuse_weapon(profile, slot, now_ms);
+                self.encounter_mut()?.refuse_weapon(profile, slot, now_ms);
                 return Ok(out);
             }
         }
@@ -797,7 +795,7 @@ impl Gameplay {
             if bindings.len() > 16 {
                 return Err(invalid("too many disappearing actor bindings"));
             }
-            let engine = opening.as_ref().unwrap();
+            let engine = opening.as_ref().ok_or_else(|| unloaded("opening"))?;
             let journal = engine.journal_entries();
             let mut proof = Vec::new();
             std::fs::File::open(directory.join("opening.json"))?
@@ -1388,11 +1386,11 @@ impl Gameplay {
         replies: &[Vec<u8>],
     ) -> (bool, Option<Vec<u8>>) {
         let target_profile = if inner.starts_with(&[42, 0, 2, 0]) && inner.len() == 12 {
-            Some(i32::from_le_bytes(inner[8..12].try_into().unwrap()))
+            le::i32(inner, 8)
         } else if inner.starts_with(&[42, 0, 3, 0]) && inner.len() == 16 {
-            Some(i32::from_le_bytes(inner[8..12].try_into().unwrap()))
+            le::i32(inner, 8)
         } else if inner.starts_with(&[42, 0, 8, 0]) && inner.len() == 20 {
-            Some(i32::from_le_bytes(inner[12..16].try_into().unwrap()))
+            le::i32(inner, 12)
         } else {
             None
         };
@@ -1641,9 +1639,7 @@ impl Gameplay {
             None => bytes.to_vec(),
         };
         let bytes = match &self.journal {
-            Some(journal) => {
-                journal.patch_self(&bytes, &self.opening.as_ref().unwrap().journal_entries())?
-            }
+            Some(journal) => journal.patch_self(&bytes, &self.opening()?.journal_entries())?,
             None => self.quests.patch_self_template(&bytes)?,
         };
         self.inventory.initialization_patch(&bytes)
@@ -1753,7 +1749,7 @@ impl Gameplay {
                 ..Outcome::default()
             });
         }
-        if self.opening.is_none() {
+        let Some(before) = self.opening.as_ref().map(OpeningEngine::journal_entries) else {
             let mut out = self.initialization(character.position)?;
             out.replies.extend(self.customization_data());
             self.append_npc_quest_login_sync(&mut out)?;
@@ -1767,8 +1763,7 @@ impl Gameplay {
             self.sync_client_objectives(&mut out);
             self.sync_achievement_progress(&mut out, None)?;
             return Ok(out);
-        }
-        let before = self.opening.as_ref().unwrap().journal_entries();
+        };
         let mut out = Outcome::default();
         // A fresh movie cannot reuse data_sent from a disconnected movie.
         // Keep attempt IDs/completions, cancel without consuming or awarding.
@@ -1806,49 +1801,34 @@ impl Gameplay {
         self.forging_tick_ms = None;
         out.replies
             .extend(self.categories.as_ref().map(ItemCategories::initialization));
-        let profile = self.profiles.as_ref().unwrap().shown();
-        out.replies.push(
-            self.profiles
-                .as_ref()
-                .unwrap()
-                .activation(profile, &self.inventory)?,
-        );
+        let profile = self.profiles()?.shown();
+        out.replies
+            .push(self.profiles()?.activation(profile, &self.inventory)?);
         out.replies.extend(self.customization_data());
         out.replies.extend(self.ability_activation_for(profile)?);
         let result = self
-            .opening
-            .as_mut()
-            .unwrap()
+            .opening_mut()?
             .on_position(character.zone_id, character.position)?;
         self.apply_opening(result, &mut out)?;
         self.opening_equipment_events(&mut out)?;
-        let result = self.opening.as_ref().unwrap().initialization();
+        let result = self.opening()?.initialization();
         self.apply_opening(result, &mut out)?;
-        if !self.encounter.as_ref().unwrap().active() {
+        if !self.encounter()?.active() {
             let visible: Vec<_> = self
-                .opening
-                .as_ref()
-                .unwrap()
+                .opening()?
                 .actors()
                 .iter()
                 .filter(|actor| !self.actor_hidden(actor.guid))
                 .cloned()
                 .collect();
-            out.replies.extend(
-                self.world
-                    .as_ref()
-                    .unwrap()
-                    .initialization(&visible, character.zone_id),
-            );
+            let world = self.world.as_ref().ok_or_else(|| unloaded("world"))?;
+            out.replies
+                .extend(world.initialization(&visible, character.zone_id));
         }
         self.sync_world_stage(&mut out)?;
         self.sync_field_quests(&mut out)?;
         self.sync_player_level(&mut out);
-        let result = self
-            .encounter
-            .as_mut()
-            .unwrap()
-            .on_zone_ready(profile, now_ms)?;
+        let result = self.encounter_mut()?.on_zone_ready(profile, now_ms)?;
         self.apply_encounter(result, &mut out)?;
         self.append_journal_updates(&before, &mut out)?;
         self.append_npc_quest_login_sync(&mut out)?;
@@ -1885,18 +1865,15 @@ impl Gameplay {
             &mut out,
         )?;
         self.follow_pet(character, now_ms, &mut out);
-        if self.opening.is_none() {
+        let Some(before) = self.opening.as_ref().map(OpeningEngine::journal_entries) else {
             let result = self.on_position(character.position, now_ms)?;
             out.changed |= result.changed;
             out.replies.extend(result.replies);
             self.sync_tracked_target(character, &mut out);
             return Ok(out);
-        }
-        let before = self.opening.as_ref().unwrap().journal_entries();
+        };
         let result = self
-            .opening
-            .as_mut()
-            .unwrap()
+            .opening_mut()?
             .on_position(character.zone_id, character.position)?;
         self.apply_opening(result, &mut out)?;
         self.append_journal_updates(&before, &mut out)?;
@@ -1944,7 +1921,7 @@ impl Gameplay {
     fn tick_world(&mut self, character: &CharacterState, now_ms: u64) -> io::Result<Outcome> {
         if self.soccer.is_some() {
             let mut staged = self.clone();
-            let result = staged.soccer.as_mut().unwrap().tick(now_ms)?;
+            let result = staged.soccer_mut()?.tick(now_ms)?;
             // The match is session-local; periodic clock ticks must not force
             // a character save. Only an adopted reward marks a persisted change.
             let mut out = Outcome {
@@ -1955,11 +1932,7 @@ impl Gameplay {
                 // Settle on the live bag and profiles, never the entry snapshot:
                 // a claim or trade made during the match must survive the payout.
                 let live = staged.reward_snapshot();
-                let settled = staged
-                    .soccer
-                    .as_mut()
-                    .unwrap()
-                    .settle(character.guid, &live)?;
+                let settled = staged.soccer_mut()?.settle(character.guid, &live)?;
                 out.replies.extend(settled.replies.iter().cloned());
                 if let Some(rewards) = settled.reward_state {
                     staged.adopt_reward_state(rewards, &mut out)?;
@@ -1983,7 +1956,7 @@ impl Gameplay {
         }
         if self.kart_entry.as_ref().is_some_and(|k| k.active()) {
             let mut staged = self.clone();
-            let kart = staged.kart_entry.as_mut().unwrap();
+            let kart = staged.kart_entry.as_mut().ok_or_else(|| unloaded("kart"))?;
             let before = kart.state().clone();
             let mut replies = kart.tick(now_ms)?;
             if kart
@@ -2045,11 +2018,8 @@ impl Gameplay {
         if let Some(encounter) = &mut self.encounter {
             // W158: pickups left in another zone are already gone from the client.
             encounter.enter_zone(character.zone_id);
-            let result = encounter.tick(
-                character.position,
-                self.profiles.as_ref().unwrap().active(),
-                now_ms,
-            )?;
+            let profiles = self.profiles.as_ref().ok_or_else(|| unloaded("profiles"))?;
+            let result = encounter.tick(character.position, profiles.active(), now_ms)?;
             self.apply_encounter(result, &mut out)?;
         }
         self.refresh_power_up_slot(held.as_deref(), &mut out)?;
@@ -2201,8 +2171,7 @@ impl Gameplay {
             *self = staged;
             return Ok(out);
         }
-        if self.kart_entry.is_some() {
-            let active = self.kart_entry.as_ref().unwrap().active();
+        if let Some(active) = self.kart_entry.as_ref().map(|kart| kart.active()) {
             let command = chat::request(inner, character.guid)?;
             let start = command
                 .as_deref()
@@ -2261,42 +2230,28 @@ impl Gameplay {
         if let Some(outcome) = self.handle_npc_packet(inner, character, now_ms)? {
             return Ok(outcome);
         }
-        if self.opening.is_none() {
+        let Some(before) = self.opening.as_ref().map(OpeningEngine::journal_entries) else {
             if let Some(result) = self.handle_item_bar(inner, character, now_ms, None)? {
                 return Ok(result);
             }
             return self.handle(inner, character.guid, character.position, now_ms);
-        }
+        };
+        let accepted = |g: &Self, id: u32| {
+            let stage = g.opening.as_ref().and_then(|o| o.state().stages.get(&id));
+            stage.is_some_and(|s| s.accepted)
+        };
         let mut staged = self.clone();
-        let before = staged.opening.as_ref().unwrap().journal_entries();
         let hidden_before = staged.hidden_actor_guids();
         let accepted_before: Vec<_> = [910004, 910006, 910013, 910015]
             .into_iter()
-            .filter(|id| {
-                staged
-                    .opening
-                    .as_ref()
-                    .unwrap()
-                    .state()
-                    .stages
-                    .get(id)
-                    .is_some_and(|s| s.accepted)
-            })
+            .filter(|id| accepted(&staged, *id))
             .collect();
         let mut out = staged.handle_opening_inner(inner, character, now_ms)?;
         if staged.forging.is_some() {
             for id in [910006, 910015] {
-                if !accepted_before.contains(&id)
-                    && staged
-                        .opening
-                        .as_ref()
-                        .unwrap()
-                        .state()
-                        .stages
-                        .get(&id)
-                        .is_some_and(|s| s.accepted)
-                {
-                    let mut supplies = staged.forging.as_ref().unwrap().requirements().to_vec();
+                if !accepted_before.contains(&id) && accepted(&staged, id) {
+                    let forging = staged.forging.as_ref().ok_or_else(|| unloaded("forging"))?;
+                    let mut supplies = forging.requirements().to_vec();
                     if id == 910015 {
                         // The reinforcement step first requires smelting.
                         // Give its inputs, rather than free bars that would
@@ -2321,16 +2276,7 @@ impl Gameplay {
         }
         if staged.cooking.is_some() {
             for id in [910004, 910013] {
-                if !accepted_before.contains(&id)
-                    && staged
-                        .opening
-                        .as_ref()
-                        .unwrap()
-                        .state()
-                        .stages
-                        .get(&id)
-                        .is_some_and(|s| s.accepted)
-                {
+                if !accepted_before.contains(&id) && accepted(&staged, id) {
                     // Explicit local bounded supplies for each untouched Chef
                     // step. Harvested leaf/fruit are earned through counted goals.
                     staged.grant_reward(0, &[(2862, 4), (2900, 4)], &mut out)?;
@@ -2377,8 +2323,8 @@ impl Gameplay {
         };
         if let Some(next) = change.reward_state {
             let before = self.inventory.state().clone();
-            let next_profiles = if self.profiles.is_some()
-                && next.profiles != *self.profiles.as_ref().unwrap().state()
+            let next_profiles = if let Some(profiles) = &self.profiles
+                && next.profiles != *profiles.state()
             {
                 let directory = self
                     .profile_content_directory
@@ -2430,10 +2376,9 @@ impl Gameplay {
         now_ms: u64,
     ) -> io::Result<Option<Outcome>> {
         use crate::harvest_nodes::{Visitor, payout_fits};
-        if !inner.starts_with(&[26, 0, 8, 0]) || inner.len() < 12 {
+        let (true, Some(target)) = (inner.starts_with(&[26, 0, 8, 0]), le::u64(inner, 4)) else {
             return Ok(None);
-        }
-        let target = u64::from_le_bytes(inner[4..12].try_into().unwrap());
+        };
         // T524: a sparkling collection node grants an item instead of starting a run. Its
         // handler lives in the pickup module with the shared collection ledger.
         if self
@@ -2486,7 +2431,9 @@ impl Gameplay {
             return Ok(Some(out));
         }
         let mut staged = self.clone();
-        staged.gathering_nodes.as_mut().unwrap().begin(target);
+        if let Some(nodes) = staged.gathering_nodes.as_mut() {
+            nodes.begin(target);
+        }
         staged.begin_gather(gather, game, now_ms, &mut out)?;
         *self = staged;
         Ok(Some(out))
@@ -2567,8 +2514,8 @@ impl Gameplay {
         now_ms: u64,
     ) -> io::Result<Outcome> {
         let mut out = Outcome::default();
-        let active = self.kart_entry.as_ref().unwrap().active();
-        if !active {
+        let kart = self.kart_entry.as_mut().ok_or_else(|| unloaded("kart"))?;
+        if !kart.active() {
             if self.activity_busy() {
                 out.replies.push(chat::system(
                     crate::kart_gateway::EntryDenied::Busy.message(),
@@ -2578,15 +2525,15 @@ impl Gameplay {
             return self.begin_kart_race(character);
         }
         // T392: the client's mid-race quit (41/109) is answered with 41/121, then the same exit.
-        let quit = self.kart_entry.as_ref().unwrap().quit_reply(inner)?;
+        let quit = kart.quit_reply(inner)?;
         let exit = command.is_some_and(|c| c.trim().eq_ignore_ascii_case("realm exit"))
             || inner == [26, 0, 42, 0]
             || quit.is_some()
-            || self.kart_entry.as_ref().unwrap().accepts_close(inner)?;
+            || kart.accepts_close(inner)?;
         if exit {
             out.replies.extend(quit);
-            let previous_job = self.kart_entry.as_ref().unwrap().previous_job();
-            let return_location = self.kart_entry.as_mut().unwrap().exit().unwrap();
+            let previous_job = kart.previous_job();
+            let return_location = kart.exit().ok_or_else(|| invalid("no kart race"))?;
             if let Some(job) = previous_job {
                 self.restore_job(job, character.guid, &mut out)?;
             }
@@ -2598,7 +2545,6 @@ impl Gameplay {
             return Ok(out);
         }
         if inner.starts_with(&[33, 0]) || inner.starts_with(&[41, 0, 108, 0]) {
-            let kart = self.kart_entry.as_mut().unwrap();
             let before = kart.state().clone();
             out.replies = kart.handle(inner, now_ms)?;
             let mut minigame = None;
@@ -2883,7 +2829,7 @@ impl Gameplay {
     /// The bot stands next to its target, swings on cooldown, uses First Aid
     /// below 60% health and Triage-like strikes when energy allows.
     fn simulate_battle(&self, battle: u32, character: &CharacterState) -> io::Result<Vec<String>> {
-        let profile = self.profiles.as_ref().unwrap().active();
+        let profile = self.profiles()?.active();
         let Some(base) = self.encounter.as_ref() else {
             return Ok(vec!["No encounter engine.".into()]);
         };
@@ -3177,15 +3123,11 @@ impl Gameplay {
         character: &CharacterState,
         now_ms: u64,
     ) -> io::Result<Option<Outcome>> {
-        if self.soccer.is_none() {
+        let Some(soccer) = self.soccer.as_mut() else {
             return Ok(None);
-        }
+        };
         if inner.starts_with(&[76, 0]) {
-            let replies =
-                self.soccer
-                    .as_mut()
-                    .unwrap()
-                    .handle_client(character.guid, inner, now_ms)?;
+            let replies = soccer.handle_client(character.guid, inner, now_ms)?;
             return Ok(Some(Outcome {
                 replies,
                 ..Outcome::default()
@@ -3195,11 +3137,7 @@ impl Gameplay {
             || inner.starts_with(&[41, 0, 109, 0])
             || inner.starts_with(&[26, 0, 42, 0])
         {
-            let result =
-                self.soccer
-                    .as_mut()
-                    .unwrap()
-                    .handle_lifecycle(character.guid, inner, now_ms)?;
+            let result = soccer.handle_lifecycle(character.guid, inner, now_ms)?;
             let mut out = Outcome {
                 replies: result.replies,
                 ..Outcome::default()
@@ -3340,12 +3278,11 @@ impl Gameplay {
         }
         let mut staged = self.clone();
         let rewards = staged.reward_snapshot();
-        let Some(change) =
-            staged
-                .chess
-                .as_mut()
-                .unwrap()
-                .route(character.guid, inner, now_ms, &rewards)?
+        let Some(change) = staged
+            .chess
+            .as_mut()
+            .ok_or_else(|| unloaded("chess"))?
+            .route(character.guid, inner, now_ms, &rewards)?
         else {
             return Ok(None);
         };
@@ -3693,13 +3630,16 @@ impl Gameplay {
                 ));
             }
         };
-        let guid = records
+        let Some(guid) = records
             .iter()
             .map(|r| r.guid)
             .max()
             .unwrap_or(crate::world::PLACEMENT_GUID_BASE)
             .max(crate::world::PLACEMENT_GUID_BASE)
-            + 1;
+            .checked_add(1)
+        else {
+            return Ok("No placement GUID is left above the highest one. Nothing changed.".into());
+        };
         let placement = crate::world::Placement {
             guid,
             model_id,
@@ -3937,7 +3877,7 @@ impl Gameplay {
                 "v5" => (false, false, vec![(1, None)]),
                 // Prime UIProcessor+0x1c with intro 0, then send the original intro.
                 "v6" => (false, false, vec![(0, Some(0)), (0, None)]),
-                _ => unreachable!("variant was validated above"),
+                _ => return Err(invalid("unknown quest offer variant")),
             };
 
         let dialogue = if send_dialogue {
@@ -4028,12 +3968,9 @@ impl Gameplay {
         before: &[crate::opening::OpeningJournalEntry],
         out: &mut Outcome,
     ) -> io::Result<()> {
-        out.replies.extend(
-            self.journal
-                .as_ref()
-                .unwrap()
-                .updates(before, &self.opening.as_ref().unwrap().journal_entries())?,
-        );
+        let journal = self.journal.as_ref().ok_or_else(|| unloaded("journal"))?;
+        out.replies
+            .extend(journal.updates(before, &self.opening()?.journal_entries())?);
         Ok(())
     }
 
@@ -4129,7 +4066,7 @@ impl Gameplay {
                         }
                     }
                     _ => {
-                        let result = self.opening.as_mut().unwrap().handle_command(command);
+                        let result = self.opening_mut()?.handle_command(command);
                         self.apply_opening(result, &mut out)?;
                     }
                 }
@@ -4137,12 +4074,10 @@ impl Gameplay {
             return Ok(out);
         }
         if inner.starts_with(&[26, 0, 13, 0]) {
-            if inner.len() != 8 {
+            let (8, Some(id)) = (inner.len(), le::i32(inner, 4)) else {
                 return Err(invalid("invalid class selection request"));
-            }
-            let id = i32::from_le_bytes(inner[4..8].try_into().unwrap());
-            let outfit_before =
-                self.profile_attachments(self.profiles.as_ref().unwrap().shown())?;
+            };
+            let outfit_before = self.profile_attachments(self.profiles()?.shown())?;
             if let Some(changed) = self.stage_job_selection(id, &mut out)? {
                 out.replies.extend(self.ability_activation_for(id)?);
                 self.sync_player_level(&mut out);
@@ -4194,12 +4129,12 @@ impl Gameplay {
             if inner.len() != 13 || inner[12] > 1 {
                 return Err(invalid("malformed opening interaction"));
             }
-            Some((u64::from_le_bytes(inner[4..12].try_into().unwrap()), false))
+            le::u64(inner, 4).map(|guid| (guid, false))
         } else if inner.starts_with(&[26, 0, 10, 0]) {
             if inner.len() != 16 {
                 return Err(invalid("malformed opening interaction selection"));
             }
-            Some((u64::from_le_bytes(inner[4..12].try_into().unwrap()), true))
+            le::u64(inner, 4).map(|guid| (guid, true))
         } else {
             None
         };
@@ -4207,11 +4142,9 @@ impl Gameplay {
             if self.actor_hidden(guid) {
                 return Ok(out);
             }
-            if !self.encounter.as_ref().unwrap().active() {
+            if !self.encounter()?.active() {
                 let actor = self
-                    .opening
-                    .as_ref()
-                    .unwrap()
+                    .opening()?
                     .actors()
                     .iter()
                     .find(|a| a.guid == guid && a.kind != "enemy")
@@ -4267,7 +4200,7 @@ impl Gameplay {
                         }
                         _ => None,
                     };
-                    let result = self.opening.as_mut().unwrap().on_interaction(guid)?;
+                    let result = self.opening_mut()?.on_interaction(guid)?;
                     let accepted = result.accepted;
                     self.apply_opening(result, &mut out)?;
                     if accepted
@@ -4299,17 +4232,12 @@ impl Gameplay {
                     }
                     self.opening_equipment_events(&mut out)?;
                     self.sync_world_stage(&mut out)?;
-                    let pending = self
-                        .opening
-                        .as_ref()
-                        .unwrap()
-                        .active_stage()
-                        .and_then(|stage| {
+                    let pending =
+                        self.opening()?.active_stage().and_then(|stage| {
                             if stage.giver_guid != guid {
                                 return None;
                             }
-                            let progress =
-                                &self.opening.as_ref().unwrap().state().stages[&stage.id];
+                            let progress = &self.opening.as_ref()?.state().stages[&stage.id];
                             if !progress.accepted {
                                 return None;
                             }
@@ -4338,7 +4266,7 @@ impl Gameplay {
                 }
             }
         }
-        let active_profile = self.profiles.as_ref().unwrap().active();
+        let active_profile = self.profiles()?.active();
         // 36/12: tooltip/detail lookup. (R) Only the definitions already sent for this
         // job at this level resolve; any other id is silently dropped (no state change).
         if inner.starts_with(&[36, 0, 12, 0]) {
@@ -4353,12 +4281,12 @@ impl Gameplay {
             out.replies.push(refusal);
             return Ok(out);
         }
-        if inner.starts_with(&[36, 0, 10, 0]) && inner.len() >= 12 {
+        if inner.starts_with(&[36, 0, 10, 0])
+            && let (Some(bar), Some(slot)) = (le::i32(inner, 4), le::i32(inner, 8))
+        {
             // Native ActionBarData.Id is the bar category (1), not the job.
             // The supplied client's captured basic requests confirm bar1/slot0.
             // Only the actual displayed basic slot is implemented in this slice.
-            let bar = i32::from_le_bytes(inner[4..8].try_into().unwrap());
-            let slot = i32::from_le_bytes(inner[8..12].try_into().unwrap());
             // Job abilities on slots 1.. (keys 2..): targeted (type 0) requests.
             if bar == 1 && slot >= 1 {
                 // T222: the held power-up owns its key slot; nothing held
@@ -4367,28 +4295,25 @@ impl Gameplay {
                     return Ok(outcome);
                 }
                 let ability = self
-                    .abilities
-                    .as_ref()
-                    .unwrap()
+                    .abilities()?
                     .job_slot(active_profile, slot, self.job_level(active_profile))
                     .cloned();
                 if let Some(ability) = ability {
-                    if inner.len() == 24 && inner[12..16] == 0_i32.to_le_bytes() {
-                        if !self.abilities.as_ref().unwrap().weapon_matches(
+                    if inner.len() == 24
+                        && inner[12..16] == 0_i32.to_le_bytes()
+                        && let Some(target) = le::u64(inner, 16)
+                    {
+                        if !self.abilities()?.weapon_matches(
                             &self.inventory,
                             active_profile,
                             slot,
                             self.job_level(active_profile),
                         ) {
-                            self.encounter.as_mut().unwrap().refuse_weapon(
-                                active_profile,
-                                slot,
-                                now_ms,
-                            );
+                            self.encounter_mut()?
+                                .refuse_weapon(active_profile, slot, now_ms);
                             return Ok(out);
                         }
-                        let target = u64::from_le_bytes(inner[16..24].try_into().unwrap());
-                        let result = self.encounter.as_mut().unwrap().job_ability(
+                        let result = self.encounter_mut()?.job_ability(
                             &ability,
                             target,
                             character.position,
@@ -4404,14 +4329,7 @@ impl Gameplay {
                 }
                 return Ok(out);
             }
-            if bar != 1
-                || slot != 0
-                || !self
-                    .abilities
-                    .as_ref()
-                    .unwrap()
-                    .supports_basic(active_profile)
-            {
+            if bar != 1 || slot != 0 || !self.abilities()?.supports_basic(active_profile) {
                 // Slot 0 on a non-combat job: explicit failure. (R)
                 out.replies
                     .push(crate::abilities::unsupported_cast_failure());
@@ -4421,11 +4339,7 @@ impl Gameplay {
         if inner.starts_with(&[26, 0, 10, 0])
             && inner.len() == 16
             && inner[12..16] == 103i32.to_le_bytes()
-            && !self
-                .abilities
-                .as_ref()
-                .unwrap()
-                .supports_basic(active_profile)
+            && !self.abilities()?.supports_basic(active_profile)
         {
             out.replies.push(crate::abilities::non_combat_refusal(true));
             return Ok(out);
@@ -4441,16 +4355,14 @@ impl Gameplay {
                 && inner.starts_with(&[26, 0, 10, 0])
                 && inner[12..16] == 103_i32.to_le_bytes());
         if basic_cast
-            && !self.abilities.as_ref().unwrap().weapon_matches(
+            && !self.abilities()?.weapon_matches(
                 &self.inventory,
                 active_profile,
                 0,
                 self.job_level(active_profile),
             )
         {
-            self.encounter
-                .as_mut()
-                .unwrap()
+            self.encounter_mut()?
                 .refuse_weapon(active_profile, 0, now_ms);
             return Ok(out);
         }
@@ -4463,13 +4375,10 @@ impl Gameplay {
         if self.handle_paid_revive(inner, now_ms, &mut out)? {
             return Ok(out);
         }
-        let result = self.encounter.as_mut().unwrap().handle(
-            inner,
-            character.guid,
-            character.position,
-            self.profiles.as_ref().unwrap().active(),
-            now_ms,
-        )?;
+        let job = self.profiles()?.active();
+        let result =
+            self.encounter_mut()?
+                .handle(inner, character.guid, character.position, job, now_ms)?;
         self.apply_encounter(result, &mut out)?;
         Ok(out)
     }
@@ -4509,14 +4418,10 @@ impl Gameplay {
     }
 
     fn opening_equipment_events(&mut self, out: &mut Outcome) -> io::Result<()> {
-        let profile = self.profiles.as_ref().unwrap().active();
-        let result = self
-            .opening
-            .as_mut()
-            .unwrap()
-            .on_event(OpeningEvent::ClassSelected {
-                profile_id: profile,
-            })?;
+        let profile = self.profiles()?.active();
+        let result = self.opening_mut()?.on_event(OpeningEvent::ClassSelected {
+            profile_id: profile,
+        })?;
         self.apply_opening(result, out)?;
         let equipped: Vec<_> = self
             .inventory
@@ -4534,13 +4439,11 @@ impl Gameplay {
             })
             .collect();
         for definition in equipped {
-            let result =
-                self.opening
-                    .as_mut()
-                    .unwrap()
-                    .on_event(OpeningEvent::CosmeticEquipped {
-                        definition_id: definition,
-                    })?;
+            let result = self
+                .opening_mut()?
+                .on_event(OpeningEvent::CosmeticEquipped {
+                    definition_id: definition,
+                })?;
             self.apply_opening(result, out)?;
         }
         Ok(())
@@ -4551,7 +4454,7 @@ impl Gameplay {
         out.replies
             .extend(result.messages.iter().map(|m| chat::system(m)));
         for id in result.unlock_profiles {
-            if self.profiles.as_mut().unwrap().unlock(id)? {
+            if self.profiles_mut()?.unlock(id)? {
                 out.changed = true;
                 self.give_starter_outfit(id, false, out)?;
                 self.npc_quest_profiles_changed(out)?;
@@ -4560,7 +4463,7 @@ impl Gameplay {
         // F576: only an unlock or a reward changes profiles; a plain footstep scans nothing.
         for reward in result.rewards {
             self.grant_reward(reward.coins, &reward.items, out)?;
-            let profiles = self.profiles.as_mut().unwrap();
+            let profiles = self.profiles_mut()?;
             let previous_xp = profiles
                 .state()
                 .experience
@@ -4575,7 +4478,7 @@ impl Gameplay {
     }
 
     fn sync_world_stage(&mut self, out: &mut Outcome) -> io::Result<()> {
-        let opening = self.opening.as_ref().unwrap();
+        let opening = self.opening()?;
         // Do not expose finite quest enemies until their ordered defeat goal
         // can count them. Otherwise early kills permanently exhaust the pool.
         let stage = opening
@@ -4593,7 +4496,7 @@ impl Gameplay {
             })
             .map(|s| s.id)
             .unwrap_or(0);
-        let result = self.encounter.as_mut().unwrap().set_world_stage(stage);
+        let result = self.encounter_mut()?.set_world_stage(stage);
         self.apply_encounter(result, out)
     }
 
@@ -4614,13 +4517,9 @@ impl Gameplay {
             self.apply_encounter_reward(reward, out)?;
         }
         for definition in result.defeated {
-            let result = self
-                .opening
-                .as_mut()
-                .unwrap()
-                .on_event(OpeningEvent::Defeat {
-                    definition_id: definition,
-                })?;
+            let result = self.opening_mut()?.on_event(OpeningEvent::Defeat {
+                definition_id: definition,
+            })?;
             self.apply_opening(result, out)?;
             // NPC quests count kills by enemy definition id ("defeat" goals author
             // that id as `model_id`; quest_engine maps it to KillActorKind).
@@ -4649,9 +4548,7 @@ impl Gameplay {
         }
         if let Some(id) = result.completed {
             let result = self
-                .opening
-                .as_mut()
-                .unwrap()
+                .opening_mut()?
                 .on_event(OpeningEvent::DungeonCompleted { encounter_id: id })?;
             self.apply_opening(result, out)?;
         }
@@ -4721,20 +4618,12 @@ impl Gameplay {
         character: &CharacterState,
         out: &mut Outcome,
     ) -> io::Result<()> {
-        if !self
-            .abilities
-            .as_ref()
-            .unwrap()
-            .supports_basic(self.profiles.as_ref().unwrap().active())
-        {
+        if !self.abilities()?.supports_basic(self.profiles()?.active()) {
             let outfit_before = self
                 .inventory
-                .profile_attachments(self.profiles.as_ref().unwrap().active())?;
-            let reply = self
-                .profiles
-                .as_mut()
-                .unwrap()
-                .select(43, &self.inventory)?;
+                .profile_attachments(self.profiles()?.active())?;
+            let profiles = self.profiles.as_mut().ok_or_else(|| unloaded("profiles"))?;
+            let reply = profiles.select(43, &self.inventory)?;
             out.changed = true;
             out.replies.push(reply);
             out.replies.extend(self.ability_activation_for(43)?);
@@ -4743,11 +4632,10 @@ impl Gameplay {
             self.opening_equipment_events(out)?;
             self.announce_profile_outfit(character.guid, &outfit_before, true, out)?;
         }
-        let result = self.encounter.as_mut().unwrap().begin(
-            encounter_id,
-            character.clone(),
-            self.profiles.as_ref().unwrap().active(),
-        )?;
+        let job = self.profiles()?.active();
+        let result = self
+            .encounter_mut()?
+            .begin(encounter_id, character.clone(), job)?;
         self.apply_encounter(result, out)
     }
 
@@ -4805,9 +4693,9 @@ impl Gameplay {
     /// refreshes the ability bar at once. L087: a live star booster raises it.
     fn award_job_xp(&mut self, amount: u32, out: &mut Outcome) -> io::Result<()> {
         let amount = self.consumable_effects.boost().stars(amount);
-        let profile = self.profiles.as_ref().unwrap().active();
+        let profile = self.profiles()?.active();
         let before = self.job_level(profile);
-        let profiles = self.profiles.as_mut().unwrap();
+        let profiles = self.profiles_mut()?;
         let previous_xp = profiles
             .state()
             .experience
@@ -4997,10 +4885,9 @@ impl Gameplay {
             self.resend_bar_after_weapon_change(&before, &mut out)?;
         }
         if inner.starts_with(&[26, 0, 13, 0]) {
-            if inner.len() != 8 {
+            let (8, Some(id)) = (inner.len(), le::i32(inner, 4)) else {
                 return Err(invalid("invalid class selection request"));
-            }
-            let id = i32::from_le_bytes(inner[4..8].try_into().unwrap());
+            };
             // No class content: the same silent no-op `stage_job_selection` gives.
             let Some(active) = self.active_profile() else {
                 return Ok(out);

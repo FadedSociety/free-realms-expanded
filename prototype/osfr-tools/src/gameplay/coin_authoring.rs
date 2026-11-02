@@ -435,3 +435,46 @@ fn coin_edits_error(error: io::Error) {
         "error": error.to_string(),
     }));
 }
+
+/// L120 hygiene: the engines a request needs, as a refusal where `gameplay.rs` used to
+/// `unwrap` them. The opening, encounter, abilities and world engines load together, and the
+/// opening also needs the profiles (`content_presence::OPENING`). These sit here only because
+/// the `gameplay.rs` hub is at its line ceiling.
+impl Gameplay {
+    pub(super) fn opening(&self) -> io::Result<&OpeningEngine> {
+        self.opening.as_ref().ok_or_else(|| unloaded("opening"))
+    }
+
+    pub(super) fn opening_mut(&mut self) -> io::Result<&mut OpeningEngine> {
+        self.opening.as_mut().ok_or_else(|| unloaded("opening"))
+    }
+
+    pub(super) fn encounter(&self) -> io::Result<&EncounterEngine> {
+        self.encounter.as_ref().ok_or_else(|| unloaded("encounter"))
+    }
+
+    pub(super) fn encounter_mut(&mut self) -> io::Result<&mut EncounterEngine> {
+        self.encounter.as_mut().ok_or_else(|| unloaded("encounter"))
+    }
+
+    pub(super) fn profiles(&self) -> io::Result<&Profiles> {
+        self.profiles.as_ref().ok_or_else(|| unloaded("profiles"))
+    }
+
+    pub(super) fn profiles_mut(&mut self) -> io::Result<&mut Profiles> {
+        self.profiles.as_mut().ok_or_else(|| unloaded("profiles"))
+    }
+
+    pub(super) fn abilities(&self) -> io::Result<&OpeningAbilities> {
+        self.abilities.as_ref().ok_or_else(|| unloaded("abilities"))
+    }
+
+    pub(super) fn soccer_mut(&mut self) -> io::Result<&mut crate::soccer_entry::Session> {
+        self.soccer.as_mut().ok_or_else(|| unloaded("soccer"))
+    }
+}
+
+/// The refusal for a request that needs `engine` content this set did not load.
+pub(super) fn unloaded(engine: &str) -> io::Error {
+    invalid(format!("no {engine} content is loaded"))
+}
