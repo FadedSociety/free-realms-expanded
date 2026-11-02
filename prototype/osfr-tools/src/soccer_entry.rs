@@ -9,8 +9,9 @@
 //! * Family 76 input layouts and the shared `39/*` lifecycle are owned by the
 //!   already-reviewed `soccer`, `soccer_match` and `soccer_service` modules.
 //! * The scene name `sg_soccer` and the opcode-31 entry frame are the captured
-//!   candidate in `soccer_service`; its spawn, sky, geometry and match values
-//!   stay reconstructed (R).
+//!   candidate in `soccer_service`; its sky, geometry and match values stay
+//!   reconstructed (R). The content's pitch centre, bounds and player spawn
+//!   follow the live capture cited in `soccer.json`.
 //!
 //! Everything in this module is the gateway adapter around those modules:
 //! content admission, roster setup, packet wrapping, auto-resume/second-half
@@ -22,7 +23,9 @@ use crate::activity_portal::Activity;
 use crate::character_store::CharacterState;
 use crate::minigame::RunState;
 use crate::rewards::{RewardDisplay, RewardGrant, RewardState};
-use crate::soccer_match::{FieldBounds, HalfPolicy, MatchConfig, MatchPhase, PhysicsConfig};
+use crate::soccer_match::{
+    Authority, FieldBounds, HalfPolicy, Intent, MatchConfig, MatchPhase, PhysicsConfig,
+};
 use crate::soccer_service::{
     AdapterPolicy, ServiceEvent, SoccerService, entry_scene, wire_from_inner,
 };
@@ -62,6 +65,9 @@ pub struct Game {
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 struct BoundsSettings {
+    /// World pitch centre; older files without it keep the origin.
+    #[serde(default)]
+    centre: [f32; 3],
     half_x: f32,
     half_z: f32,
     goal_half_width: f32,
@@ -178,6 +184,7 @@ impl Content {
         let settings = self.match_config;
         MatchConfig {
             bounds: FieldBounds {
+                centre: settings.bounds.centre,
                 half_x: settings.bounds.half_x,
                 half_z: settings.bounds.half_z,
                 goal_half_width: settings.bounds.goal_half_width,
@@ -245,6 +252,20 @@ impl Content {
         // The service validates the match configuration and adapter policy.
         SoccerService::new(self.config(), self.policy())?;
         self.entry_scene()?;
+        // The player spawns at the entry position, so the authority must take it
+        // as a first position: on the pitch and one step from the kickoff.
+        let [x, y, z, _] = self.match_config.entry_position;
+        let mut probe = Authority::new(self.config())?;
+        probe.register(1, 0, 0)?;
+        probe.kickoff()?;
+        let first = Intent::Position {
+            player: 1,
+            sequence: 1,
+            position: [x, y, z],
+        };
+        probe
+            .apply(1, 0.0, first)
+            .map_err(|_| invalid("soccer entry position is not a first position on the pitch"))?;
         if self.reward.coins > i32::MAX as u32
             || self
                 .reward

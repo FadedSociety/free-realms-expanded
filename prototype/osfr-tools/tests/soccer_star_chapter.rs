@@ -45,12 +45,13 @@ use osfr_tools::{
     gameplay::{Gameplay, Outcome},
     npc_interaction::{decode_dialogue_26_3, decode_quest_offer_49_1},
     quest_engine::QuestStatus,
+    soccer_entry,
     startup_world::parse_add_npc,
     station_cash::EarnSource,
     world::NpcVisibility,
 };
 use serde_json::json;
-use soccer_play::{enter_match, lifecycle, play, tick_to_full_time, win_match};
+use soccer_play::{enter_match, lifecycle, play, shoot_from, tick_to_full_time};
 use std::{
     fs, io,
     path::{Path, PathBuf},
@@ -232,7 +233,11 @@ impl Player {
     /// Play one won match of `activity` through the portal, then Close the results.
     fn win(&mut self, activity: u32) -> Outcome {
         let at = self.stamp();
-        let (replies, settled) = win_match(&mut self.game, &self.character, activity, at);
+        let shipped = soccer_entry::Content::load(&content_dir().join("soccer.json")).unwrap();
+        let kickoff = shipped.config().kickoff_spawn;
+        enter_match(&mut self.game, &self.character, activity, at);
+        shoot_from(&mut self.game, &self.character, at + 200, kickoff);
+        let (replies, settled) = tick_to_full_time(&mut self.game, &self.character, at + 350);
         self.now = settled;
         self.close_results();
         Outcome {

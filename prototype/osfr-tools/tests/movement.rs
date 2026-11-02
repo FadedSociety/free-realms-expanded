@@ -353,6 +353,11 @@ struct ReplayStats {
     zone_tokens: usize,
 }
 
+/// Runs that recorded a server bug, so their rejects are right, not legitimate movement.
+/// 20261102T073239Z: soccer entered at the (0,0,0) placeholder; the client then put itself on the
+/// pitch (226, 1.1, 212.5), 310 units away, and the gateway rightly rejected it. L921 fixed the entry.
+const BUGGY_SERVER_RUNS: &[&str] = &["client-baseline-20261102T073239Z"];
+
 #[test]
 fn replay_all_recorded_native_baselines_without_rejecting_legitimate_positions() {
     let runs = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab/runs");
@@ -363,7 +368,9 @@ fn replay_all_recorded_native_baselines_without_rejecting_legitimate_positions()
         .filter(|path| {
             path.file_name()
                 .and_then(|name| name.to_str())
-                .is_some_and(|name| name.starts_with("client-baseline-"))
+                .is_some_and(|name| {
+                    name.starts_with("client-baseline-") && !BUGGY_SERVER_RUNS.contains(&name)
+                })
                 && (path.join("manifest.json").is_file()
                     || path.join("frames/live-index.jsonl").is_file())
         })

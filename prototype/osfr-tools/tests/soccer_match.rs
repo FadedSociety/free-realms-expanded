@@ -98,6 +98,7 @@ fn vec_impulse() -> Vec<u8> {
 /// Arbitrary caller-supplied test bounds; not historical values.
 fn bounds() -> FieldBounds {
     FieldBounds {
+        centre: [0.0; 3],
         half_x: 50.0,
         half_z: 30.0,
         goal_half_width: 4.0,
@@ -625,6 +626,7 @@ fn out_of_play_restarts_bounded_at_the_spawn() {
     // F4: a miss over the touchline or byline restarts at the spawn through
     // kickoff() instead of leaving a dead ball.
     let mut config = MatchConfig::new(FieldBounds {
+        centre: [0.0; 3],
         half_x: 10.0,
         half_z: 30.0,
         goal_half_width: 4.0,
@@ -899,6 +901,7 @@ fn caller_spawn_coordinates_and_state_accessors_are_usable() {
     // R: the spawn and bounds are caller-supplied test values.
     const TEST_SPAWN: [f32; 3] = [10.0, 0.0, 10.0];
     let bounds = FieldBounds {
+        centre: [0.0; 3],
         half_x: 300.0,
         half_z: 300.0,
         goal_half_width: 20.0,
@@ -923,6 +926,53 @@ fn caller_spawn_coordinates_and_state_accessors_are_usable() {
     game.advance(0.1).unwrap();
     assert!(game.elapsed() > elapsed);
     assert!(game.server_time() > server);
+}
+
+/// L921: the live sg_soccer pitch is centred far from the world origin
+/// (`data/content/soccer.json`), so the field, the goal line and the mouth are
+/// all measured from the configured centre.
+#[test]
+fn an_off_origin_pitch_measures_positions_and_goals_from_its_centre() {
+    const CENTRE: [f32; 3] = [226.7, 0.0, 212.9];
+    let at = |x: f32, z: f32| [CENTRE[0] + x, 1.0, CENTRE[2] + z];
+    let mut config = MatchConfig::new(FieldBounds {
+        centre: CENTRE,
+        half_x: 27.0,
+        half_z: 17.5,
+        goal_half_width: 8.0,
+        goal_height: 5.0,
+    });
+    assert_eq!(config.kickoff_spawn, CENTRE, "kickoff defaults to the centre");
+    config.physics.gravity = 0.0;
+    let mut origin = config;
+    origin.kickoff_spawn = [0.0; 3];
+    assert!(Authority::new(origin).is_err(), "the world origin is off this pitch");
+
+    let mut game = Authority::new(config).unwrap();
+    game.register(0x10, 0, 0).unwrap();
+    game.register(0x20, 1, 0).unwrap();
+    game.kickoff().unwrap();
+    // The live human's first position is on the pitch; past either line is not.
+    send(&mut game, 0x20, position(0x20, 1, [230.64, 0.0, 210.22])).unwrap();
+    for over in [at(27.5, 0.0), at(0.0, -18.0)] {
+        let refused = send(&mut game, 0x10, position(0x10, 1, over)).unwrap_err();
+        assert!(refused.to_string().contains("outside the field"), "{refused}");
+    }
+
+    // Take the ball at the centre and score through the +z mouth.
+    send(&mut game, 0x10, position(0x10, 1, at(0.5, 0.0))).unwrap();
+    game.advance(0.02).unwrap();
+    assert_eq!(game.possession(), Some(0x10));
+    let next = walk(&mut game, 0x10, 2, &[at(0.0, 9.0), at(0.0, 16.0)]);
+    game.advance(0.02).unwrap();
+    send(&mut game, 0x10, shot(0x10, next, [0.0, 0.0, 1.0], 30.0)).unwrap();
+    for _ in 0..8 {
+        if game.phase() != MatchPhase::Running {
+            break;
+        }
+        game.advance(0.1).unwrap();
+    }
+    assert_eq!(game.score(), [1, 0], "a goal on the line 17.5 past the centre");
 }
 
 // ---------------------------------------------------------------------------

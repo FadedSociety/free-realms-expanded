@@ -13,6 +13,7 @@ use osfr_tools::{
     gateway::{Gateway, GatewayOutcome},
     progression_extras,
     rewards::{ItemGrant, RewardDisplay, RewardGrant},
+    soccer_entry,
     soccer_service::FIRST_INSTANCE_ID,
     world::{World, WorldPose},
 };
@@ -966,4 +967,30 @@ fn a_reconnect_mid_match_drops_the_match_and_restores_the_pre_match_pose() {
         coins,
         "no reward"
     );
+}
+
+/// L921: the shipped pitch is far from the world origin. Its content loads only
+/// while the player's entry spawn is a first position the authority takes (on
+/// the pitch, one step from the kickoff); the zone corner is refused.
+#[test]
+fn the_shipped_entry_spawn_is_on_the_pitch() {
+    let shipped = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/soccer.json");
+    let content = soccer_entry::Content::load(&shipped).unwrap();
+    let corner = [0.0, 0.0, 0.0, 1.0];
+    assert_ne!(content.entry_scene().unwrap().position, corner);
+
+    let mut moved: serde_json::Value =
+        serde_json::from_slice(&fs::read(&shipped).unwrap()).unwrap();
+    moved["match_config"]["entry_position"] = json!(corner);
+    let directory = std::env::temp_dir().join(format!(
+        "osfr-soccer-spawn-{}-{}",
+        std::process::id(),
+        NEXT.fetch_add(1, Ordering::Relaxed)
+    ));
+    fs::create_dir(&directory).unwrap();
+    let path = directory.join("soccer.json");
+    fs::write(&path, serde_json::to_vec(&moved).unwrap()).unwrap();
+    let refused = soccer_entry::Content::load(&path).unwrap_err();
+    let _ = fs::remove_dir_all(&directory);
+    assert!(refused.to_string().contains("first position"), "{refused}");
 }

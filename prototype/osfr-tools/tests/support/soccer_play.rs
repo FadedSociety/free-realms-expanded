@@ -91,9 +91,15 @@ pub fn enter_match(game: &mut Gameplay, character: &CharacterState, activity: u3
 }
 
 /// The server-scored goal a real client produces: report the pose, let the
-/// server step, then send the sub-14 charged shot.
+/// server step, then send the sub-14 charged shot. For content whose kickoff
+/// is the world origin; see [`shoot_from`].
 pub fn shoot(game: &mut Gameplay, character: &CharacterState, at: u64) {
-    game.handle_in_world(&position(character.guid, [0.0, 0.0, 0.0]), character, at)
+    shoot_from(game, character, at, [0.0; 3]);
+}
+
+/// [`shoot`] standing at `kickoff`, the loaded content's kickoff spawn.
+pub fn shoot_from(game: &mut Gameplay, character: &CharacterState, at: u64, kickoff: [f32; 3]) {
+    game.handle_in_world(&position(character.guid, kickoff), character, at)
         .unwrap();
     game.tick(character, at + 150).unwrap();
     game.handle_in_world(&shot(character.guid), character, at + 150)

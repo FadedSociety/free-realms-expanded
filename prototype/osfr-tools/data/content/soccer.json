@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source": "MiniGameData rows 42/43/44 (type 12) and client Resources/ActivityCategories.txt row 22 (Soccer_Briarwood.dds); match, roster, reward and adapter values are reconstructed (R) and remain tunable.",
+  "source": "MiniGameData rows 42/43/44 (type 12) and client Resources/ActivityCategories.txt row 22 (Soccer_Briarwood.dds); match, roster, reward and adapter values are reconstructed (R) and remain tunable. Pitch geometry (R) from the live 2014 capture OpenSourceFreeRealms ofrserver Packets/packets_soccer_minigame.pcapng, 76/1 UpdatePlayerPos: kickoff formation at frame 6451 mirrors through centre (226.7, 0, 212.9); every player position lies in x 200.4..253.0, z 196.4..229.6, y -0.009..0.04; the human player is first placed at (230.64, 0, 210.22) (frame 5534), used here as the entry spawn (this server sends no 76/1 placement); entry rotation (0, 0, 0, 1) is that capture's opcode-31 value.",
   "games": [
     {
       "id": 42,
@@ -32,8 +32,9 @@
   ],
   "match_config": {
     "bounds": {
-      "half_x": 50.0,
-      "half_z": 30.0,
+      "centre": [226.7, 0.0, 212.9],
+      "half_x": 27.0,
+      "half_z": 17.5,
       "goal_half_width": 8.0,
       "goal_height": 5.0
     },
@@ -47,15 +48,15 @@
       "max_tick": 0.25
     },
     "half_seconds": 180.0,
-    "kickoff_spawn": [0.0, 0.0, 0.0],
+    "kickoff_spawn": [226.7, 0.0, 212.9],
     "half_policy": "switch_sides",
     "adapter": {
       "max_power": 30.0,
       "charge_floor": 0.01,
       "min_direction_norm": 0.001
     },
-    "entry_position": [0.0, 0.0, 0.0, 1.0],
-    "entry_rotation": [0.0, 0.0, 1.0, 0.0]
+    "entry_position": [230.64, 0.0, 210.22, 1.0],
+    "entry_rotation": [0.0, 0.0, 0.0, 1.0]
   },
   "reward": {
     "coins": 10,

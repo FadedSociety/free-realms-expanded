@@ -38,6 +38,7 @@ static REWARD_FIXTURE_ID: AtomicU64 = AtomicU64::new(0);
 
 fn config() -> MatchConfig {
     let mut config = MatchConfig::new(FieldBounds {
+        centre: [0.0; 3],
         half_x: 100.0,
         half_z: 100.0,
         goal_half_width: 10.0,
@@ -54,6 +55,7 @@ fn config() -> MatchConfig {
 /// Small pitch: a +z shot at power 4 crosses the goal line after 10 ticks.
 fn goal_config() -> MatchConfig {
     let mut config = MatchConfig::new(FieldBounds {
+        centre: [0.0; 3],
         half_x: 100.0,
         half_z: 10.0,
         goal_half_width: 10.0,

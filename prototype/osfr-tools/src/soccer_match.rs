@@ -66,9 +66,12 @@ fn normalize(value: [f32; 3]) -> io::Result<[f32; 3]> {
 }
 
 /// Caller-supplied pitch bounds (R); no dimensions are recovered from the
-/// client. Team 0 attacks `+z`, team 1 `-z` (R).
+/// client. Team 0 attacks `+z`, team 1 `-z` (R). Extents, goal lines and goal
+/// mouths are measured from `centre`, a world position whose `y` is the pitch
+/// floor; every other position stays in world coordinates.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct FieldBounds {
+    pub centre: [f32; 3],
     pub half_x: f32,
     pub half_z: f32,
     pub goal_half_width: f32,
@@ -77,7 +80,8 @@ pub struct FieldBounds {
 
 impl FieldBounds {
     pub fn validate(&self) -> io::Result<()> {
-        if !finite3([self.half_x, self.half_z, self.goal_half_width])
+        if !finite3(self.centre)
+            || !finite3([self.half_x, self.half_z, self.goal_half_width])
             || !self.goal_height.is_finite()
         {
             return Err(invalid("soccer field bounds must be finite"));
@@ -95,7 +99,14 @@ impl FieldBounds {
     }
 
     fn inside(&self, position: [f32; 3]) -> bool {
-        position[0].abs() <= self.half_x && position[2].abs() <= self.half_z && position[1] >= 0.0
+        let [x, y, z] = self.local(position);
+        x.abs() <= self.half_x && z.abs() <= self.half_z && y >= 0.0
+    }
+
+    /// `position` relative to the pitch centre.
+    fn local(&self, position: [f32; 3]) -> [f32; 3] {
+        let c = self.centre;
+        [position[0] - c[0], position[1] - c[1], position[2] - c[2]]
     }
 }
 
@@ -147,14 +158,14 @@ pub struct MatchConfig {
 
 impl MatchConfig {
     /// Defaults: reconstructed physics, an R 180-second fallback, and an R
-    /// origin kickoff. Geometry and spawn supplied by callers are also R until
-    /// client evidence establishes otherwise.
+    /// kickoff at the pitch centre. Geometry and spawn supplied by callers are
+    /// also R until client evidence establishes otherwise.
     pub fn new(bounds: FieldBounds) -> Self {
         Self {
             bounds,
             physics: PhysicsConfig::default(),
             half_seconds: crate::soccer::HALF_SECONDS,
-            kickoff_spawn: [0.0, 0.0, 0.0],
+            kickoff_spawn: bounds.centre,
             half_policy: HalfPolicy::SwitchSides,
         }
     }
@@ -819,8 +830,9 @@ impl Authority {
         if self.config.physics.gravity > 0.0 {
             self.ball_velocity[1] -= self.config.physics.gravity * dt;
         }
-        if next[1] < 0.0 {
-            next[1] = 0.0;
+        let floor = self.config.bounds.centre[1];
+        if next[1] < floor {
+            next[1] = floor;
             self.ball_velocity[1] = 0.0;
         }
         self.ball_position = next;
@@ -994,8 +1006,10 @@ impl Authority {
     }
 
     /// Deterministic goal test: a signed crossing of the team's attack goal
-    /// line inside the caller-supplied mouth.
+    /// line inside the caller-supplied mouth, measured from the pitch centre.
     fn goal_crossing(&self, previous: [f32; 3], next: [f32; 3]) -> Option<u32> {
+        let bounds = self.config.bounds;
+        let (previous, next) = (bounds.local(previous), bounds.local(next));
         for team in 0..2u32 {
             let sign = self.attack_sign(team);
             let line = sign * self.config.bounds.half_z;
