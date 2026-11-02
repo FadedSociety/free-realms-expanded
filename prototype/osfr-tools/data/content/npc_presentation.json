@@ -106,6 +106,8 @@
     {"name_string_id": 415047, "name": "Halloween Harry", "cursor_id": 5},
     {"name_string_id": 415500, "name": "Skelly", "cursor_id": 5},
     {"name_string_id": 415613, "name": "Finklestein", "cursor_id": 5},
+    {"name_string_id": 416257, "name": "Right Side Soccer Gate", "cursor_id": 17},
+    {"name_string_id": 416258, "name": "Left Side Soccer Gate", "cursor_id": 17},
     {"name_string_id": 416777, "name": "Ghost Hunter", "cursor_id": 5},
     {"name_string_id": 419832, "name": "Candi Ivy", "cursor_id": 5},
     {"name_string_id": 420171, "name": "Tiger the Party Animal", "cursor_id": 5},

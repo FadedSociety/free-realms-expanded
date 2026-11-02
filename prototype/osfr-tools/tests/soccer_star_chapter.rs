@@ -110,9 +110,13 @@ fn chapter_fixture() -> Fixture {
         "the active package dresses Soccer Star (52)"
     );
     fs::copy(&profiles, fixture.path().join("profiles.json")).unwrap();
-    fs::copy(
-        content_dir().join("soccer.json"),
+    // L932: the chapter scripts the player's own goal, so the shipped server bots stay passive
+    // here (`bot_ai` off); tests/soccer_bots.rs covers the bots.
+    let mut soccer = read_json(&content_dir().join("soccer.json"));
+    soccer["match_config"]["bot_ai"] = json!(false);
+    fs::write(
         fixture.path().join("soccer.json"),
+        serde_json::to_vec(&soccer).unwrap(),
     )
     .unwrap();
     fixture

@@ -76,6 +76,7 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
                         | "live_capture"
                         | "legacy_data"
                         | "reference_data"
+                        | "client_object"
                         | "video_index"
                         | "poi_anchor"
                         | "unanchored"
@@ -210,10 +211,16 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
                 number(&position[1], &owner),
                 number(&position[2], &owner),
             ];
-            if placement == "reference_data" {
+            // L932: a `client_object` row stands on a client terrain object (the Snowhill soccer
+            // gates); it cites that object instead of a Sanctuary-main spawn.
+            let (spawn_source, tag_kind, tag_text) = match placement {
+                "client_object" => ("client_terrain_object", "client", "terrain object"),
+                _ => ("reference_spawn", "reference", "Sanctuary-main-20261019@10f129e"),
+            };
+            if placement == "reference_data" || placement == "client_object" {
                 // Interaction range reads this row; the drawn body is the extras row.
                 // They must stand at the same place or a click lands on empty ground.
-                assert_eq!(source, "reference_spawn", "{owner}: unexpected source");
+                assert_eq!(source, spawn_source, "{owner}: unexpected source");
                 assert!(
                     candidates.is_empty(),
                     "{owner}: reference row has candidates"
@@ -227,11 +234,11 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
                         .as_array()
                         .unwrap()
                         .iter()
-                        .any(|tag| tag["kind"] == "reference"
-                            && tag["evidence"].as_str().is_some_and(
-                                |text| text.contains("Sanctuary-main-20261019@10f129e")
-                            )),
-                    "{owner}: position lacks the Sanctuary-main reference tag"
+                        .any(|tag| tag["kind"] == tag_kind
+                            && tag["evidence"]
+                                .as_str()
+                                .is_some_and(|text| text.contains(tag_text))),
+                    "{owner}: position lacks its {tag_kind} tag naming {tag_text}"
                 );
                 let bodies: Vec<_> = extras
                     .iter()
@@ -325,6 +332,7 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
     // T739 appended four clickable quest props (Planter, Treasure Chest, Sanctuary Postboxes, 1 Way Back Way).
     // L096 appended the two Wildwood turnstile actors (live_capture).
     // L925 appended twelve fanbyte-wiki quest givers (poi_anchor, 1,223).
-    assert_eq!(npc_count, 1_223);
+    // L932 appended the two Snowhill soccer gates (client_object, 1,225).
+    assert_eq!(npc_count, 1_225);
     println!("NPC placement sources: {counts:?}");
 }

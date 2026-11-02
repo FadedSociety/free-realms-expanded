@@ -342,6 +342,15 @@ pub enum ServiceEvent {
     },
     /// R match clock.
     GameTime { remaining: f32, elapsed: f32 },
+    /// L932: a server player's pose, in the live 76/1 layout (position, w 1.0, facing and move
+    /// direction as (x, 0, z, 0), server time, speed, flag byte).
+    PlayerPos {
+        player: u64,
+        position: [f32; 3],
+        facing: [f32; 2],
+        time: f32,
+        speed: f32,
+    },
 }
 
 impl ServiceEvent {
@@ -394,6 +403,30 @@ impl ServiceEvent {
                 remaining: *remaining,
                 elapsed: *elapsed,
             },
+            ServiceEvent::PlayerPos {
+                player,
+                position,
+                facing,
+                time,
+                speed,
+            } => {
+                // w 1.0, facing and move direction as float4s, time, speed, then one zero byte.
+                let direction = [facing[0], 0.0, facing[1], 0.0];
+                let values = [1.0f32]
+                    .into_iter()
+                    .chain(direction)
+                    .chain(direction)
+                    .chain([*time, *speed]);
+                let mut bytes = [0u8; 45];
+                for (slot, value) in bytes.chunks_exact_mut(4).zip(values) {
+                    slot.copy_from_slice(&value.to_le_bytes());
+                }
+                SoccerPacket::UpdatePlayerPos {
+                    player: *player,
+                    position: *position,
+                    tail: bytes,
+                }
+            }
         }
     }
 
@@ -479,6 +512,9 @@ pub struct SoccerService {
     sessions: BTreeMap<u64, SessionEntry>,
     runs: BTreeMap<u64, ParticipantRun>,
     bots: BTreeSet<u64>,
+    /// L932: each bot's AI memory and the last pose sent (time, facing).
+    bot_memory: BTreeMap<u64, crate::soccer_bots::BotMemory>,
+    bot_sent: BTreeMap<u64, (f32, [f32; 2], f32)>,
     bots_filled: bool,
     cancelled: bool,
     /// R relay bookkeeping: last holder reported on the service wire (`0` none).
@@ -496,6 +532,8 @@ impl SoccerService {
             sessions: BTreeMap::new(),
             runs: BTreeMap::new(),
             bots: BTreeSet::new(),
+            bot_memory: BTreeMap::new(),
+            bot_sent: BTreeMap::new(),
             bots_filled: false,
             cancelled: false,
             last_holder: NO_HOLDER,
@@ -645,7 +683,52 @@ impl SoccerService {
             });
         }
         self.bots_filled = true;
+        let lined = crate::soccer_bots::line_up(&mut self.authority, &self.bots)?;
+        events.extend(self.bot_poses(lined, true));
         Ok(events)
+    }
+
+    /// L932: bot moves as 76/1 poses. A bot's pose goes out when it turns or every half second
+    /// (the live server sent about one per bot per two seconds; the client extrapolates the move
+    /// direction and speed in between); `force` sends every one (kickoff line-up).
+    fn bot_poses(
+        &mut self,
+        events: Vec<crate::soccer_bots::BotEvent>,
+        force: bool,
+    ) -> Vec<ServiceEvent> {
+        let time = self.authority.server_time();
+        let mut out = Vec::new();
+        for event in events {
+            let crate::soccer_bots::BotEvent::Moved {
+                player,
+                position,
+                facing,
+                speed,
+            } = event
+            else {
+                continue;
+            };
+            // Due on a turn, a speed change (a stop included) or every 0.5 s.
+            let due = self
+                .bot_sent
+                .get(&player)
+                .is_none_or(|(at, last, last_speed)| {
+                    let turned =
+                        facing != [0.0; 2] && facing[0] * last[0] + facing[1] * last[1] < 0.87;
+                    time - at >= 0.5 || turned || speed != *last_speed
+                });
+            if force || due {
+                self.bot_sent.insert(player, (time, facing, speed));
+                out.push(ServiceEvent::PlayerPos {
+                    player,
+                    position,
+                    facing,
+                    time,
+                    speed,
+                });
+            }
+        }
+        out
     }
 
     /// Offer the type-12 Soccer run through the shared lifecycle. `game_id`,
@@ -828,7 +911,10 @@ impl SoccerService {
             return Err(invalid("soccer minigame start handshake is incomplete"));
         }
         self.authority.kickoff()?;
-        Ok(vec![self.game_time()])
+        let lined = crate::soccer_bots::line_up(&mut self.authority, &self.bots)?;
+        let mut events = self.bot_poses(lined, true);
+        events.push(self.game_time());
+        Ok(events)
     }
 
     /// Start the second half from the interval and report the clock.
@@ -837,7 +923,11 @@ impl SoccerService {
             return Err(invalid("soccer match is cancelled"));
         }
         self.authority.start_second_half()?;
-        Ok(vec![self.game_time()])
+        // L932: the sides swap, so the bots line up on their new kickoff spots.
+        let lined = crate::soccer_bots::line_up(&mut self.authority, &self.bots)?;
+        let mut events = self.bot_poses(lined, true);
+        events.push(self.game_time());
+        Ok(events)
     }
 
     /// Advance the deterministic R simulation and report its candidate events:
@@ -852,6 +942,36 @@ impl SoccerService {
         let before_score = self.authority.score();
         let before_possession = self.authority.possession();
         let previous_holder = self.last_holder;
+        // L932: the bots act on the match before it advances; a refused step moves nobody.
+        if !(dt > 0.0 && dt <= self.authority.config().physics.max_tick) {
+            return Err(invalid("soccer tick step is out of range"));
+        }
+        let acted =
+            crate::soccer_bots::step(&mut self.authority, &self.bots, &mut self.bot_memory, dt)?;
+        let mut bot_events = Vec::new();
+        for event in &acted {
+            if let crate::soccer_bots::BotEvent::Kicked {
+                player,
+                kind,
+                power,
+            } = *event
+            {
+                let direction = unit(self.authority.ball_velocity())?;
+                bot_events.push(ServiceEvent::Impulse {
+                    player,
+                    kind,
+                    vector: [direction[0], direction[1], direction[2], IMPULSE_W],
+                    charge: 1.0,
+                    power,
+                    action: match kind {
+                        KickKind::Shot => SHOT_ACTION,
+                        KickKind::Pass => PASS_ACTION,
+                    },
+                    value_c: 0.0,
+                });
+            }
+        }
+        bot_events.extend(self.bot_poses(acted, false));
         self.authority.advance(dt)?;
 
         if self.authority.score() != before_score {
@@ -864,7 +984,7 @@ impl SoccerService {
             }
         }
 
-        let mut events = Vec::new();
+        let mut events = bot_events;
         if self.authority.score() != before_score {
             events.push(ServiceEvent::Goal {
                 score: self.authority.score(),

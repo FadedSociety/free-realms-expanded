@@ -521,7 +521,8 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
     // T498 appended the Burglz row (the Wilds quarry troll) to npcs/wilds.json; T500 appended Hasti
     // to npcs/sanctuary.json (1,203); T501 appended Shannon and Sugaboo to npcs/merry_vale.json (1,205);
     // T739 appended four clickable quest props (1,209); L096 the two Wildwood turnstile actors.
-    assert_eq!(content_npcs.len(), 1223); // L925: twelve wiki quest givers
+    // L925: twelve wiki quest givers. L932: the two Snowhill soccer gates.
+    assert_eq!(content_npcs.len(), 1225);
     let expected_npc_count = loader_npcs.len();
     write_json(
         &scratch.join("npcs.json"),

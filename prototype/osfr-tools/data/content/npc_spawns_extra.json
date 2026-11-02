@@ -77375,6 +77375,84 @@
       ],
       "position_w": null,
       "scale": 1.0
+    },
+    {
+      "spawn_guid": 9500001022,
+      "legacy_npc_id": null,
+      "content_key": 9500001022,
+      "model_id": 271,
+      "model_file_name": "invisible_cube.adr",
+      "name": "Right Side Soccer Gate",
+      "name_string_id": 416257,
+      "notifications": [
+        {
+          "kind": 6,
+          "image_id": 22,
+          "state": 119,
+          "name_id": 416257
+        }
+      ],
+      "position": [
+        -154.3046417236328,
+        -5.306054592132568,
+        248.9303436279297
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt row 271 = invisible_cube.adr (\"Invisible Cube without particles\"); Global.Text 416257 = \"Right Side Soccer Gate\"; client terrain chunk object 1254789685 (sg_soccer_entrance_gate_01.adr) stands at the position (lab/reports/world-objects-20261015.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Sanctuary-BubbaJoeX-20261031 src/Resources/Npcs.json Id=33972: ModelId 271, NameId 416257, CursorId 17, NotificationType 6, IconId 119, IconState 22, TerrainObjectId 1254789685."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L932: spawn_guid/content_key reuse the regional NPC key as the runtime actor GUID so the ordinary 26/8 click resolves the regional row. Notification: NotificationImages.txt key 22 (the community row IconState) with the icon id 119 in the state slot, as the postbox rows do (npc_notifications.rs). Heading 0.0: the model is an invisible cube."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500001023,
+      "legacy_npc_id": null,
+      "content_key": 9500001023,
+      "model_id": 271,
+      "model_file_name": "invisible_cube.adr",
+      "name": "Left Side Soccer Gate",
+      "name_string_id": 416258,
+      "notifications": [
+        {
+          "kind": 6,
+          "image_id": 22,
+          "state": 119,
+          "name_id": 416258
+        }
+      ],
+      "position": [
+        -158.525390625,
+        -5.284570217132568,
+        249.42747497558594
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt row 271 = invisible_cube.adr (\"Invisible Cube without particles\"); Global.Text 416258 = \"Left Side Soccer Gate\"; client terrain chunk object 1254789670 (sg_soccer_entrance_gate_01.adr) stands at the position (lab/reports/world-objects-20261015.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Sanctuary-BubbaJoeX-20261031 src/Resources/Npcs.json Id=33973: ModelId 271, NameId 416258, CursorId 17, NotificationType 6, IconId 119, IconState 22, TerrainObjectId 1254789670."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L932: spawn_guid/content_key reuse the regional NPC key as the runtime actor GUID so the ordinary 26/8 click resolves the regional row. Notification: NotificationImages.txt key 22 (the community row IconState) with the icon id 119 in the state slot, as the postbox rows do (npc_notifications.rs). Heading 0.0: the model is an invisible cube."
+        }
+      ],
+      "position_w": null
     }
   ]
 }

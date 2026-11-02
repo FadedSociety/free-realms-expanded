@@ -131,8 +131,8 @@ fn soccer_content_with_reward(job_xp: u32) -> Vec<u8> {
         }],
         "match_config": {
             "bounds": {
-                "half_x": 50.0,
-                "half_z": 10.0,
+                "half_x": 10.0,
+                "half_z": 50.0,
                 "goal_half_width": 8.0,
                 "goal_height": 5.0
             },

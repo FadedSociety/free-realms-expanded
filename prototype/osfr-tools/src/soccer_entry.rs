@@ -45,13 +45,13 @@ pub const SCHEMA_VERSION: u32 = 1;
 /// The Soccer Star job (`jobs.json` profile 52): the match's job XP goes here.
 pub const SOCCER_STAR_PROFILE: i32 = 52;
 const MAX_FILE: u64 = 1 << 20;
-const MAX_GAMES: usize = 8;
+const MAX_GAMES: usize = 32;
 
-/// One published soccer activity row.
+/// One soccer MiniGameData row (type 12): a Games window row (42/43/44) or a quest-only row.
 #[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct Game {
-    /// Portal activity id; equal to the shipped MiniGameData row (42/43/44).
+    /// MiniGameData row; the id a settled win credits to quests.
     pub id: u32,
     pub name_id: u32,
     pub description_id: u32,
@@ -62,6 +62,25 @@ pub struct Game {
     pub required_level: u32,
     /// R encounter identity used by the shared `RunMode::Encounter` start.
     pub encounter_id: i32,
+    /// L932: no Games window tile. A match credits this row only when a quest's open
+    /// `finish_minigame` objective names it (see [`Content::credited_row`]).
+    #[serde(default)]
+    pub quest_only: bool,
+    /// L932 (R): a win counts for the quest only when the other team scored at most this many
+    /// goals. Tackles, steals, dodges and knockdowns are not measured, so rows whose bonus goals
+    /// ask for them credit on the win alone.
+    #[serde(default)]
+    pub max_conceded: Option<u32>,
+    /// Evidence for the row's win condition; documentation only.
+    #[serde(default, rename = "source")]
+    _source: String,
+}
+
+impl Game {
+    /// L932: whether a won match counts for this row when the other team scored `conceded`.
+    pub fn counts(&self, conceded: u32) -> bool {
+        self.max_conceded.is_none_or(|max| conceded <= max)
+    }
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq)]
@@ -114,6 +133,9 @@ struct MatchSettings {
     adapter: AdapterSettings,
     entry_position: [f32; 4],
     entry_rotation: [f32; 4],
+    /// L932: the server bots play (chase, dribble, pass, shoot, tackle); absent = passive bots.
+    #[serde(default)]
+    bot_ai: bool,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
@@ -125,6 +147,19 @@ struct RewardSettings {
     job_xp: BTreeMap<i32, u32>,
 }
 
+/// L932: the world gates that start a match: the client's "Left/Right Side Soccer Gate" NPCs
+/// (Global.Text 416257, 416258; the quests say "Click the soccer gate").
+#[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+struct GateSettings {
+    /// NPC content keys (`npcs/*.json` rows, drawn by `npc_spawns_extra.json`).
+    npcs: Vec<u64>,
+    /// Locale id of the menu option.
+    menu_string_id: u32,
+    /// The Games window row a gate enters; an open quest objective's row still wins.
+    game_id: u32,
+}
+
 #[derive(Clone, Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Content {
@@ -132,6 +167,8 @@ pub struct Content {
     #[serde(default, rename = "source")]
     _source: String,
     games: Vec<Game>,
+    #[serde(default)]
+    gates: Option<GateSettings>,
     match_config: MatchSettings,
     reward: RewardSettings,
 }
@@ -159,10 +196,26 @@ impl Content {
         self.games.iter().find(|game| game.id == id)
     }
 
-    /// Portal rows for this file; admission keeps its own per-player checks.
+    /// L932: the NPCs whose menu offers a match (none without a `gates` block).
+    pub fn gate_npcs(&self) -> &[u64] {
+        self.gates.as_ref().map_or(&[], |gates| &gates.npcs)
+    }
+
+    pub fn gate_menu_string_id(&self) -> u32 {
+        self.gates.as_ref().map_or(0, |gates| gates.menu_string_id)
+    }
+
+    /// The Games window row a gate enters.
+    pub fn gate_game(&self) -> Option<u32> {
+        self.gates.as_ref().map(|gates| gates.game_id)
+    }
+
+    /// Portal rows for this file; admission keeps its own per-player checks. A quest-only row has
+    /// no Games window tile.
     pub fn portal_rows(&self) -> Vec<Activity> {
         self.games
             .iter()
+            .filter(|game| !game.quest_only)
             .map(|game| Activity {
                 id: game.id,
                 name_id: game.name_id,
@@ -173,6 +226,17 @@ impl Content {
                 kind: crate::activity_portal::Kind::Soccer,
             })
             .collect()
+    }
+
+    /// L932: the row a match entered as `entered` credits. A quest objective that is open and
+    /// names the entered row wins, then the first open objective naming a quest-only row (the
+    /// derby does the same per gate, `gameplay/derby_rows.rs`); with none, the entered row.
+    pub fn credited_row(&self, entered: u32, open: &[u32]) -> u32 {
+        if open.contains(&entered) {
+            return entered;
+        }
+        let quest_only = |id: &&u32| self.game(**id).is_some_and(|game| game.quest_only);
+        open.iter().find(quest_only).copied().unwrap_or(entered)
     }
 
     pub fn entry_scene(&self) -> io::Result<ZoneTransition> {
@@ -207,6 +271,7 @@ impl Content {
                 HalfPolicySetting::SwitchSides => HalfPolicy::SwitchSides,
                 HalfPolicySetting::KeepSides => HalfPolicy::KeepSides,
             },
+            bot_ai: settings.bot_ai,
         }
     }
 
@@ -244,7 +309,7 @@ impl Content {
             return Err(invalid("soccer content schema version is not supported"));
         }
         if self.games.is_empty() || self.games.len() > MAX_GAMES {
-            return Err(invalid("soccer content needs 1..=8 games"));
+            return Err(invalid("soccer content needs 1..=32 games"));
         }
         for (index, game) in self.games.iter().enumerate() {
             if game.id == 0
@@ -253,6 +318,20 @@ impl Content {
                 || self.games[..index].iter().any(|other| other.id == game.id)
             {
                 return Err(invalid("soccer game ids/encounters are invalid"));
+            }
+        }
+        if let Some(gates) = &self.gates {
+            let entry = self.game(gates.game_id).filter(|game| !game.quest_only);
+            if entry.is_none()
+                || gates.npcs.is_empty()
+                || gates.npcs.contains(&0)
+                || gates
+                    .npcs
+                    .iter()
+                    .enumerate()
+                    .any(|(i, npc)| gates.npcs[..i].contains(npc))
+            {
+                return Err(invalid("soccer gates need NPCs and a Games window row"));
             }
         }
         // The service validates the match configuration and adapter policy.
@@ -322,6 +401,8 @@ pub struct TickResult {
     pub changed: bool,
     pub finished: bool,
     pub settlement_due: bool,
+    /// L932: the settled row's win condition held, so the caller may credit the quest event.
+    pub credit: bool,
 }
 
 impl Session {
@@ -523,6 +604,12 @@ impl Session {
         let mut service = self.service.clone();
         let outcome = service.finish_minigame(guid, live)?;
         if outcome.accepted {
+            let [home, away] = service.score();
+            result.credit = match service.session_team(guid) {
+                Some((0, _)) => self.game.counts(away),
+                Some(_) => self.game.counts(home),
+                None => false,
+            };
             self.settled = true;
             result.replies.extend(outcome.replies);
             result.replies.extend(outcome.reward_packets);
@@ -556,5 +643,43 @@ mod tests {
             BTreeMap::from([(SOCCER_STAR_PROFILE, 72)])
         );
         assert_eq!(content.grant(game, 1, Some(72)).coins, content.reward.coins);
+    }
+
+    fn shipped() -> Content {
+        let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/soccer.json");
+        Content::load(&path).unwrap()
+    }
+
+    /// L932: the Soccer Star quest rows are loaded, sit outside the Games window and each ask for
+    /// the win alone, except Goal Stopper, which also asks the other team to stay under 5 goals.
+    #[test]
+    fn quest_rows_are_unlisted_and_goal_stopper_limits_the_other_team() {
+        let content = shipped();
+        let ids: Vec<u32> = content.games().iter().map(|game| game.id).collect();
+        assert_eq!(
+            ids,
+            [
+                42, 43, 44, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333
+            ]
+        );
+        let listed: Vec<u32> = content.portal_rows().iter().map(|row| row.id).collect();
+        assert_eq!(listed, [42, 43, 44], "quest rows have no Games window tile");
+        for game in content.games() {
+            assert!(game.counts(4), "row {} counts 4 conceded", game.id);
+            assert_eq!(game.counts(5), game.id != 323, "row {} at 5", game.id);
+        }
+    }
+
+    /// L932: an open objective on the entered row wins, then the first open quest-only row;
+    /// a closed or non-soccer objective leaves the entered row.
+    #[test]
+    fn the_credited_row_follows_the_open_objective() {
+        let content = shipped();
+        assert_eq!(content.credited_row(43, &[]), 43);
+        assert_eq!(content.credited_row(43, &[326]), 326, "a quest-only row");
+        assert_eq!(content.credited_row(43, &[333, 326]), 333, "first open row");
+        assert_eq!(content.credited_row(43, &[326, 43]), 43, "the entered row");
+        assert_eq!(content.credited_row(43, &[44]), 43, "another tile's row");
+        assert_eq!(content.credited_row(43, &[39, 604]), 43, "not soccer rows");
     }
 }

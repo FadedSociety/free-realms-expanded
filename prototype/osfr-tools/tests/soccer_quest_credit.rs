@@ -131,8 +131,8 @@ fn soccer_content() -> Vec<u8> {
         "games": games,
         "match_config": {
             "bounds": {
-                "half_x": 50.0,
-                "half_z": 10.0,
+                "half_x": 10.0,
+                "half_z": 50.0,
                 "goal_half_width": 8.0,
                 "goal_height": 5.0
             },

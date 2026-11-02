@@ -48527,6 +48527,838 @@
           }
         ]
       }
+    },
+    {
+      "npc_id": 9500001022,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Right Side Soccer Gate",
+      "name_reason": null,
+      "name_string_id": 416257,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 416257
+        }
+      ],
+      "name_string_id_reason": null,
+      "zone": "Snowhill",
+      "zone_id": 13,
+      "zone_reason": null,
+      "region_pages": [
+        "Snowhill"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "Soccer field gate: the quest objectives say \"Click the soccer gate\" (Global.Text 402694, 402788, 402796, 431448-431462)."
+      ],
+      "roles": [
+        "ambient"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "The soccer field gate on the road near Snowhill (Global.Text 402695, 402784, 402797, 402807). Tommy Crackletoe stands \"Near the Left Side Soccer Gate\" (video WjpJl2U5OK0/00000)."
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [],
+      "quests_accepted": [],
+      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "vendor_stock": null,
+      "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
+      "services": [],
+      "services_reason": "The regional row lists no distinct service.",
+      "position": [
+        -154.3046417236328,
+        -5.306054592132568,
+        248.9303436279297
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "placement": "client_object",
+      "placement_source": "client_terrain_object",
+      "placement_confidence": "medium",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "(R) L932: the position of the client terrain chunk object 1254789685 (sg_soccer_entrance_gate_01.adr); the community server binds NPC 33972 to that object. Heading is not recovered (the NPC is an invisible cube).",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "name": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: a scenery trigger; the roles vocabulary has no gate role, so it is ambient"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the gate gives no quest; it starts a soccer match"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the gate is a soccer.json gates entry, not a regional service row"
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "position": [
+          {
+            "kind": "client",
+            "evidence": "lab/reports/world-objects-20261015.json: terrain object 1254789685, sg_soccer_entrance_gate_01.adr, at [-154.3046, -5.3061, 248.9303]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Sanctuary-BubbaJoeX-20261031 src/Resources/Npcs.json Id=33972 (Right Side Soccer Gate, TerrainObjectId 1254789685, ModelId 271 invisible_cube.adr)"
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416257 \"Right Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789685 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "client",
+            "evidence": "lab/reports/world-objects-20261015.json: terrain object 1254789685, sg_soccer_entrance_gate_01.adr, at [-154.3046, -5.3061, 248.9303]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Sanctuary-BubbaJoeX-20261031 src/Resources/Npcs.json Id=33972 (Right Side Soccer Gate, TerrainObjectId 1254789685, ModelId 271 invisible_cube.adr)"
+          }
+        ],
+        "placement": [
+          {
+            "kind": "client",
+            "evidence": "lab/reports/world-objects-20261015.json: terrain object 1254789685, sg_soccer_entrance_gate_01.adr, at [-154.3046, -5.3061, 248.9303]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Sanctuary-BubbaJoeX-20261031 src/Resources/Npcs.json Id=33972 (Right Side Soccer Gate, TerrainObjectId 1254789685, ModelId 271 invisible_cube.adr)"
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "client",
+            "evidence": "lab/reports/world-objects-20261015.json: terrain object 1254789685, sg_soccer_entrance_gate_01.adr, at [-154.3046, -5.3061, 248.9303]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Sanctuary-BubbaJoeX-20261031 src/Resources/Npcs.json Id=33972 (Right Side Soccer Gate, TerrainObjectId 1254789685, ModelId 271 invisible_cube.adr)"
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "client",
+            "evidence": "lab/reports/world-objects-20261015.json: terrain object 1254789685, sg_soccer_entrance_gate_01.adr, at [-154.3046, -5.3061, 248.9303]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Sanctuary-BubbaJoeX-20261031 src/Resources/Npcs.json Id=33972 (Right Side Soccer Gate, TerrainObjectId 1254789685, ModelId 271 invisible_cube.adr)"
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "client",
+            "evidence": "lab/reports/world-objects-20261015.json: terrain object 1254789685, sg_soccer_entrance_gate_01.adr, at [-154.3046, -5.3061, 248.9303]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Sanctuary-BubbaJoeX-20261031 src/Resources/Npcs.json Id=33972 (Right Side Soccer Gate, TerrainObjectId 1254789685, ModelId 271 invisible_cube.adr)"
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Null means no startup AddNpc row matched this regional row."
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "client",
+            "evidence": "lab/reports/world-objects-20261015.json: terrain object 1254789685, sg_soccer_entrance_gate_01.adr, at [-154.3046, -5.3061, 248.9303]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Sanctuary-BubbaJoeX-20261031 src/Resources/Npcs.json Id=33972 (Right Side Soccer Gate, TerrainObjectId 1254789685, ModelId 271 invisible_cube.adr)"
+          }
+        ],
+        "heading": [
+          {
+            "kind": "client",
+            "evidence": "lab/reports/world-objects-20261015.json: terrain object 1254789685, sg_soccer_entrance_gate_01.adr, at [-154.3046, -5.3061, 248.9303]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Sanctuary-BubbaJoeX-20261031 src/Resources/Npcs.json Id=33972 (Right Side Soccer Gate, TerrainObjectId 1254789685, ModelId 271 invisible_cube.adr)"
+          }
+        ]
+      },
+      "heading": 0.0
+    },
+    {
+      "npc_id": 9500001023,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Left Side Soccer Gate",
+      "name_reason": null,
+      "name_string_id": 416258,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 416258
+        }
+      ],
+      "name_string_id_reason": null,
+      "zone": "Snowhill",
+      "zone_id": 13,
+      "zone_reason": null,
+      "region_pages": [
+        "Snowhill"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "Soccer field gate: the quest objectives say \"Click the soccer gate\" (Global.Text 402694, 402788, 402796, 431448-431462)."
+      ],
+      "roles": [
+        "ambient"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "The soccer field gate on the road near Snowhill (Global.Text 402695, 402784, 402797, 402807). Tommy Crackletoe stands \"Near the Left Side Soccer Gate\" (video WjpJl2U5OK0/00000)."
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [],
+      "quests_accepted": [],
+      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "vendor_stock": null,
+      "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
+      "services": [],
+      "services_reason": "The regional row lists no distinct service.",
+      "position": [
+        -158.525390625,
+        -5.284570217132568,
+        249.42747497558594
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "placement": "client_object",
+      "placement_source": "client_terrain_object",
+      "placement_confidence": "medium",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "(R) L932: the position of the client terrain chunk object 1254789670 (sg_soccer_entrance_gate_01.adr); the community server binds NPC 33973 to that object. Heading is not recovered (the NPC is an invisible cube).",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "name": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: a scenery trigger; the roles vocabulary has no gate role, so it is ambient"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the gate gives no quest; it starts a soccer match"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the gate is a soccer.json gates entry, not a regional service row"
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "position": [
+          {
+            "kind": "client",
+            "evidence": "lab/reports/world-objects-20261015.json: terrain object 1254789670, sg_soccer_entrance_gate_01.adr, at [-158.5254, -5.2846, 249.4275]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Sanctuary-BubbaJoeX-20261031 src/Resources/Npcs.json Id=33973 (Left Side Soccer Gate, TerrainObjectId 1254789670, ModelId 271 invisible_cube.adr)"
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text 416258 \"Left Side Soccer Gate\" (lab/reports/locale-id-to-text.json); client terrain chunk object 1254789670 is sg_soccer_entrance_gate_01.adr at the Snowhill soccer field (lab/reports/world-objects-20261015.json)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L932: the NPC id is a reconstructed package key; the retail actor id is not captured (the community server numbers this gate 33972/33973 and binds it to the terrain object, not to an actor id)"
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "client",
+            "evidence": "lab/reports/world-objects-20261015.json: terrain object 1254789670, sg_soccer_entrance_gate_01.adr, at [-158.5254, -5.2846, 249.4275]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Sanctuary-BubbaJoeX-20261031 src/Resources/Npcs.json Id=33973 (Left Side Soccer Gate, TerrainObjectId 1254789670, ModelId 271 invisible_cube.adr)"
+          }
+        ],
+        "placement": [
+          {
+            "kind": "client",
+            "evidence": "lab/reports/world-objects-20261015.json: terrain object 1254789670, sg_soccer_entrance_gate_01.adr, at [-158.5254, -5.2846, 249.4275]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Sanctuary-BubbaJoeX-20261031 src/Resources/Npcs.json Id=33973 (Left Side Soccer Gate, TerrainObjectId 1254789670, ModelId 271 invisible_cube.adr)"
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "client",
+            "evidence": "lab/reports/world-objects-20261015.json: terrain object 1254789670, sg_soccer_entrance_gate_01.adr, at [-158.5254, -5.2846, 249.4275]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Sanctuary-BubbaJoeX-20261031 src/Resources/Npcs.json Id=33973 (Left Side Soccer Gate, TerrainObjectId 1254789670, ModelId 271 invisible_cube.adr)"
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "client",
+            "evidence": "lab/reports/world-objects-20261015.json: terrain object 1254789670, sg_soccer_entrance_gate_01.adr, at [-158.5254, -5.2846, 249.4275]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Sanctuary-BubbaJoeX-20261031 src/Resources/Npcs.json Id=33973 (Left Side Soccer Gate, TerrainObjectId 1254789670, ModelId 271 invisible_cube.adr)"
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "client",
+            "evidence": "lab/reports/world-objects-20261015.json: terrain object 1254789670, sg_soccer_entrance_gate_01.adr, at [-158.5254, -5.2846, 249.4275]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Sanctuary-BubbaJoeX-20261031 src/Resources/Npcs.json Id=33973 (Left Side Soccer Gate, TerrainObjectId 1254789670, ModelId 271 invisible_cube.adr)"
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Null means no startup AddNpc row matched this regional row."
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "client",
+            "evidence": "lab/reports/world-objects-20261015.json: terrain object 1254789670, sg_soccer_entrance_gate_01.adr, at [-158.5254, -5.2846, 249.4275]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Sanctuary-BubbaJoeX-20261031 src/Resources/Npcs.json Id=33973 (Left Side Soccer Gate, TerrainObjectId 1254789670, ModelId 271 invisible_cube.adr)"
+          }
+        ],
+        "heading": [
+          {
+            "kind": "client",
+            "evidence": "lab/reports/world-objects-20261015.json: terrain object 1254789670, sg_soccer_entrance_gate_01.adr, at [-158.5254, -5.2846, 249.4275]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Sanctuary-BubbaJoeX-20261031 src/Resources/Npcs.json Id=33973 (Left Side Soccer Gate, TerrainObjectId 1254789670, ModelId 271 invisible_cube.adr)"
+          }
+        ]
+      },
+      "heading": 0.0
     }
   ]
 }

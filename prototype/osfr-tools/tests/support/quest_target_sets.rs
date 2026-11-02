@@ -210,6 +210,8 @@ impl Targets {
         }) {
             targets.producer(speedway, [MinigameFact::Elapsed]);
         }
+        // L932: every `soccer.json` game is a producer, the Games window rows 42-44 and the
+        // quest-only rows 322-333 alike; a win reports the team's goals and the match time.
         let soccer = root.join(soccer_entry::CONTENT_FILE);
         if soccer.is_file() {
             for game in soccer_entry::Content::load(&soccer)?.games() {

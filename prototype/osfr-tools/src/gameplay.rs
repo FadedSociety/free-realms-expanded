@@ -92,6 +92,7 @@ mod redeem;
 mod rides;
 /// Station Cash earned by server-verified activity completions (T229).
 mod sc_earnings;
+mod soccer_session;
 /// Test and offline-fixture clock and shuffle seams; the gateway never calls them.
 mod seeds;
 mod startup_health;
@@ -1119,6 +1120,14 @@ impl Gameplay {
                 );
             }
         }
+        if let (Some(soccer), Some(interaction)) = (&soccer_content, &mut npc_interaction) {
+            let (npcs, label) = (soccer.gate_npcs(), soccer.gate_menu_string_id());
+            for npc in interaction.set_soccer_gates(npcs, label) {
+                npc_event(
+                    serde_json::json!({"event": "soccer_gate_unknown_npc", "content_key": npc}),
+                );
+            }
+        }
         let folders = [directory, bundled_npc_content.as_path()];
         let (kart, derby_ref) = (kart_entry.as_ref(), derby.as_ref());
         let type8 = [mining.as_ref(), harvesting.as_ref(), mail_sorting.as_ref()];
@@ -1938,7 +1947,10 @@ impl Gameplay {
                     staged.adopt_reward_state(rewards, &mut out)?;
                 }
                 // T259: the settled server result credits FinishMinigame once per match.
-                staged.npc_minigame_win(&settled.replies, &mut out)?;
+                // L932: unless the row's win condition (`max_conceded`) failed.
+                if settled.credit {
+                    staged.npc_minigame_win(&settled.replies, &mut out)?;
+                }
                 if settled.finished {
                     // T229: one completed match pays once; `settle` accepts once per match.
                     staged.pay_earned_station_cash(EarnSource::SoccerMatch, &mut out)?;
@@ -3083,49 +3095,6 @@ impl Gameplay {
             crafts: CraftingJob::ALL.map(|job| self.job_level(job.profile_id())),
             postman: self.job_level(crate::mail_sorting::POSTMAN_PROFILE_ID),
         }
-    }
-
-    /// (R) Begin a portal soccer row: join the authenticated player, fill the
-    /// solo roster with passive bots, and offer the shared type-12 run. The
-    /// client sees the captured scene entry first; roster and the 39/16 offer
-    /// follow after Loaded. Any failure leaves the player untouched.
-    fn begin_soccer(
-        &mut self,
-        activity: u32,
-        character: &CharacterState,
-        out: &mut Outcome,
-    ) -> io::Result<()> {
-        let Some(content) = self.soccer_content.clone() else {
-            out.replies
-                .push(chat::system("Soccer is not available right now."));
-            return Ok(());
-        };
-        // L936: the match switches the player into Soccer Star (client 101319), staged so a
-        // refused start changes nothing. L927: the per-match `activity_xp`, only while that job
-        // is unlocked (the payout refuses an XP row for a locked job whole).
-        let star = crate::soccer_entry::SOCCER_STAR_PROFILE;
-        let mut staged = self.clone();
-        let mut switch = Outcome::default();
-        staged.enter_activity_job(star, character.guid, &mut switch)?;
-        let xp = staged
-            .profiles
-            .as_ref()
-            .filter(|p| p.state().unlocked.contains(&star))
-            .and_then(|p| p.activity_xp(star));
-        match crate::soccer_entry::Session::begin(&content, activity, character, xp) {
-            Ok(session) => {
-                *self = staged;
-                out.replies.extend(switch.replies);
-                out.nearby.extend(switch.nearby);
-                out.scene_zoning = Some(session.scene().clone());
-                self.soccer = Some(session);
-                out.changed = true;
-            }
-            Err(_) => out
-                .replies
-                .push(chat::system("You cannot start that activity here.")),
-        }
-        Ok(())
     }
 
     /// While a soccer match owns the character, family-76 input and the shared

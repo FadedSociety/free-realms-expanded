@@ -56,8 +56,9 @@ fn config() -> MatchConfig {
 fn goal_config() -> MatchConfig {
     let mut config = MatchConfig::new(FieldBounds {
         centre: [0.0; 3],
-        half_x: 100.0,
-        half_z: 10.0,
+        // L932: the goals are on the x ends; the 10-unit goal axis is kept.
+        half_x: 10.0,
+        half_z: 100.0,
         goal_half_width: 10.0,
         goal_height: 5.0,
     });
@@ -654,7 +655,7 @@ fn solo_bots_match_runs_through_shared_lifecycle_to_one_win_payment() {
         .handle_client(
             KICKER,
             0.05,
-            &client_state(KICKER, 17, 255, [0.0, 0.0, 1.0, 1.0]),
+            &client_state(KICKER, 17, 255, [-1.0, 0.0, 0.0, 1.0]),
             2,
             None,
         )
@@ -772,11 +773,11 @@ fn server_tick_alone_scores_and_the_restart_seam_resumes_play() {
         .handle_client(
             KICKER,
             0.05,
-            &client_state(KICKER, 17, 255, [0.0, 0.0, 1.0, 1.0]),
+            &client_state(KICKER, 17, 255, [-1.0, 0.0, 0.0, 1.0]),
             2,
             None,
         )
-        .expect("shot at the +z goal");
+        .expect("shot at the -x goal (L932: team 0 attacks -x)");
 
     let mut goal_events = Vec::new();
     for step in 1..=14 {
@@ -1003,4 +1004,80 @@ fn full_match_finishes_with_a_missing_reward_and_no_result_body() {
         })
         .is_err()
     );
+}
+
+/// L932 review: with `bot_ai` on, the solo fill runs. A moving bot goes out as a 76/1 pose whose
+/// 45-byte tail is w 1.0, facing, move direction, time, speed and one zero byte; the second half
+/// lines every bot up again on its kickoff spot at the other end.
+#[test]
+fn bot_ai_poses_carry_the_live_tail_and_half_time_lines_the_bots_up_again() {
+    let mut config = config();
+    config.bot_ai = true;
+    config.half_seconds = 3.0;
+    let mut service = SoccerService::new(config, policy()).expect("service config");
+    service.join(KICKER, 0, 0).expect("join");
+    service.fill_bots_for_solo(KICKER).expect("bots");
+    let poses = |events: &[ServiceEvent]| -> Vec<(u64, f32, f32, Vec<u8>)> {
+        events
+            .iter()
+            .filter_map(|event| match event {
+                ServiceEvent::PlayerPos {
+                    player,
+                    position,
+                    speed,
+                    ..
+                } => {
+                    let inner = event.inner();
+                    Some((
+                        *player,
+                        position[0],
+                        *speed,
+                        inner[inner.len() - 45..].to_vec(),
+                    ))
+                }
+                _ => None,
+            })
+            .collect()
+    };
+    let float = |tail: &[u8], at: usize| f32::from_le_bytes(tail[at..at + 4].try_into().unwrap());
+    let kickoff = poses(&offer_and_start(&mut service, KICKER));
+    assert_eq!(kickoff.len(), 7, "every bot is lined up at kickoff");
+    assert!(kickoff.iter().all(|pose| pose.2 == 0.0));
+
+    let mut running = Vec::new();
+    for _ in 0..4 {
+        running.extend(poses(&service.tick(0.25).expect("tick")));
+    }
+    let (_, _, speed, tail) = running
+        .iter()
+        .find(|pose| pose.2 > 0.0)
+        .expect("a bot runs");
+    assert_eq!(float(tail, 0), 1.0, "w");
+    assert_eq!(
+        float(tail, 4),
+        float(tail, 20),
+        "facing and move direction agree"
+    );
+    assert_eq!(float(tail, 40), *speed, "the speed slot");
+    assert_eq!(tail[44], 0);
+
+    for _ in 0..40 {
+        match service.phase() {
+            MatchPhase::HalfTime => break,
+            MatchPhase::Restart => drop(service.start().expect("restart")),
+            _ => drop(service.tick(0.25).expect("tick")),
+        }
+    }
+    assert_eq!(service.phase(), MatchPhase::HalfTime);
+    let second = poses(&service.second_half().expect("second half"));
+    assert_eq!(second.len(), 7, "every bot is lined up again");
+    let keepers: Vec<_> = kickoff.iter().filter(|pose| pose.1.abs() > 25.0).collect();
+    assert_eq!(keepers.len(), 2);
+    for keeper in keepers {
+        let after = second.iter().find(|pose| pose.0 == keeper.0).unwrap();
+        assert!(
+            (after.1 + keeper.1).abs() < 0.01,
+            "the keeper swaps ends: {after:?}"
+        );
+    }
 }

@@ -215,8 +215,20 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
                         .is_some_and(|text| text.contains("community captures"))
             })
         });
+        // L932: a gate actor placed on a client terrain object cites that object.
+        let terrain_object = row["source"].as_array().is_some_and(|tags| {
+            tags.iter().any(|tag| {
+                tag["kind"] == "client"
+                    && tag["evidence"]
+                        .as_str()
+                        .is_some_and(|text| text.contains("client terrain chunk object"))
+            })
+        });
         assert!(
-            has_source(row, "legacy-data") || has_source(row, "reference") || live_capture,
+            has_source(row, "legacy-data")
+                || has_source(row, "reference")
+                || live_capture
+                || terrain_object,
             "{owner}: missing Legacy or reference tag"
         );
         for tag in row["source"].as_array().unwrap() {
@@ -301,8 +313,9 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // T500 appended the unanchored Hasti row (1,203) and moved Dani and Honey to legacy spawns;
     // T501 appended the unanchored Shannon and Sugaboo rows (1,205); T739 appended four
     // `legacy_data` clickable quest props (1,209, all Legacy spawns); L096 the two Wildwood
-    // turnstile actors (1,211, live_capture); L925 twelve fanbyte-wiki quest givers (1,223, poi_anchor).
-    assert_eq!(regional_legacy + regional_reconstructed, 1223);
+    // turnstile actors (1,211, live_capture); L925 twelve fanbyte-wiki quest givers (1,223, poi_anchor);
+    // L932 the two Snowhill soccer gates (1,225, client_object).
+    assert_eq!(regional_legacy + regional_reconstructed, 1225);
     assert!(
         regional_legacy >= 582,
         "regional NPCs dropped to {regional_legacy}"
@@ -326,8 +339,9 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // Hooligan, Hooligan Archer and Hooligan Wolf bodies (friendly blue props nobody could fight; 4154/4155
     // stay, the quest camp shares their GUIDs). 4667 and 4675 stay too: field_enemies.json now gives
     // each a hostile body with the same GUID, which hides the passive copy. That leaves 3,199.
-    // L096 appended the bodies of the two Wildwood turnstile actors (3,201).
-    assert_eq!(extra_rows.len(), 3201);
+    // L096 appended the bodies of the two Wildwood turnstile actors (3,201); L932 the two Snowhill
+    // soccer gates (3,203).
+    assert_eq!(extra_rows.len(), 3203);
     assert_eq!(captured_actors.len(), 9);
     println!(
         "NPC placements: {regional_legacy} Legacy, {regional_reconstructed} reconstructed; {} extra spawns, {} capture-confirmed",

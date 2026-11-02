@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source": "MiniGameData rows 42/43/44 (type 12) and client Resources/ActivityCategories.txt row 22 (Soccer_Briarwood.dds); match, roster, reward and adapter values are reconstructed (R) and remain tunable. Pitch geometry (R) from the live 2014 capture OpenSourceFreeRealms ofrserver Packets/packets_soccer_minigame.pcapng, 76/1 UpdatePlayerPos: kickoff formation at frame 6451 mirrors through centre (226.7, 0, 212.9); every player position lies in x 200.4..253.0, z 196.4..229.6, y -0.009..0.04; the human player is first placed at (230.64, 0, 210.22) (frame 5534), used here as the entry spawn (this server sends no 76/1 placement); entry rotation (0, 0, 0, 1) is that capture's opcode-31 value.",
+  "source": "MiniGameData rows 42/43/44 (type 12) and client Resources/ActivityCategories.txt row 22 (Soccer_Briarwood.dds); L932: the quest-only type-12 rows 322-333 (Soccer Star quest line, names Global.Text 402582-402618 and 414908-414912) share this one pitch and roster and differ only in the row a win credits and each row's own win condition; the match, roster, reward and adapter values are reconstructed (R) and remain tunable. Pitch geometry (R) from the live 2014 capture OpenSourceFreeRealms ofrserver Packets/packets_soccer_minigame.pcapng, 76/1 UpdatePlayerPos: kickoff formation at frame 6451 mirrors through centre (226.7, 0, 212.9); every player position lies in x 200.4..253.0, z 196.4..229.6, y -0.009..0.04; the human player is first placed at (230.64, 0, 210.22) (frame 5534), used here as the entry spawn (this server sends no 76/1 placement); entry rotation (0, 0, 0, 1) is that capture's opcode-31 value. L932 gates: NPC keys 9500001022 / 9500001023 are the client's Right / Left Side Soccer Gate (Global.Text 416257 / 416258; the quest objectives say 'Click the soccer gate', Global.Text 402694, 402788, 402796), menu label Global.Text 3212 'Soccer Lobby'; (R) a gate enters Snowhill Soccer (row 43), the field it stands at, with the quest row override of the games list.",
   "games": [
     {
       "id": 42,
@@ -28,11 +28,144 @@
       "difficulty": 1,
       "required_level": 0,
       "encounter_id": 3
+    },
+    {
+      "id": 322,
+      "name_id": 402582,
+      "description_id": 37947,
+      "icon_id": 20992,
+      "difficulty": 1,
+      "encounter_id": 4,
+      "quest_only": true,
+      "source": "MiniGameData row 322 (type 12, name Global.Text 402582 Snowy Scrimmage). Objective text 402838 'Beat the Snowspurs'; 407268 calls it a friendly practice match. (R) win only. Quest 3140004 is authored against Games row 43; this row credits when an objective names 322."
+    },
+    {
+      "id": 323,
+      "name_id": 402586,
+      "description_id": 37947,
+      "icon_id": 20992,
+      "difficulty": 1,
+      "encounter_id": 5,
+      "quest_only": true,
+      "max_conceded": 4,
+      "source": "MiniGameData row 323 (type 12, name 402586 Goal Stopper). Objectives 402842 'Beat the Goalbusters' and 402851 / 403498 'Don't let the Goalbusters score 5 goals'; 407269 repeats the limit. (R) the win counts only while the other team scored at most 4 goals."
+    },
+    {
+      "id": 324,
+      "name_id": 402590,
+      "description_id": 37947,
+      "icon_id": 20992,
+      "difficulty": 2,
+      "encounter_id": 6,
+      "quest_only": true,
+      "source": "MiniGameData row 324 (type 12, name 402590 Briarwood's Fancy Feet). Objective 402931 'Beat the Black Widows'; 407270 asks for 15 slide tackles on the star player, which the server does not measure. (R) win only."
+    },
+    {
+      "id": 325,
+      "name_id": 402598,
+      "description_id": 37947,
+      "icon_id": 20992,
+      "difficulty": 3,
+      "encounter_id": 7,
+      "quest_only": true,
+      "source": "MiniGameData row 325 (type 12, name 402598 Sidekicks Steal). Objective 402958 'Beat the Mud Hoppers'; bonus 406461 'Steal the ball 10 times' is not measured. (R) win only."
+    },
+    {
+      "id": 326,
+      "name_id": 402606,
+      "description_id": 37947,
+      "icon_id": 20992,
+      "difficulty": 1,
+      "encounter_id": 8,
+      "quest_only": true,
+      "source": "MiniGameData row 326 (type 12, name 402606 Slowing The Snowspurs). Objective 406475 'Beat the Snowspurs'; bonus 406473 'Don't get knocked down 15 times' is not measured. (R) win only."
+    },
+    {
+      "id": 327,
+      "name_id": 402610,
+      "description_id": 37947,
+      "icon_id": 20992,
+      "difficulty": 4,
+      "encounter_id": 9,
+      "quest_only": true,
+      "source": "MiniGameData row 327 (type 12, name 402610 Making The Finals). Objective 402995 'Beat the Twinkletoes'; bonus goals 406621 (10 dodges) and 406624 (knock the star player down 15 times) are not measured. (R) win only."
+    },
+    {
+      "id": 328,
+      "name_id": 402618,
+      "description_id": 37947,
+      "icon_id": 20992,
+      "difficulty": 5,
+      "encounter_id": 10,
+      "quest_only": true,
+      "source": "MiniGameData row 328 (type 12, name 402618 Tournament Champion). Objective 403026 'Beat the Cheetahs'; 402818 calls it the final game of the season. (R) win only."
+    },
+    {
+      "id": 329,
+      "name_id": 414908,
+      "description_id": 37947,
+      "icon_id": 20992,
+      "difficulty": 2,
+      "encounter_id": 11,
+      "quest_only": true,
+      "source": "MiniGameData row 329 (type 12, name 414908 Power Game). Objective 402842 'Beat the Goalbusters'; bonus 414973 'Steal the ball 5 times' is not measured. (R) win only."
+    },
+    {
+      "id": 330,
+      "name_id": 414909,
+      "description_id": 37947,
+      "icon_id": 20992,
+      "difficulty": 2,
+      "encounter_id": 12,
+      "quest_only": true,
+      "source": "MiniGameData row 330 (type 12, name 414909 Black Widows' Rematch). Objective 414976 'beat the Black Widows in a rematch'. (R) win only."
+    },
+    {
+      "id": 331,
+      "name_id": 414910,
+      "description_id": 37947,
+      "icon_id": 20992,
+      "difficulty": 3,
+      "encounter_id": 13,
+      "quest_only": true,
+      "source": "MiniGameData row 331 (type 12, name 414910 Mud Hopping). Objective 414990 'beat the Mud Hoppers in a game for coin'; the coin is the quest's reward. (R) win only."
+    },
+    {
+      "id": 332,
+      "name_id": 414911,
+      "description_id": 37947,
+      "icon_id": 20992,
+      "difficulty": 4,
+      "encounter_id": 14,
+      "quest_only": true,
+      "source": "MiniGameData row 332 (type 12, name 414911 Twinkle Toes). Objective 414998 'beat the Sanctuary Twinkletoes in a friendly soccer game'; the offer 414950 asks for a few extra goals as a side request. (R) win only."
+    },
+    {
+      "id": 333,
+      "name_id": 414912,
+      "description_id": 37947,
+      "icon_id": 20992,
+      "difficulty": 4,
+      "encounter_id": 15,
+      "quest_only": true,
+      "source": "MiniGameData row 333 (type 12, name 414912 Cheetahs Double Challenge). Objectives 415011 'Beat the Cheetahs' First Challenge' and 415107 '... Second Challenge'. (R) win only; each win credits one challenge, so the quest authors two wins."
     }
   ],
+  "gates": {
+    "npcs": [
+      9500001022,
+      9500001023
+    ],
+    "menu_string_id": 3212,
+    "game_id": 43
+  },
   "match_config": {
     "bounds": {
-      "centre": [226.7, 0.0, 212.9],
+      "centre": [
+        226.7,
+        0.0,
+        212.9
+      ],
       "half_x": 27.0,
       "half_z": 17.5,
       "goal_half_width": 8.0,
@@ -48,15 +181,30 @@
       "max_tick": 0.25
     },
     "half_seconds": 180.0,
-    "kickoff_spawn": [226.7, 0.0, 212.9],
+    "kickoff_spawn": [
+      226.7,
+      0.0,
+      212.9
+    ],
     "half_policy": "switch_sides",
     "adapter": {
       "max_power": 30.0,
       "charge_floor": 0.01,
       "min_direction_norm": 0.001
     },
-    "entry_position": [230.64, 0.0, 210.22, 1.0],
-    "entry_rotation": [0.0, 0.0, 0.0, 1.0]
+    "entry_position": [
+      230.64,
+      0.0,
+      210.22,
+      1.0
+    ],
+    "entry_rotation": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "bot_ai": true
   },
   "reward": {
     "coins": 10,

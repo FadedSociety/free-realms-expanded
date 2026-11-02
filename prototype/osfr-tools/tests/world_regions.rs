@@ -283,14 +283,16 @@ fn shipped_npc_rows_cover_1192_of_1209() {
         }
     }
 
-    assert_eq!(total, 1223, "shipped NPC rows");
+    // L932: the two Snowhill soccer gates (1,225).
+    assert_eq!(total, 1225, "shipped NPC rows");
     // T876 (was 981 / 844 / 905 / 1091 with the T753 grouping and the community region shapes): the places'
     // music/ambience area families and the client-row regions cover 1,193 rows, of which every one is in a place.
     // T665 moved Sorin and Coach Eddie onto drawn Legacy spawns; one of the two landed outside every
     // place and region, which took each count down by one (1,193 / 893 / 954 / 1,193 before).
     // L096 added the two Wildwood turnstile actors, both inside a place (1,194).
     // L925 added twelve fanbyte-wiki quest givers among their landmark's NPCs, all inside a place (1,206).
-    assert_eq!(in_place, 1206, "rows in a first-party place group");
+    // L932: both Snowhill soccer gates stand in a place (1,208).
+    assert_eq!(in_place, 1208, "rows in a first-party place group");
     // T896 moved sixteen reconstructed rows onto their video-archive points; net, one row fewer stands in the
     // banner regions (892 -> 891) and two fewer in any region shape (953 -> 951).
     // L925's twelve givers: nine stand in a banner region (891 -> 900).
@@ -301,7 +303,7 @@ fn shipped_npc_rows_cover_1192_of_1209() {
     // L096's two turnstile actors stand in the region 1 fallback sphere, not a banner region (953).
     // L925: the same nine givers (953 -> 962).
     assert_eq!(in_any_region, 962, "rows in a region (including region 1)");
-    assert_eq!(covered, 1206, "rows in a place or a region");
+    assert_eq!(covered, 1208, "rows in a place or a region");
 }
 
 #[test]

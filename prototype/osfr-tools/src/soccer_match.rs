@@ -92,7 +92,8 @@ impl FieldBounds {
         if self.goal_half_width <= 0.0 || self.goal_height <= 0.0 {
             return Err(invalid("soccer goal bounds must be positive"));
         }
-        if self.goal_half_width > self.half_x {
+        // L932: the goals are on the x ends, so the mouth spans z.
+        if self.goal_half_width > self.half_z {
             return Err(invalid("soccer goal is wider than the field"));
         }
         Ok(())
@@ -154,6 +155,8 @@ pub struct MatchConfig {
     pub kickoff_spawn: [f32; 3],
     /// Caller-owned second-half side policy.
     pub half_policy: HalfPolicy,
+    /// L932: server bots play (`soccer_bots`); off keeps them passive (scripted tests).
+    pub bot_ai: bool,
 }
 
 impl MatchConfig {
@@ -167,6 +170,7 @@ impl MatchConfig {
             half_seconds: crate::soccer::HALF_SECONDS,
             kickoff_spawn: bounds.centre,
             half_policy: HalfPolicy::SwitchSides,
+            bot_ai: false,
         }
     }
 
@@ -432,6 +436,8 @@ pub struct Authority {
     server_time: f64,
     revision: u64,
     outcome: Option<Outcome>,
+    /// L932: the team that takes the next kickoff: team 0 first, then whoever conceded (R).
+    kickoff_team: u32,
 }
 
 impl Authority {
@@ -454,7 +460,68 @@ impl Authority {
             server_time: 0.0,
             revision: 0,
             outcome: None,
+            kickoff_team: 0,
         })
+    }
+
+    /// L932: the team that takes the next kickoff.
+    pub fn kickoff_team(&self) -> u32 {
+        self.kickoff_team
+    }
+
+    /// Every registered player, by id.
+    pub fn players(&self) -> impl Iterator<Item = (u64, &PlayerState)> {
+        self.players.iter().map(|(id, state)| (*id, state))
+    }
+
+    /// L932: move a server-owned player (a bot) to `position`. Client players
+    /// move only through [`Self::apply`]'s bounded intents; a bot is the
+    /// server's own actor, so it is placed directly, inside the field.
+    pub fn place_server_player(&mut self, player: u64, position: [f32; 3]) -> io::Result<()> {
+        if !finite3(position) || !self.config.bounds.inside(position) {
+            return Err(invalid("soccer bot position outside the field"));
+        }
+        let server_time = self.server_time;
+        let state = self
+            .players
+            .get_mut(&player)
+            .ok_or_else(|| invalid(UNREGISTERED_PLAYER))?;
+        state.position = Some(position);
+        state.position_at = server_time;
+        Ok(())
+    }
+
+    /// L932: a slide tackle (the wiki: "Use the Spacebar or the Left Mouse
+    /// button to Slide Tackle and steal the ball from opponents"). A tackler
+    /// within the control radius of an opposing ball carrier takes the ball and
+    /// knocks the carrier down. Returns the player knocked down.
+    pub fn tackle(&mut self, tackler: u64) -> io::Result<Option<u64>> {
+        if self.phase != MatchPhase::Running {
+            return Err(invalid("soccer tackles are only accepted while running"));
+        }
+        let state = *self
+            .players
+            .get(&tackler)
+            .ok_or_else(|| invalid(UNREGISTERED_PLAYER))?;
+        let (Some(holder), Some(at)) = (self.possession, state.position) else {
+            return Ok(None);
+        };
+        let Some(victim) = self.players.get(&holder) else {
+            return Ok(None);
+        };
+        let close = victim
+            .position
+            .is_some_and(|position| distance(position, at) <= self.config.physics.control_radius);
+        if holder == tackler || victim.team == state.team || !close {
+            return Ok(None);
+        }
+        self.possession = Some(tackler);
+        self.ball_position = at;
+        self.ball_velocity = [0.0; 3];
+        self.live_pass = None;
+        self.last_touch = Some(tackler);
+        self.revision += 1;
+        Ok(Some(holder))
     }
 
     pub fn config(&self) -> &MatchConfig {
@@ -853,6 +920,7 @@ impl Authority {
 
         if let Some(team) = self.goal_crossing(previous, next) {
             self.score[team as usize] += 1;
+            self.kickoff_team = 1 - team;
             self.phase = MatchPhase::Restart;
             self.ball_velocity = [0.0; 3];
             self.possession = None;
@@ -995,36 +1063,50 @@ impl Authority {
         }
     }
 
-    /// Attack direction sign for a team in the current half. First-half
-    /// convention: team 0 attacks `+z`, team 1 `-z` (reconstructed). The
+    /// Attack direction sign for a team in the current half (along x). The
     /// caller-owned [`HalfPolicy`] decides whether the sides swap at the
     /// interval; the side-switch behavior remains R policy.
-    fn attack_sign(&self, team: u32) -> f32 {
-        let first_half = if team == 0 { 1.0 } else { -1.0 };
+    /// L932: the goals sit on the pitch's long (x) axis. In the live capture
+    /// (packets_soccer_minigame.pcapng) the keepers stand at x 252.5 and 200.9
+    /// and team 0 (the joining player's side) kicks off on the high-x half, so
+    /// it defends +x and attacks -x in the first half.
+    pub fn attack_sign(&self, team: u32) -> f32 {
+        let first_half = if team == 0 { -1.0 } else { 1.0 };
         let switched = self.config.half_policy == HalfPolicy::SwitchSides && self.half == 2;
         if switched { -first_half } else { first_half }
     }
 
+    /// The world centre of the goal `team` attacks, on the pitch floor.
+    pub fn attack_goal(&self, team: u32) -> [f32; 3] {
+        let c = self.config.bounds.centre;
+        [
+            c[0] + self.attack_sign(team) * self.config.bounds.half_x,
+            c[1],
+            c[2],
+        ]
+    }
+
     /// Deterministic goal test: a signed crossing of the team's attack goal
-    /// line inside the caller-supplied mouth, measured from the pitch centre.
+    /// line (x = sign * half_x from the pitch centre) inside the mouth
+    /// (|z| <= goal_half_width, 0 <= y <= goal_height).
     fn goal_crossing(&self, previous: [f32; 3], next: [f32; 3]) -> Option<u32> {
         let bounds = self.config.bounds;
         let (previous, next) = (bounds.local(previous), bounds.local(next));
         for team in 0..2u32 {
             let sign = self.attack_sign(team);
-            let line = sign * self.config.bounds.half_z;
+            let line = sign * self.config.bounds.half_x;
             let crossed = if sign > 0.0 {
-                previous[2] <= line && next[2] > line
+                previous[0] <= line && next[0] > line
             } else {
-                previous[2] >= line && next[2] < line
+                previous[0] >= line && next[0] < line
             };
             if !crossed {
                 continue;
             }
-            let t = (line - previous[2]) / (next[2] - previous[2]);
-            let x = previous[0] + (next[0] - previous[0]) * t;
+            let t = (line - previous[0]) / (next[0] - previous[0]);
+            let z = previous[2] + (next[2] - previous[2]) * t;
             let y = previous[1] + (next[1] - previous[1]) * t;
-            if x.abs() <= self.config.bounds.goal_half_width
+            if z.abs() <= self.config.bounds.goal_half_width
                 && y >= 0.0
                 && y <= self.config.bounds.goal_height
             {

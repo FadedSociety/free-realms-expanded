@@ -99,8 +99,9 @@ fn vec_impulse() -> Vec<u8> {
 fn bounds() -> FieldBounds {
     FieldBounds {
         centre: [0.0; 3],
-        half_x: 50.0,
-        half_z: 30.0,
+        // L932: the goals are on the x ends; the test pitch keeps its 30-unit goal axis.
+        half_x: 30.0,
+        half_z: 50.0,
         goal_half_width: 4.0,
         goal_height: 3.0,
     }
@@ -537,7 +538,7 @@ fn pass_progresses_to_the_target_and_transfers_possession() {
 #[test]
 fn pass_requires_a_registered_teammate_in_range() {
     let mut game = authority();
-    send(&mut game, 0x10, position(0x10, 1, pos(0.5, 0.0))).unwrap();
+    send(&mut game, 0x10, position(0x10, 1, pos(0.0, 0.5))).unwrap();
     game.advance(0.02).unwrap();
     assert!(
         send(&mut game, 0x10, pass(0x10, 2, 0x20, 4.0)).is_err(),
@@ -552,11 +553,11 @@ fn pass_requires_a_registered_teammate_in_range() {
         0x11,
         1,
         &[
-            pos(9.0, 0.0),
-            pos(18.0, 0.0),
-            pos(27.0, 0.0),
-            pos(36.0, 0.0),
-            pos(45.0, 0.0),
+            pos(0.0, 9.0),
+            pos(0.0, 18.0),
+            pos(0.0, 27.0),
+            pos(0.0, 36.0),
+            pos(0.0, 45.0),
         ],
     );
     assert!(
@@ -568,17 +569,17 @@ fn pass_requires_a_registered_teammate_in_range() {
 #[test]
 fn goal_crossing_scores_once_inside_the_mouth_only() {
     let mut game = authority();
-    send(&mut game, 0x10, position(0x10, 1, pos(0.5, 0.0))).unwrap();
+    send(&mut game, 0x10, position(0x10, 1, pos(0.0, 0.5))).unwrap();
     game.advance(0.02).unwrap();
-    // Bounded steps to the +z goal line that team 0 attacks in half 1.
+    // Bounded steps to the -x goal line that team 0 attacks in half 1.
     let next = walk(
         &mut game,
         0x10,
         2,
-        &[pos(0.0, 9.0), pos(0.0, 18.0), pos(0.0, 28.0)],
+        &[pos(-9.0, 0.0), pos(-18.0, 0.0), pos(-28.0, 0.0)],
     );
     game.advance(0.02).unwrap(); // dribble: the ball follows the holder
-    send(&mut game, 0x10, shot(0x10, next, [0.0, 0.0, 1.0], 5.0)).unwrap();
+    send(&mut game, 0x10, shot(0x10, next, [-1.0, 0.0, 0.0], 5.0)).unwrap();
     for _ in 0..8 {
         if game.phase() != MatchPhase::Running {
             break;
@@ -586,7 +587,7 @@ fn goal_crossing_scores_once_inside_the_mouth_only() {
         game.advance(0.1).unwrap();
     }
     assert_eq!(game.phase(), MatchPhase::Restart);
-    assert_eq!(game.score(), [1, 0], "team 0 attacks +z");
+    assert_eq!(game.score(), [1, 0], "team 0 attacks -x");
     assert_eq!(game.ball_velocity(), [0.0, 0.0, 0.0]);
     // Once-only: no further advance or scoring while the goal is latched.
     assert!(game.advance(0.1).is_err());
@@ -595,21 +596,21 @@ fn goal_crossing_scores_once_inside_the_mouth_only() {
     // Outside the mouth: no goal, and the ball restarts at the spawn instead
     // of stranding (F4).
     let mut game = authority();
-    send(&mut game, 0x10, position(0x10, 1, pos(0.5, 0.0))).unwrap();
+    send(&mut game, 0x10, position(0x10, 1, pos(0.0, 0.5))).unwrap();
     game.advance(0.02).unwrap();
     let next = walk(
         &mut game,
         0x10,
         2,
         &[
-            pos(5.0, 4.5),
-            pos(10.0, 9.0),
-            pos(10.0, 18.0),
-            pos(10.0, 28.0),
+            pos(-4.5, 5.0),
+            pos(-9.0, 10.0),
+            pos(-18.0, 10.0),
+            pos(-28.0, 10.0),
         ],
     );
     game.advance(0.02).unwrap();
-    send(&mut game, 0x10, shot(0x10, next, [0.0, 0.0, 1.0], 5.0)).unwrap();
+    send(&mut game, 0x10, shot(0x10, next, [-1.0, 0.0, 0.0], 5.0)).unwrap();
     for _ in 0..8 {
         if game.phase() != MatchPhase::Running {
             break;
@@ -666,16 +667,16 @@ fn out_of_play_restarts_bounded_at_the_spawn() {
 #[test]
 fn kickoff_reset_resumes_play_and_preserves_the_score() {
     let mut game = authority();
-    send(&mut game, 0x10, position(0x10, 1, pos(0.5, 0.0))).unwrap();
+    send(&mut game, 0x10, position(0x10, 1, pos(0.0, 0.5))).unwrap();
     game.advance(0.02).unwrap();
     let next = walk(
         &mut game,
         0x10,
         2,
-        &[pos(0.0, 9.0), pos(0.0, 18.0), pos(0.0, 28.0)],
+        &[pos(-9.0, 0.0), pos(-18.0, 0.0), pos(-28.0, 0.0)],
     );
     game.advance(0.02).unwrap();
-    send(&mut game, 0x10, shot(0x10, next, [0.0, 0.0, 1.0], 30.0)).unwrap();
+    send(&mut game, 0x10, shot(0x10, next, [-1.0, 0.0, 0.0], 30.0)).unwrap();
     for _ in 0..8 {
         if game.phase() != MatchPhase::Running {
             break;
@@ -694,7 +695,7 @@ fn kickoff_reset_resumes_play_and_preserves_the_score() {
         &mut game,
         0x10,
         next + 1,
-        &[pos(0.0, 18.0), pos(0.5, 9.0), pos(0.5, 0.0)],
+        &[pos(-18.0, 0.0), pos(-9.0, 0.5), pos(0.0, 0.5)],
     );
     game.advance(0.02).unwrap();
     assert_eq!(game.possession(), Some(0x10));
@@ -702,10 +703,10 @@ fn kickoff_reset_resumes_play_and_preserves_the_score() {
         &mut game,
         0x10,
         next,
-        &[pos(0.0, 9.0), pos(0.0, 18.0), pos(0.0, 28.0)],
+        &[pos(-9.0, 0.0), pos(-18.0, 0.0), pos(-28.0, 0.0)],
     );
     game.advance(0.02).unwrap();
-    send(&mut game, 0x10, shot(0x10, next, [0.0, 0.0, 1.0], 30.0)).unwrap();
+    send(&mut game, 0x10, shot(0x10, next, [-1.0, 0.0, 0.0], 30.0)).unwrap();
     for _ in 0..8 {
         if game.phase() != MatchPhase::Running {
             break;
@@ -744,7 +745,7 @@ fn halves_transition_and_the_finished_outcome_is_once_only() {
 
 #[test]
 fn second_half_switches_attack_sides() {
-    // F6: with the default SwitchSides policy, team 0 attacks -z in half 2.
+    // F6: with the default SwitchSides policy, team 0 attacks +x in half 2.
     let mut config = MatchConfig::new(bounds());
     config.half_seconds = 5.0;
     config.physics.gravity = 0.0;
@@ -756,23 +757,23 @@ fn second_half_switches_attack_sides() {
     assert_eq!(game.phase(), MatchPhase::HalfTime);
     game.start_second_half().unwrap();
     assert_eq!(game.half(), 2);
-    send(&mut game, 0x10, position(0x10, 1, pos(0.5, 0.0))).unwrap();
+    send(&mut game, 0x10, position(0x10, 1, pos(0.0, 0.5))).unwrap();
     game.advance(0.02).unwrap();
     let next = walk(
         &mut game,
         0x10,
         2,
-        &[pos(0.0, -9.0), pos(0.0, -18.0), pos(0.0, -28.0)],
+        &[pos(9.0, 0.0), pos(18.0, 0.0), pos(28.0, 0.0)],
     );
     game.advance(0.02).unwrap();
-    send(&mut game, 0x10, shot(0x10, next, [0.0, 0.0, -1.0], 30.0)).unwrap();
+    send(&mut game, 0x10, shot(0x10, next, [1.0, 0.0, 0.0], 30.0)).unwrap();
     for _ in 0..8 {
         if game.phase() != MatchPhase::Running {
             break;
         }
         game.advance(0.1).unwrap();
     }
-    assert_eq!(game.score(), [1, 0], "team 0 attacks -z after the interval");
+    assert_eq!(game.score(), [1, 0], "team 0 attacks +x after the interval");
 }
 
 #[test]
@@ -787,17 +788,17 @@ fn keep_sides_policy_is_caller_owned() {
     game.kickoff().unwrap();
     run_half(&mut game);
     game.start_second_half().unwrap();
-    // Team 1 still attacks -z, so its shot over the -z line scores for team 1.
-    send(&mut game, 0x20, position(0x20, 1, pos(0.5, 0.0))).unwrap();
+    // Team 1 still attacks +x, so its shot over the -z line scores for team 1.
+    send(&mut game, 0x20, position(0x20, 1, pos(0.0, 0.5))).unwrap();
     game.advance(0.02).unwrap();
     let next = walk(
         &mut game,
         0x20,
         2,
-        &[pos(0.0, -9.0), pos(0.0, -18.0), pos(0.0, -28.0)],
+        &[pos(9.0, 0.0), pos(18.0, 0.0), pos(28.0, 0.0)],
     );
     game.advance(0.02).unwrap();
-    send(&mut game, 0x20, shot(0x20, next, [0.0, 0.0, -1.0], 30.0)).unwrap();
+    send(&mut game, 0x20, shot(0x20, next, [1.0, 0.0, 0.0], 30.0)).unwrap();
     for _ in 0..8 {
         if game.phase() != MatchPhase::Running {
             break;
@@ -959,20 +960,21 @@ fn an_off_origin_pitch_measures_positions_and_goals_from_its_centre() {
         assert!(refused.to_string().contains("outside the field"), "{refused}");
     }
 
-    // Take the ball at the centre and score through the +z mouth.
+    // Take the ball at the centre and score through the -x mouth (L932: the goals are on the x
+    // ends, 27 from the centre; team 0 attacks -x in the first half).
     send(&mut game, 0x10, position(0x10, 1, at(0.5, 0.0))).unwrap();
     game.advance(0.02).unwrap();
     assert_eq!(game.possession(), Some(0x10));
-    let next = walk(&mut game, 0x10, 2, &[at(0.0, 9.0), at(0.0, 16.0)]);
+    let next = walk(&mut game, 0x10, 2, &[at(-9.0, 0.0), at(-18.0, 0.0), at(-25.0, 0.0)]);
     game.advance(0.02).unwrap();
-    send(&mut game, 0x10, shot(0x10, next, [0.0, 0.0, 1.0], 30.0)).unwrap();
+    send(&mut game, 0x10, shot(0x10, next, [-1.0, 0.0, 0.0], 30.0)).unwrap();
     for _ in 0..8 {
         if game.phase() != MatchPhase::Running {
             break;
         }
         game.advance(0.1).unwrap();
     }
-    assert_eq!(game.score(), [1, 0], "a goal on the line 17.5 past the centre");
+    assert_eq!(game.score(), [1, 0], "a goal on the line 27 past the centre");
 }
 
 // ---------------------------------------------------------------------------

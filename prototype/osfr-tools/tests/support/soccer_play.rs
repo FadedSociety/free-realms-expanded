@@ -60,7 +60,8 @@ pub fn shot(player: u64) -> Vec<u8> {
         state: 17,
         aux: 255,
         state_counter: 1,
-        vectors: [[0.0, 0.0, 1.0, 1.0], [0.0; 4], [0.0; 4]],
+        // L932: team 0 attacks the -x goal in the first half (the goals are on the x ends).
+        vectors: [[-1.0, 0.0, 0.0, 1.0], [0.0; 4], [0.0; 4]],
     })
 }
 
