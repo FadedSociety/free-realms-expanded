@@ -210,10 +210,7 @@ pub fn item_reward(
 }
 
 fn read_u16(bytes: &[u8], offset: usize) -> io::Result<u16> {
-    let pair = bytes
-        .get(offset..offset + 2)
-        .ok_or_else(|| eof("packet header"))?;
-    Ok(u16::from_le_bytes([pair[0], pair[1]]))
+    crate::le::u16(bytes, offset).ok_or_else(|| eof("packet header"))
 }
 
 fn eof(what: &str) -> io::Error {

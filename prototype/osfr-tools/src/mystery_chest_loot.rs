@@ -212,7 +212,12 @@ impl MysteryChests {
                 ..InventoryOutcome::default()
             });
         }
-        let choices = eligible(&self.rewards[&chest.definition_id], member, gender);
+        // The chest lookup above admits only bound definitions, so the binding is present.
+        let choices = self
+            .rewards
+            .get(&chest.definition_id)
+            .map(|prizes| eligible(prizes, member, gender))
+            .unwrap_or_default();
         if choices.is_empty() {
             return Ok(InventoryOutcome {
                 replies: vec![chat::system("Nothing in this Mystery Chest can be yours.")],
@@ -229,7 +234,8 @@ impl MysteryChests {
         hash.update(key.id.to_le_bytes());
         hash.update(key.count.to_le_bytes());
         let digest = hash.finalize();
-        let draw = u64::from_le_bytes(digest[..8].try_into().unwrap());
+        let draw =
+            crate::le::u64(&digest, 0).ok_or_else(|| invalid("chest draw digest is short"))?;
         let reward = choices[(draw % choices.len() as u64) as usize];
         let metadata = inventory.presentation(reward)?;
         let mut staged = inventory.clone();

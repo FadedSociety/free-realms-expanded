@@ -665,3 +665,22 @@ fn private_captured_inventory_roundtrip_and_reward() {
         "1386 saved items, {missing_item_bytes} bytes withheld from startup self data; reward count and coins restored"
     );
 }
+
+/// L113: `without_content` does not validate the save, so its coins can exceed the i32 wire
+/// field. Spending from it is refused and changes nothing; the 38/19 balance used to wrap.
+#[test]
+fn spending_from_an_unvalidated_oversized_wallet_is_refused() {
+    let state = InventoryState {
+        coins: u32::MAX,
+        items: Vec::new(),
+        equipment: Vec::new(),
+        next_instance_id: None,
+    };
+    let mut inventory = Inventory::without_content(Some(state.clone()));
+    assert!(inventory.spend_coins(1).is_err());
+    assert_eq!(inventory.state(), &state);
+    assert!(
+        inventory.spend_coins(0).unwrap().replies.is_empty(),
+        "spending nothing stays a no-op"
+    );
+}

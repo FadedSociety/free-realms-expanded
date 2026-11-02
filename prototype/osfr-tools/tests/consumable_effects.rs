@@ -396,3 +396,20 @@ fn resend_shows_the_live_state_with_remaining_time() {
     assert_eq!(aura_row.unknown_7, 570); // 10 minutes minus 30 s
     assert!(EffectStack::default().resend_to_self(GUID, 0).is_empty());
 }
+
+/// L113: a `Boost` built with a percent the stack would refuse is computed exactly, or clamps at
+/// `u32::MAX`, instead of overflowing (`100 + percent` used to panic in a debug build).
+#[test]
+fn a_huge_boost_percent_clamps_instead_of_overflowing() {
+    let boost = Boost {
+        stars: u32::MAX,
+        coins: u32::MAX,
+    };
+    assert_eq!(
+        boost.stars(10),
+        429_496_740,
+        "10 x (u32::MAX + 100) / 100, rounded"
+    );
+    assert_eq!(boost.coins(u32::MAX), u32::MAX);
+    assert_eq!(boost.coins(0), 0);
+}

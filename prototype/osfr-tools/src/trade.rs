@@ -479,16 +479,10 @@ impl TradeService {
         if previous == quantity {
             return Ok(Vec::new());
         }
-        if quantity > 0 {
+        let item = if quantity > 0 {
             let player = self.players.get(&guid).ok_or(TradeError::UnknownPlayer)?;
             validate_offer_item(&player.inventory, item_id, quantity)?;
-        }
-        let counter = session
-            .counter
-            .checked_add(1)
-            .ok_or(TradeError::RevisionExhausted)?;
-        let item = if quantity > 0 {
-            let mut item = self.players[&guid]
+            let mut item = player
                 .inventory
                 .state
                 .items
@@ -504,8 +498,15 @@ impl TradeService {
         } else {
             None
         };
+        let counter = session
+            .counter
+            .checked_add(1)
+            .ok_or(TradeError::RevisionExhausted)?;
         // Every fallible step is done: from here the session changes.
-        let session = self.sessions.get_mut(&session_id).unwrap();
+        let session = self
+            .sessions
+            .get_mut(&session_id)
+            .ok_or(TradeError::UnknownSession)?;
         let unlocked = clear_acceptance(session);
         session.counter = counter;
         if quantity == 0 {
@@ -513,9 +514,9 @@ impl TradeService {
         } else {
             session.offers[index].insert(item_id, quantity);
         }
-        let session = &self.sessions[&session_id];
-        let mut out = self.lock_reset_messages(session, session_id, unlocked)?;
-        for recipient_index in 0..2 {
+        let participants = session.players;
+        let mut out = self.lock_reset_messages(participants, session_id, unlocked)?;
+        for (recipient_index, recipient) in participants.into_iter().enumerate() {
             let side = u8::from(recipient_index == index);
             let bytes = match &item {
                 Some(item) if previous == 0 => {
@@ -524,7 +525,7 @@ impl TradeService {
                 Some(_) => update_item_count_packet(session_id, counter, side, item_id, quantity)?,
                 None => update_item_count_packet(session_id, counter, side, item_id, 0)?,
             };
-            out.push(self.message(session.players[recipient_index], bytes)?);
+            out.push(self.message(recipient, bytes)?);
         }
         Ok(out)
     }
@@ -552,16 +553,19 @@ impl TradeService {
             .counter
             .checked_add(1)
             .ok_or(TradeError::RevisionExhausted)?;
-        let session = self.sessions.get_mut(&session_id).unwrap();
+        let session = self
+            .sessions
+            .get_mut(&session_id)
+            .ok_or(TradeError::UnknownSession)?;
         let unlocked = clear_acceptance(session);
         session.counter = counter;
         session.coins[index] = amount;
-        let session = &self.sessions[&session_id];
-        let mut out = self.lock_reset_messages(session, session_id, unlocked)?;
-        for recipient_index in 0..2 {
+        let participants = session.players;
+        let mut out = self.lock_reset_messages(participants, session_id, unlocked)?;
+        for (recipient_index, recipient) in participants.into_iter().enumerate() {
             let side = u8::from(recipient_index == index);
             out.push(self.message(
-                session.players[recipient_index],
+                recipient,
                 update_coin_packet(session_id, counter, side, amount),
             )?);
         }
@@ -591,7 +595,10 @@ impl TradeService {
         if session.locked[index] == locked {
             return Ok(Vec::new());
         }
-        let session = self.sessions.get_mut(&session_id).unwrap();
+        let session = self
+            .sessions
+            .get_mut(&session_id)
+            .ok_or(TradeError::UnknownSession)?;
         if !locked {
             let had_lock = session.locked.iter().any(|value| *value);
             session.locked = [false, false];
@@ -667,7 +674,10 @@ impl TradeService {
                 .inventory
                 .clone(),
         ];
-        let session = self.sessions.get_mut(&session_id).unwrap();
+        let session = self
+            .sessions
+            .get_mut(&session_id)
+            .ok_or(TradeError::UnknownSession)?;
         session.accepted[index] = true;
         if !session.accepted.iter().all(|value| *value) {
             return Ok(TradeOutcome::default());
@@ -675,7 +685,7 @@ impl TradeService {
         let [staged_first, staged_second] = staged_from;
         match stage_swap(session_id, session, staged_first, staged_second) {
             Ok(settlement) => {
-                self.sessions.get_mut(&session_id).unwrap().settlement = Some(settlement.clone());
+                session.settlement = Some(settlement.clone());
                 Ok(TradeOutcome {
                     messages: Vec::new(),
                     settlement: Some(settlement),
@@ -913,7 +923,8 @@ impl TradeService {
             return Err(TradeError::Malformed);
         };
         let session_id = u32::from_le_bytes(*id);
-        let word = |at: usize| u32::from_le_bytes(body[at..at + 4].try_into().unwrap());
+        // Every arm below matches the body length first, so a short body never reaches a read.
+        let word = |at: usize| crate::le::u32(body, at).ok_or(TradeError::Malformed);
         if session_id == u32::MAX || session_id == 0 {
             return Err(TradeError::Malformed);
         }
@@ -930,7 +941,7 @@ impl TradeService {
             (3, 1) => self
                 .reply_invite(players, social, guid, session_id, body[0] != 0, now_ms)
                 .map(plain),
-            (6, 4) => self.accept(players, social, guid, session_id, word(0), now_ms),
+            (6, 4) => self.accept(players, social, guid, session_id, word(0)?, now_ms),
             (7, 0) => self.cancel(guid, session_id).map(plain),
             (8, 5) => self
                 .set_lock(
@@ -938,14 +949,14 @@ impl TradeService {
                     social,
                     guid,
                     session_id,
-                    word(0),
+                    word(0)?,
                     body[4] != 0,
                     now_ms,
                 )
                 .map(plain),
             (9, 8) => {
-                let item = i32::try_from(word(0)).map_err(|_| TradeError::Malformed)?;
-                self.offer_item(players, social, guid, session_id, item, word(4))
+                let item = i32::try_from(word(0)?).map_err(|_| TradeError::Malformed)?;
+                self.offer_item(players, social, guid, session_id, item, word(4)?)
                     .map(plain)
                     .or_else(|error| match error {
                         TradeError::UnknownItem
@@ -967,7 +978,7 @@ impl TradeService {
                     })
             }
             (10, 4) => self
-                .offer_coins(players, social, guid, session_id, word(0))
+                .offer_coins(players, social, guid, session_id, word(0)?)
                 .map(plain),
             _ => return Err(TradeError::Malformed),
         };
@@ -1064,15 +1075,14 @@ impl TradeService {
 
     fn lock_reset_messages(
         &self,
-        session: &Session,
+        participants: [u64; 2],
         session_id: u32,
         was_locked: bool,
     ) -> Result<Vec<TradeMessage>, TradeError> {
         if !was_locked {
             return Ok(Vec::new());
         }
-        session
-            .players
+        participants
             .iter()
             .map(|guid| self.message(*guid, update_lock_packet(session_id, false)))
             .collect()
@@ -1321,7 +1331,12 @@ fn stage_swap(
     let mut gave: [Vec<ItemMove>; 2] = [Vec::new(), Vec::new()];
     let mut received: [Vec<ItemMove>; 2] = [Vec::new(), Vec::new()];
     for source in 0..2 {
-        staged[source].state.coins -= session.coins[source];
+        // Checked above; a wallet or a stack never goes below zero even if that check moves.
+        staged[source].state.coins = staged[source]
+            .state
+            .coins
+            .checked_sub(session.coins[source])
+            .ok_or(invalid(source))?;
         for (&item_id, &quantity) in &session.offers[source] {
             let Some(index) = staged[source]
                 .state
@@ -1333,13 +1348,15 @@ fn stage_swap(
             };
             let mut item = staged[source].state.items[index].clone();
             // Validated above, so present: no-trade and max stack belong to the definition.
-            let definition = staged[source].definitions[&item.definition_id];
+            let Some(&definition) = staged[source].definitions.get(&item.definition_id) else {
+                return Err(invalid(source));
+            };
             gave[source].push(item_move(&item, quantity));
             if quantity == item.count {
                 staged[source].state.items.remove(index);
             } else {
                 let owned = &mut staged[source].state.items[index];
-                owned.count -= quantity;
+                owned.count = owned.count.checked_sub(quantity).ok_or(invalid(source))?;
                 owned.consumed_count = owned.consumed_count.min(owned.count);
                 owned.stored_count = owned.stored_count.min(owned.count - owned.consumed_count);
             }
@@ -1456,11 +1473,10 @@ fn receive_item(
 fn allocate_item_id(state: &mut InventoryState) -> Option<i32> {
     let max_live = state.items.iter().map(|item| item.id).max().unwrap_or(0);
     let next = state.next_instance_id.unwrap_or(i64::from(max_live) + 1);
-    let mut candidate = if next > i64::from(max_live) && next <= i64::from(i32::MAX) {
-        next as i32
-    } else {
-        1
-    };
+    let mut candidate = i32::try_from(next)
+        .ok()
+        .filter(|next| *next > max_live)
+        .unwrap_or(1);
     for _ in 0..=state.items.len() {
         if !state.items.iter().any(|item| item.id == candidate) {
             state.next_instance_id = Some(i64::from(max_live.max(candidate)) + 1);

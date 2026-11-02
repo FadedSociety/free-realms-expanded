@@ -19,6 +19,7 @@
 //! membership and real-money orders stay refused (R).
 
 use crate::inventory::Inventory;
+use crate::le;
 use crate::station_cash::{self, RowKind, StoreRow, Wallet};
 use serde::Deserialize;
 use std::{
@@ -609,7 +610,17 @@ impl CoinShop {
                 ));
             }
         }
-        let item = self.catalogue.item(item_id).expect("item was checked");
+        let Some(item) = self.catalogue.item(item_id) else {
+            return Ok(self.failure(
+                1,
+                RESULT_INVALID_ITEM,
+                transaction_id,
+                item_id,
+                quantity,
+                0,
+                merchant_id,
+            ));
+        };
         let unit_price = if self.is_member {
             item.member_price_coins.or(item.purchase_price_coins)
         } else {
@@ -638,7 +649,7 @@ impl CoinShop {
                 merchant_id,
             ));
         };
-        if self.inventory.state().coins < total_price {
+        let Some(coins) = self.inventory.state().coins.checked_sub(total_price) else {
             return Ok(self.failure(
                 1,
                 RESULT_INSUFFICIENT_COINS,
@@ -648,9 +659,9 @@ impl CoinShop {
                 unit_price,
                 merchant_id,
             ));
-        }
+        };
         let mut next_state = self.inventory.state().clone();
-        next_state.coins -= total_price;
+        next_state.coins = coins;
         let mut staged = Inventory::load(&self.inventory_content, Some(next_state))?;
         let granted = match staged.grant(0, item_id, quantity) {
             Ok(granted) => granted,
@@ -705,14 +716,11 @@ impl CoinShop {
     /// it (closed shop, range, merchant). Echoes the request's fields when it is well formed.
     /// Nothing is read from or changed in the inventory; the refusal is not recorded as a sale (R).
     pub fn refuse_sell(&mut self, inner: &[u8], result_code: u32) -> CoinShopOutcome {
-        let (merchant, item, quantity) = match inner {
-            [0xa5, 0, 5, 0, rest @ ..] if rest.len() == 16 => (
-                u64::from_le_bytes(rest[..8].try_into().unwrap()),
-                i32::from_le_bytes(rest[8..12].try_into().unwrap()),
-                u32::from_le_bytes(rest[12..].try_into().unwrap()),
-            ),
-            _ => (0, 0, 0),
-        };
+        let (merchant, item, quantity) = inner
+            .strip_prefix(&[0xa5, 0, 5, 0])
+            .filter(|rest| rest.len() == 16)
+            .and_then(|rest| Some((le::u64(rest, 0)?, le::i32(rest, 8)?, le::u32(rest, 12)?)))
+            .unwrap_or((0, 0, 0));
         let transaction_id = self.allocate_transaction_id();
         self.failure(2, result_code, transaction_id, item, quantity, 0, merchant)
     }
@@ -737,17 +745,20 @@ impl CoinShop {
         let mut pending = Vec::new();
         let mut complete = true;
         let mut deliver_bytes = 0usize;
-        for chunk in inner[8..].chunks_exact(4) {
-            let id = u32::from_le_bytes(chunk.try_into().unwrap());
-            let defined = i32::try_from(id).is_ok_and(|id| self.inventory.has_definition(id));
-            complete &= defined;
-            if defined && seen.insert(id) {
+        for chunk in inner[8..].as_chunks::<4>().0 {
+            let id = u32::from_le_bytes(*chunk);
+            let defined = i32::try_from(id).ok().and_then(|definition_id| {
+                Some((
+                    definition_id,
+                    self.inventory.definition_record(definition_id)?,
+                ))
+            });
+            complete &= defined.is_some();
+            if let Some((definition_id, record)) = defined
+                && seen.insert(id)
+            {
                 known.push(id);
-                if !self.inventory.definition_was_captured(id as i32) {
-                    let record = self
-                        .inventory
-                        .definition_record(id as i32)
-                        .expect("definition existence was checked");
+                if !self.inventory.definition_was_captured(definition_id) {
                     deliver_bytes = deliver_bytes.saturating_add(record.len());
                     pending.push(record);
                 }
@@ -788,13 +799,11 @@ impl CoinShop {
     /// Client-readable 165/13 refusal for a 165/12 the NPC layer rejected before the shop saw it
     /// (closed shop, range). Echoes the request's id and quantity; changes nothing (R).
     pub fn refuse_buy_back(&self, inner: &[u8], result_code: u32) -> CoinShopOutcome {
-        let (transaction, context) = match inner {
-            [0xa5, 0, 12, 0, rest @ ..] if rest.len() == 8 => (
-                u32::from_le_bytes(rest[..4].try_into().unwrap()),
-                u32::from_le_bytes(rest[4..].try_into().unwrap()),
-            ),
-            _ => (0, 0),
-        };
+        let (transaction, context) = inner
+            .strip_prefix(&[0xa5, 0, 12, 0])
+            .filter(|rest| rest.len() == 8)
+            .and_then(|rest| Some((le::u32(rest, 0)?, le::u32(rest, 4)?)))
+            .unwrap_or((0, 0));
         buy_back_result(transaction, result_code, context)
     }
 
@@ -1050,15 +1059,15 @@ impl CoinShop {
                 client_context,
             ));
         };
-        if self.inventory.state().coins < total_price {
+        let Some(coins) = self.inventory.state().coins.checked_sub(total_price) else {
             return Ok(buy_back_result(
                 sale_transaction_id,
                 RESULT_FAILURE,
                 client_context,
             ));
-        }
+        };
         let mut next_state = self.inventory.state().clone();
-        next_state.coins -= total_price;
+        next_state.coins = coins;
         let mut staged = Inventory::load(&self.inventory_content, Some(next_state))?;
         let restored = match staged.grant_with_tint(0, sale.item_id, wanted, sale.tint) {
             Ok(restored) => restored,
@@ -1467,13 +1476,12 @@ fn empty_list_with_text(opcode: u16) -> Vec<u8> {
 /// the header) are the bare header; 66/16, 20 and 25 add an `i32` length and that many locale
 /// bytes (`en_US`). Rows with no observed sender are only length-bounded (R).
 fn marketplace_request_is_well_formed(opcode: u16, inner: &[u8]) -> bool {
-    match (opcode, inner.get(4..8)) {
+    match (opcode, le::i32(inner, 4)) {
         // The order body is parsed strictly by `station_cash::decode_order`; 4 KiB bounds the
         // six small strings, one detail and the preview's extra string before allocation.
         (1 | 3, _) => inner.len() <= station_cash::MAX_ORDER_PACKET,
         (10 | 18 | 38, _) => inner.len() == 4,
         (16 | 20 | 25, Some(length)) => {
-            let length = i32::from_le_bytes(length.try_into().unwrap());
             usize::try_from(length).is_ok_and(|n| n <= 32 && inner.len() == 8 + n)
         }
         (16 | 20 | 25, None) => false,
@@ -1528,43 +1536,19 @@ fn put_u64(bytes: &mut Vec<u8>, value: u64) {
 }
 
 fn read_u16(bytes: &[u8], offset: usize) -> io::Result<u16> {
-    Ok(u16::from_le_bytes(
-        bytes
-            .get(offset..offset + 2)
-            .ok_or_else(|| invalid("truncated store field"))?
-            .try_into()
-            .unwrap(),
-    ))
+    le::u16(bytes, offset).ok_or_else(|| invalid("truncated store field"))
 }
 
 fn read_u32(bytes: &[u8], offset: usize) -> io::Result<u32> {
-    Ok(u32::from_le_bytes(
-        bytes
-            .get(offset..offset + 4)
-            .ok_or_else(|| invalid("truncated store field"))?
-            .try_into()
-            .unwrap(),
-    ))
+    le::u32(bytes, offset).ok_or_else(|| invalid("truncated store field"))
 }
 
 fn read_i32(bytes: &[u8], offset: usize) -> io::Result<i32> {
-    Ok(i32::from_le_bytes(
-        bytes
-            .get(offset..offset + 4)
-            .ok_or_else(|| invalid("truncated store field"))?
-            .try_into()
-            .unwrap(),
-    ))
+    le::i32(bytes, offset).ok_or_else(|| invalid("truncated store field"))
 }
 
 fn read_u64(bytes: &[u8], offset: usize) -> io::Result<u64> {
-    Ok(u64::from_le_bytes(
-        bytes
-            .get(offset..offset + 8)
-            .ok_or_else(|| invalid("truncated store field"))?
-            .try_into()
-            .unwrap(),
-    ))
+    le::u64(bytes, offset).ok_or_else(|| invalid("truncated store field"))
 }
 
 fn invalid(message: &'static str) -> io::Error {

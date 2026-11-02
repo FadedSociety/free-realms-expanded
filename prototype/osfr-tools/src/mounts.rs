@@ -1194,19 +1194,21 @@ pub fn decode_request(inner: &[u8]) -> io::Result<Option<MountRequest>> {
         return Ok(None);
     }
     let body = &inner[3..];
-    let word = |at: usize| i32::from_le_bytes(body[at..at + 4].try_into().unwrap());
+    // Each arm matches the body length first, so these reads never run short.
+    let malformed = || invalid_data("malformed mount request");
+    let word = |at: usize| crate::le::i32(body, at).ok_or_else(malformed);
     Ok(Some(match (inner[2], body.len()) {
         (1, 8..=24) => MountRequest::Mount {
-            target: u64::from_le_bytes(body[..8].try_into().unwrap()),
+            target: crate::le::u64(body, 0).ok_or_else(malformed)?,
         },
         (3, 0..=16) => MountRequest::Dismount,
-        (6, 4) => MountRequest::Spawn { mount_id: word(0) },
+        (6, 4) => MountRequest::Spawn { mount_id: word(0)? },
         (8, 5) => MountRequest::SpawnByItem {
-            item_definition_id: word(0),
+            item_definition_id: word(0)?,
         },
         (14, 8) => MountRequest::Upgrade {
-            row_id: word(0),
-            item_definition_id: word(4),
+            row_id: word(0)?,
+            item_definition_id: word(4)?,
         },
         (1 | 3 | 6 | 8 | 14, _) => return Err(invalid_data("malformed mount request")),
         _ => return Ok(None),

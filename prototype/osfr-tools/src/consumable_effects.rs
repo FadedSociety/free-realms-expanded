@@ -129,7 +129,11 @@ impl Boost {
 }
 
 fn raise(amount: u32, percent: u32) -> u32 {
-    let raised = (u64::from(amount) * u64::from(100 + percent) + 50) / 100;
+    // Widened before adding 100, so a percent near `u32::MAX` clamps like any too-large result.
+    let raised = u64::from(amount)
+        .saturating_mul(u64::from(percent) + 100)
+        .saturating_add(50)
+        / 100;
     u32::try_from(raised).unwrap_or(u32::MAX)
 }
 

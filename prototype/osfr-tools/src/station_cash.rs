@@ -1340,9 +1340,9 @@ pub fn place_order(
             ..OrderOutcome::default()
         };
     }
-    if wallet.balance < total {
+    let Some(balance) = wallet.balance.checked_sub(total) else {
         return refusal(order, ORDER_INSUFFICIENT_SC);
-    }
+    };
     let (granted, added) = if listing.deed {
         // L046: a deed never enters the inventory; no lot for it means no sale.
         match grant_lot(listing.item_id, true) {
@@ -1361,7 +1361,6 @@ pub fn place_order(
         *inventory = staged;
         (granted.replies, granted.granted)
     };
-    let balance = wallet.balance - total;
     wallet.balance = balance;
     wallet.orders.push(OrderRecord {
         tracking_id: order.tracking_id,

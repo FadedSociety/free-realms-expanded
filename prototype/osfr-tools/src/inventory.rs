@@ -17,6 +17,8 @@ use std::{
     time::SystemTime,
 };
 
+// `osfr_tools::`, not `crate::`: `restoration/piece_045.rs` includes this file by path.
+use osfr_tools::le;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
@@ -1075,22 +1077,25 @@ impl Inventory {
     /// Whether `grant_coins(amount)` would succeed on the live balance: the
     /// stored total is a `u32` but the wire coin field is `i32`.
     pub fn can_grant_coins(&self, amount: u32) -> bool {
-        self.state
-            .coins
-            .checked_add(amount)
-            .is_some_and(|coins| coins <= i32::MAX as u32)
+        self.coins_after_grant(amount).is_some()
+    }
+
+    /// The balance `grant_coins(amount)` leaves, stored and on the wire; `None` past `i32::MAX`.
+    fn coins_after_grant(&self, amount: u32) -> Option<(u32, i32)> {
+        let coins = self.state.coins.checked_add(amount)?;
+        Some((coins, i32::try_from(coins).ok()?))
     }
 
     pub fn grant_coins(&mut self, amount: u32) -> io::Result<InventoryOutcome> {
-        if !self.can_grant_coins(amount) {
+        let Some((coins, wire)) = self.coins_after_grant(amount) else {
             return Err(invalid("coin balance overflow"));
-        }
+        };
         if amount == 0 {
             return Ok(InventoryOutcome::default());
         }
-        self.state.coins += amount;
+        self.state.coins = coins;
         let mut reply = header(38, 19);
-        put(&mut reply, self.state.coins as i32);
+        put(&mut reply, wire);
         Ok(InventoryOutcome {
             replies: vec![reply],
             changed: true,
@@ -1109,9 +1114,13 @@ impl Inventory {
         if amount == 0 {
             return Ok(InventoryOutcome::default());
         }
+        // A validated bag holds at most `i32::MAX`; only an unvalidated save
+        // (`without_content`) can be above it, and that is refused, not wrapped.
+        let wire =
+            i32::try_from(coins).map_err(|_| invalid("coin balance exceeds its i32 field"))?;
         self.state.coins = coins;
         let mut reply = header(38, 19);
-        put(&mut reply, coins as i32);
+        put(&mut reply, wire);
         Ok(InventoryOutcome {
             replies: vec![reply],
             changed: true,
@@ -1417,11 +1426,12 @@ impl Inventory {
         inner: &[u8],
         player: Option<&EquipContext>,
     ) -> io::Result<InventoryOutcome> {
-        if inner.len() < 4 || inner.len() > 4096 {
+        let (Some(family), Some(opcode)) = (le::u16(inner, 0), le::u16(inner, 2)) else {
+            return Err(invalid("invalid inventory message length"));
+        };
+        if inner.len() > 4096 {
             return Err(invalid("invalid inventory message length"));
         }
-        let family = u16::from_le_bytes(inner[..2].try_into().unwrap());
-        let opcode = u16::from_le_bytes(inner[2..4].try_into().unwrap());
         if family == 35 && opcode == 34 {
             return Ok(InventoryOutcome {
                 replies: self.definition_replies(inner)?,
@@ -1580,10 +1590,10 @@ impl Inventory {
             || self_template.len() > MAX_CONTENT
             || self_template[..3] != [5, 0, 1]
             || self_template[7..9] != [12, 0]
-            || u32::from_le_bytes(self_template[3..7].try_into().unwrap()) as usize
-                != self_template.len() - 7
-            || u32::from_le_bytes(self_template[9..13].try_into().unwrap()) as usize
-                != self_template.len() - 13
+            || le::u32(self_template, 3).map(|length| length as usize)
+                != Some(self_template.len() - 7)
+            || le::u32(self_template, 9).map(|length| length as usize)
+                != Some(self_template.len() - 13)
         {
             return Err(invalid("invalid self template envelope"));
         }
@@ -1671,13 +1681,7 @@ fn header(family: u16, opcode: u16) -> Vec<u8> {
     [family.to_le_bytes(), opcode.to_le_bytes()].concat()
 }
 fn read(bytes: &[u8], offset: usize) -> io::Result<i32> {
-    Ok(i32::from_le_bytes(
-        bytes
-            .get(offset..offset + 4)
-            .ok_or_else(|| invalid("truncated inventory field"))?
-            .try_into()
-            .unwrap(),
-    ))
+    le::i32(bytes, offset).ok_or_else(|| invalid("truncated inventory field"))
 }
 
 /// The one walk over a serialized `ClientItemDefinition` row's variable-length strings, in

@@ -716,10 +716,12 @@ impl ItemBar {
                 .map(Some);
         }
         if inner.starts_with(SUB_ASSIGN_BY_RECORD) {
+            let malformed = || invalid("invalid item-bar record assignment");
             if inner.len() != 16 {
-                return Err(invalid("invalid item-bar record assignment"));
+                return Err(malformed());
             }
-            let (slot, definition, tint) = (word(inner, 4), word(inner, 8), word(inner, 12));
+            let word = |at| crate::le::i32(inner, at).ok_or_else(malformed);
+            let (slot, definition, tint) = (word(4)?, word(8)?, word(12)?);
             // Same record match as 42/8 equip: the first owned stack with this definition and tint.
             let owned = inventory.state().items.iter().find(|i| {
                 i.definition_id == definition
@@ -1102,8 +1104,8 @@ impl ItemBar {
                 if self
                     .cooldown_left(action.definition_id, recast, now_ms)
                     .is_some()
+                    && let Some(&used) = self.last_used.get(&action.definition_id)
                 {
-                    let used = self.last_used[&action.definition_id];
                     slot.cast_age = now_ms.saturating_sub(used).min(i32::MAX as u64) as i32;
                 }
             }
@@ -1112,14 +1114,6 @@ impl ItemBar {
         }
         Some(bar_wire::item_slot_update(binding.slot, &slot))
     }
-}
-
-fn word(bytes: &[u8], at: usize) -> i32 {
-    i32::from_le_bytes(
-        bytes[at..at + 4]
-            .try_into()
-            .expect("length checked by caller"),
-    )
 }
 
 fn invalid(error: impl Into<Box<dyn std::error::Error + Send + Sync>>) -> io::Error {

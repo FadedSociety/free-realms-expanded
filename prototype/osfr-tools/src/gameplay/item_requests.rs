@@ -43,8 +43,8 @@ impl Gameplay {
 /// client's removal path (`0092f460` case 6).
 pub(super) fn item_change_packet(inner: &[u8], guid: u64, replies: &[Vec<u8>]) -> Option<Vec<u8>> {
     if inner.len() == 12 && inner.starts_with(&[42, 0, 2, 0]) {
-        let slot = i32::from_le_bytes(inner[4..8].try_into().ok()?);
-        let profile = i32::from_le_bytes(inner[8..12].try_into().ok()?);
+        let slot = crate::le::i32(inner, 4)?;
+        let profile = crate::le::i32(inner, 8)?;
         // The inventory owns the one 35/6 encoder; an empty attachment clears the slot.
         return Some(crate::inventory::equip_change_packet(
             guid, 0, None, slot, profile,

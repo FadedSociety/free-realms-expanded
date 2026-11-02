@@ -113,7 +113,10 @@ fn replace_bytes_with(
     mut replace: impl FnMut(&Path, &Path) -> io::Result<()>,
 ) -> io::Result<()> {
     let mut temporary = create_temporary(path)?;
-    let file = temporary.file.as_mut().expect("temporary file is open");
+    // `create_temporary` always opens it; a missing handle is refused, never a panic mid-save.
+    let Some(file) = temporary.file.as_mut() else {
+        return Err(io::Error::other("temporary save file is not open"));
+    };
     file.write_all(bytes)?;
     file.sync_all()?;
     // Windows requires closing our temporary-file handle before replacement.

@@ -40,10 +40,10 @@ pub fn encode_definition_batch_v2(
     // per definition id, in id order.
     let mut by_id = BTreeMap::<i32, &[u8]>::new();
     for record in definitions {
-        if record.len() < 4 {
+        // `osfr_tools::`: `tests/item_catalogue_roundtrip.rs` includes this file by path.
+        let Some(id) = osfr_tools::le::i32(record, 0) else {
             return Err(InventoryV2Error::InvalidDefinitionRecord);
-        }
-        let id = i32::from_le_bytes(record[..4].try_into().unwrap());
+        };
         if id <= 0 {
             return Err(InventoryV2Error::InvalidDefinitionId(id));
         }
