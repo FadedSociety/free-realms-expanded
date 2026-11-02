@@ -477,6 +477,12 @@ impl AccountStore {
         if let Some(state) = &world_state {
             state.validate()?;
         }
+        let account = self
+            .data
+            .accounts
+            .get_mut(&account_id)
+            .ok_or_else(|| invalid_data("unknown account"))?;
+        account.character_guids.push(guid);
         self.data.next_character_guid = next_guid;
         self.data.characters.insert(
             guid,
@@ -487,12 +493,6 @@ impl AccountStore {
                 world_state,
             },
         );
-        self.data
-            .accounts
-            .get_mut(&account_id)
-            .expect("account checked above")
-            .character_guids
-            .push(guid);
         Ok(guid)
     }
 
@@ -523,6 +523,12 @@ impl AccountStore {
         let next_guid = guid
             .checked_add(1)
             .ok_or_else(|| invalid_data("character guid space exhausted"))?;
+        let account = self
+            .data
+            .accounts
+            .get_mut(&account_id)
+            .ok_or_else(|| invalid_data("unknown account"))?;
+        account.character_guids.push(guid);
         self.data.next_character_guid = self.data.next_character_guid.max(next_guid);
         self.data.characters.insert(
             guid,
@@ -533,12 +539,6 @@ impl AccountStore {
                 world_state: Some(state),
             },
         );
-        self.data
-            .accounts
-            .get_mut(&account_id)
-            .expect("account checked above")
-            .character_guids
-            .push(guid);
         Ok(())
     }
 

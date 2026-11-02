@@ -417,7 +417,12 @@ impl LoginService {
                     if reply.status == CharacterCreateStatus::Created {
                         staged.save(&self.config.account_store_file)?;
                         if account_id == 1 && reply.guid == 1 {
-                            let record = staged.character(1).unwrap();
+                            let record = staged.character(1).ok_or_else(|| {
+                                io::Error::new(
+                                    io::ErrorKind::InvalidData,
+                                    "created character is missing",
+                                )
+                            })?;
                             identity::save(&self.config.identity_file, &record.identity)?;
                         }
                         self.account_store = Some(staged);
@@ -687,11 +692,11 @@ fn login_reply_fields(success: bool, membership: bool, max_characters: i32) -> V
     );
     let callback = rules.account_info_callback_bytes(max_characters.max(0) as u32, false, 0);
     let mut account = vec![u8::from(
-        u32::from_le_bytes(callback[..4].try_into().unwrap()) != 0,
+        crate::le::u32(&callback, 0).is_some_and(|flag| flag != 0),
     )];
     account.extend_from_slice(&callback[4..8]);
     account.push(u8::from(
-        u32::from_le_bytes(callback[8..12].try_into().unwrap()) != 0,
+        crate::le::u32(&callback, 8).is_some_and(|flag| flag != 0),
     ));
     payload(&mut out, &account);
     out

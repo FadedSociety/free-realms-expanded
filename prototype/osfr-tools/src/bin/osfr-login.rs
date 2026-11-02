@@ -463,8 +463,8 @@ impl Broker {
                     Err(e) if e.kind() == io::ErrorKind::WouldBlock => {}
                     Err(_) => continue,
                 }
-                if peer.input.len() >= 4 {
-                    let length = u32::from_le_bytes(peer.input[..4].try_into().unwrap()) as usize;
+                if let Some(length) = osfr_tools::le::u32(&peer.input, 0) {
+                    let length = length as usize;
                     if !(10..=192).contains(&length) || peer.input.len() > length + 4 {
                         peer.reply = Some([0; 69]);
                     } else if peer.input.len() == length + 4 {

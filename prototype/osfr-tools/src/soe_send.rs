@@ -277,8 +277,8 @@ impl ReliableSender {
             };
             self.retained_bytes -= wire.len();
         } else {
-            for _ in 0..=position {
-                if let Some(wire) = self.pending.pop_front().unwrap().wire {
+            for acknowledged in self.pending.drain(..=position) {
+                if let Some(wire) = acknowledged.wire {
                     self.retained_bytes -= wire.len();
                 }
             }

@@ -348,8 +348,9 @@ pub fn character_list(store: &AccountStore, account_id: u64, server_id: i32) -> 
     for record in records {
         let identity = record.wire_identity();
         let single = login::selection_reply(Some(&identity));
-        let data_len = u32::from_le_bytes(single[26..30].try_into().unwrap()) as usize;
-        let data = &single[30..30 + data_len];
+        let data = crate::le::u32(&single, 26)
+            .and_then(|length| single.get(30..30 + length as usize))
+            .unwrap_or_default();
         let payload_base64 = base64(data);
         message_bytes.extend(record.guid.to_le_bytes());
         message_bytes.extend(server_id.to_le_bytes());

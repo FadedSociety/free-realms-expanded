@@ -447,9 +447,9 @@ pub fn patch_self(bytes: &[u8], identity: &CharacterIdentity) -> io::Result<Vec<
     if bytes.len() < 33
         || bytes[..3] != [5, 0, 1]
         || bytes[7..9] != [12, 0]
-        || u32::from_le_bytes(bytes[3..7].try_into().unwrap()) as usize != bytes.len() - 7
-        || u32::from_le_bytes(bytes[9..13].try_into().unwrap()) as usize != bytes.len() - 13
-        || u64::from_le_bytes(bytes[21..29].try_into().unwrap()) != 1
+        || crate::le::u32(bytes, 3) != u32::try_from(bytes.len() - 7).ok()
+        || crate::le::u32(bytes, 9) != u32::try_from(bytes.len() - 13).ok()
+        || crate::le::u64(bytes, 21) != Some(1)
     {
         return Err(invalid("unsupported native self packet"));
     }
@@ -535,10 +535,11 @@ impl<'a> Reader<'a> {
         Ok(self.take(1)?[0])
     }
     pub(crate) fn i32(&mut self) -> io::Result<i32> {
-        Ok(i32::from_le_bytes(self.take(4)?.try_into().unwrap()))
+        let field = self.take(4)?;
+        Ok(i32::from_le_bytes([field[0], field[1], field[2], field[3]]))
     }
     pub(crate) fn u64(&mut self) -> io::Result<u64> {
-        Ok(u64::from_le_bytes(self.take(8)?.try_into().unwrap()))
+        crate::le::u64(self.take(8)?, 0).ok_or_else(|| invalid("truncated login message"))
     }
     pub(crate) fn string(&mut self, max: usize) -> io::Result<String> {
         let n = self.i32()?;
