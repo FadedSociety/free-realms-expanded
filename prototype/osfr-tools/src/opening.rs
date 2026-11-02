@@ -598,12 +598,29 @@ impl OpeningEngine {
         })
     }
 
+    /// The first position after a session reset is where the player loaded in. Arriving is not
+    /// discovering (R, owner playtest 2026-11-02: a fresh character spawning inside Briarwood
+    /// Caverns got its reward and a quarter of the XP bar on load), so a discovery there counts as
+    /// found without a message or reward. Walking into any other one still rewards it.
     pub fn on_position(&mut self, zone_id: u32, position: [f32; 3]) -> io::Result<OpeningOutcome> {
         if !valid_position(position) {
             return Err(invalid("invalid opening player position"));
         }
+        let arrived = self.location.is_none();
         self.location = Some((zone_id, position));
-        self.on_event(OpeningEvent::Visit { zone_id, position })
+        let mut found = false;
+        if arrived {
+            for discovery in &self.content.discoveries {
+                if zone_id == discovery.zone_id
+                    && within(position, discovery.position, discovery.radius)
+                {
+                    found |= self.state.discoveries.insert(discovery.id);
+                }
+            }
+        }
+        let mut outcome = self.on_event(OpeningEvent::Visit { zone_id, position })?;
+        outcome.changed |= found;
+        Ok(outcome)
     }
 
     /// Move the remembered interaction origin without evaluating position

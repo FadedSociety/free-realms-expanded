@@ -146,7 +146,9 @@ if use_rust:
         server_command += ["--identity", str(identity_file)]
         # W55 login integration: login and gateway share one account store and a
         # per-run local handoff key that signs the selected-character binding.
-        account_store_file = identity_file.with_name("accounts.json")
+        # osfr-login's default store is identity.with_extension("accounts.json"): the gateway must read
+        # the same file, or a character the login created is absent and selection fails "file not found".
+        account_store_file = identity_file.with_suffix(".accounts.json")
         handoff_key_file = run / "handoff.key"
         handoff_key_file.write_bytes(os.urandom(16))
         server_command += ["--account-store", str(account_store_file),

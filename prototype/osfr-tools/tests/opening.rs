@@ -208,6 +208,20 @@ fn discoveries_have_zone_identity_and_persistent_reward_once() {
     assert!(!engine.complete());
 }
 
+/// L917: the place a session starts in counts as found, without a message or reward.
+#[test]
+fn arriving_inside_a_discovery_finds_it_without_a_reward() {
+    let reference = Reference::new();
+    let mut engine = reference.engine();
+    let arrival = engine.on_position(5, [0.0, 0.0, 0.0]).unwrap();
+    assert!(arrival.changed && arrival.rewards.is_empty());
+    assert!(!arrival.messages.iter().any(|m| m.starts_with("Discovered")));
+    assert!(engine.state().discoveries.contains(&1));
+    let mut engine =
+        OpeningEngine::load(&reference.directory, Some(engine.state().clone())).unwrap();
+    assert!(!engine.on_position(5, [0.0, 0.0, 0.0]).unwrap().changed);
+}
+
 #[test]
 fn chat_cannot_complete_skip_or_accept_a_remote_step() {
     let reference = Reference::new();

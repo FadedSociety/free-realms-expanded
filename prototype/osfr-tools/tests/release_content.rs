@@ -25,6 +25,7 @@
 //! private".
 use osfr_tools::{
     combat::Combat,
+    gameplay::Gameplay,
     gateway::Gateway,
     inventory::{Inventory, InventoryItem},
     item_categories::ItemCategories,
@@ -844,6 +845,24 @@ fn a_fresh_character_starts_every_job_at_rank_one() {
     }
     let _ = fs::remove_dir_all(merged);
     let _ = fs::remove_dir_all(bare);
+}
+
+/// L917 (owner playtest 2026-11-02): a fresh character starts at the opening checkpoint, inside the
+/// Briarwood Caverns discovery, which paid 5 coins and 25 XP the moment the zone loaded (a 38/14
+/// update: a quarter of the bar).
+#[test]
+fn a_fresh_character_earns_nothing_by_loading_in() {
+    let merged = merged_content("arrival");
+    let state =
+        Gameplay::initial_character(&merged, Gateway::content_state(&merged).unwrap()).unwrap();
+    let mut gateway = Gateway::load_gameplay_from_content(state.clone(), &merged, None).unwrap();
+    startup_and_world(&mut gateway, &state, &content_version(&content()));
+    let saved = gateway.snapshot().gameplay.unwrap();
+    let experience = saved.profiles.unwrap().experience;
+    assert!(experience.values().all(|xp| *xp == 0), "loading in paid job XP: {experience:?}");
+    // The start still counts as found, so the opening checklist can complete.
+    assert!(saved.opening.unwrap().discoveries.contains(&1));
+    let _ = fs::remove_dir_all(merged);
 }
 
 #[test]

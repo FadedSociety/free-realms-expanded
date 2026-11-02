@@ -608,8 +608,12 @@ fn private_dev_teleport_location_setter_is_progress_free_but_visit_rules_are_not
     let zone = discovery["zone_id"].as_u64().unwrap() as u32;
     let position = float3(&discovery["position"]);
 
-    // The ordinary visit path records the discovery and its message.
+    // The ordinary visit path records the discovery and its message. L917: the session's first
+    // position is its arrival, so arrive away from the discovery first.
     let mut visited = OpeningEngine::load(&content, None).unwrap();
+    visited
+        .on_position(zone, [position[0] + 1000.0, position[1], position[2]])
+        .unwrap();
     let before_visit = visited.state().clone();
     let outcome = visited.on_position(zone, position).unwrap();
     assert!(outcome.changed, "the visit must fire the discovery");
