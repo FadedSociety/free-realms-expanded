@@ -5,7 +5,9 @@
 
 use osfr_tools::{
     harvesting::{CHEF_PROFILE_ID, HARVESTING_ICON_ID},
-    minigame::{Activity, ActivityFinish, MinigameRuns, RunMode, RunOutcome, RunSpec, RunState},
+    minigame::{
+        Activity, ActivityFinish, MinigameRuns, RunMode, RunOutcome, RunSpec, RunState, movie_text,
+    },
     mining::{Type8Engine, Type8Phase, Type8State, Type8Transaction},
     quest_engine::QuestEvent,
     rewards::{ItemGrant, RewardDisplay, RewardGrant, RewardState},
@@ -298,7 +300,7 @@ impl HarvestingLifecycle {
                 .runs
                 .state(id)
                 .is_some_and(|state| matches!(state, RunState::Won | RunState::Lost))
-                && movie_command(packet)? != "FRServer_GameClose"
+                && movie_text(packet)?.split('\t').next() != Some("FRServer_GameClose")
             {
                 return Ok(HarvestingActivityOutcome::default());
             }
@@ -364,14 +366,10 @@ impl HarvestingLifecycle {
                 out.replies = finished.replies;
                 out.reward_packets = finished.reward_packets;
                 out.reward_state = finished.reward_state;
-                if won && out.reward_state.is_some() {
-                    out.quest_events = grant_quest_events(
-                        &grant
-                            .as_ref()
-                            .expect("winning Harvesting run has a grant")
-                            .1,
-                        self.game_id,
-                    );
+                if let Some((_, grant)) = &grant
+                    && out.reward_state.is_some()
+                {
+                    out.quest_events = grant_quest_events(grant, self.game_id);
                 }
             } else if runs.state(id).is_some_and(|state| {
                 matches!(state, RunState::Won | RunState::Lost | RunState::Closed)
@@ -516,17 +514,4 @@ fn validate_pair(engine: &Type8Engine, runs: &MinigameRuns) -> io::Result<()> {
 
 fn invalid(message: &'static str) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, message)
-}
-
-fn movie_command(packet: &[u8]) -> io::Result<&str> {
-    if packet.len() < 20 || packet[..3] != [39, 0, 14] {
-        return Err(invalid("malformed Harvesting movie packet"));
-    }
-    let size = i32::from_le_bytes(packet[15..19].try_into().unwrap());
-    if size < 2 || size as usize != packet.len() - 19 || packet.last() != Some(&0) {
-        return Err(invalid("malformed Harvesting movie payload"));
-    }
-    let body = std::str::from_utf8(&packet[19..packet.len() - 1])
-        .map_err(|_| invalid("Harvesting movie payload is not UTF-8"))?;
-    Ok(body.split('\t').next().unwrap_or_default())
 }

@@ -630,7 +630,9 @@ impl Type8Engine {
             return Ok(Type8Outcome::default());
         }
         let mut next = self.state.clone();
-        let run = next.active.as_mut().unwrap();
+        let Some(run) = next.active.as_mut() else {
+            return Ok(Type8Outcome::default());
+        };
         run.wall_ms = run.wall_ms.saturating_add(elapsed_ms).min(MAX_WALL_MS);
         let mut out = Type8Outcome {
             changed: true,
@@ -707,7 +709,9 @@ impl Type8Engine {
             return Ok(Type8Outcome::default());
         }
         let mut next = self.state.clone();
-        let run = next.active.as_mut().unwrap();
+        let Some(run) = next.active.as_mut() else {
+            return Ok(Type8Outcome::default());
+        };
         let id = run.instance_id;
         let mut out = Type8Outcome::default();
         let mut presented = self.results_presented;
@@ -717,8 +721,8 @@ impl Type8Engine {
                 out.replies.push(launch_packet(&self.content.launch_movie));
                 run.phase = Type8Phase::Launched;
             }
-        } else {
-            let fields: Vec<_> = msg.unwrap().split('\t').collect();
+        } else if let Some(msg) = msg {
+            let fields: Vec<_> = msg.split('\t').collect();
             match fields.as_slice() {
                 ["OnConnectMsg"] => {
                     if run.phase == Type8Phase::Launched {
@@ -918,16 +922,20 @@ impl Type8Engine {
                     }
                 }
                 ["OnLevelEventMsg", "50", x, y] => {
-                    let (x, y) = (number(x)? as usize, number(y)? as usize);
+                    let (x, y) = (number(x)?, number(y)?);
                     if run.phase == Type8Phase::Playing {
+                        let cell = |n: i64| {
+                            usize::try_from(n)
+                                .map_err(|_| invalid("mining fall outside the bottom row"))
+                        };
                         collect_fall(
                             run,
                             &self.content.spec,
                             self.bounds,
                             &mut out,
                             self.game_id,
-                            x,
-                            y,
+                            cell(x)?,
+                            cell(y)?,
                             &self.content.powerup_definitions,
                         )?;
                     }
@@ -2428,14 +2436,7 @@ fn payload_packet_for(id: i32, game_id: i32, s: &str) -> io::Result<Vec<u8>> {
 }
 
 fn decode_payload(b: &[u8]) -> io::Result<&str> {
-    if b.len() < 20 {
-        return Err(invalid("truncated mining payload"));
-    }
-    let n = read_i32(b, 15);
-    if n < 1 || n as usize > MAX_PAYLOAD || b.len() != 19 + n as usize || b.last() != Some(&0) {
-        return Err(invalid("invalid mining payload length"));
-    }
-    let s = std::str::from_utf8(&b[19..b.len() - 1]).map_err(invalid)?;
+    let s = osfr_tools::minigame::movie_text(b)?;
     validate_text(s)?;
     Ok(s)
 }
@@ -2499,7 +2500,7 @@ fn launch_packet(movie: &str) -> Vec<u8> {
 }
 
 fn read_i32(b: &[u8], p: usize) -> i32 {
-    i32::from_le_bytes(b[p..p + 4].try_into().unwrap())
+    i32::from_le_bytes([b[p], b[p + 1], b[p + 2], b[p + 3]])
 }
 
 fn invalid(e: impl ToString) -> io::Error {

@@ -15,6 +15,8 @@ const FAMILY_ENCOUNTER: u16 = 41;
 const HEADER_LEN: usize = 15;
 const INFO_OBJECTIVE_BYTES: usize = 0xe8;
 const EMPTY_REWARD_BUNDLES_BYTES: usize = 3 * 69;
+/// A movie message's text length cap, its NUL included.
+const MAX_MOVIE_TEXT: u32 = 4096;
 
 /// Generic lifecycle phase. Terminal state is retained until the real result
 /// close arrives; `39/7` is only the automatic removal acknowledgement.
@@ -891,8 +893,29 @@ fn validate_asset_name(name: &str) -> io::Result<()> {
     Ok(())
 }
 
+/// The text of a client 39/14 movie message: the 15-byte minigame header, the text length
+/// with its NUL at 15, then the NUL-terminated UTF-8 text (1..=4,095 bytes). L108: the one
+/// decoder the movie engines share instead of a copy each.
+pub fn movie_text(packet: &[u8]) -> io::Result<&str> {
+    let malformed = || invalid("malformed minigame movie message");
+    if packet.get(..3) != Some(&[39, 0, 14][..]) {
+        return Err(malformed());
+    }
+    let size = packet
+        .get(15..19)
+        .map(|size| u32::from_le_bytes([size[0], size[1], size[2], size[3]]))
+        .ok_or_else(malformed)?;
+    let body = packet.get(19..).ok_or_else(malformed)?;
+    if !(2..=MAX_MOVIE_TEXT).contains(&size) || u32::try_from(body.len()) != Ok(size) {
+        return Err(malformed());
+    }
+    let text = body.strip_suffix(&[0]).ok_or_else(malformed)?;
+    std::str::from_utf8(text).map_err(invalid)
+}
+
 fn read_i32(bytes: &[u8], offset: usize) -> i32 {
-    i32::from_le_bytes(bytes[offset..offset + 4].try_into().unwrap())
+    let field = &bytes[offset..offset + 4];
+    i32::from_le_bytes([field[0], field[1], field[2], field[3]])
 }
 
 fn invalid(error: impl ToString) -> io::Error {

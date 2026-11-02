@@ -419,7 +419,9 @@ impl Cooking {
                 // Native start acknowledgement only changes the state/HUD.
                 // Command26/12 is what invokes MiniGameFlash:Show with the GFx.
                 replies.push(launch_packet());
-                self.state.active.as_mut().unwrap().phase = CookingPhase::Playing;
+                if let Some(run) = self.state.active.as_mut() {
+                    run.phase = CookingPhase::Playing;
+                }
             }
             return Ok(CookingOutcome {
                 replies,
@@ -429,9 +431,11 @@ impl Cooking {
         }
         // Clone and commit only after the complete message has been validated.
         let mut next = self.state.clone();
-        let a = next.active.as_mut().unwrap();
+        let (Some(a), Some(message)) = (next.active.as_mut(), message) else {
+            return Ok(CookingOutcome::default());
+        };
         let mut out = CookingOutcome::default();
-        let fields: Vec<_> = message.unwrap().split('\t').collect();
+        let fields: Vec<_> = message.split('\t').collect();
         match fields.as_slice() {
             ["OnConnectMsg"] | ["FRServer_Connect"] => {}
             ["FRServer_ReadyForGameData"] => {
@@ -692,14 +696,25 @@ fn assign_stat(slot: &mut Option<f64>, value: f64) -> io::Result<()> {
 fn validate_totals(a: &CookingRun) -> io::Result<()> {
     // CookingGameClient.onWin reports the sum of each action category after
     // six roundCompleted calls. The final timer is a cumulative stopwatch.
+    let missing = || invalid("missing cooking statistics");
     for kind in 0..3 {
-        let expected: f64 = a.round_stats.iter().map(|r| r[kind].unwrap()).sum();
+        let expected = a
+            .round_stats
+            .iter()
+            .map(|r| r[kind])
+            .sum::<Option<f64>>()
+            .ok_or_else(missing)?;
         if a.game_stats[kind + 1] != Some(expected) {
             return Err(invalid("inconsistent cooking action totals"));
         }
     }
-    let rounds: f64 = a.round_stats.iter().map(|r| r[3].unwrap()).sum();
-    let total = a.game_stats[0].unwrap();
+    let rounds: f64 = a
+        .round_stats
+        .iter()
+        .map(|r| r[3])
+        .sum::<Option<f64>>()
+        .ok_or_else(missing)?;
+    let total = a.game_stats[0].ok_or_else(missing)?;
     if total < rounds || total > rounds + 6.0 {
         return Err(invalid("inconsistent cooking timer total"));
     }
@@ -720,18 +735,7 @@ fn payload_packet_with_game(instance_id: i32, message: &str, game_id: i32) -> io
     Ok(b)
 }
 fn decode_payload(inner: &[u8]) -> io::Result<&str> {
-    if inner.len() < 20 {
-        return Err(invalid("truncated cooking payload"));
-    }
-    let length = read_i32(inner, 15);
-    if length < 1
-        || length as usize > MAX_PAYLOAD
-        || inner.len() != 19 + length as usize
-        || *inner.last().unwrap() != 0
-    {
-        return Err(invalid("invalid cooking payload length"));
-    }
-    let text = std::str::from_utf8(&inner[19..inner.len() - 1]).map_err(invalid)?;
+    let text = osfr_tools::minigame::movie_text(inner)?;
     validate_text(text)?;
     Ok(text)
 }
@@ -786,7 +790,7 @@ fn launch_packet() -> Vec<u8> {
     b
 }
 fn read_i32(b: &[u8], offset: usize) -> i32 {
-    i32::from_le_bytes(b[offset..offset + 4].try_into().unwrap())
+    i32::from_le_bytes([b[offset], b[offset + 1], b[offset + 2], b[offset + 3]])
 }
 fn parse_score(s: &str) -> io::Result<u32> {
     let score = s.parse().map_err(invalid)?;

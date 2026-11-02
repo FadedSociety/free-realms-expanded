@@ -404,7 +404,9 @@ impl Smelting {
                 // Native start acknowledgement only changes the state/HUD.
                 // Command26/12 is what invokes MiniGameFlash:Show with the GFx.
                 replies.push(launch_packet());
-                self.state.active.as_mut().unwrap().phase = SmeltingPhase::Playing;
+                if let Some(run) = self.state.active.as_mut() {
+                    run.phase = SmeltingPhase::Playing;
+                }
             }
             return Ok(SmeltingOutcome {
                 replies,
@@ -414,9 +416,11 @@ impl Smelting {
         }
         // Clone and commit only after the complete message has been validated.
         let mut next = self.state.clone();
-        let a = next.active.as_mut().unwrap();
+        let (Some(a), Some(message)) = (next.active.as_mut(), message) else {
+            return Ok(SmeltingOutcome::default());
+        };
         let mut out = SmeltingOutcome::default();
-        let fields: Vec<_> = message.unwrap().split('\t').collect();
+        let fields: Vec<_> = message.split('\t').collect();
         match fields.as_slice() {
             ["OnConnectMsg"] | ["FRServer_Connect"] => {}
             ["FRServer_ReadyForGameData"] => {
@@ -662,18 +666,7 @@ fn payload_packet_with_game(instance_id: i32, message: &str, game_id: i32) -> io
     Ok(b)
 }
 fn decode_payload(inner: &[u8]) -> io::Result<&str> {
-    if inner.len() < 20 {
-        return Err(invalid("truncated smelting payload"));
-    }
-    let length = read_i32(inner, 15);
-    if length < 1
-        || length as usize > MAX_PAYLOAD
-        || inner.len() != 19 + length as usize
-        || *inner.last().unwrap() != 0
-    {
-        return Err(invalid("invalid smelting payload length"));
-    }
-    let text = std::str::from_utf8(&inner[19..inner.len() - 1]).map_err(invalid)?;
+    let text = osfr_tools::minigame::movie_text(inner)?;
     validate_text(text)?;
     Ok(text)
 }
@@ -804,7 +797,7 @@ fn launch_packet() -> Vec<u8> {
     b
 }
 fn read_i32(b: &[u8], offset: usize) -> i32 {
-    i32::from_le_bytes(b[offset..offset + 4].try_into().unwrap())
+    i32::from_le_bytes([b[offset], b[offset + 1], b[offset + 2], b[offset + 3]])
 }
 fn parse_score(s: &str) -> io::Result<u32> {
     let score = s.parse().map_err(invalid)?;

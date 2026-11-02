@@ -614,3 +614,36 @@ fn persisted_counter_never_reuses_ids_and_wrong_instance_is_rejected() {
     assert_ne!(restarted.current_instance_id(), Some(128));
     assert!(!second.replies.is_empty());
 }
+
+/// L108: the one 39/14 movie-text decoder the movie engines share.
+#[test]
+fn movie_text_takes_only_an_exact_nul_terminated_text() {
+    let packet = |size: i32, body: &[u8]| {
+        let mut bytes = vec![39, 0, 14];
+        bytes.extend([0xff; 12]);
+        bytes.extend(size.to_le_bytes());
+        bytes.extend(body);
+        bytes
+    };
+    assert_eq!(minigame::movie_text(&packet(2, b"A\0")).ok(), Some("A"));
+    let longest = [vec![b'x'; 4095], vec![0]].concat();
+    let accepted = packet(4096, &longest);
+    assert_eq!(
+        minigame::movie_text(&accepted).map(str::len).ok(),
+        Some(4095)
+    );
+    let mut wrong_family = packet(2, b"A\0");
+    wrong_family[2] = 5;
+    for refused in [
+        packet(1, b"\0"),
+        packet(4097, &[longest.clone(), vec![b'x']].concat()),
+        packet(3, b"A\0"),
+        packet(2, b"AB"),
+        packet(-1, b"A\0"),
+        packet(3, b"\xff\xfe\0"),
+        packet(2, b"A\0")[..18].to_vec(),
+        wrong_family,
+    ] {
+        assert!(minigame::movie_text(&refused).is_err(), "{refused:?}");
+    }
+}

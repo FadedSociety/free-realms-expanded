@@ -24,6 +24,16 @@ const BUSY_TERMS: [&str; 7] = [
     "EncounterEngine::active",
     "DerbyGateway::active",
 ];
+/// Calls that panic on a bad value: 872 textual hits when L108 set the first ceiling (clippy counted
+/// 664 unwrap/expect/panic in production code on 2026-11-01, `lab/reports/hygiene-20261101`).
+const PANIC_TERMS: [&str; 6] = [
+    ".unwrap()",
+    ".expect(",
+    "panic!(",
+    "unreachable!(",
+    "todo!(",
+    "unimplemented!(",
+];
 
 fn rust_files(dir: &Path, out: &mut Vec<PathBuf>) {
     for entry in fs::read_dir(dir).unwrap() {
@@ -116,6 +126,8 @@ fn measure(root: &Path) -> BTreeMap<String, usize> {
         "busy_outside_occupation".into(),
         count(Some("occupation.rs"), &BUSY_TERMS),
     );
+    // L108 (hygiene pass): server code refuses bad input with an error instead of panicking.
+    values.insert("panic_calls".into(), count(None, &PANIC_TERMS));
     values
 }
 
@@ -153,8 +165,8 @@ fn spine_rules_only_ratchet_down() {
         .collect();
     assert!(
         over.is_empty(),
-        "spine rules grew (move code into a module, use replace_bytes, trace::hex_prefix or \
-         Gameplay::is_occupied): {over:?}"
+        "spine rules grew (move code into a module, use replace_bytes, trace::hex_prefix, \
+         Gameplay::is_occupied, or return an error instead of unwrap/expect/panic): {over:?}"
     );
     if std::env::var_os("SPINE_RATCHET_LOWER").is_some() {
         let lowered = text

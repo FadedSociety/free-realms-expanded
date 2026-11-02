@@ -349,7 +349,9 @@ impl Forging {
         }
         let game_id = self.selected_game_id();
         let mut next = self.state.clone();
-        let a = next.active.as_mut().unwrap();
+        let Some(a) = next.active.as_mut() else {
+            return Ok(ForgingOutcome::default());
+        };
         a.wall_ms = a.wall_ms.saturating_add(elapsed_ms).min(MAX_WALL_MS);
         let mut out = ForgingOutcome {
             changed: true,
@@ -427,7 +429,9 @@ impl Forging {
             return Ok(ForgingOutcome::default());
         }
         let mut next = self.state.clone();
-        let a = next.active.as_mut().unwrap();
+        let Some(a) = next.active.as_mut() else {
+            return Ok(ForgingOutcome::default());
+        };
         let id = a.instance_id;
         let mut out = ForgingOutcome::default();
         let mut presented = self.results_presented;
@@ -437,8 +441,8 @@ impl Forging {
                 out.replies.push(launch_packet());
                 a.phase = ForgingPhase::Launched;
             }
-        } else {
-            let fields: Vec<_> = msg.unwrap().split('\t').collect();
+        } else if let Some(msg) = msg {
+            let fields: Vec<_> = msg.split('\t').collect();
             match fields.as_slice() {
                 ["OnConnectMsg"] => {
                     if a.phase == ForgingPhase::Launched {
@@ -1138,17 +1142,10 @@ fn payload_packet_with_game(id: i32, s: &str, game_id: i32) -> io::Result<Vec<u8
     b.push(0);
     Ok(b)
 }
-fn decode_payload(b: &[u8]) -> io::Result<&str> {
-    if b.len() < 20 {
-        return Err(invalid("truncated forging payload"));
-    }
-    let n = read_i32(b, 15);
-    if n < 1 || n as usize > MAX_PAYLOAD || b.len() != 19 + n as usize || b.last() != Some(&0) {
-        return Err(invalid("invalid forging payload length"));
-    }
-    let s = std::str::from_utf8(&b[19..b.len() - 1]).map_err(invalid)?;
-    validate_text(s)?;
-    Ok(s)
+fn decode_payload(inner: &[u8]) -> io::Result<&str> {
+    let text = osfr_tools::minigame::movie_text(inner)?;
+    validate_text(text)?;
+    Ok(text)
 }
 fn validate_text(s: &str) -> io::Result<()> {
     if s.is_empty()
@@ -1206,7 +1203,7 @@ fn launch_packet() -> Vec<u8> {
     b
 }
 fn read_i32(b: &[u8], p: usize) -> i32 {
-    i32::from_le_bytes(b[p..p + 4].try_into().unwrap())
+    i32::from_le_bytes([b[p], b[p + 1], b[p + 2], b[p + 3]])
 }
 fn invalid(e: impl ToString) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, e.to_string())
