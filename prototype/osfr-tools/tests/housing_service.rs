@@ -3027,3 +3027,53 @@ fn the_catalog_setting_reads_housing_settings_json() {
         );
     }
 }
+
+/// Hygiene pass (L115): every short or long body of the hand-decoded requests is a refusal, never
+/// a panic, and the exact-length ones still decode.
+#[test]
+fn hand_decoded_request_bodies_refuse_every_wrong_length() {
+    let frame = |opcode: u16, body: &[u8]| {
+        let mut bytes = BASE_OPCODE.to_le_bytes().to_vec();
+        bytes.extend_from_slice(&opcode.to_le_bytes());
+        bytes.extend_from_slice(body);
+        bytes
+    };
+    let houses = |text_len: u32, text: &[u8]| {
+        let mut body = OWNER.to_le_bytes().to_vec();
+        body.extend_from_slice(&text_len.to_le_bytes());
+        body.extend_from_slice(text);
+        frame(14, &body)
+    };
+    let one_extra = Err(RequestError::TrailingBytes { count: 1 });
+    let cases = [
+        (vec![0x7f, 0x00, 0x17], Err(RequestError::TooShort)),
+        (frame(23, &[]), Ok(Request::RequestGrant)),
+        (frame(23, &[0]), one_extra),
+        (frame(14, &[0; 11]), Err(RequestError::Truncated)),
+        (houses(4_097, &[]), Err(RequestError::BodyRejected)),
+        (houses(3, b"ab"), Err(RequestError::Truncated)),
+        (houses(3, b"abcd"), one_extra),
+        (
+            houses(3, b"abc"),
+            Ok(Request::RequestHouses { owner_guid: OWNER }),
+        ),
+        (frame(4, &[0]), one_extra),
+        (frame(10, &[]), Ok(Request::Leave)),
+        (frame(5, &[1; 43]), Err(RequestError::BodyRejected)),
+        (save_frame(0), Err(RequestError::BodyRejected)),
+    ];
+    for (bytes, expected) in cases {
+        assert_eq!(decode_request(&bytes), expected, "{bytes:?}");
+    }
+}
+
+/// Hygiene pass (L115): a content document that does not parse keeps the parser's reason, so the
+/// load-failure log names the field.
+#[test]
+fn a_content_parse_failure_keeps_the_reason() {
+    let error = HousingContent::parse(br#"{"schema_version":1,"bogus":2}"#).unwrap_err();
+    assert!(
+        matches!(&error, ServiceError::ContentJson(reason) if reason.contains("bogus")),
+        "{error:?}"
+    );
+}

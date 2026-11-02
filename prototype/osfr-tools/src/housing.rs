@@ -403,6 +403,9 @@ impl FixtureItemLedger {
             return false;
         }
         // Validate the whole request before mutating: a rejected seed must not consume any id.
+        let Ok(count) = u32::try_from(ids.len()) else {
+            return false;
+        };
         let mut unique = BTreeSet::new();
         if ids
             .iter()
@@ -410,7 +413,6 @@ impl FixtureItemLedger {
         {
             return false;
         }
-        let count = ids.len() as u32;
         for id in &ids {
             self.spawnable.insert((definition_id, *id));
         }
@@ -680,14 +682,13 @@ impl Housing {
         Ok(HOUSE_GUID_BASE | (hash & 0x00ff_ffff_ffff_ffff))
     }
 
-    pub fn register_property(&mut self, property: PropertyDefinition) {
-        property
-            .validate()
-            .expect("property definitions are private content and must validate");
-        if self.properties.contains_key(&property.property_id) {
-            return;
-        }
-        self.properties.insert(property.property_id, property);
+    /// Add a content property row; an invalid row is refused. A row already registered is kept.
+    pub fn register_property(&mut self, property: PropertyDefinition) -> Result<(), HousingError> {
+        property.validate()?;
+        self.properties
+            .entry(property.property_id)
+            .or_insert(property);
+        Ok(())
     }
 
     /// Reconstructed owner gate, guided by Legacy `PlayerOwnsHouse(ownerId, zoneDefinitionId)`.
@@ -715,16 +716,18 @@ impl Housing {
         let name_id = property.name_id;
         let max_fixtures = property.max_fixtures;
         let max_landmarks = property.max_landmarks;
-        self.properties.entry(property_id).or_insert(property);
+        // A row already registered wins over the grant's copy: its build areas bound the lot.
+        let property = self
+            .properties
+            .entry(property_id)
+            .or_insert(property)
+            .clone();
+        let build_areas = property.build_areas.clone();
         self.grants.insert(
             lot_guid,
             PropertyGrant {
                 owner_guid: grant.owner_guid,
-                property: self
-                    .properties
-                    .get(&property_id)
-                    .expect("the granted property was just inserted")
-                    .clone(),
+                property,
                 lot_guid,
             },
         );
@@ -739,12 +742,7 @@ impl Housing {
                 max_fixtures,
                 max_landmarks,
                 locked: false,
-                build_areas: self
-                    .properties
-                    .get(&property_id)
-                    .expect("the granted property was just inserted")
-                    .build_areas
-                    .clone(),
+                build_areas,
                 fixtures: BTreeMap::new(),
                 permissions: BTreeMap::new(),
             },
@@ -772,7 +770,7 @@ impl Housing {
         house_guid: u64,
         snapshot: LotSnapshot,
     ) -> Result<(), HousingError> {
-        if snapshot.count != snapshot.fixtures.len() as u32 {
+        if snapshot.fixtures.len() != snapshot.count as usize {
             return Err(HousingError::CorruptSnapshot);
         }
         let property = PropertyDefinition {
@@ -1069,7 +1067,7 @@ impl Housing {
             house_guid,
             item_instance_id: fixture.item_instance_id,
             fixture_definition_id: fixture.fixture_definition_id,
-            transform: fixture.transform.clone(),
+            transform: fixture.transform,
         };
         removed.validate()?;
         let lot = self
@@ -1278,7 +1276,7 @@ impl Housing {
     /// replaced, so a rejected document leaves the caller exactly as it was.
     pub fn restore_lots(&mut self, lots: Vec<LotSnapshot>) -> Result<(), HousingError> {
         for property in &lots {
-            if property.count != property.fixtures.len() as u32 {
+            if property.fixtures.len() != property.count as usize {
                 return Err(HousingError::CorruptSnapshot);
             }
         }
@@ -1492,7 +1490,9 @@ fn validate_transform(transform: &FixtureTransform) -> Result<(), HousingError> 
 /// registers the module in `src/lib.rs`.
 fn replace_bytes(path: &Path, bytes: &[u8]) -> io::Result<()> {
     let mut temporary = create_temporary(path)?;
-    let file = temporary.file.as_mut().expect("temporary file is open");
+    let Some(file) = temporary.file.as_mut() else {
+        return Err(io::Error::other("housing snapshot file is not open"));
+    };
     file.write_all(bytes)?;
     file.sync_all()?;
     // Windows requires closing our temporary-file handle before replacement.

@@ -370,8 +370,9 @@ impl HousingContent {
                 "housing content exceeds 1 MiB",
             ));
         }
-        let content: Self = serde_json::from_slice(bytes)
-            .map_err(|_| ServiceError::HousingContentInvalid("invalid housing content JSON"))?;
+        let content: Self = serde_json::from_slice(bytes).map_err(|error| {
+            ServiceError::ContentJson(format!("invalid housing content JSON: {error}"))
+        })?;
         content.validate()?;
         Ok(content)
     }
@@ -510,48 +511,42 @@ impl Request {
 
 /// Decode a complete inner game packet: base opcode 127, inner opcode, then the recovered body.
 pub fn decode_request(inner: &[u8]) -> Result<Request, RequestError> {
-    if inner.len() < HEADER_LEN {
+    // `payload` starts at the inner opcode (the codecs' subtype); `body` follows the header.
+    let (Some(base), Some(opcode), Some(payload), Some(body)) = (
+        crate::le::u16(inner, 0),
+        crate::le::u16(inner, 2),
+        inner.get(2..),
+        inner.get(HEADER_LEN..),
+    ) else {
         return Err(RequestError::TooShort);
-    }
-    let base = u16::from_le_bytes([inner[0], inner[1]]);
+    };
     if base != BASE_OPCODE {
         return Err(RequestError::WrongBaseOpcode { found: base });
     }
-    let opcode = u16::from_le_bytes([inner[2], inner[3]]);
     if opcode == OP_REQUEST_GRANT {
-        return match inner.len() - HEADER_LEN {
+        return match body.len() {
             0 => Ok(Request::RequestGrant),
             count => Err(RequestError::TrailingBytes { count }),
         };
     }
     if opcode == OP_REQUEST_HOUSES {
         // u64 owner guid, then a u32-length string (bounded, otherwise unused).
-        let body = &inner[HEADER_LEN..];
-        if body.len() < 12 {
+        let (Some(owner_guid), Some(text_len)) = (crate::le::u64(body, 0), crate::le::u32(body, 8))
+        else {
             return Err(RequestError::Truncated);
-        }
-        let text_len = u32::from_le_bytes(body[8..12].try_into().unwrap()) as usize;
+        };
         if text_len > 4096 {
             return Err(RequestError::BodyRejected);
         }
-        if body.len() != 12 + text_len {
-            return Err(if body.len() < 12 + text_len {
-                RequestError::Truncated
-            } else {
-                RequestError::TrailingBytes {
-                    count: body.len() - 12 - text_len,
-                }
-            });
-        }
-        return Ok(Request::RequestHouses {
-            owner_guid: u64::from_le_bytes(body[..8].try_into().unwrap()),
-        });
+        return match body.len().checked_sub(12 + text_len as usize) {
+            None => Err(RequestError::Truncated),
+            Some(0) => Ok(Request::RequestHouses { owner_guid }),
+            Some(count) => Err(RequestError::TrailingBytes { count }),
+        };
     }
     if opcode == OP_PICKUP_ALL || opcode == OP_LEAVE {
-        if inner.len() != HEADER_LEN {
-            return Err(RequestError::TrailingBytes {
-                count: inner.len().saturating_sub(HEADER_LEN),
-            });
+        if !body.is_empty() {
+            return Err(RequestError::TrailingBytes { count: body.len() });
         }
         return Ok(if opcode == OP_PICKUP_ALL {
             Request::PickupAll
@@ -561,8 +556,7 @@ pub fn decode_request(inner: &[u8]) -> Result<Request, RequestError> {
     }
     if opcode == OP_PLACE {
         // The codec starts at the subtype, so the family prefix is excluded here.
-        let place =
-            WirePlaceFixture::decode(&inner[2..]).map_err(|_| RequestError::BodyRejected)?;
+        let place = WirePlaceFixture::decode(payload).map_err(|_| RequestError::BodyRejected)?;
         return Ok(Request::Place {
             selection_id: place.first_dword,
             transform: WireTransform {
@@ -576,22 +570,20 @@ pub fn decode_request(inner: &[u8]) -> Result<Request, RequestError> {
         // Client writer FUN_00abf620: fixture key, two four-float groups, then a 24-byte block
         // whose dword is 0 in every real move (not the 127/2 scale; see `WireTransform::scale`).
         // Only the transform prefix is interpreted.
-        let body = &inner[HEADER_LEN..];
         if body.len() < 44 || body.len() > 64 * 1024 {
             return Err(RequestError::BodyRejected);
         }
-        let fixture_guid = u64::from_le_bytes(body[..8].try_into().unwrap());
+        let (Some(fixture_guid), Some(position), Some(rotation), Some(scale)) = (
+            crate::le::u64(body, 0),
+            body.get(8..).and_then(float4),
+            body.get(24..).and_then(float4),
+            crate::le::f32(body, 40),
+        ) else {
+            return Err(RequestError::BodyRejected);
+        };
         if fixture_guid == 0 {
             return Err(RequestError::BodyRejected);
         }
-        let read_float4 = |bytes: &[u8]| -> [f32; 4] {
-            std::array::from_fn(|index| {
-                f32::from_le_bytes(bytes[index * 4..index * 4 + 4].try_into().unwrap())
-            })
-        };
-        let position = read_float4(&body[8..24]);
-        let rotation = read_float4(&body[24..40]);
-        let scale = f32::from_le_bytes(body[40..44].try_into().unwrap());
         return Ok(Request::Move {
             fixture_guid,
             transform: WireTransform {
@@ -627,6 +619,12 @@ pub fn decode_request(inner: &[u8]) -> Result<Request, RequestError> {
             Ok(Request::PreviewByItemDefinition)
         }
     }
+}
+
+/// The four little-endian `f32`s at the start of `bytes`; `None` when it ends first.
+fn float4(bytes: &[u8]) -> Option<[f32; 4]> {
+    let [a, b, c, d] = [0, 4, 8, 12].map(|at| crate::le::f32(bytes, at));
+    Some([a?, b?, c?, d?])
 }
 
 impl From<wire::WireError> for RequestError {
@@ -812,6 +810,9 @@ pub enum ServiceError {
     /// The fixture-configuration table itself is not usable.
     FixtureConfigInvalid(&'static str),
     HousingContentInvalid(&'static str),
+    /// A content document (`houses.json`, `housing_fixtures.json`) does not parse; the parser's
+    /// reason (the field, line and column) is kept for the load-failure log.
+    ContentJson(String),
     HouseSceneUnavailable {
         property_id: i32,
     },
@@ -911,9 +912,9 @@ impl ServiceError {
             Self::FixtureDefinitionUnknown { .. }
             | Self::FixtureDefinitionAmbiguous { .. }
             | Self::FixtureConfigInvalid(_) => "That item has no placeable fixture definition.",
-            Self::HousingContentInvalid(_) | Self::HouseSceneUnavailable { .. } => {
-                "That house is unavailable."
-            }
+            Self::HousingContentInvalid(_)
+            | Self::ContentJson(_)
+            | Self::HouseSceneUnavailable { .. } => "That house is unavailable.",
             Self::EditModeRequired => "Enter edit mode before changing fixtures.",
             Self::NotInHouse { .. } => "Enter a lot before editing it.",
             Self::StockRejected { .. } => "The inventory could not apply that change.",
@@ -1204,8 +1205,8 @@ impl FixtureConfig {
                 "fixture configuration exceeds 4 MiB",
             ));
         }
-        let config: Self = serde_json::from_slice(&bytes).map_err(|_| {
-            ServiceError::FixtureConfigInvalid("invalid fixture configuration JSON")
+        let config: Self = serde_json::from_slice(&bytes).map_err(|error| {
+            ServiceError::ContentJson(format!("invalid fixture configuration JSON: {error}"))
         })?;
         config.validate()?;
         Ok(config)
@@ -1401,7 +1402,7 @@ impl HousingService {
             ));
         }
         let property = definition.property();
-        self.housing.register_property(property);
+        self.housing.register_property(property)?;
         self.house_definitions
             .insert(definition.property_id, definition);
         Ok(())
@@ -1631,8 +1632,8 @@ impl HousingService {
         Ok(self.housing.saved_fixtures(house_guid)?)
     }
 
-    pub fn register_property(&mut self, property: PropertyDefinition) {
-        self.housing.register_property(property);
+    pub fn register_property(&mut self, property: PropertyDefinition) -> Result<(), ServiceError> {
+        Ok(self.housing.register_property(property)?)
     }
 
     pub fn grant_property(&mut self, grant: PropertyGrant) -> Result<(), ServiceError> {
@@ -2233,7 +2234,9 @@ impl HousingService {
 
     /// The placement ledger for one lot, projected from the two real owners of furniture: the live
     /// inventory and the fixtures the lot already holds. It is rebuilt per request and never kept,
-    /// so it cannot drift into a second ledger of record.
+    /// so it cannot drift into a second ledger of record. A refused seed or stage leaves that unit
+    /// out of the ledger, and placing it or picking it up is then refused (`InstanceNotOwned`,
+    /// `InventoryNotOwned`), so their results are not needed here.
     fn derive_ledger(&self, lot: &LotSnapshot, stock: &dyn FurnitureStock) -> FixtureItemLedger {
         let mut ledger = FixtureItemLedger::default();
         for instance in stock.instances() {

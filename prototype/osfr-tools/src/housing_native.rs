@@ -68,20 +68,23 @@ impl<'a> Reader<'a> {
             .offset
             .checked_add(count)
             .ok_or_else(|| invalid("housing codec offset overflow"))?;
-        if end > self.data.len() {
-            return Err(invalid("truncated housing payload"));
-        }
-        let chunk = &self.data[self.offset..end];
+        let chunk = (self.data.get(self.offset..end))
+            .ok_or_else(|| invalid("truncated housing payload"))?;
         self.offset = end;
         Ok(chunk)
     }
 
+    fn array<const N: usize>(&mut self) -> io::Result<[u8; N]> {
+        (self.take(N)?.first_chunk().copied()).ok_or_else(|| invalid("truncated housing payload"))
+    }
+
     fn subtype(&mut self) -> io::Result<u16> {
-        Ok(u16::from_le_bytes(self.take(2)?.try_into().unwrap()))
+        Ok(u16::from_le_bytes(self.array()?))
     }
 
     fn u8(&mut self) -> io::Result<u8> {
-        Ok(self.take(1)?[0])
+        let [byte] = self.array()?;
+        Ok(byte)
     }
 
     fn bool(&mut self) -> io::Result<bool> {
@@ -93,19 +96,19 @@ impl<'a> Reader<'a> {
     }
 
     fn u32(&mut self) -> io::Result<u32> {
-        Ok(u32::from_le_bytes(self.take(4)?.try_into().unwrap()))
+        Ok(u32::from_le_bytes(self.array()?))
     }
 
     fn i32(&mut self) -> io::Result<i32> {
-        Ok(i32::from_le_bytes(self.take(4)?.try_into().unwrap()))
+        Ok(i32::from_le_bytes(self.array()?))
     }
 
     fn u64(&mut self) -> io::Result<u64> {
-        Ok(u64::from_le_bytes(self.take(8)?.try_into().unwrap()))
+        Ok(u64::from_le_bytes(self.array()?))
     }
 
     fn f32(&mut self) -> io::Result<f32> {
-        let value = f32::from_le_bytes(self.take(4)?.try_into().unwrap());
+        let value = f32::from_le_bytes(self.array()?);
         finite(&[value])?;
         Ok(value)
     }
@@ -1282,10 +1285,9 @@ impl HousingPacket {
     }
 
     pub fn decode(payload: &[u8]) -> io::Result<Self> {
-        if payload.len() < 2 {
-            return Err(invalid("truncated housing subtype"));
-        }
-        match u16::from_le_bytes(payload[..2].try_into().unwrap()) {
+        let subtype =
+            crate::le::u16(payload, 0).ok_or_else(|| invalid("truncated housing subtype"))?;
+        match subtype {
             SUB_PLACE => Ok(Self::Place(PlaceFixture::decode(payload)?)),
             SUB_INSTANCE_DATA => Ok(Self::InstanceData(InstanceData::decode(payload)?)),
             SUB_FIXTURE_UPDATE => Ok(Self::FixtureUpdate(FixtureUpdate::decode(payload)?)),
