@@ -230,5 +230,21 @@
       {"name": "Snowspurs Rightwing", "team": 1, "slot": 2, "name_string_id": 401713, "model_id": 1412},
       {"name": "Snowhill Goalie", "team": 1, "slot": 3, "name_string_id": 401711, "model_id": 1436}
     ]
+  },
+  "pickups": {
+    "source": "L942: the live server's power-ups, capture OpenSourceFreeRealms ofrserver Packets/packets_soccer_minigame.pcapng: 76/9 spawns on four spots (x, z) symmetric about the centre with 30 s left, the first 20 s into play, then every few seconds, up to three at once; 76/10 grabs for 20.0 s. Kinds from the client HUD switch (0xb81414) and Resources/CodeStringMappings.txt: 1 bbe_soccer_pickup_speed (Speed Increase), 2 _toughness (Toughness Increase), 4 _charge (Charge Speed Increase); the two u32 per kind as sent. every, reach and both factors are R.",
+    "spots": [[220.125, 208.43], [220.125, 217.38], [233.27, 217.38], [233.27, 208.43]],
+    "kinds": [
+      {"kind": 1, "definition": 852, "instance": 1480},
+      {"kind": 2, "definition": 853, "instance": 1484},
+      {"kind": 4, "definition": 887, "instance": 1482}
+    ],
+    "first_after": 20.0,
+    "every": 6.0,
+    "lifetime": 30.0,
+    "duration": 20.0,
+    "reach": 1.5,
+    "speed_factor": 1.4,
+    "toughness_factor": 0.5
   }
 }

@@ -68,6 +68,14 @@ pub struct BotMemory {
     pub tackle_ready_at: f32,
     /// A knocked-down bot neither moves nor tackles until this server time.
     pub down_until: f32,
+    /// L942: a grabbed power-up (until, factor): Speed scales the run speeds, Toughness the knockdown time.
+    pub speed_boost: Option<(f32, f32)>,
+    pub tough_boost: Option<(f32, f32)>,
+}
+
+/// L942: a live boost's factor, or 1.
+fn boost(boost: Option<(f32, f32)>, now: f32) -> f32 {
+    boost.filter(|(until, _)| now < *until).map_or(1.0, |(_, factor)| factor)
 }
 
 fn sub(a: [f32; 3], b: [f32; 3]) -> [f32; 3] {
@@ -181,6 +189,7 @@ pub fn step(
             events.push(stopped(bot, at, ball));
             continue;
         }
+        let pace = boost(memory.get(&bot).and_then(|m| m.speed_boost), now);
         let goal = authority.attack_goal(state.team);
         let c = authority.config().bounds.centre;
         // Read possession per bot: an earlier bot this step may have tackled or kicked.
@@ -196,14 +205,14 @@ pub fn step(
                 at[1],
                 (ball[2]).clamp(c[2] - KEEPER_REACH, c[2] + KEEPER_REACH),
             ];
-            let (next, facing) = toward(at, target, KEEPER_SPEED * dt);
+            let (next, facing) = toward(at, target, KEEPER_SPEED * pace * dt);
             if next != at {
                 authority.place_server_player(bot, next)?;
                 events.push(BotEvent::Moved {
                     player: bot,
                     position: next,
                     facing,
-                    speed: KEEPER_SPEED,
+                    speed: KEEPER_SPEED * pace,
                 });
             } else {
                 events.push(stopped(bot, at, ball));
@@ -251,13 +260,13 @@ pub fn step(
                     continue;
                 }
             }
-            let (next, facing) = toward(at, goal, RUN_SPEED * dt);
+            let (next, facing) = toward(at, goal, RUN_SPEED * pace * dt);
             authority.place_server_player(bot, next)?;
             events.push(BotEvent::Moved {
                 player: bot,
                 position: next,
                 facing,
-                speed: RUN_SPEED,
+                speed: RUN_SPEED * pace,
             });
             continue;
         }
@@ -271,20 +280,22 @@ pub fn step(
                     .find(|r| r.0 == carrier)
                     .map(|r| r.3)
                     .unwrap_or(ball);
-                let (next, facing) = toward(at, carrier_at, SPRINT_SPEED * dt);
+                let (next, facing) = toward(at, carrier_at, SPRINT_SPEED * pace * dt);
                 authority.place_server_player(bot, next)?;
                 events.push(BotEvent::Moved {
                     player: bot,
                     position: next,
                     facing,
-                    speed: SPRINT_SPEED,
+                    speed: SPRINT_SPEED * pace,
                 });
                 let ready = memory.get(&bot).map_or(0.0, |m| m.tackle_ready_at);
                 if now >= ready {
                     if let Some(victim) = authority.tackle(bot)? {
                         memory.entry(bot).or_default().tackle_ready_at = now + TACKLE_COOLDOWN;
                         // The carrier goes down, so it cannot chase and tackle straight back.
-                        memory.entry(victim).or_default().down_until = now + KNOCKDOWN;
+                        let victim_memory = memory.entry(victim).or_default();
+                        victim_memory.down_until =
+                            now + KNOCKDOWN * boost(victim_memory.tough_boost, now);
                         events.push(BotEvent::Tackled {
                             tackler: bot,
                             victim,
@@ -296,13 +307,13 @@ pub fn step(
         }
         // A loose ball: the chaser runs to it (the match gives possession on contact).
         if holder.is_none() && chasing {
-            let (next, facing) = toward(at, ball, RUN_SPEED * dt);
+            let (next, facing) = toward(at, ball, RUN_SPEED * pace * dt);
             authority.place_server_player(bot, next)?;
             events.push(BotEvent::Moved {
                 player: bot,
                 position: next,
                 facing,
-                speed: RUN_SPEED,
+                speed: RUN_SPEED * pace,
             });
             continue;
         }
@@ -310,13 +321,13 @@ pub fn step(
         let spot = home(authority, state.team, state.slot);
         let target = [spot[0] + (ball[0] - spot[0]) * 0.5, at[1], spot[2]];
         if flat_distance(at, target) > 0.5 {
-            let (next, facing) = toward(at, target, SUPPORT_SPEED * dt);
+            let (next, facing) = toward(at, target, SUPPORT_SPEED * pace * dt);
             authority.place_server_player(bot, next)?;
             events.push(BotEvent::Moved {
                 player: bot,
                 position: next,
                 facing,
-                speed: SUPPORT_SPEED,
+                speed: SUPPORT_SPEED * pace,
             });
         } else {
             events.push(stopped(bot, at, ball));

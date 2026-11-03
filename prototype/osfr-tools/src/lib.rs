@@ -117,6 +117,7 @@ pub mod soccer;
 pub mod soccer_bots;
 pub mod soccer_entry;
 pub mod soccer_match;
+pub mod soccer_pickups;
 pub mod soccer_service;
 pub mod social_chat;
 pub mod social_lists;

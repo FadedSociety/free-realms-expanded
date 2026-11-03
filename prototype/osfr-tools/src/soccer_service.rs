@@ -316,6 +316,8 @@ fn wrap(packet: SoccerPacket) -> Vec<u8> {
 pub enum ServiceEvent {
     /// L940: one of the live server's match setup records (`Setup`), sent as captured.
     Setup(SoccerPacket),
+    /// L942: a power-up spawn, clear (76/9) or grab (76/10) from `soccer_pickups`.
+    Pickup(SoccerPacket),
     /// R server-assigned roster entry.
     Registered { player: u64, marker: [u8; 2] },
     /// R server-assigned team/slot for one player.
@@ -362,7 +364,7 @@ impl ServiceEvent {
     /// The codec packet layout selected by this R event.
     pub fn packet(&self) -> SoccerPacket {
         match self {
-            ServiceEvent::Setup(packet) => packet.clone(),
+            ServiceEvent::Setup(packet) | ServiceEvent::Pickup(packet) => packet.clone(),
             ServiceEvent::Registered { player, marker } => SoccerPacket::RegisterPlayer {
                 player: *player,
                 marker: *marker,
@@ -566,6 +568,8 @@ pub struct SoccerService {
     /// L940: the live setup records and whether the first kickoff has sent its steps.
     setup: Option<Setup>,
     kicked_off: bool,
+    /// L942: the power-ups on the pitch, when the content has them.
+    pickups: Option<crate::soccer_pickups::Pickups>,
     /// R relay bookkeeping: last holder reported on the service wire (`0` none).
     last_holder: u64,
 }
@@ -587,6 +591,7 @@ impl SoccerService {
             cancelled: false,
             setup: None,
             kicked_off: false,
+            pickups: None,
             last_holder: NO_HOLDER,
         })
     }
@@ -594,6 +599,38 @@ impl SoccerService {
     /// L940: send the live server's setup records around the roster (see [`Setup`]).
     pub fn set_setup(&mut self, setup: Setup) {
         self.setup = Some(setup);
+    }
+
+    /// L942: run power-ups on the pitch (see `soccer_pickups`).
+    pub fn set_pickups(&mut self, settings: crate::soccer_pickups::Settings) -> io::Result<()> {
+        self.pickups = Some(crate::soccer_pickups::Pickups::new(settings)?);
+        Ok(())
+    }
+
+    /// L942: power-ups during play. A grab gives its player one boost at a time (the bots use it;
+    /// Charge only fills the client's kick meter faster).
+    fn pickup_step(&mut self, dt: f32) -> Vec<ServiceEvent> {
+        let Some(pickups) = &mut self.pickups else { return Vec::new() };
+        if self.authority.phase() != MatchPhase::Running {
+            return Vec::new();
+        }
+        let players: Vec<_> = self
+            .authority
+            .players()
+            .filter_map(|(id, state)| state.position.map(|at| (id, at)))
+            .collect();
+        let (records, grabs) = pickups.step(dt, &players);
+        let settings = pickups.settings();
+        let now = self.authority.server_time();
+        for grab in grabs {
+            let until = now + grab.duration;
+            let memory = self.bot_memory.entry(grab.player).or_default();
+            memory.speed_boost = (grab.kind == crate::soccer_pickups::SPEED)
+                .then_some((until, settings.speed_factor));
+            memory.tough_boost = (grab.kind == crate::soccer_pickups::TOUGHNESS)
+                .then_some((until, settings.toughness_factor));
+        }
+        records.into_iter().map(ServiceEvent::Pickup).collect()
     }
 
     fn player_count(&self) -> u32 {
@@ -1100,6 +1137,7 @@ impl SoccerService {
         }
 
         let mut events = bot_events;
+        events.extend(self.pickup_step(dt));
         if self.authority.score() != before_score {
             events.push(ServiceEvent::Goal {
                 score: self.authority.score(),

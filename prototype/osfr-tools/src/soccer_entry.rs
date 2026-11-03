@@ -244,6 +244,9 @@ pub struct Content {
     /// L940: the live server's match setup records (see `soccer_service::Setup`).
     #[serde(default)]
     setup: Option<SetupSettings>,
+    /// L942: the live server's power-ups (see `soccer_pickups`).
+    #[serde(default)]
+    pickups: Option<crate::soccer_pickups::Settings>,
 }
 
 /// L940: `soccer.json` `setup`, as captured: 76/7 and 76/8 as hex, 76/21 floats and 76/19 words per role.
@@ -455,6 +458,9 @@ impl Content {
             return Err(invalid("soccer content schema version is not supported"));
         }
         self.setup()?;
+        if let Some(pickups) = &self.pickups {
+            pickups.validate()?;
+        }
         if self.games.is_empty() || self.games.len() > MAX_GAMES {
             return Err(invalid("soccer content needs 1..=32 games"));
         }
@@ -579,6 +585,9 @@ impl Session {
             }
             None => false,
         };
+        if let Some(pickups) = &content.pickups {
+            service.set_pickups(pickups.clone())?;
+        }
         let mut roster = service.join(character.guid, 0, 0)?;
         roster.extend(service.fill_bots_for_solo(character.guid)?);
         // L940: the live server posed the human at its spawn with the bots' line-up; without it the
@@ -688,6 +697,12 @@ impl Session {
             // L940: player status bit 12 (0x1000) puts the client in soccer: its status handler
             // (0x932d68) then runs the soccer start (sub_B7E2D0), which builds the local
             // "SoccerPlayerLocal". Without it the pitch stays empty and the HUD crashes on the setup.
+            // L942: the live server first stowed whatever the player held (35/61 active wield type 0),
+            // then sent the status.
+            let mut unarmed = [35u16.to_le_bytes(), 61u16.to_le_bytes()].concat();
+            unarmed.extend(guid.to_le_bytes());
+            unarmed.extend(0u32.to_le_bytes());
+            result.replies.push(unarmed);
             result
                 .replies
                 .push(crate::kart_gateway::player_status(guid, SOCCER_STATUS));
@@ -729,6 +744,16 @@ impl Session {
         now_ms: u64,
     ) -> io::Result<Vec<Vec<u8>>> {
         let wire = wire_from_inner(inner)?;
+        // L942: the client reports its own registration and non kick/pass states as it plays (the
+        // live client did too). They are advisory: nothing changes and nothing is sent. Refusing
+        // them ended the session, because the client bundles them with its poses and a refused
+        // bundle child fails the whole message (native 2026-11-03).
+        if matches!(
+            crate::soccer_match::client_packet(&wire, 0),
+            Ok(crate::soccer_match::ClientPacket::ReadOnly(_))
+        ) {
+            return Ok(Vec::new());
+        }
         let sequence = self
             .sequence
             .checked_add(1)

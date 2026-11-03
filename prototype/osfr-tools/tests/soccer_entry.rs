@@ -1095,3 +1095,31 @@ fn the_shipped_bots_spawn_as_actors_before_their_registration() {
     }
     assert_eq!(models, [1415, 1428, 1592, 1434, 1426, 1412, 1436]);
 }
+
+/// L942 (native 2026-11-03): the client's own non kick/pass state reports are advisory. Refusing
+/// one ended the session when the client bundled it with its poses; now it changes nothing.
+#[test]
+fn the_clients_own_state_reports_are_ignored_not_refused() {
+    let shipped = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/soccer.json");
+    let content = soccer_entry::Content::load(&shipped).unwrap();
+    let human = CharacterState {
+        guid: GUID,
+        zone_id: 0,
+        position: [0.0; 3],
+        rotation: [0.0, 0.0, 1.0],
+    };
+    let mut session =
+        soccer_entry::Session::begin(&content, content.games()[0].id, &human, None).unwrap();
+    let offer = session.loaded_replies();
+    session
+        .handle_lifecycle(GUID, &lifecycle(5, offer_instance(&offer)), 1_000)
+        .unwrap();
+    let idle = osfr_tools::soccer::encode_inner(&osfr_tools::soccer::SoccerPacket::UpdatePlayerState {
+        player: GUID,
+        state: 1,
+        aux: 0,
+        state_counter: 1,
+        vectors: [[1.0, 0.0, 0.0, 1.0], [0.0; 4], [0.0; 4]],
+    });
+    assert!(session.handle_client(GUID, &idle, 1_100).unwrap().is_empty());
+}
