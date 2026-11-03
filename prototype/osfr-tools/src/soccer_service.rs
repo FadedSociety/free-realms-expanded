@@ -101,6 +101,19 @@ const BOT_ID_BASE: u64 = u64::MAX - 7;
 /// L943: the live 76/14 states of a running and a standing bot.
 const BOT_RUNNING: u8 = 2;
 const BOT_STANDING: u8 = 1;
+/// L948: bot kick states (client state table 0x1BA2338): 17 KickRight, 22 SuperKick at full charge.
+const KICK_RIGHT: u8 = 17;
+const SUPER_KICK: u8 = 22;
+/// L948: a kicker plays its kick this long before its next state (live: 0.41 s to the release).
+const KICK_HOLD: f32 = 0.4;
+/// L948: the loose ball goes out about this often (live 76/4 cadence).
+const BALL_EVERY: f32 = 0.15;
+/// L948: a kick's ball effect drains at this rate over two seconds (live: KickRight 4, SuperKick 5).
+const KICK_EFFECT_RATE: f32 = 4.0;
+const SUPER_EFFECT_RATE: f32 = 5.0;
+const KICK_EFFECT_SECONDS: f32 = 2.0;
+/// L948: the byte the client keeps at ball +0x14, as sent live while the ball is in play (R).
+const IN_PLAY: u8 = 0xFF;
 
 #[derive(Clone)]
 struct ParticipantRun {
@@ -324,12 +337,24 @@ pub enum ServiceEvent {
     /// L943: a bot's 76/14 state. The live server sent one on every start (state 2, with the move
     /// direction) and stop (state 1) of a bot, counting them per bot. The client animates a remote
     /// soccer player from it; without one a field player drew no body (native 2026-11-03).
+    /// L948: and a kick (stop, charge in `aux`, then the kick state).
     BotState {
         player: u64,
-        running: bool,
+        state: u8,
+        aux: u8,
         counter: u32,
         direction: [f32; 2],
         position: [f32; 3],
+    },
+    /// L948: the loose ball (76/4) as the live server streamed it. `live` is in play (cleared by a
+    /// goal), `effect` a kick's effect amount and drain rate, `snap` the kickoff drop.
+    Ball {
+        position: [f32; 3],
+        velocity: [f32; 3],
+        owner: u8,
+        live: bool,
+        effect: [f32; 2],
+        snap: bool,
     },
     /// R server-assigned roster entry.
     Registered { player: u64, marker: [u8; 2] },
@@ -380,23 +405,56 @@ impl ServiceEvent {
             ServiceEvent::Setup(packet) | ServiceEvent::Pickup(packet) => packet.clone(),
             ServiceEvent::BotState {
                 player,
-                running,
+                state,
+                aux,
                 counter,
                 direction,
                 position,
             } => {
-                // As sent live: up (0, 1, 0, 0), the move direction (zero when stopped), the position.
-                let moving = if *running { *direction } else { [0.0; 2] };
+                // As sent live: running is up (0, 1, 0, 0) then the move direction; standing and
+                // kicking face the direction with no move; then the position.
+                let direction = [direction[0], 0.0, direction[1], 0.0];
+                let (first, second) = if *state == BOT_RUNNING {
+                    ([0.0, 1.0, 0.0, 0.0], direction)
+                } else {
+                    (direction, [0.0; 4])
+                };
                 SoccerPacket::UpdatePlayerState {
                     player: *player,
-                    state: if *running { BOT_RUNNING } else { BOT_STANDING },
-                    aux: 0,
+                    state: *state,
+                    aux: *aux,
                     state_counter: *counter,
-                    vectors: [
-                        [0.0, 1.0, 0.0, 0.0],
-                        [moving[0], 0.0, moving[1], 0.0],
-                        [position[0], position[1], position[2], 1.0],
-                    ],
+                    vectors: [first, second, [position[0], position[1], position[2], 1.0]],
+                }
+            }
+            ServiceEvent::Ball {
+                position,
+                velocity,
+                owner,
+                live,
+                effect,
+                snap,
+            } => {
+                // As the client reads it (0xb80ac0 case 4): the transform (no spin, the position
+                // in row 3), the velocity with w 1.0, the owner byte, flags (bit 0 in play, bit 1
+                // physics on, ball slot 0 in bits 3-4, the top bits and the drop's 0x20 as sent),
+                // the effect amount and rate (ball +0x74, +0x78), then the snap byte.
+                let mut transform = [0.0f32; 16];
+                for diagonal in [0, 5, 10, 15] {
+                    transform[diagonal] = 1.0;
+                }
+                transform[12..15].copy_from_slice(position);
+                let mut tail = [0u8; 15];
+                tail[..4].copy_from_slice(&1.0f32.to_le_bytes());
+                tail[4] = *owner;
+                tail[5] = 0xC2 | u8::from(*live) | if *snap { 0x20 } else { 0 };
+                tail[6..10].copy_from_slice(&effect[0].to_le_bytes());
+                tail[10..14].copy_from_slice(&effect[1].to_le_bytes());
+                tail[14] = u8::from(*snap);
+                SoccerPacket::UpdateSoccerBall {
+                    transform,
+                    velocity: *velocity,
+                    tail,
                 }
             }
             ServiceEvent::Registered { player, marker } => SoccerPacket::RegisterPlayer {
@@ -630,6 +688,12 @@ pub struct SoccerService {
     tally: Tally,
     /// L942: the power-ups on the pitch, when the content has them.
     pickups: Option<crate::soccer_pickups::Pickups>,
+    /// L948: the ball feed: when it last went out, in play, the kick effect, and each kicker's
+    /// state hold.
+    ball_sent_at: f32,
+    ball_live: bool,
+    ball_effect: [f32; 2],
+    kick_hold: BTreeMap<u64, f32>,
     /// R relay bookkeeping: last holder reported on the service wire (`0` none).
     last_holder: u64,
 }
@@ -655,6 +719,10 @@ impl SoccerService {
             celebrating: false,
             tally: Tally::default(),
             pickups: None,
+            ball_sent_at: 0.0,
+            ball_live: false,
+            ball_effect: [0.0; 2],
+            kick_hold: BTreeMap::new(),
             last_holder: NO_HOLDER,
         })
     }
@@ -966,15 +1034,25 @@ impl SoccerService {
                     snap: false,
                 });
             }
+            // L948: a kicker shows its kick first; then its state goes out again.
+            if self
+                .kick_hold
+                .get(&player)
+                .is_some_and(|until| time < *until)
+            {
+                continue;
+            }
+            let after_kick = self.kick_hold.remove(&player).is_some();
             // A bot starts standing (the line-up sends no state); each start and stop is counted.
             let running = speed > 0.0;
             let (last, counter) = self.bot_states.entry(player).or_insert((false, 0));
-            if running != *last {
+            if running != *last || after_kick {
                 *last = running;
                 *counter += 1;
                 out.push(ServiceEvent::BotState {
                     player,
-                    running,
+                    state: if running { BOT_RUNNING } else { BOT_STANDING },
+                    aux: 0,
                     counter: *counter,
                     direction: facing,
                     position,
@@ -1186,6 +1264,7 @@ impl SoccerService {
         let lined = crate::soccer_bots::line_up(&mut self.authority, &self.bots)?;
         let poses = self.bot_poses(lined, true);
         events.extend(if opening { snapped(poses) } else { poses });
+        events.extend(self.ball_drop());
         events.push(self.game_time());
         Ok(events)
     }
@@ -1200,6 +1279,7 @@ impl SoccerService {
         // L932: the sides swap, so the bots line up on their new kickoff spots.
         let lined = crate::soccer_bots::line_up(&mut self.authority, &self.bots)?;
         events.extend(self.bot_poses(lined, true));
+        events.extend(self.ball_drop());
         events.push(self.game_time());
         Ok(events)
     }
@@ -1225,6 +1305,7 @@ impl SoccerService {
         let mut bot_events = Vec::new();
         let mut counted = Vec::new();
         let mut shot = false;
+        let mut kicked = false;
         for event in &acted {
             if let crate::soccer_bots::BotEvent::Tackled { tackler, .. } = *event {
                 counted.extend(self.count(
@@ -1243,6 +1324,16 @@ impl SoccerService {
                     self.count(player, &[SHOTS], &[]);
                     shot = true;
                 }
+                if self.setup.is_some() {
+                    // L948: the live server sent a bot's kick as its 76/14 states, never a 76/13.
+                    let charge = power / self.authority.config().physics.max_kick_power;
+                    let aux = (charge.clamp(0.0, 1.0) * 255.0).round() as u8;
+                    let (state, effect) = kick_style(kind == KickKind::Shot, aux);
+                    self.ball_effect = effect;
+                    kicked = true;
+                    bot_events.extend(self.bot_kick(player, state, aux));
+                    continue;
+                }
                 let direction = unit(self.authority.ball_velocity())?;
                 bot_events.push(ServiceEvent::Impulse {
                     player,
@@ -1260,6 +1351,7 @@ impl SoccerService {
         }
         bot_events.extend(self.bot_poses(acted, false));
         let toucher = self.authority.last_touch();
+        let carried = self.authority.ball_velocity();
         self.authority.advance(dt)?;
 
         if self.authority.score() != before_score {
@@ -1283,6 +1375,12 @@ impl SoccerService {
             let after = self.authority.score();
             self.tally.last_goal_team = Some(u32::from(after[1] != before_score[1]));
             events.push(ServiceEvent::Goal { score: after });
+            if self.setup.is_some() {
+                // L948: as live, the goal's ball carries the scoring team and leaves play, still
+                // moving (the client plays it into the net).
+                self.ball_live = false;
+                events.push(self.ball(u8::from(after[1] != before_score[1]), carried, false));
+            }
             if let Some(scorer) = toucher {
                 events.extend(self.count(scorer, &[], &[PLAYER_GOALS]));
             }
@@ -1324,6 +1422,18 @@ impl SoccerService {
                 }
             }
         }
+        // L948: the loose ball goes out (76/4) right after a kick, then every 0.15 s, as live.
+        if self.setup.is_some() {
+            self.ball_effect[0] = (self.ball_effect[0] - self.ball_effect[1] * dt).max(0.0);
+            let time = self.authority.server_time();
+            if self.authority.phase() == MatchPhase::Running
+                && self.authority.possession().is_none()
+                && (kicked || time - self.ball_sent_at >= BALL_EVERY)
+            {
+                self.ball_sent_at = time;
+                events.push(self.ball(IN_PLAY, self.authority.ball_velocity(), false));
+            }
+        }
         // L946: the half-time board and the end of the match.
         if before_phase == MatchPhase::Running {
             match self.authority.phase() {
@@ -1344,6 +1454,67 @@ impl SoccerService {
     /// L946: a goal's celebration is running; the next kickoff waits for it (`soccer_entry`).
     pub fn celebrating(&self) -> bool {
         self.celebrating
+    }
+
+    /// L948: the ball as the live server streamed it (76/4). `owner` is the byte the client keeps at
+    /// ball +0x14: 0xFF in play, the scoring team on a goal, 0 on the kickoff drop (as sent; R).
+    fn ball(&self, owner: u8, velocity: [f32; 3], snap: bool) -> ServiceEvent {
+        ServiceEvent::Ball {
+            position: self.authority.ball_position(),
+            velocity,
+            owner,
+            live: self.ball_live,
+            effect: self.ball_effect,
+            snap,
+        }
+    }
+
+    /// L948: a kickoff drops the ball on its spot (snap) and puts it in play, with the live setup.
+    fn ball_drop(&mut self) -> Vec<ServiceEvent> {
+        if self.setup.is_none() {
+            return Vec::new();
+        }
+        self.ball_live = true;
+        self.ball_effect = [0.0; 2];
+        self.ball_sent_at = self.authority.server_time();
+        vec![self.ball(0, [0.0; 3], true)]
+    }
+
+    /// L948: a bot's kick as the live server sent it (76/14): it stops (when running), charges and
+    /// kicks facing the ball's way, each change of state counted; its next state waits for the kick
+    /// to play out.
+    fn bot_kick(&mut self, player: u64, state: u8, aux: u8) -> Vec<ServiceEvent> {
+        let velocity = self.authority.ball_velocity();
+        let flat = velocity[0].hypot(velocity[2]).max(f32::EPSILON);
+        let direction = [velocity[0] / flat, velocity[2] / flat];
+        let position = self
+            .authority
+            .player(player)
+            .and_then(|bot| bot.position)
+            .unwrap_or_default();
+        self.kick_hold
+            .insert(player, self.authority.server_time() + KICK_HOLD);
+        let (running, counter) = self.bot_states.entry(player).or_insert((false, 0));
+        if *running {
+            *running = false;
+            *counter += 1;
+        }
+        let stop = *counter;
+        *counter += 1;
+        [
+            (BOT_STANDING, 0, stop),
+            (BOT_STANDING, aux, stop),
+            (state, aux, *counter),
+        ]
+        .map(|(state, aux, counter)| ServiceEvent::BotState {
+            player,
+            state,
+            aux,
+            counter,
+            direction,
+            position,
+        })
+        .to_vec()
     }
 
     /// L947: one 76/5 with the match in it (client handler 0xb82fb6): the last scoring team, the
@@ -1450,6 +1621,20 @@ impl SoccerService {
                 if kind == KickKind::Shot {
                     self.count(request.player, &[SHOTS], &[]);
                 }
+                if self.setup.is_some() {
+                    // L948: the live server never sent a 76/13; the ball leaves the kicker (76/12)
+                    // and goes out as the server moves it (76/4).
+                    self.ball_effect = kick_style(kind == KickKind::Shot, request.aux).1;
+                    self.ball_sent_at = self.authority.server_time();
+                    return Ok(vec![
+                        ServiceEvent::FreeBall {
+                            position: self.authority.ball_position(),
+                            scale: FREE_BALL_SCALE,
+                            previous: request.player,
+                        },
+                        self.ball(IN_PLAY, self.authority.ball_velocity(), false),
+                    ]);
+                }
                 Ok(vec![ServiceEvent::Impulse {
                     player: request.player,
                     kind,
@@ -1490,6 +1675,21 @@ impl SoccerService {
             elapsed: self.authority.elapsed(),
         }
     }
+}
+
+/// L948: a kick's 76/14 state and the ball effect it starts (76/4 tail: an amount the client drains
+/// at a rate). Live: KickRight at aux 233 started 7.3 draining 4 a second, a full-charge SuperKick
+/// 10 draining 5, both over two seconds; a pass goes out as KickRight (R: no live bot pass).
+fn kick_style(shot: bool, aux: u8) -> (u8, [f32; 2]) {
+    let (state, rate) = if shot && aux == u8::MAX {
+        (SUPER_KICK, SUPER_EFFECT_RATE)
+    } else {
+        (KICK_RIGHT, KICK_EFFECT_RATE)
+    };
+    (
+        state,
+        [charge_from_aux(aux) * rate * KICK_EFFECT_SECONDS, rate],
+    )
 }
 
 /// Unit direction with the same acceptance threshold as `soccer_match`'s own

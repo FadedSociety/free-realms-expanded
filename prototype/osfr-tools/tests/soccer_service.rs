@@ -1116,7 +1116,8 @@ fn setup_records_follow_the_encounter_start_in_the_live_order() {
     let stats = ["21", "19"].repeat(8);
     let mut expected = vec!["5(1,0)", "5(2,0)", "7", "5(2,1)", "5(3,1)", "5(4,1)", "5(5,8)", "8"];
     expected.extend(stats);
-    expected.extend(["5(6,8)", "5(7,8)", "5(11,8)", "5(12,8)", "23"]);
+    // L948: the kickoff drops the ball (76/4), as live with step 11.
+    expected.extend(["5(6,8)", "5(7,8)", "5(11,8)", "5(12,8)", "4", "23"]);
     assert_eq!(subs, expected);
     // The human gets the human row; a keeper bot its side's keeper row.
     let human_stats = events.iter().find_map(|event| match event.packet() {
@@ -1163,7 +1164,7 @@ fn a_goal_celebrates_before_the_next_kickoff() {
         .handle_client(KICKER, 0.0, &client_position(KICKER, [0.0, 0.0, 0.0]), 1, None)
         .expect("kicker position");
     service.tick(0.05).expect("acquire possession");
-    service
+    let kick = service
         .handle_client(
             KICKER,
             0.05,
@@ -1172,6 +1173,20 @@ fn a_goal_celebrates_before_the_next_kickoff() {
             None,
         )
         .expect("shot at the -x goal");
+    // L948: no 76/13 (the live server sent none); the ball leaves the kicker (76/12) and goes out
+    // moving (76/4): in play, physics on, a full-charge kick's effect.
+    assert!(matches!(
+        kick[0],
+        ServiceEvent::FreeBall {
+            previous: KICKER,
+            ..
+        }
+    ));
+    let (_, velocity, tail) = kick.iter().find_map(ball_of).expect("the kicked ball");
+    assert!(velocity[0] < 0.0, "toward the -x goal");
+    assert_eq!(tail[4..6], [0xFF, 0xC3]);
+    assert_eq!(f32_at(&tail, 6), 10.0);
+    assert_eq!(f32_at(&tail, 10), 5.0);
     let mut goal_events = Vec::new();
     while service.phase() == MatchPhase::Running {
         goal_events.extend(service.tick(0.25).expect("tick"));
@@ -1203,6 +1218,120 @@ fn a_goal_celebrates_before_the_next_kickoff() {
         SoccerPacket::UpdatePlayerStats { player: KICKER, words } if words[3] == 1
     )));
     assert!(service.celebrating());
-    assert_eq!(steps(&service.start().expect("restart")), [18, 11, 12]);
+    // L948: the loose ball went out each tick; the goal's carries the scoring team, out of play.
+    let balls: Vec<_> = goal_events.iter().filter_map(ball_of).collect();
+    assert!(balls.len() > 1, "the ball streams while it is loose");
+    let (_, carried, goal) = balls.last().unwrap();
+    assert_eq!(goal[4..6], [0, 0xC2], "team 0 scored; out of play");
+    assert!(carried[0] < 0.0, "still moving into the net");
+    let restart = service.start().expect("restart");
+    assert_eq!(steps(&restart), [18, 11, 12]);
     assert!(!service.celebrating());
+    // L948: the kickoff drops the ball on its spot (snap byte), in play again.
+    let (transform, velocity, drop) = restart.iter().find_map(ball_of).expect("the kickoff drop");
+    assert_eq!((drop[4], drop[5], drop[14]), (0, 0xE3, 1));
+    assert_eq!(velocity, [0.0; 3]);
+    assert_eq!(transform[12..15], goal_config().kickoff_spawn);
+}
+
+/// L948: the ball packet's fields (76/4: transform, velocity, the 15-byte tail).
+fn ball_of(event: &ServiceEvent) -> Option<([f32; 16], [f32; 3], [u8; 15])> {
+    match event.packet() {
+        SoccerPacket::UpdateSoccerBall {
+            transform,
+            velocity,
+            tail,
+        } => Some((transform, velocity, tail)),
+        _ => None,
+    }
+}
+
+fn f32_at(bytes: &[u8], at: usize) -> f32 {
+    f32::from_le_bytes(bytes[at..at + 4].try_into().unwrap())
+}
+
+/// L948: a bot's kick goes out as the live server sent it: its 76/14 stop, charge and kick states,
+/// the free ball (76/12), then the moving ball (76/4); never a 76/13. The kicker's next state waits
+/// for the kick to play out.
+#[test]
+fn a_bots_kick_goes_out_as_its_states_and_the_moving_ball() {
+    let mut config = config();
+    config.bot_ai = true;
+    let mut service = SoccerService::new(config, policy()).expect("service config");
+    service.set_setup(Setup {
+        match_config: Vec::new(),
+        teams: Vec::new(),
+        roles: BTreeMap::new(),
+    });
+    service.join(KICKER, 0, 0).expect("join");
+    service.fill_bots_for_solo(KICKER).expect("bots");
+    let mut events = offer_and_start(&mut service, KICKER);
+    let mut kick_at = None;
+    for _ in 0..800 {
+        let ticked = service.tick(0.05).expect("tick");
+        let kicked = ticked.iter().position(|event| {
+            matches!(event, ServiceEvent::BotState { state, .. } if *state == 17 || *state == 22)
+        });
+        if let Some(at) = kicked {
+            kick_at = Some(events.len() + at);
+        }
+        events.extend(ticked);
+        if kick_at.is_some() {
+            break;
+        }
+    }
+    let kick = kick_at.expect("a bot kicks");
+    let ServiceEvent::BotState {
+        player: kicker,
+        aux,
+        counter,
+        ..
+    } = events[kick]
+    else {
+        unreachable!()
+    };
+    let states: Vec<_> = events[kick - 2..=kick]
+        .iter()
+        .map(|event| match event {
+            ServiceEvent::BotState {
+                player,
+                state,
+                aux,
+                counter,
+                ..
+            } if *player == kicker => (*state, *aux, *counter),
+            other => panic!("not the kicker's state: {other:?}"),
+        })
+        .collect();
+    assert_eq!(states[..2], [(1, 0, counter - 1), (1, aux, counter - 1)]);
+    assert!(aux > 0);
+    let free = events[kick..]
+        .iter()
+        .position(
+            |event| matches!(event, ServiceEvent::FreeBall { previous, .. } if *previous == kicker),
+        )
+        .expect("the ball leaves the kicker");
+    let (_, velocity, tail) = events[kick + free..]
+        .iter()
+        .find_map(ball_of)
+        .expect("then the moving ball");
+    assert!(velocity.iter().any(|v| *v != 0.0));
+    assert_eq!(tail[4..6], [0xFF, 0xC3]);
+    assert!(f32_at(&tail, 6) > 0.0, "the kick's effect");
+    assert!(
+        !events
+            .iter()
+            .any(|event| matches!(event.packet(), SoccerPacket::ImpulseBall { .. })),
+        "the live server sent no 76/13"
+    );
+    // Within the kick's 0.4 s the kicker sends no state.
+    let mut next = Vec::new();
+    for _ in 0..7 {
+        next.extend(service.tick(0.05).expect("tick"));
+    }
+    assert!(
+        !next.iter().any(
+            |event| matches!(event, ServiceEvent::BotState { player, .. } if *player == kicker)
+        )
+    );
 }
