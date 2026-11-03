@@ -21,5 +21,23 @@
     "BACK": "J",
     "LTHUMB": "NUMLOCK",
     "RTHUMB": "5"
+  },
+  "zones": {"sg_soccer": "Soccer", "sg_dm_": "Vehicle", "sg_kt_": "Vehicle", "sg_fishing": "Fishing"},
+  "contexts": {
+    "Soccer": {
+      "camera": false,
+      "left_stick": {"up": "UP", "down": "DOWN", "left": "LEFT", "right": "RIGHT"},
+      "buttons": {"A": "SPACE", "X": "CTRL", "B": "ALT", "Y": "",
+                  "DPAD_UP": "UP", "DPAD_DOWN": "DOWN", "DPAD_LEFT": "LEFT", "DPAD_RIGHT": "RIGHT"}
+    },
+    "Vehicle": {
+      "camera": false,
+      "left_stick": {"up": "UP", "down": "DOWN", "left": "LEFT", "right": "RIGHT"},
+      "buttons": {"A": "UP", "X": "DOWN", "B": "CTRL", "Y": "SPACE", "LB": "SPACE", "RB": "CTRL", "RT": "UP",
+                  "DPAD_LEFT": "LEFT", "DPAD_RIGHT": "RIGHT"}
+    },
+    "Fishing": {
+      "buttons": {"A": "SPACE", "X": "MOUSE_LEFT", "B": "3", "Y": "1"}
+    }
   }
 }

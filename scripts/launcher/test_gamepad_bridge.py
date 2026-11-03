@@ -2,6 +2,7 @@
 
 import importlib.util
 import json
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -19,10 +20,13 @@ def pad(buttons=0, lt=0, rt=0, lx=0, ly=0, rx=0, ry=0):
 
 class Mapping(unittest.TestCase):
     def test_every_configured_key_name_resolves(self):
-        for key in [*CFG["buttons"].values(), *CFG["left_stick"].values()]:
-            bridge.vk(key)
-        for name in [*CFG["buttons"], CFG["cursor_mode"]]:
-            bridge.held(name, 0, 0, 0)
+        for context in ["Default", *CFG["contexts"]]:
+            cfg = bridge.layout(CFG, context)
+            for key in [*cfg["buttons"].values(), *cfg["left_stick"].values()]:
+                if key != "MOUSE_LEFT":
+                    bridge.vk(key)
+            for name in [*cfg["buttons"], cfg["cursor_mode"]]:
+                bridge.held(name, 0, 0, 0)
 
     def test_idle_pad_holds_nothing(self):
         self.assertEqual(bridge.plan(pad(lx=3000, ry=-3000), CFG), (set(), set(), (0.0, 0.0)))
@@ -47,6 +51,51 @@ class Mapping(unittest.TestCase):
         keys, mouse, (dx, _) = bridge.plan(pad(buttons=A | B, lt=255, rx=32767), CFG)
         self.assertEqual((keys, mouse), (set(), {"left", "right"}))
         self.assertAlmostEqual(dx, CFG["cursor_speed"])
+
+    def test_soccer_kicks_with_a_and_has_no_camera(self):
+        soccer = bridge.layout(CFG, "Soccer")
+        keys, mouse, velocity = bridge.plan(pad(buttons=A, ly=32767, rx=32767), soccer)
+        self.assertEqual((keys, mouse, velocity), ({0x20, 0x26}, set(), (0.0, 0.0)))
+        # Y is unbound there; the base layout's other buttons still work.
+        keys, _, _ = bridge.plan(pad(buttons=bridge.BUTTONS["Y"] | bridge.BUTTONS["START"]), soccer)
+        self.assertEqual(keys, {0x1B})
+
+    def test_fishing_casts_with_the_left_mouse_and_keeps_the_camera(self):
+        _, mouse, (dx, _) = bridge.plan(pad(buttons=bridge.BUTTONS["X"], rx=32767), bridge.layout(CFG, "Fishing"))
+        self.assertEqual(mouse, {"left", "right"})
+        self.assertAlmostEqual(dx, CFG["camera_speed"])
+
+    def test_arrows_and_delete_are_sent_as_extended_keys(self):
+        self.assertEqual(bridge.key_input(0x26, False).ki.dwFlags, 0x0001)
+        self.assertEqual(bridge.key_input(0x26, True).ki.dwFlags, 0x0003)
+        self.assertEqual(bridge.key_input(bridge.vk("DELETE"), False).ki.dwFlags, 0x0001)
+        self.assertEqual(bridge.key_input(0x20, True).ki.dwFlags, 0x0002)
+
+    def test_every_zone_names_a_layout(self):
+        self.assertLessEqual(set(CFG["zones"].values()), set(CFG["contexts"]))
+
+    def test_the_client_log_picks_the_layout(self):
+        with tempfile.TemporaryDirectory() as folder:
+            log = Path(folder) / "FreeRealms.log"
+            log.write_text("old session: sg_soccer.map\nMiniGame:JoinGame\n")
+            watch = bridge.LogWatch(log, CFG["zones"])
+            self.assertEqual(watch.poll(), "Default")  # what was there before is not replayed
+
+            def write(*lines, raw=""):
+                with log.open("a") as out:
+                    out.write("".join(f"2026-11-03\t12:59:51\t\t{line}\n" for line in lines) + raw)
+                return watch.poll()
+
+            self.assertEqual(write("AssetRequested sg_soccer_0_0.gcnk"), "Default")
+            self.assertEqual(write("MiniGame:JoinGame"), "Soccer")
+            self.assertEqual(write("MiniGame:LeaveMiniGame"), "Default")
+            log.write_text("")  # a new client run starts a new log
+            self.assertEqual(write("asset not in manifest: sg_dm_arena.map", "MiniGame:JoinGame"), "Vehicle")
+            # The HUD quit logs no leave; the next join without a zone of its own is Default.
+            self.assertEqual(write("MiniGame:JoinGame"), "Default")
+            # A line caught half-written is read whole on the next poll.
+            self.assertEqual(write("sg_fishing_medpond.gzne", raw="2026-11-03\t12:59:51\t\tMiniGame:Join"), "Default")
+            self.assertEqual(write(raw="Game\n"), "Fishing")
 
     def test_pointer_is_kept_inside_the_window(self):
         rect = (100, 50, 1100, 850)

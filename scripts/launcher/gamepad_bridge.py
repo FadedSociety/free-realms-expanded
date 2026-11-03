@@ -8,6 +8,12 @@ Research/Native Combat Controls) plus right-mouse-drag camera.
 Input is sent only while a Free Realms window is in front; everything held is
 released the moment it is not. The layout is gamepad.json, re-read when it changes.
 
+The layout follows what is being played, as the PS3 build's own pad tables did
+(USRDIR/ps3padmappings.ini: one context per minigame). The bridge reads the
+client's log (Logs/FreeRealms.log next to its executable): a scene asset named in
+gamepad.json "zones" picks the context, "MiniGame:JoinGame" switches to it and
+"MiniGame:LeaveMiniGame" switches back to Default.
+
     python gamepad_bridge.py            # run until Ctrl+C
     python gamepad_bridge.py --check    # show whether a pad is connected
     python gamepad_bridge.py --pid N    # only drive client process N
@@ -33,6 +39,7 @@ BUTTONS = {
 NAMED_KEYS = {
     "SPACE": 0x20, "TAB": 0x09, "ESCAPE": 0x1B, "ENTER": 0x0D, "SHIFT": 0xA0,
     "CTRL": 0xA2, "ALT": 0xA4, "NUMLOCK": 0x90, "DELETE": 0x2E, "BACKSPACE": 0x08,
+    "LEFT": 0x25, "UP": 0x26, "RIGHT": 0x27, "DOWN": 0x28,
     **{f"F{n}": 0x6F + n for n in range(1, 13)},
 }
 
@@ -60,6 +67,64 @@ def axis(value: int, deadzone: float) -> float:
     return (abs(v) - deadzone) / (1 - deadzone) * (1 if v > 0 else -1)
 
 
+def layout(cfg: dict, context: str) -> dict:
+    """The layout for a context: its buttons and stick over the base ones (an empty
+    key unbinds), and whether the right stick turns the camera."""
+    over = cfg.get("contexts", {}).get(context, {})
+    buttons = {**cfg["buttons"], **over.get("buttons", {})}
+    return {
+        **cfg,
+        "buttons": {name: key for name, key in buttons.items() if key},
+        "left_stick": over.get("left_stick", cfg["left_stick"]),
+        "camera": over.get("camera", True),
+    }
+
+
+class LogWatch:
+    """Follows the client's log for the minigame being played (see the module doc)."""
+
+    def __init__(self, path: Path | None, zones: dict):
+        self.path, self.zones = path, zones
+        self.at = self.size()
+        self.pending, self.context = None, "Default"
+
+    def size(self) -> int:
+        try:
+            return self.path.stat().st_size if self.path else 0
+        except OSError:
+            return 0  # not written yet, or being replaced
+
+    def read(self, line: str):
+        lower = line.lower()
+        if "minigame:leaveminigame" in lower:
+            self.pending, self.context = None, "Default"
+        elif "minigame:joingame" in lower:
+            # A join uses its zone up: the HUD quit logs no leave, so a stale zone would stick.
+            self.context, self.pending = self.pending or "Default", None
+        else:
+            for prefix, context in self.zones.items():
+                if prefix in lower:
+                    self.pending = context
+
+    def poll(self) -> str:
+        size = self.size()
+        if size < self.at:
+            self.at = 0  # a new log
+        if size > self.at:
+            try:
+                with self.path.open("rb") as log:
+                    log.seek(self.at)
+                    text = log.read(size - self.at)
+            except OSError:
+                return self.context
+            # Whole lines only: a line still being written is read on the next poll.
+            done = text.rfind(b"\n") + 1
+            self.at += done
+            for line in text[:done].decode("latin-1").splitlines():
+                self.read(line)
+        return self.context
+
+
 def plan(pad: tuple[int, int, int, int, int, int, int], cfg: dict):
     """What should be held right now: (keys, mouse buttons, mouse velocity px/s)."""
     buttons, lt, rt, lx, ly, rx, ry = pad
@@ -81,9 +146,14 @@ def plan(pad: tuple[int, int, int, int, int, int, int], cfg: dict):
         if cursor and name in ("A", "B", cfg["cursor_mode"]):
             continue
         if held(name, buttons, lt, rt):
-            keys.add(vk(key))
+            if key == "MOUSE_LEFT":
+                mouse.add("left")
+            else:
+                keys.add(vk(key))
 
     cx, cy = axis(rx, dz), axis(ry, dz)
+    if not (cursor or cfg.get("camera", True)):
+        cx = cy = 0.0  # the context has no camera control (soccer, vehicles)
     speed = cfg["cursor_speed"] if cursor else cfg["camera_speed"]
     velocity = (cx * speed, -cy * speed * (-1 if cfg.get("invert_y") else 1))
     if cursor:
@@ -171,13 +241,33 @@ def send(*inputs: INPUT):
         user32.SendInput(len(inputs), (INPUT * len(inputs))(*inputs), ctypes.sizeof(INPUT))
 
 
+# Keys on the extended set (arrows, Delete): without the flag their scan codes read as the keypad's.
+EXTENDED = {0x25, 0x26, 0x27, 0x28, 0x2E}
+
+
 def key_input(code: int, up: bool) -> INPUT:
     scan = user32.MapVirtualKeyW(code, 0)
-    return INPUT(type=1, ki=KEYBDINPUT(wVk=code, wScan=scan, dwFlags=0x0002 if up else 0))
+    flags = (0x0002 if up else 0) | (0x0001 if code in EXTENDED else 0)
+    return INPUT(type=1, ki=KEYBDINPUT(wVk=code, wScan=scan, dwFlags=flags))
 
 
 def mouse_input(flags: int, dx: int = 0, dy: int = 0) -> INPUT:
     return INPUT(type=0, mi=MOUSEINPUT(dx=dx, dy=dy, dwFlags=flags))
+
+
+def image(pid: int) -> Path | None:
+    """A process's executable."""
+    process = kernel32.OpenProcess(0x1000, False, pid)  # QUERY_LIMITED_INFORMATION
+    if not process:
+        return None
+    try:
+        buffer = ctypes.create_unicode_buffer(32768)
+        size = wintypes.DWORD(len(buffer))
+        if not kernel32.QueryFullProcessImageNameW(process, 0, buffer, ctypes.byref(size)):
+            return None
+        return Path(buffer.value)
+    finally:
+        kernel32.CloseHandle(process)
 
 
 def client_in_front(pid: int | None) -> bool:
@@ -186,16 +276,8 @@ def client_in_front(pid: int | None) -> bool:
     user32.GetWindowThreadProcessId(window, ctypes.byref(owner))
     if pid is not None:
         return owner.value == pid
-    process = kernel32.OpenProcess(0x1000, False, owner.value)  # QUERY_LIMITED_INFORMATION
-    if not process:
-        return False
-    try:
-        buffer = ctypes.create_unicode_buffer(32768)
-        size = wintypes.DWORD(len(buffer))
-        kernel32.QueryFullProcessImageNameW(process, 0, buffer, ctypes.byref(size))
-        return Path(buffer.value).name.lower() == "freerealms.exe"
-    finally:
-        kernel32.CloseHandle(process)
+    exe = image(owner.value)
+    return exe is not None and exe.name.lower() == "freerealms.exe"
 
 
 def client_rect() -> tuple[int, int, int, int]:
@@ -227,26 +309,36 @@ def exited(pid: int) -> bool:
 def run(pid: int | None):
     get_state = load_xinput()
     cfg, stamp = None, None
+    exe = image(pid) if pid is not None else None
+    watch = LogWatch(exe and exe.parent / "Logs" / "FreeRealms.log", {})
+    context = "Default"
     keys, mouse = set(), set()
     carry = [0.0, 0.0]
     last = time.monotonic()
-    print("Controller bridge running; Ctrl+C to stop.")
+    print("Controller bridge running; Ctrl+C to stop.", flush=True)
     try:
         while True:
             if CONFIG.stat().st_mtime != stamp:
                 stamp = CONFIG.stat().st_mtime
                 cfg = json.loads(CONFIG.read_text(encoding="utf-8"))
+                watch.zones = cfg.get("zones", {})
+            if watch.poll() != context:
+                context = watch.context
+                print(f"Layout: {context}", flush=True)
             now = time.monotonic()
             if pid is not None and int(now) != int(last) and exited(pid):
                 return  # releases everything below
             dt, last = now - last, now
             pad = read_pad(get_state) if client_in_front(pid) else None
-            want_keys, want_mouse, velocity = plan(pad, cfg) if pad else (set(), set(), (0, 0))
+            active = layout(cfg, context)
+            want_keys, want_mouse, velocity = plan(pad, active) if pad else (set(), set(), (0, 0))
             pointing = bool(pad) and held(cfg["cursor_mode"], pad[0], pad[1], pad[2])
             dragging = "right" in want_mouse and not pointing
             rect = client_rect() if pad else None
             if dragging and "right" not in mouse:
                 user32.SetCursorPos(*drag_anchor(rect))  # start every turn inside the game
+            if "left" in want_mouse - mouse and not pointing and rect:
+                user32.SetCursorPos(*keep_inside(cursor(), rect))  # a bound click (fishing X) lands in the game
 
             send(*[key_input(k, True) for k in keys - want_keys],
                  *[key_input(k, False) for k in want_keys - keys],
