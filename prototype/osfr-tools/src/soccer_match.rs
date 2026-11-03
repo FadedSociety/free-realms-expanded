@@ -287,6 +287,11 @@ pub struct StateRequest {
 }
 
 /// R candidate allowlist: 16-26 and 31-34 are treated as kicks; 27-30 as passes.
+/// L945: the client's tackle states (client state table 0x1BA2338): StealTackle when slow,
+/// SlideTackleStart when running (`FUN_01074b50`'s speed check).
+pub const STEAL_TACKLE: u8 = 35;
+pub const SLIDE_TACKLE_START: u8 = 36;
+
 pub fn classify_state(state: u8) -> Option<StateAction> {
     match state {
         16..=26 | 31..=34 => Some(StateAction::Kick),

@@ -647,6 +647,25 @@ impl SoccerService {
         self.setup = Some(setup);
     }
 
+    /// L945: the player's own tackle (a client 76/14 StealTackle or SlideTackleStart). A tackle in
+    /// reach of an opposing carrier steals the ball and knocks the carrier down; anything else
+    /// (out of reach, no carrier, not in play) changes nothing.
+    pub fn player_tackle(&mut self, player: u64) -> io::Result<Vec<ServiceEvent>> {
+        if self.cancelled || self.authority.phase() != MatchPhase::Running {
+            return Ok(Vec::new());
+        }
+        let Some(victim) = self.authority.tackle(player)? else {
+            return Ok(Vec::new());
+        };
+        let now = self.authority.server_time();
+        crate::soccer_bots::knock_down(&mut self.bot_memory, player, victim, now);
+        self.last_holder = player;
+        Ok(vec![ServiceEvent::Possession {
+            holder: player,
+            previous: victim,
+        }])
+    }
+
     /// L942: run power-ups on the pitch (see `soccer_pickups`).
     pub fn set_pickups(&mut self, settings: crate::soccer_pickups::Settings) -> io::Result<()> {
         self.pickups = Some(crate::soccer_pickups::Pickups::new(settings)?);

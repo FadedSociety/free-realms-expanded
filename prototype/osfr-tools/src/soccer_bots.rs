@@ -108,6 +108,15 @@ pub const BASE_STATS: Stats = Stats {
     tackle: 2,
 };
 
+/// L944/L945: a tackled player goes down for KNOCKDOWN, longer by the tackler's Tackle Power,
+/// shorter by its own Toughness and the Toughness power-up. Bots and the human tackle alike.
+pub fn knock_down(memory: &mut BTreeMap<u64, BotMemory>, tackler: u64, victim: u64, now: f32) {
+    let hit = ratio(memory.get(&tackler).and_then(|m| m.stats), |s| s.tackle);
+    let victim = memory.entry(victim).or_default();
+    victim.down_until = now
+        + KNOCKDOWN * hit * boost(victim.tough_boost, now) / ratio(victim.stats, |s| s.toughness);
+}
+
 /// A stat against its base. Zero means "not this player's stat" (the keepers' Speed, Kick and
 /// Tackle are 0 and they still move), so it leaves the rule as it is.
 fn ratio(stats: Option<Stats>, pick: fn(&Stats) -> u32) -> f32 {
@@ -341,12 +350,7 @@ pub fn step(
                     if let Some(victim) = authority.tackle(bot)? {
                         memory.entry(bot).or_default().tackle_ready_at = now + TACKLE_COOLDOWN;
                         // The carrier goes down, so it cannot chase and tackle straight back.
-                        // Tackle Power makes the knockdown longer, Toughness shorter.
-                        let hit = ratio(stats, |s| s.tackle);
-                        let victim_memory = memory.entry(victim).or_default();
-                        victim_memory.down_until = now
-                            + KNOCKDOWN * hit * boost(victim_memory.tough_boost, now)
-                                / ratio(victim_memory.stats, |s| s.toughness);
+                        knock_down(memory, bot, victim, now);
                         events.push(BotEvent::Tackled {
                             tackler: bot,
                             victim,

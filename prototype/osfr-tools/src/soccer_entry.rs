@@ -753,11 +753,19 @@ impl Session {
         // live client did too). They are advisory: nothing changes and nothing is sent. Refusing
         // them ended the session, because the client bundles them with its poses and a refused
         // bundle child fails the whole message (native 2026-11-03).
-        if matches!(
-            crate::soccer_match::client_packet(&wire, 0),
-            Ok(crate::soccer_match::ClientPacket::ReadOnly(_))
-        ) {
-            return Ok(Vec::new());
+        use crate::soccer_match::{ClientPacket, SLIDE_TACKLE_START, STEAL_TACKLE, client_packet};
+        match client_packet(&wire, 0) {
+            // L945: the player's own tackle is one of those states; the server runs it.
+            Ok(ClientPacket::ReadOnly(SoccerPacket::UpdatePlayerState { player, state, .. }))
+                if player == guid && matches!(state, STEAL_TACKLE | SLIDE_TACKLE_START) =>
+            {
+                let mut service = self.service.clone();
+                let events = service.player_tackle(guid)?;
+                self.service = service;
+                return Ok(events.iter().map(ServiceEvent::inner).collect());
+            }
+            Ok(ClientPacket::ReadOnly(_)) => return Ok(Vec::new()),
+            _ => {}
         }
         let sequence = self
             .sequence

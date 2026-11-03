@@ -1125,3 +1125,24 @@ fn setup_records_follow_the_encounter_start_in_the_live_order() {
     });
     assert_eq!(human_stats, Some(0.0));
 }
+
+/// L945: the player's own tackle (client 76/14 StealTackle 35 / SlideTackleStart 36) runs the
+/// authority's tackle: an opponent in reach of the carrier steals the ball; a teammate cannot.
+#[test]
+fn a_players_tackle_steals_from_an_opposing_carrier_in_reach() {
+    let mut service = running_service();
+    assert!(service.player_tackle(TEAMMATE).unwrap().is_empty(), "no tackle on a teammate");
+    assert_eq!(service.possession(), Some(KICKER));
+    service
+        .handle_client(OPPONENT, 0.05, &client_position(OPPONENT, [1.0, 0.0, 0.0]), 1, None)
+        .expect("opponent position");
+    let events = service.player_tackle(OPPONENT).unwrap();
+    assert_eq!(
+        events,
+        vec![ServiceEvent::Possession {
+            holder: OPPONENT,
+            previous: KICKER
+        }]
+    );
+    assert_eq!(service.possession(), Some(OPPONENT), "the tackle steals the ball");
+}
