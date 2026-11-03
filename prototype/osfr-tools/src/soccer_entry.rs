@@ -173,6 +173,11 @@ fn with_bot_bodies(
     let mut out = Vec::with_capacity(roster.len() + bodies.len() * 3);
     let mut after = Vec::with_capacity(bodies.len() * 2);
     for event in roster {
+        // L943: the live server sent the human only its 76/6; the client registers its own player,
+        // and a second registration bound another soccer player to the human's body.
+        if matches!(event, ServiceEvent::Registered { player, .. } if *player == human) {
+            continue;
+        }
         if let ServiceEvent::Registered { player, .. } = event
             && *player != human
             && let Some(state) = service.player(*player)

@@ -1094,6 +1094,21 @@ fn the_shipped_bots_spawn_as_actors_before_their_registration() {
         models.push(actor.model_id);
     }
     assert_eq!(models, [1415, 1428, 1592, 1434, 1426, 1412, 1436]);
+    // L943: the client registers its own player; the live server sent the human only its 76/6.
+    assert!(!sent([76, 0, 3, 0], GUID), "no 76/3 for the human");
+    // L943: a bot's first move brings its 76/14 start record (state 2, count 1), as sent live.
+    let mut states = Vec::new();
+    for step in 1..=20 {
+        let ticked = session.tick(1_000 + step * 50).unwrap();
+        states.extend(
+            ticked
+                .replies
+                .into_iter()
+                .filter(|reply| reply.starts_with(&[76, 0, 14, 0])),
+        );
+    }
+    let first = states.first().expect("a bot starts running");
+    assert_eq!((first[12], first[14]), (2, 1), "state 2, count 1");
 }
 
 /// L942 (native 2026-11-03): the client's own non kick/pass state reports are advisory. Refusing

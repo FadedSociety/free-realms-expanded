@@ -98,6 +98,9 @@ pub const SHOT_ACTION: u32 = 0;
 pub const PASS_ACTION: u32 = 1;
 
 const BOT_ID_BASE: u64 = u64::MAX - 7;
+/// L943: the live 76/14 states of a running and a standing bot.
+const BOT_RUNNING: u8 = 2;
+const BOT_STANDING: u8 = 1;
 
 #[derive(Clone)]
 struct ParticipantRun {
@@ -318,6 +321,16 @@ pub enum ServiceEvent {
     Setup(SoccerPacket),
     /// L942: a power-up spawn, clear (76/9) or grab (76/10) from `soccer_pickups`.
     Pickup(SoccerPacket),
+    /// L943: a bot's 76/14 state. The live server sent one on every start (state 2, with the move
+    /// direction) and stop (state 1) of a bot, counting them per bot. The client animates a remote
+    /// soccer player from it; without one a field player drew no body (native 2026-11-03).
+    BotState {
+        player: u64,
+        running: bool,
+        counter: u32,
+        direction: [f32; 2],
+        position: [f32; 3],
+    },
     /// R server-assigned roster entry.
     Registered { player: u64, marker: [u8; 2] },
     /// R server-assigned team/slot for one player.
@@ -365,6 +378,27 @@ impl ServiceEvent {
     pub fn packet(&self) -> SoccerPacket {
         match self {
             ServiceEvent::Setup(packet) | ServiceEvent::Pickup(packet) => packet.clone(),
+            ServiceEvent::BotState {
+                player,
+                running,
+                counter,
+                direction,
+                position,
+            } => {
+                // As sent live: up (0, 1, 0, 0), the move direction (zero when stopped), the position.
+                let moving = if *running { *direction } else { [0.0; 2] };
+                SoccerPacket::UpdatePlayerState {
+                    player: *player,
+                    state: if *running { BOT_RUNNING } else { BOT_STANDING },
+                    aux: 0,
+                    state_counter: *counter,
+                    vectors: [
+                        [0.0, 1.0, 0.0, 0.0],
+                        [moving[0], 0.0, moving[1], 0.0],
+                        [position[0], position[1], position[2], 1.0],
+                    ],
+                }
+            }
             ServiceEvent::Registered { player, marker } => SoccerPacket::RegisterPlayer {
                 player: *player,
                 marker: *marker,
@@ -563,6 +597,8 @@ pub struct SoccerService {
     /// L932: each bot's AI memory and the last pose sent (time, facing).
     bot_memory: BTreeMap<u64, crate::soccer_bots::BotMemory>,
     bot_sent: BTreeMap<u64, (f32, [f32; 2], f32)>,
+    /// L943: each bot's last 76/14 (running) and its count.
+    bot_states: BTreeMap<u64, (bool, u32)>,
     bots_filled: bool,
     cancelled: bool,
     /// L940: the live setup records and whether the first kickoff has sent its steps.
@@ -587,6 +623,7 @@ impl SoccerService {
             bots: BTreeSet::new(),
             bot_memory: BTreeMap::new(),
             bot_sent: BTreeMap::new(),
+            bot_states: BTreeMap::new(),
             bots_filled: false,
             cancelled: false,
             setup: None,
@@ -864,6 +901,20 @@ impl SoccerService {
                     time,
                     speed,
                     snap: false,
+                });
+            }
+            // A bot starts standing (the line-up sends no state); each start and stop is counted.
+            let running = speed > 0.0;
+            let (last, counter) = self.bot_states.entry(player).or_insert((false, 0));
+            if running != *last {
+                *last = running;
+                *counter += 1;
+                out.push(ServiceEvent::BotState {
+                    player,
+                    running,
+                    counter: *counter,
+                    direction: facing,
+                    position,
                 });
             }
         }
