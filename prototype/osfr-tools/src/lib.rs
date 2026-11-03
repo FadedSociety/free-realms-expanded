@@ -116,6 +116,7 @@ pub mod security_log;
 pub mod session;
 pub mod smelting;
 pub mod soccer;
+pub mod soccer_ball;
 pub mod soccer_bots;
 pub mod soccer_entry;
 pub mod soccer_match;

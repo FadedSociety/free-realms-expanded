@@ -100,12 +100,43 @@ pub const PASS_ACTION: u32 = 1;
 const BOT_ID_BASE: u64 = u64::MAX - 7;
 /// L943: the live 76/14 states of a running and a standing bot.
 const BOT_RUNNING: u8 = 2;
+/// L955: seconds between a moving bot's poses, as live (scratchpad derby/bot_poses.py: 0.153 s).
+const BOT_POSE_EVERY: f32 = 0.15;
+/// L955: a bot keeps its stick while the AI's heading stays within 45 degrees of it (cos 45).
+const OCTANT_KEEP: f32 = std::f32::consts::FRAC_1_SQRT_2;
+/// L955: the client's ball position is its centre; ours is its lowest point. Live rolling balls sat
+/// at y 0.23-0.31 and resting ones at 0.29-0.35 (Fable review); a ball sent at the floor bounced up
+/// and down fast in the client.
+const BALL_CENTRE: f32 = 0.3;
+/// L955: extra reach (m) for the player's own tackle (R): the client shows the bots about 0.15-0.2 s
+/// behind where the server has them (1.2-1.6 m at their pace), so a tackle inside the carrier's
+/// circle on screen missed on the server (owner, native 2026-11-03).
+const PLAYER_TACKLE_LAG: f32 = 1.5;
 const BOT_STANDING: u8 = 1;
 /// L948: bot kick states (client state table 0x1BA2338): 17 KickRight, 22 SuperKick at full charge.
 const KICK_RIGHT: u8 = 17;
 const SUPER_KICK: u8 = 22;
 /// L948: a kicker plays its kick this long before its next state (live: 0.41 s to the release).
 const KICK_HOLD: f32 = 0.4;
+/// L955: the client's receive states (12 ReceiveBall, 13 RunningReceiveBall) and how long a bot
+/// shows one (R: live went 13, Idle, RunWithBall within about 0.9 s).
+const RECEIVE: u8 = 12;
+const RUNNING_RECEIVE: u8 = 13;
+const RECEIVE_HOLD: f32 = 0.4;
+/// L955: a bot's slide tackle as live sent it (Fable review: SlideTackleStart with the steal, Middle
+/// 0.32 s and End 0.37 s later, its run again about 0.8 s on); before, the ball changed feet with
+/// no animation at all.
+const SLIDE_MIDDLE: u8 = 37;
+const SLIDE_END: u8 = 38;
+const SLIDE_STEPS: [(f32, u8); 2] = [(0.32, SLIDE_MIDDLE), (0.37, SLIDE_END)];
+const SLIDE_HOLD: f32 = 0.8;
+/// L955: how long the player's slide can still take the ball (R): the client slides them about
+/// 5 m over 0.7 s, and live resolved a tackle 0.1-0.4 s into the slide; we judged it once, at the
+/// start, on positions up to 0.15 s old, so the ball rarely came loose (owner).
+const PLAYER_SLIDE_WINDOW: f32 = 0.5;
+/// L955: seconds before the player's next slide counts (R: about the slide's own length), so a
+/// client spamming SlideTackleStart cannot keep a steal window open (Opus review).
+const SLIDE_COOLDOWN: f32 = 0.8;
 /// L948: the loose ball goes out about this often (live 76/4 cadence).
 const BALL_EVERY: f32 = 0.15;
 /// L948: a kick's ball effect drains at this rate over two seconds (live: KickRight 4, SuperKick 5).
@@ -197,6 +228,18 @@ pub fn charge_from_aux(aux: u8) -> f32 {
     f32::from(aux) / 255.0
 }
 
+/// L952: 76/5 word 0. At the results (step 10) it is the winner, `u32::MAX` on a draw: the client
+/// shows YOU WIN when it is the local player's team (`FUN_00b7de60`: soccer+0x140 ==
+/// player+0x18). Before, it is the last scoring team (`u32::MAX` before any goal).
+pub fn scoreboard_team(state: u32, [home, away]: [u32; 2], last_goal_team: Option<u32>) -> u32 {
+    match (state, home.cmp(&away)) {
+        (10, std::cmp::Ordering::Greater) => 0,
+        (10, std::cmp::Ordering::Less) => 1,
+        (10, std::cmp::Ordering::Equal) => u32::MAX,
+        _ => last_goal_team.unwrap_or(u32::MAX),
+    }
+}
+
 /// Build the server-owned kick intent for one typed sub-14 state request.
 ///
 /// Copied from the frozen private adapter; the authority's own guards still
@@ -208,9 +251,15 @@ pub fn state_request_intent(
     target: Option<u64>,
 ) -> io::Result<Intent> {
     validate_policy(policy)?;
+    // L955: the client's standing pass is a kick state (Alt sends 17 KickRight, 18/31 back,
+    // `01074b50`), and a pass state with no team-mate in line goes as a kick, so either action
+    // may ride on those states; the service decides (`SoccerService::pass_target`).
+    let standing_pass = matches!(request.state, 17 | 18 | 31);
     if match request.action {
-        StateAction::Kick => !matches!(classify_state(request.state), Some(StateAction::Kick)),
-        StateAction::Pass => !matches!(classify_state(request.state), Some(StateAction::Pass)),
+        StateAction::Kick => classify_state(request.state).is_none(),
+        StateAction::Pass => {
+            !standing_pass && !matches!(classify_state(request.state), Some(StateAction::Pass))
+        }
     } {
         return Err(invalid(
             "soccer state action does not match the classified state",
@@ -296,11 +345,7 @@ pub fn apply_state_request(
     if request.sequence <= state.sequence {
         return Err(invalid("stale soccer state request"));
     }
-    if classify_state(request.state) != Some(request.action) {
-        return Err(invalid(
-            "soccer state action does not match the classified state",
-        ));
-    }
+    // L955: the action/state check is `state_request_intent`'s (a standing pass rides on 17).
     if request.action == StateAction::Pass {
         let target = target
             .ok_or_else(|| invalid("soccer pass state needs an explicit server-verified target"))?;
@@ -334,6 +379,9 @@ fn wrap(packet: SoccerPacket) -> Vec<u8> {
 pub enum ServiceEvent {
     /// L940: one of the live server's match setup records (`Setup`), sent as captured.
     Setup(SoccerPacket),
+    /// L955: a bot's control stick (76/16 UpdatePlayerControls), as live: x and z are -1, 0 or 1
+    /// and the client moves the bot along normalize(x, -z).
+    Controls { player: u64, stick: [f32; 2] },
     /// L942: a power-up spawn, clear (76/9) or grab (76/10) from `soccer_pickups`.
     Pickup(SoccerPacket),
     /// L943: a bot's 76/14 state. The live server sent one on every start (state 2, with the move
@@ -405,6 +453,11 @@ impl ServiceEvent {
     pub fn packet(&self) -> SoccerPacket {
         match self {
             ServiceEvent::Setup(packet) | ServiceEvent::Pickup(packet) => packet.clone(),
+            ServiceEvent::Controls { player, stick } => SoccerPacket::UpdatePlayerControls {
+                player: *player,
+                direction: *stick,
+                controls: 0,
+            },
             ServiceEvent::BotState {
                 player,
                 state,
@@ -446,6 +499,7 @@ impl ServiceEvent {
                     transform[diagonal] = 1.0;
                 }
                 transform[12..15].copy_from_slice(position);
+                transform[13] += BALL_CENTRE;
                 let mut tail = [0u8; 15];
                 tail[..4].copy_from_slice(&1.0f32.to_le_bytes());
                 tail[4] = *owner;
@@ -615,6 +669,26 @@ pub struct Setup {
 
 /// 76/5: `ffffffff`, zeros, the state step and the player count at words 12/13, `ffffffff`.
 /// L942: the opening line-up's poses carry the snap flag (see `ServiceEvent::PlayerPos`).
+/// L955: the 8-way octant ([x, z] each -1, 0 or 1) nearest a unit world heading.
+fn octant(heading: [f32; 2]) -> [i8; 2] {
+    let sector = (heading[1].atan2(heading[0]) / std::f32::consts::FRAC_PI_4).round();
+    let angle = sector * std::f32::consts::FRAC_PI_4;
+    // The cast is exact: each component rounds to -1, 0 or 1.
+    let unit = |v: f32| (v * std::f32::consts::SQRT_2).round().clamp(-1.0, 1.0) as i8;
+    [unit(angle.cos()), unit(angle.sin())]
+}
+
+/// L955: the unit world heading of an 8-way stick (zero for none).
+fn stick_world(stick: [i8; 2]) -> [f32; 2] {
+    let [x, z] = [f32::from(stick[0]), f32::from(stick[1])];
+    let length = x.hypot(z);
+    if length > 0.0 {
+        [x / length, z / length]
+    } else {
+        [0.0; 2]
+    }
+}
+
 fn snapped(mut events: Vec<ServiceEvent>) -> Vec<ServiceEvent> {
     for event in &mut events {
         if let ServiceEvent::PlayerPos { snap, .. } = event {
@@ -676,9 +750,14 @@ pub struct SoccerService {
     bots: BTreeSet<u64>,
     /// L932: each bot's AI memory and the last pose sent (time, facing).
     bot_memory: BTreeMap<u64, crate::soccer_bots::BotMemory>,
+    /// L955: (time, facing, speed) of each bot's last 76/1.
     bot_sent: BTreeMap<u64, (f32, [f32; 2], f32)>,
     /// L943: each bot's last 76/14 (running) and its count.
     bot_states: BTreeMap<u64, (bool, u32)>,
+    /// L955: each bot's 8-way stick ([x, z] in world terms, 0 = standing) and where the service
+    /// left it (the start of its next step).
+    bot_stick: BTreeMap<u64, [i8; 2]>,
+    bot_at: BTreeMap<u64, [f32; 3]>,
     bots_filled: bool,
     cancelled: bool,
     /// L940: the live setup records and whether the first kickoff has sent its steps.
@@ -696,6 +775,12 @@ pub struct SoccerService {
     ball_live: bool,
     ball_effect: [f32; 2],
     kick_hold: BTreeMap<u64, f32>,
+    /// L955: a bot's slide tackle states still to show (due time, bot, state).
+    slides: Vec<(f32, u64, u8)>,
+    /// L955: the player's slide tackle while it can still land (player, until), and when each
+    /// player's next slide counts.
+    sliding: Option<(u64, f32)>,
+    slide_ready: BTreeMap<u64, f32>,
     /// R relay bookkeeping: last holder reported on the service wire (`0` none).
     last_holder: u64,
 }
@@ -714,6 +799,8 @@ impl SoccerService {
             bot_memory: BTreeMap::new(),
             bot_sent: BTreeMap::new(),
             bot_states: BTreeMap::new(),
+            bot_stick: BTreeMap::new(),
+            bot_at: BTreeMap::new(),
             bots_filled: false,
             cancelled: false,
             setup: None,
@@ -725,6 +812,9 @@ impl SoccerService {
             ball_live: false,
             ball_effect: [0.0; 2],
             kick_hold: BTreeMap::new(),
+            slides: Vec::new(),
+            sliding: None,
+            slide_ready: BTreeMap::new(),
             last_holder: NO_HOLDER,
         })
     }
@@ -741,16 +831,53 @@ impl SoccerService {
         if self.cancelled || self.authority.phase() != MatchPhase::Running {
             return Ok(Vec::new());
         }
-        let Some(victim) = self.authority.tackle(player)? else {
+        // L955: a juking carrier dodges it. The bots' protect window after winning the ball stops
+        // their back-and-forth steals; the player's tackle ignores it (it read as the ball never
+        // coming loose).
+        let now = self.authority.server_time();
+        let dodging = |carrier: u64| {
+            self.bot_memory
+                .get(&carrier)
+                .is_some_and(|m| now < m.dodge_until)
+        };
+        if self.authority.possession().is_some_and(dodging)
+            || self
+                .slide_ready
+                .get(&player)
+                .is_some_and(|ready| now < *ready)
+        {
+            return Ok(Vec::new());
+        }
+        self.slide_ready.insert(player, now + SLIDE_COOLDOWN);
+        let events = self.land_tackle(player)?;
+        if events.is_empty() {
+            self.sliding = Some((player, now + PLAYER_SLIDE_WINDOW));
+        }
+        Ok(events)
+    }
+
+    /// L955: the player's tackle against the carrier as things stand; nothing when it misses. A
+    /// steal goes out as live: the victim frees the ball (76/12), then the tackler takes it (76/11).
+    fn land_tackle(&mut self, player: u64) -> io::Result<Vec<ServiceEvent>> {
+        let now = self.authority.server_time();
+        let reach = crate::soccer_bots::TACKLE_REACH + PLAYER_TACKLE_LAG;
+        let Some(victim) = self.authority.tackle(player, reach)? else {
             return Ok(Vec::new());
         };
-        let now = self.authority.server_time();
-        crate::soccer_bots::knock_down(&mut self.bot_memory, player, victim, now);
+        self.sliding = None;
+        crate::soccer_bots::won_by_tackle(&mut self.bot_memory, player, victim, now);
         self.last_holder = player;
-        let mut events = vec![ServiceEvent::Possession {
-            holder: player,
-            previous: victim,
-        }];
+        let mut events = vec![
+            ServiceEvent::FreeBall {
+                position: self.authority.ball_position(),
+                scale: FREE_BALL_SCALE,
+                previous: victim,
+            },
+            ServiceEvent::Possession {
+                holder: player,
+                previous: victim,
+            },
+        ];
         events.extend(self.count(
             player,
             &[STEALS, KNOCKDOWNS],
@@ -760,6 +887,13 @@ impl SoccerService {
             events.push(self.step(12, self.player_count()));
         }
         Ok(events)
+    }
+
+    /// L955: the player's own juke (client 76/14 states 4-6, the Ctrl dodge): no tackle lands on
+    /// them for `soccer_bots::DODGE_TIME`.
+    pub fn player_juke(&mut self, player: u64) {
+        let now = self.authority.server_time();
+        crate::soccer_bots::juke(&mut self.bot_memory, player, now);
     }
 
     /// L942: run power-ups on the pitch (see `soccer_pickups`).
@@ -992,40 +1126,147 @@ impl SoccerService {
         }
         self.bots_filled = true;
         let lined = crate::soccer_bots::line_up(&mut self.authority, &self.bots)?;
-        events.extend(snapped(self.bot_poses(lined, true)));
+        events.extend(snapped(self.bot_poses(lined, true, 0.0)));
         Ok(events)
     }
 
-    /// L932: bot moves as 76/1 poses. A bot's pose goes out when it turns or every half second
-    /// (the live server sent about one per bot per two seconds; the client extrapolates the move
-    /// direction and speed in between); `force` sends every one (kickoff line-up).
+    /// L955: the team-mate a kick is passed to, as the client picks it (`00b77480`: the mate best
+    /// aligned with the kick direction). A pass state (27-30) takes the best mate within 60
+    /// degrees; a standing kick (17 KickRight, 18/31 back) is a pass when it points at a mate more
+    /// than at the goal, because the client's Space kick aims at the goal and its Alt pass at a
+    /// mate, both as 17. None: the kick is a shot along its direction. Before, every pass was
+    /// refused and the ball stayed at the player's feet (owner: team-mates never got it).
+    fn pass_target(&self, request: &StateRequest) -> Option<u64> {
+        let me = self.authority.player(request.player)?;
+        let at = me.position?;
+        let d = request.action_direction;
+        let length = d[0].hypot(d[2]);
+        if length <= 1e-6 {
+            return None;
+        }
+        let along = [d[0] / length, d[2] / length];
+        let aim = |to: [f32; 3]| {
+            let way = [to[0] - at[0], to[2] - at[2]];
+            let length = way[0].hypot(way[1]);
+            if length <= 1e-6 {
+                -1.0
+            } else {
+                (way[0] * along[0] + way[1] * along[1]) / length
+            }
+        };
+        let (mate, dot) = self
+            .authority
+            .players()
+            .filter(|(id, state)| *id != request.player && state.team == me.team)
+            .filter_map(|(id, state)| Some((id, aim(state.position?))))
+            .max_by(|a, b| a.1.total_cmp(&b.1))?;
+        let pass = match classify_state(request.state) {
+            Some(StateAction::Pass) => dot >= 0.5,
+            // R: within about 25 degrees of the mate, and nearer it than the goal.
+            _ if matches!(request.state, 17 | 18 | 31) => {
+                dot >= 0.9 && dot > aim(self.authority.attack_goal(me.team))
+            }
+            _ => false,
+        };
+        pass.then_some(mate)
+    }
+
+    /// L955: bot moves as live drove them: the client dead-reckons every player from its 76/16 stick
+    /// (`01075880`, `00cd8020`) and 76/1 only corrects drift, so each bot's moves this tick become one
+    /// step along an 8-way stick at its pace (kept until the AI's heading leaves its octant by more
+    /// than 45 degrees), Run/Idle go with the stick's starts and stops, and a pose every 0.15 s.
+    /// `force` is the kickoff line-up. Lab notes: opus/minigames/soccer-sync-fable.md.
     fn bot_poses(
         &mut self,
         events: Vec<crate::soccer_bots::BotEvent>,
         force: bool,
+        dt: f32,
     ) -> Vec<ServiceEvent> {
         let time = self.authority.server_time();
-        let mut out = Vec::new();
+        // One move per bot per tick: the AI's last spot, its last facing and its pace.
+        let mut moves: BTreeMap<u64, ([f32; 3], [f32; 2], f32)> = BTreeMap::new();
         for event in events {
-            let crate::soccer_bots::BotEvent::Moved {
+            if let crate::soccer_bots::BotEvent::Moved {
                 player,
                 position,
                 facing,
                 speed,
             } = event
-            else {
-                continue;
+            {
+                let entry = moves.entry(player).or_insert((position, facing, 0.0));
+                entry.0 = position;
+                if facing != [0.0; 2] {
+                    entry.1 = facing;
+                }
+                entry.2 = entry.2.max(speed);
+            }
+        }
+        // A running bot the AI did not move this tick (its kick or tackle) stops where it is: the
+        // client would otherwise run it on along its stick.
+        let idle: Vec<u64> = self
+            .bot_stick
+            .iter()
+            .filter(|(bot, stick)| **stick != [0, 0] && !moves.contains_key(*bot))
+            .map(|(bot, _)| *bot)
+            .collect();
+        for bot in idle {
+            if let Some(at) = self.authority.player(bot).and_then(|state| state.position) {
+                moves.insert(bot, (at, [0.0; 2], 0.0));
+            }
+        }
+        let mut out = Vec::new();
+        for (player, (aimed, aim_facing, pace)) in moves {
+            let from = self.bot_at.get(&player).copied().unwrap_or(aimed);
+            let old = self.bot_stick.get(&player).copied().unwrap_or([0, 0]);
+            let step = pace * dt;
+            let want = [aimed[0] - from[0], aimed[2] - from[2]];
+            let distance = want[0].hypot(want[1]);
+            // Under half a step of intent is a stop (R).
+            let stick = if force || pace <= 0.0 || distance < 0.5 * step {
+                [0, 0]
+            } else {
+                let heading = [want[0] / distance, want[1] / distance];
+                let kept = stick_world(old);
+                if old != [0, 0] && heading[0] * kept[0] + heading[1] * kept[1] >= OCTANT_KEEP {
+                    old
+                } else {
+                    octant(heading)
+                }
             };
-            // Due on a turn, a speed change (a stop included) or every 0.5 s.
-            let due = self
-                .bot_sent
-                .get(&player)
-                .is_none_or(|(at, last, last_speed)| {
-                    let turned =
-                        facing != [0.0; 2] && facing[0] * last[0] + facing[1] * last[1] < 0.87;
-                    time - at >= 0.5 || turned || speed != *last_speed
+            let world = stick_world(stick);
+            let position = if stick == [0, 0] {
+                aimed
+            } else {
+                let along = [from[0] + world[0] * step, aimed[1], from[2] + world[1] * step];
+                if self.authority.place_server_player(player, along).is_ok() {
+                    along
+                } else {
+                    aimed
+                }
+            };
+            self.bot_at.insert(player, position);
+            self.bot_stick.insert(player, stick);
+            if stick != old {
+                out.push(ServiceEvent::Controls {
+                    player,
+                    stick: [f32::from(stick[0]), -f32::from(stick[1])],
                 });
-            if force || due {
+            }
+            let last = self.bot_sent.get(&player).copied();
+            let facing = if stick != [0, 0] {
+                world
+            } else if aim_facing != [0.0; 2] {
+                aim_facing
+            } else {
+                last.map_or([1.0, 0.0], |sent| sent.1)
+            };
+            let speed = if stick == [0, 0] { 0.0 } else { pace };
+            // A pace change goes out at once: the client runs the bot at the last pose's speed.
+            let due = force
+                || stick != old
+                || last.is_some_and(|sent| sent.2 != speed)
+                || (stick != [0, 0] && last.is_none_or(|sent| time - sent.0 >= BOT_POSE_EVERY));
+            if due {
                 self.bot_sent.insert(player, (time, facing, speed));
                 out.push(ServiceEvent::PlayerPos {
                     player,
@@ -1046,10 +1287,10 @@ impl SoccerService {
             }
             let after_kick = self.kick_hold.remove(&player).is_some();
             // A bot starts standing (the line-up sends no state); each start and stop is counted.
-            let running = speed > 0.0;
-            let (last, counter) = self.bot_states.entry(player).or_insert((false, 0));
-            if running != *last || after_kick {
-                *last = running;
+            let running = stick != [0, 0];
+            let (last_running, counter) = self.bot_states.entry(player).or_insert((false, 0));
+            if running != *last_running || after_kick {
+                *last_running = running;
                 *counter += 1;
                 out.push(ServiceEvent::BotState {
                     player,
@@ -1204,6 +1445,10 @@ impl SoccerService {
         if self.last_holder == session {
             self.last_holder = NO_HOLDER;
         }
+        if self.sliding.is_some_and(|(player, _)| player == session) {
+            self.sliding = None;
+        }
+        self.slide_ready.remove(&session);
         if released {
             self.cancelled = self.sessions.is_empty();
             Ok(vec![ServiceEvent::FreeBall {
@@ -1264,7 +1509,9 @@ impl SoccerService {
         self.kicked_off = true;
         self.celebrating = false;
         let lined = crate::soccer_bots::line_up(&mut self.authority, &self.bots)?;
-        let poses = self.bot_poses(lined, true);
+        self.slides.clear();
+        self.sliding = None;
+        let poses = self.bot_poses(lined, true, 0.0);
         events.extend(if opening { snapped(poses) } else { poses });
         events.extend(self.ball_drop());
         events.push(self.game_time());
@@ -1280,14 +1527,16 @@ impl SoccerService {
         let mut events = self.stages(&[11, 12]);
         // L932: the sides swap, so the bots line up on their new kickoff spots.
         let lined = crate::soccer_bots::line_up(&mut self.authority, &self.bots)?;
-        events.extend(self.bot_poses(lined, true));
+        self.slides.clear();
+        self.sliding = None;
+        events.extend(self.bot_poses(lined, true, 0.0));
         events.extend(self.ball_drop());
         events.push(self.game_time());
         Ok(events)
     }
 
     /// Advance the deterministic R simulation and report its candidate events:
-    /// a goal, out-of-play free-ball relay, possession change, then the clock.
+    /// a goal, a possession change, then the clock (L955: the pitch is walled, so no out of play).
     /// Invalid steps are refused and
     /// leave the match untouched.
     pub fn tick(&mut self, dt: f32) -> io::Result<Vec<ServiceEvent>> {
@@ -1296,8 +1545,8 @@ impl SoccerService {
         }
         let before_phase = self.authority.phase();
         let before_score = self.authority.score();
-        let before_possession = self.authority.possession();
-        let previous_holder = self.last_holder;
+        let mut before_possession = self.authority.possession();
+        let mut previous_holder = self.last_holder;
         // L932: the bots act on the match before it advances; a refused step moves nobody.
         if !(dt > 0.0 && dt <= self.authority.config().physics.max_tick) {
             return Err(invalid("soccer tick step is out of range"));
@@ -1320,6 +1569,13 @@ impl SoccerService {
                 }
             }
             if let crate::soccer_bots::BotEvent::Tackled { tackler, .. } = *event {
+                if self.setup.is_some() {
+                    let time = self.authority.server_time();
+                    let start = crate::soccer_match::SLIDE_TACKLE_START;
+                    bot_events.push(self.show(tackler, start, SLIDE_HOLD));
+                    self.slides
+                        .extend(SLIDE_STEPS.map(|(after, state)| (time + after, tackler, state)));
+                }
                 counted.extend(self.count(
                     tackler,
                     &[STEALS, KNOCKDOWNS],
@@ -1342,6 +1598,8 @@ impl SoccerService {
                     shot = true;
                 }
                 if self.setup.is_some() {
+                    // L955: a kick ends any slide still playing (its states would cut the kick).
+                    self.slides.retain(|slide| slide.1 != player);
                     // L948: the live server sent a bot's kick as its 76/14 states, never a 76/13.
                     let charge = power / self.authority.config().physics.max_kick_power;
                     let aux = (charge.clamp(0.0, 1.0) * 255.0).round() as u8;
@@ -1369,9 +1627,30 @@ impl SoccerService {
                 });
             }
         }
-        bot_events.extend(self.bot_poses(acted, false));
+        let time = self.authority.server_time();
+        let (due, later): (Vec<_>, Vec<_>) = self.slides.drain(..).partition(|s| s.0 <= time);
+        self.slides = later;
+        for (_, bot, state) in due {
+            let after = SLIDE_STEPS.iter().find(|s| s.1 == state).map_or(0.0, |s| s.0);
+            bot_events.push(self.show(bot, state, SLIDE_HOLD - after));
+        }
+        if let Some((player, until)) = self.sliding {
+            if time > until {
+                self.sliding = None;
+            } else {
+                let landed = self.land_tackle(player)?;
+                if !landed.is_empty() {
+                    // Its free and acquire are out: the change below must not send them again.
+                    before_possession = self.authority.possession();
+                    previous_holder = self.last_holder;
+                }
+                counted.extend(landed);
+            }
+        }
+        bot_events.extend(self.bot_poses(acted, false, dt));
         let toucher = self.authority.last_touch();
         let carried = self.authority.ball_velocity();
+        let passed_to = self.authority.live_pass();
         self.authority.advance(dt)?;
 
         if self.authority.score() != before_score {
@@ -1422,27 +1701,33 @@ impl SoccerService {
             events.extend(self.stages(&[16, 17]));
             self.celebrating = self.setup.is_some();
             self.last_holder = NO_HOLDER;
-        } else if before_phase == MatchPhase::Running
-            && self.authority.phase() == MatchPhase::Restart
-        {
-            // R out-of-play return: reset at the configured spawn and report
-            // the last holder using the candidate codec layout.
-            events.push(ServiceEvent::FreeBall {
-                position: self.authority.ball_position(),
-                scale: FREE_BALL_SCALE,
-                previous: before_possession.unwrap_or(previous_holder),
-            });
-            self.last_holder = NO_HOLDER;
         } else if self.authority.phase() == MatchPhase::Running {
             let after_possession = self.authority.possession();
             if after_possession != before_possession {
                 match after_possession {
                     Some(holder) => {
+                        // L955: a steal (holder to holder) frees the ball from the victim first,
+                        // as live.
+                        if before_possession == Some(previous_holder) && previous_holder != NO_HOLDER
+                        {
+                            events.push(ServiceEvent::FreeBall {
+                                position: self.authority.ball_position(),
+                                scale: FREE_BALL_SCALE,
+                                previous: previous_holder,
+                            });
+                        }
                         events.push(ServiceEvent::Possession {
                             holder,
                             previous: previous_holder,
                         });
                         self.last_holder = holder;
+                        // L955: a bot meeting a pass shows the receive, as live (76/14 13
+                        // RunningReceiveBall with the 76/11, or 12 ReceiveBall standing).
+                        if passed_to == Some(holder) && self.bots.contains(&holder) {
+                            let running = self.bot_stick.get(&holder).is_some_and(|s| *s != [0, 0]);
+                            let state = if running { RUNNING_RECEIVE } else { RECEIVE };
+                            events.push(self.show(holder, state, RECEIVE_HOLD));
+                        }
                     }
                     None => {
                         if previous_holder != NO_HOLDER {
@@ -1582,7 +1867,11 @@ impl SoccerService {
         let half = usize::from(self.authority.half().saturating_sub(1)).min(1);
         let [home, away] = self.authority.score();
         let mut words = [0u32; 18];
-        words[0] = self.tally.last_goal_team.unwrap_or(u32::MAX);
+        // L952: at the results (step 10) the client shows YOU WIN when this word is the local
+        // player's team (`FUN_00b7de60`: soccer+0x140 == player+0x18), so there it names the
+        // winner (none on a draw); before, it is the last scoring team. A 4-3 win whose last goal
+        // was the other team's showed TRY AGAIN (owner playtest 2026-11-03).
+        words[0] = scoreboard_team(state, [home, away], self.tally.last_goal_team);
         words[1] = half as u32;
         words[2] = home;
         words[3] = away;
@@ -1654,7 +1943,14 @@ impl SoccerService {
                 self.authority.apply(sender, now, intent)?;
                 Ok(Vec::new())
             }
-            ClientPacket::State(request) => {
+            ClientPacket::State(mut request) => {
+                // L955: the client names no pass target; resolve it as the client chose it.
+                let pass_target = pass_target.or_else(|| self.pass_target(&request));
+                request.action = if pass_target.is_some() {
+                    StateAction::Pass
+                } else {
+                    StateAction::Kick
+                };
                 let intent = state_request_intent(&request, &self.policy, pass_target)?;
                 let (kind, power) = match intent {
                     Intent::Kick { kind, power, .. } => (kind, power),

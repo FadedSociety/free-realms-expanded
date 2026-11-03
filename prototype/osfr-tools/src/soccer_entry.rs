@@ -142,6 +142,9 @@ struct MatchSettings {
     /// L932: the server bots play (chase, dribble, pass, shoot, tackle); absent = passive bots.
     #[serde(default)]
     bot_ai: bool,
+    /// L955: the ball's tuning; absent = the defaults fitted to the live ball.
+    #[serde(default)]
+    ball: crate::soccer_ball::BallTuning,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
@@ -436,6 +439,7 @@ impl Content {
                 HalfPolicySetting::KeepSides => HalfPolicy::KeepSides,
             },
             bot_ai: settings.bot_ai,
+            ball: settings.ball,
         }
     }
 
@@ -783,6 +787,13 @@ impl Session {
                 let events = service.player_tackle(guid)?;
                 self.service = service;
                 return Ok(events.iter().map(ServiceEvent::inner).collect());
+            }
+            // L955: the Ctrl juke (4 Juke, 5 JukeWithBall, 6 Juke360WithBall) dodges tackles.
+            Ok(ClientPacket::ReadOnly(SoccerPacket::UpdatePlayerState {
+                player, state, ..
+            })) if player == guid && (4..=6).contains(&state) => {
+                self.service.player_juke(guid);
+                return Ok(Vec::new());
             }
             Ok(ClientPacket::ReadOnly(_)) => return Ok(Vec::new()),
             _ => {}

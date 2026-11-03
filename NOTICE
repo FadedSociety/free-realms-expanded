@@ -18,6 +18,9 @@ Not covered by our licence (it stays under its own terms):
   and are distributed under AGPL-3.0 with the rest of this project.
 - Text and facts collected from the Free Realms Wiki on Fandom, available under CC BY-SA 3.0. Rows that use it
   cite the wiki page.
+- Soccer ball physics (and, as it lands, soccer AI) adapted from League-Soccer (github.com/awest813/League-Soccer),
+  of the GameplayFootball / Google Research Football lineage, under the Apache License 2.0. Adapted files say so
+  in a header; the Apache-2.0 terms apply to that adapted material.
 
 Credits
 
@@ -25,5 +28,6 @@ Credits
   references, and code adapted from them with credit (AGPL-3.0).
 - FreeRealmsLocaleTools, used to build the client's text packs.
 - fr-adr-toolkit, used to check our reading of the client's actor and model files.
+- League-Soccer (awest813) and GameplayFootball, for the soccer ball physics and AI we adapted (Apache-2.0).
 - The Free Realms Wiki on Fandom and its editors.
 - Everyone who kept Free Realms alive after 2014.

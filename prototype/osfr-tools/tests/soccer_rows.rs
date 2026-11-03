@@ -103,6 +103,7 @@ fn short_match_content() -> Vec<u8> {
             "gravity": 0.0, "max_position_step": 10.0, "max_speed": 40.0,
             "control_radius": 2.0, "max_kick_power": 4.0, "pass_radius": 40.0, "max_tick": 0.25
         },
+        "ball": {"drag": 0.0, "friction": 0.0, "linear_friction": 0.0},
         "half_seconds": 30.0,
         "kickoff_spawn": [0.0, 0.0, 0.0],
         "half_policy": "keep_sides",

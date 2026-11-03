@@ -22,6 +22,8 @@ pub const SUPPORT_SPEED: f32 = 6.0;
 pub const KEEPER_SPEED: f32 = 4.0;
 /// How far a keeper strays from the goal centre along the line (live: about 3.3).
 pub const KEEPER_REACH: f32 = 3.3;
+/// L955: how far off its spot on the line a keeper drifts before it moves (R).
+pub const KEEPER_DEADBAND: f32 = 0.6;
 /// A ball carrier shoots inside this distance of the goal (R).
 pub const SHOOT_RANGE: f32 = 14.0;
 /// Shot and pass power (R; the match caps kicks at `max_kick_power`).
@@ -29,8 +31,35 @@ pub const SHOT_POWER: f32 = 22.0;
 pub const PASS_POWER: f32 = 14.0;
 /// An opponent this close puts the carrier under pressure, so it passes forward (R).
 pub const PRESSURE_RANGE: f32 = 5.0;
-/// Seconds between one bot's tackles (R), so a tackle can be escaped.
-pub const TACKLE_COOLDOWN: f32 = 1.5;
+/// Seconds between one bot's tackles (R), so a tackle can be escaped. L955: 1.5 let the bots steal
+/// back and forth every two seconds (owner playtest: 169 steals a match).
+pub const TACKLE_COOLDOWN: f32 = 3.0;
+/// L955: seconds a player who just won the ball cannot be tackled (R), so possession settles.
+pub const PROTECT: f32 = 1.5;
+/// L955: seconds a juking player cannot be tackled (R): the client's Ctrl juke (states 4-6).
+pub const DODGE_TIME: f32 = 0.8;
+/// L955: seconds between jukes that count (R), so spamming the dodge cannot keep a player
+/// untackleable (Opus review).
+pub const JUKE_COOLDOWN: f32 = 2.0;
+/// L955: another bot takes over the chase only when it is this much nearer the ball (R).
+pub const CHASE_SWITCH: f32 = 2.5;
+/// L955: a supporting bot re-forms only when its spot moved this far (R): no stop-start churn.
+pub const SUPPORT_DEADBAND: f32 = 2.0;
+/// L955: a carrier does not pass back to who passed to it within this many seconds (R).
+pub const PASS_BACK: f32 = 3.0;
+/// L955: a teammate that has not moved for this long gets no pass (R): no feeding a still player.
+pub const IDLE_MATE: f32 = 2.0;
+/// L955: how close a chaser stays to a carrier it cannot tackle yet (R).
+const SHADOW: f32 = 2.5;
+/// L955: a shadowing chaser closes in again only this far past `SHADOW` (R): stopping and starting
+/// at the one distance flapped its stick every tick.
+const SHADOW_SLACK: f32 = 1.0;
+/// L955: share of in-reach bot tackles that land (R); a miss still spends the cooldown. The live
+/// match had about one slide tackle per 11 s; with every bot landing every try ours had one per 2 s.
+pub const TACKLE_LANDS: f32 = 0.4;
+/// L955: a tackle reaches this far: the client's own tackle range (00cd8330: distance^2 <= 3.0).
+/// The 2 m control radius let bots steal from behind the player (owner, native 2026-11-03).
+pub const TACKLE_REACH: f32 = 1.732;
 /// Seconds a slide-tackled bot stays down (R; the Soccer Star Toughness stat shortens it).
 pub const KNOCKDOWN: f32 = 1.5;
 /// The keeper slot (live: the fourth server player of each side stood on the goal line).
@@ -38,6 +67,9 @@ pub const KEEPER_SLOT: u32 = TEAM_SLOT_COUNT - 1;
 /// L949: a keeper dives at a shot this close to its line (seconds) and this far across it (R).
 pub const DIVE_TIME: f32 = 0.3;
 pub const DIVE_REACH: f32 = 3.0;
+/// L955: how long a dive lasts: its time to the line and a little after (R). The keeper is down and
+/// its reach wide for all of it, so a shot that arrives late is still its save.
+const DIVE_WINDOW: f32 = DIVE_TIME + 0.2;
 /// L949: a shot this hard (of `max_kick_power`) is blocked and cleared, not caught (R: live, a
 /// KickRight was caught; full-charge SuperKicks were blocked or went in).
 pub const BLOCK_SHOT: f32 = 0.95;
@@ -105,6 +137,44 @@ pub struct BotMemory {
     pub hold_until: Option<f32>,
     pub in_hand: bool,
     pub blocking: bool,
+    /// L955: this player won the ball and cannot be tackled until then.
+    pub protected_until: f32,
+    /// L955: this player is juking (client states 4-6) and cannot be tackled until then.
+    pub dodge_until: f32,
+    /// L955: this bot is its side's chaser (kept until another is clearly nearer).
+    pub chasing: bool,
+    /// L955: who last passed to this player, and when.
+    pub passed_by: Option<(u64, f32)>,
+    /// L955: where this player was when it last moved, and when (for idle teammates).
+    pub last_at: Option<([f32; 3], f32)>,
+    /// L955: a support run under way (until it arrives) and a chaser holding off a carrier.
+    pub support_run: bool,
+    pub shadowing: bool,
+    /// L955: when this player's next juke counts (`JUKE_COOLDOWN`).
+    pub juke_ready_at: f32,
+}
+
+/// L955: whether `player` may be tackled now (not just won the ball, not juking).
+pub fn tackleable(memory: &BTreeMap<u64, BotMemory>, player: u64, now: f32) -> bool {
+    memory
+        .get(&player)
+        .is_none_or(|m| now >= m.protected_until && now >= m.dodge_until)
+}
+
+/// L955: a tackle took the ball: the tackler keeps it for PROTECT, the carrier goes down.
+pub fn won_by_tackle(memory: &mut BTreeMap<u64, BotMemory>, tackler: u64, victim: u64, now: f32) {
+    memory.entry(tackler).or_default().protected_until = now + PROTECT;
+    knock_down(memory, tackler, victim, now);
+}
+
+/// L955: the client's juke (states 4 Juke, 5 JukeWithBall, 6 Juke360WithBall).
+pub fn juke(memory: &mut BTreeMap<u64, BotMemory>, player: u64, now: f32) {
+    let mind = memory.entry(player).or_default();
+    if now < mind.juke_ready_at {
+        return;
+    }
+    mind.juke_ready_at = now + JUKE_COOLDOWN;
+    mind.dodge_until = now + DODGE_TIME;
 }
 
 /// L944: a player's Soccer Star stats as sent in 76/19 words 0..5 (the client's stat-name table order,
@@ -244,8 +314,22 @@ pub fn step(
     let now = authority.server_time();
     let ball = authority.ball_position();
     let pass_radius = authority.config().physics.pass_radius;
-    // The field player of each side nearest the ball goes for it; the rest support.
+    // L955: every player's last move (a still teammate gets no pass).
+    for (id, state) in authority.players() {
+        if let Some(position) = state.position {
+            let m = memory.entry(id).or_default();
+            let moved = m
+                .last_at
+                .is_none_or(|(at, _)| flat_distance(at, position) > 0.3);
+            if moved {
+                m.last_at = Some((position, now));
+            }
+        }
+    }
+    // The field player of each side nearest the ball goes for it; the rest support. L955: the
+    // current chaser keeps the chase unless another is clearly nearer (no target flip-flop).
     let mut chaser = [None::<(u64, f32)>; 2];
+    let mut current = [None::<(u64, f32)>; 2];
     for (id, state) in authority.players() {
         let (Some(position), true) = (state.position, state.slot != KEEPER_SLOT) else {
             continue;
@@ -255,10 +339,33 @@ pub fn step(
             continue;
         }
         let distance = flat_distance(position, ball);
-        let side = &mut chaser[(state.team & 1) as usize];
+        let team = (state.team & 1) as usize;
+        if memory.get(&id).is_some_and(|m| m.chasing) {
+            current[team] = Some((id, distance));
+        }
+        let side = &mut chaser[team];
         if side.is_none_or(|(_, best)| distance < best) {
             *side = Some((id, distance));
         }
+    }
+    for team in 0..2 {
+        if let (Some(kept), Some((_, best))) = (current[team], chaser[team])
+            && kept.1 <= best + CHASE_SWITCH
+        {
+            chaser[team] = Some(kept);
+        }
+    }
+    // L955: a pass's target goes to meet the ball (live: it was already running to it when the
+    // ball arrived); before, only the team's nearest bot moved and the target stood still.
+    if let Some(target) = authority.live_pass()
+        && bots.contains(&target)
+        && let Some(state) = authority.player(target)
+    {
+        chaser[(state.team & 1) as usize] = Some((target, 0.0));
+    }
+    for &bot in bots {
+        let chasing = chaser.iter().flatten().any(|(id, _)| *id == bot);
+        memory.entry(bot).or_default().chasing = chasing;
     }
     let roster: Vec<(u64, u32, u32, [f32; 3])> = authority
         .players()
@@ -304,14 +411,17 @@ pub fn step(
                     } else {
                         catch_state(height)
                     };
-                    let to = [line[0], at[1], z];
-                    authority.place_server_player(bot, to)?;
+                    // L955: the keeper saves where it stands, as live (blocks 51-57 and catches
+                    // 58-60 are in-place animations): for the dive its reach covers the shot's
+                    // line. It used to jump, then slide, across to it (owner: it teleports).
+                    // R: half a metre of arm past the dive's reach.
+                    authority.extend_reach(bot, DIVE_REACH + 0.5, now + DIVE_WINDOW);
                     let mind = memory.entry(bot).or_default();
                     mind.blocking = blocking;
-                    mind.down_until = now + DIVE_TIME;
+                    mind.down_until = now + DIVE_WINDOW;
                     events.push(BotEvent::Moved {
                         player: bot,
-                        position: to,
+                        position: at,
                         facing: outward,
                         speed: 0.0,
                     });
@@ -334,8 +444,18 @@ pub fn step(
                 shot.map_or(ball[2], |shot| shot.1)
                     .clamp(c[2] - reach, c[2] + reach),
             ];
+            // L955: a keeper re-places itself only past KEEPER_DEADBAND (at once for a shot) and
+            // finishes the move: inching after the ball flapped its stick.
+            let away = flat_distance(at, target);
+            let mind = memory.entry(bot).or_default();
+            // R: 5 cm counts as on its spot.
+            if away > KEEPER_DEADBAND || (shot.is_some() && away > 0.05) {
+                mind.support_run = true;
+            } else if away <= 0.05 {
+                mind.support_run = false;
+            }
             let (next, facing) = toward(at, target, KEEPER_SPEED * pace * dt);
-            if next != at {
+            if mind.support_run && next != at {
                 authority.place_server_player(bot, next)?;
                 events.push(BotEvent::Moved {
                     player: bot,
@@ -427,14 +547,29 @@ pub fn step(
                 let open = roster
                     .iter()
                     .filter(|&&(id, team, _, p)| {
+                        // L955: not back to who just passed here, not to a teammate standing still.
+                        let passed_back = memory
+                            .get(&bot)
+                            .and_then(|m| m.passed_by)
+                            .is_some_and(|(by, at)| by == id && now - at < PASS_BACK);
+                        let idle = memory
+                            .get(&id)
+                            .and_then(|m| m.last_at)
+                            .is_some_and(|(_, at)| now - at > IDLE_MATE);
                         team == state.team
                             && id != bot
+                            && !passed_back
+                            && !idle
                             && in_reach(p)
                             && flat_distance(p, goal) < ahead
                     })
                     .min_by(|a, b| flat_distance(a.3, goal).total_cmp(&flat_distance(b.3, goal)));
                 if let Some(&(mate, _, _, mate_at)) = open {
-                    events.extend(pass(authority, bot, mate, mate_at, strength));
+                    let thrown = pass(authority, bot, mate, mate_at, strength);
+                    if thrown.is_some() {
+                        memory.entry(mate).or_default().passed_by = Some((bot, now));
+                    }
+                    events.extend(thrown);
                     continue;
                 }
             }
@@ -458,20 +593,38 @@ pub fn step(
                     .find(|r| r.0 == carrier)
                     .map(|r| r.3)
                     .unwrap_or(ball);
-                let (next, facing) = toward(at, carrier_at, SPRINT_SPEED * pace * dt);
+                // L955: a carrier that cannot be tackled yet is shadowed, not run into.
+                let open = tackleable(memory, carrier, now);
+                let gap = flat_distance(at, carrier_at);
+                let mind = memory.entry(bot).or_default();
+                mind.shadowing =
+                    !open && (gap <= SHADOW || (mind.shadowing && gap <= SHADOW + SHADOW_SLACK));
+                if mind.shadowing {
+                    events.push(stopped(bot, at, carrier_at));
+                    continue;
+                }
+                let speed = if open { SPRINT_SPEED } else { RUN_SPEED } * pace;
+                let (next, facing) = toward(at, carrier_at, speed * dt);
                 authority.place_server_player(bot, next)?;
                 events.push(BotEvent::Moved {
                     player: bot,
                     position: next,
                     facing,
-                    speed: SPRINT_SPEED * pace,
+                    speed,
                 });
                 let ready = memory.get(&bot).map_or(0.0, |m| m.tackle_ready_at);
-                if now >= ready {
-                    if let Some(victim) = authority.tackle(bot)? {
-                        memory.entry(bot).or_default().tackle_ready_at = now + TACKLE_COOLDOWN;
+                let in_reach = flat_distance(next, carrier_at) <= TACKLE_REACH;
+                if open && now >= ready && in_reach {
+                    // L955: an attempt; it lands TACKLE_LANDS of the time (repeatable per bot and clock).
+                    memory.entry(bot).or_default().tackle_ready_at = now + TACKLE_COOLDOWN;
+                    let landed = if aim_roll(bot, now) < TACKLE_LANDS {
+                        authority.tackle(bot, TACKLE_REACH)?
+                    } else {
+                        None
+                    };
+                    if let Some(victim) = landed {
                         // The carrier goes down, so it cannot chase and tackle straight back.
-                        knock_down(memory, bot, victim, now);
+                        won_by_tackle(memory, bot, victim, now);
                         events.push(BotEvent::Tackled {
                             tackler: bot,
                             victim,
@@ -496,7 +649,15 @@ pub fn step(
         // Support: the kickoff spot, shifted halfway toward the ball along the pitch.
         let spot = home(authority, state.team, state.slot);
         let target = [spot[0] + (ball[0] - spot[0]) * 0.5, at[1], spot[2]];
-        if flat_distance(at, target) > 0.5 {
+        // L955: re-form only past the deadband, and finish the run once started (no churn).
+        let away = flat_distance(at, target);
+        let mind = memory.entry(bot).or_default();
+        if away > SUPPORT_DEADBAND {
+            mind.support_run = true;
+        } else if away <= 0.5 {
+            mind.support_run = false;
+        }
+        if mind.support_run {
             let (next, facing) = toward(at, target, SUPPORT_SPEED * pace * dt);
             authority.place_server_player(bot, next)?;
             events.push(BotEvent::Moved {

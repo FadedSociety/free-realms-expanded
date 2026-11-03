@@ -16,6 +16,7 @@ use osfr_tools::{inventory::Inventory, profiles::ProfileState, soccer_service};
 use osfr_tools::minigame::RunState;
 use osfr_tools::rewards::{RewardDisplay, RewardGrant, RewardState};
 use osfr_tools::soccer::{Evidence, Message, SoccerPacket, decode as soccer_decode};
+use osfr_tools::soccer_ball::BallTuning;
 use osfr_tools::soccer_match::{FieldBounds, MatchConfig, MatchPhase, PhysicsConfig};
 use osfr_tools::zone_transition;
 use serde_json::{Value, json};
@@ -49,6 +50,7 @@ fn config() -> MatchConfig {
         gravity: 0.0,
         ..PhysicsConfig::default()
     };
+    config.ball = rolling_ball();
     config
 }
 
@@ -67,7 +69,18 @@ fn goal_config() -> MatchConfig {
         gravity: 0.0,
         ..PhysicsConfig::default()
     };
+    config.ball = rolling_ball();
     config
+}
+
+/// L955: a ball that keeps its speed on the grass, so the synthetic shots travel in straight lines.
+fn rolling_ball() -> BallTuning {
+    BallTuning {
+        drag: 0.0,
+        friction: 0.0,
+        linear_friction: 0.0,
+        ..BallTuning::default()
+    }
 }
 
 fn policy() -> AdapterPolicy {
@@ -375,7 +388,9 @@ fn client_shot_moves_the_ball_and_emits_the_recovered_impulse_layout() {
         .handle_client(
             KICKER,
             0.05,
-            &client_state(KICKER, 17, 255, [1.0, 0.0, 0.0, 1.0]),
+            // L955: 16, a Space-only standing kick; a 17 straight at the team-mate standing 3 m
+            // along +x (and away from the goal) is the client's Alt pass.
+            &client_state(KICKER, 16, 255, [1.0, 0.0, 0.0, 1.0]),
             2,
             None,
         )
@@ -445,9 +460,6 @@ fn pass_uses_the_verified_teammate_target_and_refuses_unverified_targets() {
     };
 
     let before = service.snapshot();
-    let error = pass_points(&mut service, None).expect_err("pass without a target");
-    assert!(error.to_string().contains("target"), "{error}");
-    assert_eq!(service.snapshot(), before);
     let error = pass_points(&mut service, Some(UNREGISTERED)).expect_err("unregistered target");
     assert!(error.to_string().contains("target"), "{error}");
     assert_eq!(service.snapshot(), before);
@@ -486,6 +498,33 @@ fn pass_uses_the_verified_teammate_target_and_refuses_unverified_targets() {
         velocity[1].abs() < 1.0e-6 && velocity[2].abs() < 1.0e-6,
         "{velocity:?}"
     );
+}
+
+/// L955: the client names no pass target, so the service resolves it as the client chose it
+/// (`00b77480`: the team-mate best aligned with the kick): a pass state at the team-mate passes to
+/// it, a standing 17 at the team-mate is the client's Alt pass, a standing 17 at the goal is a
+/// shot, and a pass with no mate in line goes as a kick. Before, every pass left the ball at the
+/// player's feet (owner: team-mates never got it).
+#[test]
+fn the_service_finds_the_pass_target_the_client_aimed_at() {
+    use osfr_tools::soccer_match::KickKind;
+    // TEAMMATE stands 3 m along +x from KICKER; team 0 attacks -x in the first half.
+    let kick = |state: u8, direction: [f32; 4]| {
+        let mut service = running_service();
+        let events = service
+            .handle_client(KICKER, 0.05, &client_state(KICKER, state, 128, direction), 2, None)
+            .expect("kick applies");
+        let ServiceEvent::Impulse { kind, .. } = impulse_event(&events) else {
+            panic!("expected an impulse");
+        };
+        (*kind, service.ball_velocity())
+    };
+    assert_eq!(kick(27, [1.0, 0.0, 0.0, 1.0]).0, KickKind::Pass, "running pass");
+    assert_eq!(kick(17, [1.0, 0.0, 0.0, 1.0]).0, KickKind::Pass, "standing pass");
+    assert_eq!(kick(17, [-1.0, 0.0, 0.0, 1.0]).0, KickKind::Shot, "shot at goal");
+    let (kind, velocity) = kick(27, [0.0, 0.0, 1.0, 1.0]);
+    assert_eq!(kind, KickKind::Shot, "no team-mate in line");
+    assert!(velocity[2] > 0.0, "the ball still leaves the player's feet");
 }
 
 #[test]
@@ -1138,14 +1177,224 @@ fn a_players_tackle_steals_from_an_opposing_carrier_in_reach() {
         .handle_client(OPPONENT, 0.05, &client_position(OPPONENT, [1.0, 0.0, 0.0]), 1, None)
         .expect("opponent position");
     let events = service.player_tackle(OPPONENT).unwrap();
-    assert_eq!(
-        events,
-        vec![ServiceEvent::Possession {
-            holder: OPPONENT,
-            previous: KICKER
-        }]
-    );
+    // L955: as live, the victim frees the ball (76/12), then the tackler takes it (76/11).
+    assert!(matches!(
+        events.as_slice(),
+        [
+            ServiceEvent::FreeBall { previous: KICKER, .. },
+            ServiceEvent::Possession {
+                holder: OPPONENT,
+                previous: KICKER
+            }
+        ]
+    ));
     assert_eq!(service.possession(), Some(OPPONENT), "the tackle steals the ball");
+}
+
+/// L955: the player's tackle has a lag allowance over the bots' reach (the client shows the bots a
+/// moment behind the server), so a tackle inside the carrier's circle on screen lands; far away it
+/// still misses.
+#[test]
+fn a_players_tackle_allows_for_the_lag_but_not_a_long_way() {
+    let mut service = running_service();
+    service
+        .handle_client(
+            OPPONENT,
+            0.5,
+            &client_position(OPPONENT, [3.5, 0.0, 0.0]),
+            1,
+            None,
+        )
+        .expect("opponent far");
+    assert!(
+        service.player_tackle(OPPONENT).unwrap().is_empty(),
+        "3.5 m is out of reach"
+    );
+    // Past the first slide's window and the slide cooldown.
+    for _ in 0..4 {
+        service.tick(0.25).expect("server time for the next slide");
+    }
+    service
+        .handle_client(
+            OPPONENT,
+            1.0,
+            &client_position(OPPONENT, [2.8, 0.0, 0.0]),
+            2,
+            None,
+        )
+        .expect("opponent near");
+    assert!(
+        !service.player_tackle(OPPONENT).unwrap().is_empty(),
+        "2.8 m lands"
+    );
+    assert_eq!(service.possession(), Some(OPPONENT));
+}
+
+/// L955: the player's slide can take the ball for `PLAYER_SLIDE_WINDOW` (0.5 s) after it starts,
+/// as the client slides them on (live resolved tackles 0.1-0.4 s into the slide); after that it
+/// is spent. Before, it was judged once, at its start.
+#[test]
+fn a_players_slide_lands_while_it_closes_in() {
+    let slide = |wait: f32| {
+        let mut service = running_service();
+        service
+            .handle_client(
+                OPPONENT,
+                0.5,
+                &client_position(OPPONENT, [5.0, 0.0, 0.0]),
+                1,
+                None,
+            )
+            .expect("opponent out of reach");
+        assert!(service.player_tackle(OPPONENT).unwrap().is_empty(), "5 m misses");
+        service.tick(wait).expect("the slide goes on");
+        service
+            .handle_client(
+                OPPONENT,
+                1.0,
+                &client_position(OPPONENT, [2.5, 0.0, 0.0]),
+                2,
+                None,
+            )
+            .expect("opponent closes in");
+        service.tick(0.05).expect("tick");
+        service.possession()
+    };
+    assert_eq!(slide(0.25), Some(OPPONENT), "inside the window the slide lands");
+    let mut late = running_service();
+    late.player_tackle(OPPONENT).unwrap();
+    for _ in 0..3 {
+        late.tick(0.25).expect("tick");
+    }
+    late.handle_client(
+        OPPONENT,
+        1.0,
+        &client_position(OPPONENT, [2.5, 0.0, 0.0]),
+        2,
+        None,
+    )
+    .expect("opponent closes in late");
+    late.tick(0.05).expect("tick");
+    assert_eq!(late.possession(), Some(KICKER), "a spent slide takes nothing");
+
+    // Opus review: spamming the slide does not reopen it inside SLIDE_COOLDOWN.
+    let mut spam = running_service();
+    spam.player_tackle(OPPONENT).unwrap();
+    for _ in 0..3 {
+        spam.tick(0.25).expect("tick");
+        spam.player_tackle(OPPONENT).unwrap();
+    }
+    spam.handle_client(
+        OPPONENT,
+        1.0,
+        &client_position(OPPONENT, [2.5, 0.0, 0.0]),
+        2,
+        None,
+    )
+    .expect("opponent closes in");
+    spam.tick(0.04).expect("tick");
+    assert_eq!(
+        spam.possession(),
+        Some(KICKER),
+        "the spammed slides took nothing"
+    );
+}
+
+/// L955 (Opus review): a slide that lands later in its window sends one free and one acquire, not
+/// the pair again from the tick's own possession change.
+#[test]
+fn a_slide_landing_late_sends_one_free_and_one_acquire() {
+    let mut service = running_service();
+    service.set_setup(Setup {
+        match_config: Vec::new(),
+        teams: Vec::new(),
+        roles: BTreeMap::new(),
+    });
+    service
+        .handle_client(
+            OPPONENT,
+            0.5,
+            &client_position(OPPONENT, [5.0, 0.0, 0.0]),
+            1,
+            None,
+        )
+        .expect("opponent out of reach");
+    assert!(service.player_tackle(OPPONENT).unwrap().is_empty());
+    service.tick(0.25).expect("the slide goes on");
+    service
+        .handle_client(
+            OPPONENT,
+            1.0,
+            &client_position(OPPONENT, [2.5, 0.0, 0.0]),
+            2,
+            None,
+        )
+        .expect("opponent closes in");
+    let events = service.tick(0.05).expect("tick");
+    let frees = events
+        .iter()
+        .filter(|e| matches!(e, ServiceEvent::FreeBall { .. }))
+        .count();
+    let takes = events
+        .iter()
+        .filter(|e| matches!(e, ServiceEvent::Possession { .. }))
+        .count();
+    assert_eq!((frees, takes), (1, 1), "{events:?}");
+    assert_eq!(service.possession(), Some(OPPONENT));
+}
+
+/// L955: a bot's steal goes out as live sent it: the tackler's SlideTackleStart (36), the victim
+/// freeing the ball (76/12) and then the tackler taking it (76/11), then Middle (37) and End (38).
+/// Before, the ball changed feet with no animation.
+#[test]
+fn a_bots_steal_slides_frees_then_acquires() {
+    let centre = [226.7, 0.0, 212.9];
+    let mut config = MatchConfig::new(FieldBounds {
+        centre,
+        half_x: 27.0,
+        half_z: 17.5,
+        goal_half_width: 8.0,
+        goal_height: 5.0,
+    });
+    config.kickoff_spawn = centre;
+    config.bot_ai = true;
+    let mut service = SoccerService::new(config, policy()).expect("service config");
+    service.set_setup(Setup {
+        match_config: Vec::new(),
+        teams: Vec::new(),
+        roles: BTreeMap::new(),
+    });
+    service.join(KICKER, 0, 0).expect("join");
+    service.fill_bots_for_solo(KICKER).expect("bots");
+    offer_and_start(&mut service, KICKER);
+    let (mut steals, mut middles) = (0, 0);
+    for _ in 0..2_000 {
+        let events = match service.phase() {
+            MatchPhase::Restart => service.start().expect("restart"),
+            MatchPhase::HalfTime => service.second_half().expect("second half"),
+            MatchPhase::Running => service.tick(0.06).expect("tick"),
+            _ => break,
+        };
+        for (at, event) in events.iter().enumerate() {
+            if let ServiceEvent::BotState { player, state: 36, .. } = event {
+                steals += 1;
+                let rest = &events[at..];
+                let freed = rest
+                    .iter()
+                    .position(|e| matches!(e, ServiceEvent::FreeBall { .. }));
+                let taken = rest.iter().position(
+                    |e| matches!(e, ServiceEvent::Possession { holder, .. } if holder == player),
+                );
+                assert!(
+                    matches!((freed, taken), (Some(f), Some(t)) if f < t),
+                    "free then acquire after the slide: {rest:?}"
+                );
+            }
+            middles += usize::from(matches!(event, ServiceEvent::BotState { state: 37, .. }));
+        }
+    }
+    assert!(steals > 0, "the bots tackled");
+    assert!(middles > 0, "the slides played on");
 }
 
 /// L946: with the live setup, a goal brings the celebration steps (76/5 16, 17) and the next kickoff
@@ -1231,7 +1480,9 @@ fn a_goal_celebrates_before_the_next_kickoff() {
     let (transform, velocity, drop) = restart.iter().find_map(ball_of).expect("the kickoff drop");
     assert_eq!((drop[4], drop[5], drop[14]), (0, 0xE3, 1));
     assert_eq!(velocity, [0.0; 3]);
-    assert_eq!(transform[12..15], goal_config().kickoff_spawn);
+    // L955: the client's ball position is its centre, 0.3 above our floor-level spot.
+    let spawn = goal_config().kickoff_spawn;
+    assert_eq!(transform[12..15], [spawn[0], spawn[1] + 0.3, spawn[2]]);
 }
 
 /// L948: the ball packet's fields (76/4: transform, velocity, the 15-byte tail).
@@ -1248,6 +1499,134 @@ fn ball_of(event: &ServiceEvent) -> Option<([f32; 16], [f32; 3], [u8; 15])> {
 
 fn f32_at(bytes: &[u8], at: usize) -> f32 {
     f32::from_le_bytes(bytes[at..at + 4].try_into().unwrap())
+}
+
+/// L955: the bots move as live drove them (Fable review): an 8-way control stick (76/16, each axis
+/// -1, 0 or 1) on every heading change, a Run or Idle 76/14 only with the stick's starts and stops,
+/// and poses that follow the stick at the bot's pace, so the client's own dead reckoning (pos +=
+/// stick x speed x dt) lands where the server has the bot. Before, the client parked the bots
+/// between poses and they slid (owner, native 2026-11-03).
+#[test]
+fn bots_move_along_their_control_stick() {
+    let centre = [226.7, 0.0, 212.9];
+    let mut config = MatchConfig::new(FieldBounds {
+        centre,
+        half_x: 27.0,
+        half_z: 17.5,
+        goal_half_width: 8.0,
+        goal_height: 5.0,
+    });
+    config.kickoff_spawn = centre;
+    config.bot_ai = true;
+    let mut service = SoccerService::new(config, policy()).expect("service config");
+    service.set_setup(Setup {
+        match_config: Vec::new(),
+        teams: Vec::new(),
+        roles: BTreeMap::new(),
+    });
+    service.join(KICKER, 0, 0).expect("join");
+    service.fill_bots_for_solo(KICKER).expect("bots");
+    offer_and_start(&mut service, KICKER);
+    let mut stick: BTreeMap<u64, [f32; 2]> = BTreeMap::new();
+    let mut last_pose: BTreeMap<u64, (f32, [f32; 3], [f32; 2], f32)> = BTreeMap::new();
+    let (mut changes, mut problems, mut seconds) = (0usize, Vec::new(), 0.0f32);
+    let mut kinds = BTreeMap::new();
+    for _ in 0..2_000 {
+        let events = match service.phase() {
+            MatchPhase::Restart => service.start().expect("restart"),
+            MatchPhase::HalfTime => service.second_half().expect("second half"),
+            MatchPhase::Running => {
+                seconds += 0.06;
+                service.tick(0.06).expect("tick")
+            }
+            _ => break,
+        };
+        let steered: BTreeSet<u64> = events
+            .iter()
+            .filter_map(|event| match event {
+                ServiceEvent::Controls { player, stick } => {
+                    if !stick.iter().all(|v| [-1.0, 0.0, 1.0].contains(v)) {
+                        problems.push(format!("{player:x}: stick {stick:?}"));
+                    }
+                    Some(*player)
+                }
+                _ => None,
+            })
+            .collect();
+        // A kick, tackle, save or celebration has its own states; Run and Idle are the stick's.
+        let acting: BTreeSet<u64> = events
+            .iter()
+            .filter_map(|event| match event {
+                ServiceEvent::BotState { player, state, .. } if *state > 2 => Some(*player),
+                _ => None,
+            })
+            .collect();
+        for event in &events {
+            match event {
+                ServiceEvent::Controls { player, stick: now } => {
+                    changes += 1;
+                    let before = stick.get(player).copied().unwrap_or([0.0; 2]);
+                    let kind = match (before == [0.0; 2], *now == [0.0; 2]) {
+                        (true, false) => "start",
+                        (false, true) => "stop",
+                        _ => "turn",
+                    };
+                    *kinds.entry((*player, kind)).or_insert(0usize) += 1;
+                    stick.insert(*player, *now);
+                    last_pose.remove(player);
+                }
+                ServiceEvent::BotState { player, state, .. }
+                    if *state <= 2 && !steered.contains(player) && !acting.contains(player) =>
+                {
+                    // After a kick hold the state goes out again; it must agree with the stick.
+                    let standing = stick.get(player).is_none_or(|s| *s == [0.0, 0.0]);
+                    if (*state == 1) != standing {
+                        problems.push(format!("{player:x}: state {state} against its stick"));
+                    }
+                }
+                ServiceEvent::PlayerPos {
+                    player,
+                    position,
+                    facing,
+                    time,
+                    speed,
+                    snap,
+                } => {
+                    if *facing == [0.0; 2] {
+                        problems.push(format!("{player:x}: zero facing"));
+                    }
+                    let along = stick.get(player).copied().unwrap_or([0.0; 2]);
+                    if let Some((at, from, was, pace)) = last_pose.get(player).copied() {
+                        if !snap && along != [0.0; 2] && was == along && pace == *speed && *time > at {
+                            let way = [position[0] - from[0], position[2] - from[2]];
+                            let length = way[0].hypot(way[1]);
+                            // The stick's world heading: normalize(x, -z).
+                            let norm = along[0].hypot(along[1]);
+                            let heading = [along[0] / norm, -along[1] / norm];
+                            let dot = (way[0] * heading[0] + way[1] * heading[1]) / length.max(1e-6);
+                            let expected = speed * (time - at);
+                            if length > 0.05 && (dot < 0.99 || (length - expected).abs() > 0.05 * expected.max(1.0)) {
+                                problems.push(format!(
+                                    "{player:x}: moved {way:?} in {:.2} s on stick {along:?} at {speed}",
+                                    time - at
+                                ));
+                            }
+                        }
+                    }
+                    last_pose.insert(*player, (*time, *position, along, *speed));
+                }
+                _ => {}
+            }
+        }
+    }
+    assert!(problems.is_empty(), "{} problems: {:?}", problems.len(), &problems[..problems.len().min(8)]);
+    let per_bot_minute = changes as f32 / 7.0 / (seconds / 60.0);
+    // Live: about 23 (961 sticks for 7 bots). Ours is about 67 (goal line-ups, kicks, chase
+    // switches; the AI port, L958, is the fix); per-tick flapping would be about 1,000.
+    assert!(
+        per_bot_minute < 90.0,
+        "stick changes per bot per minute: {per_bot_minute} {kinds:?}"
+    );
 }
 
 /// L949: with the live setup a keeper's save goes out as its goalie state (76/14 51-62), and a goal
@@ -1375,9 +1754,30 @@ fn a_bots_kick_goes_out_as_its_states_and_the_moving_ball() {
     for _ in 0..7 {
         next.extend(service.tick(0.05).expect("tick"));
     }
-    assert!(
-        !next.iter().any(
-            |event| matches!(event, ServiceEvent::BotState { player, .. } if *player == kicker)
-        )
+    let states: Vec<_> = next
+        .iter()
+        .filter(|event| matches!(event, ServiceEvent::BotState { player, .. } if *player == kicker))
+        .collect();
+    assert!(states.is_empty(), "{states:?}");
+}
+
+/// L952: 76/5 word 0 at the results (step 10) is the winner, which the client compares with the
+/// local player's team for YOU WIN / TRY AGAIN. A 4-3 win whose last goal was the other side's
+/// showed TRY AGAIN (owner playtest 2026-11-03). Before the results it is the last scorer.
+#[test]
+fn the_results_name_the_winner_not_the_last_scorer() {
+    use soccer_service::scoreboard_team;
+    assert_eq!(scoreboard_team(10, [4, 3], Some(1)), 0);
+    assert_eq!(scoreboard_team(10, [2, 3], Some(0)), 1);
+    assert_eq!(
+        scoreboard_team(10, [1, 1], Some(0)),
+        u32::MAX,
+        "a draw has no winner"
     );
+    assert_eq!(
+        scoreboard_team(5, [4, 3], Some(1)),
+        1,
+        "mid-match: the last scorer"
+    );
+    assert_eq!(scoreboard_team(5, [0, 0], None), u32::MAX);
 }

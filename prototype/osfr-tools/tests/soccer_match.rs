@@ -111,6 +111,10 @@ fn config() -> MatchConfig {
     let mut config = MatchConfig::new(bounds());
     // Deterministic linear motion for the tests; the equations are unchanged.
     config.physics.gravity = 0.0;
+    // L955: no drag or grass friction either (`soccer_ball` has its own tests).
+    config.ball.drag = 0.0;
+    config.ball.friction = 0.0;
+    config.ball.linear_friction = 0.0;
     config
 }
 
@@ -487,7 +491,7 @@ fn ball_motion_is_deterministic_and_clock_advances() {
 
     // Gravity is a caller-supplied reconstructed constant applied after the
     // position step: v_y = power - g*dt.
-    let mut config = MatchConfig::new(bounds());
+    let mut config = config();
     config.physics.gravity = 9.81;
     let mut game = Authority::new(config).unwrap();
     game.register(0x10, 0, 0).unwrap();
@@ -497,6 +501,28 @@ fn ball_motion_is_deterministic_and_clock_advances() {
     send(&mut game, 0x10, shot(0x10, 2, [0.0, 1.0, 0.0], 9.81)).unwrap();
     game.advance(0.1).unwrap();
     assert!((game.ball_velocity()[1] - (9.81 - 9.81 * 0.1)).abs() < 1e-3);
+}
+
+/// L955: a 20 m/s shot moves 5 m a 0.25 s tick. A player the ball passes between two ticks still
+/// takes it (before, the ball stepped through a keeper's reach into the goal).
+#[test]
+fn a_fast_shot_is_taken_by_a_player_it_passes_between_ticks() {
+    let mut game = authority();
+    send(&mut game, 0x10, position(0x10, 1, pos(0.5, 0.0))).unwrap();
+    game.advance(0.25).unwrap();
+    assert_eq!(game.possession(), Some(0x10));
+    // Team 0 attacks -x in the first half; 0x20 stands 2.5 m in front of that goal line, where
+    // neither tick's ball position (-24.5, -29.5) is within its 2 m reach.
+    game.place_server_player(0x20, pos(-27.5, 0.0)).unwrap();
+    send(&mut game, 0x10, shot(0x10, 2, [-1.0, 0.0, 0.0], 20.0)).unwrap();
+    for _ in 0..8 {
+        game.advance(0.25).unwrap();
+        if game.possession().is_some() || game.phase() != MatchPhase::Running {
+            break;
+        }
+    }
+    assert_eq!(game.possession(), Some(0x20), "the shot is saved");
+    assert_eq!(game.score(), [0, 0]);
 }
 
 #[test]
@@ -593,8 +619,7 @@ fn goal_crossing_scores_once_inside_the_mouth_only() {
     assert!(game.advance(0.1).is_err());
     assert_eq!(game.score(), [1, 0]);
 
-    // Outside the mouth: no goal, and the ball restarts at the spawn instead
-    // of stranding (F4).
+    // Outside the mouth: no goal; L955: the byline is walled, so the ball comes back into play.
     let mut game = authority();
     send(&mut game, 0x10, position(0x10, 1, pos(0.0, 0.5))).unwrap();
     game.advance(0.02).unwrap();
@@ -612,20 +637,21 @@ fn goal_crossing_scores_once_inside_the_mouth_only() {
     game.advance(0.02).unwrap();
     send(&mut game, 0x10, shot(0x10, next, [-1.0, 0.0, 0.0], 5.0)).unwrap();
     for _ in 0..8 {
-        if game.phase() != MatchPhase::Running {
+        game.advance(0.1).unwrap();
+        if game.ball_velocity()[0] > 0.0 {
             break;
         }
-        game.advance(0.1).unwrap();
     }
     assert_eq!(game.score(), [0, 0]);
-    assert_eq!(game.phase(), MatchPhase::Restart);
-    assert_eq!(game.ball_position(), game.config().kickoff_spawn);
+    assert_eq!(game.phase(), MatchPhase::Running);
+    assert!(game.ball_velocity()[0] > 0.0, "off the byline wall");
 }
 
+/// L955: the pitch is walled, as live: a miss over the touchline bounces back into play. The old
+/// out-of-play restart sent a 76/12 FreeBall with no holder, and the client's handler dereferenced
+/// the holder and crashed (native 2026-11-03).
 #[test]
-fn out_of_play_restarts_bounded_at_the_spawn() {
-    // F4: a miss over the touchline or byline restarts at the spawn through
-    // kickoff() instead of leaving a dead ball.
+fn a_ball_over_the_touchline_bounces_back_into_play() {
     let mut config = MatchConfig::new(FieldBounds {
         centre: [0.0; 3],
         half_x: 10.0,
@@ -634,6 +660,9 @@ fn out_of_play_restarts_bounded_at_the_spawn() {
         goal_height: 3.0,
     });
     config.physics.gravity = 0.0;
+    config.ball.drag = 0.0;
+    config.ball.friction = 0.0;
+    config.ball.linear_friction = 0.0;
     let mut game = Authority::new(config).unwrap();
     game.register(0x10, 0, 0).unwrap();
     game.kickoff().unwrap();
@@ -646,22 +675,21 @@ fn out_of_play_restarts_bounded_at_the_spawn() {
         &[pos(4.0, 9.0), pos(8.0, 18.0), pos(8.0, 28.0)],
     );
     game.advance(0.02).unwrap();
+    // Across the pitch at z 28, outside the goal mouth (|z| <= 4): straight at the +x wall.
     send(&mut game, 0x10, shot(0x10, next, [1.0, 0.0, 0.0], 5.0)).unwrap();
+    // Until it comes off the wall (the kicker would take it back a step later).
     for _ in 0..8 {
-        if game.phase() != MatchPhase::Running {
+        game.advance(0.1).unwrap();
+        if game.ball_velocity()[0] < 0.0 {
             break;
         }
-        game.advance(0.1).unwrap();
     }
-    assert_eq!(game.phase(), MatchPhase::Restart, "bounded restart");
+    assert_eq!(game.phase(), MatchPhase::Running, "no restart");
     assert_eq!(game.score(), [0, 0]);
-    assert_eq!(game.ball_position(), game.config().kickoff_spawn);
-    assert_eq!(game.ball_velocity(), [0.0; 3]);
-    assert_eq!(game.possession(), None);
-    // Play resumes through the normal kickoff path.
-    game.kickoff().unwrap();
-    assert_eq!(game.phase(), MatchPhase::Running);
-    assert_eq!(game.ball_position(), game.config().kickoff_spawn);
+    let (at, velocity) = (game.ball_position(), game.ball_velocity());
+    assert!(at[0] <= 10.0 && at[0] > 0.0, "back inside: {at:?}");
+    assert!(velocity[0] < 0.0, "coming back off the wall: {velocity:?}");
+    assert!((velocity[0] + 3.0).abs() < 1e-3, "0.6 of 5 m/s: {velocity:?}");
 }
 
 #[test]

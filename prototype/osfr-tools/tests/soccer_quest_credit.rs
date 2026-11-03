@@ -145,6 +145,7 @@ fn soccer_content() -> Vec<u8> {
                 "pass_radius": 40.0,
                 "max_tick": 0.25
             },
+            "ball": {"drag": 0.0, "friction": 0.0, "linear_friction": 0.0},
             "half_seconds": 6.0,
             "kickoff_spawn": [0.0, 0.0, 0.0],
             "half_policy": "keep_sides",

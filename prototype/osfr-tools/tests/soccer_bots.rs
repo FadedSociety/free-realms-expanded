@@ -298,6 +298,68 @@ fn a_full_power_shot_is_blocked_and_cleared() {
     assert!(kicked_by(&events, keeper), "cleared");
 }
 
+/// L955: a keeper saves where it stands, as live: its dive widens its reach instead of moving it
+/// (it used to jump, then slide, 3 m across to the shot's line: the owner saw it teleport).
+#[test]
+fn a_keeper_saves_without_leaping_across() {
+    let (game, keeper, events) = shot_at_keeper(2.5, 20.0);
+    assert_eq!(game.score(), [0, 0], "saved");
+    let steps: Vec<[f32; 3]> = events
+        .iter()
+        .filter_map(|event| match event {
+            BotEvent::Moved {
+                player, position, ..
+            } if *player == keeper => Some(*position),
+            _ => None,
+        })
+        .collect();
+    let longest = steps
+        .windows(2)
+        .map(|w| (w[1][0] - w[0][0]).hypot(w[1][2] - w[0][2]))
+        .fold(0.0f32, f32::max);
+    assert!(
+        longest <= soccer_bots::KEEPER_SPEED * 0.05 + 1e-3,
+        "keeper stepped {longest} m in one 0.05 s step"
+    );
+}
+
+/// L955: a pass's target runs to meet the ball and takes it. Before, only the team's nearest bot
+/// moved and the target stood still (owner: passes never reached a team-mate).
+#[test]
+fn a_pass_target_runs_to_meet_the_ball() {
+    let (mut game, bots) = match_with_bots();
+    soccer_bots::line_up(&mut game, &bots).unwrap();
+    place_human(&mut game, CENTRE, 1);
+    game.advance(0.02).unwrap();
+    assert_eq!(game.possession(), Some(HUMAN));
+    let target = 0x102;
+    let start = game.player(target).unwrap().position.unwrap();
+    let now = game.server_time();
+    let pass = Intent::Kick {
+        player: HUMAN,
+        sequence: 2,
+        kind: KickKind::Pass,
+        direction: [start[0] - CENTRE[0], 0.0, start[2] - CENTRE[2]],
+        power: 6.0,
+        target: Some(target),
+    };
+    game.apply(HUMAN, now, pass).unwrap();
+    let mut memory = BTreeMap::new();
+    for _ in 0..80 {
+        if game.possession().is_some() || game.phase() != MatchPhase::Running {
+            break;
+        }
+        soccer_bots::step(&mut game, &bots, &mut memory, 0.05).unwrap();
+        game.advance(0.05).unwrap();
+    }
+    assert_eq!(game.possession(), Some(target), "the pass reached its target");
+    let at = game.player(target).unwrap().position.unwrap();
+    assert!(
+        (at[0] - start[0]).hypot(at[2] - start[2]) > 0.5,
+        "the target moved to meet the ball"
+    );
+}
+
 /// L949: a shot past the keeper's dive goes in.
 #[test]
 fn a_shot_beyond_the_keepers_dive_goes_in() {
@@ -317,8 +379,35 @@ fn a_keepers_ball_cannot_be_tackled() {
     assert_eq!(game.possession(), Some(keeper));
     game.place_server_player(opponent, [CENTRE[0] + 1.0, 0.0, CENTRE[2]])
         .unwrap();
-    assert_eq!(game.tackle(opponent).unwrap(), None);
+    assert_eq!(
+        game.tackle(opponent, soccer_bots::TACKLE_REACH).unwrap(),
+        None
+    );
     assert_eq!(game.possession(), Some(keeper));
+}
+
+/// L955: a bot tackles only inside the client's own tackle range (1.73 m), not the 2 m control
+/// radius: bots stole from behind the player (owner, native 2026-11-03).
+#[test]
+fn a_tackle_reaches_only_the_clients_tackle_range() {
+    let (mut game, bots) = match_with_bots();
+    soccer_bots::line_up(&mut game, &bots).unwrap();
+    let (carrier, tackler) = (0x105, 0x101);
+    game.place_server_player(carrier, CENTRE).unwrap();
+    game.advance(0.02).unwrap();
+    assert_eq!(game.possession(), Some(carrier));
+    game.place_server_player(tackler, [CENTRE[0] + 1.9, 0.0, CENTRE[2]])
+        .unwrap();
+    assert_eq!(
+        game.tackle(tackler, soccer_bots::TACKLE_REACH).unwrap(),
+        None
+    );
+    game.place_server_player(tackler, [CENTRE[0] + 1.5, 0.0, CENTRE[2]])
+        .unwrap();
+    assert_eq!(
+        game.tackle(tackler, soccer_bots::TACKLE_REACH).unwrap(),
+        Some(carrier)
+    );
 }
 
 #[test]
@@ -369,4 +458,70 @@ fn toughness_shortens_the_knockdown_a_tackle_gives() {
         game.advance(0.25).unwrap();
     }
     panic!("the nearest opponent closes in and tackles");
+}
+
+/// L955: the player's Ctrl juke (client states 4-6) dodges tackles while it lasts; once it stops,
+/// the nearest opponent's tackle lands again (owner playtest 2026-11-03: dodge did nothing).
+#[test]
+fn a_juke_dodges_for_a_moment_and_spamming_it_does_not_last() {
+    let (mut game, bots) = match_with_bots();
+    soccer_bots::line_up(&mut game, &bots).unwrap();
+    place_human(&mut game, CENTRE, 1);
+    game.advance(0.02).unwrap();
+    assert_eq!(game.possession(), Some(HUMAN));
+    let mut memory = BTreeMap::new();
+    let mut tackled_at = None;
+    for step in 0..60 {
+        // L955: jukes sent every step count once per JUKE_COOLDOWN.
+        soccer_bots::juke(&mut memory, HUMAN, game.server_time());
+        for event in soccer_bots::step(&mut game, &bots, &mut memory, 0.25).unwrap() {
+            if let BotEvent::Tackled { victim: HUMAN, .. } = event {
+                tackled_at.get_or_insert(step);
+            }
+        }
+        if game.phase() != MatchPhase::Running {
+            break;
+        }
+        game.advance(0.25).unwrap();
+    }
+    let step = tackled_at.expect("spammed jukes do not keep the carrier untackleable");
+    assert!(
+        step as f32 * 0.25 >= soccer_bots::DODGE_TIME,
+        "no tackle while the first juke lasts (tackled at step {step})"
+    );
+}
+
+/// L955: a player who just won the ball keeps it for `PROTECT`: the bots stopped stealing back
+/// and forth every two seconds (owner playtest: 169 steals in a match).
+#[test]
+fn a_fresh_carrier_keeps_the_ball_through_the_protect_window() {
+    let (mut game, bots) = match_with_bots();
+    soccer_bots::line_up(&mut game, &bots).unwrap();
+    let (carrier, chaser) = (0x105, 0x101);
+    game.place_server_player(carrier, CENTRE).unwrap();
+    game.advance(0.02).unwrap();
+    game.place_server_player(chaser, [CENTRE[0] + 1.0, 0.0, CENTRE[2]])
+        .unwrap();
+    let mut memory = BTreeMap::new();
+    let mut tackles = Vec::new();
+    for _ in 0..12 {
+        let now = game.server_time();
+        for event in soccer_bots::step(&mut game, &bots, &mut memory, 0.25).unwrap() {
+            if let BotEvent::Tackled { tackler, victim } = event {
+                tackles.push((now, tackler, victim));
+            }
+        }
+        if game.phase() != MatchPhase::Running {
+            break;
+        }
+        game.advance(0.25).unwrap();
+    }
+    let &(won_at, winner, _) = tackles.first().expect("the chaser takes the ball");
+    assert_eq!(winner, chaser);
+    assert!(
+        !tackles
+            .iter()
+            .any(|&(at, _, victim)| victim == chaser && at < won_at + soccer_bots::PROTECT),
+        "nobody steals from the new carrier inside the protect window: {tackles:?}"
+    );
 }

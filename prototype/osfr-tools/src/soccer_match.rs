@@ -145,6 +145,11 @@ impl Default for PhysicsConfig {
     }
 }
 
+/// L955: a pass slower than this (m/s along the ground) is dead and the ball is loose (R).
+const DEAD_PASS_SPEED: f32 = 1.0;
+/// L955: share of its speed across the wall a ball keeps when it bounces off the pitch's edge (R).
+const WALL_BOUNCE: f32 = 0.6;
+
 /// Caller-supplied configuration for one match.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct MatchConfig {
@@ -157,6 +162,8 @@ pub struct MatchConfig {
     pub half_policy: HalfPolicy,
     /// L932: server bots play (`soccer_bots`); off keeps them passive (scripted tests).
     pub bot_ai: bool,
+    /// L955: the ball's drag, bounce and grass friction (`soccer_ball`).
+    pub ball: crate::soccer_ball::BallTuning,
 }
 
 impl MatchConfig {
@@ -171,11 +178,13 @@ impl MatchConfig {
             kickoff_spawn: bounds.centre,
             half_policy: HalfPolicy::SwitchSides,
             bot_ai: false,
+            ball: crate::soccer_ball::BallTuning::default(),
         }
     }
 
     pub fn validate(&self) -> io::Result<()> {
         self.bounds.validate()?;
+        self.ball.validate()?;
         if !self.half_seconds.is_finite() || self.half_seconds <= 0.0 {
             return Err(invalid("soccer half length must be positive"));
         }
@@ -429,6 +438,8 @@ pub struct Authority {
     possession: Option<u64>,
     live_pass: Option<u64>,
     last_touch: Option<u64>,
+    /// L955: a wider reach (m) per player until a server time (a keeper's dive).
+    reach: BTreeMap<u64, (f32, f64)>,
     /// False while the last toucher may not immediately re-take the ball.
     toucher_clear: bool,
     score: [u32; 2],
@@ -456,6 +467,7 @@ impl Authority {
             possession: None,
             live_pass: None,
             last_touch: None,
+            reach: BTreeMap::new(),
             toucher_clear: true,
             score: [0, 0],
             phase: MatchPhase::Kickoff,
@@ -498,9 +510,10 @@ impl Authority {
 
     /// L932: a slide tackle (the wiki: "Use the Spacebar or the Left Mouse
     /// button to Slide Tackle and steal the ball from opponents"). A tackler
-    /// within the control radius of an opposing ball carrier takes the ball and
-    /// knocks the carrier down. Returns the player knocked down.
-    pub fn tackle(&mut self, tackler: u64) -> io::Result<Option<u64>> {
+    /// within `reach` of an opposing ball carrier takes the ball and knocks the
+    /// carrier down. Returns the player knocked down. L955: the bots use the
+    /// client's own tackle range, the player a lag allowance on top.
+    pub fn tackle(&mut self, tackler: u64, reach: f32) -> io::Result<Option<u64>> {
         if self.phase != MatchPhase::Running {
             return Err(invalid("soccer tackles are only accepted while running"));
         }
@@ -516,7 +529,7 @@ impl Authority {
         };
         let close = victim
             .position
-            .is_some_and(|position| distance(position, at) <= self.config.physics.control_radius);
+            .is_some_and(|position| distance(position, at) <= reach);
         // L949: a keeper's ball is in its hands; it cannot be tackled away (R).
         if holder == tackler
             || victim.team == state.team
@@ -853,10 +866,9 @@ impl Authority {
         Ok(())
     }
 
-    /// Advance the deterministic simulation by `dt` seconds. The equations are
-    /// reconstructed, not recorded: position += velocity * dt, then
-    /// velocity.y -= gravity * dt. The caller supplies the step and is bounded
-    /// by `max_tick`.
+    /// Advance the deterministic simulation by `dt` seconds (bounded by `max_tick`). L955: the
+    /// ball moves through `soccer_ball::advance`, touches count along its path, and the pitch is
+    /// walled.
     pub fn advance(&mut self, dt: f32) -> io::Result<()> {
         if self.phase != MatchPhase::Running {
             return Err(invalid("soccer advance requires a running match"));
@@ -893,25 +905,18 @@ impl Authority {
             }
         }
 
+        // L955: drag, bounce and grass friction in 10 ms substeps (`soccer_ball`); before, a
+        // ground ball kept its kick speed until something stopped it.
         let previous = self.ball_position;
-        let step = [
-            self.ball_velocity[0] * dt,
-            self.ball_velocity[1] * dt,
-            self.ball_velocity[2] * dt,
-        ];
-        let mut next = [
-            previous[0] + step[0],
-            previous[1] + step[1],
-            previous[2] + step[2],
-        ];
-        if self.config.physics.gravity > 0.0 {
-            self.ball_velocity[1] -= self.config.physics.gravity * dt;
-        }
-        let floor = self.config.bounds.centre[1];
-        if next[1] < floor {
-            next[1] = floor;
-            self.ball_velocity[1] = 0.0;
-        }
+        let mut next = previous;
+        crate::soccer_ball::advance(
+            &mut next,
+            &mut self.ball_velocity,
+            self.config.bounds.centre[1],
+            self.config.physics.gravity,
+            &self.config.ball,
+            dt,
+        );
         self.ball_position = next;
 
         if !self.toucher_clear {
@@ -928,7 +933,38 @@ impl Authority {
             }
         }
 
-        if let Some(team) = self.goal_crossing(previous, next) {
+        // L955: with grass friction a pass can die short of its target; a ball that has all but
+        // stopped is loose for anyone (else it stayed reserved for a target that never came).
+        let ground_speed = (self.ball_velocity[0] * self.ball_velocity[0]
+            + self.ball_velocity[2] * self.ball_velocity[2])
+            .sqrt();
+        if self.live_pass.is_some() && ground_speed < DEAD_PASS_SPEED {
+            self.live_pass = None;
+            self.toucher_clear = true;
+        }
+        // L955: the first player the ball reaches on this step's path. A live pass is the target's
+        // alone; a loose ball is anyone's once the kicker is clear (nearest first on a still ball).
+        let touch = if let Some(target) = self.live_pass {
+            self.reach_along(target, previous, next)
+                .map(|(at, _)| (target, at))
+        } else if self.possession.is_none() && self.toucher_clear {
+            self.players
+                .keys()
+                .filter_map(|&player| {
+                    let (at, gap) = self.reach_along(player, previous, next)?;
+                    Some((player, at, gap))
+                })
+                .min_by(|a, b| a.1.total_cmp(&b.1).then(a.2.total_cmp(&b.2)))
+                .map(|(player, at, _)| (player, at))
+        } else {
+            None
+        };
+
+        // A touch before the line keeps the ball in play: a keeper's save beats the goal.
+        let goal = self
+            .goal_crossing(previous, next)
+            .filter(|&(_, crossing)| touch.is_none_or(|(_, at)| at > crossing));
+        if let Some((team, _)) = goal {
             self.score[team as usize] += 1;
             self.kickoff_team = 1 - team;
             self.phase = MatchPhase::Restart;
@@ -939,47 +975,75 @@ impl Authority {
             return Ok(());
         }
 
-        if !self.config.bounds.inside(next) {
-            // R out-of-play restart:
-            // the ball returns to the kickoff spawn and play resumes through
-            // `kickoff()`, so a miss cannot strand the match.
-            self.reset_ball();
-            self.phase = MatchPhase::Restart;
-            self.revision += 1;
-            return Ok(());
-        }
-
-        if let Some(target) = self.live_pass {
-            if let Some(position) = self.players.get(&target).and_then(|state| state.position) {
-                if distance(position, next) <= self.config.physics.control_radius {
-                    self.possession = Some(target);
-                    self.ball_position = position;
-                    self.ball_velocity = [0.0; 3];
-                    self.live_pass = None;
-                    self.revision += 1;
-                    return Ok(());
-                }
-            }
-        } else if self.possession.is_none() && self.toucher_clear {
-            let control_radius = self.config.physics.control_radius;
-            let winner = self
-                .players
-                .iter()
-                .filter_map(|(player, state)| {
-                    let position = state.position?;
-                    let distance = distance(position, next);
-                    (distance <= control_radius).then_some((*player, position, distance))
-                })
-                .min_by(|a, b| a.2.total_cmp(&b.2));
-            if let Some((player, position, _)) = winner {
+        if let Some((player, _)) = touch {
+            if let Some(position) = self.players.get(&player).and_then(|state| state.position) {
                 self.possession = Some(player);
                 self.ball_position = position;
                 self.ball_velocity = [0.0; 3];
+                self.live_pass = None;
             }
+        } else if !self.config.bounds.inside(next) {
+            // L955: the pitch is walled, as live (the client has a bbe_inviswall_hit effect and the
+            // live capture never restarted out of play): a loose ball bounces back in. The old R
+            // restart sent a 76/12 with no holder, which the client's FreeBall handler dereferences:
+            // it crashed the client (0xb82ed1, native 2026-11-03).
+            self.bounce_off_walls();
         }
 
         self.revision += 1;
         Ok(())
+    }
+
+    /// L955: the player a pass in flight is for (the ball is theirs alone until it dies).
+    pub fn live_pass(&self) -> Option<u64> {
+        self.live_pass
+    }
+
+    /// L955: give `player` a wider reach (a keeper's dive) until server time `until`.
+    pub fn extend_reach(&mut self, player: u64, reach: f32, until: f32) {
+        self.reach.insert(player, (reach, f64::from(until)));
+    }
+
+    /// L955: where along this step's ball path (0..1) `player` first has the ball in reach, and how
+    /// near it passes: the closest approach of the path, so a fast ball cannot step through a
+    /// player between ticks (a 20 m/s shot moves 5 m a 0.25 s tick, past a keeper's 2 m reach).
+    /// A player already in reach where the step starts (the kicker, or a defender on its heels)
+    /// keeps the end-point test: a kick leaves the kicker's feet before anyone there can take it,
+    /// and the kicker cannot re-take it until it is clear (`toucher_clear`).
+    fn reach_along(&self, player: u64, previous: [f32; 3], next: [f32; 3]) -> Option<(f32, f32)> {
+        let position = self.players.get(&player)?.position?;
+        let control = self.config.physics.control_radius;
+        let radius = match self.reach.get(&player) {
+            Some(&(reach, until)) if self.server_time < until => control.max(reach),
+            _ => control,
+        };
+        if distance(position, previous) <= control {
+            let gap = distance(position, next);
+            return (gap <= radius).then_some((1.0, gap));
+        }
+        let path = [
+            next[0] - previous[0],
+            next[1] - previous[1],
+            next[2] - previous[2],
+        ];
+        let to = [
+            position[0] - previous[0],
+            position[1] - previous[1],
+            position[2] - previous[2],
+        ];
+        let squared = path[0] * path[0] + path[1] * path[1] + path[2] * path[2];
+        let at = if squared > 0.0 {
+            ((to[0] * path[0] + to[1] * path[1] + to[2] * path[2]) / squared).clamp(0.0, 1.0)
+        } else {
+            0.0
+        };
+        let closest = [
+            previous[0] + path[0] * at,
+            previous[1] + path[1] * at,
+            previous[2] + path[2] * at,
+        ];
+        let gap = distance(position, closest);
+        (gap <= radius).then_some((at, gap))
     }
 
     /// Reconnect save: an exact clone of the authority state.
@@ -1014,6 +1078,9 @@ impl Authority {
         for state in self.players.values_mut() {
             state.position_at += delta;
         }
+        for (_, until) in self.reach.values_mut() {
+            *until += delta;
+        }
         Ok(())
     }
 
@@ -1044,6 +1111,24 @@ impl Authority {
             }
         }
         Ok(())
+    }
+
+    /// L955: put a ball that crossed a touchline or byline (outside the goal mouth) back on the
+    /// line it crossed, its speed across that line reversed and cut to `WALL_BOUNCE`.
+    fn bounce_off_walls(&mut self) {
+        let bounds = self.config.bounds;
+        let mut local = bounds.local(self.ball_position);
+        for (axis, half) in [(0, bounds.half_x), (2, bounds.half_z)] {
+            if local[axis].abs() > half {
+                let side = local[axis].signum();
+                local[axis] = side * half;
+                if self.ball_velocity[axis] * side > 0.0 {
+                    self.ball_velocity[axis] *= -WALL_BOUNCE;
+                }
+            }
+        }
+        let c = bounds.centre;
+        self.ball_position = [c[0] + local[0], c[1] + local[1].max(0.0), c[2] + local[2]];
     }
 
     fn reset_ball(&mut self) {
@@ -1098,8 +1183,9 @@ impl Authority {
 
     /// Deterministic goal test: a signed crossing of the team's attack goal
     /// line (x = sign * half_x from the pitch centre) inside the mouth
-    /// (|z| <= goal_half_width, 0 <= y <= goal_height).
-    fn goal_crossing(&self, previous: [f32; 3], next: [f32; 3]) -> Option<u32> {
+    /// (|z| <= goal_half_width, 0 <= y <= goal_height). L955: also where along the
+    /// step's path (0..1) it crosses.
+    fn goal_crossing(&self, previous: [f32; 3], next: [f32; 3]) -> Option<(u32, f32)> {
         let bounds = self.config.bounds;
         let (previous, next) = (bounds.local(previous), bounds.local(next));
         for team in 0..2u32 {
@@ -1120,7 +1206,7 @@ impl Authority {
                 && y >= 0.0
                 && y <= self.config.bounds.goal_height
             {
-                return Some(team);
+                return Some((team, t));
             }
         }
         None
