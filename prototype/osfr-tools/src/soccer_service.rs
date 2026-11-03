@@ -112,6 +112,10 @@ const BALL_EVERY: f32 = 0.15;
 const KICK_EFFECT_RATE: f32 = 4.0;
 const SUPER_EFFECT_RATE: f32 = 5.0;
 const KICK_EFFECT_SECONDS: f32 = 2.0;
+/// L949: Dissapointed1-3 (client state table 0x1BA2338) and how long a goal shows them (the
+/// celebration).
+const DISAPPOINTED: u8 = 48;
+const DISAPPOINTED_HOLD: f32 = 3.0;
 /// L948: the byte the client keeps at ball +0x14, as sent live while the ball is in play (R).
 const IN_PLAY: u8 = 0xFF;
 
@@ -1307,6 +1311,16 @@ impl SoccerService {
         let mut shot = false;
         let mut kicked = false;
         for event in &acted {
+            if let crate::soccer_bots::BotEvent::Goalie {
+                player,
+                state,
+                hold,
+            } = *event
+            {
+                if self.setup.is_some() {
+                    bot_events.push(self.show(player, state, hold));
+                }
+            }
             if let crate::soccer_bots::BotEvent::Tackled { tackler, .. } = *event {
                 counted.extend(self.count(
                     tackler,
@@ -1320,7 +1334,12 @@ impl SoccerService {
                 power,
             } = *event
             {
-                if kind == KickKind::Shot {
+                // L949: a keeper's clear is no shot on goal.
+                let keeper = self
+                    .authority
+                    .player(player)
+                    .is_some_and(|bot| bot.slot == crate::soccer_bots::KEEPER_SLOT);
+                if kind == KickKind::Shot && !keeper {
                     self.count(player, &[SHOTS], &[]);
                     shot = true;
                 }
@@ -1331,7 +1350,10 @@ impl SoccerService {
                     let (state, effect) = kick_style(kind == KickKind::Shot, aux);
                     self.ball_effect = effect;
                     kicked = true;
-                    bot_events.extend(self.bot_kick(player, state, aux));
+                    // L949: a keeper's throw or clear shows its goalie state instead.
+                    if !keeper {
+                        bot_events.extend(self.bot_kick(player, state, aux));
+                    }
                     continue;
                 }
                 let direction = unit(self.authority.ball_velocity())?;
@@ -1379,7 +1401,22 @@ impl SoccerService {
                 // L948: as live, the goal's ball carries the scoring team and leaves play, still
                 // moving (the client plays it into the net).
                 self.ball_live = false;
-                events.push(self.ball(u8::from(after[1] != before_score[1]), carried, false));
+                let scored = u32::from(after[1] != before_score[1]);
+                events.push(self.ball(scored as u8, carried, false));
+                // L949: as live, the conceding side's field bots are disappointed (states 48-50).
+                let downcast: Vec<(u64, u32)> = self
+                    .bots
+                    .iter()
+                    .filter_map(|&bot| self.authority.player(bot).map(|p| (bot, p.team, p.slot)))
+                    .filter(|&(_, team, slot)| {
+                        team != scored && slot != crate::soccer_bots::KEEPER_SLOT
+                    })
+                    .map(|(bot, _, slot)| (bot, slot))
+                    .collect();
+                for (bot, slot) in downcast {
+                    let state = DISAPPOINTED + (slot % 3) as u8;
+                    events.push(self.show(bot, state, DISAPPOINTED_HOLD));
+                }
             }
             if let Some(scorer) = toucher {
                 events.extend(self.count(scorer, &[], &[PLAYER_GOALS]));
@@ -1478,6 +1515,30 @@ impl SoccerService {
         self.ball_effect = [0.0; 2];
         self.ball_sent_at = self.authority.server_time();
         vec![self.ball(0, [0.0; 3], true)]
+    }
+
+    /// L949: a bot's one-off 76/14 state (a save, a throw, a goal against), shown for `hold` seconds
+    /// before its run and stop states go out again.
+    fn show(&mut self, player: u64, state: u8, hold: f32) -> ServiceEvent {
+        let position = self
+            .authority
+            .player(player)
+            .and_then(|bot| bot.position)
+            .unwrap_or_default();
+        let direction = self.bot_sent.get(&player).map_or([0.0; 2], |sent| sent.1);
+        self.kick_hold
+            .insert(player, self.authority.server_time() + hold);
+        let (running, counter) = self.bot_states.entry(player).or_insert((false, 0));
+        *running = false;
+        *counter += 1;
+        ServiceEvent::BotState {
+            player,
+            state,
+            aux: 0,
+            counter: *counter,
+            direction,
+            position,
+        }
     }
 
     /// L948: a bot's kick as the live server sent it (76/14): it stops (when running), charges and

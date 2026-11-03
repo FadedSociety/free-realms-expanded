@@ -35,6 +35,27 @@ pub const TACKLE_COOLDOWN: f32 = 1.5;
 pub const KNOCKDOWN: f32 = 1.5;
 /// The keeper slot (live: the fourth server player of each side stood on the goal line).
 pub const KEEPER_SLOT: u32 = TEAM_SLOT_COUNT - 1;
+/// L949: a keeper dives at a shot this close to its line (seconds) and this far across it (R).
+pub const DIVE_TIME: f32 = 0.3;
+pub const DIVE_REACH: f32 = 3.0;
+/// L949: a shot this hard (of `max_kick_power`) is blocked and cleared, not caught (R: live, a
+/// KickRight was caught; full-charge SuperKicks were blocked or went in).
+pub const BLOCK_SHOT: f32 = 0.95;
+/// L949: a bot's shot aims at least this share of the way from the goal centre to the far post (R).
+const AIM_MIN: f32 = 0.3;
+/// L949: how hard a keeper clears a blocked shot (R).
+const CLEAR_POWER: f32 = 12.0;
+/// L949: a caught ball stays in the keeper's hands this long, then the ball-in-hand state, then the
+/// throw (live: 0.99 s, then 0.08 s).
+pub const KEEPER_HOLD: f32 = 0.9;
+const THROW_WINDUP: f32 = 0.1;
+/// L949: goalie states (client state table 0x1BA2338): BlockHighLeft 51 (+1 right, +2 low),
+/// BlockCenter 57, CatchHigh 58 / Mid 59 / Low 60, IdleWithBallInHand 61, Throw 62.
+pub const BLOCK_HIGH_LEFT: u8 = 51;
+pub const BLOCK_CENTER: u8 = 57;
+pub const CATCH_HIGH: u8 = 58;
+pub const BALL_IN_HAND: u8 = 61;
+pub const THROW: u8 = 62;
 
 /// Kickoff spots in "defending" coordinates: x is distance toward the side's own goal from the
 /// pitch centre, z is across. Live kickoff frame 6451: (10.5, -8.9), (10.5, 9.0), keeper (25.8, 0);
@@ -60,6 +81,12 @@ pub enum BotEvent {
         tackler: u64,
         victim: u64,
     },
+    /// L949: a keeper's save, ball in hand or throw: its goalie state, shown for `hold` seconds.
+    Goalie {
+        player: u64,
+        state: u8,
+        hold: f32,
+    },
 }
 
 /// One bot's memory between steps.
@@ -73,6 +100,11 @@ pub struct BotMemory {
     pub tough_boost: Option<(f32, f32)>,
     /// L944: the player's Soccer Star stats, when the match sent them (76/19).
     pub stats: Option<Stats>,
+    /// L949: a keeper's caught ball: when the next hand step is due, whether the ball-in-hand state
+    /// went out, and whether its dive was a block (the ball goes straight back out).
+    pub hold_until: Option<f32>,
+    pub in_hand: bool,
+    pub blocking: bool,
 }
 
 /// L944: a player's Soccer Star stats as sent in 76/19 words 0..5 (the client's stat-name table order,
@@ -256,10 +288,51 @@ pub fn step(
         // Keeper: slide along the own goal line with the ball.
         if state.slot == KEEPER_SLOT {
             let line = home(authority, state.team, state.slot);
+            let outward = [authority.attack_sign(state.team), 0.0];
+            // L949: a shot on goal: the keeper moves to where it crosses, then dives at it.
+            let shot = incoming(authority, line[0]);
+            if let Some((time, z, height)) = shot {
+                if time <= DIVE_TIME && (z - at[2]).abs() <= DIVE_REACH {
+                    let max = authority.config().physics.max_kick_power;
+                    let v = authority.ball_velocity();
+                    let blocking =
+                        (v[0] * v[0] + v[1] * v[1] + v[2] * v[2]).sqrt() >= BLOCK_SHOT * max;
+                    // Positive is the keeper's right (it faces the field).
+                    let side = -(z - at[2]) * outward[0];
+                    let dive = if blocking {
+                        block_state(side, height)
+                    } else {
+                        catch_state(height)
+                    };
+                    let to = [line[0], at[1], z];
+                    authority.place_server_player(bot, to)?;
+                    let mind = memory.entry(bot).or_default();
+                    mind.blocking = blocking;
+                    mind.down_until = now + DIVE_TIME;
+                    events.push(BotEvent::Moved {
+                        player: bot,
+                        position: to,
+                        facing: outward,
+                        speed: 0.0,
+                    });
+                    events.push(BotEvent::Goalie {
+                        player: bot,
+                        state: dive,
+                        hold: KEEPER_HOLD,
+                    });
+                    continue;
+                }
+            }
+            let reach = if shot.is_some() {
+                authority.config().bounds.goal_half_width
+            } else {
+                KEEPER_REACH
+            };
             let target = [
                 line[0],
                 at[1],
-                (ball[2]).clamp(c[2] - KEEPER_REACH, c[2] + KEEPER_REACH),
+                shot.map_or(ball[2], |shot| shot.1)
+                    .clamp(c[2] - reach, c[2] + reach),
             ];
             let (next, facing) = toward(at, target, KEEPER_SPEED * pace * dt);
             if next != at {
@@ -273,14 +346,62 @@ pub fn step(
             } else {
                 events.push(stopped(bot, at, ball));
             }
-            // A keeper with the ball distributes it to the nearest teammate (R).
-            if holder == Some(bot) {
-                let mate = roster
-                    .iter()
-                    .filter(|&&(id, team, _, p)| team == state.team && id != bot && in_reach(p))
-                    .min_by(|a, b| flat_distance(a.3, at).total_cmp(&flat_distance(b.3, at)));
-                if let Some(&(mate, _, _, mate_at)) = mate {
-                    events.extend(pass(authority, bot, mate, mate_at, strength));
+            let mind = memory.entry(bot).or_default();
+            if holder != Some(bot) {
+                *mind = BotMemory {
+                    hold_until: None,
+                    in_hand: false,
+                    blocking: false,
+                    ..*mind
+                };
+                continue;
+            }
+            // L949: a blocked shot goes straight back out, toward the side it came from.
+            if mind.blocking {
+                mind.blocking = false;
+                let across = if at[2] >= c[2] { 0.5 } else { -0.5 };
+                let away = [outward[0], 0.3, across];
+                events.extend(bot_kick(
+                    authority,
+                    bot,
+                    KickKind::Shot,
+                    away,
+                    CLEAR_POWER,
+                    None,
+                ));
+                continue;
+            }
+            // L949: a caught ball is held, shown in hand, then thrown to the nearest teammate (R).
+            match mind.hold_until {
+                None => mind.hold_until = Some(now + KEEPER_HOLD),
+                Some(due) if now < due => {}
+                Some(_) if !mind.in_hand => {
+                    mind.in_hand = true;
+                    mind.hold_until = Some(now + THROW_WINDUP);
+                    events.push(BotEvent::Goalie {
+                        player: bot,
+                        state: BALL_IN_HAND,
+                        hold: THROW_WINDUP,
+                    });
+                }
+                Some(_) => {
+                    let mate = roster
+                        .iter()
+                        .filter(|&&(id, team, _, p)| team == state.team && id != bot && in_reach(p))
+                        .min_by(|a, b| flat_distance(a.3, at).total_cmp(&flat_distance(b.3, at)));
+                    if let Some(&(mate, _, _, mate_at)) = mate {
+                        let thrown = pass(authority, bot, mate, mate_at, strength);
+                        if thrown.is_some() {
+                            mind.hold_until = None;
+                            mind.in_hand = false;
+                            events.push(BotEvent::Goalie {
+                                player: bot,
+                                state: THROW,
+                                hold: KEEPER_HOLD,
+                            });
+                        }
+                        events.extend(thrown);
+                    }
                 }
             }
             continue;
@@ -292,7 +413,7 @@ pub fn step(
                 events.extend(kick(
                     authority,
                     bot,
-                    far_post(authority, &roster, state.team, goal),
+                    far_post(authority, &roster, state.team, goal, aim_roll(bot, now)),
                     strength,
                 ));
                 continue;
@@ -391,14 +512,54 @@ pub fn step(
     Ok(events)
 }
 
+/// L949: a repeatable 0..1 per shot (the bot and the match clock), for its aim.
+fn aim_roll(bot: u64, now: f32) -> f32 {
+    (now * 7.77 + (bot % 13) as f32 * 0.618).fract()
+}
+
+/// L949: a free ball on its way into the goal whose keeper stands on `line_x`: the time until it
+/// reaches the line, where it crosses and how high. None when it is held, going away or wide.
+fn incoming(authority: &Authority, line_x: f32) -> Option<(f32, f32, f32)> {
+    if authority.possession().is_some() {
+        return None;
+    }
+    let ball = authority.ball_position();
+    let velocity = authority.ball_velocity();
+    let time = (line_x - ball[0]) / velocity[0];
+    if !(time.is_finite() && time > 0.0) {
+        return None;
+    }
+    let bounds = authority.config().bounds;
+    let z = ball[2] + velocity[2] * time;
+    let height = (ball[1] + velocity[1] * time - bounds.centre[1]).max(0.0);
+    ((z - bounds.centre[2]).abs() <= bounds.goal_half_width).then_some((time, z, height))
+}
+
+/// L949: a block's state by the keeper's side (positive is its right) and the ball's height (R).
+fn block_state(side: f32, height: f32) -> u8 {
+    if side.abs() < 0.5 {
+        return BLOCK_CENTER;
+    }
+    BLOCK_HIGH_LEFT + u8::from(side > 0.0) + 2 * u8::from(height < 1.2)
+}
+
+/// L949: a catch's state by the ball's height: high, mid or low (live: a ball at 0.25 was CatchLow).
+fn catch_state(height: f32) -> u8 {
+    CATCH_HIGH + u8::from(height <= 1.6) + u8::from(height <= 0.6)
+}
+
 /// Aim inside the post away from the defending keeper (R: a shot at the goal centre is the keeper's).
+/// L949: how far inside varies shot to shot by `roll` (0..1), from `AIM_MIN` of the way to the post
+/// out to it, so a keeper reaches some (live shots crossed near the keeper; R).
 fn far_post(
     authority: &Authority,
     roster: &[(u64, u32, u32, [f32; 3])],
     team: u32,
     goal: [f32; 3],
+    roll: f32,
 ) -> [f32; 3] {
-    let inset = (authority.config().bounds.goal_half_width - 1.5).max(0.0);
+    let inset = (authority.config().bounds.goal_half_width - 1.5).max(0.0)
+        * (AIM_MIN + (1.0 - AIM_MIN) * roll);
     let keeper_z = roster
         .iter()
         .find(|&&(_, t, slot, _)| t != team && slot == KEEPER_SLOT)

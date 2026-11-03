@@ -1250,6 +1250,52 @@ fn f32_at(bytes: &[u8], at: usize) -> f32 {
     f32::from_le_bytes(bytes[at..at + 4].try_into().unwrap())
 }
 
+/// L949: with the live setup a keeper's save goes out as its goalie state (76/14 51-62), and a goal
+/// leaves the side that let it in disappointed (48-50), as live.
+#[test]
+fn keepers_save_and_a_goal_disappoints_the_side_that_let_it_in() {
+    // The live pitch (`data/content/soccer.json`).
+    let centre = [226.7, 0.0, 212.9];
+    let mut config = MatchConfig::new(FieldBounds {
+        centre,
+        half_x: 27.0,
+        half_z: 17.5,
+        goal_half_width: 8.0,
+        goal_height: 5.0,
+    });
+    config.kickoff_spawn = centre;
+    config.bot_ai = true;
+    let mut service = SoccerService::new(config, policy()).expect("service config");
+    service.set_setup(Setup {
+        match_config: Vec::new(),
+        teams: Vec::new(),
+        roles: BTreeMap::new(),
+    });
+    service.join(KICKER, 0, 0).expect("join");
+    service.fill_bots_for_solo(KICKER).expect("bots");
+    offer_and_start(&mut service, KICKER);
+    let (mut saved, mut disappointed) = (false, false);
+    for _ in 0..8_000 {
+        let events = match service.phase() {
+            MatchPhase::Restart => service.start().expect("restart"),
+            MatchPhase::HalfTime => service.second_half().expect("second half"),
+            MatchPhase::Running => service.tick(0.05).expect("tick"),
+            _ => break,
+        };
+        for event in &events {
+            if let ServiceEvent::BotState { state, .. } = event {
+                saved |= (51..=62).contains(state);
+                disappointed |= (48..=50).contains(state);
+            }
+        }
+        if saved && disappointed {
+            break;
+        }
+    }
+    assert!(saved, "a keeper saves");
+    assert!(disappointed, "a goal disappoints the other side");
+}
+
 /// L948: a bot's kick goes out as the live server sent it: its 76/14 stop, charge and kick states,
 /// the free ball (76/12), then the moving ball (76/4); never a 76/13. The kicker's next state waits
 /// for the kick to play out.

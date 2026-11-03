@@ -517,7 +517,12 @@ impl Authority {
         let close = victim
             .position
             .is_some_and(|position| distance(position, at) <= self.config.physics.control_radius);
-        if holder == tackler || victim.team == state.team || !close {
+        // L949: a keeper's ball is in its hands; it cannot be tackled away (R).
+        if holder == tackler
+            || victim.team == state.team
+            || victim.slot == TEAM_SLOT_COUNT - 1
+            || !close
+        {
             return Ok(None);
         }
         self.possession = Some(tackler);

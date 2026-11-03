@@ -2,7 +2,7 @@
 //! geometry: centre (226.7, 0, 212.9), half_x 27, half_z 17.5, goal mouth 8).
 use std::collections::{BTreeMap, BTreeSet};
 
-use osfr_tools::soccer_bots::{self, BotEvent, KEEPER_REACH, KEEPER_SLOT};
+use osfr_tools::soccer_bots::{self, BotEvent, KEEPER_SLOT};
 use osfr_tools::soccer_match::{Authority, FieldBounds, Intent, KickKind, MatchConfig, MatchPhase};
 
 const HUMAN: u64 = 0x10;
@@ -202,7 +202,8 @@ fn a_keeper_stays_on_its_line_and_tracks_the_ball_within_reach() {
         soccer_bots::step(&mut game, &bots, &mut memory, 0.25).unwrap();
         let at = game.player(keeper).unwrap().position.unwrap();
         assert!((at[0] - line).abs() < 0.01, "the keeper holds its line");
-        assert!((at[2] - CENTRE[2]).abs() <= KEEPER_REACH + 0.01, "{at:?}");
+        // L949: a shot on goal widens the keeper's reach to the goal mouth.
+        assert!((at[2] - CENTRE[2]).abs() <= 8.0 + 0.01, "{at:?}");
         moved |= (at[2] - CENTRE[2]).abs() > 0.01;
         if game.phase() == MatchPhase::Restart {
             game.kickoff().unwrap();
@@ -214,6 +215,110 @@ fn a_keeper_stays_on_its_line_and_tracks_the_ball_within_reach() {
         game.advance(0.25).unwrap();
     }
     assert!(moved, "the keeper slides with the ball");
+}
+
+/// L949: a team 0 bot shoots from 10 units out at the goal team 1's keeper guards, `offset` across
+/// from the keeper, with `power`; only the keeper plays.
+fn shot_at_keeper(offset: f32, power: f32) -> (Authority, u64, Vec<BotEvent>) {
+    let (mut game, bots) = match_with_bots();
+    soccer_bots::line_up(&mut game, &bots).unwrap();
+    let (shooter, keeper) = (0x101, 0x100 + 4 + u64::from(KEEPER_SLOT));
+    game.place_server_player(shooter, CENTRE).unwrap();
+    game.advance(0.02).unwrap();
+    assert_eq!(game.possession(), Some(shooter));
+    let goal = game.attack_goal(0);
+    let guard = game.player(keeper).unwrap().position.unwrap();
+    let spot = [goal[0] - game.attack_sign(0) * 10.0, 0.0, guard[2]];
+    game.place_server_player(shooter, spot).unwrap();
+    game.advance(0.02).unwrap();
+    let from = game.ball_position();
+    let now = game.server_time();
+    let kick = Intent::Kick {
+        player: shooter,
+        sequence: 1,
+        kind: KickKind::Shot,
+        direction: [guard[0] - from[0], 0.5, guard[2] + offset - from[2]],
+        power,
+        target: None,
+    };
+    game.apply(shooter, now, kick).unwrap();
+    let keepers = BTreeSet::from([keeper]);
+    let mut memory = BTreeMap::new();
+    let mut events = Vec::new();
+    for _ in 0..80 {
+        if game.phase() != MatchPhase::Running {
+            break;
+        }
+        events.extend(soccer_bots::step(&mut game, &keepers, &mut memory, 0.05).unwrap());
+        game.advance(0.05).unwrap();
+    }
+    (game, keeper, events)
+}
+
+fn goalie_states(events: &[BotEvent]) -> Vec<u8> {
+    events
+        .iter()
+        .filter_map(|event| match event {
+            BotEvent::Goalie { state, .. } => Some(*state),
+            _ => None,
+        })
+        .collect()
+}
+
+fn kicked_by(events: &[BotEvent], keeper: u64) -> bool {
+    events
+        .iter()
+        .any(|event| matches!(event, BotEvent::Kicked { player, .. } if *player == keeper))
+}
+
+/// L949: as live (a KickRight caught: CatchLow 60, the ball in hand 61, Throw 62), a keeper dives at
+/// a shot it can reach, catches it, holds it and throws it to a teammate.
+#[test]
+fn a_keeper_catches_a_shot_it_can_reach_and_throws_it_out() {
+    let (game, keeper, events) = shot_at_keeper(1.5, 20.0);
+    assert_eq!(game.score(), [0, 0], "saved");
+    let states = goalie_states(&events);
+    assert!((58..=60).contains(&states[0]), "a catch: {states:?}");
+    assert_eq!(states[1..], [61, 62], "the ball in hand, then the throw");
+    assert!(kicked_by(&events, keeper), "thrown to a teammate");
+    assert_ne!(game.possession(), Some(keeper));
+}
+
+/// L949: a full-power shot is blocked (live SuperKicks were blocked or went in) and cleared at once.
+#[test]
+fn a_full_power_shot_is_blocked_and_cleared() {
+    let (game, keeper, events) = shot_at_keeper(1.5, 30.0);
+    assert_eq!(game.score(), [0, 0], "saved");
+    let states = goalie_states(&events);
+    assert_eq!(states.len(), 1, "{states:?}");
+    assert!(
+        (51..=54).contains(&states[0]) || states[0] == 57,
+        "a block: {states:?}"
+    );
+    assert!(kicked_by(&events, keeper), "cleared");
+}
+
+/// L949: a shot past the keeper's dive goes in.
+#[test]
+fn a_shot_beyond_the_keepers_dive_goes_in() {
+    let (game, _, events) = shot_at_keeper(6.5, 20.0);
+    assert_eq!(game.score(), [1, 0]);
+    assert!(goalie_states(&events).is_empty(), "out of reach: no dive");
+}
+
+/// L949: a keeper's ball is in its hands: a tackle cannot take it.
+#[test]
+fn a_keepers_ball_cannot_be_tackled() {
+    let (mut game, bots) = match_with_bots();
+    soccer_bots::line_up(&mut game, &bots).unwrap();
+    let (keeper, opponent) = (0x100 + 4 + u64::from(KEEPER_SLOT), 0x101);
+    game.place_server_player(keeper, CENTRE).unwrap();
+    game.advance(0.02).unwrap();
+    assert_eq!(game.possession(), Some(keeper));
+    game.place_server_player(opponent, [CENTRE[0] + 1.0, 0.0, CENTRE[2]])
+        .unwrap();
+    assert_eq!(game.tackle(opponent).unwrap(), None);
+    assert_eq!(game.possession(), Some(keeper));
 }
 
 #[test]
