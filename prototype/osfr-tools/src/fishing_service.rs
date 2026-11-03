@@ -832,11 +832,14 @@ impl FishingService {
         }
         match request {
             ClientRequest::CastAnim { .. } => {
-                // Client state 1 sends this before state 2 sends CastRequest.
-                // It carries presentation only; the server does not echo it.
+                // Client state 1 sends this before state 2 sends CastRequest. L941: the server
+                // echoes it (native 2026-11-03: without the echo the client never plays the throw
+                // and no line or bobber shows; the Sanctuary fork's FishingPond.CastAnimation sends
+                // the same record back to everyone in view).
                 if tracked.attempt.is_none() && tracked.session.phase() != Phase::Idle {
                     return Err(Error::OutOfOrder);
                 }
+                change.replies.push(inner.to_vec());
                 change.changed = true;
             }
             ClientRequest::Cast { target, .. } => {

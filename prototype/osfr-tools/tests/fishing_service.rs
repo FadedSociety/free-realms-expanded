@@ -578,3 +578,20 @@ fn content_covers_six_areas_with_client_name_ids_and_reconstructed_tuning() {
     assert_eq!(json["lures"].as_array().unwrap().len(), 13);
     assert!(json["timing"]["source"].as_str().unwrap().contains("R:"));
 }
+
+/// L941 (native 2026-11-03): the client's throw (138/5) is echoed back, the reply that makes the
+/// client play the cast; only then does it send the cast itself (138/6).
+#[test]
+fn the_throw_is_echoed_so_the_client_plays_the_cast() {
+    let (_fixture, mut service) = running();
+    service.handle(&register_request(), PLAYER, T0).unwrap();
+    let mut body = handle_bytes(ACTOR);
+    for value in [12.2f32, 2.7, 0.0, -11.9, 0.0] {
+        body.extend(value.to_le_bytes());
+    }
+    let throw = request(5, &body);
+    let echoed = service.handle(&throw, PLAYER, T0 + 5).unwrap();
+    assert_eq!(echoed.replies, vec![throw]);
+    let cast = service.handle(&cast_request(), PLAYER, T0 + 10).unwrap();
+    assert_eq!(packet_ids(&cast), vec![(138, 8), (138, 18)]);
+}
