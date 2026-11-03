@@ -10,6 +10,8 @@
 use crate::{
     character_store::CharacterState,
     kart_entry::{EntryGate, EntryOutcome, KartEntryHandler, RaceEntryContent, RaceEntryContext},
+    kart_rows::KartRows,
+    kart_service::KartServiceContent,
     le, zone_transition,
 };
 use serde::{Deserialize, Serialize};
@@ -101,6 +103,10 @@ pub struct ActiveKartEntry {
     /// The job before the race made the player a Kart Driver; restored on exit.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub previous_job: Option<i32>,
+    /// L930: the MiniGameData row this race runs as; a finish credits it. Absent in saves that
+    /// predate rows (the gates' default row then).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub row: Option<u32>,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -151,7 +157,8 @@ impl KartGatewayState {
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct KartRewardClaim {
     pub replies: Vec<Vec<u8>>,
-    /// (R) The speedway id is the stable, content-authored race identity.
+    /// L930: the MiniGameData row the race ran as (`kart_rows.json`), not the speedway id the
+    /// reward registry is keyed by.
     pub minigame_id: Option<u32>,
     /// (R) T787: the finished race's own elapsed time. The course has no rivals, so
     /// a placement is never reported.
@@ -166,6 +173,10 @@ pub struct KartGateway {
     race: Option<crate::kart_service::KartService>,
     rewards: Arc<crate::kart_rewards::KartRewardRegistry>,
     gates: Option<Arc<KartGates>>,
+    /// L930: the rows the race serves; `None` means the one default row.
+    rows: Option<Arc<crate::kart_rows::KartRows>>,
+    /// The row the next [`Self::begin`] runs, set by [`Self::choose_row`]; never saved.
+    next_row: Option<u32>,
 }
 
 fn invalid(message: impl ToString) -> io::Error {
@@ -179,6 +190,19 @@ pub(crate) fn player_status(guid: u64, flags: u32) -> Vec<u8> {
     bytes.extend(guid.to_le_bytes());
     bytes.extend(flags.to_le_bytes());
     bytes
+}
+
+/// The race package row `row` runs: the table's rules for a table row, the package itself for a
+/// save that predates rows or a package with no table.
+fn race_for(
+    rows: Option<&KartRows>,
+    base: &KartServiceContent,
+    row: Option<u32>,
+) -> io::Result<KartServiceContent> {
+    match (rows, row) {
+        (Some(rows), Some(id)) => rows.race(id, base),
+        _ => Ok(base.clone()),
+    }
 }
 
 fn now_unix() -> u64 {
@@ -331,6 +355,19 @@ impl KartGateway {
                 return Err(invalid("invalid active kart entry snapshot"));
             }
         }
+        let gates = load_gates(directory)?.map(Arc::new);
+        let rows = KartRows::load(directory, &content.context.scene.scene)?.map(Arc::new);
+        if let (Some(rows), Some(base)) = (&rows, &content.race) {
+            // Every row that can run must build a valid race, and the gates' row must be one.
+            for id in rows.playable_ids() {
+                crate::kart_service::KartService::new(rows.race(id, base)?).map_err(invalid)?;
+            }
+            if let Some(id) = gates.as_ref().and_then(|g| g.minigame_id)
+                && !rows.is_playable(id)
+            {
+                return Err(invalid("the kart gates' row cannot run"));
+            }
+        }
         let mut race = match (&content.race, &state.race) {
             (Some(config), Some(saved)) => {
                 if saved.reward_taken != saved.session.reward_claimed {
@@ -347,9 +384,13 @@ impl KartGateway {
                 {
                     return Err(invalid("kart race snapshot ownership differs"));
                 }
+                let row = state.active.as_ref().and_then(|a| a.row);
                 Some(
-                    crate::kart_service::KartService::restore(config.clone(), saved.clone())
-                        .map_err(invalid)?,
+                    crate::kart_service::KartService::restore(
+                        race_for(rows.as_deref(), config, row)?,
+                        saved.clone(),
+                    )
+                    .map_err(invalid)?,
                 )
             }
             (Some(config), None) => {
@@ -363,7 +404,7 @@ impl KartGateway {
         }
         // Content is the sole source of the registered price. Save state may
         // not override it; its SHA and service layout are checked above.
-        let rows = content
+        let prices = content
             .race
             .as_ref()
             .and_then(|r| {
@@ -378,7 +419,7 @@ impl KartGateway {
             .into_iter()
             .collect();
         let rewards = Arc::new(
-            crate::kart_rewards::KartRewardRegistry::new(rows)
+            crate::kart_rewards::KartRewardRegistry::new(prices)
                 .map_err(|e| invalid(format!("invalid kart reward registration: {e:?}")))?,
         );
         let mut result = Self {
@@ -387,7 +428,9 @@ impl KartGateway {
             entry: None,
             race,
             rewards,
-            gates: load_gates(directory)?.map(Arc::new),
+            gates,
+            rows,
+            next_row: None,
         };
         if result.state.active.is_some() {
             result.rebuild_entry()?;
@@ -409,6 +452,39 @@ impl KartGateway {
     pub fn minigame_id(&self) -> Option<u32> {
         self.content.race.as_ref()?;
         self.gates.as_ref()?.minigame_id
+    }
+    /// L930: every MiniGameData row a race can run as, sorted: the default row and the table's
+    /// playable rows. Empty without race content. A row on a track we have no content for is
+    /// absent, so its Games window row stays closed.
+    pub fn minigame_ids(&self) -> Vec<u32> {
+        if self.content.race.is_none() {
+            return Vec::new();
+        }
+        let mut ids: Vec<u32> = self.minigame_id().into_iter().collect();
+        ids.extend(self.rows.iter().flat_map(|rows| rows.playable_ids()));
+        ids.sort_unstable();
+        ids.dedup();
+        ids
+    }
+    /// L930: picks the row the next [`Self::begin`] runs: the first of `wanted` (the player's open
+    /// quest objectives) that can run, else `entered` (the Games window row played), else the
+    /// default row. Call it just before `begin`, on the same staged copy.
+    pub fn choose_row(&mut self, wanted: &[u32], entered: Option<u32>) {
+        let runs = |id: &u32| self.rows.as_ref().is_some_and(|rows| rows.is_playable(*id));
+        self.next_row = wanted
+            .iter()
+            .copied()
+            .find(runs)
+            .or_else(|| entered.filter(runs));
+    }
+    /// The row a race with no choice runs as: the gates' `minigame_id`.
+    fn default_row(&self) -> Option<u32> {
+        self.gates.as_ref()?.minigame_id
+    }
+    /// The row the active race runs as; saves that predate rows run the default one.
+    pub fn row(&self) -> Option<u32> {
+        let active = self.state.active.as_ref()?;
+        active.row.or_else(|| self.default_row())
     }
     /// Locale id of the race option's menu label.
     pub fn menu_string_id(&self) -> u32 {
@@ -575,6 +651,7 @@ impl KartGateway {
             .checked_add(1)
             .filter(|n| *n <= i32::MAX as u32)
             .ok_or_else(|| invalid("kart instance overflow"))?;
+        let row = self.next_row.take().or_else(|| self.default_row());
         let mut staged = self.clone();
         let mut context = self.content.context.clone();
         context.session = character.guid;
@@ -585,12 +662,13 @@ impl KartGateway {
             context,
             return_location: character.clone(),
             previous_job: None,
+            row,
         });
         staged.state.next_instance = next;
         staged.rebuild_entry()?;
-        if let Some(config) = &staged.content.race {
-            let mut race =
-                crate::kart_service::KartService::new(config.clone()).map_err(invalid)?;
+        if let Some(base) = &staged.content.race {
+            let config = race_for(staged.rows.as_deref(), base, row)?;
+            let mut race = crate::kart_service::KartService::new(config).map_err(invalid)?;
             race.set_gate(EntryGate::Enabled);
             staged.race = Some(race);
             staged.sync_race();
@@ -793,12 +871,13 @@ impl KartGateway {
         };
         staged.state.last_paid_unix = Some(now_unix());
         staged.sync_race();
+        let minigame_id = staged.row();
         *self = staged;
         *inventory = staged_inventory;
         *profiles = staged_profiles;
         Ok(KartRewardClaim {
             replies: payout.replies,
-            minigame_id: Some(u32::from(payout.speedway)),
+            minigame_id,
             elapsed_seconds,
         })
     }

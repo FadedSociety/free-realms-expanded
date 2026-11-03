@@ -62,6 +62,7 @@ mod housing;
 mod item_requests;
 mod item_use;
 mod jobs;
+mod kart_rows;
 mod knockout;
 mod live_events;
 mod matchmaking_route;

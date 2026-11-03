@@ -1,0 +1,498 @@
+{
+  "schema_version": 1,
+  "rows": [
+    {
+      "game_id": 28,
+      "track": "sg_kt_track",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 28 '28^10^17958^37935^9870^1^...' is TYPE 10, NAME_ID 17958 (Wildwood Kart Racing), description id 37935. Games window row 62 has ContentId 28. The shipped race package (kart_entry.json) runs this row as is: scene sg_kt_track, its own lap count and race window."
+        }
+      ]
+    },
+    {
+      "game_id": 37,
+      "track": "sh_kt_track",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 37 '37^10^37933^37936^9872^1^...' is TYPE 10, NAME_ID 37933 (Frost Ridge Kart Racing), description id 37936. Games window row 63 has ContentId 37."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: the client asset manifest lists the scene sh_kt_track (Snowhill, home of Frost Ridge). No race content (gates, start, pickups) was recovered for it, so the row stays listed and closed."
+        }
+      ]
+    },
+    {
+      "game_id": 38,
+      "track": "bw_kt_track",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 38 '38^10^37934^37937^9868^1^...' is TYPE 10, NAME_ID 37934 (Tangletrack Kart Racing), description id 37937. Games window row 64 has ContentId 38."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: the client asset manifest lists the scene bw_kt_track (Briarwood, home of Tangletrack). No race content was recovered for it, so the row stays listed and closed."
+        }
+      ]
+    },
+    {
+      "game_id": 567,
+      "track": "sg_kt_track2",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 567 '567^10^3606^3244^9870^1^...' is TYPE 10, NAME_ID 3606 (Thunder Falls Speedway), description id 3244. Games window row 228 has ContentId 567."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: the client asset manifest lists a second scene beside the Wildwood one, sg_kt_track2; assigning it to Thunder Falls is a guess. No race content was recovered for it, so the row stays listed and closed."
+        }
+      ]
+    },
+    {
+      "game_id": 578,
+      "track": "ss_kt_track",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 578 '578^10^401623^407515^20991^1^...' is TYPE 10, NAME_ID 401623 (Sandstorm Speedway), description id 407515. Games window row 231 has ContentId 578."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: the client asset manifest lists the scene ss_kt_track (Seaside, home of Sandstorm). No race content was recovered for it, so the row stays listed and closed."
+        }
+      ]
+    },
+    {
+      "game_id": 277,
+      "track": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 277 '277^10^117323^139383^18420^1^...' is TYPE 10, NAME_ID 117323 (Racing Tutorial), description id 139383. The Racing Tutorial quest goal text (139383) is this row's description, and Games window row 1048 has ContentId 277."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: the tutorial's track is not recovered (the quest places the lesson at Frost Ridge), so the row stays listed and closed."
+        }
+      ]
+    },
+    {
+      "game_id": 628,
+      "track": "sg_kt_track",
+      "time_limit_s": 250,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 628 '628^10^3296^3433^9870^1^...' is TYPE 10, NAME_ID 3296 (Target Acquired), description id 3433. The goal text (id 3433) asks to place higher than Verve McNichols on the Wildwood speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rule: the race has no rival racers, so the rival is a par time. Finish the package's 3 laps inside 250 s or the race ends unpaid at the limit. The three Wildwood rival rows step 250 / 215 / 190 s, tightening toward the 167 s Wildwood endurance time (row 632)."
+        }
+      ]
+    },
+    {
+      "game_id": 629,
+      "track": "sg_kt_track",
+      "time_limit_s": 215,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 629 '629^10^3297^3434^9870^1^...' is TYPE 10, NAME_ID 3297 (Ready to Redline), description id 3434. The goal text (id 3434) asks to place higher than Linx Redline on the Wildwood speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rule: the race has no rival racers, so the rival is a par time. Finish the package's 3 laps inside 215 s or the race ends unpaid at the limit. The three Wildwood rival rows step 250 / 215 / 190 s, tightening toward the 167 s Wildwood endurance time (row 632)."
+        }
+      ]
+    },
+    {
+      "game_id": 630,
+      "track": "sg_kt_track",
+      "time_limit_s": 190,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 630 '630^10^3298^3435^9870^1^...' is TYPE 10, NAME_ID 3298 (You Want To Go Fast?), description id 3435. The goal text (id 3435) asks to place higher than T. R. Walker Jr. on the Wildwood speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rule: the race has no rival racers, so the rival is a par time. Finish the package's 3 laps inside 190 s or the race ends unpaid at the limit. The three Wildwood rival rows step 250 / 215 / 190 s, tightening toward the 167 s Wildwood endurance time (row 632)."
+        }
+      ]
+    },
+    {
+      "game_id": 631,
+      "track": "sg_kt_track",
+      "laps": 1,
+      "time_limit_s": 60,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 631 '631^10^3319^394507^9870^1^...' is TYPE 10, NAME_ID 3319 (Wildwood Sprint Challenge), description id 394507. Goal text 394507 asks for one lap in under 60 seconds at the Wildwood Speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rule: sprint = 1 lap with a 60 s time limit; the race ends unpaid at the limit. Mechanism (limit = race window) is a reconstruction; the numbers are the client's."
+        }
+      ]
+    },
+    {
+      "game_id": 632,
+      "track": "sg_kt_track",
+      "laps": 3,
+      "time_limit_s": 167,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 632 '632^10^3320^400926^9870^1^...' is TYPE 10, NAME_ID 3320 (Wildwood Endurance Challenge), description id 400926. Goal text 400926 asks for three laps in under 2:47."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rule: endurance = 3 laps with a 167 s (2:47) time limit; the race ends unpaid at the limit. Mechanism (limit = race window) is a reconstruction; the numbers are the client's."
+        }
+      ]
+    },
+    {
+      "game_id": 633,
+      "track": "sg_kt_track",
+      "time_limit_s": 167,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 633 '633^10^3321^3438^9870^1^...' is TYPE 10, NAME_ID 3321 (Dominating at Wildwood), description id 3438. The goal text (3438) is 'Win the race!'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rule: the race has no rival racers, so winning is a par time: the package's 3 laps inside 167 s (the Wildwood endurance time of row 632), or the race ends unpaid at the limit."
+        }
+      ]
+    },
+    {
+      "game_id": 634,
+      "track": "sg_kt_track",
+      "time_limit_s": 167,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 634 '634^10^3425^3438^9870^1^...' is TYPE 10, NAME_ID 3425 (SG Tour 400: Wildwood), description id 3438. The goal text (3438) is 'Win the race!'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rule: the race has no rival racers, so winning is a par time: the package's 3 laps inside 167 s (the Wildwood endurance time of row 632), or the race ends unpaid at the limit."
+        }
+      ]
+    },
+    {
+      "game_id": 635,
+      "track": "sh_kt_track",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 635 '635^10^3322^3439^9872^1^...' is TYPE 10, NAME_ID 3322 (A Treacherous Track), description id 3439. The goal text (id 3439) asks to place higher than Sparks Blitzwing on the Frost Ridge speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: sh_kt_track has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        }
+      ]
+    },
+    {
+      "game_id": 636,
+      "track": "sh_kt_track",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 636 '636^10^3323^3440^9872^2^...' is TYPE 10, NAME_ID 3323 (Redline Returns), description id 3440. The goal text (id 3440) asks to place higher than Linx Redline on the Frost Ridge speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: sh_kt_track has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        }
+      ]
+    },
+    {
+      "game_id": 637,
+      "track": "sh_kt_track",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 637 '637^10^3324^3443^9872^2^...' is TYPE 10, NAME_ID 3324 (Icy Perfection), description id 3443. The goal text (id 3443) asks to place higher than Amber Violet on the Frost Ridge speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: sh_kt_track has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        }
+      ]
+    },
+    {
+      "game_id": 638,
+      "track": "sh_kt_track",
+      "laps": 1,
+      "time_limit_s": 28,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 638 '638^10^3325^394925^9872^2^...' is TYPE 10, NAME_ID 3325 (Frost Ridge Sprint Challenge), description id 394925. The goal text (id 394925) states 1 lap(s) in 28 s on the Frost Ridge speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: sh_kt_track has no recovered race content, so the row stays listed and closed. The laps and time limit are the client's stated numbers, kept for when the track runs."
+        }
+      ]
+    },
+    {
+      "game_id": 639,
+      "track": "sh_kt_track",
+      "laps": 5,
+      "time_limit_s": 135,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 639 '639^10^3327^401086^9872^2^...' is TYPE 10, NAME_ID 3327 (Frost Ridge Endurance Challenge), description id 401086. The goal text (id 401086) states 5 lap(s) in 135 s on the Frost Ridge speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: sh_kt_track has no recovered race content, so the row stays listed and closed. The laps and time limit are the client's stated numbers, kept for when the track runs."
+        }
+      ]
+    },
+    {
+      "game_id": 640,
+      "track": "sh_kt_track",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 640 '640^10^3328^3438^9872^2^...' is TYPE 10, NAME_ID 3328 (Dominating at Frost Ridge), description id 3438. The goal text (id 3438) is 'Win the race!' on the Frost Ridge speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: sh_kt_track has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        }
+      ]
+    },
+    {
+      "game_id": 641,
+      "track": "sh_kt_track",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 641 '641^10^3426^3438^9872^2^...' is TYPE 10, NAME_ID 3426 (SG Tour 400: Frost Ridge), description id 3438. The goal text (id 3438) is 'Win the race!' on the Frost Ridge speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: sh_kt_track has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        }
+      ]
+    },
+    {
+      "game_id": 642,
+      "track": "sg_kt_track2",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 642 '642^10^3329^3447^20990^2^...' is TYPE 10, NAME_ID 3329 (Age Before Beauty), description id 3447. The goal text (id 3447) asks to place higher than Ace O'Mally on the Thunder Falls speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: sg_kt_track2 has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        }
+      ]
+    },
+    {
+      "game_id": 643,
+      "track": "sg_kt_track2",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 643 '643^10^3337^3448^20990^2^...' is TYPE 10, NAME_ID 3337 (Settling the Score), description id 3448. The goal text (id 3448) asks to place higher than Linx Redline on the Thunder Falls speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: sg_kt_track2 has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        }
+      ]
+    },
+    {
+      "game_id": 644,
+      "track": "sg_kt_track2",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 644 '644^10^3338^3449^20990^2^...' is TYPE 10, NAME_ID 3338 (High Speed Chase), description id 3449. The goal text (id 3449) asks to place higher than Chase Wheeler on the Thunder Falls speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: sg_kt_track2 has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        }
+      ]
+    },
+    {
+      "game_id": 645,
+      "track": "sg_kt_track2",
+      "laps": 1,
+      "time_limit_s": 48,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 645 '645^10^3339^403408^20990^2^...' is TYPE 10, NAME_ID 3339 (Thunder Falls Sprint Challenge), description id 403408. The goal text (id 403408) states 1 lap(s) in 48 s on the Thunder Falls speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: sg_kt_track2 has no recovered race content, so the row stays listed and closed. The laps and time limit are the client's stated numbers, kept for when the track runs."
+        }
+      ]
+    },
+    {
+      "game_id": 646,
+      "track": "sg_kt_track2",
+      "laps": 4,
+      "time_limit_s": 165,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 646 '646^10^3340^403410^20990^2^...' is TYPE 10, NAME_ID 3340 (Thunder Falls Endurance Challenge), description id 403410. The goal text (id 403410) states 4 lap(s) in 165 s on the Thunder Falls speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: sg_kt_track2 has no recovered race content, so the row stays listed and closed. The laps and time limit are the client's stated numbers, kept for when the track runs."
+        }
+      ]
+    },
+    {
+      "game_id": 647,
+      "track": "sg_kt_track2",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 647 '647^10^3341^3438^20990^2^...' is TYPE 10, NAME_ID 3341 (Dominating at Thunder Falls), description id 3438. The goal text (id 3438) is 'Win the race!' on the Thunder Falls speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: sg_kt_track2 has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        }
+      ]
+    },
+    {
+      "game_id": 648,
+      "track": "sg_kt_track2",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 648 '648^10^3428^3438^20990^2^...' is TYPE 10, NAME_ID 3428 (SG Tour 400: Thunder Falls), description id 3438. The goal text (id 3438) is 'Win the race!' on the Thunder Falls speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: sg_kt_track2 has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        }
+      ]
+    },
+    {
+      "game_id": 649,
+      "track": "bw_kt_track",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 649 '649^10^3343^3461^9870^2^...' is TYPE 10, NAME_ID 3343 (Burning Up the Track), description id 3461. The goal text (id 3461) asks to place higher than Antonio Taurino on the Tangletrack speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: bw_kt_track has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        }
+      ]
+    },
+    {
+      "game_id": 650,
+      "track": "bw_kt_track",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 650 '650^10^3344^3462^9870^3^...' is TYPE 10, NAME_ID 3344 (The Showdown), description id 3462. The goal text (id 3462) asks to place higher than Linx Redline on the Tangletrack speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: bw_kt_track has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        }
+      ]
+    },
+    {
+      "game_id": 651,
+      "track": "bw_kt_track",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 651 '651^10^3356^3466^9870^3^...' is TYPE 10, NAME_ID 3356 (The Right Stuff), description id 3466. The goal text (id 3466) asks to place higher than Mirana Vega on the Tangletrack speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: bw_kt_track has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        }
+      ]
+    },
+    {
+      "game_id": 652,
+      "track": "bw_kt_track",
+      "laps": 1,
+      "time_limit_s": 70,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 652 '652^10^3422^403412^9870^3^...' is TYPE 10, NAME_ID 3422 (Tangletrack Sprint Challenge), description id 403412. The goal text (id 403412) states 1 lap(s) in 70 s on the Tangletrack speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: bw_kt_track has no recovered race content, so the row stays listed and closed. The laps and time limit are the client's stated numbers, kept for when the track runs."
+        }
+      ]
+    },
+    {
+      "game_id": 653,
+      "track": "bw_kt_track",
+      "laps": 2,
+      "time_limit_s": 135,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 653 '653^10^3423^403414^9870^3^...' is TYPE 10, NAME_ID 3423 (Tangletrack Endurance Challenge), description id 403414. The goal text (id 403414) states 2 lap(s) in 135 s on the Tangletrack speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: bw_kt_track has no recovered race content, so the row stays listed and closed. The laps and time limit are the client's stated numbers, kept for when the track runs."
+        }
+      ]
+    },
+    {
+      "game_id": 654,
+      "track": "bw_kt_track",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 654 '654^10^3424^3438^9870^3^...' is TYPE 10, NAME_ID 3424 (Dominating at Tangletrack), description id 3438. The goal text (id 3438) is 'Win the race!' on the Tangletrack speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: bw_kt_track has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        }
+      ]
+    },
+    {
+      "game_id": 655,
+      "track": "bw_kt_track",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 655 '655^10^3432^3438^9870^3^...' is TYPE 10, NAME_ID 3432 (SG Tour 400: Tangletrack), description id 3438. The goal text (id 3438) is 'Win the race!' on the Tangletrack speedway."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: bw_kt_track has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        }
+      ]
+    }
+  ]
+}

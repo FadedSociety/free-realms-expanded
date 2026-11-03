@@ -18,7 +18,7 @@
 //!   | mining win (`Gameplay::apply_type8` -> `npc_minigame_win`) | 18 | `mining::MINING_GAME_ID` |
 //!   | harvesting win (`Gameplay::apply_type8` -> `npc_minigame_win`) | 111 | `Gameplay`'s `HARVESTING_GAME_ID` |
 //!   | paid fishing catch (`Gameplay::handle_fishing`) | spot game id | `fishing_spots.json` `spots[].game_id` |
-//!   | kart claim (`Gameplay::handle_kart_entry`/tick) | 31 | `kart_entry.json` `race.speedway` |
+//!   | kart claim (`Gameplay::handle_kart_entry`/tick) | entered row id (28, 628-634) | `KartGateway::minigame_ids` (`kart_gates.json` + the playable `kart_rows.json` rows) |
 //!   | finished derby (`Gameplay::pay_derby_completion`) | entered row id | `DerbyGateway::rows` (`derby_entry.json` default + `derby_rows.json`) |
 //!
 //!   Chess sends the row id as the 39/18 game id through its `RunSpec`; it reports
@@ -79,6 +79,7 @@ use osfr_tools::{
     harvesting,
     inventory::Inventory,
     item_bar::Effects,
+    kart_gateway::KartGateway,
     mining::{self, Type8Engine},
     pets::PetContent,
     recipes::{CraftingJob, RecipeCatalog},
@@ -202,13 +203,13 @@ impl Targets {
                 targets.producer(row.row_id, [MinigameFact::Elapsed]);
             }
         }
-        // `KartGateway::load` owns the file; the kart claim credits the authored
-        // speedway id, and the service exposes no id accessor. A time trial has no
+        // `KartGateway::load` owns `kart_gates.json` and `kart_rows.json`; a kart claim credits the
+        // MiniGameData row the race ran as (L930), one of `minigame_ids`. A time trial has no
         // rival, so no placement is reported.
-        for speedway in read_ids(root, "kart_entry.json", |document| {
-            as_u32(&document["race"]["speedway"]).into_iter().collect()
-        }) {
-            targets.producer(speedway, [MinigameFact::Elapsed]);
+        if let Some(kart) = KartGateway::load(root, None)? {
+            for row in kart.minigame_ids() {
+                targets.producer(row, [MinigameFact::Elapsed]);
+            }
         }
         // L932: every `soccer.json` game is a producer, the Games window rows 42-44 and the
         // quest-only rows 322-333 alike; a win reports the team's goals and the match time.

@@ -574,6 +574,12 @@ fn kart_gateway(scratch: &Scratch) -> crate::kart_gateway::KartGateway {
         serde_json::to_vec(&content).unwrap(),
     )
     .unwrap();
+    // L930: a finish credits the MiniGameData row the race ran as; the gates name the default one.
+    fs::write(
+        scratch.0.join("kart_gates.json"),
+        br#"{"schema_version": 1, "npcs": [], "minigame_id": 28}"#,
+    )
+    .unwrap();
     crate::kart_gateway::KartGateway::load(&scratch.0, None)
         .unwrap()
         .unwrap()
@@ -1204,7 +1210,8 @@ fn kart_completion_reaches_quests_only_after_a_paid_claim() {
     select(&mut game, 48);
     install(
         &mut game,
-        ObjectiveKind::FinishMinigame { minigame_id: 31 },
+        // L930: the credit is the MiniGameData row (28, Wildwood Kart Racing), not speedway 31.
+        ObjectiveKind::FinishMinigame { minigame_id: 28 },
         // Two completions: the first paid finish leaves the objective at 1 of 2, so a replayed
         // finish that leaked a second quest event would saturate it and be visible below.
         2,
@@ -1308,6 +1315,88 @@ fn kart_completion_reaches_quests_only_after_a_paid_claim() {
         "a replayed finish neither pays nor advances the quest"
     );
     count(&game, 1);
+}
+
+/// L930: a kart game whose package has the rows 28 (the package as is) and 631 (a one-lap
+/// sprint) on its own track, with `objective` installed. Entry goes through the production row
+/// choice, so the objective and the Games window row decide the race.
+fn kart_rows_game(scratch: &Scratch, objective: ObjectiveKind) -> Gameplay {
+    let source = r#"[{"kind": "client", "evidence": "L930 test fixture"}]"#;
+    fs::write(
+        scratch.0.join("kart_rows.json"),
+        format!(
+            r#"{{"schema_version": 1, "rows": [
+                {{"game_id": 28, "track": "sg_kt_track", "source": {source}}},
+                {{"game_id": 631, "track": "sg_kt_track", "laps": 1, "time_limit_s": 60,
+                  "source": {source}}}]}}"#
+        ),
+    )
+    .unwrap();
+    let kart = kart_gateway(scratch);
+    let mut game = game();
+    install(&mut game, objective, 2);
+    game.kart_entry = Some(kart);
+    game
+}
+
+/// Registers, presses Go, ticks to green and hits `gates` one second apart.
+fn drive_kart_round(game: &mut Gameplay, character: &CharacterState, gates: &[f32]) {
+    send(game, character, &kart_register(), 100_000);
+    let active = game
+        .kart_entry
+        .as_ref()
+        .unwrap()
+        .state()
+        .active
+        .clone()
+        .unwrap();
+    let (encounter, instance) = (active.context.encounter_id, active.context.instance_id);
+    send(game, character, &kart_go(encounter, instance), 100_500);
+    let green = 106_500;
+    game.tick(character, green).unwrap();
+    for (index, gate) in gates.iter().enumerate() {
+        send(
+            game,
+            character,
+            &kart_gate(*gate),
+            green + 1_000 * (index as u64 + 1),
+        );
+    }
+}
+
+#[test]
+fn kart_entry_runs_the_row_an_open_objective_names_and_credits_that_row() {
+    let scratch = Scratch::new("kart-rows-objective");
+    let character = kart_character();
+    let mut game = kart_rows_game(&scratch, ObjectiveKind::FinishMinigame { minigame_id: 631 });
+    // The Games window row played is 28, but the open objective names the sprint row.
+    game.begin_kart_row(&character, Some(28)).unwrap();
+    assert_eq!(game.kart_entry.as_ref().unwrap().row(), Some(631));
+    // One lap is four gates here: the sprint finishes where the default row would still race.
+    drive_kart_round(&mut game, &character, &[1., 2., 3., 4.]);
+    assert_eq!(
+        game.inventory.state().coins,
+        40,
+        "the sprint paid its finish"
+    );
+    count(&game, 1);
+}
+
+#[test]
+fn kart_entry_without_an_objective_runs_the_entered_row_and_never_credits_the_speedway_id() {
+    let scratch = Scratch::new("kart-rows-entered");
+    let character = kart_character();
+    // An objective on the speedway POI id 31 (the old, wrong credit) must stay unmet.
+    let mut game = kart_rows_game(&scratch, ObjectiveKind::FinishMinigame { minigame_id: 31 });
+    game.begin_kart_row(&character, Some(28)).unwrap();
+    assert_eq!(game.kart_entry.as_ref().unwrap().row(), Some(28));
+    drive_kart_round(&mut game, &character, &[1., 2., 3., 4., 1., 2., 3., 4.]);
+    assert_eq!(
+        game.inventory.state().coins,
+        40,
+        "the default race paid its finish"
+    );
+    count(&game, 0);
 }
 
 #[test]

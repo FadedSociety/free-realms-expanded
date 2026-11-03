@@ -75,6 +75,7 @@ ACTIVITY_CONTENT = (
     "kart_entry.json",  # kart_gateway.rs: race entry, vehicle and race service
     "kart_lobby.json",  # gameplay.rs: the 102/2 lobby body
     "kart_gates.json",  # kart_gateway.rs: (R) NPC menu gates and reward cooldown
+    "kart_rows.json",  # kart_rows.rs: (R) the MiniGameData rows a race runs as (L930)
     "derby_entry.json",  # derby_gateway.rs: (R) derby vehicle, rules and completion reward
     "derby_gates.json",  # derby_gateway.rs: (R) four arena driver menu gates
     "derby_rows.json",  # derby_gateway.rs: extra hosted MiniGameData rows (T791)
@@ -95,6 +96,7 @@ ACTIVITY_MAX_BYTES = {
     "kart_entry.json": 512 * 1024,
     "kart_lobby.json": 256 * 1024,
     "kart_gates.json": 16 * 1024,
+    "kart_rows.json": 64 * 1024,
     "derby_entry.json": 512 * 1024,
     "derby_gates.json": 16 * 1024,
     "derby_rows.json": 64 * 1024,

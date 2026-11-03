@@ -35,6 +35,7 @@ const FILES: &[&str] = &[
     "kart_entry.json",
     "kart_lobby.json",
     "kart_gates.json",
+    "kart_rows.json",
     "derby_entry.json",
     "derby_gates.json",
     "derby_rows.json",

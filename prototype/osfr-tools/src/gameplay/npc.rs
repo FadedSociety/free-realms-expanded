@@ -873,8 +873,9 @@ impl Gameplay {
                     let busy = self.activity_busy();
                     match self.kart_entry.as_ref().map(|kart| kart.admit(key, busy)) {
                         Some(Ok(())) => {
-                            out =
-                                self.commit_if_changed(|staged| staged.begin_kart_race(character))?;
+                            out = self.commit_if_changed(|staged| {
+                                staged.begin_kart_row(character, None)
+                            })?;
                         }
                         Some(Err(denied)) => out.replies.push(chat::system(denied.message())),
                         None => out.replies.push(chat::system(

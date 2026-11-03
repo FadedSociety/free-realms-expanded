@@ -426,3 +426,28 @@ fn no_requirement_goal_behaves_as_before() {
     assert_eq!(counts(&engine), vec![1]);
     assert_eq!(opcodes(&outcome), vec![(49, 9), (49, 10)]);
 }
+
+/// L930: a hosted row is chosen from the open objectives, and a goal with a result bound is
+/// one of them (a kart sprint wants "a lap in under 60 s", not just "finish").
+#[test]
+fn open_objective_ids_include_goals_with_a_result_bound() {
+    let (engine, _) = active(vec![
+        objective(
+            1,
+            1,
+            ObjectiveKind::MinigameResult {
+                minigame_id: 631,
+                require: require(None, Some(60), None, false),
+            },
+        ),
+        objective(
+            2,
+            1,
+            ObjectiveKind::FinishMinigame {
+                minigame_id: MINIGAME,
+            },
+        ),
+        objective(3, 1, ObjectiveKind::TalkToNpc { npc_id: GIVER }),
+    ]);
+    assert_eq!(engine.open_finish_minigame_ids(), [631, MINIGAME]);
+}

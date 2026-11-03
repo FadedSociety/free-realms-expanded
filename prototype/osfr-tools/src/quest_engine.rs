@@ -3662,15 +3662,17 @@ impl QuestEngine {
     }
 
     /// The game ids of the open `finish_minigame` objectives across this character's active
-    /// quests, in quest order. `current_objectives` already keeps an ordered quest to its open
-    /// step, so a later step cannot choose a hosted row early.
+    /// quests, in quest order; L930: a goal with a `require` (a result bound) is one too.
+    /// `current_objectives` already keeps an ordered quest to its open step, so a later step
+    /// cannot choose a hosted row early.
     pub fn open_finish_minigame_ids(&self) -> Vec<u32> {
         self.state
             .quests
             .keys()
             .flat_map(|quest_id| self.current_objectives(*quest_id))
             .filter_map(|objective| match &objective.kind {
-                ObjectiveKind::FinishMinigame { minigame_id } => Some(*minigame_id),
+                ObjectiveKind::FinishMinigame { minigame_id }
+                | ObjectiveKind::MinigameResult { minigame_id, .. } => Some(*minigame_id),
                 _ => None,
             })
             .collect()

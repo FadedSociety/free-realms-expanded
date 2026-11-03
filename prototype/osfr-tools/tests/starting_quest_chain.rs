@@ -31,7 +31,8 @@ const BURT_CREWE: u64 = 9_500_000_731;
 const SAMANTHA: u64 = 9_000_000_189;
 const RICKY_DANGER: u64 = 9_500_000_254;
 const SHAKEY: u64 = 9_500_000_941;
-const KART_TUTORIAL_SPEEDWAY: u32 = 31;
+// L930: the Racing Tutorial credits the MiniGameData row 28 (Wildwood Kart Racing), not speedway 31.
+const KART_TUTORIAL_ROW: u32 = 28;
 const MUSTANG_POSITION: [f32; 3] = [-237.1163, 1.1, -46.70612];
 const TALK_MENU_STRING_ID: u32 = 3300;
 const RACE_MENU_STRING_ID: u32 = 3052;
@@ -394,7 +395,7 @@ fn seed_tutorial_prerequisites(
         assert!(
             engine
                 .on_event(QuestEvent::FinishMinigame {
-                    minigame_id: KART_TUTORIAL_SPEEDWAY,
+                    minigame_id: KART_TUTORIAL_ROW,
                 })
                 .unwrap()
                 .changed
@@ -530,7 +531,7 @@ fn highroad_entry_chain_finishes_through_the_real_quest_engine() {
         MUSTANG_ALLI,
         &[
             QuestEvent::FinishMinigame {
-                minigame_id: KART_TUTORIAL_SPEEDWAY,
+                minigame_id: KART_TUTORIAL_ROW,
             },
             QuestEvent::TalkToNpc {
                 npc_id: MUSTANG_ALLI,

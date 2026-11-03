@@ -708,11 +708,14 @@ fn shipped_minigame_producers_are_pinned() {
         // L932: the soccer quest rows 322-333 (`soccer.json` games), each a server-settled win
         // reporting the team's goals and the match time. L931: the derby also credits 40/41 (Games
         // window rows 67/68), the tutorials 289/290 and the quest rows 607, 615, 616, 624 and 627.
+        // L930: a kart finish credits the MiniGameData row it ran as, no longer the speedway id 31:
+        // 28 (Wildwood Kart Racing) and the Wildwood challenge rows 628-634.
         vec![
-            18, 20, 31, 39, 40, 41, 42, 43, 44, 46, 66, 67, 77, 111, 134, 135, 136, 137, 139, 173,
+            18, 20, 28, 39, 40, 41, 42, 43, 44, 46, 66, 67, 77, 111, 134, 135, 136, 137, 139, 173,
             174, 175, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192,
             193, 194, 195, 196, 197, 198, 199, 289, 290, 322, 323, 324, 325, 326, 327, 328, 329,
-            330, 331, 332, 333, 596, 597, 598, 599, 600, 601, 604, 607, 615, 616, 624, 627,
+            330, 331, 332, 333, 596, 597, 598, 599, 600, 601, 604, 607, 615, 616, 624, 627, 628,
+            629, 630, 631, 632, 633, 634,
         ],
         "the finish_minigame producer set changed; update the producer table and this pin"
     );
@@ -773,6 +776,12 @@ fn shipped_minigame_producers_are_pinned() {
         assert!(catalogue.targets.reports(soccer, MinigameFact::Score), "{soccer}");
         assert!(catalogue.targets.reports(soccer, MinigameFact::Elapsed), "{soccer}");
         assert!(!catalogue.targets.reports(soccer, MinigameFact::Placement), "{soccer}");
+    }
+    // L930: every kart row is a solo time trial: its elapsed time is the only fact.
+    for kart in [28, 628, 629, 630, 631, 632, 633, 634] {
+        assert!(catalogue.targets.reports(kart, MinigameFact::Elapsed));
+        assert!(!catalogue.targets.reports(kart, MinigameFact::Score));
+        assert!(!catalogue.targets.reports(kart, MinigameFact::Placement));
     }
 }
 

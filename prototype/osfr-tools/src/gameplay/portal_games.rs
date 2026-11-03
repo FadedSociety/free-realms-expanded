@@ -36,7 +36,7 @@ pub(super) fn games(
     type8: [Option<&Type8Engine>; 3],
     fishing: Option<&FishingSpots>,
 ) -> Vec<Activity> {
-    let kart = kart.and_then(KartGateway::minigame_id);
+    let kart = kart.map(KartGateway::minigame_ids).unwrap_or_default();
     // L931: every hosted derby row is a Games window join key, so Play starts the row chosen.
     let derby = derby.into_iter().flat_map(|derby| {
         (derby.rows().iter()).filter_map(|row| u32::try_from(row.game_id()).ok())
@@ -83,7 +83,7 @@ pub(super) fn games(
     let holes = (fishing.into_iter().flat_map(FishingSpots::games)).filter_map(|(guide, game)| {
         Some(game_row(u32::try_from(game).ok()?, Kind::Fishing { guide }))
     });
-    (kart.map(|id| game_row(id, Kind::Kart)).into_iter())
+    (kart.into_iter().map(|id| game_row(id, Kind::Kart)))
         .chain(derby.map(|id| game_row(id, Kind::Derby)))
         .chain(crafts)
         .chain(gathers)
@@ -120,7 +120,9 @@ impl Gameplay {
         };
         match kind {
             Kind::Kart => match self.kart_entry.as_ref().map(|kart| kart.admit_play(busy)) {
-                Some(Ok(())) => self.commit_if_changed(|staged| staged.begin_kart_race(character)),
+                Some(Ok(())) => {
+                    self.commit_if_changed(|staged| staged.begin_kart_row(character, Some(id)))
+                }
                 Some(Err(denied)) => Ok(refused(denied.message())),
                 None => Ok(refused(EntryDenied::NoRace.message())),
             },

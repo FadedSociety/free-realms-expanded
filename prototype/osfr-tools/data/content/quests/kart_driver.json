@@ -172,7 +172,7 @@
         {
           "kind": "finish_minigame",
           "id": 1,
-          "minigame_id": 31,
+          "minigame_id": 28,
           "count": 1,
           "text_string_id": 139383,
           "source": [
@@ -186,7 +186,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) Bind completion to speedway 31, the stable race identity emitted by the current paid NPC-entry kart bridge. That is the normal Wildwood race in the play package, not a recovered retail tutorial minigame id; this substitutes the existing normal race for the unavailable Frost Ridge tutorial-specific game."
+              "evidence": "(R) Bind completion to MiniGameData row 28 (Wildwood Kart Racing), the row the current paid kart entry credits (L930; it was the speedway POI id 31, which is not a MiniGameData row). That is the normal Wildwood race in the play package, not the retail tutorial row: the client's own Racing Tutorial row is 277 (its description is this goal's text 139383), but its track is unrecovered, so the normal race is the explicit stand-in."
             },
             {
               "kind": "client",
@@ -273,7 +273,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W110: Racing Tutorial is offered by Mustang Alli at Frost Ridge. The current paid NPC-entry bridge reports speedway 31 (the normal Wildwood race); the retail tutorial-specific minigame id is unrecovered, so that normal race is the explicit stand-in. Complete the race, then return to Mustang Alli."
+          "evidence": "(R) W110: Racing Tutorial is offered by Mustang Alli at Frost Ridge. The current paid kart entry reports MiniGameData row 28 (the normal Wildwood race); the retail tutorial row 277 has no recovered track, so that normal race is the explicit stand-in. Complete the race, then return to Mustang Alli."
         },
         {
           "kind": "legacy-data",

@@ -79,9 +79,18 @@ impl Fixture {
         .unwrap();
     }
     fn write_gates(&self, npcs: &[u64]) {
+        // L930: the gates name the default MiniGameData row (28, Wildwood Kart Racing).
         self.write_gates_raw(
-            &serde_json::to_vec(&json!({"schema_version": 1, "npcs": npcs})).unwrap(),
+            &serde_json::to_vec(&json!({"schema_version": 1, "npcs": npcs, "minigame_id": 28}))
+                .unwrap(),
         );
+    }
+    fn write_rows(&self, rows: serde_json::Value) {
+        fs::write(
+            self.0.join("kart_rows.json"),
+            serde_json::to_vec(&json!({"schema_version": 1, "rows": rows})).unwrap(),
+        )
+        .unwrap();
     }
     fn write_gates_raw(&self, bytes: &[u8]) {
         let path = self.0.join("kart_gates.json");
@@ -722,10 +731,11 @@ fn ordinary_entry_finishes_pays_exactly_once_and_returns_in_the_prior_job() {
         !paid.replies.is_empty(),
         "a finished race must send its reward frames"
     );
+    // L930: the quest credit is the MiniGameData row the race ran as, not the speedway id (31).
     assert_eq!(
         paid.minigame_id,
-        Some(31),
-        "the stable speedway id is the quest completion identity"
+        Some(28),
+        "the gates' default row is the quest completion identity"
     );
     assert_eq!(
         paid.elapsed_seconds,
@@ -831,6 +841,278 @@ fn a_disconnect_mid_race_survives_a_snapshot_with_the_prior_job() {
     let mut restored = KartGateway::load(&f.0, Some(saved)).unwrap().unwrap();
     assert_eq!(restored.previous_job(), Some(PRIOR_JOB));
     assert_eq!(restored.exit(), Some(character()));
+}
+
+// ---- L930: the MiniGameData row a race runs as ------------------------------------------------
+
+fn row(
+    game_id: u32,
+    track: Option<&str>,
+    laps: Option<u32>,
+    limit: Option<u32>,
+) -> serde_json::Value {
+    json!({
+        "game_id": game_id, "track": track, "laps": laps, "time_limit_s": limit,
+        "source": [{"kind": "client", "evidence": "L930 test fixture"}],
+    })
+}
+
+/// Row 28 is the package as is, 37 races a track with no content (closed), 631 is a one-lap sprint
+/// and 632 is the package's two laps inside 30 s. The synthetic scene is `sg_kt_track`.
+fn rows() -> serde_json::Value {
+    json!([
+        row(28, Some("sg_kt_track"), None, None),
+        row(37, Some("sh_kt_track"), None, None),
+        row(631, Some("sg_kt_track"), Some(1), Some(60)),
+        row(632, Some("sg_kt_track"), None, Some(30)),
+    ])
+}
+
+fn rows_gateway() -> (Fixture, KartGateway) {
+    let f = Fixture::new(true);
+    f.write_gates(&[GATE_NPC]);
+    f.write_rows(rows());
+    let g = f.load();
+    (f, g)
+}
+
+/// Enters row `row` and drives `gates` one-second gate hits from the green light.
+fn race_row(g: &mut KartGateway, row: u32, gates: u32) -> u64 {
+    g.choose_row(&[row], None);
+    g.begin(&character()).unwrap();
+    let (_, green) = start_to_green(g);
+    let mut now = green;
+    for gate in (1..=4).cycle().take(gates as usize) {
+        now += 1_000;
+        g.handle(&gate_hit(PLAYER, gate as f32), now).unwrap();
+    }
+    now
+}
+
+#[test]
+fn the_race_runs_as_the_open_objective_then_the_entered_row_then_the_default() {
+    let (_f, mut g) = rows_gateway();
+    // 37 races a track with no content: it is neither a Games window row nor a choice.
+    assert_eq!(g.minigame_ids(), [28, 631, 632]);
+    for (wanted, entered, expected) in [
+        (vec![], None, 28),
+        (vec![37, 99], None, 28),
+        (vec![37, 631], Some(632), 631),
+        (vec![632, 631], None, 632),
+        (vec![], Some(632), 632),
+        (vec![], Some(37), 28),
+    ] {
+        g.choose_row(&wanted, entered);
+        g.begin(&character()).unwrap();
+        assert_eq!(g.row(), Some(expected), "{wanted:?} / {entered:?}");
+        g.exit();
+    }
+    // A choice is spent by the entry it was made for.
+    g.choose_row(&[631], None);
+    g.begin(&character()).unwrap();
+    g.exit();
+    g.begin(&character()).unwrap();
+    assert_eq!(g.row(), Some(28));
+}
+
+#[test]
+fn a_package_without_a_row_table_runs_only_its_default_row() {
+    let f = Fixture::new(true);
+    f.write_gates(&[GATE_NPC]);
+    let mut g = f.load();
+    assert_eq!(g.minigame_ids(), [28]);
+    g.choose_row(&[631], Some(632));
+    g.begin(&character()).unwrap();
+    assert_eq!(g.row(), Some(28));
+    // No gates row and no table: the race still pays, but no quest id is known to credit.
+    let bare = Fixture::new(true);
+    bare.write_gates_raw(&serde_json::to_vec(&json!({"schema_version": 1, "npcs": []})).unwrap());
+    let mut g = bare.load();
+    assert!(g.minigame_ids().is_empty());
+    g.begin(&character()).unwrap();
+    assert_eq!(g.row(), None);
+}
+
+#[test]
+fn a_sprint_row_runs_its_own_laps_and_credits_its_own_row_once() {
+    let (_f, mut g) = rows_gateway();
+    let eco = Economy::new(KART_JOB);
+    let (mut inventory, mut profiles) = eco.banks();
+    // One lap is four gates here; the package's two laps would still be racing.
+    race_row(&mut g, 631, 4);
+    let paid = g
+        .claim_reward_with_event(&mut inventory, &mut profiles, Default::default())
+        .unwrap();
+    assert_eq!(paid.minigame_id, Some(631));
+    assert!(paid.elapsed_seconds.is_some());
+    assert_eq!((coins(&inventory), xp(&profiles)), (40, 60));
+    let again = g
+        .claim_reward_with_event(&mut inventory, &mut profiles, Default::default())
+        .unwrap();
+    assert_eq!(again.minigame_id, None, "a finish credits once");
+    assert_eq!((coins(&inventory), xp(&profiles)), (40, 60));
+
+    // The default row still wants both laps.
+    g.exit();
+    g.begin(&character()).unwrap();
+    let (_, green) = start_to_green(&mut g);
+    for gate in 1..=4 {
+        g.handle(&gate_hit(PLAYER, gate as f32), green + 1_000 * gate as u64)
+            .unwrap();
+    }
+    let unpaid = g
+        .claim_reward_with_event(&mut inventory, &mut profiles, Default::default())
+        .unwrap();
+    assert_eq!(unpaid.minigame_id, None);
+    assert_eq!((coins(&inventory), xp(&profiles)), (40, 60));
+}
+
+#[test]
+fn a_row_past_its_time_limit_ends_unpaid_and_inside_it_pays_its_row() {
+    use osfr_tools::kart_service::RacePhase;
+    let eco = Economy::new(KART_JOB);
+    let (mut inventory, mut profiles) = eco.banks();
+    // Row 632 allows 30 s for two laps.
+    let (_f, mut g) = rows_gateway();
+    g.choose_row(&[632], None);
+    g.begin(&character()).unwrap();
+    let (_, green) = start_to_green(&mut g);
+    g.handle(&gate_hit(PLAYER, 1.0), green + 1_000).unwrap();
+    g.tick(green + 31_000).unwrap();
+    assert_eq!(g.state().race.as_ref().unwrap().phase, RacePhase::Aborted);
+    assert_eq!(
+        g.claim_reward_with_event(&mut inventory, &mut profiles, Default::default())
+            .unwrap()
+            .minigame_id,
+        None
+    );
+    assert_eq!((coins(&inventory), xp(&profiles)), (0, 0));
+
+    let (_f, mut g) = rows_gateway();
+    race_row(&mut g, 632, 8);
+    let paid = g
+        .claim_reward_with_event(&mut inventory, &mut profiles, Default::default())
+        .unwrap();
+    assert_eq!(paid.minigame_id, Some(632));
+    assert_eq!((coins(&inventory), xp(&profiles)), (40, 60));
+}
+
+#[test]
+fn a_saved_row_race_restores_with_its_own_rules_and_credits_its_row() {
+    let (f, mut g) = rows_gateway();
+    let eco = Economy::new(KART_JOB);
+    let (mut inventory, mut profiles) = eco.banks();
+    let now = race_row(&mut g, 631, 2);
+    let saved: osfr_tools::kart_gateway::KartGatewayState =
+        serde_json::from_slice(&serde_json::to_vec(g.state()).unwrap()).unwrap();
+    assert_eq!(saved.active.as_ref().unwrap().row, Some(631));
+    let mut restored = KartGateway::load(&f.0, Some(saved.clone()))
+        .unwrap()
+        .unwrap();
+    assert_eq!(restored.row(), Some(631));
+    for gate in [3, 4] {
+        let at = now + 1_000 * (gate as u64 - 2);
+        restored.handle(&gate_hit(PLAYER, gate as f32), at).unwrap();
+    }
+    let paid = restored
+        .claim_reward_with_event(&mut inventory, &mut profiles, Default::default())
+        .unwrap();
+    assert_eq!(
+        paid.minigame_id,
+        Some(631),
+        "the one-lap rule survived the save"
+    );
+
+    // A table that lost the saved row refuses the save instead of racing it by other rules.
+    f.write_rows(json!([row(28, Some("sg_kt_track"), None, None)]));
+    assert!(KartGateway::load(&f.0, Some(saved)).is_err());
+}
+
+#[test]
+fn a_save_that_predates_rows_restores_as_the_default_row() {
+    let (f, mut g) = rows_gateway();
+    g.begin(&character()).unwrap();
+    start_to_green(&mut g);
+    // The old save format has no `row` key.
+    let mut json = serde_json::to_value(g.state()).unwrap();
+    json["active"].as_object_mut().unwrap().remove("row");
+    let old: osfr_tools::kart_gateway::KartGatewayState = serde_json::from_value(json).unwrap();
+    assert_eq!(old.active.as_ref().unwrap().row, None);
+    let restored = KartGateway::load(&f.0, Some(old)).unwrap().unwrap();
+    assert_eq!(restored.row(), Some(28));
+}
+
+#[test]
+fn malformed_row_tables_are_refused_at_load() {
+    let ok = |rows: serde_json::Value| {
+        let f = Fixture::new(true);
+        f.write_gates(&[GATE_NPC]);
+        f.write_rows(rows);
+        KartGateway::load(&f.0, None).is_ok()
+    };
+    let default = || row(28, Some("sg_kt_track"), None, None);
+    assert!(ok(json!([default()])));
+    // The package's window is 600 s; its lap bound is 99 and its claim budget fits 16 laps here.
+    assert!(ok(json!([
+        default(),
+        row(631, Some("sg_kt_track"), Some(16), Some(600))
+    ])));
+    for (what, rows) in [
+        ("duplicate id", json!([default(), default()])),
+        ("zero id", json!([default(), row(0, None, None, None)])),
+        (
+            "zero laps",
+            json!([default(), row(631, Some("sg_kt_track"), Some(0), None)]),
+        ),
+        (
+            "zero limit",
+            json!([default(), row(631, Some("sg_kt_track"), None, Some(0))]),
+        ),
+        (
+            "limit past the window",
+            json!([default(), row(631, Some("sg_kt_track"), None, Some(601))]),
+        ),
+        (
+            "laps past the claim budget",
+            json!([default(), row(631, Some("sg_kt_track"), Some(17), None)]),
+        ),
+        (
+            "too many laps",
+            json!([default(), row(631, Some("sg_kt_track"), Some(100), None)]),
+        ),
+        (
+            "the gates' row cannot run",
+            json!([row(28, Some("sh_kt_track"), None, None)]),
+        ),
+        (
+            "the gates' row is missing",
+            json!([row(631, Some("sg_kt_track"), None, None)]),
+        ),
+        (
+            "no source",
+            json!([default(), {"game_id": 631, "track": "sg_kt_track", "source": []}]),
+        ),
+        (
+            "reconstructed without (R)",
+            json!([default(), {"game_id": 631, "track": "sg_kt_track",
+                "source": [{"kind": "reconstructed", "evidence": "a par time"}]}]),
+        ),
+        (
+            "unknown field",
+            json!([default(), {"game_id": 631, "bonus": 1,
+                "source": [{"kind": "client", "evidence": "x"}]}]),
+        ),
+    ] {
+        assert!(!ok(rows), "{what} must be refused");
+    }
+    let f = Fixture::new(true);
+    f.write_gates(&[GATE_NPC]);
+    fs::write(
+        f.0.join("kart_rows.json"),
+        b"{\"schema_version\": 2, \"rows\": []}",
+    )
+    .unwrap();
+    assert!(KartGateway::load(&f.0, None).is_err(), "schema version");
 }
 
 // ---- gameplay tick: a clock-only racing tick must not request a save -------------------------
@@ -1045,6 +1327,12 @@ impl GameplayFixture {
         fs::write(
             self.0.join("kart_entry.json"),
             serde_json::to_vec(&kart).unwrap(),
+        )
+        .unwrap();
+        // L930: a paid finish needs a row to credit (it also gates the Station Cash payout).
+        fs::write(
+            self.0.join("kart_gates.json"),
+            br#"{"schema_version": 1, "npcs": [], "minigame_id": 28}"#,
         )
         .unwrap();
     }
