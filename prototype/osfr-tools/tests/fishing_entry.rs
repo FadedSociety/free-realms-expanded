@@ -176,6 +176,18 @@ fn reel() -> Vec<u8> {
     fishing_packets::reel(ACTOR)
 }
 
+/// L950: the size of the catch held up (result 5) among a catch's packets.
+fn caught_grade(replies: &[Vec<u8>]) -> u32 {
+    replies
+        .iter()
+        .filter(|reply| reply.starts_with(&[138, 0, 14, 0]))
+        .find_map(|reply| match ServerPacket::decode_known(Sub::Result, &reply[4..]) {
+            Ok(ServerPacket::Result { body }) if body.at_18 == 5 => Some(body.at_3c),
+            _ => None,
+        })
+        .expect("a catch held up")
+}
+
 fn ids(replies: &[Vec<u8>]) -> Vec<(u16, u16)> {
     replies
         .iter()
@@ -293,7 +305,14 @@ impl Round {
         self.service.tick(PLAYER, at + 1_510).unwrap();
         self.service.tick(PLAYER, at + 2_410).unwrap();
         assert_eq!(self.service.phase(PLAYER), Some(Phase::Reeling));
-        self.send(&reel(), at + 2_420).unwrap().unwrap()
+        let mut caught = self.send(&reel(), at + 2_420).unwrap().unwrap();
+        // L950: paid at the reel-in; shown after the fish's fight (result 4) and reel-up (result 5).
+        for later in [at + 2_420 + 1_900, at + 2_420 + 3_700] {
+            caught
+                .replies
+                .extend(self.service.tick(PLAYER, later).unwrap().replies);
+        }
+        caught
     }
 
     fn fish_held(&self) -> u32 {
@@ -847,10 +866,7 @@ fn the_payout_row_for_the_caught_grade_drives_coins_and_xp() {
     let mut round = Round::started_with(spots, true);
     let caught = round.catch(T0 + 100);
     assert!(caught.paid);
-    let grade = match ServerPacket::decode_known(Sub::Result, &caught.replies[0][4..]).unwrap() {
-        ServerPacket::Result { body } => body.at_3c,
-        packet => panic!("expected a catch result, got {packet:?}"),
-    };
+    let grade = caught_grade(&caught.replies);
     assert!((1..=4).contains(&grade));
     assert_eq!(round.fish_held(), 1);
     assert_eq!(
@@ -1125,10 +1141,8 @@ fn only_sizes_with_an_item_are_caught() {
         service.tick(PLAYER, at + 2_410).unwrap();
         let caught = route(&mut service, &reel(), at + 2_420);
         assert!(caught.paid, "cast {n} paid");
-        match ServerPacket::decode_known(Sub::Result, &caught.replies[0][4..]).unwrap() {
-            ServerPacket::Result { body } => grades.insert(body.at_3c),
-            packet => panic!("expected a catch result, got {packet:?}"),
-        };
+        let held = service.tick(PLAYER, at + 2_420 + 3_700).unwrap();
+        grades.insert(caught_grade(&held.replies));
     }
     assert_eq!(
         grades,

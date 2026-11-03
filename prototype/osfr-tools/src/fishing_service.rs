@@ -121,6 +121,11 @@ pub struct Change {
     pub scene: Option<ZoneTransition>,
 }
 
+/// L950: 138/14 result types (Lxzxrus FishingPacketFishingResult): 0 nothing caught, 4 the catch
+/// pulled up to the rod, 5 held up with its banner.
+const REEL_UP: u32 = 4;
+const SCORED_CATCH: u32 = 5;
+
 #[derive(Clone)]
 struct Tracked {
     runs: MinigameRuns,
@@ -150,6 +155,8 @@ struct Tracked {
     lure_key: Option<String>,
     cast_sequence: u32,
     playing: bool,
+    /// L950: a settled catch's display, due in order (server time, packets): pulled up, then held up.
+    landing: Vec<(u64, Vec<Vec<u8>>)>,
 }
 
 /// Paid catches for one character. The service is already scoped to one player; the map key
@@ -345,6 +352,7 @@ impl FishingService {
                 lure_key: None,
                 cast_sequence: 0,
                 playing: false,
+                landing: Vec::new(),
             },
         );
         Ok(Change {
@@ -824,6 +832,13 @@ impl FishingService {
         }
 
         let mut change = advance(tracked, now_ms)?;
+        // L950: a new cast brings any catch display still due first, so it keeps its order.
+        let flush = if matches!(request, ClientRequest::Cast { .. }) {
+            u64::MAX
+        } else {
+            now_ms
+        };
+        land(tracked, flush, &mut change);
         if matches!(request, ClientRequest::ReelIn { .. })
             && tracked.attempt.is_none()
             && change.changed
@@ -908,7 +923,9 @@ impl FishingService {
         if !tracked.playing {
             return Ok(Change::default());
         }
-        advance(tracked, now_ms)
+        let mut change = advance(tracked, now_ms)?;
+        land(tracked, now_ms, &mut change);
+        Ok(change)
     }
 
     fn bound_to(&self, actor: Handle) -> Option<u64> {
@@ -946,6 +963,19 @@ fn advance(tracked: &mut Tracked, now_ms: u64) -> Result<Change, Error> {
         change.changed = true;
     }
     Ok(change)
+}
+
+/// L950: send the catch display packets due by `now_ms`.
+fn land(tracked: &mut Tracked, now_ms: u64, change: &mut Change) {
+    let due = tracked
+        .landing
+        .iter()
+        .take_while(|(at, _)| *at <= now_ms)
+        .count();
+    for (_, packets) in tracked.landing.drain(..due) {
+        change.replies.extend(packets);
+        change.changed = true;
+    }
 }
 
 fn escape(tracked: &mut Tracked, actor: Handle) -> Vec<Vec<u8>> {
@@ -1018,9 +1048,12 @@ fn settle_catch(
     let weight = fish.weight_kg[0] + (fish.weight_kg[1] - fish.weight_kg[0]) * weight_roll;
     let elapsed = now_ms.saturating_sub(attempt.cast_at_ms) as f32 / 1000.0;
     let score = fish.difficulty.saturating_mul(fish.rarity);
+    // L950: the model held up is the fish's own shape (the Lxzxrus fork holds up the underwater
+    // model); without one the client shows no catch.
+    let held = CONTENT.models.fish_by_grade[usize::from(grade) - 1] as u32;
     let result = ResultBody {
         actor,
-        at_18: 5,
+        at_18: SCORED_CATCH,
         at_1c: false,
         at_20: fish.name_id,
         at_24: fish.icon_id,
@@ -1030,6 +1063,17 @@ fn settle_catch(
         at_44: fish.difficulty,
         at_48: fish.rarity,
         at_4c: score,
+        at_50: held,
+        at_74: CONTENT.models.catch_effect as u32,
+        at_78: u32::from(grade),
+        ..ResultBody::default()
+    };
+    let reel_up = ResultBody {
+        actor,
+        at_18: REEL_UP,
+        at_20: fish.name_id,
+        at_50: held,
+        at_78: u32::from(grade),
         ..ResultBody::default()
     };
 
@@ -1086,8 +1130,15 @@ fn settle_catch(
         return Ok(());
     };
 
-    change.replies.push(result_reply(&result));
-    change.replies.extend(reward_packets);
+    // L950: paid now; shown as the client plays it: the fish fights, is pulled up to the rod
+    // (result 4), then held up with its banner while the bag fills (result 5 and the rewards).
+    let pulled_at = now_ms.saturating_add(CONTENT.timing.fight_ms);
+    let mut held_up = vec![result_reply(&result)];
+    held_up.extend(reward_packets);
+    tracked.landing = vec![
+        (pulled_at, vec![result_reply(&reel_up)]),
+        (pulled_at.saturating_add(CONTENT.timing.reel_up_ms), held_up),
+    ];
     change.quest_events.push(QuestEvent::CollectItem {
         item_id: definition_id,
         quantity: 1,
@@ -1800,6 +1851,10 @@ struct Timing {
     bite_delay_ms: u64,
     nibble_ms: u64,
     reel_window_ms: u64,
+    /// L950: after the reel-in, the fish fights this long before it is pulled up (result 4), and
+    /// comes up this long before it is held up (result 5).
+    fight_ms: u64,
+    reel_up_ms: u64,
     catch_chance: f32,
     line_snap_chance: f32,
     source: String,
@@ -1839,14 +1894,21 @@ struct Models {
     /// The Fish Finder's highlight on a picked fish's school by rarity 1, 2 and 3 or more:
     /// green, yellow, red (`BBE_PFX_fishing_fishfinder_*`).
     finder_effects: [i32; 3],
+    /// L950: the composite effect played when a fish is held up.
+    catch_effect: i32,
 }
 
 impl Models {
     /// The client looks every id up unchecked, so each must be positive; motion is a sanity
     /// bound (R), which also refuses NaN and infinities.
     fn valid(&self) -> bool {
-        [self.bobber, self.run_header, self.school_effect]
-            .iter()
+        [
+            self.bobber,
+            self.run_header,
+            self.school_effect,
+            self.catch_effect,
+        ]
+        .iter()
             .chain(&self.fish_by_grade)
             .chain(&self.finder_effects)
             .all(|id| *id > 0)

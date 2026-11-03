@@ -8,9 +8,11 @@
     "bite_delay_ms": 1500,
     "nibble_ms": 900,
     "reel_window_ms": 7000,
+    "fight_ms": 1900,
+    "reel_up_ms": 1800,
     "catch_chance": 1.0,
     "line_snap_chance": 0.0,
-    "source": "R: no original fishing timing or outcome probabilities are sent by the client."
+    "source": "R: no original fishing timing or outcome probabilities are sent by the client. L950: fight_ms and reel_up_ms are the Lxzxrus Free-Realms-Server fork's native-tested FishingSession.FightMs (the client pulls a fish up only after its ~1.7 s fight) and ReelUpMs."
   },
   "registration": {
     "player_words": [
@@ -69,6 +71,7 @@
       16087,
       16085
     ],
+    "catch_effect": 15880,
     "source_tags": {
       "school_effect": "client ActorCompositeEffectDefinitions.xml 15777 BBE_PFX_fishing_school; the played Sanctuary fork (BubbaJoeX 1ff876a FishingRules.SchoolEffectId) sends it in 138/11 so the client plays it on the school's first model",
       "finder_effects": "client ActorCompositeEffectDefinitions.xml 16086 BBE_PFX_fishing_fishfinder_green, 16087 _yellow, 16085 _red; R: the rarity pairing 1 green, 2 yellow, 3 and up red is the played fork's FishFinderEffectId",
@@ -76,7 +79,8 @@
       "run_header": "R: 138/18 header model, the lure drawn at the hook and read unchecked at 0x00b6da36 when the head record +0x30 (on_hook) is 0, so unused while we send 1; client Models.txt 1673 sg_fishing_lure_bbe.adr; the lure choice is a hint from Lxzxrus 75f7d95 FishingSession.cs HookLureModelId",
       "fish_by_grade": "R: client Models.txt 1670 fishing_thin_fish_bbe, 1671 fishing_medium_fish_bbe, 1672 fishing_fat_fish_bbe, for size grades 1-4; the grade pairing is not recovered. The 138/3 integer list is the distinct ids here: the client creates each model actor at the origin on registration (played register response, Lxzxrus FishingSession.FishModelIds).",
       "fish_motion": "R: 138/18 record floats +0x34..+0x58 (reader 0x00b67550, copied to the fish at 0x00b6d749); values are a hint from Lxzxrus 37ef175 docs/research/fishing/FISHING_RE_NOTES.md:240-245 ('lively'); integers freeze the fish",
-      "fish_motion_tail": "R: 138/18 record float +0x5c (read by 0x008d53b0); same hint"
+      "fish_motion_tail": "R: 138/18 record float +0x5c (read by 0x008d53b0); same hint",
+      "catch_effect": "L950: the composite effect the Lxzxrus Free-Realms-Server fork plays when a fish is held up (FishingCatch.FishEffectId 15880; 15881 for its treasure chest), sent in 138/14 at +0x74"
     }
   },
   "sizes": [

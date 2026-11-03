@@ -310,6 +310,15 @@ impl Rig {
         self.game.tick(character, now).expect("world tick");
     }
 
+    /// L950: reel in, then let the catch show (its fight, then the reel-up) and gather what went out.
+    fn reel_landed(&mut self, at: u64) -> Outcome {
+        let mut caught = self.send_at(&reel(ACTOR), at).expect("reel accepted");
+        for later in [at + 1_900, at + 3_700] {
+            caught.replies.extend(self.tick(later));
+        }
+        caught
+    }
+
     fn interact_at(&mut self, target: u64) -> Outcome {
         let now = self.stamp();
         interact(&mut self.game, &self.character, target, now)
@@ -898,9 +907,7 @@ fn learning_then_catching_and_turning_in_pays_once() {
 
     let instance = start_round(&mut rig);
     cast_and_hook(&mut rig);
-    let caught = rig
-        .send_at(&reel(ACTOR), FISH_T0 + 2_420)
-        .expect("reel accepted");
+    let caught = rig.reel_landed(FISH_T0 + 2_420);
     assert!(
         find(&caught.replies, &[138, 0, 14, 0]).is_some(),
         "the paid catch sends the 138/14 result"
@@ -1006,9 +1013,7 @@ fn a_quit_escape_or_disconnect_does_not_count_the_catch() {
     // The chapter is still playable after every failure.
     let instance = start_round(&mut rig);
     cast_and_hook(&mut rig);
-    let caught = rig
-        .send_at(&reel(ACTOR), FISH_T0 + 2_420)
-        .expect("reel accepted");
+    let caught = rig.reel_landed(FISH_T0 + 2_420);
     assert!(find(&caught.replies, &[138, 0, 14, 0]).is_some());
     assert_eq!(rig.progress(TESTING_THE_WATERS).unwrap().counts, [1, 0]);
     leave_round(&mut rig, instance);
@@ -1112,9 +1117,7 @@ fn a_forged_or_missing_completion_changes_nothing() {
     assert_eq!(rig.progress(TESTING_THE_WATERS).unwrap().counts, [0, 0]);
 
     // The forged frames did not damage the live round: the real catch still counts.
-    let caught = rig
-        .send_at(&reel(ACTOR), FISH_T0 + 2_440)
-        .expect("reel accepted");
+    let caught = rig.reel_landed(FISH_T0 + 2_440);
     assert!(find(&caught.replies, &[138, 0, 14, 0]).is_some());
     assert_eq!(rig.progress(TESTING_THE_WATERS).unwrap().counts, [1, 0]);
     assert_eq!(rig.coins(), coins, "the catch pays no coins");
@@ -1282,9 +1285,7 @@ fn two_independent_sessions_fish_the_same_spot() {
     // The first player quits; the second still lands the same round.
     leave_round(&mut first, first_instance);
     assert_eq!(first.fishing_items(), 0);
-    let caught = second
-        .send_at(&reel(ACTOR), FISH_T0 + 2_420)
-        .expect("reel accepted");
+    let caught = second.reel_landed(FISH_T0 + 2_420);
     assert!(find(&caught.replies, &[138, 0, 14, 0]).is_some());
     assert_eq!(second.fishing_items(), 1);
     leave_round(&mut second, second_instance);

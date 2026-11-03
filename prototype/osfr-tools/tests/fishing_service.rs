@@ -154,21 +154,36 @@ fn registration_cast_bite_reel_catch_has_exact_messages_and_one_item() {
     assert_eq!(service.phase(PLAYER), Some(Phase::Reeling));
 
     let caught = service.handle(&reel_request(), PLAYER, T0 + 2420).unwrap();
+    // L950: paid at the reel-in, shown as the client plays it (Lxzxrus fork): the fish fights
+    // 1.9 s, is pulled up to the rod (result 4), and 1.8 s later is held up with its banner
+    // (result 5) while the rewards grant inventory and display.
+    assert!(caught.replies.is_empty() && caught.paid);
+    assert!(service.tick(PLAYER, T0 + 2420 + 1899).unwrap().replies.is_empty());
+    let pulled = service.tick(PLAYER, T0 + 2420 + 1900).unwrap();
+    assert_eq!(packet_ids(&pulled), vec![(138, 14)]);
+    let held = service.tick(PLAYER, T0 + 2420 + 3700).unwrap();
     assert_eq!(
-        packet_ids(&caught),
+        packet_ids(&held),
         vec![(138, 14), (38, 2), (50, 1)],
         "sub 14 drives the client catch card; rewards then grant inventory and display"
     );
-    match ServerPacket::decode_known(Sub::Result, &caught.replies[0][4..]).unwrap() {
-        ServerPacket::Result { body } => {
-            assert_eq!(body.at_18, 5);
-            assert_eq!(body.at_1c, false);
-            assert_ne!(body.at_20, 0);
-            assert!((1..=4).contains(&body.at_3c));
-            assert!(body.at_38.is_finite());
+    let result = |change: &osfr_tools::fishing_service::Change| {
+        match ServerPacket::decode_known(Sub::Result, &change.replies[0][4..]).unwrap() {
+            ServerPacket::Result { body } => body,
+            packet => panic!("expected catch result, got {packet:?}"),
         }
-        packet => panic!("expected catch result, got {packet:?}"),
-    }
+    };
+    let up = result(&pulled);
+    assert_eq!(up.at_18, 4, "pulled up");
+    assert!((1670..=1672).contains(&up.at_50), "the fish model on the line");
+    let body = result(&held);
+    assert_eq!(body.at_18, 5);
+    assert_eq!(body.at_1c, false);
+    assert_ne!(body.at_20, 0);
+    assert!((1..=4).contains(&body.at_3c));
+    assert!(body.at_38.is_finite());
+    assert_eq!((body.at_50, body.at_74), (up.at_50, 15880), "held up with its effect");
+    assert_eq!(body.at_78, body.at_3c, "the held model's size");
     let reward = service.reward_state(PLAYER).unwrap();
     assert_eq!(reward.inventory.state().items.len(), 1);
     assert_eq!(reward.inventory.state().items[0].definition_id, 100);

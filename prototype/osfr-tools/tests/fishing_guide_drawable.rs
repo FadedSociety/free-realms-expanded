@@ -539,12 +539,17 @@ fn a_trip_can_be_quit_and_a_reconnect_releases_the_round() {
     let registered = player.send(&register(ACTOR));
     assert!(find(&registered.replies, &[138, 0, 3, 0]).is_some());
     player.cast_and_hook();
-    let caught = send(
+    let mut caught = send(
         &mut player.game,
         &player.character,
         &reel(ACTOR),
         FISH_T0 + 2_420,
     );
+    // L950: the catch shows after the fish's fight and reel-up.
+    for at in [FISH_T0 + 2_420 + 1_900, FISH_T0 + 2_420 + 3_700] {
+        let landed = player.game.tick(&player.character, at).expect("world tick");
+        caught.replies.extend(landed.replies);
+    }
     assert!(find(&caught.replies, &[138, 0, 14, 0]).is_some());
     assert_eq!(player.fish_held(), 1, "one catch, paid by the server");
     let xp = profile_xp(&player.game, FISHERMAN_PROFILE);
