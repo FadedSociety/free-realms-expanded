@@ -1005,8 +1005,16 @@ fn the_release_overlay_is_publishable() {
     assert!(combat.get("template_file").is_none());
 
     let profiles = read_json(&release.join("profiles.json"));
-    // L933: was `{}`; the Fisherman's kit is the one starter entry (T846 moves the rest).
-    assert_eq!(profiles["starter_items"], fisherman_starter_items());
+    // L933: was `{}`; the Fisherman's kit keeps its rod. L953: every job with FreeRealms-Legacy
+    // defaults has its kit (data, so the shape is checked, not every id).
+    let kits = profiles["starter_items"].as_object().unwrap();
+    assert_eq!(kits["137"], fisherman_starter_items()["137"]);
+    let jobs: std::collections::BTreeSet<i64> = kits.keys().map(|k| k.parse().unwrap()).collect();
+    assert_eq!(
+        jobs,
+        [2, 4, 11, 12, 14, 16, 32, 35, 43, 45, 48, 49, 52, 137].into(),
+        "a kit per job with Legacy defaults (Adventurer and Card Duelist have none)"
+    );
     assert!(profiles["provenance"].get("starter_definitions").is_none());
 
     let inventory = read_json(&release.join("inventory.json"));

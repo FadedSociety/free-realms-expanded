@@ -611,6 +611,17 @@ impl Inventory {
         Some(self.content.definitions.get(&definition_id)?.slot)
     }
 
+    /// L953: who may wear this item (0 anyone, 1 boys, 2 girls); `None` when it is not defined.
+    pub fn definition_gender(&self, definition_id: i32) -> Option<i32> {
+        Some(
+            self.content
+                .definitions
+                .get(&definition_id)?
+                .requirement
+                .gender,
+        )
+    }
+
     /// How the catalogue draws this item (the fields `write_attachment` sends); `None` when the
     /// loaded catalogue does not define it.
     pub fn look(&self, definition_id: i32) -> Option<ItemLook> {

@@ -42,8 +42,11 @@ impl Gameplay {
         if profiles.active() == job {
             return Ok(());
         }
-        if profiles.unlock(job)? {
-            self.give_starter_outfit(job, false, out)?;
+        // L953: a job unlocked bare (before every job had a kit) is dressed too, from what the
+        // player owns first; nothing is granted twice.
+        let first = profiles.unlock(job)?;
+        if first || !self.inventory.has_required_profile_slots(job) {
+            self.give_starter_outfit(job, !first, out)?;
         }
         let mut staged = self.clone();
         let mut switch = Outcome::default();
@@ -109,6 +112,12 @@ impl Gameplay {
             // that cosmetic in the versioned Cooking campaign; older
             // campaigns and original profile records stay compatible.
             if job == 45 && definition == 14794 && self.cooking.is_some() {
+                continue;
+            }
+            // L953: a kit can list a boys' and a girls' piece for one slot; the other gender's
+            // piece is skipped (an unknown gender keeps both, the last equipped wins).
+            let need = self.inventory.definition_gender(definition).unwrap_or(0);
+            if need != 0 && self.gender != 0 && need != self.gender {
                 continue;
             }
             self.give_starter_piece(job, definition, reuse_owned, out)?;
