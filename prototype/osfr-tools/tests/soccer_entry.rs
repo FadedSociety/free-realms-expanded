@@ -1027,3 +1027,71 @@ fn the_shipped_entry_spawn_is_on_the_pitch() {
     let _ = fs::remove_dir_all(&directory);
     assert!(refused.to_string().contains("first position"), "{refused}");
 }
+
+/// L940 (native 2026-11-03): the shipped match spawns each bot as the live server did, its 35/2
+/// actor (own name and model) right before its 76/3, then its 35/9 and 35/20 status 1. The roster
+/// waits for the start and follows the soccer status and the match config: the client's soccer
+/// start deletes every soccer player it already has.
+#[test]
+fn the_shipped_bots_spawn_as_actors_before_their_registration() {
+    let shipped = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/soccer.json");
+    let content = soccer_entry::Content::load(&shipped).unwrap();
+    let human = CharacterState {
+        guid: GUID,
+        zone_id: 0,
+        position: [0.0; 3],
+        rotation: [0.0, 0.0, 1.0],
+    };
+    let activity = content.games()[0].id;
+    let mut session = soccer_entry::Session::begin(&content, activity, &human, None).unwrap();
+    let offer = session.loaded_replies();
+    assert!(
+        !offer.iter().any(|reply| reply.starts_with(&[76, 0, 3, 0])),
+        "the roster waits for the start"
+    );
+    let replies = session
+        .handle_lifecycle(GUID, &lifecycle(5, offer_instance(&offer)), 1_000)
+        .unwrap()
+        .replies;
+    let guid_of = |reply: &[u8]| u64::from_le_bytes(reply[4..12].try_into().unwrap());
+    let first = |head: [u8; 4]| replies.iter().position(|reply| reply.starts_with(&head));
+    let roster = first([76, 0, 3, 0]).expect("roster at the start");
+    assert!(first([35, 0, 20, 0]).unwrap() < roster, "the soccer status first");
+    assert!(first([76, 0, 7, 0]).unwrap() < roster, "the match config first");
+    let human_pose = replies
+        .iter()
+        .find(|reply| reply.starts_with(&[76, 0, 1, 0]) && guid_of(reply) == GUID)
+        .expect("the human is posed with the line-up");
+    let spawn = content.entry_scene().unwrap().position;
+    let posed: Vec<f32> = human_pose[12..24]
+        .chunks_exact(4)
+        .map(|bytes| f32::from_le_bytes(bytes.try_into().unwrap()))
+        .collect();
+    assert_eq!(posed, spawn[..3], "at the entry spawn");
+    // L942: the line-up poses end in the snap flag, or the client never places its own player.
+    assert!(
+        replies
+            .iter()
+            .filter(|reply| reply.starts_with(&[76, 0, 1, 0]))
+            .all(|pose| pose.last() == Some(&1)),
+        "every line-up pose snaps"
+    );
+    let sent = |head: [u8; 4], guid: u64| {
+        replies
+            .iter()
+            .any(|reply| reply.starts_with(&head) && guid_of(reply) == guid)
+    };
+    let mut models = Vec::new();
+    for (index, reply) in replies.iter().enumerate() {
+        if !reply.starts_with(&[76, 0, 3, 0]) || guid_of(reply) == GUID {
+            continue;
+        }
+        let actor = osfr_tools::startup_world::parse_add_npc(&replies[index - 1])
+            .expect("the bot's actor right before its 76/3");
+        assert_eq!(actor.actor_id, guid_of(reply));
+        assert!(sent([35, 0, 9, 0], actor.actor_id), "35/9");
+        assert!(sent([35, 0, 20, 0], actor.actor_id), "35/20");
+        models.push(actor.model_id);
+    }
+    assert_eq!(models, [1415, 1428, 1592, 1434, 1426, 1412, 1436]);
+}

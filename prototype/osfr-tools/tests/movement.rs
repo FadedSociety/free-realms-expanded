@@ -356,7 +356,12 @@ struct ReplayStats {
 /// Runs that recorded a server bug, so their rejects are right, not legitimate movement.
 /// 20261102T073239Z: soccer entered at the (0,0,0) placeholder; the client then put itself on the
 /// pitch (226, 1.1, 212.5), 310 units away, and the gateway rightly rejected it. L921 fixed the entry.
-const BUGGY_SERVER_RUNS: &[&str] = &["client-baseline-20261102T073239Z"];
+/// 20261103T032441Z: soccer line-up poses without the snap flag (fixed in L942); the client left its
+/// player in the pitch corner fence, climbing, and its movement sequence went out of order.
+const BUGGY_SERVER_RUNS: &[&str] = &[
+    "client-baseline-20261102T073239Z",
+    "client-baseline-20261103T032441Z",
+];
 
 #[test]
 fn replay_all_recorded_native_baselines_without_rejecting_legitimate_positions() {

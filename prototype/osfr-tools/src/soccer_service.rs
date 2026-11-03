@@ -314,6 +314,8 @@ fn wrap(packet: SoccerPacket) -> Vec<u8> {
 /// layouts and field values for these events remain open evidence.
 #[derive(Clone, Debug, PartialEq)]
 pub enum ServiceEvent {
+    /// L940: one of the live server's match setup records (`Setup`), sent as captured.
+    Setup(SoccerPacket),
     /// R server-assigned roster entry.
     Registered { player: u64, marker: [u8; 2] },
     /// R server-assigned team/slot for one player.
@@ -350,6 +352,9 @@ pub enum ServiceEvent {
         facing: [f32; 2],
         time: f32,
         speed: f32,
+        /// L942: the flag byte. The live server set it only on the opening line-up (every player,
+        /// the human included); the client then places the player there, its own one too.
+        snap: bool,
     },
 }
 
@@ -357,6 +362,7 @@ impl ServiceEvent {
     /// The codec packet layout selected by this R event.
     pub fn packet(&self) -> SoccerPacket {
         match self {
+            ServiceEvent::Setup(packet) => packet.clone(),
             ServiceEvent::Registered { player, marker } => SoccerPacket::RegisterPlayer {
                 player: *player,
                 marker: *marker,
@@ -409,8 +415,9 @@ impl ServiceEvent {
                 facing,
                 time,
                 speed,
+                snap,
             } => {
-                // w 1.0, facing and move direction as float4s, time, speed, then one zero byte.
+                // w 1.0, facing and move direction as float4s, time, speed, then the snap flag.
                 let direction = [facing[0], 0.0, facing[1], 0.0];
                 let values = [1.0f32]
                     .into_iter()
@@ -421,6 +428,7 @@ impl ServiceEvent {
                 for (slot, value) in bytes.chunks_exact_mut(4).zip(values) {
                     slot.copy_from_slice(&value.to_le_bytes());
                 }
+                bytes[44] = u8::from(*snap);
                 SoccerPacket::UpdatePlayerPos {
                     player: *player,
                     position: *position,
@@ -491,6 +499,44 @@ fn unsupported_reason(packet: &SoccerPacket) -> &'static str {
     }
 }
 
+/// L940: the match setup records the live server sent (live capture `packets_soccer_minigame.pcapng`;
+/// data in `soccer.json` `setup`). Without them the client draws no players, ball or HUD after Go
+/// (native 2026-11-03). As captured, after the encounter start (41/2): `76/5 (1,0) (2,0)`, `76/7`,
+/// `76/5 (2,1) (3,1) (4,1)`, the roster, `76/5 (5,n)`, `76/8`, `76/21 + 76/19` per player,
+/// `76/5 (6,n)`, then `(7,n) (11,n) (12,n)`; `(12,n)` again at each restart. Our roster already
+/// went out at Loaded; the client closed when these records came with it (native 2026-11-03), so
+/// the whole block follows our 41/2 at the first kickoff.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Setup {
+    /// 76/7, 221 bytes: the pitch box, tuning floats and the ball model `sg_soccerball_bbe.adr`.
+    pub match_config: Vec<u8>,
+    /// 76/8: the two teams' names and colours.
+    pub teams: Vec<u8>,
+    /// 76/21 tuning floats and 76/19 stat words per role: `human`, `team_0`, `team_1`,
+    /// `keeper_0`, `keeper_1`.
+    pub roles: BTreeMap<String, ([f32; 42], [u32; 9])>,
+}
+
+/// 76/5: `ffffffff`, zeros, the state step and the player count at words 12/13, `ffffffff`.
+/// L942: the opening line-up's poses carry the snap flag (see `ServiceEvent::PlayerPos`).
+fn snapped(mut events: Vec<ServiceEvent>) -> Vec<ServiceEvent> {
+    for event in &mut events {
+        if let ServiceEvent::PlayerPos { snap, .. } = event {
+            *snap = true;
+        }
+    }
+    events
+}
+
+fn game_state(state: u32, players: u32) -> ServiceEvent {
+    let mut words = [0u32; 18];
+    words[0] = u32::MAX;
+    words[12] = state;
+    words[13] = players;
+    words[17] = u32::MAX;
+    ServiceEvent::Setup(SoccerPacket::UpdateGameState { words })
+}
+
 /// A joined session's server-assigned roster entry.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 struct SessionEntry {
@@ -517,6 +563,9 @@ pub struct SoccerService {
     bot_sent: BTreeMap<u64, (f32, [f32; 2], f32)>,
     bots_filled: bool,
     cancelled: bool,
+    /// L940: the live setup records and whether the first kickoff has sent its steps.
+    setup: Option<Setup>,
+    kicked_off: bool,
     /// R relay bookkeeping: last holder reported on the service wire (`0` none).
     last_holder: u64,
 }
@@ -536,8 +585,58 @@ impl SoccerService {
             bot_sent: BTreeMap::new(),
             bots_filled: false,
             cancelled: false,
+            setup: None,
+            kicked_off: false,
             last_holder: NO_HOLDER,
         })
+    }
+
+    /// L940: send the live server's setup records around the roster (see [`Setup`]).
+    pub fn set_setup(&mut self, setup: Setup) {
+        self.setup = Some(setup);
+    }
+
+    fn player_count(&self) -> u32 {
+        u32::try_from(self.authority.players().count()).unwrap_or(u32::MAX)
+    }
+
+    /// L940: the steps and match config before the first roster entry.
+    fn setup_opening(&self) -> Vec<ServiceEvent> {
+        let Some(setup) = &self.setup else { return Vec::new() };
+        let config = SoccerPacket::Unknown { sub: 7, payload: setup.match_config.clone() };
+        vec![
+            game_state(1, 0),
+            game_state(2, 0),
+            ServiceEvent::Setup(config),
+            game_state(2, 1),
+            game_state(3, 1),
+            game_state(4, 1),
+        ]
+    }
+
+    /// L940: after the roster, the teams and every player's 76/21 + 76/19 by role.
+    fn setup_roster(&self) -> Vec<ServiceEvent> {
+        let Some(setup) = &self.setup else { return Vec::new() };
+        let players = self.player_count();
+        let mut events = vec![
+            game_state(5, players),
+            ServiceEvent::Setup(SoccerPacket::Unknown { sub: 8, payload: setup.teams.clone() }),
+        ];
+        for (id, state) in self.authority.players() {
+            let role = match (self.bots.contains(&id), state.slot) {
+                (false, _) => "human".to_owned(),
+                (true, slot) if slot == crate::soccer_bots::KEEPER_SLOT => format!("keeper_{}", state.team),
+                (true, _) => format!("team_{}", state.team),
+            };
+            let Some((stats, words)) = setup.roles.get(&role) else { continue };
+            events.push(ServiceEvent::Setup(SoccerPacket::SetSoccerPlayerOneTimeStats {
+                player: id,
+                stats: *stats,
+            }));
+            events.push(ServiceEvent::Setup(SoccerPacket::PlayerVariableStats { player: id, words: *words }));
+        }
+        events.push(game_state(6, players));
+        events
     }
 
     pub fn authority(&self) -> &Authority {
@@ -625,9 +724,10 @@ impl SoccerService {
         if self.sessions.contains_key(&session) {
             return Err(invalid("soccer session is already joined"));
         }
+        let mut events = Vec::new();
         self.authority.register(session, team, slot)?;
         self.sessions.insert(session, SessionEntry { team, slot });
-        Ok(vec![
+        events.extend([
             ServiceEvent::Registered {
                 player: session,
                 marker: REGISTER_MARKER,
@@ -637,11 +737,12 @@ impl SoccerService {
                 team,
                 slot,
             },
-        ])
+        ]);
+        Ok(events)
     }
 
-    /// R: fill every open 4v4 roster slot with passive server bots for solo
-    /// testing. Bots have no AI, never submit client intents, and never score.
+    /// R: fill every open 4v4 roster slot with server bots for solo play. Bots
+    /// never submit client intents; with `bot_ai` they play (`soccer_bots`).
     pub fn fill_bots_for_solo(&mut self, session: u64) -> io::Result<Vec<ServiceEvent>> {
         if self.cancelled
             || self.authority.phase() != MatchPhase::Kickoff
@@ -684,7 +785,7 @@ impl SoccerService {
         }
         self.bots_filled = true;
         let lined = crate::soccer_bots::line_up(&mut self.authority, &self.bots)?;
-        events.extend(self.bot_poses(lined, true));
+        events.extend(snapped(self.bot_poses(lined, true)));
         Ok(events)
     }
 
@@ -725,6 +826,7 @@ impl SoccerService {
                     facing,
                     time,
                     speed,
+                    snap: false,
                 });
             }
         }
@@ -911,8 +1013,21 @@ impl SoccerService {
             return Err(invalid("soccer minigame start handshake is incomplete"));
         }
         self.authority.kickoff()?;
+        let mut events = Vec::new();
+        if self.setup.is_some() {
+            let players = self.player_count();
+            if !self.kicked_off {
+                events.extend(self.setup_opening());
+                events.extend(self.setup_roster());
+            }
+            let steps: &[u32] = if self.kicked_off { &[12] } else { &[7, 11, 12] };
+            events.extend(steps.iter().map(|step| game_state(*step, players)));
+        }
+        let opening = !self.kicked_off;
+        self.kicked_off = true;
         let lined = crate::soccer_bots::line_up(&mut self.authority, &self.bots)?;
-        let mut events = self.bot_poses(lined, true);
+        let poses = self.bot_poses(lined, true);
+        events.extend(if opening { snapped(poses) } else { poses });
         events.push(self.game_time());
         Ok(events)
     }

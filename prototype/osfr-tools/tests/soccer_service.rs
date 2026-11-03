@@ -21,7 +21,7 @@ use osfr_tools::zone_transition;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use soccer_service::{
-    AdapterPolicy, R_ENTRY_POSITION, R_ENTRY_ROTATION, REGISTER_MARKER, SCENE_ID, ServiceEvent,
+    AdapterPolicy, R_ENTRY_POSITION, R_ENTRY_ROTATION, REGISTER_MARKER, SCENE_ID, ServiceEvent, Setup,
     SoccerService, emit_packet, entry_frame,
 };
 use std::{
@@ -1080,4 +1080,48 @@ fn bot_ai_poses_carry_the_live_tail_and_half_time_lines_the_bots_up_again() {
             "the keeper swaps ends: {after:?}"
         );
     }
+}
+
+/// L940 (native 2026-11-03): with the live setup records, the first kickoff sends them in the live
+/// order (state steps, the match config, the teams, every player's 76/21 + 76/19 by role, then the
+/// kickoff steps 7, 11, 12); the roster itself went out before, at Loaded, without them.
+#[test]
+fn setup_records_follow_the_encounter_start_in_the_live_order() {
+    let mut service = service();
+    let roles = ["human", "team_0", "team_1", "keeper_0", "keeper_1"]
+        .into_iter()
+        .enumerate()
+        .map(|(index, role)| (role.to_owned(), ([index as f32; 42], [index as u32; 9])))
+        .collect();
+    service.set_setup(Setup { match_config: vec![7; 221], teams: vec![8; 38], roles });
+    let mut roster = service.join(KICKER, 0, 0).unwrap();
+    roster.extend(service.fill_bots_for_solo(KICKER).unwrap());
+    assert!(
+        roster.iter().all(|event| !matches!(event, ServiceEvent::Setup(_))),
+        "nothing of the setup goes out with the roster at Loaded"
+    );
+    let events = offer_and_start(&mut service, KICKER);
+    let state = |event: &ServiceEvent| match event.packet() {
+        SoccerPacket::UpdateGameState { words } => Some((words[12], words[13])),
+        _ => None,
+    };
+    let subs: Vec<String> = events
+        .iter()
+        .filter(|event| !matches!(event, ServiceEvent::PlayerPos { .. }))
+        .map(|event| match state(event) {
+            Some((step, players)) => format!("5({step},{players})"),
+            None => event.inner()[2].to_string(),
+        })
+        .collect();
+    let stats = ["21", "19"].repeat(8);
+    let mut expected = vec!["5(1,0)", "5(2,0)", "7", "5(2,1)", "5(3,1)", "5(4,1)", "5(5,8)", "8"];
+    expected.extend(stats);
+    expected.extend(["5(6,8)", "5(7,8)", "5(11,8)", "5(12,8)", "23"]);
+    assert_eq!(subs, expected);
+    // The human gets the human row; a keeper bot its side's keeper row.
+    let human_stats = events.iter().find_map(|event| match event.packet() {
+        SoccerPacket::SetSoccerPlayerOneTimeStats { player: KICKER, stats } => Some(stats[0]),
+        _ => None,
+    });
+    assert_eq!(human_stats, Some(0.0));
 }

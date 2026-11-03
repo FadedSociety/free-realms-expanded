@@ -209,5 +209,26 @@
   "reward": {
     "coins": 10,
     "job_xp": {}
+  },
+  "setup": {
+    "source": "L940: the live server's match setup records, live capture OpenSourceFreeRealms ofrserver Packets/packets_soccer_minigame.pcapng (server to client, family 76): 76/7 match config (221 bytes: pitch box 200.4..253 x 195..230.81, tuning floats, ball model sg_soccerball_bbe.adr, ball spawn 226.7 / 2.0 / 212.9) and 76/8 teams (sweetpea / ocean) as sent; 76/21 tuning floats (fields 36 and 41 are small integers carried as float bits) and 76/19 stat words of each role as sent to the human (team 0 slot 0), its teammates (team_0), the other side (team_1) and the two keepers (slot 3). Native 2026-11-03: without them the client draws no players, ball or HUD after Go.",
+    "match_config_hex": "666648430000434300007d435ccf6643cdcccc3ecdcccc3e0000803e0000003fcdcc0c3f9a99193fc3f5283f0000c0400000004100001041c3f5a83ecdcc4c3e0000803e9a99993e0000803e9a99593f0000603fc3f5683fcdcc8c3ec3f5283f0000003f6666863f0000c03f0000e8c00000f0c0000000c10000803f1500000073675f736f6363657262616c6c5f6262652e6164720000403f0000003f33b3624300000040aee754430000803f0000803e85ebd13e3333333fcdcc4c3e0000003f000000410000003ecdcccc3d3333733fc03e0000c13e000000000040",
+    "teams_hex": "080000007377656574706561050000006f6365616eff6423000f32ff00c1450600be45060000",
+    "roles": {
+      "human": {"one_time": [6.5, 6.0, 8.0, 0.5, 6.0, 6.25, 5.85, 6.0, 5.7, 8.0, 0.05, 4.05, 15.0, 2e+01, 15.0, 2e+01, 2e+01, 25.0, 15.0, 4e+01, 0.1, 0.25, -0.1, 0.8, 5.4e+02, 5e+01, 0.65, 0.5, 0.8, 1.25, 1.5, 0.0, 0.0, 1e+01, 2.5, 2e+01, 1.4e-43, 2e+01, -0.75, 15.0, 1.0, 8.555e-42], "variable": [8, 8, 12, 8, 2, 0, 0, 0, 0]},
+      "team_0": {"one_time": [6.65, 6.65, 8.0, 0.5, 6.0, 6.25, 5.7, 6.0, 6.5, 8.0, 0.05, 2.0, 15.0, 2e+01, 15.0, 2e+01, 15.0, 25.0, 15.0, 4e+01, 0.1, 0.4, -0.1, 0.8, 9.424778, 0.87266463, 0.55, 0.5, 0.8, 1.25, 1.0, 0.0, 0.0, 1e+01, 2.5, 2e+01, 1.4e-43, 2e+01, -0.75, 15.0, 1.0, 8.555e-42], "variable": [8, 8, 8, 8, 2, 0, 0, 0, 0]},
+      "keeper_0": {"one_time": [4.0, 4.0, 5.0, 0.5, 5.0, 4.0, 4.0, 4.0, 8.0, 8.0, 0.05, 0.33, 22.5, 25.0, 22.5, 25.0, 22.5, 25.0, 22.5, 25.0, 0.425, 0.425, 0.425, 1.0, 3.1415927, 0.7853982, 0.65, 0.5, 0.8, 1.0, 1e+01, 0.0, 0.0, 1e+01, 2.5, 2e+01, 1.4e-43, 2e+01, -0.75, 15.0, 1.0, 8.555e-42], "variable": [0, 0, 0, 200, 0, 0, 0, 0, 0]},
+      "team_1": {"one_time": [6.5, 6.5, 8.0, 0.5, 6.0, 6.25, 5.7, 6.0, 6.5, 8.0, 0.05, 2.0, 15.0, 2e+01, 15.0, 2e+01, 15.0, 25.0, 15.0, 4e+01, 0.1, 0.4, -0.1, 0.8, 9.424778, 0.87266463, 0.55, 0.5, 0.8, 1.25, 1.0, 0.0, 0.0, 1e+01, 2.5, 2e+01, 1.4e-43, 2e+01, -0.75, 15.0, 1.0, 8.555e-42], "variable": [8, 16, 8, 8, 2, 0, 0, 0, 0]},
+      "keeper_1": {"one_time": [3.0, 4.0, 5.0, 0.5, 5.0, 4.0, 4.0, 4.0, 8.0, 8.0, 0.05, 0.33, 22.5, 25.0, 22.5, 25.0, 22.5, 25.0, 22.5, 25.0, 0.425, 0.425, 0.425, 1.0, 3.1415927, 0.7853982, 0.65, 0.5, 0.8, 1.0, 1e+01, 0.0, 0.0, 1e+01, 2.5, 2e+01, 1.4e-43, 2e+01, -0.75, 15.0, 1.0, 8.555e-42], "variable": [0, 0, 0, 200, 0, 0, 0, 0, 0]}
+    },
+    "bots": [
+      {"name": "Bobo Flamefoot", "team": 0, "slot": 1, "name_string_id": 401726, "model_id": 1415},
+      {"name": "Bigs McKicker", "team": 0, "slot": 2, "name_string_id": 401725, "model_id": 1428},
+      {"name": "Goalster Deedee", "team": 0, "slot": 3, "name_string_id": 401728, "model_id": 1592},
+      {"name": "\"Iron Foot\" Ronnie", "team": 1, "slot": 0, "name_string_id": 401707, "model_id": 1434},
+      {"name": "Snowspurs Leftwing", "team": 1, "slot": 1, "name_string_id": 401712, "model_id": 1426},
+      {"name": "Snowspurs Rightwing", "team": 1, "slot": 2, "name_string_id": 401713, "model_id": 1412},
+      {"name": "Snowhill Goalie", "team": 1, "slot": 3, "name_string_id": 401711, "model_id": 1436}
+    ]
   }
 }

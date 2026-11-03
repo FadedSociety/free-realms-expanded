@@ -23,6 +23,7 @@ use crate::activity_portal::Activity;
 use crate::character_store::CharacterState;
 use crate::minigame::RunState;
 use crate::rewards::{RewardDisplay, RewardGrant, RewardState};
+use crate::soccer::SoccerPacket;
 use crate::soccer_match::{
     Authority, FieldBounds, HalfPolicy, Intent, MatchConfig, MatchPhase, PhysicsConfig,
 };
@@ -160,6 +161,75 @@ struct GateSettings {
     game_id: u32,
 }
 
+/// L940: the roster with each bot's body: its AddNpc right before its 76/3, then its 35/9 and
+/// 35/20 after the roster, the order the live server sent (`packets_soccer_minigame.pcapng`).
+/// Without the actor the client builds the soccer player but draws no body (native 2026-11-03).
+fn with_bot_bodies(
+    service: &SoccerService,
+    bodies: &BTreeMap<(u32, u32), (i32, i32)>,
+    human: u64,
+    roster: &[ServiceEvent],
+) -> io::Result<Vec<Vec<u8>>> {
+    let mut out = Vec::with_capacity(roster.len() + bodies.len() * 3);
+    let mut after = Vec::with_capacity(bodies.len() * 2);
+    for event in roster {
+        if let ServiceEvent::Registered { player, .. } = event
+            && *player != human
+            && let Some(state) = service.player(*player)
+            && let Some(&(name, model)) = bodies.get(&(state.team, state.slot))
+        {
+            // Passive bots (no `bot_ai`) are never lined up; they stand at the kickoff spot.
+            let position = state
+                .position
+                .unwrap_or(service.authority().config().kickoff_spawn);
+            out.push(bot_actor(*player, name, model, position)?);
+            let mut health = [35u16.to_le_bytes(), 9u16.to_le_bytes()].concat();
+            health.extend(player.to_le_bytes());
+            // (R) read as health, max and a third word; the live server sent 100 for all three.
+            for value in [100u32; 3] {
+                health.extend(value.to_le_bytes());
+            }
+            after.push(health);
+            after.push(crate::kart_gateway::player_status(*player, 1));
+        }
+        out.push(event.inner());
+    }
+    out.append(&mut after);
+    Ok(out)
+}
+
+/// L940: a bot's 35/2 with the live server's values; the fields not set here were zero.
+fn bot_actor(guid: u64, name: i32, model: i32, position: [f32; 3]) -> io::Result<Vec<u8>> {
+    let actor = crate::startup_world::NpcSpawn {
+        actor_id: guid,
+        name_string_id: name,
+        model_id: model,
+        chat_bubble_foreground_color: 408_679,
+        chat_bubble_background_color: 13_951_728,
+        chat_bubble_size: 1,
+        scale: 1.0,
+        position: [position[0], position[1], position[2], 1.0],
+        rotation: [0.0, 0.0, 1.0, 0.0],
+        animation_id: 1,
+        interact_range: 100,
+        walk_animation_id: -1,
+        run_animation_id: -1,
+        stand_animation_id: -1,
+        sub_text_name_string_id: -1,
+        area_definition_id: -1,
+        is_interactable: 1,
+        movement_type: 2,
+        active_profile: 8,
+        // (R) unnamed; the live value.
+        unknown_field_68: 3442,
+        ..Default::default()
+    };
+    crate::world::unframe_tunnel(&crate::startup_world::build_add_npc(&actor))
+}
+
+/// L940: the player status word while a soccer match runs: bit 12 (soccer) plus the normal bit 0.
+const SOCCER_STATUS: u32 = 0x1001;
+
 #[derive(Clone, Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Content {
@@ -171,9 +241,85 @@ pub struct Content {
     gates: Option<GateSettings>,
     match_config: MatchSettings,
     reward: RewardSettings,
+    /// L940: the live server's match setup records (see `soccer_service::Setup`).
+    #[serde(default)]
+    setup: Option<SetupSettings>,
 }
 
+/// L940: `soccer.json` `setup`, as captured: 76/7 and 76/8 as hex, 76/21 floats and 76/19 words per role.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SetupSettings {
+    #[serde(default, rename = "source")]
+    _source: String,
+    match_config_hex: String,
+    teams_hex: String,
+    roles: std::collections::BTreeMap<String, RoleSetup>,
+    /// Each bot's name and model by team and slot, as the live server spawned them.
+    #[serde(default)]
+    bots: Vec<BotBody>,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct BotBody {
+    #[serde(default, rename = "name")]
+    _name: String,
+    team: u32,
+    slot: u32,
+    name_string_id: i32,
+    model_id: i32,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct RoleSetup {
+    one_time: Vec<f32>,
+    variable: Vec<u32>,
+}
+
+const SETUP_ROLES: [&str; 5] = ["human", "team_0", "team_1", "keeper_0", "keeper_1"];
+
 impl Content {
+    /// L940: the setup records, checked: every role present with 42 finite floats and 9 words.
+    pub fn setup(&self) -> io::Result<Option<crate::soccer_service::Setup>> {
+        let Some(setup) = &self.setup else { return Ok(None) };
+        let decode = crate::startup_snapshot::decode_hex;
+        let mut roles = std::collections::BTreeMap::new();
+        for role in SETUP_ROLES {
+            let entry = setup.roles.get(role).ok_or_else(|| invalid("soccer setup role missing"))?;
+            let stats: [f32; 42] = entry.one_time.as_slice().try_into().map_err(|_| invalid("soccer setup floats"))?;
+            let words: [u32; 9] = entry.variable.as_slice().try_into().map_err(|_| invalid("soccer setup words"))?;
+            if !stats.iter().all(|value| value.is_finite()) {
+                return Err(invalid("soccer setup floats"));
+            }
+            roles.insert(role.to_owned(), (stats, words));
+        }
+        let mut seats = std::collections::BTreeSet::new();
+        for bot in &setup.bots {
+            if bot.team > 1
+                || bot.slot >= crate::soccer_match::TEAM_SLOT_COUNT
+                || !seats.insert((bot.team, bot.slot))
+            {
+                return Err(invalid("soccer setup bot seat"));
+            }
+        }
+        Ok(Some(crate::soccer_service::Setup {
+            match_config: decode(&setup.match_config_hex)?,
+            teams: decode(&setup.teams_hex)?,
+            roles,
+        }))
+    }
+
+    /// L940: each bot's (name string, model) by (team, slot).
+    fn bot_bodies(&self) -> BTreeMap<(u32, u32), (i32, i32)> {
+        self.setup
+            .iter()
+            .flat_map(|setup| &setup.bots)
+            .map(|bot| ((bot.team, bot.slot), (bot.name_string_id, bot.model_id)))
+            .collect()
+    }
+
     pub fn load(path: &Path) -> io::Result<Self> {
         let mut bytes = Vec::new();
         fs::File::open(path)?
@@ -308,6 +454,7 @@ impl Content {
         if self.schema_version != SCHEMA_VERSION {
             return Err(invalid("soccer content schema version is not supported"));
         }
+        self.setup()?;
         if self.games.is_empty() || self.games.len() > MAX_GAMES {
             return Err(invalid("soccer content needs 1..=32 games"));
         }
@@ -370,8 +517,10 @@ impl Content {
 pub struct Session {
     service: SoccerService,
     game: Game,
-    human: u64,
-    pending: Vec<ServiceEvent>,
+    pub(crate) human: u64,
+    pending: Vec<Vec<u8>>,
+    /// L940: with the live setup the roster waits for the start (see `handle_lifecycle`).
+    hold_roster: bool,
     offer: Vec<Vec<u8>>,
     /// The server-owned arena scene this match entered; the gateway stages it
     /// and reports it as the runtime zone while the session lives.
@@ -423,8 +572,27 @@ impl Session {
             .ok_or_else(|| invalid("soccer activity is not configured"))?;
         let scene = content.entry_scene()?;
         let mut service = SoccerService::new(content.config(), content.policy())?;
-        let mut pending = service.join(character.guid, 0, 0)?;
-        pending.extend(service.fill_bots_for_solo(character.guid)?);
+        let hold_roster = match content.setup()? {
+            Some(setup) => {
+                service.set_setup(setup);
+                true
+            }
+            None => false,
+        };
+        let mut roster = service.join(character.guid, 0, 0)?;
+        roster.extend(service.fill_bots_for_solo(character.guid)?);
+        // L940: the live server posed the human at its spawn with the bots' line-up; without it the
+        // client picks its own spot 8 m away and every pose it sends is refused (native 2026-11-03).
+        let [x, y, z, _] = scene.position;
+        roster.push(ServiceEvent::PlayerPos {
+            player: character.guid,
+            position: [x, y, z],
+            facing: [0.0, 0.0],
+            time: service.authority().server_time(),
+            speed: 0.0,
+            snap: true,
+        });
+        let pending = with_bot_bodies(&service, &content.bot_bodies(), character.guid, &roster)?;
         let offered = service.offer_minigame(
             character.guid,
             game.id as i32,
@@ -439,6 +607,7 @@ impl Session {
             game,
             human: character.guid,
             pending,
+            hold_roster,
             offer: offered.replies,
             scene,
             sequence: 0,
@@ -450,9 +619,13 @@ impl Session {
         })
     }
 
-    /// Roster, team and 39/16 offer already staged for the client after Loaded.
+    /// The 39/16 offer staged for the client after Loaded, with the roster unless it is held.
     pub fn loaded_replies(&mut self) -> Vec<Vec<u8>> {
-        let mut replies: Vec<_> = self.pending.drain(..).map(|event| event.inner()).collect();
+        let mut replies = if self.hold_roster {
+            Vec::new()
+        } else {
+            std::mem::take(&mut self.pending)
+        };
         replies.append(&mut self.offer);
         replies
     }
@@ -512,13 +685,35 @@ impl Session {
             .extend(change.soccer_events.iter().map(ServiceEvent::inner));
         if result.state == Some(RunState::Starting) {
             let started = service.mark_started(guid)?;
+            // L940: player status bit 12 (0x1000) puts the client in soccer: its status handler
+            // (0x932d68) then runs the soccer start (sub_B7E2D0), which builds the local
+            // "SoccerPlayerLocal". Without it the pitch stays empty and the HUD crashes on the setup.
             result
                 .replies
-                .extend(started.iter().map(ServiceEvent::inner));
+                .push(crate::kart_gateway::player_status(guid, SOCCER_STATUS));
+            // That soccer start also deletes every soccer player the client already has, so a held
+            // roster goes after the status, where the live server sent it: after state step 4.
+            let split = started
+                .iter()
+                .position(|event| {
+                    matches!(event.packet(), SoccerPacket::UpdateGameState { words } if words[12] == 5)
+                })
+                .unwrap_or(0);
+            result
+                .replies
+                .extend(started[..split].iter().map(ServiceEvent::inner));
+            result.replies.append(&mut self.pending);
+            result
+                .replies
+                .extend(started[split..].iter().map(ServiceEvent::inner));
             result.state = service.run_state(guid);
             if result.state == Some(RunState::Playing) {
                 self.last_tick_ms = Some(now_ms);
             }
+        }
+        // L940: leaving the match clears the soccer status bit again.
+        if matches!(result.state, Some(RunState::Cancelled | RunState::Closed)) {
+            result.replies.push(crate::kart_gateway::player_status(guid, 1));
         }
         self.service = service;
         Ok(result)
