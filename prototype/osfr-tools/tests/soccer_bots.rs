@@ -360,6 +360,53 @@ fn a_pass_target_runs_to_meet_the_ball() {
     );
 }
 
+/// L956: a carrier's choice, read off the pitch (`soccer_eval`): its kick, if it kicked.
+fn carrier_kick(carrier_at: [f32; 3], defenders: &[[f32; 3]], mate_at: [f32; 3]) -> Option<KickKind> {
+    let (mut game, bots) = match_with_bots();
+    soccer_bots::line_up(&mut game, &bots).unwrap();
+    let (carrier, mate) = (0x105, 0x106);
+    // It takes the ball at the kickoff spot, then carries it where the test wants it.
+    game.place_server_player(carrier, CENTRE).unwrap();
+    game.advance(0.02).unwrap();
+    assert_eq!(game.possession(), Some(carrier));
+    game.place_server_player(carrier, carrier_at).unwrap();
+    game.advance(0.02).unwrap();
+    assert_eq!(game.possession(), Some(carrier));
+    game.place_server_player(mate, mate_at).unwrap();
+    // Team 0's field players.
+    for (&at, defender) in defenders.iter().zip(0x101..0x103) {
+        game.place_server_player(defender, at).unwrap();
+    }
+    let mut memory = BTreeMap::new();
+    // No tackle in the way of the choice.
+    soccer_bots::juke(&mut memory, carrier, game.server_time());
+    let events = soccer_bots::step(&mut game, &bots, &mut memory, 0.05).unwrap();
+    events.iter().find_map(|event| match event {
+        BotEvent::Kicked { player, kind, .. } if *player == carrier => Some(*kind),
+        _ => None,
+    })
+}
+
+#[test]
+fn a_carrier_shoots_through_an_open_line_and_passes_when_pressed() {
+    let game = match_with_bots().0;
+    let goal = game.attack_goal(1);
+    let sign = game.attack_sign(1);
+    // 10 m out (past half the range, so only an open line shoots), the team-mate far off.
+    let out = [goal[0] - sign * 10.0, 0.0, goal[2]];
+    let far_mate = [goal[0] - sign * 20.0, 0.0, goal[2] + 10.0];
+    assert_eq!(carrier_kick(out, &[], far_mate), Some(KickKind::Shot));
+    // A defender just in front on each post's line closes both.
+    let posts = [-0.5, 0.5].map(|z| [out[0] + sign * 0.8, 0.0, out[2] + z]);
+    assert_ne!(carrier_kick(out, &posts, far_mate), Some(KickKind::Shot));
+    // At the centre with a defender 1.8 m off its shoulder and a free team-mate 8 m ahead it
+    // passes; unpressed, it keeps the ball.
+    let mate = [CENTRE[0] + sign * 8.0, 0.0, CENTRE[2] - 3.0];
+    let presser = [CENTRE[0], 0.0, CENTRE[2] + 1.8];
+    assert_eq!(carrier_kick(CENTRE, &[presser], mate), Some(KickKind::Pass));
+    assert_eq!(carrier_kick(CENTRE, &[], mate), None);
+}
+
 /// L949: a shot past the keeper's dive goes in.
 #[test]
 fn a_shot_beyond_the_keepers_dive_goes_in() {

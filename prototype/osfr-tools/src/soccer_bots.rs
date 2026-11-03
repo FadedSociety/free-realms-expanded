@@ -9,6 +9,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::io;
 
+use crate::soccer_eval;
 use crate::soccer_match::{Authority, Intent, KickKind, MatchPhase, TEAM_SLOT_COUNT};
 
 /// Field player run speed (live: 6.5-6.65).
@@ -29,8 +30,28 @@ pub const SHOOT_RANGE: f32 = 14.0;
 /// Shot and pass power (R; the match caps kicks at `max_kick_power`).
 pub const SHOT_POWER: f32 = 22.0;
 pub const PASS_POWER: f32 = 14.0;
-/// An opponent this close puts the carrier under pressure, so it passes forward (R).
-pub const PRESSURE_RANGE: f32 = 5.0;
+/// L956: a carrier shoots in range only through a line this open (`soccer_eval::passing_odds`,
+/// field players only), or from half the range regardless (R).
+const SHOT_ODDS: f32 = 0.5;
+/// L956: a pass goes when its rating beats the carrier's own situation by this much, weighing the
+/// goal gain this much against safety (R).
+const PASS_MARGIN: f32 = 0.3;
+const OPPORTUNISM: f32 = 0.5;
+/// L956: a dribble looks this far ahead for space, and leans goalward by this much (R).
+const DRIBBLE_LOOK: f32 = 3.0;
+const DRIBBLE_GOALWARD: f32 = 0.3;
+/// L956: a marker stands this far goal-side of its man (R).
+const MARK_GAP: f32 = 2.0;
+/// L956: a support or marking run ends this close to its spot (R): a marker never quite reaches a
+/// spot that moves with its man, and kept re-aiming.
+const SUPPORT_ARRIVE: f32 = 1.0;
+/// L956: how often a supporting or marking bot re-picks its spot (R).
+const SUPPORT_REPLAN: f32 = 0.5;
+/// L956: a supporting bot goes this share of the way to the ball along the pitch when its side has
+/// it, this share otherwise, and this share across (R).
+const ATTACK_PUSH: f32 = 0.7;
+const SHAPE_PUSH: f32 = 0.5;
+const SIDE_PULL: f32 = 0.3;
 /// Seconds between one bot's tackles (R), so a tackle can be escaped. L955: 1.5 let the bots steal
 /// back and forth every two seconds (owner playtest: 169 steals a match).
 pub const TACKLE_COOLDOWN: f32 = 3.0;
@@ -152,6 +173,22 @@ pub struct BotMemory {
     pub shadowing: bool,
     /// L955: when this player's next juke counts (`JUKE_COOLDOWN`).
     pub juke_ready_at: f32,
+    /// L956: the opponent this bot marks while its side defends.
+    pub mark: Option<u64>,
+    /// L956: a supporting bot's spot and when it was picked.
+    pub support_spot: Option<([f32; 3], f32)>,
+    /// L956: a carrier's dribble direction and when it was picked.
+    pub dribble: Option<([f32; 2], f32)>,
+}
+
+impl BotMemory {
+    /// L956: drops the shape plans (man, spot, dribble). The match clock stands still between a
+    /// goal or the whistle and the kickoff, so a plan from before a line-up still looked fresh.
+    pub fn forget_plans(&mut self) {
+        self.mark = None;
+        self.support_spot = None;
+        self.dribble = None;
+    }
 }
 
 /// L955: whether `player` may be tackled now (not just won the ball, not juking).
@@ -365,13 +402,24 @@ pub fn step(
     }
     for &bot in bots {
         let chasing = chaser.iter().flatten().any(|(id, _)| *id == bot);
-        memory.entry(bot).or_default().chasing = chasing;
+        let mind = memory.entry(bot).or_default();
+        mind.chasing = chasing;
+        // L956: a chaser or the carrier marks nobody (a stale man would be taken back later).
+        if chasing || authority.possession() == Some(bot) {
+            mind.mark = None;
+        }
     }
     let roster: Vec<(u64, u32, u32, [f32; 3])> = authority
         .players()
         .filter_map(|(id, s)| s.position.map(|p| (id, s.team, s.slot, p)))
         .collect();
     let mut events = Vec::new();
+    // L956: opponents already marked (each once). Kept men are claimed up front, so a bot earlier
+    // in id order does not take a later bot's man.
+    let mut marked: BTreeSet<u64> = bots
+        .iter()
+        .filter_map(|bot| memory.get(bot).and_then(|m| m.mark))
+        .collect();
     for &bot in bots {
         let Some(state) = authority.player(bot).copied() else {
             continue;
@@ -386,7 +434,8 @@ pub fn step(
             * ratio(stats, |s| s.speed);
         let strength = ratio(stats, |s| s.kick);
         let goal = authority.attack_goal(state.team);
-        let c = authority.config().bounds.centre;
+        let bounds = authority.config().bounds;
+        let c = bounds.centre;
         // Read possession per bot: an earlier bot this step may have tackled or kicked.
         let holder = authority.possession();
         let holder_team = holder.and_then(|id| authority.player(id)).map(|s| s.team);
@@ -527,54 +576,120 @@ pub fn step(
             continue;
         }
 
-        // Carrier: shoot, pass round a blocker, or dribble at goal.
+        // Carrier: shoot through an open line, pass when a team-mate is better placed, or dribble
+        // goalward into space. L956: read with `soccer_eval` (League-Soccer's ratings).
         if holder == Some(bot) {
-            if flat_distance(at, goal) <= SHOOT_RANGE {
-                events.extend(kick(
-                    authority,
-                    bot,
-                    far_post(authority, &roster, state.team, goal, aim_roll(bot, now)),
-                    strength,
-                ));
-                continue;
-            }
-            // Under pressure (an opponent close by), pass forward to the teammate nearest the goal.
-            let pressed = roster.iter().any(|&(_, team, _, p)| {
-                team != state.team && flat_distance(p, at) <= PRESSURE_RANGE
-            });
-            if pressed {
-                let ahead = flat_distance(at, goal);
-                let open = roster
+            let flat = |p: [f32; 3]| [p[0], p[2]];
+            let opponents: Vec<[f32; 2]> = roster
+                .iter()
+                .filter(|r| r.1 != state.team)
+                .map(|r| flat(r.3))
+                .collect();
+            let to_goal = flat_distance(at, goal);
+            if to_goal <= SHOOT_RANGE {
+                let field: Vec<[f32; 2]> = roster
                     .iter()
-                    .filter(|&&(id, team, _, p)| {
-                        // L955: not back to who just passed here, not to a teammate standing still.
-                        let passed_back = memory
-                            .get(&bot)
-                            .and_then(|m| m.passed_by)
-                            .is_some_and(|(by, at)| by == id && now - at < PASS_BACK);
-                        let idle = memory
-                            .get(&id)
-                            .and_then(|m| m.last_at)
-                            .is_some_and(|(_, at)| now - at > IDLE_MATE);
-                        team == state.team
-                            && id != bot
-                            && !passed_back
-                            && !idle
-                            && in_reach(p)
-                            && flat_distance(p, goal) < ahead
-                    })
-                    .min_by(|a, b| flat_distance(a.3, goal).total_cmp(&flat_distance(b.3, goal)));
-                if let Some(&(mate, _, _, mate_at)) = open {
-                    let thrown = pass(authority, bot, mate, mate_at, strength);
-                    if thrown.is_some() {
-                        memory.entry(mate).or_default().passed_by = Some((bot, now));
-                    }
-                    events.extend(thrown);
+                    .filter(|&&(_, team, slot, _)| team != state.team && slot != KEEPER_SLOT)
+                    .map(|r| flat(r.3))
+                    .collect();
+                let aim = far_post(authority, &roster, state.team, goal, aim_roll(bot, now));
+                // The keeper is the dive's business; field players in the line block it.
+                let open = soccer_eval::passing_odds(flat(at), flat(aim), &field) >= SHOT_ODDS;
+                if open || to_goal <= SHOOT_RANGE * 0.5 {
+                    events.extend(kick(authority, bot, aim, strength));
                     continue;
                 }
             }
-            let (next, facing) = toward(at, goal, RUN_SPEED * pace * dt);
-            authority.place_server_player(bot, next)?;
+            let mates = roster.iter().filter(|&&(id, team, slot, p)| {
+                // L955: not back to who just passed here, not to a team-mate standing still.
+                let passed_back = memory
+                    .get(&bot)
+                    .and_then(|m| m.passed_by)
+                    .is_some_and(|(by, at)| by == id && now - at < PASS_BACK);
+                let idle = memory
+                    .get(&id)
+                    .and_then(|m| m.last_at)
+                    .is_some_and(|(_, at)| now - at > IDLE_MATE);
+                team == state.team
+                    && id != bot
+                    && slot != KEEPER_SLOT
+                    && !passed_back
+                    && !idle
+                    && in_reach(p)
+            });
+            let best = mates
+                .map(|&(id, _, _, p)| {
+                    let rating = soccer_eval::pass_rating(
+                        flat(at),
+                        flat(p),
+                        flat(goal),
+                        &opponents,
+                        OPPORTUNISM,
+                    );
+                    (id, p, rating)
+                })
+                .max_by(|a, b| a.2.total_cmp(&b.2));
+            let free = soccer_eval::situation(flat(at), &opponents);
+            if let Some((mate, mate_at, rating)) = best
+                && rating > free + PASS_MARGIN
+            {
+                let thrown = pass(authority, bot, mate, mate_at, strength);
+                if thrown.is_some() {
+                    memory.entry(mate).or_default().passed_by = Some((bot, now));
+                }
+                events.extend(thrown);
+                continue;
+            }
+            // Dribble: straight at goal or 45 degrees off it, whichever leaves it freest a few
+            // metres on (their AI_GetBestDribbleMovement, cut down; R).
+            let heading = toward(at, goal, 1.0).1;
+            let (sin, cos) = std::f32::consts::FRAC_PI_4.sin_cos();
+            let turns = [
+                heading,
+                [
+                    heading[0] * cos - heading[1] * sin,
+                    heading[0] * sin + heading[1] * cos,
+                ],
+                [
+                    heading[0] * cos + heading[1] * sin,
+                    -heading[0] * sin + heading[1] * cos,
+                ],
+            ];
+            let score = |d: [f32; 2]| {
+                let ahead = [at[0] + d[0] * DRIBBLE_LOOK, at[2] + d[1] * DRIBBLE_LOOK];
+                let goalward = d[0] * heading[0] + d[1] * heading[1];
+                // As theirs: space past the touchline is no space.
+                let over = ((ahead[0] - c[0]).abs() - bounds.half_x).max(0.0)
+                    + ((ahead[1] - c[2]).abs() - bounds.half_z).max(0.0);
+                soccer_eval::situation(ahead, &opponents) + DRIBBLE_GOALWARD * goalward - over
+            };
+            // Re-picked every SUPPORT_REPLAN, like a support spot: near-equal choices flipped
+            // the stick every tick.
+            let mind = memory.entry(bot).or_default();
+            let way = match mind.dribble {
+                Some((way, picked)) if now - picked < SUPPORT_REPLAN => way,
+                _ => {
+                    let way = turns
+                        .into_iter()
+                        .max_by(|a, b| score(*a).total_cmp(&score(*b)))
+                        .unwrap_or(heading);
+                    mind.dribble = Some((way, now));
+                    way
+                }
+            };
+            let target = [
+                at[0] + way[0] * DRIBBLE_LOOK,
+                at[1],
+                at[2] + way[1] * DRIBBLE_LOOK,
+            ];
+            let (next, facing) = toward(at, target, RUN_SPEED * pace * dt);
+            let (next, facing) = if authority.place_server_player(bot, next).is_ok() {
+                (next, facing)
+            } else {
+                let inside = toward(at, goal, RUN_SPEED * pace * dt);
+                authority.place_server_player(bot, inside.0)?;
+                inside
+            };
             events.push(BotEvent::Moved {
                 player: bot,
                 position: next,
@@ -646,15 +761,78 @@ pub fn step(
             });
             continue;
         }
-        // Support: the kickoff spot, shifted halfway toward the ball along the pitch.
-        let spot = home(authority, state.team, state.slot);
-        let target = [spot[0] + (ball[0] - spot[0]) * 0.5, at[1], spot[2]];
+        // L956: team shape. Defending, a bot marks goal-side the nearest opponent nobody marks yet
+        // (the carrier is the chaser's); otherwise it holds its kickoff spot moved with the ball,
+        // along the pitch (further when its side has the ball) and a little toward the ball's
+        // side (League-Soccer's marking and adapted formation, cut down). Before, the bots stood
+        // off the play and nobody tracked back.
+        // A bot keeps its man while its side defends (re-picking the nearest each tick swapped
+        // men and flapped the stick).
+        let defending = holder_team.is_some_and(|team| team != state.team);
+        let kept = memory.get(&bot).and_then(|m| m.mark);
+        let markable = |&&(id, team, slot, _): &&(u64, u32, u32, [f32; 3])| {
+            defending
+                && team != state.team
+                && slot != KEEPER_SLOT
+                && Some(id) != holder
+                && (Some(id) == kept || !marked.contains(&id))
+        };
+        let marking = roster
+            .iter()
+            .filter(markable)
+            .find(|r| Some(r.0) == kept)
+            .or_else(|| {
+                roster
+                    .iter()
+                    .filter(markable)
+                    .min_by(|a, b| flat_distance(a.3, at).total_cmp(&flat_distance(b.3, at)))
+            })
+            .map(|&(id, _, _, p)| (id, p));
+        let mind = memory.entry(bot).or_default();
+        mind.mark = marking.map(|(id, _)| id);
+        let target = if let Some((opponent, there)) = marking {
+            marked.insert(opponent);
+            let own_goal = authority.attack_goal(state.team ^ 1);
+            let goal_side = toward(there, own_goal, 1.0).1;
+            [
+                there[0] + goal_side[0] * MARK_GAP,
+                at[1],
+                there[2] + goal_side[1] * MARK_GAP,
+            ]
+        } else {
+            let spot = home(authority, state.team, state.slot);
+            let push = if holder_team == Some(state.team) {
+                ATTACK_PUSH
+            } else {
+                SHAPE_PUSH
+            };
+            [
+                spot[0] + (ball[0] - spot[0]) * push,
+                at[1],
+                spot[2] + (ball[2] - spot[2]) * SIDE_PULL,
+            ]
+        };
+        // Half a metre inside the touchlines (a pitch under a metre wide has no inside).
+        let inner = [(bounds.half_x - 0.5).max(0.0), (bounds.half_z - 0.5).max(0.0)];
+        let target = [
+            target[0].clamp(c[0] - inner[0], c[0] + inner[0]),
+            target[1],
+            target[2].clamp(c[2] - inner[1], c[2] + inner[1]),
+        ];
+        // Re-planned every SUPPORT_REPLAN: a spot that moved with the ball or a man each tick
+        // swung the bot's heading (and its stick) back and forth.
+        let target = match mind.support_spot {
+            Some((spot, at_time)) if now - at_time < SUPPORT_REPLAN => spot,
+            _ => {
+                mind.support_spot = Some((target, now));
+                target
+            }
+        };
         // L955: re-form only past the deadband, and finish the run once started (no churn).
         let away = flat_distance(at, target);
-        let mind = memory.entry(bot).or_default();
         if away > SUPPORT_DEADBAND {
             mind.support_run = true;
-        } else if away <= 0.5 {
+        } else if away <= SUPPORT_ARRIVE {
             mind.support_run = false;
         }
         if mind.support_run {

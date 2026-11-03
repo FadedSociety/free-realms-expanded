@@ -119,6 +119,7 @@ pub mod soccer;
 pub mod soccer_ball;
 pub mod soccer_bots;
 pub mod soccer_entry;
+pub mod soccer_eval;
 pub mod soccer_match;
 pub mod soccer_pickups;
 pub mod soccer_service;

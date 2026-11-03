@@ -1509,6 +1509,9 @@ impl SoccerService {
         self.kicked_off = true;
         self.celebrating = false;
         let lined = crate::soccer_bots::line_up(&mut self.authority, &self.bots)?;
+        self.bot_memory
+            .values_mut()
+            .for_each(crate::soccer_bots::BotMemory::forget_plans);
         self.slides.clear();
         self.sliding = None;
         let poses = self.bot_poses(lined, true, 0.0);
@@ -1527,6 +1530,9 @@ impl SoccerService {
         let mut events = self.stages(&[11, 12]);
         // L932: the sides swap, so the bots line up on their new kickoff spots.
         let lined = crate::soccer_bots::line_up(&mut self.authority, &self.bots)?;
+        self.bot_memory
+            .values_mut()
+            .for_each(crate::soccer_bots::BotMemory::forget_plans);
         self.slides.clear();
         self.sliding = None;
         events.extend(self.bot_poses(lined, true, 0.0));

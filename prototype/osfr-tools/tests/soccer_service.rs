@@ -1621,10 +1621,11 @@ fn bots_move_along_their_control_stick() {
     }
     assert!(problems.is_empty(), "{} problems: {:?}", problems.len(), &problems[..problems.len().min(8)]);
     let per_bot_minute = changes as f32 / 7.0 / (seconds / 60.0);
-    // Live: about 23 (961 sticks for 7 bots). Ours is about 67 (goal line-ups, kicks, chase
-    // switches; the AI port, L958, is the fix); per-tick flapping would be about 1,000.
+    // Live: about 23 (961 sticks for 7 bots). Ours is about 112 since L956's marking and team
+    // shape: about one change per bot per SUPPORT_REPLAN (0.5 s), plus goal line-ups, kicks and
+    // chase switches. Per-tick flapping would be about 1,000; a doubled re-plan cadence trips this.
     assert!(
-        per_bot_minute < 90.0,
+        per_bot_minute < 150.0,
         "stick changes per bot per minute: {per_bot_minute} {kinds:?}"
     );
 }
