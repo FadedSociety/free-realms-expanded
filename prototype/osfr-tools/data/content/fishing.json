@@ -5,14 +5,14 @@
     "minigame_type_id": "client MiniGameTypeData.txt; native fishing is non-Flash TYPE 21"
   },
   "timing": {
-    "bite_delay_ms": 1500,
-    "nibble_ms": 900,
-    "reel_window_ms": 7000,
+    "bite_delay_ms": 3500,
+    "nibble_ms": 1500,
+    "reel_window_ms": 12000,
     "fight_ms": 1900,
     "reel_up_ms": 1800,
     "catch_chance": 1.0,
     "line_snap_chance": 0.0,
-    "source": "R: no original fishing timing or outcome probabilities are sent by the client. L950: fight_ms and reel_up_ms are the Lxzxrus Free-Realms-Server fork's native-tested FishingSession.FightMs (the client pulls a fish up only after its ~1.7 s fight) and ReelUpMs."
+    "source": "R: no original fishing timing or outcome probabilities are sent by the client. L951: bite_delay_ms, nibble_ms and reel_window_ms are the Lxzxrus Free-Realms-Server fork's native-tested interest (3.5-5 s; the client draws the line about 2 s after the bobber lands, so an earlier bite looked like the line appearing with it), approach (1.2-1.8 s, mid) and EscapeMs. L950: fight_ms and reel_up_ms are the Lxzxrus Free-Realms-Server fork's native-tested FishingSession.FightMs (the client pulls a fish up only after its ~1.7 s fight) and ReelUpMs."
   },
   "registration": {
     "player_words": [

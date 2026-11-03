@@ -46,6 +46,7 @@ mod fishing_packets;
 mod npc_quest_chain;
 
 use fishing_packets::{
+    bite_ms, fight_ms, hook_ms, landed_ms,
     add_fish_definitions, cast_at, fish_item_ids, handle_bytes, lifecycle, reel, register, request,
 };
 use npc_quest_chain::*;
@@ -80,7 +81,7 @@ const ACTOR: Handle = Handle {
     id: 0x1122_3344,
     seq: 0x5566_7788,
 };
-/// The fishing service's timer base; bite 1,500 ms, nibble 900 ms, reel window 7 s.
+/// The fishing service's timer base (the timing itself is `fishing.json`'s, see `fishing_packets`).
 const FISH_T0: u64 = 1_000_000;
 
 // ---- content lookups ----------------------------------------------------------------------
@@ -313,7 +314,7 @@ impl Rig {
     /// L950: reel in, then let the catch show (its fight, then the reel-up) and gather what went out.
     fn reel_landed(&mut self, at: u64) -> Outcome {
         let mut caught = self.send_at(&reel(ACTOR), at).expect("reel accepted");
-        for later in [at + 1_900, at + 3_700] {
+        for later in [at + fight_ms(), at + landed_ms()] {
             caught.replies.extend(self.tick(later));
         }
         caught
@@ -572,8 +573,8 @@ fn cast_and_hook(rig: &mut Rig) {
     let now = FISH_T0 + 10;
     rig.send_at(&cast_at(ACTOR, reed_position(), 10.0), now)
         .expect("cast accepted");
-    rig.tick(FISH_T0 + 1_510);
-    rig.tick(FISH_T0 + 2_410);
+    rig.tick(FISH_T0 + 10 + bite_ms());
+    rig.tick(FISH_T0 + 10 + hook_ms());
 }
 
 fn leave_round(rig: &mut Rig, instance: i32) -> Outcome {
@@ -907,7 +908,7 @@ fn learning_then_catching_and_turning_in_pays_once() {
 
     let instance = start_round(&mut rig);
     cast_and_hook(&mut rig);
-    let caught = rig.reel_landed(FISH_T0 + 2_420);
+    let caught = rig.reel_landed(FISH_T0 + 20 + hook_ms());
     assert!(
         find(&caught.replies, &[138, 0, 14, 0]).is_some(),
         "the paid catch sends the 138/14 result"
@@ -1013,7 +1014,7 @@ fn a_quit_escape_or_disconnect_does_not_count_the_catch() {
     // The chapter is still playable after every failure.
     let instance = start_round(&mut rig);
     cast_and_hook(&mut rig);
-    let caught = rig.reel_landed(FISH_T0 + 2_420);
+    let caught = rig.reel_landed(FISH_T0 + 20 + hook_ms());
     assert!(find(&caught.replies, &[138, 0, 14, 0]).is_some());
     assert_eq!(rig.progress(TESTING_THE_WATERS).unwrap().counts, [1, 0]);
     leave_round(&mut rig, instance);
@@ -1117,7 +1118,7 @@ fn a_forged_or_missing_completion_changes_nothing() {
     assert_eq!(rig.progress(TESTING_THE_WATERS).unwrap().counts, [0, 0]);
 
     // The forged frames did not damage the live round: the real catch still counts.
-    let caught = rig.reel_landed(FISH_T0 + 2_440);
+    let caught = rig.reel_landed(FISH_T0 + 40 + hook_ms());
     assert!(find(&caught.replies, &[138, 0, 14, 0]).is_some());
     assert_eq!(rig.progress(TESTING_THE_WATERS).unwrap().counts, [1, 0]);
     assert_eq!(rig.coins(), coins, "the catch pays no coins");
@@ -1285,7 +1286,7 @@ fn two_independent_sessions_fish_the_same_spot() {
     // The first player quits; the second still lands the same round.
     leave_round(&mut first, first_instance);
     assert_eq!(first.fishing_items(), 0);
-    let caught = second.reel_landed(FISH_T0 + 2_420);
+    let caught = second.reel_landed(FISH_T0 + 20 + hook_ms());
     assert!(find(&caught.replies, &[138, 0, 14, 0]).is_some());
     assert_eq!(second.fishing_items(), 1);
     leave_round(&mut second, second_instance);

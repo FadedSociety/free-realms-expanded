@@ -210,6 +210,13 @@ impl FishingService {
         CONTENT_JSON
     }
 
+    /// L951: the shipped bite and hook times in milliseconds from a cast (`fishing.json`), for
+    /// tests and tools that drive a round.
+    pub fn bite_and_hook_ms() -> (u64, u64) {
+        let timing = &CONTENT.timing;
+        (timing.bite_delay_ms, timing.bite_delay_ms + timing.nibble_ms)
+    }
+
     pub fn area_count() -> usize {
         CONTENT.areas.len()
     }

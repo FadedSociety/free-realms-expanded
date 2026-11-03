@@ -22,7 +22,10 @@ mod models;
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
 
-use fishing_packets::{add_fish_definitions, cast_at, fish_item_ids, lifecycle, reel, register};
+use fishing_packets::{
+    add_fish_definitions, bite_ms, cast_at, fish_item_ids, hook_ms, landed_ms, fight_ms, lifecycle,
+    reel, register,
+};
 use gateway_packets::{chat, interact, select};
 use npc_quest_chain::{
     CHARACTER, Fixture, character_at_for, content_dir, menu_option, profile_xp, read_json, saved,
@@ -57,7 +60,7 @@ const ACTOR: Handle = Handle {
     id: 0x1122_3344,
     seq: 0x5566_7788,
 };
-/// The fishing service's timer base; bite 1,500 ms, nibble 900 ms.
+/// The fishing service's timer base (the timing itself is `fishing.json`'s, see `fishing_packets`).
 const FISH_T0: u64 = 1_000_000;
 
 // ---- shipped content ------------------------------------------------------------------------
@@ -262,7 +265,7 @@ impl Player {
             &cast_at(ACTOR, position, 10.0),
             FISH_T0 + 10,
         );
-        for at in [FISH_T0 + 1_510, FISH_T0 + 2_410] {
+        for at in [FISH_T0 + 10 + bite_ms(), FISH_T0 + 10 + hook_ms()] {
             self.game.tick(&self.character, at).expect("world tick");
         }
     }
@@ -543,10 +546,10 @@ fn a_trip_can_be_quit_and_a_reconnect_releases_the_round() {
         &mut player.game,
         &player.character,
         &reel(ACTOR),
-        FISH_T0 + 2_420,
+        FISH_T0 + 20 + hook_ms(),
     );
     // L950: the catch shows after the fish's fight and reel-up.
-    for at in [FISH_T0 + 2_420 + 1_900, FISH_T0 + 2_420 + 3_700] {
+    for at in [FISH_T0 + 20 + hook_ms() + fight_ms(), FISH_T0 + 20 + hook_ms() + landed_ms()] {
         let landed = player.game.tick(&player.character, at).expect("world tick");
         caught.replies.extend(landed.replies);
     }

@@ -23,7 +23,7 @@ static FIXTURE_ID: AtomicU64 = AtomicU64::new(0);
 #[path = "support/fishing_packets.rs"]
 mod fishing_packets;
 
-use fishing_packets::{handle_bytes, request};
+use fishing_packets::{bite_ms, fight_ms, handle_bytes, hook_ms, landed_ms, request};
 
 struct InventoryFixture(PathBuf);
 
@@ -146,22 +146,22 @@ fn registration_cast_bite_reel_catch_has_exact_messages_and_one_item() {
 
     let cast = service.handle(&cast_request(), PLAYER, T0 + 10).unwrap();
     assert_eq!(packet_ids(&cast), vec![(138, 8), (138, 18)]);
-    let bite = service.tick(PLAYER, T0 + 1510).unwrap();
+    let bite = service.tick(PLAYER, T0 + 10 + bite_ms()).unwrap();
     assert_eq!(packet_ids(&bite), vec![(138, 10)]);
     assert_eq!(service.phase(PLAYER), Some(Phase::Hook));
-    let hook = service.tick(PLAYER, T0 + 2410).unwrap();
+    let hook = service.tick(PLAYER, T0 + 10 + hook_ms()).unwrap();
     assert_eq!(packet_ids(&hook), vec![(138, 10)]);
     assert_eq!(service.phase(PLAYER), Some(Phase::Reeling));
 
-    let caught = service.handle(&reel_request(), PLAYER, T0 + 2420).unwrap();
+    let caught = service.handle(&reel_request(), PLAYER, T0 + 20 + hook_ms()).unwrap();
     // L950: paid at the reel-in, shown as the client plays it (Lxzxrus fork): the fish fights
     // 1.9 s, is pulled up to the rod (result 4), and 1.8 s later is held up with its banner
     // (result 5) while the rewards grant inventory and display.
     assert!(caught.replies.is_empty() && caught.paid);
-    assert!(service.tick(PLAYER, T0 + 2420 + 1899).unwrap().replies.is_empty());
-    let pulled = service.tick(PLAYER, T0 + 2420 + 1900).unwrap();
+    assert!(service.tick(PLAYER, T0 + 20 + hook_ms() + fight_ms() - 1).unwrap().replies.is_empty());
+    let pulled = service.tick(PLAYER, T0 + 20 + hook_ms() + fight_ms()).unwrap();
     assert_eq!(packet_ids(&pulled), vec![(138, 14)]);
-    let held = service.tick(PLAYER, T0 + 2420 + 3700).unwrap();
+    let held = service.tick(PLAYER, T0 + 20 + hook_ms() + landed_ms()).unwrap();
     assert_eq!(
         packet_ids(&held),
         vec![(138, 14), (38, 2), (50, 1)],
@@ -247,7 +247,7 @@ fn a_cast_spawns_the_bobber_model_and_the_fish_the_bite_names() {
     );
 
     let bite = service
-        .supervise(PLAYER, 0, [0.0; 3], T0 + 1_510)
+        .supervise(PLAYER, 0, [0.0; 3], T0 + 10 + bite_ms())
         .unwrap()
         .unwrap();
     match ServerPacket::decode_known(Sub::UpdateBobber, &bite.replies[0][4..]).unwrap() {
@@ -544,7 +544,7 @@ fn disconnect_mid_fight_clears_ephemeral_state_without_grant() {
     let (_fixture, mut service) = running();
     service.handle(&register_request(), PLAYER, T0).unwrap();
     service.handle(&cast_request(), PLAYER, T0 + 1).unwrap();
-    service.tick(PLAYER, T0 + 1501).unwrap();
+    service.tick(PLAYER, T0 + 1 + bite_ms()).unwrap();
     let disconnected = service.disconnect(PLAYER);
     assert!(disconnected.changed);
     assert_eq!(packet_ids(&disconnected), vec![(138, 12); schools()]);

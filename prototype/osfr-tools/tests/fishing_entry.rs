@@ -161,7 +161,10 @@ fn hex(bytes: &[u8]) -> String {
 
 // ---- packets ----------------------------------------------------------------------------
 
-use fishing_packets::{encounter_close, handle_bytes, lifecycle, request};
+use fishing_packets::{
+    bite_ms, encounter_close, fight_ms, handle_bytes, hook_ms, landed_ms, lifecycle, request,
+    window_ms,
+};
 
 fn register() -> Vec<u8> {
     fishing_packets::register(ACTOR)
@@ -302,12 +305,12 @@ impl Round {
     /// Cast, wait out the bite and hook, reel. Returns the reel's change.
     fn catch(&mut self, at: u64) -> Change {
         self.send(&cast_at(10.0), at + 10).unwrap().unwrap();
-        self.service.tick(PLAYER, at + 1_510).unwrap();
-        self.service.tick(PLAYER, at + 2_410).unwrap();
+        self.service.tick(PLAYER, at + 10 + bite_ms()).unwrap();
+        self.service.tick(PLAYER, at + 10 + hook_ms()).unwrap();
         assert_eq!(self.service.phase(PLAYER), Some(Phase::Reeling));
-        let mut caught = self.send(&reel(), at + 2_420).unwrap().unwrap();
+        let mut caught = self.send(&reel(), at + 20 + hook_ms()).unwrap().unwrap();
         // L950: paid at the reel-in; shown after the fish's fight (result 4) and reel-up (result 5).
-        for later in [at + 2_420 + 1_900, at + 2_420 + 3_700] {
+        for later in [at + 20 + hook_ms() + fight_ms(), at + 20 + hook_ms() + landed_ms()] {
             caught
                 .replies
                 .extend(self.service.tick(PLAYER, later).unwrap().replies);
@@ -793,7 +796,7 @@ fn one_catch_is_paid_once_with_the_item_and_fisherman_xp() {
     );
 
     // The same reel bytes again, in the same window or later: nothing more is paid.
-    for at in [T0 + 2_530, T0 + 2_600, T0 + 60_000] {
+    for at in [T0 + 130 + hook_ms(), T0 + 200 + hook_ms(), T0 + 60_000] {
         let replay = round.send(&reel(), at);
         assert!(
             replay.is_err() || replay.unwrap().is_none_or(|c| !c.paid),
@@ -958,7 +961,7 @@ fn an_hour_cap_uses_a_rolling_window() {
     assert!(!blocked.paid);
     assert_eq!(round.fish_held(), 1);
 
-    // The paid catch was at T0+2_520; one hour later its slot is free.
+    // The paid catch was at its reel-in (T0 + 120 + the hook); one hour later its slot is free.
     assert!(round.catch(T0 + 3_610_000).paid);
     // The new catch is still inside the hour, so the next one is refused again.
     let blocked_again = round.catch(T0 + 3_620_000);
@@ -978,7 +981,7 @@ fn reconnect_clears_only_the_session_count_not_the_hour_history() {
     );
     assert!(round.catch(T0 + 100).paid);
     let history = round.service.hour_history(PLAYER);
-    assert_eq!(history, vec![T0 + 2_520]);
+    assert_eq!(history, vec![T0 + 120 + hook_ms()], "paid at the reel-in");
     assert_eq!(round.service.reset_all(), 1);
     assert_eq!(round.service.hour_history(PLAYER), history);
 
@@ -1021,10 +1024,10 @@ fn reeling_before_the_hook_pays_nothing() {
 fn letting_the_hooked_fish_wait_too_long_pays_nothing() {
     let mut round = Round::started(true);
     round.send(&cast_at(10.0), T0 + 10).unwrap();
-    round.service.tick(PLAYER, T0 + 1_510).unwrap();
-    round.service.tick(PLAYER, T0 + 2_410).unwrap();
+    round.service.tick(PLAYER, T0 + 10 + bite_ms()).unwrap();
+    round.service.tick(PLAYER, T0 + 10 + hook_ms()).unwrap();
     // The 7 s reel window has passed: the late reel is refused or finds nothing.
-    let late = round.send(&reel(), T0 + 2_410 + 7_001);
+    let late = round.send(&reel(), T0 + 11 + hook_ms() + window_ms());
     assert!(late.is_err() || late.unwrap().is_none_or(|c| !c.paid));
     assert_eq!(round.fish_held(), 0);
 }
@@ -1137,11 +1140,11 @@ fn only_sizes_with_an_item_are_caught() {
     for n in 0..40u64 {
         let at = T0 + 100 + n * 10_000;
         route(&mut service, &cast_at(10.0), at + 10);
-        service.tick(PLAYER, at + 1_510).unwrap();
-        service.tick(PLAYER, at + 2_410).unwrap();
-        let caught = route(&mut service, &reel(), at + 2_420);
+        service.tick(PLAYER, at + 10 + bite_ms()).unwrap();
+        service.tick(PLAYER, at + 10 + hook_ms()).unwrap();
+        let caught = route(&mut service, &reel(), at + 20 + hook_ms());
         assert!(caught.paid, "cast {n} paid");
-        let held = service.tick(PLAYER, at + 2_420 + 3_700).unwrap();
+        let held = service.tick(PLAYER, at + 20 + hook_ms() + landed_ms()).unwrap();
         grades.insert(caught_grade(&held.replies));
     }
     assert_eq!(
@@ -1168,9 +1171,9 @@ fn a_catch_that_cannot_be_stored_is_released_and_says_so() {
         .service
         .handle(&cast_at(10.0), PLAYER, at + 10)
         .unwrap();
-    round.service.tick(PLAYER, at + 1_510).unwrap();
-    round.service.tick(PLAYER, at + 2_410).unwrap();
-    let caught = round.service.handle(&reel(), PLAYER, at + 2_420).unwrap();
+    round.service.tick(PLAYER, at + 10 + bite_ms()).unwrap();
+    round.service.tick(PLAYER, at + 10 + hook_ms()).unwrap();
+    let caught = round.service.handle(&reel(), PLAYER, at + 20 + hook_ms()).unwrap();
     assert!(!caught.paid);
     assert_eq!(caught.notices.len(), 1);
     assert_eq!(round.fish_held(), 0);
@@ -1220,21 +1223,21 @@ fn quitting_mid_attempt_pays_nothing_and_turns_the_flag_off() {
     for quit in ["41/109", "39/6"] {
         let mut round = Round::started(true);
         round.send(&cast_at(10.0), T0 + 10).unwrap();
-        round.service.tick(PLAYER, T0 + 1_510).unwrap();
+        round.service.tick(PLAYER, T0 + 10 + bite_ms()).unwrap();
         let instance = round.service.instance_id(PLAYER).unwrap();
         let packet = if quit == "41/109" {
             encounter_close(instance)
         } else {
             lifecycle(6, instance)
         };
-        let left = round.send(&packet, T0 + 2_000).unwrap().unwrap();
+        let left = round.send(&packet, T0 + 500 + bite_ms()).unwrap().unwrap();
         assert!(!left.paid, "{quit}");
         assert_eq!(status_flags(&left.replies), vec![1], "{quit}: flag off");
         assert!(round.service.is_empty(), "{quit}: the round is gone");
         assert_eq!(round.fish_held(), 0, "{quit}");
         assert_eq!(round.fisherman_xp(), 0, "{quit}");
         // The reel that would have caught it now finds no round.
-        assert!(round.send(&reel(), T0 + 2_420).unwrap().is_none());
+        assert!(round.send(&reel(), T0 + 20 + hook_ms()).unwrap().is_none());
         // And the player can go again.
         assert!(round.enter(REED, false).is_ok(), "{quit}: a new trip");
     }
@@ -1257,7 +1260,7 @@ fn reconnect_releases_the_round_and_keeps_what_was_already_paid() {
     assert!(round.catch(T0 + 100).paid);
     // A second cast is in flight when the connection drops.
     round.send(&cast_at(10.0), T0 + 20_000).unwrap();
-    round.service.tick(PLAYER, T0 + 21_510).unwrap();
+    round.service.tick(PLAYER, T0 + 20_010 + bite_ms()).unwrap();
     assert_eq!(
         round.service.reset_all(),
         1,
@@ -1265,7 +1268,7 @@ fn reconnect_releases_the_round_and_keeps_what_was_already_paid() {
     );
     assert!(round.service.is_empty());
     assert!(
-        round.send(&reel(), T0 + 22_500).unwrap().is_none(),
+        round.send(&reel(), T0 + 20_100 + hook_ms()).unwrap().is_none(),
         "no round, nothing paid"
     );
     assert_eq!(round.fish_held(), 1, "the first catch was paid and stays");
@@ -1334,7 +1337,7 @@ fn the_bite_timers_run_from_supervise() {
     round.send(&cast_at(10.0), T0 + 10).unwrap();
     let bite = round
         .service
-        .supervise(PLAYER, 0, SPOT, T0 + 1_510)
+        .supervise(PLAYER, 0, SPOT, T0 + 10 + bite_ms())
         .unwrap()
         .unwrap();
     assert_eq!(ids(&bite.replies), vec![(138, 10)]);
@@ -1497,16 +1500,21 @@ mod gateway_route {
         body.push(0);
         let cast = send_at(&mut g, &request(6, &body), NOW + 10);
         assert_eq!(ids(&cast), vec![(138, 8), (138, 18)]);
-        let bite = tick(&mut g, NOW + 1_600);
+        let bite = tick(&mut g, NOW + 110 + bite_ms());
         assert!(
             ids(&bite).contains(&(138, 10)),
             "bite timer from the tick: {:?}",
             ids(&bite)
         );
-        let _ = tick(&mut g, NOW + 2_600);
+        let _ = tick(&mut g, NOW + 110 + hook_ms());
         assert_eq!(fish_items(&g), base);
-        let caught = send_at(&mut g, &reel(), NOW + 2_700);
+        let reeled = NOW + 200 + hook_ms();
+        send_at(&mut g, &reel(), reeled);
+        let caught = tick(&mut g, reeled + fight_ms());
         assert_eq!(ids(&caught)[0], (138, 14), "{:?}", ids(&caught));
+        tick(&mut g, reeled + landed_ms());
+        // Every later step keeps its old spacing after the landing.
+        let at = |old: u64| reeled + landed_ms() + (old - 2_700);
         assert_eq!(fish_items(&g), base + 1, "one fish, paid by the server");
         let job = g.snapshot().gameplay.unwrap().profiles.unwrap();
         assert!(
@@ -1523,46 +1531,46 @@ mod gateway_route {
             "fishing leaves the active job alone"
         );
         // Replayed and forged catches pay nothing.
-        for at in [NOW + 2_710, NOW + 9_000] {
-            let _ = g.handle_at(&wrap(&reel()), at);
+        for when in [at(2_710), at(9_000)] {
+            let _ = g.handle_at(&wrap(&reel()), when);
             assert_eq!(fish_items(&g), base + 1, "a replayed reel");
         }
         let mut forged = request(14, &handle_bytes(ACTOR));
         forged.extend(5u32.to_le_bytes());
-        let _ = g.handle_at(&wrap(&forged), NOW + 3_000);
+        let _ = g.handle_at(&wrap(&forged), at(3_000));
         assert_eq!(fish_items(&g), base + 1, "a forged result");
 
         // 7. Quit: the round ends, the flag goes off, nothing more is paid.
-        let quit = send_at(&mut g, &encounter_close(instance), NOW + 4_000);
+        let quit = send_at(&mut g, &encounter_close(instance), at(4_000));
         assert_eq!(status_flags(&quit), vec![1]);
-        let _ = g.handle_at(&wrap(&reel()), NOW + 4_100);
+        let _ = g.handle_at(&wrap(&reel()), at(4_100));
         assert_eq!(fish_items(&g), base + 1);
 
         // 8. Disconnect mid-attempt, then reconnect: released, the earlier catch stays, and a
         //    new trip is offered fresh.
         menu(&mut g, REED);
-        let replies = send_at(&mut g, &npc(10, REED, Some(option)), NOW + 5_000);
+        let replies = send_at(&mut g, &npc(10, REED, Some(option)), at(5_000));
         let offer = replies
             .iter()
             .find(|p| p.starts_with(&[39, 0, 16]))
             .unwrap();
         let instance = i32::from_le_bytes(offer[3..7].try_into().unwrap());
-        send_at(&mut g, &lifecycle(5, instance), NOW + 5_100);
-        send_at(&mut g, &register(), NOW + 5_100);
-        send_at(&mut g, &request(6, &body), NOW + 5_200);
+        send_at(&mut g, &lifecycle(5, instance), at(5_100));
+        send_at(&mut g, &register(), at(5_100));
+        send_at(&mut g, &request(6, &body), at(5_200));
         g.reset_session();
         assert_eq!(fish_items(&g), base + 1, "the dropped cast paid nothing");
         for packet in [login(), wrap(&[13, 0]), wrap(&[10, 0])] {
-            g.handle_at(&packet, NOW + 6_000).unwrap();
+            g.handle_at(&packet, at(6_000)).unwrap();
         }
-        let _ = g.handle_at(&wrap(&reel()), NOW + 8_000);
+        let _ = g.handle_at(&wrap(&reel()), at(8_000));
         assert_eq!(
             fish_items(&g),
             base + 1,
             "a reel after the reconnect finds no round"
         );
         menu(&mut g, REED);
-        let replies = send_at(&mut g, &npc(10, REED, Some(option)), NOW + 9_000);
+        let replies = send_at(&mut g, &npc(10, REED, Some(option)), at(9_000));
         assert!(
             offers(&replies),
             "after the reconnect the player can fish again"

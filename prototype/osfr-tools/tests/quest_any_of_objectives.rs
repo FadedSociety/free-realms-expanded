@@ -21,7 +21,7 @@ mod npc_quest_chain;
 #[path = "support/scratch.rs"]
 mod scratch;
 
-use fishing_packets::{cast_at, lifecycle, reel, register};
+use fishing_packets::{bite_ms, cast_at, hook_ms, lifecycle, reel, register};
 use npc_quest_chain::content_dir;
 use osfr_tools::{
     content::ContentDb,
@@ -724,13 +724,13 @@ fn fish_variant_catch_credits_any_of() {
             )
             .unwrap()
             .expect("the cast belongs to the round");
-        service.tick(PLAYER, now + 1_510).unwrap();
-        service.tick(PLAYER, now + 2_410).unwrap();
+        service.tick(PLAYER, now + 10 + bite_ms()).unwrap();
+        service.tick(PLAYER, now + 10 + hook_ms()).unwrap();
         let caught = service
             .route(
                 PLAYER,
                 &reel(ACTOR),
-                now + 2_420,
+                now + 20 + hook_ms(),
                 &rewards.inventory,
                 &rewards.profiles,
             )

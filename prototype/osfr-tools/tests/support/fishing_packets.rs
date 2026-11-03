@@ -21,6 +21,39 @@ use std::{
     path::Path,
 };
 
+/// L951: the shipped fishing timing (`data/content/fishing.json`), so the tests follow its tuning
+/// instead of pinning it. All in milliseconds from the cast.
+fn timing(key: &str) -> u64 {
+    let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/fishing.json");
+    let value: Value = serde_json::from_slice(&fs::read(path).unwrap()).unwrap();
+    value["timing"][key].as_u64().unwrap()
+}
+
+/// The fish takes an interest (138/10, not yet hooked).
+pub fn bite_ms() -> u64 {
+    timing("bite_delay_ms")
+}
+
+/// The fish is hooked: the reel window opens.
+pub fn hook_ms() -> u64 {
+    bite_ms() + timing("nibble_ms")
+}
+
+/// How long a hooked fish waits to be reeled in.
+pub fn window_ms() -> u64 {
+    timing("reel_window_ms")
+}
+
+/// From the reel-in: the catch is pulled up (result 4).
+pub fn fight_ms() -> u64 {
+    timing("fight_ms")
+}
+
+/// From the reel-in: the catch is held up with its banner (result 5) and the rewards.
+pub fn landed_ms() -> u64 {
+    fight_ms() + timing("reel_up_ms")
+}
+
 /// Every fish item id the shipped `fishing_spots.json` binds.
 pub fn fish_item_ids() -> BTreeSet<i32> {
     let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/fishing_spots.json");

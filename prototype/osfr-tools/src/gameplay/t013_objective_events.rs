@@ -1379,10 +1379,12 @@ fn fishing_pays_both_objectives_twice_and_replay_changes_nothing() {
     };
     for caught in 1..=3u32 {
         let at = FISHING_T0 + u64::from(caught) * 10_000;
+        // L951: the bite and hook follow the shipped tuning.
+        let (bite, hook) = crate::fishing_service::FishingService::bite_and_hook_ms();
         send(&mut game, &character, &fishing_cast(), at + 10);
-        game.tick(&character, at + 1_510).unwrap();
-        game.tick(&character, at + 2_410).unwrap();
-        let outcome = send(&mut game, &character, &fishing_reel(), at + 2_420);
+        game.tick(&character, at + 10 + bite).unwrap();
+        game.tick(&character, at + 10 + hook).unwrap();
+        let outcome = send(&mut game, &character, &fishing_reel(), at + 20 + hook);
         assert!(outcome.changed);
         assert_eq!(
             game.npc_quests
@@ -1395,7 +1397,7 @@ fn fishing_pays_both_objectives_twice_and_replay_changes_nothing() {
         );
         if caught == 2 {
             let before = economy(&game);
-            let replay = send(&mut game, &character, &fishing_reel(), at + 2_430);
+            let replay = send(&mut game, &character, &fishing_reel(), at + 30 + hook);
             assert!(!replay.changed, "a replayed reel is not a catch");
             assert_eq!(economy(&game), before);
             assert_eq!(

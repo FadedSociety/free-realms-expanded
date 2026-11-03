@@ -197,10 +197,13 @@ fn try_catch(
         &cast(),
         at + 10,
     );
-    session.gateway.tick_at(at + 1_600).unwrap();
-    session.gateway.tick_at(at + 2_600).unwrap();
+    // L951: the bite and hook follow the shipped tuning (cast at +10).
+    let (bite, hook) = osfr_tools::fishing_service::FishingService::bite_and_hook_ms();
+    session.gateway.tick_at(at + 100 + bite).unwrap();
+    session.gateway.tick_at(at + 200 + hook).unwrap();
+    let reeled = at + 300 + hook;
     let mut probe = session.gateway.clone();
-    let outcome = probe.handle_at(&wrap(&reel()), at + 2_700).unwrap();
+    let outcome = probe.handle_at(&wrap(&reel()), reeled).unwrap();
     send(
         session,
         options,
@@ -208,9 +211,9 @@ fn try_catch(
         membership,
         sessions,
         &reel(),
-        at + 2_700,
+        reeled,
     );
-    (outcome, at + 2_700)
+    (outcome, reeled)
 }
 
 #[test]

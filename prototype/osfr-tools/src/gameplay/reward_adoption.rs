@@ -69,10 +69,12 @@ fn begin(game: &mut Gameplay) {
 }
 
 fn catch(game: &mut Gameplay, at: u64) -> io::Result<Outcome> {
+    // L951: the bite and hook follow the shipped tuning.
+    let (bite, hook) = crate::fishing_service::FishingService::bite_and_hook_ms();
     game.handle_in_world(&fishing_cast(), &character(), at + 10)?;
-    game.tick(&character(), at + 1_510)?;
-    game.tick(&character(), at + 2_410)?;
-    game.handle_in_world(&fishing_reel(), &character(), at + 2_420)
+    game.tick(&character(), at + 10 + bite)?;
+    game.tick(&character(), at + 10 + hook)?;
+    game.handle_in_world(&fishing_reel(), &character(), at + 20 + hook)
 }
 
 fn item_count(game: &Gameplay, definition_id: i32) -> u32 {
