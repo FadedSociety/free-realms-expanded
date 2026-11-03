@@ -1187,6 +1187,21 @@ fn a_goal_celebrates_before_the_next_kickoff() {
     };
     assert_eq!(service.score(), [1, 0]);
     assert_eq!(steps(&goal_events), [16, 17]);
+    // L947: the stage carries the scoreboard (client handler 0xb82fb6): last scoring team, half,
+    // both scores; and the scorer's results row counts the goal (76/15 word 3).
+    let words = goal_events
+        .iter()
+        .rev()
+        .find_map(|event| match event.packet() {
+            SoccerPacket::UpdateGameState { words } => Some(words),
+            _ => None,
+        })
+        .unwrap();
+    assert_eq!(words[..4], [0, 0, 1, 0], "team 0 scored in the first half: 1-0");
+    assert!(goal_events.iter().any(|event| matches!(
+        event.packet(),
+        SoccerPacket::UpdatePlayerStats { player: KICKER, words } if words[3] == 1
+    )));
     assert!(service.celebrating());
     assert_eq!(steps(&service.start().expect("restart")), [18, 11, 12]);
     assert!(!service.celebrating());

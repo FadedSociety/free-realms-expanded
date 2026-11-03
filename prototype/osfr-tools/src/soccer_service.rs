@@ -573,13 +573,24 @@ fn role(bot: bool, team: u32, slot: u32) -> String {
     }
 }
 
-fn game_state(state: u32, players: u32) -> ServiceEvent {
-    let mut words = [0u32; 18];
-    words[0] = u32::MAX;
-    words[12] = state;
-    words[13] = players;
-    words[17] = u32::MAX;
-    ServiceEvent::Setup(SoccerPacket::UpdateGameState { words })
+/// L947: the team counters the results board shows per half (76/5 words 4..11 as pairs of team 0,
+/// team 1). Shots on goal comes first (the live server's shot raised word 5); the rest is R.
+const SHOTS: usize = 0;
+const STEALS: usize = 1;
+const DODGES: usize = 2;
+const KNOCKDOWNS: usize = 3;
+/// L947: a player's results row (76/15 words, R past the live goal in word 3 and knockdown in 1).
+const PLAYER_STEALS: usize = 0;
+const PLAYER_KNOCKDOWNS: usize = 1;
+const PLAYER_GOALS: usize = 3;
+
+/// L947: what the scoreboard and the results board count.
+#[derive(Clone, Debug, Default)]
+struct Tally {
+    last_goal_team: Option<u32>,
+    /// [half][stat][team].
+    team: [[[u32; 2]; 4]; 2],
+    players: BTreeMap<u64, [u32; 5]>,
 }
 
 /// A joined session's server-assigned roster entry.
@@ -615,6 +626,8 @@ pub struct SoccerService {
     kicked_off: bool,
     /// L946: a goal's celebration runs until the next kickoff (steps 16, 17, then 18).
     celebrating: bool,
+    /// L947: the scoreboard and results counters sent in 76/5 and 76/15.
+    tally: Tally,
     /// L942: the power-ups on the pitch, when the content has them.
     pickups: Option<crate::soccer_pickups::Pickups>,
     /// R relay bookkeeping: last holder reported on the service wire (`0` none).
@@ -640,6 +653,7 @@ impl SoccerService {
             setup: None,
             kicked_off: false,
             celebrating: false,
+            tally: Tally::default(),
             pickups: None,
             last_holder: NO_HOLDER,
         })
@@ -663,10 +677,19 @@ impl SoccerService {
         let now = self.authority.server_time();
         crate::soccer_bots::knock_down(&mut self.bot_memory, player, victim, now);
         self.last_holder = player;
-        Ok(vec![ServiceEvent::Possession {
+        let mut events = vec![ServiceEvent::Possession {
             holder: player,
             previous: victim,
-        }])
+        }];
+        events.extend(self.count(
+            player,
+            &[STEALS, KNOCKDOWNS],
+            &[PLAYER_STEALS, PLAYER_KNOCKDOWNS],
+        ));
+        if self.setup.is_some() {
+            events.push(self.step(12, self.player_count()));
+        }
+        Ok(events)
     }
 
     /// L942: run power-ups on the pitch (see `soccer_pickups`).
@@ -723,12 +746,12 @@ impl SoccerService {
         let Some(setup) = &self.setup else { return Vec::new() };
         let config = SoccerPacket::Unknown { sub: 7, payload: setup.match_config.clone() };
         vec![
-            game_state(1, 0),
-            game_state(2, 0),
+            self.step(1, 0),
+            self.step(2, 0),
             ServiceEvent::Setup(config),
-            game_state(2, 1),
-            game_state(3, 1),
-            game_state(4, 1),
+            self.step(2, 1),
+            self.step(3, 1),
+            self.step(4, 1),
         ]
     }
 
@@ -737,7 +760,7 @@ impl SoccerService {
         let Some(setup) = &self.setup else { return Vec::new() };
         let players = self.player_count();
         let mut events = vec![
-            game_state(5, players),
+            self.step(5, players),
             ServiceEvent::Setup(SoccerPacket::Unknown { sub: 8, payload: setup.teams.clone() }),
         ];
         for (id, state) in self.authority.players() {
@@ -749,7 +772,7 @@ impl SoccerService {
             }));
             events.push(ServiceEvent::Setup(SoccerPacket::PlayerVariableStats { player: id, words: *words }));
         }
-        events.push(game_state(6, players));
+        events.push(self.step(6, players));
         events
     }
 
@@ -1155,7 +1178,7 @@ impl SoccerService {
                 (true, true) => &[18, 11, 12],
                 (true, false) => &[12],
             };
-            events.extend(steps.iter().map(|step| game_state(*step, players)));
+            events.extend(steps.iter().map(|step| self.step(*step, players)));
         }
         let opening = !self.kicked_off;
         self.kicked_off = true;
@@ -1200,13 +1223,26 @@ impl SoccerService {
         let acted =
             crate::soccer_bots::step(&mut self.authority, &self.bots, &mut self.bot_memory, dt)?;
         let mut bot_events = Vec::new();
+        let mut counted = Vec::new();
+        let mut shot = false;
         for event in &acted {
+            if let crate::soccer_bots::BotEvent::Tackled { tackler, .. } = *event {
+                counted.extend(self.count(
+                    tackler,
+                    &[STEALS, KNOCKDOWNS],
+                    &[PLAYER_STEALS, PLAYER_KNOCKDOWNS],
+                ));
+            }
             if let crate::soccer_bots::BotEvent::Kicked {
                 player,
                 kind,
                 power,
             } = *event
             {
+                if kind == KickKind::Shot {
+                    self.count(player, &[SHOTS], &[]);
+                    shot = true;
+                }
                 let direction = unit(self.authority.ball_velocity())?;
                 bot_events.push(ServiceEvent::Impulse {
                     player,
@@ -1223,6 +1259,7 @@ impl SoccerService {
             }
         }
         bot_events.extend(self.bot_poses(acted, false));
+        let toucher = self.authority.last_touch();
         self.authority.advance(dt)?;
 
         if self.authority.score() != before_score {
@@ -1237,10 +1274,18 @@ impl SoccerService {
 
         let mut events = bot_events;
         events.extend(self.pickup_step(dt));
+        if self.setup.is_some() && (shot || !counted.is_empty()) {
+            // As live: a player's row, then the stage again with the new counters.
+            counted.push(self.step(12, self.player_count()));
+            events.extend(counted);
+        }
         if self.authority.score() != before_score {
-            events.push(ServiceEvent::Goal {
-                score: self.authority.score(),
-            });
+            let after = self.authority.score();
+            self.tally.last_goal_team = Some(u32::from(after[1] != before_score[1]));
+            events.push(ServiceEvent::Goal { score: after });
+            if let Some(scorer) = toucher {
+                events.extend(self.count(scorer, &[], &[PLAYER_GOALS]));
+            }
             events.extend(self.stages(&[16, 17]));
             self.celebrating = self.setup.is_some();
             self.last_holder = NO_HOLDER;
@@ -1301,13 +1346,58 @@ impl SoccerService {
         self.celebrating
     }
 
+    /// L947: one 76/5 with the match in it (client handler 0xb82fb6): the last scoring team, the
+    /// half, both scores, this half's team counters, the step and the player count.
+    fn step(&self, state: u32, players: u32) -> ServiceEvent {
+        let half = usize::from(self.authority.half().saturating_sub(1)).min(1);
+        let [home, away] = self.authority.score();
+        let mut words = [0u32; 18];
+        words[0] = self.tally.last_goal_team.unwrap_or(u32::MAX);
+        words[1] = half as u32;
+        words[2] = home;
+        words[3] = away;
+        for (stat, teams) in self.tally.team[half].iter().enumerate() {
+            words[4 + 2 * stat] = teams[0];
+            words[5 + 2 * stat] = teams[1];
+        }
+        words[12] = state;
+        words[13] = players;
+        // As sent live: 1 once kicked off; 17 leaves its 0xFFFFFFFF at the first goal.
+        words[16] = u32::from(self.kicked_off);
+        words[17] = if self.tally.last_goal_team.is_some() { 0 } else { u32::MAX };
+        ServiceEvent::Setup(SoccerPacket::UpdateGameState { words })
+    }
+
+    /// L947: count a shot, a tackle (a steal and a knockdown) or a goal for `player` and its team;
+    /// returns the player's new results row (76/15) when it changed.
+    fn count(&mut self, player: u64, team_stats: &[usize], player_stats: &[usize]) -> Vec<ServiceEvent> {
+        let Some(team) = self.authority.player(player).map(|state| (state.team & 1) as usize) else {
+            return Vec::new();
+        };
+        let half = usize::from(self.authority.half().saturating_sub(1)).min(1);
+        for &stat in team_stats {
+            self.tally.team[half][stat][team] += 1;
+        }
+        if player_stats.is_empty() || self.setup.is_none() {
+            return Vec::new();
+        }
+        let row = self.tally.players.entry(player).or_default();
+        for &stat in player_stats {
+            row[stat] += 1;
+        }
+        vec![ServiceEvent::Setup(SoccerPacket::UpdatePlayerStats {
+            player,
+            words: *row,
+        })]
+    }
+
     /// L946: match-stage steps (76/5), with the live setup only.
     fn stages(&self, steps: &[u32]) -> Vec<ServiceEvent> {
         if self.setup.is_none() {
             return Vec::new();
         }
         let players = self.player_count();
-        steps.iter().map(|step| game_state(*step, players)).collect()
+        steps.iter().map(|step| self.step(*step, players)).collect()
     }
 
     /// Process one decoded client family-76 packet.
@@ -1357,6 +1447,9 @@ impl SoccerService {
                     pass_target,
                 )?;
                 self.last_holder = request.player;
+                if kind == KickKind::Shot {
+                    self.count(request.player, &[SHOTS], &[]);
+                }
                 Ok(vec![ServiceEvent::Impulse {
                     player: request.player,
                     kind,
