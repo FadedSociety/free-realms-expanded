@@ -23,12 +23,13 @@ use osfr_tools::{
 
 /// 167/1/2 activity-portal Play: activity id, then a zero dword. L095: a shipped soccer game
 /// (MiniGameData 42/43/44) is listed as the live Games window row with its name (72/73/18), the
-/// id the client names; any other id goes out as given.
+/// id the client names (L952: the Soccer Tutorial 1030 is row 1050); any other id goes out as given.
 pub fn play(activity: u32) -> Vec<u8> {
     let listed: u32 = match activity {
         42 => 72,
         43 => 73,
         44 => 18,
+        1030 => 1050,
         other => other,
     };
     let mut inner = vec![167, 0, 1, 2];

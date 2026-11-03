@@ -72,6 +72,11 @@ pub struct Game {
     /// ask for them credit on the win alone.
     #[serde(default)]
     pub max_conceded: Option<u32>,
+    /// L952: a client Lua `Table.Method` the match runs at its first kickoff (BaseUi 47/7), such
+    /// as the Soccer Tutorial row's `SoccerTutorial.StartSoccerTut`, which opens the client's own
+    /// tutorial pages over the match.
+    #[serde(default)]
+    pub client_script: Option<String>,
     /// Evidence for the row's win condition; documentation only.
     #[serde(default, rename = "source")]
     _source: String,
@@ -479,6 +484,7 @@ impl Content {
                 || game.id > i32::MAX as u32
                 || game.encounter_id <= 0
                 || self.games[..index].iter().any(|other| other.id == game.id)
+                || (game.client_script.as_deref()).is_some_and(|s| !crate::base_ui::valid_script(s))
             {
                 return Err(invalid("soccer game ids/encounters are invalid"));
             }
@@ -548,6 +554,8 @@ pub struct Session {
     /// True once the terminal score was settled; a settled match never pays
     /// again, and the flag is session-only like the match itself.
     settled: bool,
+    /// L952: the row's client script, sent once with the first kickoff.
+    script: Option<Vec<u8>>,
     return_zone: u32,
     return_position: [f32; 3],
     return_rotation: [f32; 3],
@@ -623,6 +631,9 @@ impl Session {
         if !offered.accepted {
             return Err(invalid("soccer offer was refused"));
         }
+        let script = (game.client_script.as_deref())
+            .map(|script| crate::base_ui::execute_script(script, &[]))
+            .transpose()?;
         Ok(Self {
             service,
             game,
@@ -635,6 +646,7 @@ impl Session {
             last_tick_ms: None,
             resume_at_ms: None,
             settled: false,
+            script,
             return_zone: character.zone_id,
             return_position: character.position,
             return_rotation: character.rotation,
@@ -730,6 +742,10 @@ impl Session {
             result
                 .replies
                 .extend(started[split..].iter().map(ServiceEvent::inner));
+            // L952: the row's client script goes with the first kickoff.
+            if !started.is_empty() {
+                result.replies.extend(self.script.take());
+            }
             result.state = service.run_state(guid);
             if result.state == Some(RunState::Playing) {
                 self.last_tick_ms = Some(now_ms);
@@ -776,7 +792,13 @@ impl Session {
             .checked_add(1)
             .ok_or_else(|| invalid("soccer input sequence exhausted"))?;
         let mut service = self.service.clone();
-        let events = service.handle_client(guid, now_ms as f32 / 1000.0, &wire, sequence, None)?;
+        // L952: a refused input (a pose past the bounds, a stray packet around the whistle) leaves
+        // the match as it was and is dropped. Refusing it ended the player's session (native
+        // 2026-11-03), as the advisory states did before L942.
+        let Ok(events) = service.handle_client(guid, now_ms as f32 / 1000.0, &wire, sequence, None)
+        else {
+            return Ok(Vec::new());
+        };
         self.service = service;
         self.sequence = sequence;
         Ok(events.iter().map(ServiceEvent::inner).collect())
@@ -824,6 +846,7 @@ impl Session {
                 result
                     .replies
                     .extend(events.iter().map(ServiceEvent::inner));
+                result.replies.extend(self.script.take());
                 result.changed |= !events.is_empty();
             }
             MatchPhase::HalfTime if due => {
@@ -908,11 +931,16 @@ mod tests {
         assert_eq!(
             ids,
             [
-                42, 43, 44, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333
+                42, 43, 44, 1030, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333
             ]
         );
         let listed: Vec<u32> = content.portal_rows().iter().map(|row| row.id).collect();
-        assert_eq!(listed, [42, 43, 44], "quest rows have no Games window tile");
+        // L952: the Soccer Tutorial (1030) is a Games window row too.
+        assert_eq!(
+            listed,
+            [42, 43, 44, 1030],
+            "quest rows have no Games window tile"
+        );
         for game in content.games() {
             assert!(game.counts(4), "row {} counts 4 conceded", game.id);
             assert_eq!(game.counts(5), game.id != 323, "row {} at 5", game.id);

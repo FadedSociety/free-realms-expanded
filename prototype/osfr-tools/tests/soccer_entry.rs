@@ -330,11 +330,11 @@ fn forged_entries_and_client_goals_change_nothing() {
         .unwrap();
     game.initialize_world(&character, 2_100).unwrap();
     let before_match = game.state();
-    let forged_goal = match game.handle_in_world(&client_goal(), &character, 2_200) {
-        Err(error) => error,
-        Ok(_) => panic!("client GoalMade is refused"),
-    };
-    assert!(forged_goal.to_string().contains("goal"), "{forged_goal}");
+    // L952: a refused soccer input is dropped, never fatal to the session.
+    let forged_goal = game
+        .handle_in_world(&client_goal(), &character, 2_200)
+        .unwrap();
+    assert!(forged_goal.replies.is_empty() && !forged_goal.changed);
     assert_eq!(game.soccer_score(), Some([0, 0]));
     assert_eq!(game.state(), before_match);
 

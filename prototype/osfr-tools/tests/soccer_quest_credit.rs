@@ -595,12 +595,12 @@ fn the_event_is_not_client_reported() {
     let coins_before = game.inventory_state().coins;
     let instance = enter_match(&mut game, &character, SOCCER_42, 1_000);
 
-    // A client GoalMade is refused and changes no score or state.
-    let forged_goal = match game.handle_in_world(&client_goal(), &character, 1_200) {
-        Err(error) => error,
-        Ok(_) => panic!("client GoalMade is refused"),
-    };
-    assert!(forged_goal.to_string().contains("goal"), "{forged_goal}");
+    // A client GoalMade is refused and changes no score or state. L952: a refused soccer input
+    // is dropped, never fatal to the session.
+    let forged_goal = game
+        .handle_in_world(&client_goal(), &character, 1_200)
+        .unwrap();
+    assert!(forged_goal.replies.is_empty() && !forged_goal.changed);
     assert_eq!(game.soccer_score(), Some([0, 0]));
     assert_eq!(game.soccer_phase(), Some(MatchPhase::Running));
 

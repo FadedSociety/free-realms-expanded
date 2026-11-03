@@ -230,15 +230,13 @@ pub fn state_request_intent(
         return Err(invalid("soccer state direction is degenerate"));
     }
 
-    let charge = charge_from_aux(request.aux);
+    // L952: a quick click kicks with no charge (aux 0, native 2026-11-03). It is the weakest kick,
+    // at the floor, not a refusal: refusing it ended the player's session mid-shot. A non-positive
+    // power is left to the authority's own `(0, max_kick_power]` bound.
+    let charge = charge_from_aux(request.aux).max(policy.charge_floor);
     let power = charge * policy.max_power;
-    // The candidate refuses below its reconstructed floor. A non-positive
-    // power is left to the authority's own `(0, max_kick_power]` bound, which
-    // already refuses zero power before any mutation.
-    if charge < policy.charge_floor || !power.is_finite() {
-        return Err(invalid(
-            "soccer state power below the reconstructed candidate floor (native aux 0 may be a normal uncharged kick)",
-        ));
+    if !power.is_finite() {
+        return Err(invalid("soccer state power is not finite"));
     }
 
     let kind = match request.action {

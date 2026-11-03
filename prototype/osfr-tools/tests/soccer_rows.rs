@@ -40,6 +40,8 @@ const SNOWHILL: u32 = 43;
 const SLOWING_THE_SNOWSPURS: u32 = 326;
 const GOAL_STOPPER: u32 = 323;
 const CHEETAHS_DOUBLE_CHALLENGE: u32 = 333;
+/// L952: the Soccer Tutorial row (Games window 1050).
+const SOCCER_TUTORIAL: u32 = 1030;
 static NEXT: AtomicU64 = AtomicU64::new(0);
 
 struct Fixture {
@@ -310,6 +312,84 @@ fn shot_along(game: &mut Gameplay, character: &CharacterState, at: u64, z: f32, 
         game.tick(character, now).unwrap();
     }
     now
+}
+
+/// L952: the Soccer Tutorial is the ordinary match plus the client's own tutorial pages, which the
+/// server starts with a BaseUi 47/7 ExecuteScript at the first kickoff (native 2026-11-03), once.
+#[test]
+fn the_soccer_tutorial_row_opens_the_clients_tutorial_at_its_first_kickoff_only() {
+    let fixture = Fixture::new(SNOWHILL, 1);
+    let mut game = player(&fixture, false);
+    let character = character();
+    let mut replies = Vec::new();
+    let played = game
+        .handle_in_world(&play(SOCCER_TUTORIAL), &character, 1_000)
+        .unwrap();
+    assert!(played.scene_zoning.is_some(), "Play zones into sg_soccer");
+    let loaded = game.initialize_world(&character, 1_100).unwrap();
+    assert_eq!(
+        game_id(&loaded.replies, &[39, 0, 16]),
+        SOCCER_TUTORIAL as i32
+    );
+    let start = lifecycle(5, offer_instance(&loaded.replies));
+    let started = game.handle_in_world(&start, &character, 1_200).unwrap();
+    let mut expected = vec![47, 0, 7, 29, 0, 0, 0];
+    expected.extend(b"SoccerTutorial.StartSoccerTut");
+    expected.extend([0, 0, 0, 0]);
+    assert!(
+        started.replies.contains(&expected),
+        "Go's kickoff runs the client's tutorial"
+    );
+    replies.extend(game.tick(&character, 1_300).unwrap().replies);
+    // A goal, then the restart after its celebration.
+    shoot(&mut game, &character, 1_400);
+    let mut now = 1_550;
+    while game.soccer_score() == Some([0, 0]) {
+        now += 250;
+        assert!(now < 20_000, "the shot never scored");
+        replies.extend(game.tick(&character, now).unwrap().replies);
+    }
+    for _ in 0..20 {
+        now += 250;
+        replies.extend(game.tick(&character, now).unwrap().replies);
+    }
+
+    assert!(
+        !replies.iter().any(|packet| packet.starts_with(&[47, 0, 7])),
+        "a goal's restart does not start the tutorial again"
+    );
+}
+
+/// L952: a quick click is a kick with no charge (aux 0). It kicks the ball at the weakest power;
+/// refusing it ended the player's session (native 2026-11-03).
+#[test]
+fn an_uncharged_kick_moves_the_ball_and_keeps_the_session() {
+    let fixture = Fixture::new(SNOWHILL, 1);
+    let mut game = player(&fixture, false);
+    let character = character();
+    enter_match(&mut game, &character, SNOWHILL, 1_000);
+    game.handle_in_world(&position(character.guid, [0.0; 3]), &character, 1_300)
+        .unwrap();
+    game.tick(&character, 1_450).unwrap();
+    let uncharged = soccer::encode_inner(&SoccerPacket::UpdatePlayerState {
+        player: character.guid,
+        state: 17,
+        aux: 0,
+        state_counter: 1,
+        vectors: [[-1.0, 0.0, 0.0, 1.0], [0.0; 4], [0.0; 4]],
+    });
+    let kicked = game.handle_in_world(&uncharged, &character, 1_450).unwrap();
+    assert!(
+        kicked
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[76, 0, 4, 0])),
+        "the ball goes out moving: {:?}",
+        kicked.replies
+    );
+    // A refused input (a pose far past the pitch) is dropped, not fatal.
+    let far = position(character.guid, [9_999.0, 0.0, 9_999.0]);
+    assert!(game.handle_in_world(&far, &character, 1_500).is_ok());
 }
 
 #[test]

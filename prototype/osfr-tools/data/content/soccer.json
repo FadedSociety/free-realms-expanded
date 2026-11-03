@@ -30,6 +30,17 @@
       "encounter_id": 3
     },
     {
+      "id": 1030,
+      "name_id": 407373,
+      "description_id": 407374,
+      "icon_id": 20992,
+      "difficulty": 1,
+      "required_level": 0,
+      "encounter_id": 16,
+      "client_script": "SoccerTutorial.StartSoccerTut",
+      "source": "L952: the live Games row 1050 (activity_catalogue.json: content 1030, name 407373, description 407374) is the Soccer Tutorial. The client's tutorial pages (ScriptsBase.lua SoccerTutorial.StartSoccerTut) start from the server's BaseUi 47/7 ExecuteScript, which the match sends at its first kickoff (native 2026-11-03). (R) The match itself is the ordinary solo match; the live tutorial's own roster is not recovered."
+    },
+    {
       "id": 322,
       "name_id": 402582,
       "description_id": 37947,
