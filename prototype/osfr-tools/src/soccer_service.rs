@@ -564,6 +564,15 @@ fn snapped(mut events: Vec<ServiceEvent>) -> Vec<ServiceEvent> {
     events
 }
 
+/// L940: the setup role a player's 76/21 + 76/19 come from.
+fn role(bot: bool, team: u32, slot: u32) -> String {
+    match (bot, slot) {
+        (false, _) => "human".to_owned(),
+        (true, crate::soccer_bots::KEEPER_SLOT) => format!("keeper_{team}"),
+        (true, _) => format!("team_{team}"),
+    }
+}
+
 fn game_state(state: u32, players: u32) -> ServiceEvent {
     let mut words = [0u32; 18];
     words[0] = u32::MAX;
@@ -674,6 +683,19 @@ impl SoccerService {
         u32::try_from(self.authority.players().count()).unwrap_or(u32::MAX)
     }
 
+    /// L944: every player's 76/19 stats into the bot rules (`soccer_bots::Stats`), the words the
+    /// client gets too.
+    fn apply_stats(&mut self) {
+        let Some(setup) = &self.setup else { return };
+        for (id, state) in self.authority.players() {
+            let role = role(self.bots.contains(&id), state.team, state.slot);
+            if let Some((_, words)) = setup.roles.get(&role) {
+                self.bot_memory.entry(id).or_default().stats =
+                    Some(crate::soccer_bots::Stats::from_words(words));
+            }
+        }
+    }
+
     /// L940: the steps and match config before the first roster entry.
     fn setup_opening(&self) -> Vec<ServiceEvent> {
         let Some(setup) = &self.setup else { return Vec::new() };
@@ -697,11 +719,7 @@ impl SoccerService {
             ServiceEvent::Setup(SoccerPacket::Unknown { sub: 8, payload: setup.teams.clone() }),
         ];
         for (id, state) in self.authority.players() {
-            let role = match (self.bots.contains(&id), state.slot) {
-                (false, _) => "human".to_owned(),
-                (true, slot) if slot == crate::soccer_bots::KEEPER_SLOT => format!("keeper_{}", state.team),
-                (true, _) => format!("team_{}", state.team),
-            };
+            let role = role(self.bots.contains(&id), state.team, state.slot);
             let Some((stats, words)) = setup.roles.get(&role) else { continue };
             events.push(ServiceEvent::Setup(SoccerPacket::SetSoccerPlayerOneTimeStats {
                 player: id,
@@ -1105,6 +1123,7 @@ impl SoccerService {
         if self.setup.is_some() {
             let players = self.player_count();
             if !self.kicked_off {
+                self.apply_stats();
                 events.extend(self.setup_opening());
                 events.extend(self.setup_roster());
             }

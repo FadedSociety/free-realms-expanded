@@ -233,3 +233,35 @@ fn passive_bots_without_bot_ai_never_move() {
     );
     assert_eq!(game.player(0x101).unwrap().position, None);
 }
+
+/// L944: Toughness (76/19 word 3) gets a player back up quicker: twice the base, half the knockdown.
+#[test]
+fn toughness_shortens_the_knockdown_a_tackle_gives() {
+    let (mut game, bots) = match_with_bots();
+    soccer_bots::line_up(&mut game, &bots).unwrap();
+    place_human(&mut game, CENTRE, 1);
+    game.advance(0.02).unwrap();
+    let mut memory = BTreeMap::new();
+    let tough = soccer_bots::Stats {
+        toughness: 2 * soccer_bots::BASE_STATS.toughness,
+        ..soccer_bots::BASE_STATS
+    };
+    memory.insert(
+        HUMAN,
+        soccer_bots::BotMemory {
+            stats: Some(tough),
+            ..Default::default()
+        },
+    );
+    for _ in 0..40 {
+        let now = game.server_time();
+        let events = soccer_bots::step(&mut game, &bots, &mut memory, 0.25).unwrap();
+        if events.iter().any(|event| matches!(event, BotEvent::Tackled { .. })) {
+            let down = memory[&HUMAN].down_until - now;
+            assert!((down - soccer_bots::KNOCKDOWN / 2.0).abs() < 1e-4, "{down}");
+            return;
+        }
+        game.advance(0.25).unwrap();
+    }
+    panic!("the nearest opponent closes in and tackles");
+}

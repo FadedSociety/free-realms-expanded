@@ -71,6 +71,50 @@ pub struct BotMemory {
     /// L942: a grabbed power-up (until, factor): Speed scales the run speeds, Toughness the knockdown time.
     pub speed_boost: Option<(f32, f32)>,
     pub tough_boost: Option<(f32, f32)>,
+    /// L944: the player's Soccer Star stats, when the match sent them (76/19).
+    pub stats: Option<Stats>,
+}
+
+/// L944: a player's Soccer Star stats as sent in 76/19 words 0..5 (the client's stat-name table order,
+/// stat ids 39-43, R). The wiki: Kick Power harder kicks, Tackle Power stronger tackles, Toughness
+/// back up quicker.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Stats {
+    pub kick: u32,
+    pub footwork: u32,
+    pub speed: u32,
+    pub toughness: u32,
+    pub tackle: u32,
+}
+
+impl Stats {
+    pub fn from_words(words: &[u32; 9]) -> Self {
+        Self {
+            kick: words[0],
+            footwork: words[1],
+            speed: words[2],
+            toughness: words[3],
+            tackle: words[4],
+        }
+    }
+}
+
+/// The live server's field player (8, 8, 8, 8, 2): a stat at its base leaves the rule as it is.
+pub const BASE_STATS: Stats = Stats {
+    kick: 8,
+    footwork: 8,
+    speed: 8,
+    toughness: 8,
+    tackle: 2,
+};
+
+/// A stat against its base. Zero means "not this player's stat" (the keepers' Speed, Kick and
+/// Tackle are 0 and they still move), so it leaves the rule as it is.
+fn ratio(stats: Option<Stats>, pick: fn(&Stats) -> u32) -> f32 {
+    match stats.map(|stats| pick(&stats)) {
+        Some(value) if value > 0 => value as f32 / pick(&BASE_STATS) as f32,
+        _ => 1.0,
+    }
 }
 
 /// L942: a live boost's factor, or 1.
@@ -189,7 +233,10 @@ pub fn step(
             events.push(stopped(bot, at, ball));
             continue;
         }
-        let pace = boost(memory.get(&bot).and_then(|m| m.speed_boost), now);
+        let stats = memory.get(&bot).and_then(|m| m.stats);
+        let pace = boost(memory.get(&bot).and_then(|m| m.speed_boost), now)
+            * ratio(stats, |s| s.speed);
+        let strength = ratio(stats, |s| s.kick);
         let goal = authority.attack_goal(state.team);
         let c = authority.config().bounds.centre;
         // Read possession per bot: an earlier bot this step may have tackled or kicked.
@@ -224,7 +271,7 @@ pub fn step(
                     .filter(|&&(id, team, _, p)| team == state.team && id != bot && in_reach(p))
                     .min_by(|a, b| flat_distance(a.3, at).total_cmp(&flat_distance(b.3, at)));
                 if let Some(&(mate, _, _, mate_at)) = mate {
-                    events.extend(pass(authority, bot, mate, mate_at));
+                    events.extend(pass(authority, bot, mate, mate_at, strength));
                 }
             }
             continue;
@@ -237,6 +284,7 @@ pub fn step(
                     authority,
                     bot,
                     far_post(authority, &roster, state.team, goal),
+                    strength,
                 ));
                 continue;
             }
@@ -256,7 +304,7 @@ pub fn step(
                     })
                     .min_by(|a, b| flat_distance(a.3, goal).total_cmp(&flat_distance(b.3, goal)));
                 if let Some(&(mate, _, _, mate_at)) = open {
-                    events.extend(pass(authority, bot, mate, mate_at));
+                    events.extend(pass(authority, bot, mate, mate_at, strength));
                     continue;
                 }
             }
@@ -293,9 +341,12 @@ pub fn step(
                     if let Some(victim) = authority.tackle(bot)? {
                         memory.entry(bot).or_default().tackle_ready_at = now + TACKLE_COOLDOWN;
                         // The carrier goes down, so it cannot chase and tackle straight back.
+                        // Tackle Power makes the knockdown longer, Toughness shorter.
+                        let hit = ratio(stats, |s| s.tackle);
                         let victim_memory = memory.entry(victim).or_default();
-                        victim_memory.down_until =
-                            now + KNOCKDOWN * boost(victim_memory.tough_boost, now);
+                        victim_memory.down_until = now
+                            + KNOCKDOWN * hit * boost(victim_memory.tough_boost, now)
+                                / ratio(victim_memory.stats, |s| s.toughness);
                         events.push(BotEvent::Tackled {
                             tackler: bot,
                             victim,
@@ -363,20 +414,27 @@ fn stopped(player: u64, at: [f32; 3], ball: [f32; 3]) -> BotEvent {
 }
 
 /// A shot at `at`. The match's own rules decide; a refused kick (the ball moved on) is no kick.
-fn kick(authority: &mut Authority, bot: u64, at: [f32; 3]) -> Option<BotEvent> {
+/// `strength` is the bot's Kick Power against its base (L944).
+fn kick(authority: &mut Authority, bot: u64, at: [f32; 3], strength: f32) -> Option<BotEvent> {
     let from = authority.ball_position();
     let direction = sub([at[0], from[1] + 0.5, at[2]], from);
-    bot_kick(authority, bot, KickKind::Shot, direction, SHOT_POWER, None)
+    bot_kick(authority, bot, KickKind::Shot, direction, SHOT_POWER * strength, None)
 }
 
-fn pass(authority: &mut Authority, bot: u64, mate: u64, mate_at: [f32; 3]) -> Option<BotEvent> {
+fn pass(
+    authority: &mut Authority,
+    bot: u64,
+    mate: u64,
+    mate_at: [f32; 3],
+    strength: f32,
+) -> Option<BotEvent> {
     let direction = sub(mate_at, authority.ball_position());
     bot_kick(
         authority,
         bot,
         KickKind::Pass,
         direction,
-        PASS_POWER,
+        PASS_POWER * strength,
         Some(mate),
     )
 }
