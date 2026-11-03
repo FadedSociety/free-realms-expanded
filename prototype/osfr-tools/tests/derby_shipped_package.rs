@@ -51,12 +51,13 @@ const NOT_A_GATE: u64 = 9_000_000_048;
 const DERBY_LABEL: u32 = 3053;
 const COMPLETION_COINS: u32 = 25;
 const COMPLETION_XP: u32 = 10;
-/// The captured `ReadVehicleDefinition` byte count for the shared kart/derby vehicle.
-const DEFINITION_LEN: usize = 6108;
-/// SHA-256 of the recovered definition bytes (see notes/Autopilot/T313.md).
-const DEFINITION_SHA256: &str = "0a62b7e0a974a6423bd092089d7570621bba80d4e8141add16151eb5ef3a6c5e";
-/// The first length-prefixed name inside the recovered `ReadVehicleDefinition` bytes.
-const BODY_ASSET: &str = "kt_kart08_body_bbe.cdt";
+/// L931: the live human 34/10 create's `ReadVehicleDefinition` byte count (the derby car, captured
+/// in the arena; was the shared kart, T313).
+const DEFINITION_LEN: usize = 4176;
+/// SHA-256 of those definition bytes.
+const DEFINITION_SHA256: &str = "a90182bb4fc469eb00677bd8be022941499fcde5bf3635ba8cefe3d7ea2505f1";
+/// The first length-prefixed name inside them: the live derby body.
+const BODY_ASSET: &str = "sg_dm_crusher_body_bbec_002.cdt";
 const NOW: u64 = 10_000;
 static NEXT: AtomicU64 = AtomicU64::new(0);
 
@@ -276,6 +277,13 @@ fn menu_option(menu: &[Vec<u8>], label: u32) -> Option<i32> {
     })
 }
 
+/// L931: pose the player's car beside `npc`'s, where a contact counts.
+fn beside(gateway: &mut Gateway, key: ParticipantKey, npc: ParticipantKey, now: u64) {
+    let at = gateway.gameplay().unwrap().derby_driver_position(npc);
+    let at = at.expect("the car has a pose");
+    gateway.handle_at(&wrap(&pose(key, at)), now).unwrap();
+}
+
 fn offer_instance(replies: &[Vec<u8>]) -> i32 {
     replies
         .iter()
@@ -324,7 +332,34 @@ fn enter_derby(gateway: &mut Gateway, driver: u64, base: u64) -> i32 {
         entered.gameplay_changed,
         "the offered choice starts a match"
     );
-    offer_instance(&bodies(&entered))
+    offer_instance(&arena_loaded(gateway, &entered, base + 150))
+}
+
+/// L931: the choice zones into the arena; the client's Ready (13) and Loaded (10) bring the 39/16
+/// offer. Returns everything sent from the choice on.
+fn arena_loaded(gateway: &mut Gateway, entered: &GatewayOutcome, now: u64) -> Vec<Vec<u8>> {
+    let mut replies = bodies(entered);
+    for (step, packet) in [[13u8, 0], [10, 0]].iter().enumerate() {
+        let loaded = gateway.handle_at(&wrap(packet), now + step as u64).unwrap();
+        replies.extend(bodies(&loaded));
+    }
+    replies
+}
+
+/// L931: the gameplay half of the same: the arena's load in the arena's own zone.
+fn arena_loaded_in_gameplay(
+    game: &mut Gameplay,
+    character: &CharacterState,
+    entered: &mut osfr_tools::gameplay::Outcome,
+    now: u64,
+) {
+    let Some(scene) = entered.scene_zoning.clone() else {
+        return;
+    };
+    let mut arena = character.clone();
+    arena.zone_id = u32::try_from(scene.id).unwrap();
+    let loaded = game.initialize_world(&arena, now).unwrap();
+    entered.replies.extend(loaded.replies);
 }
 
 /// Open the configured driver menu through `Gameplay` (no outer dispatch) and take the option.
@@ -334,10 +369,11 @@ fn enter_derby_gameplay(game: &mut Gameplay, driver: u64, base: u64) -> i32 {
         .handle_in_world(&npc_click(driver), &character, base)
         .unwrap();
     let option = menu_option(&menu.replies, DERBY_LABEL).expect("the driver offers the derby");
-    let entered = game
+    let mut entered = game
         .handle_in_world(&npc_select(driver, option), &character, base + 100)
         .unwrap();
     assert!(entered.changed, "the offered choice starts a match");
+    arena_loaded_in_gameplay(game, &character, &mut entered, base + 150);
     offer_instance(&entered.replies)
 }
 
@@ -413,11 +449,11 @@ fn drive_to_results(
         .handle_at(&wrap(&pose(key, [0.0, 0.0, 0.0])), base + 2_900)
         .unwrap();
     for (index, npc) in npcs.iter().enumerate() {
+        let at = base + 3_000 + index as u64 * 100;
+        // L931: the arena's cars stand apart; a hit is made beside the car it hits.
+        beside(gateway, key, *npc, at - 1);
         let out = gateway
-            .handle_at(
-                &wrap(&hit_for(key, *npc, 100.0)),
-                base + 3_000 + index as u64 * 100,
-            )
+            .handle_at(&wrap(&hit_for(key, *npc, 100.0)), at)
             .unwrap();
         assert!(
             out.gameplay_changed,
@@ -441,11 +477,10 @@ fn drive_to_results(
         "the KO'd drivers reset"
     );
     for (index, npc) in npcs.iter().take(4).enumerate() {
+        let at = respawn_at + 100 + index as u64 * 100;
+        beside(gateway, key, *npc, at - 1);
         let out = gateway
-            .handle_at(
-                &wrap(&hit_for(key, *npc, 100.0)),
-                respawn_at + 100 + index as u64 * 100,
-            )
+            .handle_at(&wrap(&hit_for(key, *npc, 100.0)), at)
             .unwrap();
         if index == 3 {
             assert_eq!(
@@ -479,7 +514,7 @@ fn the_shipped_package_loads_and_offers_from_all_four_drivers() {
         let entered = choose(&mut gateway, driver, option, NOW + 100);
         assert!(entered.gameplay_changed, "driver {driver}");
         assert!(
-            bodies(&entered)
+            arena_loaded(&mut gateway, &entered, NOW + 150)
                 .iter()
                 .any(|packet| packet.starts_with(&[39, 0, 16])),
             "driver {driver} sends the native 39/16 offer"
@@ -788,13 +823,15 @@ fn a_refused_entry_changes_nothing() {
         "an already-playing refusal changes no save state"
     );
     assert!(active.gameplay().unwrap().derby_active());
-    let _ = active.handle_at(&wrap(&[26, 0, 42, 0]), NOW + 300).unwrap();
+    let retired = active.handle_at(&wrap(&[26, 0, 42, 0]), NOW + 300).unwrap();
     assert!(!active.gameplay().unwrap().derby_active());
+    // L931: retiring the offer zones the player back out of the arena.
+    arena_loaded(&mut active, &retired, NOW + 350);
     let menu = bodies(&click(&mut active, MAD_JACK, NOW + 400));
     let option = menu_option(&menu, DERBY_LABEL).expect("the driver menu is usable again");
     let again = choose(&mut active, MAD_JACK, option, NOW + 500);
     assert_eq!(
-        offer_instance(&bodies(&again)),
+        offer_instance(&arena_loaded(&mut active, &again, NOW + 550)),
         instance + 1,
         "retiring an offer does not reissue its instance id"
     );
@@ -839,15 +876,17 @@ fn malformed_content_is_refused_and_the_shipped_definition_is_real() {
     assert_eq!(shipped.game_id, 39);
     assert_eq!(shipped.rules.max_drivers, 8);
     assert_eq!(shipped.rules.score_target, Some(22));
-    assert_eq!(shipped.rules.time_limit_ms, None);
+    // L931: the live arena's clock (Sanctuary VehicleGames Derby.TimeLimitSeconds 240).
+    assert_eq!(shipped.rules.time_limit_ms, Some(240_000));
     assert_eq!(shipped.completion_reward_coins, COMPLETION_COINS);
     assert_eq!(shipped.completion_reward_xp, COMPLETION_XP);
     assert!(shipped.reward.is_none());
     assert!(shipped.pickups.is_empty());
+    // L931: the live human 34/10 create, as captured (`opus/minigames/derby.md`): a blank name.
     assert_eq!(
         shipped.vehicle.name,
-        b"Demo Derby Car".to_vec(),
-        "the name names the derby car, not a player"
+        b" ".to_vec(),
+        "the name is the live create's, not a player's"
     );
     let definition = &shipped.vehicle.definition;
     assert_eq!(definition.len(), DEFINITION_LEN);
@@ -869,9 +908,14 @@ fn malformed_content_is_refused_and_the_shipped_definition_is_real() {
         &prefix[..],
         "ReadVehicleDefinition 0x009d7b50 reads the body asset then the captured 400.0 float"
     );
-    assert_eq!(
-        &shipped.vehicle.start_transform_bits, &[0; 16],
-        "the start pose is not separately recovered (R)"
+    // L931: the live human start slot in the arena (`opus/minigames/derby.md`).
+    let start = [12, 13, 14].map(|slot| f32::from_bits(shipped.vehicle.start_transform_bits[slot]));
+    assert!(
+        start
+            .iter()
+            .zip([373.99, 6.0, 274.55])
+            .all(|(at, live)| (at - live).abs() < 0.01),
+        "the live arena start slot: {start:?}"
     );
 
     // Every malformed package is refused at load, and the directory is left untouched.

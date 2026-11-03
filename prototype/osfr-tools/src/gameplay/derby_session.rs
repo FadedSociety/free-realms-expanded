@@ -31,6 +31,11 @@ pub(super) fn restore_saved_derby_job(
 }
 
 impl Gameplay {
+    /// L931: where a car of the live derby is now (its last pose).
+    pub fn derby_driver_position(&self, key: crate::derby::ParticipantKey) -> Option<[f32; 3]> {
+        self.derby.as_ref()?.driver_position(key)
+    }
+
     pub fn derby_phase(&self) -> Option<crate::derby::DerbyPhase> {
         self.derby
             .as_ref()
@@ -78,13 +83,18 @@ impl Gameplay {
             return Ok(Outcome::default());
         };
         let replies = derby.tick(now_ms)?;
+        let ended = derby.phase().is_some() && !derby.active();
         let previous_job = if derby.active() { None } else { derby.exit() };
+        // L931: the driven NPCs' 34/5 poses are ephemeral; they must not force a save every tick.
         let mut out = Outcome {
-            changed: !replies.is_empty(),
+            changed: replies.iter().any(|reply| !reply.starts_with(&[34, 0, 5])),
             replies,
             ..Default::default()
         };
         staged.pay_derby_completion(character, &mut out)?;
+        if ended {
+            staged.leave_derby_arena(&mut out)?;
+        }
         if let Some(job) = previous_job {
             staged.restore_job(job, character.guid, &mut out)?;
             out.replies
@@ -147,8 +157,16 @@ impl Gameplay {
             .ok_or_else(|| invalid("derby entry requires the derby service"))?;
         // L936: the player stays a Demo Derby Driver after the match (client 101319).
         let offer = derby.begin_row(character, now_ms, row)?;
-        out.replies.push(offer);
-        out.replies.extend(derby.ready_packet());
+        let mut start = vec![offer];
+        start.extend(derby.ready_packet());
+        // L931: a row with an arena zones the player in; the offer waits for the arena's Loaded.
+        match derby.scene().cloned() {
+            Some(scene) => {
+                derby.enter_arena(character.clone(), start);
+                out.scene_zoning = Some(scene);
+            }
+            None => out.replies.extend(start),
+        }
         out.changed = true;
         Ok(out)
     }
@@ -178,6 +196,7 @@ impl Gameplay {
             self.leave_activity_job(previous_job, character.guid, &mut out)?;
             out.replies
                 .push(crate::kart_gateway::player_status(character.guid, 1));
+            self.leave_derby_arena(&mut out)?;
             out.changed = true;
             self.refresh_npc_quest_eligibility(current_unix_seconds());
             return Ok(out);
@@ -293,8 +312,32 @@ impl Gameplay {
         self.leave_activity_job(previous_job, character.guid, &mut out)?;
         out.replies
             .push(crate::kart_gateway::player_status(character.guid, 1));
+        self.leave_derby_arena(&mut out)?;
         out.changed = true;
         self.refresh_npc_quest_eligibility(current_unix_seconds());
         Ok(out)
+    }
+
+    /// L931: every way out of an arena match zones the player back to the pose kept at entry,
+    /// once (the visit is consumed here).
+    fn leave_derby_arena(&mut self, out: &mut Outcome) -> io::Result<()> {
+        let back = self
+            .derby
+            .as_mut()
+            .and_then(crate::derby_gateway::DerbyGateway::leave_arena);
+        if let Some(back) = back {
+            out.scene_zoning = Some(self.world_zoning(&back)?);
+        }
+        Ok(())
+    }
+
+    /// L931: the arena scene while a match visit lasts (`current_zone`, `supports_location`).
+    pub(super) fn derby_arena_scene(&self) -> Option<&crate::zone_transition::ZoneTransition> {
+        self.derby.as_ref()?.arena_scene()
+    }
+
+    /// L931: the arena's held start records after its Loaded (`initialize_world`).
+    pub(super) fn derby_arena_loaded(&mut self) -> Option<Vec<Vec<u8>>> {
+        self.derby.as_mut()?.arena_loaded()
     }
 }

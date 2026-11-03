@@ -706,12 +706,13 @@ fn shipped_minigame_producers_are_pinned() {
         // L099: each cooking recipe credits its own MiniGameData row (173-199) since the movie
         // runs it, no longer game 46 for every recipe.
         // L932: the soccer quest rows 322-333 (`soccer.json` games), each a server-settled win
-        // reporting the team's goals and the match time.
+        // reporting the team's goals and the match time. L931: the derby also credits 40/41 (Games
+        // window rows 67/68), the tutorials 289/290 and the quest rows 607, 615, 616, 624 and 627.
         vec![
-            18, 20, 31, 39, 42, 43, 44, 46, 66, 67, 77, 111, 134, 135, 136, 137, 139, 173, 174,
-            175, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193,
-            194, 195, 196, 197, 198, 199, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332,
-            333, 596, 597, 598, 599, 600, 601, 604,
+            18, 20, 31, 39, 40, 41, 42, 43, 44, 46, 66, 67, 77, 111, 134, 135, 136, 137, 139, 173,
+            174, 175, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192,
+            193, 194, 195, 196, 197, 198, 199, 289, 290, 322, 323, 324, 325, 326, 327, 328, 329,
+            330, 331, 332, 333, 596, 597, 598, 599, 600, 601, 604, 607, 615, 616, 624, 627,
         ],
         "the finish_minigame producer set changed; update the producer table and this pin"
     );
@@ -722,6 +723,26 @@ fn shipped_minigame_producers_are_pinned() {
     );
     assert!(catalogue.targets.reports(39, MinigameFact::Placement));
     assert!(!catalogue.targets.reports(39, MinigameFact::Elapsed));
+    // L931: every derby row reports the derby's own facts (score, placement, knock-out) and
+    // no finish time, so a quest can bound exactly those: 607 placement <= 4 + no knock-out,
+    // 615 placement 1 + no knock-out + score >= 6, 616 score >= 12 + placement <= 3, 624
+    // placement 1; 290 and 627 ask nothing.
+    for derby in [39, 40, 41, 289, 290, 604, 607, 615, 616, 624, 627] {
+        for fact in [
+            MinigameFact::Score,
+            MinigameFact::Placement,
+            MinigameFact::Knockout,
+        ] {
+            assert!(
+                catalogue.targets.reports(derby, fact),
+                "derby row {derby} must report {fact:?}"
+            );
+        }
+        assert!(
+            !catalogue.targets.reports(derby, MinigameFact::Elapsed),
+            "derby row {derby} reports no finish time"
+        );
+    }
     // F854: the Chef (46) and Miner (77, 134-137) movies take their score and timer
     // from the client, so no result fact is certified for them; forging (139) keeps
     // both because its movie measures them server-side.

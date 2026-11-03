@@ -1,5 +1,12 @@
 {
   "schema_version": 1,
+  "default_npc_driving": {
+    "pose_interval_ms": 50,
+    "speed_mps": 13.0,
+    "spawn_radius_m": 25.0,
+    "bump_impact": 5.0,
+    "bump_interval_ms": 1500
+  },
   "rows": [
     {
       "game_id": 604,
@@ -13,6 +20,13 @@
       "pickups": null,
       "completion_reward_coins": null,
       "completion_reward_xp": null,
+      "npc_driving": {
+        "pose_interval_ms": 50,
+        "speed_mps": 13.0,
+        "spawn_radius_m": 25.0,
+        "bump_impact": 5.0,
+        "bump_interval_ms": 1500
+      },
       "source": [
         {
           "kind": "client",
@@ -20,7 +34,315 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) NPC assignment: derby_gates.json lists the four arena drivers 9000000391, 9000000289, 9500000731 and 9000000183, but which arena each driver runs is not recovered, so every gate may enter row 604. Unset fields inherit derby_entry.json: the same vehicle, rules, pickups and 25 coin / 10 Demo Derby Driver XP completion reward as the default row 39."
+          "evidence": "(R) NPC assignment: derby_gates.json lists the four arena drivers 9000000391, 9000000289, 9500000731 and 9000000183, but which arena each driver runs is not recovered, so every gate may enter row 604. Unset fields inherit derby_entry.json: the same vehicle, rules, pickups and 25 coin / 10 Demo Derby Driver XP completion reward as the default row 39. L931: the server drives the seven AI cars, as live (opus/minigames/derby.md: every AI car's 34/5 came from the server, about 19 Hz); the same tunables as the other rows, and default_npc_driving does the same for row 39."
+        }
+      ]
+    },
+    {
+      "game_id": 40,
+      "npcs": [
+        9000000391,
+        9000000289,
+        9500000731,
+        9000000183
+      ],
+      "rules": {
+        "time_limit_ms": 240000
+      },
+      "pickups": null,
+      "completion_reward_coins": null,
+      "completion_reward_xp": null,
+      "npc_driving": {
+        "pose_interval_ms": 50,
+        "speed_mps": 13.0,
+        "spawn_radius_m": 25.0,
+        "bump_impact": 5.0,
+        "bump_interval_ms": 1500
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Games window row 67 (data/content/activity_catalogue.json, entry type 2, ContentId 40) names this MiniGameData row; its tutorial_activity_id is 1047 (ContentId 289)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rule: completion only, the Wildwood row's rule on the one arena package. (R) NPC drivers: this row sets npc_driving (DerbyService::drive_npcs chases the nearest living car and bumps it) because the placeholder NPCs of the base package stand at a spot no contact can reach, so placement and knock-out would never differ between matches. The numbers are tunables. A match ends at the inherited first-to-22 score or this row's 240 s time limit (R: Sanctuary-BubbaJoeX src/Resources/VehicleGames.json Derby.TimeLimitSeconds is 240; retail clips run 3 to 4 minutes). The row runs on the one arena package; which scene the client shows for this id is unverified."
+        }
+      ]
+    },
+    {
+      "game_id": 41,
+      "npcs": [
+        9000000391,
+        9000000289,
+        9500000731,
+        9000000183
+      ],
+      "rules": {
+        "time_limit_ms": 240000
+      },
+      "pickups": null,
+      "completion_reward_coins": null,
+      "completion_reward_xp": null,
+      "npc_driving": {
+        "pose_interval_ms": 50,
+        "speed_mps": 13.0,
+        "spawn_radius_m": 25.0,
+        "bump_impact": 5.0,
+        "bump_interval_ms": 1500
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Games window row 68 (data/content/activity_catalogue.json, entry type 2, ContentId 41) names this MiniGameData row; its tutorial_activity_id is 1047 (ContentId 289)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rule: completion only, the Wildwood row's rule on the one arena package. (R) NPC drivers: this row sets npc_driving (DerbyService::drive_npcs chases the nearest living car and bumps it) because the placeholder NPCs of the base package stand at a spot no contact can reach, so placement and knock-out would never differ between matches. The numbers are tunables. A match ends at the inherited first-to-22 score or this row's 240 s time limit (R: Sanctuary-BubbaJoeX src/Resources/VehicleGames.json Derby.TimeLimitSeconds is 240; retail clips run 3 to 4 minutes). The row runs on the one arena package; which scene the client shows for this id is unverified."
+        }
+      ]
+    },
+    {
+      "game_id": 289,
+      "npcs": [
+        9000000391,
+        9000000289,
+        9500000731,
+        9000000183
+      ],
+      "rules": {
+        "time_limit_ms": 240000
+      },
+      "pickups": null,
+      "completion_reward_coins": null,
+      "completion_reward_xp": null,
+      "npc_driving": {
+        "pose_interval_ms": 50,
+        "speed_mps": 13.0,
+        "spawn_radius_m": 25.0,
+        "bump_impact": 5.0,
+        "bump_interval_ms": 1500
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Games window tutorial row 1047 (data/content/activity_catalogue.json, entry type 2, ContentId 289); quest record 3060001 goal text 139429 is a bare 'complete the tutorial'."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte wiki 'Demolition Derby Tutorial' (Minigame quest, no reward): objective 'Complete the tutorial'; the tutorial teaches controls, boost, power-ups, health pick-ups and scoring."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rule: completion only. The scripted tutorial prompts are unrecovered, so it is an ordinary match; it reports the derby's facts and the quest asks none. (R) NPC drivers: this row sets npc_driving (DerbyService::drive_npcs chases the nearest living car and bumps it) because the placeholder NPCs of the base package stand at a spot no contact can reach, so placement and knock-out would never differ between matches. The numbers are tunables. A match ends at the inherited first-to-22 score or this row's 240 s time limit (R: Sanctuary-BubbaJoeX src/Resources/VehicleGames.json Derby.TimeLimitSeconds is 240; retail clips run 3 to 4 minutes). The row runs on the one arena package; which scene the client shows for this id is unverified."
+        }
+      ]
+    },
+    {
+      "game_id": 290,
+      "npcs": [
+        9000000391,
+        9000000289,
+        9500000731,
+        9000000183
+      ],
+      "rules": {
+        "time_limit_ms": 240000
+      },
+      "pickups": null,
+      "completion_reward_coins": null,
+      "completion_reward_xp": null,
+      "npc_driving": {
+        "pose_interval_ms": 50,
+        "speed_mps": 13.0,
+        "spawn_radius_m": 25.0,
+        "bump_impact": 5.0,
+        "bump_interval_ms": 1500
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Quest record 3060002 'Advanced Demolition Derby Tutorial' objective text 130348 is a bare 'complete the advanced tutorial'; the wiki has no page for it."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rule: completion only; no score, placement or knock-out bound exists in the client text. The scripted tutorial prompts are unrecovered, so it is an ordinary match. (R) NPC drivers: this row sets npc_driving (DerbyService::drive_npcs chases the nearest living car and bumps it) because the placeholder NPCs of the base package stand at a spot no contact can reach, so placement and knock-out would never differ between matches. The numbers are tunables. A match ends at the inherited first-to-22 score or this row's 240 s time limit (R: Sanctuary-BubbaJoeX src/Resources/VehicleGames.json Derby.TimeLimitSeconds is 240; retail clips run 3 to 4 minutes). The row runs on the one arena package; which scene the client shows for this id is unverified."
+        }
+      ]
+    },
+    {
+      "game_id": 607,
+      "npcs": [
+        9000000391,
+        9000000289,
+        9500000731,
+        9000000183
+      ],
+      "rules": {
+        "time_limit_ms": 240000
+      },
+      "pickups": null,
+      "completion_reward_coins": null,
+      "completion_reward_xp": null,
+      "npc_driving": {
+        "pose_interval_ms": 50,
+        "speed_mps": 13.0,
+        "spawn_radius_m": 25.0,
+        "bump_impact": 5.0,
+        "bump_interval_ms": 1500
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Description 394021 reads 'Collect health power-ups while competing in a demolition derby at Thunder Falls'; quest record 3060021 goal text 393349 asks to complete a derby without getting knocked out."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte wiki 'Demo Derby: Wear and Tear' (Duncan Slickshoes, Thunder Falls): objectives 'Compete in the derby' and 'Collect 4 Health Power Ups & Finish in Top 4' (263 stars)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rule in reported facts: placement <= 4 and no knock-out taken (knocked_out false). The 'collect 4 health power-ups' count is not a fact the derby reports (the shipped arena places no pick-ups; their positions belong to the client arena), so it is not modelled. (R) NPC drivers: this row sets npc_driving (DerbyService::drive_npcs chases the nearest living car and bumps it) because the placeholder NPCs of the base package stand at a spot no contact can reach, so placement and knock-out would never differ between matches. The numbers are tunables. A match ends at the inherited first-to-22 score or this row's 240 s time limit (R: Sanctuary-BubbaJoeX src/Resources/VehicleGames.json Derby.TimeLimitSeconds is 240; retail clips run 3 to 4 minutes). The row runs on the one arena package; which scene the client shows for this id is unverified."
+        }
+      ]
+    },
+    {
+      "game_id": 615,
+      "npcs": [
+        9000000391,
+        9000000289,
+        9500000731,
+        9000000183
+      ],
+      "rules": {
+        "time_limit_ms": 240000
+      },
+      "pickups": null,
+      "completion_reward_coins": null,
+      "completion_reward_xp": null,
+      "npc_driving": {
+        "pose_interval_ms": 50,
+        "speed_mps": 13.0,
+        "spawn_radius_m": 25.0,
+        "bump_impact": 5.0,
+        "bump_interval_ms": 1500
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Quest record 3060023 goal texts: 'Take first place against Claudio's minions in Frost Ridge without getting knocked out' (394032) and 'Knock out Claudio The Tank DeMarco' (400904); description 394470 sends the player into the Frost Ridge arena."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte wiki 'Demo Derby: Taking On the Tank' (J. P. Screecher, Frost Ridge): 'Knock out the 3 main drivers (Pit Boss Crew, Claudio DeMarco & Crew Chief KC)' and 'Finish in 1st place' (188 stars)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rule in reported facts: placement 1, no knock-out taken (knocked_out false) and score >= 6. The three named drivers cannot be told apart among the NPC keys, so 'knock out three main drivers' is the score of three knock-outs at the 2-point rate (a 3-point leader knock-out can shorten it; accepted). (R) NPC drivers: this row sets npc_driving (DerbyService::drive_npcs chases the nearest living car and bumps it) because the placeholder NPCs of the base package stand at a spot no contact can reach, so placement and knock-out would never differ between matches. The numbers are tunables. A match ends at the inherited first-to-22 score or this row's 240 s time limit (R: Sanctuary-BubbaJoeX src/Resources/VehicleGames.json Derby.TimeLimitSeconds is 240; retail clips run 3 to 4 minutes). The row runs on the one arena package; which scene the client shows for this id is unverified."
+        }
+      ]
+    },
+    {
+      "game_id": 616,
+      "npcs": [
+        9000000391,
+        9000000289,
+        9500000731,
+        9000000183
+      ],
+      "rules": {
+        "time_limit_ms": 240000
+      },
+      "pickups": null,
+      "completion_reward_coins": null,
+      "completion_reward_xp": null,
+      "npc_driving": {
+        "pose_interval_ms": 50,
+        "speed_mps": 13.0,
+        "spawn_radius_m": 25.0,
+        "bump_impact": 5.0,
+        "bump_interval_ms": 1500
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Quest record 3060025 goal texts: 'Come out the big winner during the Paws 'n Claws Smash-a-thon derby in Frost Ridge' (394036) and 'Place in the top 3 of the Smash-a-thon' (401606)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte wiki 'Demo Derby: Paws 'n Claws Smash-a-thon' (Kanan, Stillwater Crossing): objectives 'Score 12 points' and 'Place in the top 3' (200 stars)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rule in reported facts: score >= 12 and placement <= 3; both are facts the derby reports directly. (R) NPC drivers: this row sets npc_driving (DerbyService::drive_npcs chases the nearest living car and bumps it) because the placeholder NPCs of the base package stand at a spot no contact can reach, so placement and knock-out would never differ between matches. The numbers are tunables. A match ends at the inherited first-to-22 score or this row's 240 s time limit (R: Sanctuary-BubbaJoeX src/Resources/VehicleGames.json Derby.TimeLimitSeconds is 240; retail clips run 3 to 4 minutes). The row runs on the one arena package; which scene the client shows for this id is unverified."
+        }
+      ]
+    },
+    {
+      "game_id": 624,
+      "npcs": [
+        9000000391,
+        9000000289,
+        9500000731,
+        9000000183
+      ],
+      "rules": {
+        "time_limit_ms": 240000
+      },
+      "pickups": null,
+      "completion_reward_coins": null,
+      "completion_reward_xp": null,
+      "npc_driving": {
+        "pose_interval_ms": 50,
+        "speed_mps": 13.0,
+        "spawn_radius_m": 25.0,
+        "bump_impact": 5.0,
+        "bump_interval_ms": 1500
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Quest record 3060040 names the 'Tangletrack Trio' encounter (string 395026) and no other goal text for this row."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte wiki 'Demo Derby: Tangletrack Trio' (Jackson Spinner, Tangletrack): objective 'Take first place against the pirates!' (192 stars)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rule in reported facts: placement 1. The three pirate drivers are not distinguished among the NPC keys: every NPC is a rival. (R) NPC drivers: this row sets npc_driving (DerbyService::drive_npcs chases the nearest living car and bumps it) because the placeholder NPCs of the base package stand at a spot no contact can reach, so placement and knock-out would never differ between matches. The numbers are tunables. A match ends at the inherited first-to-22 score or this row's 240 s time limit (R: Sanctuary-BubbaJoeX src/Resources/VehicleGames.json Derby.TimeLimitSeconds is 240; retail clips run 3 to 4 minutes). The row runs on the one arena package; which scene the client shows for this id is unverified."
+        }
+      ]
+    },
+    {
+      "game_id": 627,
+      "npcs": [
+        9000000391,
+        9000000289,
+        9500000731,
+        9000000183
+      ],
+      "rules": {
+        "time_limit_ms": 240000
+      },
+      "pickups": null,
+      "completion_reward_coins": null,
+      "completion_reward_xp": null,
+      "npc_driving": {
+        "pose_interval_ms": 50,
+        "speed_mps": 13.0,
+        "spawn_radius_m": 25.0,
+        "bump_impact": 5.0,
+        "bump_interval_ms": 1500
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Quest record 3060026 goal text 394134 is 'Compete in the Frost Ridge Invitational'; description 394482 calls it an all-or-nothing derby for the best drivers. The wiki has no page for it."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rule: completion only. 'All-or-nothing' reads as a winner-takes-all derby, but no bound is certified; the row reports score, placement and knock-out for a later quest to ask. (R) NPC drivers: this row sets npc_driving (DerbyService::drive_npcs chases the nearest living car and bumps it) because the placeholder NPCs of the base package stand at a spot no contact can reach, so placement and knock-out would never differ between matches. The numbers are tunables. A match ends at the inherited first-to-22 score or this row's 240 s time limit (R: Sanctuary-BubbaJoeX src/Resources/VehicleGames.json Derby.TimeLimitSeconds is 240; retail clips run 3 to 4 minutes). The row runs on the one arena package; which scene the client shows for this id is unverified."
         }
       ]
     }

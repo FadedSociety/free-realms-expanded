@@ -40,20 +40,25 @@ impl Gameplay {
         });
     }
 
-    /// After the hole loads (`initialize_world`, like `housing_loaded`): the held start packets.
-    /// A second load in the hole resends nothing.
-    pub(super) fn fishing_hole_loaded(&mut self) -> Option<Vec<Vec<u8>>> {
-        Some(std::mem::take(&mut self.fishing_hole.as_mut()?.pending))
+    /// After a hole or (L931) the derby arena loads (`initialize_world`, like `housing_loaded`):
+    /// the held start packets. A second load resends nothing.
+    pub(super) fn minigame_scene_loaded(&mut self) -> Option<Vec<Vec<u8>>> {
+        let hole = (self.fishing_hole.as_mut()).map(|hole| std::mem::take(&mut hole.pending));
+        hole.or_else(|| self.derby_arena_loaded())
     }
 
-    pub(super) fn fishing_hole_scene(&self) -> Option<&crate::zone_transition::ZoneTransition> {
-        Some(&self.fishing_hole.as_ref()?.scene)
+    /// The scene a fishing hole or (L931) the derby arena put the player in.
+    pub(super) fn minigame_scene(&self) -> Option<&crate::zone_transition::ZoneTransition> {
+        let hole = self.fishing_hole.as_ref().map(|hole| &hole.scene);
+        hole.or_else(|| self.derby_arena_scene())
     }
 
-    /// The hole is where the player is while the visit lasts (`supports_location`).
-    pub(super) fn in_fishing_hole(&self, character: &CharacterState) -> bool {
-        self.fishing_hole_scene()
-            .is_some_and(|scene| u32::try_from(scene.id) == Ok(character.zone_id))
+    /// The hole, or the derby arena while its visit lasts, is where the player is
+    /// (`supports_location`).
+    pub(super) fn in_minigame_scene(&self, character: &CharacterState) -> bool {
+        let hole = self.fishing_hole.as_ref().map(|hole| &hole.scene);
+        hole.is_some_and(|scene| u32::try_from(scene.id) == Ok(character.zone_id))
+            || self.derby_arena_scene().is_some()
     }
 
     /// A save taken in a house or a fishing hole stores the world pose, never scene coordinates.
@@ -62,14 +67,20 @@ impl Gameplay {
             .fishing_hole
             .as_ref()
             .map(|hole| hole.return_to.clone());
-        self.house_return().or(hole)
+        // L931: a derby arena match stores its entry pose the same way.
+        let arena = self
+            .derby
+            .as_ref()
+            .and_then(|derby| derby.arena_return().cloned());
+        self.house_return().or(hole).or(arena)
     }
 
     /// A reconnect leaves a house or a fishing hole and resumes at the world pose. The fishing
     /// round itself goes with `reset_session`, which runs next.
     pub fn abandon_scene_for_reconnect(&mut self) -> Option<CharacterState> {
         let hole = self.fishing_hole.take().map(|hole| hole.return_to);
-        self.abandon_house_for_reconnect().or(hole)
+        let arena = self.derby.as_mut().and_then(crate::derby_gateway::DerbyGateway::leave_arena);
+        self.abandon_house_for_reconnect().or(hole).or(arena)
     }
 
     /// W160 per-tick upkeep: the bite timers and the end of a round that left its spot (nothing

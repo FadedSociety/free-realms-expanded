@@ -30,7 +30,10 @@ use npc_quest_chain::{
 };
 use osfr_tools::{
     character_store::CharacterState,
-    derby::{DerbyMessage, DerbyPhase, ParticipantKey, VehiclePose, decode_inner, encode_inner},
+    derby::{
+        DerbyMessage, DerbyPhase, ParticipantKey, VehicleCreate, VehiclePose, decode_inner,
+        encode_inner,
+    },
     derby_gateway::{
         DEMO_DERBY_DRIVER_PROFILE, DerbyGateway, DerbyGatewayContent, DerbyGatewayState,
         MAX_COMPLETION_REWARD,
@@ -54,6 +57,9 @@ const DERBY_LABEL: u32 = 3_053;
 const LICENSE_TO_DRIVE: u32 = 3_060_005;
 const DEFAULT_GAME: i32 = 39;
 const BREAK_ER_IN: i32 = 604;
+/// L931: the shipped hosted rows in file order after the default row: 604, the Games window rows
+/// 40/41 and tutorials 289/290, then the quest rows 607, 615, 616, 624 and 627.
+const SHIPPED_ROWS: [i32; 11] = [39, 604, 40, 41, 289, 290, 607, 615, 616, 624, 627];
 const DERBY_FILES: [&str; 4] = [
     "derby_entry.json",
     "derby_gates.json",
@@ -61,6 +67,10 @@ const DERBY_FILES: [&str; 4] = [
     "derby_minigames.json",
 ];
 const NOW: u64 = 10_000;
+/// The client's Loaded event (gateway opcode 10) after a scene change.
+const LOADED: [u8; 2] = 10_u16.to_le_bytes();
+/// L931: after the arena's zoning the client sends Ready (13) and then Loaded (10).
+const READY: [u8; 2] = 13_u16.to_le_bytes();
 const NPC_DRIVERS: usize = 7;
 const KNOCKOUTS_TO_WIN: usize = 4;
 const RESULTS_HOLD_MS: u64 = 10_000;
@@ -169,10 +179,15 @@ fn offer_game_id(replies: &[Vec<u8>]) -> i32 {
 }
 
 fn pose(key: ParticipantKey) -> Vec<u8> {
+    pose_at(key, [0.0; 3])
+}
+
+/// L931: the player's car at `at` (the arena's cars stand apart; a hit is made beside one).
+fn pose_at(key: ParticipantKey, at: [f32; 3]) -> Vec<u8> {
     encode_inner(&DerbyMessage::VehiclePose(VehiclePose {
         key,
         transform_bits: [
-            1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+            1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, at[0], at[1], at[2], 1.0,
         ]
         .map(f32::to_bits),
         vector_a_bits: [0; 4],
@@ -192,7 +207,10 @@ fn enter_derby(gateway: &mut Gateway, driver: u64, base: u64) -> (i32, i32) {
         .find(|packet| packet.starts_with(&[26, 0, 9, 0]))
         .expect("the driver opens its 26/9 menu");
     let option = menu_option_bytes(packet, DERBY_LABEL);
-    let entered = gateway_send(gateway, &npc_select(driver, option), base + 1);
+    let mut entered = gateway_send(gateway, &npc_select(driver, option), base + 1);
+    // L931: the arena loads first; the 39/16 offer follows its Ready and Loaded.
+    entered.extend(gateway_send(gateway, &READY, base + 2));
+    entered.extend(gateway_send(gateway, &LOADED, base + 3));
     (offer_instance(&entered), offer_game_id(&entered))
 }
 
@@ -254,6 +272,12 @@ fn start_and_ready(
     (key, npcs)
 }
 
+/// L931: pose the player's car beside `npc`'s, where a contact counts.
+fn beside(gateway: &mut Gateway, key: ParticipantKey, npc: ParticipantKey, now: u64) {
+    let at = gateway.gameplay().unwrap().derby_driver_position(npc);
+    gateway_send(gateway, &pose_at(key, at.expect("the car has a pose")), now);
+}
+
 /// Knock out all seven NPC drivers, wait out their respawn, then knock out four more for the
 /// shipped first-to-22 target. Returns the final results reply bodies.
 fn drive_to_results(
@@ -264,11 +288,9 @@ fn drive_to_results(
 ) -> Vec<Vec<u8>> {
     gateway_send(gateway, &pose(key), base + 2_900);
     for (index, npc) in npcs.iter().enumerate() {
-        let out = gateway_send(
-            gateway,
-            &hit_for(key, *npc, 100.0),
-            base + 3_000 + index as u64 * 100,
-        );
+        let at = base + 3_000 + index as u64 * 100;
+        beside(gateway, key, *npc, at - 1);
+        let out = gateway_send(gateway, &hit_for(key, *npc, 100.0), at);
         assert!(!out.is_empty(), "the contact is resolved by the server");
         assert_eq!(
             gateway.gameplay().unwrap().derby_phase(),
@@ -288,11 +310,9 @@ fn drive_to_results(
         "the knocked-out drivers reset"
     );
     for (index, npc) in npcs.iter().take(KNOCKOUTS_TO_WIN).enumerate() {
-        let out = gateway_send(
-            gateway,
-            &hit_for(key, *npc, 100.0),
-            respawn_at + 100 + index as u64 * 100,
-        );
+        let at = respawn_at + 100 + index as u64 * 100;
+        beside(gateway, key, *npc, at - 1);
+        let out = gateway_send(gateway, &hit_for(key, *npc, 100.0), at);
         if index + 1 == KNOCKOUTS_TO_WIN {
             assert_eq!(
                 gateway.gameplay().unwrap().derby_phase(),
@@ -696,7 +716,7 @@ fn shipped_rows_are_hosted_at_the_four_gates() {
             .iter()
             .map(|row| row.game_id())
             .collect::<Vec<_>>(),
-        vec![DEFAULT_GAME, BREAK_ER_IN]
+        SHIPPED_ROWS
     );
     for gate in [MAD_JACK, CRASH, BURT, RIP] {
         assert_eq!(
@@ -704,7 +724,7 @@ fn shipped_rows_are_hosted_at_the_four_gates() {
                 .rows_for(gate)
                 .map(|row| row.game_id())
                 .collect::<Vec<_>>(),
-            vec![DEFAULT_GAME, BREAK_ER_IN],
+            SHIPPED_ROWS,
             "gate {gate}"
         );
     }
@@ -983,5 +1003,300 @@ fn each_session_enters_its_own_row() {
         first.gameplay().unwrap().derby_phase(),
         Some(DerbyPhase::Starting),
         "the second session's start does not move the first"
+    );
+}
+
+// ---- L931: the quest rows, row rules, server-driven NPCs and the Games window ----
+
+/// A row's `rules` object changes only the keys it names; every other key inherits.
+#[test]
+fn row_rules_are_a_partial_override() {
+    let package = Package::new(&[
+        "derby_entry.json",
+        "derby_gates.json",
+        "derby_minigames.json",
+    ]);
+    let default = default_package(&package);
+    let mut row = one_row(BREAK_ER_IN, &[MAD_JACK]);
+    row["rules"] = json!({"time_limit_ms": 90_000});
+    package.write_rows(vec![row.clone()]);
+    let gateway = DerbyGateway::load(package.path(), None)
+        .expect("a partial rules row loads")
+        .expect("the default package exists");
+    let mut expected = default.rules.clone();
+    expected.time_limit_ms = Some(90_000);
+    assert_eq!(gateway.rows()[1].package().rules, expected);
+    assert_eq!(gateway.rows()[0].package().rules, default.rules);
+
+    for bad in [json!({"no_such_rule": 1}), json!({"max_drivers": 1})] {
+        row["rules"] = bad;
+        package.write_rows(vec![row.clone()]);
+        assert!(
+            DerbyGateway::load(package.path(), None).is_err(),
+            "{row}: an unknown key or a value the service refuses fails the load"
+        );
+    }
+}
+
+fn driving_json() -> Value {
+    json!({
+        "pose_interval_ms": 100, "speed_mps": 12.0, "spawn_radius_m": 25.0,
+        "bump_impact": 5.0, "bump_interval_ms": 1500
+    })
+}
+
+/// `npc_driving` is validated at load; `default_npc_driving` is the default row's switch.
+#[test]
+fn npc_driving_is_validated_at_load_and_the_default_row_has_a_switch() {
+    let package = Package::new(&[
+        "derby_entry.json",
+        "derby_gates.json",
+        "derby_minigames.json",
+    ]);
+    let mut row = one_row(BREAK_ER_IN, &[MAD_JACK]);
+    row["npc_driving"] = driving_json();
+    package.write_rows(vec![row.clone()]);
+    let gateway = DerbyGateway::load(package.path(), None).unwrap().unwrap();
+    assert!(
+        gateway.rows()[0].npc_driving().is_none(),
+        "the default row stays inert"
+    );
+    let driving = gateway.rows()[1]
+        .npc_driving()
+        .expect("the row drives its NPCs");
+    assert_eq!(driving.bump_interval_ms, 1_500);
+
+    row["npc_driving"]["speed_mps"] = json!(-1.0);
+    package.write_rows(vec![row]);
+    assert!(
+        DerbyGateway::load(package.path(), None).is_err(),
+        "a bad row is refused"
+    );
+
+    let mut file = rows_file(vec![]);
+    file["default_npc_driving"] = driving_json();
+    json::write_pretty(&package.path().join("derby_rows.json"), &file);
+    let gateway = DerbyGateway::load(package.path(), None).unwrap().unwrap();
+    assert!(
+        gateway.rows()[0].npc_driving().is_some(),
+        "the default row drives"
+    );
+    file["default_npc_driving"]["bump_impact"] = json!(0.0);
+    json::write_pretty(&package.path().join("derby_rows.json"), &file);
+    assert!(
+        DerbyGateway::load(package.path(), None).is_err(),
+        "a bad default is refused"
+    );
+}
+
+/// The shipped quest rows run driven, clocked matches; the earlier rows are untouched.
+#[test]
+fn shipped_quest_rows_run_driven_matches_on_the_clock() {
+    let gateway = DerbyGateway::load(&content_dir(), None).unwrap().unwrap();
+    for row in gateway.rows() {
+        // L931: as live, the server drives every row's AI cars on the arena's 240 s clock.
+        assert!(row.npc_driving().is_some(), "row {}", row.game_id());
+        let rules = &row.package().rules;
+        assert_eq!(rules.time_limit_ms, Some(240_000), "row {}", row.game_id());
+        assert_eq!(
+            rules.score_target,
+            Some(22),
+            "row {} keeps first-to-22",
+            row.game_id()
+        );
+    }
+}
+
+const WEAR_AND_TEAR: i32 = 607;
+
+fn play(row: u32) -> Vec<u8> {
+    let mut inner = vec![167, 0, 1, 2];
+    inner.extend(row.to_le_bytes());
+    inner.extend(0u32.to_le_bytes());
+    inner
+}
+
+/// Games window Play starts the row the player chose: 65 -> 39, 67 -> 40, 68 -> 41 and the
+/// tutorial 1047 -> 289 (their MiniGameData ContentIds), each as its own 39/16 offer.
+#[test]
+fn games_window_play_starts_the_row_chosen() {
+    for (offset, (live_row, game)) in [(65_u32, 39_i32), (67, 40), (68, 41), (1047, 289)]
+        .into_iter()
+        .enumerate()
+    {
+        let guid = 931_100 + offset as u64;
+        let fixture = derby_fixture(guid);
+        fixture.copy_content("activity_catalogue.json");
+        let (_, position) = npc_location(CRASH);
+        let mut gateway = fixture.session(guid, position, None);
+        let mut replies = gateway_send(&mut gateway, &play(live_row), NOW);
+        replies.extend(gateway_send(&mut gateway, &READY, NOW + 1));
+        replies.extend(gateway_send(&mut gateway, &LOADED, NOW + 2));
+        assert_eq!(offer_game_id(&replies), game, "Play on row {live_row}");
+        assert!(gateway.gameplay().unwrap().derby_active());
+    }
+}
+
+/// A driven quest row (607) is entered at a gate, its NPCs appear and chase once the human's
+/// first pose arrives, the clock ends the match, and the finish credits 607 and nothing else.
+#[test]
+fn driven_row_finishes_on_the_clock_and_credits_its_own_id() {
+    let guid = 931_005;
+    let fixture = derby_fixture(guid);
+    patch_derby_quest(&fixture, &[WEAR_AND_TEAR, DEFAULT_GAME], 1);
+    let (_, position) = npc_location(CRASH);
+    let mut gateway = fixture.session(guid, position, None);
+    {
+        let character = gateway.state().clone();
+        accept_license(gateway.gameplay_mut().unwrap(), &character);
+    }
+    let (coins_before, xp_before) = money(&gateway);
+    let (instance, game_id) = enter_derby(&mut gateway, CRASH, NOW);
+    assert_eq!(
+        game_id, WEAR_AND_TEAR,
+        "the open 607 objective selects its row"
+    );
+    let (key, _) = start_and_ready(&mut gateway, instance, WEAR_AND_TEAR, NOW);
+
+    gateway_send(&mut gateway, &pose(key), NOW + 2_100);
+    // L931: the arena's cars start on their own slots (the 34/10 create) and broadcast as they
+    // drive; every one moves within the first steps.
+    let mut moved = std::collections::BTreeSet::new();
+    for at in [NOW + 2_200, NOW + 2_300] {
+        let step = gateway.tick_at(at).unwrap();
+        moved.extend(
+            step.replies
+                .iter()
+                .map(|packet| &packet[7..])
+                .filter(|packet| packet.starts_with(&[34, 0, 5]))
+                .map(|packet| packet[4..12].to_vec()),
+        );
+        assert!(
+            !step.state_changed && !step.gameplay_changed,
+            "ephemeral NPC poses never force a character save"
+        );
+    }
+    assert_eq!(
+        moved.len(),
+        NPC_DRIVERS,
+        "every NPC drives and is broadcast"
+    );
+    assert_eq!(
+        gateway.gameplay().unwrap().derby_phase(),
+        Some(DerbyPhase::Running)
+    );
+    assert_eq!(
+        counts(gateway.gameplay().unwrap(), LICENSE_TO_DRIVE),
+        vec![0, 0]
+    );
+
+    // Countdown zero was acknowledged at NOW + 2_004: the 240 s limit ends the match.
+    gateway.tick_at(NOW + 2_004 + 240_000).unwrap();
+    assert_eq!(
+        gateway.gameplay().unwrap().derby_phase(),
+        Some(DerbyPhase::Results)
+    );
+    assert_eq!(
+        counts(gateway.gameplay().unwrap(), LICENSE_TO_DRIVE),
+        vec![1, 0],
+        "only the entered row's objective is credited"
+    );
+    let (coins_after, xp_after) = money(&gateway);
+    assert_eq!((coins_after, xp_after), (coins_before + 25, xp_before + 10));
+    assert_eq!(ledger(&gateway), vec![instance]);
+}
+
+/// L931: the shipped package plays in the live arena (the captured op31 `sg_dm_arena` frame).
+/// The menu option zones the player in and the 39/16 offer waits for the arena's Loaded; the cars
+/// appear on the captured start slots with the captured bodies; a save in the arena keeps the
+/// world pose; the end of the match zones the player back to it.
+#[test]
+fn the_shipped_derby_plays_in_its_arena_and_returns_to_the_world() {
+    let guid = 931_200;
+    let fixture = derby_fixture(guid);
+    let (_, position) = npc_location(CRASH);
+    let mut gateway = fixture.session(guid, position, None);
+    let world = gateway.state().position;
+    let menu = gateway_send(&mut gateway, &npc_interact(CRASH), NOW);
+    let packet = menu.iter().find(|p| p.starts_with(&[26, 0, 9, 0])).unwrap();
+    let option = menu_option_bytes(packet, DERBY_LABEL);
+    let selected = gateway_send(&mut gateway, &npc_select(CRASH, option), NOW + 1);
+    assert!(
+        !selected.iter().any(|p| p.starts_with(&[39, 0, 16])),
+        "the offer waits for the arena"
+    );
+    let zone = |gateway: &Gateway| gateway.gameplay().unwrap().current_zone().unwrap().name;
+    assert_eq!(zone(&gateway), "sg_dm_arena");
+    gateway_send(&mut gateway, &READY, NOW + 2);
+    let instance = offer_instance(&gateway_send(&mut gateway, &LOADED, NOW + 3));
+
+    let key = ParticipantKey(guid);
+    gateway_send(&mut gateway, &start_request(instance), NOW + 300);
+    let setup = gateway_send(&mut gateway, &register_for(key), NOW + 400);
+    let cars: Vec<_> = setup
+        .iter()
+        .filter_map(|packet| match decode_inner(packet) {
+            Ok(DerbyMessage::CreateVehicle(car)) => Some(car),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(cars.len(), NPC_DRIVERS + 1);
+    let at = |bits: &[u32; 16]| [12, 13, 14].map(|slot| f32::from_bits(bits[slot]));
+    let human = cars.iter().find(|car| car.key == key).unwrap();
+    // The live start slots (`opus/minigames/derby.md`), to the capture's precision.
+    let near = |a: [f32; 3], b: [f32; 3]| a.iter().zip(b).all(|(x, y)| (x - y).abs() < 0.01);
+    assert!(near(at(&human.start_transform_bits), [373.99, 6.0, 274.55]));
+    assert!(human.unknown_flag, "the live human create carries flag 1");
+    let slots: Vec<_> = cars.iter().filter(|car| car.key != key).collect();
+    assert!(near(
+        at(&slots[0].start_transform_bits),
+        [360.09, 15.0, 215.0]
+    ));
+    let body = |car: &&VehicleCreate, model: &[u8]| {
+        car.definition.windows(model.len()).any(|w| w == model)
+    };
+    assert!(body(&slots[1], b"sg_dm_ripper_body_bbec_002.adr"));
+    assert!(body(&slots[3], b"sg_dm_crusher_body_bbec_002.adr"));
+
+    assert_eq!(
+        gateway.snapshot().character.position,
+        world,
+        "a save in the arena keeps the world pose"
+    );
+    let npcs: Vec<_> = slots.iter().map(|car| car.key).collect();
+    for value in 3..=8 {
+        gateway_send(
+            &mut gateway,
+            &phase_for(key, value),
+            NOW + 1_000 + value as u64,
+        );
+    }
+    for value in (0..=4).rev() {
+        gateway_send(
+            &mut gateway,
+            &countdown_for(key, value),
+            NOW + 2_000 + (4 - value) as u64,
+        );
+    }
+    drive_to_results(&mut gateway, key, &npcs, NOW);
+    // The results hold ends (close enabled) and the client closes the match (39/6).
+    gateway
+        .tick_at(NOW + 8_400 + RESULTS_HOLD_MS + 1_000)
+        .unwrap();
+    let mut quit = vec![39, 0, 6];
+    for word in [instance, -1, -1] {
+        quit.extend(word.to_le_bytes());
+    }
+    gateway_send(&mut gateway, &quit, NOW + 8_400 + RESULTS_HOLD_MS + 1_100);
+    assert!(!gateway.gameplay().unwrap().derby_active());
+    assert_ne!(
+        zone(&gateway),
+        "sg_dm_arena",
+        "the end of the match leaves the arena"
+    );
+    assert_eq!(
+        gateway.state().position,
+        world,
+        "back at the pose kept at entry"
     );
 }

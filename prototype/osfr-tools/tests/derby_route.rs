@@ -294,6 +294,8 @@ fn content() -> DerbyGatewayContent {
             unknown_flag: false,
             unknown_value_bits: 0,
         },
+        scene: None,
+        npc_vehicles: Vec::new(),
         rules: DerbyRules {
             max_drivers: 8,
             start_health: 20,

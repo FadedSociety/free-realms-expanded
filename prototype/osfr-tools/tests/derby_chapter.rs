@@ -347,13 +347,27 @@ fn start_match(fixture: &Fixture, game: &mut Gameplay, driver: u64, now: &mut u6
     let menu = npc_quest_chain::interact(game, &character, driver, *now);
     let option = menu_option(&menu, DERBY_LABEL);
     *now += 100;
-    let entered = send(game, &character, &npc_select(driver, option), *now);
+    let mut entered = send(game, &character, &npc_select(driver, option), *now);
     assert!(
         entered.changed,
         "the admitted derby choice must start a match: {}",
         replies_text(&entered)
     );
+    *now += 50;
+    arena_loaded(game, &character, &mut entered, *now);
     offer_instance(&entered)
+}
+
+/// L931: the choice zones into the arena; its load (in the arena's own zone) brings the 39/16
+/// offer.
+fn arena_loaded(game: &mut Gameplay, character: &CharacterState, entered: &mut Outcome, now: u64) {
+    let Some(scene) = entered.scene_zoning.clone() else {
+        return;
+    };
+    let mut arena = character.clone();
+    arena.zone_id = u32::try_from(scene.id).unwrap();
+    let loaded = game.initialize_world(&arena, now).unwrap();
+    entered.replies.extend(loaded.replies);
 }
 
 /// 39/5 Go, 34/6 register, the client-owned phase acknowledgements and the countdown; returns the
@@ -429,6 +443,11 @@ fn finish_match(
     );
     for (index, npc) in npcs.iter().enumerate() {
         let at = *now + 300 + index as u64 * 100;
+        // L931: the arena's cars stand apart; a hit is made beside the car it hits.
+        let beside = game
+            .derby_driver_position(*npc)
+            .expect("the car has a pose");
+        send(game, &character, &pose_for(key, beside), at - 1);
         let out = send(game, &character, &hit_for(key, *npc, 100.0), at);
         assert!(
             out.changed,
@@ -458,6 +477,8 @@ fn finish_match(
     );
     for (index, npc) in npcs.iter().take(KNOCKOUTS_TO_WIN).enumerate() {
         let at = respawn_at + 100 + index as u64 * 100;
+        let beside = game.derby_driver_position(*npc).expect("the car has a pose");
+        send(game, &character, &pose_for(key, beside), at - 1);
         let out = send(game, &character, &hit_for(key, *npc, 100.0), at);
         if index + 1 == KNOCKOUTS_TO_WIN {
             assert_eq!(
@@ -1130,12 +1151,13 @@ fn two_players_finish_their_own_matches_independently() {
     let entered = npc_quest_chain::interact(&mut a, &first.character(MAD_JACK), MAD_JACK, now);
     let option = menu_option(&entered, DERBY_LABEL);
     now += 100;
-    let started = send(
+    let mut started = send(
         &mut a,
         &first.character(MAD_JACK),
         &npc_select(MAD_JACK, option),
         now,
     );
+    arena_loaded(&mut a, &first.character(MAD_JACK), &mut started, now + 50);
     // L936: the live job is Demo Derby Driver and the save records it too (it replaced T313's
     // "the temporary job is never saved": there is no prior job to keep).
     assert_eq!(

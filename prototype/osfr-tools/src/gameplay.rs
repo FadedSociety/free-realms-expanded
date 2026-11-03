@@ -1702,7 +1702,7 @@ impl Gameplay {
     }
 
     pub fn supports_location(&self, character: &CharacterState) -> bool {
-        if self.soccer.is_some() || self.in_fishing_hole(character) {
+        if self.soccer.is_some() || self.in_minigame_scene(character) {
             return true;
         }
         if let Some(kart) = self.kart_entry.as_ref().filter(|k| k.active()) {
@@ -1722,7 +1722,7 @@ impl Gameplay {
         // must not stand in for it, or other players share its instance.
         let scene = (self.soccer.as_ref().map(|soccer| soccer.scene()))
             .or_else(|| self.kart_entry.as_ref().and_then(|kart| kart.scene()))
-            .or_else(|| self.fishing_hole_scene());
+            .or_else(|| self.minigame_scene());
         if let Some(scene) = scene {
             return housing::scene_zone(scene);
         }
@@ -1740,7 +1740,7 @@ impl Gameplay {
         character: &CharacterState,
         now_ms: u64,
     ) -> io::Result<Outcome> {
-        if let Some(replies) = self.housing_loaded().or_else(|| self.fishing_hole_loaded()) {
+        if let Some(replies) = self.housing_loaded().or_else(|| self.minigame_scene_loaded()) {
             return Ok(Outcome {
                 replies,
                 ..Outcome::default()
@@ -3130,7 +3130,7 @@ impl Gameplay {
                 Some(crate::minigame::RunState::Cancelled)
                     | Some(crate::minigame::RunState::Closed)
             ) {
-                self.exit_soccer(&mut out)?;
+                self.exit_soccer(character, &mut out)?;
             }
             return Ok(Some(out));
         }
@@ -3148,31 +3148,16 @@ impl Gameplay {
         Ok(None)
     }
 
-    /// Return to the pre-match world after a leave or results Close. The world
-    /// scene comes from the loaded encounter, so the saved position and the
-    /// op31 frame always agree.
-    fn exit_soccer(&mut self, out: &mut Outcome) -> io::Result<()> {
+    /// Return to the pre-match world after a leave or results Close, by the shared world return
+    /// (the saved position and the op31 frame always agree).
+    fn exit_soccer(&mut self, character: &CharacterState, out: &mut Outcome) -> io::Result<()> {
         let Some(session) = self.soccer.take() else {
             return Ok(());
         };
-        let Some(encounter) = &self.encounter else {
+        if self.encounter.is_none() {
             return Ok(());
-        };
-        let (zone, position, rotation) = session.return_location();
-        let world = encounter.world();
-        out.scene_zoning = Some(crate::zone_transition::ZoneTransition {
-            envelope_flag: 1,
-            scene: world.name.clone(),
-            type_id: 2,
-            position: [position[0], position[1], position[2], 1.0],
-            rotation: [rotation[0], rotation[1], rotation[2], 1.0],
-            sky: world.sky.clone(),
-            id: i32::try_from(zone).unwrap_or(0),
-            geometry_id: world.geometry_id,
-            override_update_radius: true,
-            unknown: 1,
-            ..Default::default()
-        });
+        }
+        out.scene_zoning = Some(self.world_zoning(&session.return_character(character))?);
         out.changed = true;
         Ok(())
     }

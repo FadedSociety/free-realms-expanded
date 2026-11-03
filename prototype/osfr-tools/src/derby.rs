@@ -271,8 +271,9 @@ pub struct VehicleState {
     pub health: u32,
     /// Confirmed consumer: score field in the HUD and results list.
     pub score: u32,
-    /// Two dwords with unknown consumers.
-    pub unknown_values: [u32; 2],
+    /// Knock-outs made, then times knocked out (live capture: the human's final 34/11 reads
+    /// score 6, [3, 1], as the match it played).
+    pub knockouts: [u32; 2],
     /// Client result damage is raw field E minus raw field F. Mapping these to dealt/received is R.
     pub damage_dealt: u32,
     pub damage_received: u32,
@@ -444,7 +445,7 @@ impl DerbyMessage {
                 put_key(out, state.key);
                 put_u32(out, state.health);
                 put_u32(out, state.score);
-                put_words(out, &state.unknown_values);
+                put_words(out, &state.knockouts);
                 put_u32(out, state.damage_dealt);
                 put_u32(out, state.damage_received);
                 out.extend(state.flags);
@@ -583,7 +584,7 @@ pub fn decode_inner(packet: &[u8]) -> Result<DerbyMessage, DerbyError> {
             key: reader.key()?,
             health: reader.u32()?,
             score: reader.u32()?,
-            unknown_values: reader.words()?,
+            knockouts: reader.words()?,
             damage_dealt: reader.u32()?,
             damage_received: reader.u32()?,
             flags: reader.array()?,
@@ -741,6 +742,39 @@ impl Default for DerbyRules {
     }
 }
 
+/// (L931, R) Server-driven NPC drivers. The client owns the arena (start slots, walls) and the retail
+/// NPC AI is unrecovered, so the server only chases: once a human's first pose arrives each NPC
+/// appears on a ring around it, then drives straight at the nearest living driver and bumps it. The
+/// bump is resolved by the server (an NPC has no client to report contacts). A service without
+/// this keeps inert placeholder NPCs. Every number is a tunable (R).
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct NpcDriving {
+    /// Movement step and pose broadcast period.
+    pub pose_interval_ms: u64,
+    pub speed_mps: f32,
+    /// Ring radius around the first human pose where the NPCs appear.
+    pub spawn_radius_m: f32,
+    /// Impact an NPC bump resolves with (damage = impact x `contact_damage_per_unit`).
+    pub bump_impact: f32,
+    /// Minimum time between two bumps by the same NPC.
+    pub bump_interval_ms: u64,
+}
+
+impl NpcDriving {
+    pub fn is_valid(&self, rules: &DerbyRules) -> bool {
+        (20..=5_000).contains(&self.pose_interval_ms)
+            && self.speed_mps.is_finite()
+            && (0.0..=100.0).contains(&self.speed_mps)
+            && self.spawn_radius_m.is_finite()
+            && (0.0..=1_000.0).contains(&self.spawn_radius_m)
+            && self.bump_impact.is_finite()
+            && self.bump_impact > 0.0
+            && self.bump_impact <= rules.max_impact
+            && (100..=60_000).contains(&self.bump_interval_ms)
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum DerbyPhase {
     Lobby,
@@ -770,8 +804,10 @@ pub struct DerbyDriverState {
     pub score: u32,
     pub damage_dealt: u32,
     pub damage_received: u32,
-    /// (R) T787: how many times a contact reduced this driver to zero health in this
-    /// match. Not part of any packet; a quest `no_knockout` bound reads it.
+    /// How many drivers this one knocked out in this match (the first 34/11 knock-out word).
+    pub knockouts_made: u32,
+    /// (R) T787: how many times a contact reduced this driver to zero health in this match (the
+    /// second 34/11 knock-out word); a quest `no_knockout` bound reads it.
     pub knockouts_taken: u32,
     pub boost: f32,
     pub shield_until_ms: Option<u64>,
@@ -831,6 +867,12 @@ pub struct DerbyService {
     results_until_ms: Option<u64>,
     lobby_deadline_ms: Option<u64>,
     closed: BTreeSet<ParticipantKey>,
+    npc_driving: Option<NpcDriving>,
+    npc_stepped_ms: Option<u64>,
+    npc_bumped_ms: BTreeMap<ParticipantKey, u64>,
+    /// L931: the AI cars by slot (body and start transform); a slot past the end reuses the
+    /// human's template.
+    npc_vehicles: Vec<DerbyVehicleTemplate>,
 }
 
 impl DerbyService {
@@ -911,6 +953,7 @@ impl DerbyService {
                     score: 0,
                     damage_dealt: 0,
                     damage_received: 0,
+                    knockouts_made: 0,
                     knockouts_taken: 0,
                     boost: 0.0,
                     shield_until_ms: None,
@@ -940,11 +983,52 @@ impl DerbyService {
             results_until_ms: None,
             lobby_deadline_ms: None,
             closed: BTreeSet::new(),
+            npc_driving: None,
+            npc_stepped_ms: None,
+            npc_bumped_ms: BTreeMap::new(),
+            npc_vehicles: Vec::new(),
         })
+    }
+
+    /// (L931, R) Let the NPC drivers chase and bump instead of standing still; call before the
+    /// match is set up. `None` is the inert default.
+    pub fn set_npc_driving(&mut self, driving: Option<NpcDriving>) -> Result<(), DerbyError> {
+        if driving.is_some_and(|driving| !driving.is_valid(&self.rules)) {
+            return Err(DerbyError::InvalidField("npc driving"));
+        }
+        self.npc_driving = driving;
+        Ok(())
+    }
+
+    /// L931: the arena's AI cars, slot 1 first (the live 34/10 bodies and start slots).
+    pub fn set_npc_vehicles(
+        &mut self,
+        vehicles: Vec<DerbyVehicleTemplate>,
+    ) -> Result<(), DerbyError> {
+        let finite = |vehicle: &DerbyVehicleTemplate| {
+            vehicle
+                .start_transform_bits
+                .iter()
+                .all(|bits| f32::from_bits(*bits).is_finite())
+        };
+        if vehicles.len() >= MAX_DERBY_DRIVERS || !vehicles.iter().all(finite) {
+            return Err(DerbyError::InvalidField("npc vehicles"));
+        }
+        self.npc_vehicles = vehicles;
+        Ok(())
     }
 
     pub fn phase(&self) -> DerbyPhase {
         self.phase
+    }
+
+    /// L931: where a car is now (its last pose); `None` before it has one.
+    pub fn driver_position(&self, key: ParticipantKey) -> Option<[f32; 3]> {
+        self.drivers
+            .get(&key)?
+            .pose
+            .as_ref()
+            .and_then(pose_position)
     }
 
     pub fn instance_id(&self) -> i32 {
@@ -1037,6 +1121,7 @@ impl DerbyService {
                     score: 0,
                     damage_dealt: 0,
                     damage_received: 0,
+                    knockouts_made: 0,
                     knockouts_taken: 0,
                     boost: 0.0,
                     shield_until_ms: None,
@@ -1252,6 +1337,10 @@ impl DerbyService {
             .clone();
         let mut slot = 1_u32;
         while self.drivers.len() < self.rules.max_drivers {
+            // L931: a car with its own start slot stands there from the start, driven or not.
+            let own = self.npc_vehicles.get(slot as usize - 1).cloned();
+            let placed = self.npc_driving.is_none() || own.is_some();
+            let vehicle = own.unwrap_or_else(|| template.clone());
             let raw = 0xd000_0000_0000_0000 | ((self.instance_id as u64) << 8) | slot as u64;
             let key = ParticipantKey(raw);
             if self.drivers.contains_key(&key) || key.0 == 0 {
@@ -1268,23 +1357,26 @@ impl DerbyService {
                         score: 0,
                         damage_dealt: 0,
                         damage_received: 0,
+                        knockouts_made: 0,
                         knockouts_taken: 0,
                         boost: 0.0,
                         shield_until_ms: None,
                         attack_until_ms: None,
                         ultimate_until_ms: None,
                     },
-                    vehicle: template.clone(),
-                    pose: Some(VehiclePose {
+                    // A driven NPC without a start slot has no pose (so no contact) until
+                    // `drive_npcs` places it.
+                    pose: placed.then_some(VehiclePose {
                         key,
-                        transform_bits: template.start_transform_bits,
+                        transform_bits: vehicle.start_transform_bits,
                         vector_a_bits: [0; 4],
                         vector_b_bits: [0; 4],
                         controls_bits: [0; 3],
                         flags: [0; 4],
                         sequence: 0,
                     }),
-                    pose_at_ms: Some(now_ms),
+                    pose_at_ms: placed.then_some(now_ms),
+                    vehicle,
                     respawn_at_ms: None,
                 },
             );
@@ -1438,6 +1530,24 @@ impl DerbyService {
         {
             return Ok(Vec::new());
         }
+        self.apply_hit(sender, report.other, impact, now_ms)
+    }
+
+    /// Resolve one validated hit by `sender` on `other`: damage, shield, knock-out, score, the
+    /// announcer and the score-target finish. A human's report is rate-limited per pair; an NPC
+    /// bump keeps its own interval in `drive_npcs`.
+    fn apply_hit(
+        &mut self,
+        sender: ParticipantKey,
+        other: ParticipantKey,
+        impact: f32,
+        now_ms: u64,
+    ) -> Result<Vec<DerbyAction>, DerbyError> {
+        let report = VehicleHitReport {
+            reporter: sender,
+            other,
+            impact_bits: impact.to_bits(),
+        };
         let attacker = self.drivers.get(&sender).ok_or(UNKNOWN_DRIVER)?;
         let multiplier = if attacker
             .state
@@ -1464,13 +1574,15 @@ impl DerbyService {
         if !victim_was_alive {
             return Ok(Vec::new());
         }
-        let pair = ordered_pair(sender, report.other);
-        if self.contact_times.get(&pair).is_some_and(|previous| {
-            now_ms.saturating_sub(*previous) < self.rules.contact_cooldown_ms
-        }) {
-            return Ok(Vec::new());
+        if self.drivers[&sender].state.human {
+            let pair = ordered_pair(sender, report.other);
+            if self.contact_times.get(&pair).is_some_and(|previous| {
+                now_ms.saturating_sub(*previous) < self.rules.contact_cooldown_ms
+            }) {
+                return Ok(Vec::new());
+            }
+            self.contact_times.insert(pair, now_ms);
         }
-        self.contact_times.insert(pair, now_ms);
         let mut actions = Vec::new();
         let recipients: Vec<_> = self
             .connected_humans()
@@ -1512,6 +1624,7 @@ impl DerbyService {
         attacker.state.damage_dealt = attacker.state.damage_dealt.saturating_add(damage);
         if knocked_out {
             attacker.state.score = attacker.state.score.saturating_add(points);
+            attacker.state.knockouts_made = attacker.state.knockouts_made.saturating_add(1);
         }
         self.push_broadcast(&mut actions, self.state_message(sender))?;
         self.push_broadcast(&mut actions, self.state_message(report.other))?;
@@ -1649,7 +1762,7 @@ impl DerbyService {
             key,
             health: state.health,
             score: state.score,
-            unknown_values: [0; 2],
+            knockouts: [state.knockouts_made, state.knockouts_taken],
             damage_dealt: state.damage_dealt,
             damage_received: state.damage_received,
             flags: [
@@ -1777,6 +1890,7 @@ impl DerbyService {
                 driver.pose_at_ms = Some(now_ms);
             }
         }
+        actions.extend(self.drive_npcs(now_ms)?);
         let expired: Vec<_> = self
             .drivers
             .iter()
@@ -1811,6 +1925,93 @@ impl DerbyService {
             actions.extend(self.finish_match(now_ms)?);
         }
         Ok(actions)
+    }
+
+    /// (L931, R) One `NpcDriving` step, at most every `pose_interval_ms`: place each unplaced NPC on
+    /// the ring around the first human pose, move each living NPC toward the nearest living driver,
+    /// broadcast the poses that changed, and let an NPC in reach bump its target.
+    fn drive_npcs(&mut self, now_ms: u64) -> Result<Vec<DerbyAction>, DerbyError> {
+        let Some(npc) = self.npc_driving else {
+            return Ok(Vec::new());
+        };
+        let elapsed_ms = match self.npc_stepped_ms {
+            Some(last) if now_ms.saturating_sub(last) < npc.pose_interval_ms => {
+                return Ok(Vec::new());
+            }
+            Some(last) => now_ms - last,
+            None => 0,
+        };
+        self.npc_stepped_ms = Some(now_ms);
+        let reach = elapsed_ms.min(1_000) as f32 / 1_000.0 * npc.speed_mps;
+        let anchor = self
+            .drivers
+            .values()
+            .filter(|driver| driver.state.human && driver.state.connected)
+            .find_map(|driver| driver.pose.as_ref().and_then(pose_position));
+        let npcs: Vec<_> = self
+            .drivers
+            .iter()
+            .filter(|(_, driver)| !driver.state.human)
+            .map(|(key, _)| *key)
+            .collect();
+        let mut actions = Vec::new();
+        for (slot, key) in npcs.iter().copied().enumerate() {
+            if self.phase != DerbyPhase::Running {
+                break;
+            }
+            let placed = self.drivers[&key].pose.as_ref().and_then(pose_position);
+            let Some(from) = placed.or_else(|| {
+                anchor.map(|anchor| ring(anchor, slot, npcs.len(), npc.spawn_radius_m))
+            }) else {
+                continue;
+            };
+            let alive = self.drivers[&key].state.health > 0;
+            let target = alive.then(|| self.nearest_driver(key, from)).flatten();
+            // The placement step only faces the human; driving starts with the next step.
+            let (position, heading) = match (placed, target) {
+                (Some(_), Some((_, goal))) => {
+                    chase(from, goal, reach, self.rules.contact_radius_m * 0.8)
+                }
+                (None, _) => anchor.map_or((from, 0.0), |anchor| chase(from, anchor, 0.0, 0.0)),
+                _ => (from, 0.0),
+            };
+            if placed != Some(position) {
+                let pose = npc_pose(key, position, heading, now_ms);
+                let driver = self.drivers.get_mut(&key).ok_or(UNKNOWN_DRIVER)?;
+                driver.pose = Some(pose);
+                driver.pose_at_ms = Some(now_ms);
+                self.push_broadcast(&mut actions, DerbyMessage::VehiclePose(pose))?;
+            }
+            if let Some((victim, goal)) = target
+                && distance_squared(position, goal)
+                    <= self.rules.contact_radius_m * self.rules.contact_radius_m
+                && self
+                    .npc_bumped_ms
+                    .get(&key)
+                    .is_none_or(|last| now_ms.saturating_sub(*last) >= npc.bump_interval_ms)
+            {
+                self.npc_bumped_ms.insert(key, now_ms);
+                actions.extend(self.apply_hit(key, victim, npc.bump_impact, now_ms)?);
+            }
+        }
+        Ok(actions)
+    }
+
+    /// The nearest connected, living, posed driver other than `from`, with its position.
+    fn nearest_driver(
+        &self,
+        from: ParticipantKey,
+        position: [f32; 3],
+    ) -> Option<(ParticipantKey, [f32; 3])> {
+        self.drivers
+            .iter()
+            .filter(|(key, driver)| {
+                **key != from && driver.state.connected && driver.state.health > 0
+            })
+            .filter_map(|(key, driver)| Some((*key, driver.pose.as_ref().and_then(pose_position)?)))
+            .min_by(|left, right| {
+                distance_squared(left.1, position).total_cmp(&distance_squared(right.1, position))
+            })
     }
 
     pub fn disconnect(&mut self, key: ParticipantKey) -> Result<Vec<DerbyAction>, DerbyError> {
@@ -1940,6 +2141,62 @@ fn pose_position(pose: &VehiclePose) -> Option<[f32; 3]> {
         f32::from_bits(pose.transform_bits[13]),
         f32::from_bits(pose.transform_bits[14]),
     ])
+}
+
+fn distance_squared(left: [f32; 3], right: [f32; 3]) -> f32 {
+    (left[0] - right[0]).powi(2) + (left[1] - right[1]).powi(2) + (left[2] - right[2]).powi(2)
+}
+
+/// Where NPC `slot` of `count` appears: evenly spaced on a ground-plane circle around `center`.
+fn ring(center: [f32; 3], slot: usize, count: usize, radius: f32) -> [f32; 3] {
+    let angle = std::f32::consts::TAU * slot as f32 / count as f32;
+    [
+        center[0] + radius * angle.cos(),
+        center[1],
+        center[2] + radius * angle.sin(),
+    ]
+}
+
+/// Move `from` toward `goal` on the ground plane by at most `reach`, stopping `stop` short of it;
+/// height follows the goal. Returns the new position and the heading about +Y (forward = +Z, R)
+/// that faces the goal.
+fn chase(from: [f32; 3], goal: [f32; 3], reach: f32, stop: f32) -> ([f32; 3], f32) {
+    let (dx, dz) = (goal[0] - from[0], goal[2] - from[2]);
+    let gap = dx.hypot(dz);
+    if gap <= f32::EPSILON {
+        return ([from[0], goal[1], from[2]], 0.0);
+    }
+    let travel = reach.min((gap - stop).max(0.0));
+    (
+        [
+            from[0] + dx / gap * travel,
+            goal[1],
+            from[2] + dz / gap * travel,
+        ],
+        dx.atan2(dz),
+    )
+}
+
+/// A synthetic 34/5 pose (row-major 4x4, rotation about +Y, translation in slots 12..14) for a
+/// server-driven NPC. `sequence` rises with the clock so the client keeps the newest record.
+fn npc_pose(key: ParticipantKey, position: [f32; 3], heading: f32, sequence: u64) -> VehiclePose {
+    let (sin, cos) = heading.sin_cos();
+    #[rustfmt::skip]
+    let matrix = [
+        cos,         0.0,         -sin,        0.0,
+        0.0,         1.0,         0.0,         0.0,
+        sin,         0.0,         cos,         0.0,
+        position[0], position[1], position[2], 1.0,
+    ];
+    VehiclePose {
+        key,
+        transform_bits: matrix.map(f32::to_bits),
+        vector_a_bits: [0; 4],
+        vector_b_bits: [0; 4],
+        controls_bits: [1.0_f32.to_bits(), 0, 0],
+        flags: [0; 4],
+        sequence,
+    }
 }
 
 struct Reader<'a> {

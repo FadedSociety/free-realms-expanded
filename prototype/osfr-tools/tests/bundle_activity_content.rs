@@ -72,7 +72,7 @@ const FROZEN_SHA256: &[(&str, &str)] = &[
     ),
     (
         "derby_entry.json",
-        "eeb9a7734f5f915e1081270ec3340bfcf495248fc1d8d63f8d037cbeed251a57",
+        "20ebcad94af577bac95516f40798a5a9cbf4d5bf06f126d84b122d5bc0eff6f2",
     ),
     (
         "derby_gates.json",
@@ -191,8 +191,9 @@ fn bundled_activity_content_loads_without_lab() {
             .iter()
             .map(|row| row.game_id())
             .collect::<Vec<_>>(),
-        [39, 604],
-        "the bundle hosts the default derby row and the T791 extra row"
+        // L931: the Games window rows 40/41, tutorials 289/290 and quest rows 607-627 join 604.
+        [39, 604, 40, 41, 289, 290, 607, 615, 616, 624, 627],
+        "the bundle hosts the default derby row, the T791 extra row and the L931 rows"
     );
     let package: Value =
         serde_json::from_slice(&fs::read(directory.join("derby_entry.json")).unwrap()).unwrap();

@@ -382,7 +382,10 @@ impl Gameplay {
         scene_zone(session.scene.as_ref()?)
     }
 
-    /// The op31 frame back to the saved world pose (house, kart race and fishing-hole returns).
+    /// The op31 frame back to the saved world pose (house, kart race, soccer, derby and
+    /// fishing-hole returns). As in every live world return (derby, kart, house captures): the
+    /// rotation is the heading with w 0 (a w of 1 rolled the native camera to the sky) and the
+    /// radius is not overridden.
     pub(super) fn world_zoning(
         &self,
         back: &CharacterState,
@@ -397,11 +400,11 @@ impl Gameplay {
             scene: world.name.clone(),
             type_id: 2,
             position: [back.position[0], back.position[1], back.position[2], 1.0],
-            rotation: [back.rotation[0], back.rotation[1], back.rotation[2], 1.0],
+            rotation: [back.rotation[0], back.rotation[1], back.rotation[2], 0.0],
             sky: world.sky.clone(),
             id: i32::try_from(back.zone_id).map_err(|_| invalid("world zone id"))?,
             geometry_id: world.geometry_id,
-            override_update_radius: true,
+            override_update_radius: false,
             unknown: 1,
             ..Default::default()
         })

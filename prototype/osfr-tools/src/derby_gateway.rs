@@ -27,9 +27,10 @@ use crate::{
     derby::{
         DEMO_DERBY_LOBBY_NAME_ID, DEMO_DERBY_TYPE_ID, DerbyAction, DerbyError,
         DerbyParticipantResult, DerbyPhase, DerbyPickup, DerbyRules, DerbyService,
-        DerbyVehicleTemplate, ParticipantKey,
+        DerbyVehicleTemplate, NpcDriving, ParticipantKey,
     },
     rewards::{RewardDisplay, RewardGrant},
+    zone_transition::ZoneTransition,
 };
 use serde::{Deserialize, Serialize};
 use std::{
@@ -81,6 +82,13 @@ pub struct DerbyGatewayContent {
     /// (R) Demo Derby Driver XP for the same completion; 0 pays no XP.
     #[serde(default)]
     pub completion_reward_xp: u32,
+    /// L931: the arena the match zones into (the live op31 `sg_dm_arena` frame); none plays in place.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub scene: Option<ZoneTransition>,
+    /// L931: the AI cars by slot, slot 1 first (the live 34/10 bodies and start transforms); a
+    /// slot past the end reuses `vehicle`.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub npc_vehicles: Vec<DerbyVehicleTemplate>,
     /// Retired F117 payout row. Accepted and ignored only so an operator's F117-era
     /// `derby_entry.json` still loads; `completion_reward_coins`/`_xp` replaced it (F206/T219).
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -94,21 +102,29 @@ pub struct DerbyGatewayContent {
 struct DerbyRowContent {
     game_id: i32,
     npcs: Vec<u64>,
+    /// The rule keys this row changes (L931: a partial object merged over the default rules; a full
+    /// `DerbyRules` object replaces every key as before).
     #[serde(default)]
-    rules: Option<DerbyRules>,
+    rules: Option<serde_json::Map<String, serde_json::Value>>,
     #[serde(default)]
     pickups: Option<Vec<DerbyPickup>>,
     #[serde(default)]
     completion_reward_coins: Option<u32>,
     #[serde(default)]
     completion_reward_xp: Option<u32>,
+    /// L931 (R): chase-and-bump NPC drivers for this row; unset keeps inert placeholder NPCs.
+    #[serde(default)]
+    npc_driving: Option<NpcDriving>,
     source: Vec<SourceTag>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Default, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct DerbyRowsFile {
     schema_version: u32,
+    /// L931 (R): the same for the default row (`derby_entry.json`), which has no row of its own.
+    #[serde(default)]
+    default_npc_driving: Option<NpcDriving>,
     rows: Vec<DerbyRowContent>,
 }
 
@@ -118,6 +134,7 @@ struct DerbyRowsFile {
 pub struct DerbyRow {
     package: Arc<DerbyGatewayContent>,
     npcs: Vec<u64>,
+    npc_driving: Option<NpcDriving>,
 }
 
 impl DerbyRow {
@@ -129,6 +146,11 @@ impl DerbyRow {
     /// The effective package; inheritance was resolved at load.
     pub fn package(&self) -> &DerbyGatewayContent {
         &self.package
+    }
+
+    /// L931 (R): the chase-and-bump NPC drivers this row runs, `None` for inert placeholder NPCs.
+    pub fn npc_driving(&self) -> Option<NpcDriving> {
+        self.npc_driving
     }
 }
 
@@ -202,6 +224,17 @@ pub struct DerbyGateway {
     previous_job: Option<i32>,
     /// Completion ledger, newest last; see `DerbyGatewayState::paid_matches`.
     paid_matches: Vec<i32>,
+    /// L931: the arena visit of the live match.
+    arena: Option<ArenaVisit>,
+}
+
+/// L931: a match played in its arena scene, as a fishing hole (`gameplay/fishing_scene.rs`).
+#[derive(Clone, Debug)]
+struct ArenaVisit {
+    /// The world pose kept at entry; every way out zones back here.
+    return_to: CharacterState,
+    /// The 39/16 offer and its ready record, sent once the arena has loaded.
+    pending: Vec<Vec<u8>>,
 }
 
 fn invalid(message: impl ToString) -> io::Error {
@@ -252,16 +285,16 @@ fn load_gates(directory: &Path) -> io::Result<Option<DerbyGates>> {
     Ok(Some(gates))
 }
 
-fn load_rows(directory: &Path) -> io::Result<Vec<DerbyRowContent>> {
+fn load_rows(directory: &Path) -> io::Result<DerbyRowsFile> {
     let path = directory.join("derby_rows.json");
     let Some(bytes) = read_regular_limited(&path, MAX_ROWS_BYTES, "derby rows")? else {
-        return Ok(Vec::new());
+        return Ok(DerbyRowsFile::default());
     };
     let rows: DerbyRowsFile = serde_json::from_slice(&bytes).map_err(invalid)?;
     if rows.schema_version != 1 || rows.rows.len() > MAX_DERBY_ROWS {
         return Err(invalid("invalid derby rows file"));
     }
-    Ok(rows.rows)
+    Ok(rows)
 }
 
 fn load_minigames(directory: &Path) -> io::Result<Option<Vec<MinigameRow>>> {
@@ -271,6 +304,16 @@ fn load_minigames(directory: &Path) -> io::Result<Option<Vec<MinigameRow>>> {
     read_minigame_rows(directory, MINIGAMES_FILE)
         .map(Some)
         .map_err(|error| invalid(error.to_string()))
+}
+
+/// Refuse a row's NPC driving numbers outside the service's bounds, at load rather than at entry.
+fn check_driving(driving: Option<NpcDriving>, rules: &DerbyRules, game_id: i32) -> io::Result<()> {
+    match driving {
+        Some(driving) if !driving.is_valid(rules) => {
+            Err(invalid(format!("derby row {game_id}: invalid npc_driving")))
+        }
+        _ => Ok(()),
+    }
 }
 
 /// Refuse a hosted id the MiniGameData table does not list as a demolition-derby (TYPE 11) row.
@@ -323,11 +366,24 @@ fn resolve_row(
     }
     check_sources(&format!("derby row {}", row.game_id), &row.source)
         .map_err(|error| invalid(error.to_string()))?;
+    let rules = match row.rules {
+        None => default.rules.clone(),
+        Some(changes) => {
+            let mut merged = serde_json::to_value(&default.rules).map_err(invalid)?;
+            let keys =
+                (merged.as_object_mut()).ok_or_else(|| invalid("derby rules are not an object"))?;
+            keys.extend(changes);
+            serde_json::from_value(merged)
+                .map_err(|error| invalid(format!("derby row {}: {error}", row.game_id)))?
+        }
+    };
     let package = DerbyGatewayContent {
         schema_version: default.schema_version,
         game_id: row.game_id,
         vehicle: default.vehicle.clone(),
-        rules: row.rules.unwrap_or_else(|| default.rules.clone()),
+        scene: default.scene.clone(),
+        npc_vehicles: default.npc_vehicles.clone(),
+        rules,
         pickups: row.pickups.unwrap_or_else(|| default.pickups.clone()),
         completion_reward_coins: row
             .completion_reward_coins
@@ -339,9 +395,11 @@ fn resolve_row(
     };
     validate_content(&package)
         .map_err(|error| invalid(format!("derby row {}: {error}", row.game_id)))?;
+    check_driving(row.npc_driving, &package.rules, row.game_id)?;
     Ok(DerbyRow {
         package: Arc::new(package),
         npcs: row.npcs,
+        npc_driving: row.npc_driving,
     })
 }
 
@@ -358,7 +416,13 @@ impl DerbyGateway {
             serde_json::from_slice(&bytes).map_err(|error| invalid(error.to_string()))?;
         let rows = load_rows(directory)?;
         let minigames = load_minigames(directory)?;
-        let mut gateway = Self::build(content, load_gates(directory)?, rows, minigames.as_deref())?;
+        let mut gateway = Self::build(
+            content,
+            load_gates(directory)?,
+            rows.default_npc_driving,
+            rows.rows,
+            minigames.as_deref(),
+        )?;
         gateway.restore_ledger(saved)?;
         Ok(Some(gateway))
     }
@@ -389,7 +453,7 @@ impl DerbyGateway {
     /// Build a gateway from typed content. This is also the strict content validator used by tests
     /// and by interactive content reloads. It hosts the default row only.
     pub fn new(content: DerbyGatewayContent, gates: Option<DerbyGates>) -> io::Result<Self> {
-        Self::build(content, gates, Vec::new(), None)
+        Self::build(content, gates, None, Vec::new(), None)
     }
 
     /// Validate the default package and its gates, resolve every extra row, and host them in file
@@ -399,10 +463,12 @@ impl DerbyGateway {
     fn build(
         content: DerbyGatewayContent,
         gates: Option<DerbyGates>,
+        default_npc_driving: Option<NpcDriving>,
         rows: Vec<DerbyRowContent>,
         minigames: Option<&[MinigameRow]>,
     ) -> io::Result<Self> {
         validate_content(&content)?;
+        check_driving(default_npc_driving, &content.rules, content.game_id)?;
         if let Some(gates) = &gates {
             if gates.schema_version != 1
                 || gates.menu_string_id == 0
@@ -448,6 +514,7 @@ impl DerbyGateway {
             DerbyRow {
                 package: Arc::clone(&content),
                 npcs: gate_npcs,
+                npc_driving: default_npc_driving,
             },
         );
         Ok(Self {
@@ -459,6 +526,7 @@ impl DerbyGateway {
             next_instance: FIRST_DERBY_INSTANCE,
             previous_job: None,
             paid_matches: Vec::new(),
+            arena: None,
         })
     }
 
@@ -491,6 +559,11 @@ impl DerbyGateway {
         self.service.as_ref().is_some_and(|service| {
             !matches!(service.phase(), DerbyPhase::Closed | DerbyPhase::Aborted)
         })
+    }
+
+    /// L931: where a car of the live match is now (its last pose).
+    pub fn driver_position(&self, key: crate::derby::ParticipantKey) -> Option<[f32; 3]> {
+        self.service.as_ref()?.driver_position(key)
     }
 
     pub fn phase(&self) -> Option<DerbyPhase> {
@@ -561,15 +634,15 @@ impl DerbyGateway {
         if character.guid == 0 {
             return Err(invalid("derby entry requires an authenticated character"));
         }
-        let package = match game_id {
+        let row = match game_id {
             Some(id) => self.rows.iter().find(|row| row.game_id() == id),
             None => self.rows.first(),
         }
-        .map(|row| Arc::clone(&row.package))
         .ok_or_else(|| match game_id {
             Some(id) => invalid(format!("derby row {id} is not hosted")),
             None => invalid("derby has no hosted row"),
         })?;
+        let (package, npc_driving) = (Arc::clone(&row.package), row.npc_driving);
         let instance = self.next_instance;
         if instance > i32::MAX as u32 {
             return Err(invalid("derby instance overflow"));
@@ -584,6 +657,12 @@ impl DerbyGateway {
             package.pickups.clone(),
         )
         .map_err(|error| invalid(error.to_string()))?;
+        service
+            .set_npc_driving(npc_driving)
+            .map_err(|error| invalid(error.to_string()))?;
+        service
+            .set_npc_vehicles(package.npc_vehicles.clone())
+            .map_err(|error| invalid(error.to_string()))?;
         service.set_lobby_deadline(now_ms);
         let offer = service
             .offer_packet()
@@ -782,6 +861,36 @@ impl DerbyGateway {
             last_paid_unix: None,
             paid_matches: self.paid_matches.clone(),
         })
+    }
+
+    /// L931: the entered row's arena scene; `None` plays the match where the player stands.
+    pub fn scene(&self) -> Option<&ZoneTransition> {
+        self.active_package().scene.as_ref()
+    }
+
+    /// L931: zone into the arena; `pending` waits for its Loaded (`arena_loaded`).
+    pub fn enter_arena(&mut self, return_to: CharacterState, pending: Vec<Vec<u8>>) {
+        self.arena = Some(ArenaVisit { return_to, pending });
+    }
+
+    /// L931: the held start records once the arena has loaded; a second load resends nothing.
+    pub fn arena_loaded(&mut self) -> Option<Vec<Vec<u8>>> {
+        Some(std::mem::take(&mut self.arena.as_mut()?.pending))
+    }
+
+    /// L931: the arena scene while a visit lasts.
+    pub fn arena_scene(&self) -> Option<&ZoneTransition> {
+        self.arena.as_ref().and(self.scene())
+    }
+
+    /// L931: the world pose a save inside the arena stores.
+    pub fn arena_return(&self) -> Option<&CharacterState> {
+        Some(&self.arena.as_ref()?.return_to)
+    }
+
+    /// L931: end the visit; the world pose to zone back to.
+    pub fn leave_arena(&mut self) -> Option<CharacterState> {
+        self.arena.take().map(|visit| visit.return_to)
     }
 
     /// Retire the live match and return the job to restore.

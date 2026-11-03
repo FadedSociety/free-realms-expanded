@@ -673,10 +673,6 @@ impl Session {
         &self.scene
     }
 
-    pub fn return_location(&self) -> (u32, [f32; 3], [f32; 3]) {
-        (self.return_zone, self.return_position, self.return_rotation)
-    }
-
     /// L012: the character back at the pose it left for the match. A match belongs to one
     /// connection, so saves and reconnects use this pose, never the arena scene.
     pub fn return_character(&self, character: &CharacterState) -> CharacterState {

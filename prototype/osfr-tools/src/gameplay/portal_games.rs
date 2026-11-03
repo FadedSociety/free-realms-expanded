@@ -37,7 +37,10 @@ pub(super) fn games(
     fishing: Option<&FishingSpots>,
 ) -> Vec<Activity> {
     let kart = kart.and_then(KartGateway::minigame_id);
-    let derby = derby.and_then(|derby| u32::try_from(derby.game_id()).ok());
+    // L931: every hosted derby row is a Games window join key, so Play starts the row chosen.
+    let derby = derby.into_iter().flat_map(|derby| {
+        (derby.rows().iter()).filter_map(|row| u32::try_from(row.game_id()).ok())
+    });
     let mut seen = std::collections::BTreeSet::new();
     let crafts = [
         CraftingJob::Chef,
@@ -122,9 +125,9 @@ impl Gameplay {
                 None => Ok(refused(EntryDenied::NoRace.message())),
             },
             Kind::Derby => match self.derby.as_ref().map(|derby| derby.admit_play(busy)) {
-                Some(Ok(())) => {
-                    self.commit_if_changed(|staged| staged.begin_derby(character, now_ms, None))
-                }
+                Some(Ok(())) => self.commit_if_changed(|staged| {
+                    staged.begin_derby(character, now_ms, i32::try_from(id).ok())
+                }),
                 Some(Err(denied)) => Ok(refused(denied.message())),
                 None => Ok(refused(DerbyEntryDenied::Unavailable.message())),
             },

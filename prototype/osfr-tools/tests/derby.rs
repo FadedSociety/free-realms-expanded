@@ -226,7 +226,7 @@ fn all_twenty_client_records_roundtrip_with_reader_widths() {
             key: OWNER,
             health: 20,
             score: 3,
-            unknown_values: [4, 5],
+            knockouts: [4, 5],
             damage_dealt: 6,
             damage_received: 7,
             flags: [0, 1, 0],

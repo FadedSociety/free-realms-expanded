@@ -182,7 +182,10 @@ fn the_derby_trainer_grants_the_job_and_the_lobby_becomes_ready_for_both_clients
         );
         // The lobby: the 39/16 offer, then the 41/107 that turns "Loading..." into Go.
         table.send(index, &npc(8, MAD_JACK, None), now + 200);
-        let lobby = table.send(index, &npc(10, MAD_JACK, Some(derby)), now + 300);
+        let mut lobby = table.send(index, &npc(10, MAD_JACK, Some(derby)), now + 300);
+        // L931: the choice zones into the arena; the offer waits for its load (Ready, Loaded).
+        lobby.extend(table.send(index, &[13, 0], now + 301));
+        lobby.extend(table.send(index, &[10, 0], now + 302));
         let offer = lobby
             .iter()
             .position(|reply| reply.starts_with(&[39, 0, 16]))

@@ -26,6 +26,123 @@
           "evidence": "Resources/MiniGameData.txt row 604 '604^11^393294^394459^9870^1^0^^0^0^0^^0^' is TYPE 11 and NAME_ID 393294 with description id 394459. T791 lists only the rows the derby package hosts; this file is not the complete client MiniGameData table."
         }
       ]
+    },
+    {
+      "id": 40,
+      "game_type_id": 11,
+      "name_string_id": 31328,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 40 '40^11^31328^37942^9871^1^0^^0^0^0^^0^' is TYPE 11, NAME_ID 31328 (Frost Ridge Demo Derby), DESCRIPTION_ID 37942. L931 lists it so the derby can host it; this file is not the complete client MiniGameData table."
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "game_type_id": 11,
+      "name_string_id": 37940,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 41 '41^11^37940^37943^9867^1^0^^0^0^0^^0^' is TYPE 11, NAME_ID 37940 (Tangletrack Demo Derby), DESCRIPTION_ID 37943. L931 lists it so the derby can host it; this file is not the complete client MiniGameData table."
+        }
+      ]
+    },
+    {
+      "id": 289,
+      "game_type_id": 11,
+      "name_string_id": 117325,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 289 '289^11^117325^139429^18417^1^0^^0^0^0^^0^' is TYPE 11, NAME_ID 117325 (Demolition Derby Tutorial), DESCRIPTION_ID 139429. L931 lists it so the derby can host it; this file is not the complete client MiniGameData table."
+        }
+      ]
+    },
+    {
+      "id": 290,
+      "game_type_id": 11,
+      "name_string_id": 117326,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 290 '290^11^117326^130348^18417^1^0^^0^0^0^^0^' is TYPE 11, NAME_ID 117326 (Advanced Demolition Derby Tutorial), DESCRIPTION_ID 130348. L931 lists it so the derby can host it; this file is not the complete client MiniGameData table."
+        }
+      ]
+    },
+    {
+      "id": 607,
+      "game_type_id": 11,
+      "name_string_id": 393298,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 607 '607^11^393298^394021^9870^1^0^^0^0^0^^0^' is TYPE 11, NAME_ID 393298 (Wear and Tear), DESCRIPTION_ID 394021. L931 lists it so the derby can host it; this file is not the complete client MiniGameData table."
+        }
+      ]
+    },
+    {
+      "id": 615,
+      "game_type_id": 11,
+      "name_string_id": 393311,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 615 '615^11^393311^394470^9870^3^0^^0^0^0^^0^' is TYPE 11, NAME_ID 393311 (Taking on the Tank), DESCRIPTION_ID 394470. L931 lists it so the derby can host it; this file is not the complete client MiniGameData table."
+        }
+      ]
+    },
+    {
+      "id": 616,
+      "game_type_id": 11,
+      "name_string_id": 393313,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 616 '616^11^393313^394471^9870^3^0^^0^0^0^^0^' is TYPE 11, NAME_ID 393313 (Paws 'n Claws Smash-a-thon), DESCRIPTION_ID 394471. L931 lists it so the derby can host it; this file is not the complete client MiniGameData table."
+        }
+      ]
+    },
+    {
+      "id": 624,
+      "game_type_id": 11,
+      "name_string_id": 393327,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 624 '624^11^393327^393367^9870^3^0^^0^0^0^^0^' is TYPE 11, NAME_ID 393327 (Tangletrack Trio), DESCRIPTION_ID 393367. L931 lists it so the derby can host it; this file is not the complete client MiniGameData table."
+        }
+      ]
+    },
+    {
+      "id": 627,
+      "game_type_id": 11,
+      "name_string_id": 393331,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 627 '627^11^393331^394482^9870^3^0^^0^0^0^^0^' is TYPE 11, NAME_ID 393331 (Frost Ridge Invitational), DESCRIPTION_ID 394482. L931 lists it so the derby can host it; this file is not the complete client MiniGameData table."
+        }
+      ]
     }
   ]
 }

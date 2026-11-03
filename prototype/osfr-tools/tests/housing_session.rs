@@ -424,6 +424,11 @@ fn leaving_returns_to_the_world_pose() {
     let scene = out.scene_zoning.expect("leaving moves the client back");
     assert_eq!(&scene.position[..3], &character().position);
     assert_eq!(scene.id, 0);
+    // L931: as every live world return: the heading with w 0 (w 1 rolled the native camera to
+    // the sky) and no radius override.
+    assert_eq!(&scene.rotation[..3], &character().rotation);
+    assert_eq!(scene.rotation[3], 0.0);
+    assert!(!scene.override_update_radius);
     assert_eq!(game.house_return(), None);
     let world = game.initialize_world(&character(), 5_000).unwrap();
     assert!(
