@@ -613,6 +613,8 @@ pub struct SoccerService {
     /// L940: the live setup records and whether the first kickoff has sent its steps.
     setup: Option<Setup>,
     kicked_off: bool,
+    /// L946: a goal's celebration runs until the next kickoff (steps 16, 17, then 18).
+    celebrating: bool,
     /// L942: the power-ups on the pitch, when the content has them.
     pickups: Option<crate::soccer_pickups::Pickups>,
     /// R relay bookkeeping: last holder reported on the service wire (`0` none).
@@ -637,6 +639,7 @@ impl SoccerService {
             cancelled: false,
             setup: None,
             kicked_off: false,
+            celebrating: false,
             pickups: None,
             last_holder: NO_HOLDER,
         })
@@ -1146,11 +1149,17 @@ impl SoccerService {
                 events.extend(self.setup_opening());
                 events.extend(self.setup_roster());
             }
-            let steps: &[u32] = if self.kicked_off { &[12] } else { &[7, 11, 12] };
+            // L946: after a goal the celebration ends (18) before the kickoff (11, 12).
+            let steps: &[u32] = match (self.kicked_off, self.celebrating) {
+                (false, _) => &[7, 11, 12],
+                (true, true) => &[18, 11, 12],
+                (true, false) => &[12],
+            };
             events.extend(steps.iter().map(|step| game_state(*step, players)));
         }
         let opening = !self.kicked_off;
         self.kicked_off = true;
+        self.celebrating = false;
         let lined = crate::soccer_bots::line_up(&mut self.authority, &self.bots)?;
         let poses = self.bot_poses(lined, true);
         events.extend(if opening { snapped(poses) } else { poses });
@@ -1164,9 +1173,10 @@ impl SoccerService {
             return Err(invalid("soccer match is cancelled"));
         }
         self.authority.start_second_half()?;
+        let mut events = self.stages(&[11, 12]);
         // L932: the sides swap, so the bots line up on their new kickoff spots.
         let lined = crate::soccer_bots::line_up(&mut self.authority, &self.bots)?;
-        let mut events = self.bot_poses(lined, true);
+        events.extend(self.bot_poses(lined, true));
         events.push(self.game_time());
         Ok(events)
     }
@@ -1231,6 +1241,8 @@ impl SoccerService {
             events.push(ServiceEvent::Goal {
                 score: self.authority.score(),
             });
+            events.extend(self.stages(&[16, 17]));
+            self.celebrating = self.setup.is_some();
             self.last_holder = NO_HOLDER;
         } else if before_phase == MatchPhase::Running
             && self.authority.phase() == MatchPhase::Restart
@@ -1267,8 +1279,35 @@ impl SoccerService {
                 }
             }
         }
+        // L946: the half-time board and the end of the match.
+        if before_phase == MatchPhase::Running {
+            match self.authority.phase() {
+                MatchPhase::HalfTime => events.extend(self.stages(&[8])),
+                MatchPhase::Finished => events.extend(self.stages(&[10])),
+                _ => {}
+            }
+        }
         events.push(self.game_time());
         Ok(events)
+    }
+
+    /// L946: whether the live setup records (and so the stage steps) are sent.
+    pub fn has_setup(&self) -> bool {
+        self.setup.is_some()
+    }
+
+    /// L946: a goal's celebration is running; the next kickoff waits for it (`soccer_entry`).
+    pub fn celebrating(&self) -> bool {
+        self.celebrating
+    }
+
+    /// L946: match-stage steps (76/5), with the live setup only.
+    fn stages(&self, steps: &[u32]) -> Vec<ServiceEvent> {
+        if self.setup.is_none() {
+            return Vec::new();
+        }
+        let players = self.player_count();
+        steps.iter().map(|step| game_state(*step, players)).collect()
     }
 
     /// Process one decoded client family-76 packet.

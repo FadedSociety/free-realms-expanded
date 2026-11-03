@@ -1146,3 +1146,48 @@ fn a_players_tackle_steals_from_an_opposing_carrier_in_reach() {
     );
     assert_eq!(service.possession(), Some(OPPONENT), "the tackle steals the ball");
 }
+
+/// L946: with the live setup, a goal brings the celebration steps (76/5 16, 17) and the next kickoff
+/// ends it first (18, then 11 and 12), as the live server sent them.
+#[test]
+fn a_goal_celebrates_before_the_next_kickoff() {
+    let mut service = SoccerService::new(goal_config(), policy()).expect("goal config");
+    service.set_setup(Setup {
+        match_config: Vec::new(),
+        teams: Vec::new(),
+        roles: BTreeMap::new(),
+    });
+    service.join(KICKER, 0, 0).expect("join");
+    offer_and_start(&mut service, KICKER);
+    service
+        .handle_client(KICKER, 0.0, &client_position(KICKER, [0.0, 0.0, 0.0]), 1, None)
+        .expect("kicker position");
+    service.tick(0.05).expect("acquire possession");
+    service
+        .handle_client(
+            KICKER,
+            0.05,
+            &client_state(KICKER, 17, 255, [-1.0, 0.0, 0.0, 1.0]),
+            2,
+            None,
+        )
+        .expect("shot at the -x goal");
+    let mut goal_events = Vec::new();
+    while service.phase() == MatchPhase::Running {
+        goal_events.extend(service.tick(0.25).expect("tick"));
+    }
+    let steps = |events: &[ServiceEvent]| -> Vec<u32> {
+        events
+            .iter()
+            .filter_map(|event| match event.packet() {
+                SoccerPacket::UpdateGameState { words } => Some(words[12]),
+                _ => None,
+            })
+            .collect()
+    };
+    assert_eq!(service.score(), [1, 0]);
+    assert_eq!(steps(&goal_events), [16, 17]);
+    assert!(service.celebrating());
+    assert_eq!(steps(&service.start().expect("restart")), [18, 11, 12]);
+    assert!(!service.celebrating());
+}

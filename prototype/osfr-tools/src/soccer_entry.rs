@@ -232,6 +232,11 @@ fn bot_actor(guid: u64, name: i32, model: i32, position: [f32; 3]) -> io::Result
     crate::world::unframe_tunnel(&crate::startup_world::build_add_npc(&actor))
 }
 
+/// L946: how long a goal's celebration holds the next kickoff (live: step 17 to 18, 3.1 s) and
+/// the half-time board holds the second half (R).
+const GOAL_CELEBRATION_MS: u64 = 3_100;
+const HALF_TIME_MS: u64 = 5_000;
+
 /// L940: the player status word while a soccer match runs: bit 12 (soccer) plus the normal bit 0.
 const SOCCER_STATUS: u32 = 0x1001;
 
@@ -538,6 +543,8 @@ pub struct Session {
     scene: ZoneTransition,
     sequence: u64,
     last_tick_ms: Option<u64>,
+    /// L946: when a held restart or second half may start (a goal's celebration, the half-time board).
+    resume_at_ms: Option<u64>,
     /// True once the terminal score was settled; a settled match never pays
     /// again, and the flag is session-only like the match itself.
     settled: bool,
@@ -626,6 +633,7 @@ impl Session {
             scene,
             sequence: 0,
             last_tick_ms: None,
+            resume_at_ms: None,
             settled: false,
             return_zone: character.zone_id,
             return_position: character.position,
@@ -802,15 +810,27 @@ impl Session {
                 result.changed |= !events.is_empty();
             }
         }
-        match service.phase() {
-            MatchPhase::Restart => {
+        // L946: a goal's celebration (3.1 s live, 17 to 18) and the half-time board (R) hold play.
+        let phase = service.phase();
+        let pause = match phase {
+            MatchPhase::Restart if service.celebrating() => GOAL_CELEBRATION_MS,
+            MatchPhase::HalfTime if service.has_setup() => HALF_TIME_MS,
+            _ => 0,
+        };
+        let due = matches!(phase, MatchPhase::Restart | MatchPhase::HalfTime)
+            && now_ms >= *self.resume_at_ms.get_or_insert(now_ms + pause);
+        if due {
+            self.resume_at_ms = None;
+        }
+        match phase {
+            MatchPhase::Restart if due => {
                 let events = service.start()?;
                 result
                     .replies
                     .extend(events.iter().map(ServiceEvent::inner));
                 result.changed |= !events.is_empty();
             }
-            MatchPhase::HalfTime => {
+            MatchPhase::HalfTime if due => {
                 let events = service.second_half()?;
                 result
                     .replies

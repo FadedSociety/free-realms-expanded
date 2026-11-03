@@ -279,6 +279,8 @@ fn a_quest_row_cannot_be_started_from_the_games_window() {
 /// A charged shot from the kickoff spot along `z` (+1 at the other team's goal, -1 at the
 /// player's own), then the clock until the ball is in a goal. Returns the time it ended.
 fn shot_along(game: &mut Gameplay, character: &CharacterState, at: u64, z: f32, n: u32) -> u64 {
+    // L946: after a goal the kickoff waits for the celebration (3.1 s); this tick starts it.
+    game.tick(character, at).unwrap();
     // After a goal the last toucher must step clear of the reset ball before the ball can be
     // taken again, so walk away and back.
     for (offset, spot) in [(0, [3.0, 0.0, 0.0]), (150, [0.0; 3])] {
@@ -320,8 +322,8 @@ fn a_win_that_concedes_more_than_the_row_allows_does_not_credit() {
     // An own goal, then two goals at the other end: 2-1 is a win that let one in.
     let mut now = shot_along(&mut game, &character, 1_300, -1.0, 1);
     assert_eq!(game.soccer_score(), Some([0, 1]), "the own goal");
-    now = shot_along(&mut game, &character, now + 500, 1.0, 2);
-    now = shot_along(&mut game, &character, now + 500, 1.0, 3);
+    now = shot_along(&mut game, &character, now + 3_500, 1.0, 2);
+    now = shot_along(&mut game, &character, now + 3_500, 1.0, 3);
     assert_eq!(game.soccer_score(), Some([2, 1]));
     let (replies, _) = tick_to_full_time(&mut game, &character, now + 250);
 
