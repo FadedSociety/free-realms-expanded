@@ -634,6 +634,17 @@ pub fn decode_inner(packet: &[u8]) -> Result<DerbyMessage, DerbyError> {
     Ok(message)
 }
 
+/// L959: an AI car's driver as the client knows it: an NPC with this name and body, added before the
+/// car (the live server sent a 35/2 AddNpc with the car's key before each AI 34/10; the 34/10 handler
+/// names the car from that entity, `FUN_009f39b0` case 10, so without it the results and kill feed
+/// show blank names).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct DerbyDriver {
+    pub name_string_id: i32,
+    pub model_id: i32,
+}
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct DerbyVehicleTemplate {
@@ -875,6 +886,8 @@ pub struct DerbyService {
     /// L931: the AI cars by slot (body and start transform); a slot past the end reuses the
     /// human's template.
     npc_vehicles: Vec<DerbyVehicleTemplate>,
+    /// L959: the AI drivers by slot, slot 1 first; a slot past the end gets no driver NPC.
+    npc_drivers: Vec<DerbyDriver>,
 }
 
 impl DerbyService {
@@ -990,6 +1003,7 @@ impl DerbyService {
             npc_stepped_ms: None,
             npc_bumped_ms: BTreeMap::new(),
             npc_vehicles: Vec::new(),
+            npc_drivers: Vec::new(),
         })
     }
 
@@ -1018,6 +1032,19 @@ impl DerbyService {
             return Err(DerbyError::InvalidField("npc vehicles"));
         }
         self.npc_vehicles = vehicles;
+        Ok(())
+    }
+
+    /// L959: the AI drivers by slot, slot 1 first.
+    pub fn set_npc_drivers(&mut self, drivers: Vec<DerbyDriver>) -> Result<(), DerbyError> {
+        if drivers.len() >= MAX_DERBY_DRIVERS
+            || drivers
+                .iter()
+                .any(|driver| driver.name_string_id <= 0 || driver.model_id <= 0)
+        {
+            return Err(DerbyError::InvalidField("npc drivers"));
+        }
+        self.npc_drivers = drivers;
         Ok(())
     }
 
@@ -1306,6 +1333,16 @@ impl DerbyService {
             DerbyMessage::NpcCount(self.npc_count() as i32),
         )?;
         for driver in self.drivers.values() {
+            // L959: an AI car's driver goes first, as the live server sent it.
+            let slot = (driver.state.key.0 & 0xff) as usize;
+            if let Some(named) = self.npc_drivers.get(slot.wrapping_sub(1))
+                && !driver.state.human
+            {
+                self.push_packet(
+                    &mut actions,
+                    driver_npc(driver.state.key, named, &driver.vehicle),
+                );
+            }
             self.push_broadcast(
                 &mut actions,
                 DerbyMessage::CreateVehicle(VehicleCreate {
@@ -2120,15 +2157,16 @@ impl DerbyService {
         actions: &mut Vec<DerbyAction>,
         message: DerbyMessage,
     ) -> Result<(), DerbyError> {
-        let recipients = self.connected_humans();
-        if recipients.is_empty() {
-            return Ok(());
-        }
-        actions.push(DerbyAction {
-            recipients,
-            packet: encode_inner(&message)?,
-        });
+        self.push_packet(actions, encode_inner(&message)?);
         Ok(())
+    }
+
+    /// One ready-made body to every connected human (none when nobody is connected).
+    fn push_packet(&self, actions: &mut Vec<DerbyAction>, packet: Vec<u8>) {
+        let recipients = self.connected_humans();
+        if !recipients.is_empty() {
+            actions.push(DerbyAction { recipients, packet });
+        }
     }
 
     fn push_to(
@@ -2329,6 +2367,23 @@ fn put_words<const N: usize>(out: &mut Vec<u8>, values: &[u32; N]) {
     for value in values {
         put_u32(out, *value);
     }
+}
+
+/// L959: the AddNpc (35/2) body for an AI car's driver, standing at the car's start slot.
+fn driver_npc(key: ParticipantKey, driver: &DerbyDriver, vehicle: &DerbyVehicleTemplate) -> Vec<u8> {
+    let at = |i: usize| f32::from_bits(vehicle.start_transform_bits[i]);
+    let npc = crate::startup_world::NpcSpawn {
+        actor_id: key.0,
+        name_string_id: driver.name_string_id,
+        model_id: driver.model_id,
+        scale: 1.0,
+        position: [at(12), at(13), at(14), 1.0],
+        rotation: [0.0, 0.0, 0.0, 1.0],
+        ..Default::default()
+    };
+    // The writer frames the body as an application tunnel (`5, 0, 1`, length); the action carries
+    // the body alone, as every derby message does.
+    crate::startup_world::build_add_npc(&npc)[7..].to_vec()
 }
 
 fn read_i32(packet: &[u8], offset: usize) -> i32 {

@@ -74,6 +74,15 @@
       "unknown_value_bits": 1131413504
     }
   ],
+  "npc_drivers": [
+    {"name_string_id": 19365, "model_id": 1331},
+    {"name_string_id": 19366, "model_id": 1297},
+    {"name_string_id": 19367, "model_id": 870},
+    {"name_string_id": 19368, "model_id": 891},
+    {"name_string_id": 19369, "model_id": 888},
+    {"name_string_id": 19370, "model_id": 870},
+    {"name_string_id": 19371, "model_id": 870}
+  ],
   "rules": {
     "max_drivers": 8,
     "start_health": 100,

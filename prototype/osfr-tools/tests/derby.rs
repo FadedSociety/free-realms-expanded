@@ -1,7 +1,7 @@
 use osfr_tools::{
     content::MinigameRequirement,
     derby::{
-        DEMO_DERBY_TYPE_ID, DerbyAction, DerbyConfig, DerbyMessage, DerbyPhase, DerbyPickup,
+        DEMO_DERBY_TYPE_ID, DerbyAction, DerbyConfig, DerbyDriver, DerbyMessage, DerbyPhase, DerbyPickup,
         DerbyPickupBody, DerbyRules, DerbyService, DerbyVehicleTemplate, ParticipantKey,
         PickupKind, SUBTYPE_SPECS, VehicleCreate, VehicleHitReport, VehiclePose, VehicleState,
         decode_inner, encode_inner,
@@ -164,6 +164,57 @@ fn activate(service: &mut DerbyService, humans: &[ParticipantKey]) -> Vec<DerbyA
     assert!(sent.iter().any(|message| matches!(message, DerbyMessage::NpcCount(count) if *count == 8 - humans.len() as i32)));
     assert!(matches!(sent.last(), Some(DerbyMessage::GameState(3))));
     setup
+}
+
+/// L959: each AI car's driver goes right before its car as a named NPC (35/2) standing at the car's
+/// start; a human's car never gets one, even when its key's low byte reads as a driver slot; the
+/// driver list holds at most the seven AI slots and real ids only.
+#[test]
+fn ai_drivers_come_as_named_npcs_before_their_cars() {
+    let human = ParticipantKey(0x1000_0000_0000_0003);
+    let mut service = service(&[human], Vec::new());
+    let drivers = |count: i32| {
+        (0..count)
+            .map(|i| DerbyDriver {
+                name_string_id: 19365 + i,
+                model_id: 870,
+            })
+            .collect::<Vec<_>>()
+    };
+    assert!(service.set_npc_drivers(drivers(8)).is_err(), "more drivers than AI slots");
+    let unnamed = vec![DerbyDriver {
+        name_string_id: 0,
+        model_id: 870,
+    }];
+    assert!(service.set_npc_drivers(unnamed).is_err());
+    service.set_npc_drivers(drivers(7)).unwrap();
+
+    service
+        .handle_minigame_packet(&request_start(INSTANCE))
+        .unwrap();
+    let register = encode_inner(&DerbyMessage::RegisterPlayer {
+        key: human,
+        unknown_key: 0,
+    })
+    .unwrap();
+    let setup = service.handle_client(human, &register, 0).unwrap();
+    let mut named = Vec::new();
+    for (index, action) in setup.iter().enumerate() {
+        let Ok(DerbyMessage::CreateVehicle(car)) = decode_inner(&action.packet) else {
+            continue;
+        };
+        let before = &setup[index - 1].packet;
+        if car.key == human {
+            assert!(!before.starts_with(&[35, 0, 2, 0]), "no driver NPC for the human");
+            continue;
+        }
+        let npc = osfr_tools::startup_world::parse_add_npc(before).expect("the driver NPC first");
+        assert_eq!(npc.actor_id, car.key.0);
+        let start = [12, 13, 14].map(|i| f32::from_bits(car.start_transform_bits[i]));
+        assert_eq!(npc.position[..3], start, "it stands at the car's start");
+        named.push(npc.name_string_id);
+    }
+    assert_eq!(named, (19365..19372).collect::<Vec<_>>());
 }
 
 fn run_to_live(service: &mut DerbyService, humans: &[ParticipantKey]) {

@@ -89,6 +89,10 @@ pub struct DerbyGatewayContent {
     /// slot past the end reuses `vehicle`.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub npc_vehicles: Vec<DerbyVehicleTemplate>,
+    /// L959: the AI drivers by slot, slot 1 first (the live 35/2 names and bodies); none names no
+    /// driver.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub npc_drivers: Vec<crate::derby::DerbyDriver>,
     /// Retired F117 payout row. Accepted and ignored only so an operator's F117-era
     /// `derby_entry.json` still loads; `completion_reward_coins`/`_xp` replaced it (F206/T219).
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -383,6 +387,7 @@ fn resolve_row(
         vehicle: default.vehicle.clone(),
         scene: default.scene.clone(),
         npc_vehicles: default.npc_vehicles.clone(),
+        npc_drivers: default.npc_drivers.clone(),
         rules,
         pickups: row.pickups.unwrap_or_else(|| default.pickups.clone()),
         completion_reward_coins: row
@@ -662,6 +667,9 @@ impl DerbyGateway {
             .map_err(|error| invalid(error.to_string()))?;
         service
             .set_npc_vehicles(package.npc_vehicles.clone())
+            .map_err(|error| invalid(error.to_string()))?;
+        service
+            .set_npc_drivers(package.npc_drivers.clone())
             .map_err(|error| invalid(error.to_string()))?;
         service.set_lobby_deadline(now_ms);
         let offer = service
@@ -956,10 +964,13 @@ fn validate_content(content: &DerbyGatewayContent) -> io::Result<()> {
             .iter()
             .any(|bits| !f32::from_bits(*bits).is_finite())
         || content.pickups.len() > 256
+        // L959: driver NPCs are only cleared by the zone change back from an arena; a package
+        // that plays in place would leave them standing in the world.
+        || content.scene.is_none() && !content.npc_drivers.is_empty()
     {
         return Err(invalid("invalid derby content"));
     }
-    DerbyService::new(
+    let mut service = DerbyService::new(
         FIRST_DERBY_INSTANCE as i32,
         content.game_id,
         ParticipantKey(1),
@@ -967,6 +978,10 @@ fn validate_content(content: &DerbyGatewayContent) -> io::Result<()> {
         content.rules.clone(),
         content.pickups.clone(),
     )
-    .map(|_| ())
-    .map_err(|error: DerbyError| invalid(error.to_string()))
+    .map_err(|error: DerbyError| invalid(error.to_string()))?;
+    // The AI cars and drivers are checked at load too, not first at a player's entry.
+    service
+        .set_npc_vehicles(content.npc_vehicles.clone())
+        .and_then(|()| service.set_npc_drivers(content.npc_drivers.clone()))
+        .map_err(|error| invalid(error.to_string()))
 }

@@ -1241,6 +1241,30 @@ fn the_shipped_derby_plays_in_its_arena_and_returns_to_the_world() {
         })
         .collect();
     assert_eq!(cars.len(), NPC_DRIVERS + 1);
+    // L959: each AI car's driver comes first as an NPC with its live name and body (the 35/2 before
+    // its 34/10), so the results and the kill feed name it; the human's car brings none.
+    let mut names = Vec::new();
+    for (index, packet) in setup.iter().enumerate() {
+        let Ok(DerbyMessage::CreateVehicle(car)) = decode_inner(packet) else {
+            continue;
+        };
+        let before = index.checked_sub(1).map(|i| setup[i].as_slice());
+        if car.key == key {
+            assert!(!before.is_some_and(|p| p.starts_with(&[35, 0, 2, 0])));
+            continue;
+        }
+        let npc = osfr_tools::startup_world::parse_add_npc(before.expect("a driver NPC"))
+            .expect("the driver NPC precedes its car");
+        assert_eq!(npc.actor_id, car.key.0, "the NPC is the car's driver");
+        names.push((npc.name_string_id, npc.model_id));
+    }
+    // The live drivers (packets_demoderby_minigame.pcapng; client locale): Tucker Thunderjolt,
+    // Willow Slamdash, Mikko Ragerunner, Jet Madedge, Morgan Slipdrifter, Nina the Wrecker, Carly
+    // Collision.
+    assert_eq!(
+        names,
+        [(19365, 1331), (19366, 1297), (19367, 870), (19368, 891), (19369, 888), (19370, 870), (19371, 870)]
+    );
     let at = |bits: &[u32; 16]| [12, 13, 14].map(|slot| f32::from_bits(bits[slot]));
     let human = cars.iter().find(|car| car.key == key).unwrap();
     // The live start slots (`opus/minigames/derby.md`), to the capture's precision.
