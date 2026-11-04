@@ -1821,3 +1821,62 @@ mod t852_content_presence;
 #[cfg(test)]
 #[path = "style_card_use.rs"]
 mod style_card_use;
+
+/// L965: a ship report comes every client frame. The session keeps only the newest (by its
+/// stamp, not the first or the last to arrive) and hands it on once at the tick, never one
+/// transaction per frame.
+#[test]
+fn l965_ship_reports_wait_for_the_tick_newest_kept() {
+    if !test_support::bin_test_target("l965") {
+        return;
+    }
+    let scratch = test_support::Scratch::new("l965-ship-report");
+    let options = test_support::options(scratch.state());
+    if !test_support::fixtures_present(&options) {
+        return;
+    }
+    let mut session = test_support::enter(&options, 1);
+    let socket = UdpSocket::bind("127.0.0.1:0").unwrap();
+    let mut world = SharedWorld::new();
+    let mut membership = World::runtime();
+    let mut sessions = SessionMap::new();
+    let report = |stamp: u64| {
+        let mut inner = vec![94, 0, 16, 0];
+        inner.extend(1_u64.to_le_bytes());
+        inner.push(0);
+        inner.extend(stamp.to_le_bytes());
+        inner.resize(117, 0);
+        direct(&wrap(&inner), true)
+    };
+    session.recent_on = true;
+    let dispatched = |session: &Session| {
+        (session.recent.iter())
+            .filter(|r| r["dir"] == "in" && r["family"] == 94)
+            .count()
+    };
+    let received = session.received;
+    for stamp in [100, 200, 150] {
+        let wire = report(stamp);
+        (session.handle(
+            &socket,
+            &wire,
+            &options,
+            0,
+            &mut world,
+            &mut membership,
+            &mut sessions,
+        ))
+        .unwrap();
+    }
+    assert_eq!(session.received, received + 3);
+    assert_eq!(dispatched(&session), 0, "held, not dispatched per frame");
+    let held = session.ship_report.clone().expect("held for the tick");
+    assert_eq!(
+        held[20..28],
+        200_u64.to_le_bytes(),
+        "the newest by its stamp"
+    );
+    (session.tick(&options, 50, &mut world, &mut membership, &mut sessions)).unwrap();
+    assert!(session.ship_report.is_none());
+    assert_eq!(dispatched(&session), 1, "handed on once");
+}

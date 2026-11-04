@@ -18,6 +18,13 @@ pub const RELIABLE_FRAGMENT: u16 = 13;
 pub const SELECTIVE_ACK: u16 = 17;
 pub const CUMULATIVE_ACK: u16 = 21;
 const MAX_DATAGRAM: usize = 65_507;
+/// The direct (unreliable) application packets the client sends, by inner header and exact length:
+/// the kart pose (C33/6) and Pirate's Plunder's UpdateShipPhysics (94/16: guid, a flag, a stamp, the
+/// ship's transform and velocity; `ShipCombatFrameUpdate` 00ca7480 sends it unreliable every frame).
+const DIRECT_SHAPES: &[([u8; 4], usize)] = &[([33, 0, 6, 0], 89), ([94, 0, 16, 0], 117)];
+/// (R) Inflate bound for a direct packet, above every admitted shape: an unadmitted shape up to
+/// this size is refused by name, a larger payload by size ("exceeds configured limit").
+const MAX_DIRECT: usize = 256;
 /// (R) Match the gateway parser's existing 1 MiB inbound-message limit.
 pub const MAX_LOGICAL_MESSAGE: usize = 1_048_576;
 // (R) Keep one receiver's out-of-order payload budget at the gateway's current cap.
@@ -42,7 +49,9 @@ pub enum Error {
     BufferLimit,
     ConflictingDuplicate,
     ReceiverPoisoned,
-    InvalidDirectPose,
+    InvalidDirectEnvelope,
+    /// A direct application packet outside `DIRECT_SHAPES`: family, sub-op and length.
+    UnadmittedDirect(u16, u16, usize),
 }
 
 impl fmt::Display for Error {
@@ -66,7 +75,13 @@ impl fmt::Display for Error {
             Self::ReceiverPoisoned => {
                 write!(f, "reliable receiver failed; a new session is required")
             }
-            Self::InvalidDirectPose => write!(f, "invalid direct kart pose envelope"),
+            Self::InvalidDirectEnvelope => write!(f, "invalid direct application envelope"),
+            Self::UnadmittedDirect(family, sub, len) => {
+                write!(
+                    f,
+                    "unadmitted direct application {family}/{sub} ({len} bytes)"
+                )
+            }
         }
     }
 }
@@ -170,10 +185,10 @@ impl Codec {
         Ok(Packet { opcode, payload })
     }
 
-    /// The native kart sends poses using a one-byte application opcode before
-    /// the negotiated compression flag, unlike two-byte SOE controls. Admit
-    /// only the recovered 96-byte C33/6 tunnel; all actions stay reliable.
-    pub fn decode_kart_pose_datagram(&self, wire: &[u8]) -> Result<Vec<u8>, Error> {
+    /// The client sends a few application packets direct (unreliable): a one-byte application
+    /// opcode before the negotiated compression flag, unlike two-byte SOE controls. Admit only the
+    /// tunnelled shapes of `DIRECT_SHAPES`, each at its exact size; all actions stay reliable.
+    pub fn decode_direct_datagram(&self, wire: &[u8]) -> Result<Vec<u8>, Error> {
         if wire.len() > MAX_DATAGRAM {
             return Err(Error::DatagramTooLarge);
         }
@@ -187,11 +202,11 @@ impl Codec {
             return Err(Error::BadCrc);
         }
         if content[0] != 5 {
-            return Err(Error::InvalidDirectPose);
+            return Err(Error::InvalidDirectEnvelope);
         }
         // Narrow expanded bound, including for highly compressed forged data.
         let bounded = Self {
-            max_payload: self.max_payload.min(95),
+            max_payload: self.max_payload.min(MAX_DIRECT),
             ..self.clone()
         };
         let encoded = &content[header_len..];
@@ -204,15 +219,22 @@ impl Codec {
         } else {
             bounded.copy_bounded(encoded)?
         };
-        if payload.len() != 95
+        // The tunnel: the opcode's high byte, a flag, the inner length, then the inner packet.
+        let inner_len = payload.len().saturating_sub(6);
+        if payload.len() < 10
             || payload[0] != 0
             || !matches!(payload[1], 0 | 1)
-            || payload[2..6] != 89u32.to_le_bytes()
-            || payload[6..10] != [33, 0, 6, 0]
+            || payload[2..6] != u32::try_from(inner_len).unwrap_or(u32::MAX).to_le_bytes()
         {
-            return Err(Error::InvalidDirectPose);
+            return Err(Error::InvalidDirectEnvelope);
         }
-        let mut application = Vec::with_capacity(96);
+        let inner = &payload[6..];
+        if !(DIRECT_SHAPES.iter()).any(|(head, len)| inner.starts_with(head) && inner.len() == *len)
+        {
+            let word = |i: usize| u16::from_le_bytes([inner[i], inner[i + 1]]);
+            return Err(Error::UnadmittedDirect(word(0), word(2), inner.len()));
+        }
+        let mut application = Vec::with_capacity(payload.len() + 1);
         application.push(5);
         application.extend(payload);
         Ok(application)

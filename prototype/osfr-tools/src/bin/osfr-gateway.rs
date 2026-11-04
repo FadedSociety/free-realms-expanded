@@ -509,7 +509,13 @@ struct Session {
     position_dirty: bool,
     last_activity: Instant,
     packets: Bucket,
+    /// L965: direct (unreliable) datagrams draw on their own budget, so a fast client's
+    /// per-frame reports never crowd out its reliable traffic.
+    direct: Bucket,
     bytes: Bucket,
+    /// L965: the newest ship report (94/16, by its stamp) since the last tick. The tick hands it
+    /// on once, so the client's frame rate never sets the server's work.
+    ship_report: Option<Vec<u8>>,
     sent: u64,
     received: u64,
     trace: Option<trace::Trace>,
@@ -1125,7 +1131,9 @@ impl Session {
             position_dirty: false,
             last_activity: Instant::now(),
             packets: Bucket::full(PACKET_BUDGET.1, Instant::now()),
+            direct: Bucket::full(DIRECT_BUDGET.1, Instant::now()),
             bytes: Bucket::full(BYTE_BUDGET.1, Instant::now()),
+            ship_report: None,
             sent: 0,
             received: 0,
             trace,
@@ -1266,7 +1274,7 @@ impl Session {
         sessions: &mut SessionMap,
     ) -> Result<bool, Box<dyn std::error::Error>> {
         if wire.first() == Some(&5) {
-            let message = match self.codec.decode_kart_pose_datagram(wire) {
+            let message = match self.codec.decode_direct_datagram(wire) {
                 Ok(message) => message,
                 Err(error) => {
                     if let Some(trace) = &self.trace {
@@ -1280,7 +1288,7 @@ impl Session {
                 }
             };
             if let Some(trace) = &self.trace {
-                let summary = trace::protocol_summary(&message[6..]);
+                let summary = trace::protocol_summary(&message);
                 trace.record(json!({
                     "event":"packet","session":self.id.0,"peer":self.peer.to_string(),
                     "direction":"in","transport":{"soe_opcode":5,"soe_name":"DirectApplication","mode":"direct"},
@@ -1292,6 +1300,21 @@ impl Session {
             }
             self.last_activity = Instant::now();
             self.received += 1;
+            // L965: the ship report comes every client frame; once a character is selected, keep the
+            // newest for the tick (before that it is refused at once, as any message is).
+            let selected = self.selected_character || options.account_store.is_none();
+            if selected
+                && message
+                    .get(7..)
+                    .is_some_and(|inner| inner.starts_with(&SHIP_REPORT))
+            {
+                let stamp = |report: &[u8]| osfr_tools::le::u64(report, 20);
+                let held = self.ship_report.as_deref();
+                if held.is_none_or(|held| stamp(held) <= stamp(&message)) {
+                    self.ship_report = Some(message);
+                }
+                return Ok(false);
+            }
             self.dispatch_message(
                 &message,
                 options,
@@ -2461,7 +2484,7 @@ impl Session {
 
     fn tick(
         &mut self,
-        _options: &Options,
+        options: &Options,
         now_ms: u64,
         world: &mut SharedWorld,
         membership: &mut World,
@@ -2470,6 +2493,13 @@ impl Session {
         #[cfg(test)]
         if isolation::PANIC_IN_TICK.get() == Some(self.id) {
             panic!("isolation probe");
+        }
+        // L965: the newest ship report since the last tick, handed on once.
+        if let Some(report) = self.ship_report.take() {
+            let transport = Some((5, None, "direct", false));
+            self.dispatch_message(
+                &report, options, now_ms, world, membership, sessions, transport,
+            )?;
         }
         let previous = self.gateway.state().clone();
         let mut staged_gateway = self.gateway.clone();
@@ -2907,6 +2937,13 @@ const MAX_SESSIONS_PER_IP: usize = 4;
 const HANDSHAKES_PER_IP: (f64, f64) = (5.0, 10.0); // per second, burst
 const LOGIN_DEADLINE: Duration = Duration::from_secs(5);
 const PACKET_BUDGET: (f64, f64) = (200.0, 400.0);
+/// (R) L965: direct datagrams per second and burst, as for reliable ones, so neither crowds out the
+/// other. The client sends its ship report and kart pose every frame (244 in the busiest second of
+/// run 143224Z); past this only direct datagrams drop. A dropped ship report costs nothing (the
+/// session keeps the newest); a dropped kart pose is lost, as it was under the shared budget.
+const DIRECT_BUDGET: (f64, f64) = PACKET_BUDGET;
+/// L965: Pirate's Plunder's UpdateShipPhysics head (94/16), held per session for the tick.
+const SHIP_REPORT: [u8; 4] = [94, 0, 16, 0];
 const BYTE_BUDGET: (f64, f64) = (256.0 * 1024.0, 1024.0 * 1024.0);
 
 pub struct Server {
@@ -3692,16 +3729,19 @@ impl Server {
                     } else if let Some(key) = self.session_key_for_peer(peer) {
                         if let Some(mut current) = self.sessions.remove(&key) {
                             let now = Instant::now();
-                            let over_budget =
-                                !current
-                                    .packets
-                                    .take(1.0, PACKET_BUDGET.0, PACKET_BUDGET.1, now)
-                                    || !current.bytes.take(
-                                        wire.len() as f64,
-                                        BYTE_BUDGET.0,
-                                        BYTE_BUDGET.1,
-                                        now,
-                                    );
+                            // L965: direct datagrams draw on their own budget.
+                            let (packets, budget) = if wire.first() == Some(&5) {
+                                (&mut current.direct, DIRECT_BUDGET)
+                            } else {
+                                (&mut current.packets, PACKET_BUDGET)
+                            };
+                            let over_budget = !packets.take(1.0, budget.0, budget.1, now)
+                                || !current.bytes.take(
+                                    wire.len() as f64,
+                                    BYTE_BUDGET.0,
+                                    BYTE_BUDGET.1,
+                                    now,
+                                );
                             if over_budget {
                                 // Dropped unread; the session and everyone else keep running.
                                 self.sessions.insert(key, current);

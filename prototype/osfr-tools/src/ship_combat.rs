@@ -547,13 +547,16 @@ const CAMERA_FIELDS: &[(&str, Field)] = &[
     ("IndicatorPulseIntervalTime", Field::F32),
 ];
 
-/// CameraConfig (13): a u32 the handler keeps at processor +0x280 (R: 0), then the camera block
+/// CameraConfig (13): a u32 the handler keeps at processor +0x280, then the camera block. The u32
+/// is 1: `ShipCombatFrameUpdate` 00ca7480 sends the client's own ship reports (UpdateShipPhysics 16,
+/// FireAtLocation 20 and the special move) only while it is set (0 kept them off, native 133931Z).
+/// After it, the camera block
 /// (`CAMERA_FIELDS`, the offset's fourth float 0 and an empty name). The handler `HandleCameraConfig`
 /// 00a62140 keeps the block at processor +0x290 and points the ship camera (`ControllerShip` +0x140,
 /// set by 00af75a0) at it; without it the camera reads a null config each frame (`sub_AF7850`,
 /// native 2026-11-04), so it follows the local player's CreateProxiedShip.
 pub fn camera_config(values: &BTreeMap<String, f64>) -> Vec<u8> {
-    let mut body = 0_u32.to_le_bytes().to_vec();
+    let mut body = 1_u32.to_le_bytes().to_vec();
     let (offset, rest) = CAMERA_FIELDS.split_at(3);
     write_fields(&mut body, offset, values);
     body.extend(0_f32.to_le_bytes());
@@ -566,7 +569,10 @@ pub fn camera_config(values: &BTreeMap<String, f64>) -> Vec<u8> {
 /// 00a6c3b0 makes the ship proxy and, for a guid with no player yet, the player: the local
 /// character's own guid becomes the processor's local player +5, whose reports (sub 3) then flow).
 /// Layout:
-/// - u64 guid, u8 (R), u32 slot (must be >= 0), four vec4 (R: position, rotation, velocity, spin);
+/// - u64 guid, u8 (R), u32 slot (must be >= 0), then the ship's 4x4 transform as four rows (right,
+///   up, forward, position with w 1): the client's frame update reads the position from the last
+///   row (00ca7480, matrix +48) and echoes the same rows in UpdateShipPhysics (native 141908Z; a
+///   position in the first row spawned the ship at the origin);
 /// - the ship config (00a683d0): the five actors and the collision asset, 15 values (Health, MastMin/MaxHealth,
 ///   HullStrength, HoldCapacity, HoldUnloadPerSecond, HomeHealingPerSecond, PainZonePerSecond,
 ///   LongShotAngle, LongShotSpeed, +168, four effect ids), 7 values, a vec3, 5 values, a u8,
@@ -583,10 +589,13 @@ pub fn create_ship(guid: u64, slot: u32, position: [f32; 3], ship: &Ship, colour
     b.push(0);
     b.extend(slot.to_le_bytes());
     let [x, y, z] = position;
-    for value in [x, y, z, 1.0, 0.0, 0.0, 0.0, 1.0] {
+    // (R) No turn: the identity rotation.
+    let rows = [
+        1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, x, y, z, 1.0,
+    ];
+    for value in rows {
         b.extend(value.to_le_bytes());
     }
-    zeros(&mut b, 8);
     // The ship config.
     for actor in ship.actors.iter().chain([&ship.collision]) {
         string(&mut b, actor);
@@ -728,6 +737,15 @@ mod tests {
         let actors: usize = (ship.actors.iter().chain([&ship.collision]))
             .map(|a| 4 + a.len())
             .sum();
+        // The four rows: the identity rotation, then the position with w 1.
+        let rows: Vec<u8> = [
+            1., 0., 0., 0., 0., 1., 0., 0., 0., 0., 1., 0., 880., 52., 723., 1.,
+        ]
+        .iter()
+        .flat_map(|v: &f32| v.to_le_bytes())
+        .collect();
+        let rows_at = 4 + 8 + 1 + 4;
+        assert_eq!(&out[rows_at..rows_at + 64], &rows[..]);
         // guid, u8, slot, four vec4; the config: actors, 31 values, a vec3, a u8, two lists and a
         // string; the physics config: 31 values, the collision asset, the gears (12 values and a
         // name each) and a name; the colour and the flag.
@@ -757,7 +775,11 @@ mod tests {
             ("IndicatorPulseIntervalTime".to_owned(), 0.6),
         ]);
         let out = camera_config(&values);
-        assert_eq!(&out[..8], &[94, 0, 13, 0, 0, 0, 0, 0]);
+        assert_eq!(
+            &out[..8],
+            &[94, 0, 13, 0, 1, 0, 0, 0],
+            "the client reports switched on"
+        );
         let block = &out[8..];
         // The offset vec4, ten values, a flag, three ints, six floats and an empty name.
         assert_eq!(block.len(), 16 + 40 + 1 + 12 + 24 + 4);
