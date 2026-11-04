@@ -128,9 +128,9 @@
         "name": "bw_fishing_stream",
         "zone_id": 561,
         "spawn_position": [
-          279,
-          0.48,
-          187
+          282.1,
+          0.0,
+          174.4
         ],
         "spawn_rotation": [
           0,
@@ -141,7 +141,7 @@
         "water_y": -2,
         "underwater_bed_x": 58,
         "client_scene_cached": true,
-        "source": "L923: zone files present on the community CDN (gzne, Areas, all 4 terrain chunks), so Go fish! zones here. Spawn: Lxzxrus-Free-Realms-Server origin/fishing/lure-and-spawns@75f7d95 src/Resources/Zones/bw_fishing_stream.json, read in game on 2026-10-19 (R); it sits 4 cm below the water. Bed X and water: our bw_fishing_streamAreas.xml (pack_14/003861), Underwater_Bed id 4118 at (58, -2, 484) and Water id 3908 with its child spheres at y -2. Zone 561 pairs with MiniGameData 597 (the 'Unknown' field of ClientActivityDefinitions in Lxzxrus-Free-Realms-Server 75f7d95, AGPL data only). R: rotation (0, 0, 0, 1). L933 (lead): spawn = the Sanctuary fork (BubbaJoeX, AGPL) src/Resources/Fishing.json Ponds Arrival [279, 0.48, 187] heading -1.326 (R), 11-16 m from a school, so the player arrives at the fishing spots."
+        "source": "L923: zone files present on the community CDN (gzne, Areas, all 4 terrain chunks), so Go fish! zones here. Spawn: Lxzxrus-Free-Realms-Server origin/fishing/lure-and-spawns@75f7d95 src/Resources/Zones/bw_fishing_stream.json, read in game on 2026-10-19 (R); it sat 4 cm below the water. Bed X and water: our bw_fishing_streamAreas.xml (pack_14/003861), Underwater_Bed id 4118 at (58, -2, 484) and Water id 3908 with its child spheres at y -2. Zone 561 pairs with MiniGameData 597 (the 'Unknown' field of ClientActivityDefinitions in Lxzxrus-Free-Realms-Server 75f7d95, AGPL data only). R: rotation (0, 0, 0, 1). L933 (lead): spawn = the Sanctuary fork (BubbaJoeX, AGPL) src/Resources/Fishing.json Ponds Arrival [279, 0.48, 187] heading -1.326 (R), 11-16 m from a school, so the player arrives at the fishing spots. L968 (owner 2026-11-04: 'Briarwood fishing still spawns in a tree'): that arrival stood 1.6 m from a giant mushroom (bw_mushroom_10) and 2.1 m from a shrub (2014 chunk props), so it moved 13 m to the nearest flat bank point with no tree, mushroom, shrub or boulder within 4.6 m and water within 7 m (a height grid of the zone's chunks), 11.5 m from that mushroom and 25 m from the nearest school (263, 191); the heading is unchanged."
       },
       "source": "Gunther (Briarwood). R: the Bayou guide line 408596 has no named speaker; Gunther is the Fisherman quest giver at Brambleback's Bayou."
     },
