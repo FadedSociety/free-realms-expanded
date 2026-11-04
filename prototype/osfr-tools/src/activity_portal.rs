@@ -168,6 +168,9 @@ pub enum Kind {
     },
     /// L104: the checkers table against the server; the row's id is MiniGameData 21.
     Checkers,
+    /// L961 (L123's engine): a Feeling the Beat! game against the server; the row's id is its
+    /// MiniGameData row (201-204).
+    Music,
 }
 
 /// One published activity: a battle of the frozen package.
@@ -530,7 +533,8 @@ impl Catalogue {
             | Kind::Recipe { .. }
             | Kind::Gather { .. }
             | Kind::Fishing { .. }
-            | Kind::Checkers => {}
+            | Kind::Checkers
+            | Kind::Music => {}
             // (R) Soccer is a world activity, not a combat-job gate. Its row
             // still honors the configured level floor; the original gate is unknown.
             Kind::Soccer => {
@@ -581,7 +585,8 @@ impl Catalogue {
             | Kind::Derby
             | Kind::Gather { .. }
             | Kind::Fishing { .. }
-            | Kind::Checkers => true,
+            | Kind::Checkers
+            | Kind::Music => true,
         }
     }
 
@@ -679,7 +684,8 @@ impl Catalogue {
             | Kind::Recipe { .. }
             | Kind::Gather { .. }
             | Kind::Fishing { .. }
-            | Kind::Checkers => return None,
+            | Kind::Checkers
+            | Kind::Music => return None,
         })
     }
 
@@ -780,7 +786,8 @@ fn runs(row: &LiveRow, a: &Activity) -> bool {
         | Kind::Recipe { .. }
         | Kind::Gather { .. }
         | Kind::Fishing { .. }
-        | Kind::Checkers => row.entry_type == ENTRY_CLIENT_TUNNEL && row.content_id == a.id,
+        | Kind::Checkers
+        | Kind::Music => row.entry_type == ENTRY_CLIENT_TUNNEL && row.content_id == a.id,
     }
 }
 

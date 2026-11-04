@@ -81,6 +81,7 @@ impl Gameplay {
                                 self.mail_sorting.as_ref(),
                             ],
                             self.fishing_spots.as_deref(),
+                            self.music.as_ref(),
                         ),
                     )?;
                     if let Some(visibility) = self.npc_visibility.as_mut() {

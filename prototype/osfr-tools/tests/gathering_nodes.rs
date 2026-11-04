@@ -1572,6 +1572,76 @@ fn games_window_play_opens_a_checkers_table_against_the_server() {
     );
 }
 
+/// L961: Play on a live Feeling the Beat! row (511, MiniGameData 201) offers that song; the
+/// movie launches on 39/5, its data request gets the song's row, and a second Play while it is
+/// open is refused by the occupation gate.
+#[test]
+fn games_window_play_opens_a_feeling_the_beat_song() {
+    let fixture = Fixture::new(PLOT);
+    let mut gateway = fixture.gateway_at(fixture.state(false, true), &fixture.node, 60.0);
+    tick(&mut gateway, 1_500);
+    let offered = play(&mut gateway, 511, 2_000);
+    let offer = inners(&offered)
+        .into_iter()
+        .find(|p| p.starts_with(&[39, 0, 16]))
+        .expect("the 39/16 offer")
+        .to_vec();
+    assert_eq!(i32::from_le_bytes(offer[11..15].try_into().unwrap()), 201);
+    assert!(
+        (offer.windows(25)).any(|w| w == b"MusicConductingAssets.txt"),
+        "the movie's preload list, or the start screen stays on Loading..."
+    );
+    let id = i32::from_le_bytes(offer[3..7].try_into().unwrap());
+    let again = play(&mut gateway, 512, 2_050);
+    // The open song is an occupation, so the shared gate refuses another activity.
+    assert_eq!(
+        chat_text(&again).trim_end(),
+        "Finish what you are doing before starting an activity."
+    );
+    let started = send(&mut gateway, &frame(5, id, -1), 2_100);
+    assert!(said(&started, "game_music.gfx"), "the music movie launches");
+    send(&mut gateway, &payload(id, "OnConnectMsg"), 2_200);
+    let data = send(
+        &mut gateway,
+        &payload(id, "FRServer_ReadyForGameData"),
+        2_300,
+    );
+    assert!(said(&data, "OnGameDataMsg	201"), "the song's data");
+    assert!(said(&data, "OnPhaseDataMsg	20101^201^"), "its level row");
+
+    // L961: the song's end (37 s after its row) wins once and pays its coins once.
+    let before = coins(&gateway);
+    send(&mut gateway, &payload(id, "FRServer_ScoreSet	1000"), 20_000);
+    let won = send(
+        &mut gateway,
+        &payload(id, "FRServer_GameWon	1000	0"),
+        39_400,
+    );
+    let result = |out: &GatewayOutcome| {
+        (inners(out).into_iter())
+            .find(|p| p.starts_with(&[39, 0, 18]))
+            .map(<[u8]>::to_vec)
+    };
+    assert_eq!(result(&won).expect("the result screen")[15], 1, "won");
+    let paid = i64::from(osfr_tools::music_game::WIN_COINS);
+    assert_eq!(coins(&gateway), before + paid);
+    let again = send(
+        &mut gateway,
+        &payload(id, "FRServer_GameWon	1000	0"),
+        39_500,
+    );
+    assert!(result(&again).is_none(), "the verdict is given once");
+    assert_eq!(coins(&gateway), before + paid, "and paid once");
+    send(&mut gateway, &payload(id, "FRServer_GameOver"), 39_600);
+    send(&mut gateway, &CLOSE, 40_000);
+    let next = play(&mut gateway, 568, 41_000);
+    let offer = inners(&next)
+        .into_iter()
+        .find(|p| p.starts_with(&[39, 0, 16]))
+        .expect("a new song after the close");
+    assert_eq!(i32::from_le_bytes(offer[11..15].try_into().unwrap()), 204);
+}
+
 #[test]
 fn each_farm_plot_starts_its_own_region_game_and_pays_its_own_produce() {
     for (region, outputs) in REGION_OUTPUTS {

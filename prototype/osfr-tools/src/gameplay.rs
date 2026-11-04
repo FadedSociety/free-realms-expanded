@@ -45,6 +45,7 @@ mod admin_move;
 pub use admin_move::{AdminMove, MoveTarget};
 mod card_launch;
 mod checkers_table;
+mod music_table;
 mod coin_authoring;
 mod collection_pickup;
 mod content_presence;
@@ -254,6 +255,8 @@ pub struct Gameplay {
     chess: Option<ChessService>,
     /// L104: this session's checkers table (session-local, like chess).
     checkers: crate::checkers::CheckersTable,
+    /// L961: this session's Feeling the Beat! run (session-local); `None` without its content.
+    music: Option<crate::music_game::MusicGame>,
     /// T765: the session's Trading Card Game launches (type-16 runs and one-time tickets).
     card_launches: Option<crate::card_game::Launches>,
     /// T560: the daily wheel (`gameplay/daily_wheel.rs`); only its day stamp is saved.
@@ -1134,7 +1137,9 @@ impl Gameplay {
         let type8 = [mining.as_ref(), harvesting.as_ref(), mail_sorting.as_ref()];
         let fishing_spots = crate::fishing_service::FishingSpots::load(directory)?.map(Arc::new);
         let fishing = fishing_spots.as_deref();
-        let games = portal_games::games(kart, derby_ref, &recipe_catalog, type8, fishing);
+        let music = music_table::load_music(npc_content)?;
+        let games =
+            portal_games::games(kart, derby_ref, &recipe_catalog, type8, fishing, music.as_ref());
         let activities = portal_games::with_live(activities, folders, &daily_wheel, games)?;
         if let (Some(spots), Some(interaction)) = (&fishing_spots, &mut npc_interaction) {
             let unknown = interaction.set_fish_gates(&spots.gate_npcs(), spots.menu_string_id());
@@ -1253,6 +1258,7 @@ impl Gameplay {
             soccer: None,
             chess,
             checkers: crate::checkers::CheckersTable::fresh()?,
+            music,
             card_launches,
             daily_wheel,
             portal_refreshed_ms: None,
@@ -2139,6 +2145,9 @@ impl Gameplay {
             return Ok(out);
         }
         if let Some(out) = self.handle_checkers(inner, character.guid, now_ms)? {
+            return Ok(out);
+        }
+        if let Some(out) = self.handle_music(inner, character.guid, now_ms)? {
             return Ok(out);
         }
         if self.chess.as_ref().is_some_and(ChessService::is_active)

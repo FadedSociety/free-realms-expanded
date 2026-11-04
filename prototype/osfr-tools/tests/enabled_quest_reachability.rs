@@ -710,13 +710,13 @@ fn shipped_minigame_producers_are_pinned() {
         // window rows 67/68), the tutorials 289/290 and the quest rows 607, 615, 616, 624 and 627.
         // L930: a kart finish credits the MiniGameData row it ran as, no longer the speedway id 31:
         // 28 (Wildwood Kart Racing) and the Wildwood challenge rows 628-634. L952: the Soccer Tutorial
-        // row 1030 is a soccer row.
+        // row 1030 is a soccer row. L961: the Feeling the Beat! songs 201-204.
         vec![
             18, 20, 28, 39, 40, 41, 42, 43, 44, 46, 66, 67, 77, 111, 134, 135, 136, 137, 139, 173,
             174, 175, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192,
-            193, 194, 195, 196, 197, 198, 199, 289, 290, 322, 323, 324, 325, 326, 327, 328, 329,
-            330, 331, 332, 333, 596, 597, 598, 599, 600, 601, 604, 607, 615, 616, 624, 627, 628,
-            629, 630, 631, 632, 633, 634, 1030,
+            193, 194, 195, 196, 197, 198, 199, 201, 202, 203, 204, 289, 290, 322, 323, 324, 325,
+            326, 327, 328, 329, 330, 331, 332, 333, 596, 597, 598, 599, 600, 601, 604, 607, 615,
+            616, 624, 627, 628, 629, 630, 631, 632, 633, 634, 1030,
         ],
         "the finish_minigame producer set changed; update the producer table and this pin"
     );
@@ -773,10 +773,21 @@ fn shipped_minigame_producers_are_pinned() {
     assert!(!catalogue.targets.reports(599, MinigameFact::Score));
     // L932: a soccer win reports the team's goals (score) and the whole-second match time; the
     // match has no placement or knock-out fact.
-    for soccer in [42, 43, 44, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 1030] {
-        assert!(catalogue.targets.reports(soccer, MinigameFact::Score), "{soccer}");
-        assert!(catalogue.targets.reports(soccer, MinigameFact::Elapsed), "{soccer}");
-        assert!(!catalogue.targets.reports(soccer, MinigameFact::Placement), "{soccer}");
+    for soccer in [
+        42, 43, 44, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 1030,
+    ] {
+        assert!(
+            catalogue.targets.reports(soccer, MinigameFact::Score),
+            "{soccer}"
+        );
+        assert!(
+            catalogue.targets.reports(soccer, MinigameFact::Elapsed),
+            "{soccer}"
+        );
+        assert!(
+            !catalogue.targets.reports(soccer, MinigameFact::Placement),
+            "{soccer}"
+        );
     }
     // L930: every kart row is a solo time trial: its elapsed time is the only fact.
     for kart in [28, 628, 629, 630, 631, 632, 633, 634] {

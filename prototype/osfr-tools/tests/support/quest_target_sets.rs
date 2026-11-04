@@ -20,6 +20,7 @@
 //!   | paid fishing catch (`Gameplay::handle_fishing`) | spot game id | `fishing_spots.json` `spots[].game_id` |
 //!   | kart claim (`Gameplay::handle_kart_entry`/tick) | entered row id (28, 628-634) | `KartGateway::minigame_ids` (`kart_gates.json` + the playable `kart_rows.json` rows) |
 //!   | finished derby (`Gameplay::pay_derby_completion`) | entered row id | `DerbyGateway::rows` (`derby_entry.json` default + `derby_rows.json`) |
+//!   | won song (`Gameplay::handle_music` -> `npc_minigame_win_id_only`, L961) | game id | `music_game.json` `games[].game_id` |
 //!
 //!   Chess sends the row id as the 39/18 game id through its `RunSpec`; it reports
 //!   an elapsed time and no score (the results page always carries zero). A craft
@@ -81,6 +82,7 @@ use osfr_tools::{
     item_bar::Effects,
     kart_gateway::KartGateway,
     mining::{self, Type8Engine},
+    music_game,
     pets::PetContent,
     recipes::{CraftingJob, RecipeCatalog},
     soccer_entry,
@@ -217,6 +219,12 @@ impl Targets {
         if soccer.is_file() {
             for game in soccer_entry::Content::load(&soccer)?.games() {
                 targets.producer(game.id, SCORE_AND_ELAPSED);
+            }
+        }
+        // L961: every `music_game.json` song; the 39/18 total is the client's, so no fact.
+        if root.join(music_game::CONTENT_FILE).is_file() {
+            for game in music_game::MusicContent::load(root)?.games {
+                targets.producer(u32::try_from(game.game_id).map_err(io::Error::other)?, []);
             }
         }
         // `FishingSpots::load` owns the file; a paid catch credits the spot's

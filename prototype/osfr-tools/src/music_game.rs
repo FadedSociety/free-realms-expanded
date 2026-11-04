@@ -22,13 +22,16 @@
 //! the score bound counts twice the movie's 30 frames a second over the song; a win needs the
 //! song's length to have passed since the row went out, a total within the bound and not below
 //! the last report, and the level's goal, else the server settles a loss; a refused report
-//! changes nothing; a win pays nothing but the result (stars 0).
-use crate::minigame::{
-    self, Activity, ActivityFinish, MinigameRuns, RunMode, RunOutcome, RunSpec, RunState,
+//! changes nothing; a win pays [`WIN_COINS`] (L961) with the result (stars 0).
+use crate::{
+    minigame::{
+        self, Activity, ActivityFinish, MinigameRuns, RunMode, RunOutcome, RunSpec, RunState,
+    },
+    rewards::{RewardDisplay, RewardGrant, RewardState},
 };
 use serde::Deserialize;
 use std::{
-    collections::BTreeSet,
+    collections::{BTreeMap, BTreeSet},
     fs,
     io::{self, Read},
     path::Path,
@@ -37,8 +40,16 @@ use std::{
 pub const GAME_TYPE: i32 = 9;
 pub const MOVIE: &str = "game_music.gfx";
 pub const CONTENT_FILE: &str = "music_game.json";
+/// L961: the client's preload list for the movie (manifest `MusicConductingAssets.txt.z`; the movie's
+/// own name is MusicConducting). Type 9 is not one the client readies by itself (`009beb70`: 1, 2,
+/// 17, 22), so without it the start screen stays on "Loading..." (native 2026-11-04), as checkers
+/// did before L918. `MoreMusicConductingAssets.txt` is the other list the manifest carries (R).
+pub const PRELOAD_FILE: &str = "MusicConductingAssets.txt";
 /// (R) Run ids of its own, apart from every other minigame's.
 pub const FIRST_INSTANCE_ID: i32 = 201_000_001;
+/// L961 (R): a won song pays checkers' award (L920), so no Games window game pays nothing.
+// ponytail: one constant for every song; move it to `music_game.json` rows with other tuning.
+pub const WIN_COINS: u32 = 10;
 const MAX_CONTENT: u64 = 16 * 1024;
 const MAX_GAMES: usize = 16;
 const MAX_TEXT: usize = 256;
@@ -163,13 +174,16 @@ impl Level {
 
 /// What one packet did, for gameplay to apply. `changed` marks a lifecycle step worth saving;
 /// score reports never set it (the run is session-local).
-#[derive(Debug, Default)]
+#[derive(Default)]
 pub struct MusicOutcome {
     pub accepted: bool,
     pub changed: bool,
     pub replies: Vec<Vec<u8>>,
     /// Why a client report was refused (nothing changed) or a reported win was overruled.
     pub refused: Option<&'static str>,
+    /// L961: a won song's payout, to adopt before sending `reward_packets`, as for checkers.
+    pub reward_packets: Vec<Vec<u8>>,
+    pub reward_state: Option<RewardState>,
 }
 
 impl MusicOutcome {
@@ -179,6 +193,8 @@ impl MusicOutcome {
             changed: run.changed,
             replies: run.replies,
             refused: None,
+            reward_packets: run.reward_packets,
+            reward_state: run.reward_state,
         }
     }
 
@@ -280,6 +296,7 @@ impl MusicGame {
         spec.description_id = self.content.description_id;
         spec.icon_id = self.content.icon_id;
         spec.difficulty = row.difficulty;
+        spec.preload_file = PRELOAD_FILE.into();
         // `offer` changes nothing on an error or a refusal.
         let offered = self.runs.offer(spec)?;
         if !offered.accepted {
@@ -297,6 +314,16 @@ impl MusicGame {
     /// One client packet while a run is open; `None` for a packet that is not this run's. A
     /// refused or stale packet changes nothing; a malformed one is an error.
     pub fn route(&mut self, packet: &[u8], now_ms: u64) -> io::Result<Option<MusicOutcome>> {
+        self.route_with(packet, now_ms, None)
+    }
+
+    /// `route`, where a won song pays [`WIN_COINS`] to `payer` (player guid and reward state).
+    pub fn route_with(
+        &mut self,
+        packet: &[u8],
+        now_ms: u64,
+        payer: Option<(u64, &RewardState)>,
+    ) -> io::Result<Option<MusicOutcome>> {
         let Some(instance) = self.runs.current_instance_id() else {
             return Ok(None);
         };
@@ -304,7 +331,7 @@ impl MusicGame {
             if field(packet, 3) != Some(instance) {
                 return Ok(None);
             }
-            return self.movie(instance, packet, now_ms).map(Some);
+            return self.movie(instance, packet, now_ms, payer).map(Some);
         }
         let start = matches!(packet.get(..3), Some([39, 0, 5]));
         if !matches!(packet.get(..3), Some([39, 0, 5..=7])) && packet != [26, 0, 42, 0] {
@@ -327,7 +354,13 @@ impl MusicGame {
         Ok(Some(out))
     }
 
-    fn movie(&mut self, instance: i32, packet: &[u8], now_ms: u64) -> io::Result<MusicOutcome> {
+    fn movie(
+        &mut self,
+        instance: i32,
+        packet: &[u8],
+        now_ms: u64,
+        payer: Option<(u64, &RewardState)>,
+    ) -> io::Result<MusicOutcome> {
         let text = minigame::movie_text(packet)?;
         let Some(mut play) = self.play else {
             return Ok(MusicOutcome::refused("no music game is open"));
@@ -390,11 +423,11 @@ impl MusicGame {
                 match verdict {
                     Ok(total) => {
                         let won = total >= f64::from(play.level.row.goal);
-                        self.settle(instance, &play, won, total, now_ms)?
+                        self.settle(instance, &play, won, total, now_ms, payer)?
                     }
                     Err(reason) => MusicOutcome {
                         refused: Some(reason),
-                        ..self.settle(instance, &play, false, play.score, now_ms)?
+                        ..self.settle(instance, &play, false, play.score, now_ms, None)?
                     },
                 }
             }
@@ -404,7 +437,7 @@ impl MusicGame {
             (["FRServer_GameLost", score], _)
                 if *score == "undefined" || parse_score(score).is_some() =>
             {
-                self.settle(instance, &play, false, play.score, now_ms)?
+                self.settle(instance, &play, false, play.score, now_ms, None)?
             }
             _ => MusicOutcome::refused("not a Feeling the Beat message"),
         };
@@ -422,6 +455,7 @@ impl MusicGame {
         won: bool,
         score: f64,
         now_ms: u64,
+        payer: Option<(u64, &RewardState)>,
     ) -> io::Result<MusicOutcome> {
         let elapsed = now_ms.saturating_sub(play.started_ms) / 1000;
         let finish = Finish {
@@ -431,12 +465,33 @@ impl MusicGame {
             elapsed_seconds: u32::try_from(elapsed).unwrap_or(u32::MAX),
         };
         // `finish` changes nothing on an error.
-        let run = if won {
-            self.runs.finish_win_without_reward(instance, &finish)?
-        } else {
-            self.runs.finish(instance, &finish, None)?
+        let run = match (won, payer) {
+            (true, Some((player, rewards))) => {
+                let grant = win_grant(player, self.content.icon_id, play.level.row.name_id);
+                self.runs
+                    .finish(instance, &finish, Some((rewards, &grant)))?
+            }
+            (true, None) => self.runs.finish_win_without_reward(instance, &finish)?,
+            (false, _) => self.runs.finish(instance, &finish, None)?,
         };
         Ok(MusicOutcome::from_run(run))
+    }
+}
+
+fn win_grant(player_id: u64, icon_id: i32, name_id: i32) -> RewardGrant {
+    RewardGrant {
+        coins: WIN_COINS,
+        items: Vec::new(),
+        job_xp: BTreeMap::new(),
+        sc: 0,
+        display: RewardDisplay {
+            source_guid: player_id,
+            player_guid: player_id,
+            reward_kind: 0,
+            icon_id,
+            name_id,
+            rows: Vec::new(),
+        },
     }
 }
 
