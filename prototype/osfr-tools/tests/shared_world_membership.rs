@@ -37,6 +37,9 @@ const HANDOFF_KEY: &[u8] = b"synthetic-handoff-key";
 // holds. A loaded machine (parallel cargo builds and test binaries) can starve the gateway thread
 // for seconds, so no wait in this file is sized by how long an idle machine takes.
 const PATIENCE: Duration = Duration::from_secs(30);
+// L971: loading the real content competes with the binary's other tests in the integrator's full
+// suite and outlasted PATIENCE there (Timeout at the address wait, known-failing since 2026-10-21).
+const STARTUP: Duration = Duration::from_secs(180);
 
 type HostAction = Box<dyn FnOnce(&mut Server) + Send>;
 struct Fixture {
@@ -122,9 +125,8 @@ impl Fixture {
             server.shutdown().unwrap();
         });
         Self {
-            // Loading real content on a loaded shared host can outlast a fixed 10 s; this is
-            // "the server gets to it", the same bound as every other wait in this file.
-            addr: addr_rx.recv_timeout(PATIENCE).unwrap(),
+            // Loading real content on a loaded shared host can outlast PATIENCE.
+            addr: addr_rx.recv_timeout(STARTUP).unwrap(),
             tx: Some(tx),
             handle: Some(handle),
             root,
