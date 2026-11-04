@@ -136,6 +136,7 @@ pub mod station_cash;
 pub mod studio;
 pub mod style_cards;
 pub mod terrain;
+pub mod tower_defense;
 pub mod trace;
 pub mod trade;
 pub mod world;

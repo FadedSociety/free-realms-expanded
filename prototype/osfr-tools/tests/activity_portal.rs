@@ -336,8 +336,8 @@ fn catalogue_validation() {
         Catalogue::new(vec![row(5, 0), row(5, 1)]).is_err(),
         "duplicate id"
     );
-    assert!(Catalogue::new((1..=128).map(|i| row(i, 0)).collect()).is_ok());
-    assert!(Catalogue::new((1..=129).map(|i| row(i, 0)).collect()).is_err());
+    assert!(Catalogue::new((1..=256).map(|i| row(i, 0)).collect()).is_ok());
+    assert!(Catalogue::new((1..=257).map(|i| row(i, 0)).collect()).is_err());
 }
 
 const BATTLES: &str = r#"{"schema_version":1,"battles":[
@@ -558,16 +558,16 @@ fn assembly_refuses_collisions_and_too_many_rows() {
             .append([chess_row(20).into(), chess_row(20).into()])
             .is_err()
     );
-    // 17 card rows plus 111 battles fit (L099 cap 128); one more does not.
+    // 17 card rows plus 239 battles fit (L962 cap 256); one more does not.
     let battles = |n: u32| (2000..2000 + n).map(|id| row(id, 0)).collect::<Vec<_>>();
     assert!(
-        Catalogue::new(battles(111))
+        Catalogue::new(battles(239))
             .unwrap()
             .append(cards.portal_rows())
             .is_ok()
     );
     assert!(
-        Catalogue::new(battles(112))
+        Catalogue::new(battles(240))
             .unwrap()
             .append(cards.portal_rows())
             .is_err()

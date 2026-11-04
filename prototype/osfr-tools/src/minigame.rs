@@ -838,7 +838,11 @@ pub(crate) fn encounter_packet(sub: u16, encounter_id: i32, instance_id: i32) ->
 }
 
 /// Movie command 39/14: NUL-inclusive length, read by `009b89e0`.
-fn payload_packet(instance_id: i32, game_id: i32, message: &str) -> io::Result<Vec<u8>> {
+pub(crate) fn payload_packet(
+    instance_id: i32,
+    game_id: i32,
+    message: &str,
+) -> io::Result<Vec<u8>> {
     let mut bytes = family39_header(14, instance_id, game_id);
     let length = i32::try_from(message.len() + 1).map_err(invalid)?;
     bytes.extend(length.to_le_bytes());

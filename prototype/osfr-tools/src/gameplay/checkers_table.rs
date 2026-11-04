@@ -28,6 +28,9 @@ impl Gameplay {
         player_id: u64,
         now_ms: u64,
     ) -> io::Result<Option<Outcome>> {
+        if !self.checkers.is_active() {
+            return Ok(None);
+        }
         let rewards = self.reward_snapshot();
         let Some(table) = self
             .checkers

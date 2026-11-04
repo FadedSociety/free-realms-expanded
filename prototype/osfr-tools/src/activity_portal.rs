@@ -126,8 +126,9 @@ const ART: &str = "bandit_hideout_detail.dds";
 const CHESS_CATEGORY: u32 = 0;
 const CHESS_DETAIL: &str = "chess_detail.dds";
 const CHESS_THUMBNAIL: &str = "chess_thumb.dds";
-/// L099: the service rows include one per runnable recipe (31 today).
-const MAX_ACTIVITIES: usize = 128;
+/// L099: the service rows include one per runnable recipe (31 today). L962: raised from 128 when
+/// Tower Defense's 36 games pushed a full content set past it; the live catalogue has 211 rows.
+const MAX_ACTIVITIES: usize = 256;
 const MAX_FILE: u64 = 1 << 20;
 const PLAY_LEN: usize = 12;
 
@@ -171,6 +172,8 @@ pub enum Kind {
     /// L961 (L123's engine): a Feeling the Beat! game against the server; the row's id is its
     /// MiniGameData row (201-204).
     Music,
+    /// L962: a Tower Defense game against the server; the row's id is its MiniGameData row.
+    TowerDefense,
 }
 
 /// One published activity: a battle of the frozen package.
@@ -534,7 +537,8 @@ impl Catalogue {
             | Kind::Gather { .. }
             | Kind::Fishing { .. }
             | Kind::Checkers
-            | Kind::Music => {}
+            | Kind::Music
+            | Kind::TowerDefense => {}
             // (R) Soccer is a world activity, not a combat-job gate. Its row
             // still honors the configured level floor; the original gate is unknown.
             Kind::Soccer => {
@@ -586,7 +590,8 @@ impl Catalogue {
             | Kind::Gather { .. }
             | Kind::Fishing { .. }
             | Kind::Checkers
-            | Kind::Music => true,
+            | Kind::Music
+            | Kind::TowerDefense => true,
         }
     }
 
@@ -685,7 +690,8 @@ impl Catalogue {
             | Kind::Gather { .. }
             | Kind::Fishing { .. }
             | Kind::Checkers
-            | Kind::Music => return None,
+            | Kind::Music
+            | Kind::TowerDefense => return None,
         })
     }
 
@@ -787,7 +793,8 @@ fn runs(row: &LiveRow, a: &Activity) -> bool {
         | Kind::Gather { .. }
         | Kind::Fishing { .. }
         | Kind::Checkers
-        | Kind::Music => row.entry_type == ENTRY_CLIENT_TUNNEL && row.content_id == a.id,
+        | Kind::Music
+        | Kind::TowerDefense => row.entry_type == ENTRY_CLIENT_TUNNEL && row.content_id == a.id,
     }
 }
 

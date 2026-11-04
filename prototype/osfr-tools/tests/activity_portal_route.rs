@@ -419,7 +419,7 @@ fn reload_battles_keeps_chess_soccer_and_card_rows() {
             .collect::<Vec<_>>()
     };
     let at_startup = listed(&loaded);
-    for id in card_ids().into_iter().chain([515, 72, 73, 18, 511]) {
+    for id in card_ids().into_iter().chain([515, 72, 73, 18, 511, 195]) {
         assert!(at_startup.iter().any(|row| row.0 == id), "{id} at startup");
     }
     let reloaded = send(

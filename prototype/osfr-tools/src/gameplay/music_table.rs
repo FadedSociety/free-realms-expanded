@@ -42,6 +42,9 @@ impl Gameplay {
         player_id: u64,
         now_ms: u64,
     ) -> io::Result<Option<Outcome>> {
+        if !(self.music.as_ref()).is_some_and(MusicGame::is_active) {
+            return Ok(None);
+        }
         let rewards = self.reward_snapshot();
         let Some(music) = self.music.as_mut() else {
             return Ok(None);

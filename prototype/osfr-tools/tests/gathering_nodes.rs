@@ -1642,6 +1642,75 @@ fn games_window_play_opens_a_feeling_the_beat_song() {
     assert_eq!(i32::from_le_bytes(offer[11..15].try_into().unwrap()), 204);
 }
 
+/// L962: Play on the Easy "Penguin Produce" row (532) offers Tower Defense game 350 with the movie's
+/// preload list; its data goes out once, a cleared map (stages 0-20 reported) wins once and pays once,
+/// and after the close Play on a Hard row (195) offers game 150.
+#[test]
+fn games_window_play_opens_a_tower_defense_map() {
+    let fixture = Fixture::new(PLOT);
+    let mut gateway = fixture.gateway_at(fixture.state(false, true), &fixture.node, 60.0);
+    tick(&mut gateway, 1_500);
+    let offered = play(&mut gateway, 532, 2_000);
+    let offer = inners(&offered)
+        .into_iter()
+        .find(|p| p.starts_with(&[39, 0, 16]))
+        .expect("the 39/16 offer")
+        .to_vec();
+    assert_eq!(i32::from_le_bytes(offer[11..15].try_into().unwrap()), 350);
+    assert!(
+        (offer.windows(22)).any(|w| w == b"TowerDefenseAssets.txt"),
+        "the movie's preload list, or the start screen stays on Loading..."
+    );
+    let id = i32::from_le_bytes(offer[3..7].try_into().unwrap());
+    let again = play(&mut gateway, 195, 2_050);
+    assert_eq!(
+        chat_text(&again).trim_end(),
+        "Finish what you are doing before starting an activity."
+    );
+    let started = send(&mut gateway, &frame(5, id, -1), 2_100);
+    assert!(said(&started, "towerdefense.gfx"), "the movie launches");
+    let data = send(
+        &mut gateway,
+        &payload(id, "FRServer_ReadyForGameData"),
+        2_300,
+    );
+    assert!(said(&data, "OnGameDataMsg	350"), "the game");
+    assert!(said(&data, "OnMapDataMsg	350^350^"), "its map row");
+    assert!(said(&data, "OnGameDataCompleteMsg"), "and the start");
+    let twice = send(
+        &mut gateway,
+        &payload(id, "FRServer_ReadyForGameData"),
+        2_400,
+    );
+    assert!(!said(&twice, "OnMapDataMsg"), "the data goes out once");
+
+    let before = coins(&gateway);
+    for stage in 0..=20 {
+        let text = format!("FRServer_CompletedStage	{stage}");
+        send(&mut gateway, &payload(id, &text), 3_000 + stage);
+    }
+    let won = send(&mut gateway, &payload(id, "FRServer_GameWon	4321"), 90_000);
+    let result = |out: &GatewayOutcome| {
+        (inners(out).into_iter())
+            .find(|p| p.starts_with(&[39, 0, 18]))
+            .map(<[u8]>::to_vec)
+    };
+    assert_eq!(result(&won).expect("the result screen")[15], 1, "won");
+    let paid = before + 10;
+    assert_eq!(coins(&gateway), paid, "the content's win_coins");
+    let again = send(&mut gateway, &payload(id, "FRServer_GameWon	4321"), 90_100);
+    assert!(result(&again).is_none(), "the verdict is given once");
+    assert_eq!(coins(&gateway), paid, "and paid once");
+    send(&mut gateway, &payload(id, "FRServer_GameOver"), 90_200);
+    send(&mut gateway, &CLOSE, 91_000);
+    let next = play(&mut gateway, 195, 92_000);
+    let offer = inners(&next)
+        .into_iter()
+        .find(|p| p.starts_with(&[39, 0, 16]))
+        .expect("a new game after the close");
+    assert_eq!(i32::from_le_bytes(offer[11..15].try_into().unwrap()), 150);
+}
+
 #[test]
 fn each_farm_plot_starts_its_own_region_game_and_pays_its_own_produce() {
     for (region, outputs) in REGION_OUTPUTS {

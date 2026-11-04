@@ -10,6 +10,7 @@ use crate::{
     kart_gateway::{EntryDenied, KartGateway},
     music_game::MusicGame,
     recipes::RecipeCatalog,
+    tower_defense::TowerDefense,
 };
 
 /// The live Games window rows (from the first of `folders` that has them) over `catalogue`, with
@@ -30,7 +31,7 @@ pub(super) fn with_live(
 /// MiniGameData row, (L100) every game the mining, harvesting and (L103) mail sorting engines
 /// (`type8`, in that order) offer and (L102) every fishing hole, as Games window join rows keyed
 /// by their MiniGameData rows, and (L104) the checkers table. (L961) Every Feeling the Beat!
-/// game `music_game.json` carries.
+/// game `music_game.json` carries, and (L962) every Tower Defense game `tower_defense.json` carries.
 pub(super) fn games(
     kart: Option<&KartGateway>,
     derby: Option<&DerbyGateway>,
@@ -38,6 +39,7 @@ pub(super) fn games(
     type8: [Option<&Type8Engine>; 3],
     fishing: Option<&FishingSpots>,
     music: Option<&MusicGame>,
+    tower_defense: Option<&TowerDefense>,
 ) -> Vec<Activity> {
     let kart = kart.map(KartGateway::minigame_ids).unwrap_or_default();
     // L931: every hosted derby row is a Games window join key, so Play starts the row chosen.
@@ -88,6 +90,8 @@ pub(super) fn games(
     });
     let songs = (music.into_iter().flat_map(MusicGame::game_ids))
         .filter_map(|game| Some(game_row(u32::try_from(game).ok()?, Kind::Music)));
+    let maps = (tower_defense.into_iter().flat_map(TowerDefense::game_ids))
+        .filter_map(|game| Some(game_row(u32::try_from(game).ok()?, Kind::TowerDefense)));
     (kart.into_iter().map(|id| game_row(id, Kind::Kart)))
         .chain(derby.map(|id| game_row(id, Kind::Derby)))
         .chain(crafts)
@@ -95,6 +99,7 @@ pub(super) fn games(
         .chain(holes)
         .chain([game_row(crate::checkers::GAME_ID as u32, Kind::Checkers)])
         .chain(songs)
+        .chain(maps)
         .collect()
 }
 
@@ -186,11 +191,15 @@ impl Gameplay {
             }
             // L961: the server's own movies start nothing during another activity (a groom session
             // keeps travel open, so the portal's travel gate alone lets them through).
-            Kind::Checkers | Kind::Music if busy => Ok(refused(&Denied::Busy.message())),
+            Kind::Checkers | Kind::Music | Kind::TowerDefense if busy => {
+                Ok(refused(&Denied::Busy.message()))
+            }
             // L104: the checkers table (it stages itself).
             Kind::Checkers => self.begin_checkers(),
             // L961: Feeling the Beat! game `id` (it stages itself).
             Kind::Music => self.begin_music(id),
+            // L962: Tower Defense game `id` (it stages itself).
+            Kind::TowerDefense => self.begin_tower_defense(id),
             _ => Err(invalid("not a Games window game row")),
         }
     }
