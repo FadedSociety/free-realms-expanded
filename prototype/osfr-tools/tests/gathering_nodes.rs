@@ -1699,11 +1699,14 @@ fn a_pirates_ship_takes_a_chest_and_banks_it_at_its_dock() {
         assert!(now < 30_000, "Playing");
     }
     assert!(inners(&send(&mut gateway, &ship_report(guid, dock), now + 100)).is_empty());
-    let other = send(&mut gateway, &ship_report(guid + 1, chest), now + 4_000);
+    // The leg from the pad to the chest at the speed bound, with a second to spare.
+    let leg = (chest[0] - dock[0]).hypot(chest[2] - dock[2]) / content.treasure.max_speed;
+    let leg_ms = (leg.ceil() as u64 + 1) * 1000;
+    let other = send(&mut gateway, &ship_report(guid + 1, chest), now + leg_ms);
     assert!(!took(&other), "another ship's report takes nothing");
-    let taken = send(&mut gateway, &ship_report(guid, chest), now + 4_000);
+    let taken = send(&mut gateway, &ship_report(guid, chest), now + leg_ms);
     assert!(took(&taken), "chest 2 taken");
-    let banked = send(&mut gateway, &ship_report(guid, dock), now + 8_000);
+    let banked = send(&mut gateway, &ship_report(guid, dock), now + 2 * leg_ms);
     let gold = (inners(&banked).into_iter())
         .find(|p| p.starts_with(&[94, 0, 8, 0]))
         .expect("the gold");

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source": "L963 (R): Pirate's Plunder arenas. Docks are each arena's Port/PortBell areas (client ss_pirate_arenaAreas.xml, ss_pir_arena3Areas.xml, ss_pir_arena4Areas.xml). The live per-zone ZoneConfig never shipped (field names: the server loader ShipZoneConfigLoad 010680f0 compiled into the client). The camera values are the client's compiled defaults (constructor 0106b090; Pitch, MinPitch and MaxPitch in degrees as the loader 0106b1e0 reads them). The ship physics values are the client's compiled defaults (constructor 0106ae50) except the speeds (MinSpeed, MaxSpeed, TurboSpeed), which are (R) as is the one gear; angles in degrees as the loaders 0106a560 and 0106a3a0 read them. Colours are the client's PirateColorFromName names (R slot order); the flag and the damage states' mast aliases are the mast actors' texture aliases (skullx01, dmg00-dmg03; R thresholds). These ZoneConfig values follow the client constructor 01067ac0: Gravity 9.81, PhysicsSimulationRate 60, ZoneBubble 12/12/2, parking 2/4/20/20/1/15, repulsor 10/30/100, shove-out 10/30, AllowablePhysicsDelta 12, PickupEmptyTime 3, FlyingTreasureHeight 1.2, ShipPickupCount 12. Every other ZoneConfig value is (R), MaxPlayers, MaxScore, PlayTime, ZoneReadyWaitTime and MaxDrawDistance included (the constructor's 1/1/0/0/0 are per-zone placeholders). Treasure (L966): every value is (R); pickup points lie between each arena's docks and their middle (60% of the way in, plus the middle), on the water level; chest models from the client's Models.txt. Spawns and pickups (L966) come from the arenas' terrain heights (osfr-terrain grids of the arena chunks): spawns 35 m off each dock where a 15 m disc lies at least 6 m under WaterLevel, chests on a 20 m grid of such water, at least 40 m from docks and 60 m apart. The chest value 3250 follows live gameplay video ('COLLECTED 3250 GOLD'); PlayTime 540 the 2010 player guide (nine minutes; the video's timer reads 8:45 a minute in). Docks (L966 rework): each bank is the arena's Port/PortBell area (the pad, where every ship starts and banks), each enter its base's shipwash cave prop from the 2014 chunks (steering in opens Ship Selection); Treasure Isle's slots follow its loading-screen map colours (Port_1 red, the shark cave). Chests stay over 70 m from every pad. EnterRadius 20 and HoldUnloadPerSecond 1 are (R); max_speed 40 is 1.33x TurboSpeed 30 (R). Effect ids (client ActorParticleEmitterDefinitions.xml by name): TreasureXMark 22036 bbe_pir_chest_treasure_x, TreasureFill 22101 bbe_pir_dock_treasure_fill, ShipChestFull/Empty 22369/22368 bbe_pir_ship_hud_chest_full/empty.",
+  "source": "L963 (R): Pirate's Plunder arenas. Docks are each arena's Port/PortBell areas (client ss_pirate_arenaAreas.xml, ss_pir_arena3Areas.xml, ss_pir_arena4Areas.xml). The live per-zone ZoneConfig never shipped (field names: the server loader ShipZoneConfigLoad 010680f0 compiled into the client). The camera values are the client's compiled defaults (constructor 0106b090; Pitch, MinPitch and MaxPitch in degrees as the loader 0106b1e0 reads them). The ship physics values are the client's compiled defaults (constructor 0106ae50) except the speeds (MinSpeed, MaxSpeed, TurboSpeed), which are (R) as is the one gear; angles in degrees as the loaders 0106a560 and 0106a3a0 read them. Colours are the client's PirateColorFromName names (R slot order); the flag and the damage states' mast aliases are the mast actors' texture aliases (skullx01, dmg00-dmg03; R thresholds). These ZoneConfig values follow the client constructor 01067ac0: Gravity 9.81, PhysicsSimulationRate 60, ZoneBubble 12/12/2, parking 2/4/20/20/1/15, repulsor 10/30/100, shove-out 10/30, AllowablePhysicsDelta 12, PickupEmptyTime 3, FlyingTreasureHeight 1.2, ShipPickupCount 12. Every other ZoneConfig value is (R), MaxPlayers, MaxScore, PlayTime, ZoneReadyWaitTime and MaxDrawDistance included (the constructor's 1/1/0/0/0 are per-zone placeholders). Treasure (L966): every value is (R); pickup points lie between each arena's docks and their middle (60% of the way in, plus the middle), on the water level; chest models from the client's Models.txt. Spawns and pickups (L966) come from the arenas' terrain heights (osfr-terrain grids of the arena chunks): spawns 35 m off each dock where a 15 m disc lies at least 6 m under WaterLevel, Shipwreck Cove's chests on a 20 m grid of such water, at least 40 m from docks and 60 m apart. The chest value 3250 follows live gameplay video ('COLLECTED 3250 GOLD'); PlayTime 540 the 2010 player guide (nine minutes; the video's timer reads 8:45 a minute in). Docks (L966 rework): each bank is the arena's Port/PortBell area (the pad, where every ship starts and banks), each enter its base's shipwash cave prop from the 2014 chunks (steering in opens Ship Selection); Treasure Isle's slots follow its loading-screen map colours (Port_1 red, the shark cave). Shipwreck Cove's chests stay over 70 m from every pad. EnterRadius 20 and HoldUnloadPerSecond 1 are (R); max_speed 40 is 1.33x TurboSpeed 30 (R). Effect ids (client ActorParticleEmitterDefinitions.xml by name): TreasureXMark 22036 bbe_pir_chest_treasure_x, TreasureFill 22101 bbe_pir_dock_treasure_fill, ShipChestFull/Empty 22369/22368 bbe_pir_ship_hud_chest_full/empty. X spots (L967): Treasure Isle's and Arctic Bay's chests lie at the X marks of their loading-screen maps (three each), fitted to the dock bells by least squares and snapped to deep water; the 'Treasure N m' marker points at their centre (Treasure Isle: 509 m from red's pad, the game showed 537). Shipwreck Cove keeps terrain-picked points until its map turns up.",
   "arenas": [
     {
       "scene": "ss_pirate_arena",
@@ -87,49 +87,19 @@
       ],
       "pickups": [
         [
-          788.0,
+          938.8,
           50,
-          863.0
+          1235.6
         ],
         [
-          848.0,
+          870.6,
           50,
-          843.0
+          1228.2
         ],
         [
-          708.0,
+          784.7,
           50,
-          863.0
-        ],
-        [
-          768.0,
-          50,
-          923.0
-        ],
-        [
-          848.0,
-          50,
-          903.0
-        ],
-        [
-          648.0,
-          50,
-          803.0
-        ],
-        [
-          908.0,
-          50,
-          803.0
-        ],
-        [
-          708.0,
-          50,
-          923.0
-        ],
-        [
-          648.0,
-          50,
-          863.0
+          1232.6
         ]
       ]
     },
@@ -344,34 +314,19 @@
       ],
       "pickups": [
         [
-          1061.0,
+          1033.1,
           50,
-          637.0
+          1130.2
         ],
         [
-          1121.0,
+          1073.4,
           50,
-          617.0
+          1128.2
         ],
         [
-          1061.0,
+          930.6,
           50,
-          697.0
-        ],
-        [
-          1161.0,
-          50,
-          557.0
-        ],
-        [
-          1061.0,
-          50,
-          757.0
-        ],
-        [
-          1221.0,
-          50,
-          537.0
+          1142.5
         ]
       ]
     }
@@ -411,8 +366,6 @@
     "ProjectileLifetime": 4,
     "ShipHoldMinValue": 1,
     "ShipNameplateVisibleRange": 200,
-    "TreasureAreaPositionX": 761,
-    "TreasureAreaPositionZ": 719,
     "ParkingAlignSpin": 1,
     "ParkingAlignPush": 15,
     "RepulsorPushSpeed": 10,

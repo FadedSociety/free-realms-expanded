@@ -66,9 +66,8 @@ impl Gameplay {
         let mut pending = vec![
             crate::kart_gateway::player_status(character.guid, ship_combat::STATUS_SHIP_COMBAT),
             ship_combat::zone_config(
-                &arena.scene,
+                arena,
                 &content.zone_config,
-                &arena.docks,
                 &content.colours,
                 &content.treasure,
             ),

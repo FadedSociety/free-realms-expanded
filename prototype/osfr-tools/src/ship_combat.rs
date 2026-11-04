@@ -28,6 +28,7 @@ pub const CAMERA_CONFIG: u16 = 13;
 pub const REFRESH_UI: u16 = 4;
 pub const UPDATE_PLAYER: u16 = 8;
 pub const UPDATE_SHIP_PHYSICS: u16 = 16;
+pub const UPDATE_PLAYER_STATE: u16 = 17;
 pub const CREATE_PROXIED_PICKUP: u16 = 28;
 pub const DESTROY_PROXIED_PICKUP: u16 = 29;
 /// UpdateShipPhysics' body as the transport admits it (`soe::DIRECT_SHAPES`, 117 with the header).
@@ -75,11 +76,7 @@ pub const EXITING: u32 = 13;
 /// (R) How long Exiting shows before the zone back.
 const EXIT_DELAY_MS: u64 = 2_000;
 /// ZoneConfig keys outside `ZONE_FIELDS`.
-const EXTRA_KEYS: &[&str] = &[
-    "TreasureAreaPositionX",
-    "TreasureAreaPositionZ",
-    "UseShipHullTintForDockTint",
-];
+const EXTRA_KEYS: &[&str] = &["UseShipHullTintForDockTint"];
 
 /// `ship_combat.json`: the arenas and the values ZoneConfig carries (R; the live values never
 /// shipped), plus the server's own timings.
@@ -235,6 +232,7 @@ impl Content {
                 && text_ok(&a.scene)
                 && !a.docks.is_empty()
                 && a.docks.len() <= MAX_DOCKS
+                && !a.pickups.is_empty()
                 && i32::try_from(a.zone_id).is_ok_and(|id| id > 0)
                 && a.pickups.len() <= MAX_PICKUPS
                 && a.docks.iter().all(apart)
@@ -266,10 +264,14 @@ impl Content {
                 .all(|state| text_ok(&state.mast_alias))
             && only(&ship.physics, PHYSICS_FIELDS)
             && f64::from(t.max_speed) >= fastest
+            && ship.health >= 1
             && (1..=1000).contains(&ship.hold_unload_per_second)
             && !ship.gears.is_empty()
             && ship.gears.iter().all(|gear| only(gear, GEAR_FIELDS));
         let play = content.zone_config.get("PlayTime").copied().unwrap_or(0.0);
+        // The hold counts chests: the client divides HoldCapacity by ShipHoldMinValue (00ca10b0,
+        // 00ca07c0), so 0 would crash every client in the arena and another value would mismatch.
+        let hold_unit = content.zone_config.get("ShipHoldMinValue") == Some(&1.0);
         let timings = [
             f64::from(content.countdown_seconds),
             f64::from(content.report_timeout_seconds),
@@ -283,6 +285,7 @@ impl Content {
             || !ship_ok
             || !treasure_ok
             || content.ship.hold_capacity < 1
+            || !hold_unit
             || content.colours.is_empty()
             || !(content.colours.iter()).all(|colour| COLOURS.contains(&colour.as_str()))
             || !timings.iter().all(|s| (0.0..=MAX_SECONDS).contains(s))
@@ -513,24 +516,28 @@ fn string(body: &mut Vec<u8>, text: &str) {
     body.extend(bytes);
 }
 
-/// ZoneConfig (12) for zone `name`: the fields of `ZONE_FIELDS` from `values` (a missing key is 0),
-/// the treasure area (`TreasureAreaPositionX`/`Z`), the dock tint flag, the docks (+384, tinted
-/// `colours` by slot), then three empty lists (+416, +432 and +448).
+/// ZoneConfig (12) for `arena`: the fields of `ZONE_FIELDS` from `values` (a missing key is 0), the
+/// treasure area, the dock tint flag, the docks (+384, tinted `colours` by slot), then three empty
+/// lists (+416, +432 and +448). The treasure area, where the HUD's "Treasure N m" marker points, is
+/// the centre of the arena's chests (its X spots; `load` keeps at least one).
 pub fn zone_config(
-    name: &str,
+    arena: &Arena,
     values: &BTreeMap<String, f64>,
-    docks: &[Dock],
     colours: &[String],
     treasure: &Treasure,
 ) -> Vec<u8> {
     let value = |key: &str| values.get(key).copied().unwrap_or(0.0);
     let mut body = Vec::new();
-    string(&mut body, name);
+    string(&mut body, &arena.scene);
     write_fields(&mut body, ZONE_FIELDS, values);
-    for key in ["TreasureAreaPositionX", "TreasureAreaPositionZ"] {
-        body.extend((value(key) as f32).to_le_bytes());
+    let chests = &arena.pickups;
+    // At most MAX_PICKUPS, so the count is exact as f32.
+    let centre = |axis: usize| chests.iter().map(|p| p[axis]).sum::<f32>() / chests.len() as f32;
+    for v in [centre(0), centre(2)] {
+        body.extend(v.to_le_bytes());
     }
     body.push(u8::from(value("UseShipHullTintForDockTint") != 0.0));
+    let docks = &arena.docks;
     body.extend(u32::try_from(docks.len()).unwrap_or(0).to_le_bytes());
     for (slot, at) in docks.iter().enumerate() {
         let tint = colours.get(slot).map_or("", String::as_str);
@@ -613,6 +620,23 @@ pub fn player_gold(guid: u64, gold: u32) -> Vec<u8> {
     packet(UPDATE_PLAYER, &body)
 }
 
+/// UpdatePlayerState (17), reader `sub_CA5620`, handler `ApplyUpdatePlayerStatePacket` 00ca6040: ship
+/// `guid`, its state flags, health, a value, the hold and a flag. The flags (named by the debug HUD
+/// 00c9f280: +I, +Ph, +Wh, +Sp, +P, +PZ; the vehicle's locked, turbo, brake, sinking, low, drift) are 0:
+/// a sailing ship. The third value is only compared, never stored, so 0 fires nothing. The hold counts
+/// in ZoneConfig's ShipHoldMinValue (load keeps 1: chests); the boxes over the ship come from
+/// HoldCapacity / ShipHoldMinValue (00ca10b0) and fill per frame from the hold (00ca07c0).
+/// ponytail: full health until damage lands; then `Plunder` carries the ship's health.
+pub fn player_state(guid: u64, health: i32, hold: u32) -> Vec<u8> {
+    let mut body = guid.to_le_bytes().to_vec();
+    body.extend(0_u32.to_le_bytes());
+    body.extend(health.to_le_bytes());
+    body.extend(0_u32.to_le_bytes());
+    body.extend(hold.to_le_bytes());
+    body.push(0);
+    packet(UPDATE_PLAYER_STATE, &body)
+}
+
 /// RefreshUI (4): the bare header; the client redraws its standings (00a655a0 → `sub_A62FD0`).
 pub fn refresh_ui() -> Vec<u8> {
     packet(REFRESH_UI, &[])
@@ -689,7 +713,8 @@ impl Plunder {
     /// The ship `guid` reports `at` in `place` (its own dock is the first): before `begin`, or
     /// faster than `max_speed`, a report is ignored; otherwise chests within reach go into the hold
     /// while it has room, and on its own pad the hold banks `hold_unload_per_second` chests a
-    /// second. The packets it earns.
+    /// second. Each change of the hold goes to the client (the boxes over the ship). The packets it
+    /// earns.
     pub fn sail(
         &mut self,
         guid: u64,
@@ -710,6 +735,7 @@ impl Plunder {
         let home = home.bank;
         let capacity = u32::try_from(ship.hold_capacity).unwrap_or(0);
         let unload_ms = 1000 / u64::try_from(ship.hold_unload_per_second.max(1)).unwrap_or(1);
+        let held = self.hold;
         if (self.anchor).is_none_or(|(_, since)| now_ms.saturating_sub(since) >= 1000) {
             self.anchor = Some((at, now_ms));
         }
@@ -730,6 +756,9 @@ impl Plunder {
             self.unloaded_ms = Some(now_ms);
             self.gold = self.gold.saturating_add(treasure.value);
             out.extend([player_gold(guid, self.gold), refresh_ui()]);
+        }
+        if self.hold != held {
+            out.push(player_state(guid, ship.health, self.hold));
         }
         out
     }
@@ -962,10 +991,15 @@ mod tests {
             ("MaxPlayers".to_owned(), 6.0),
             ("PlayTime".to_owned(), 180.0),
             ("DebugDrawJetStreams".to_owned(), 1.0),
-            ("TreasureAreaPositionX".to_owned(), 761.0),
         ]);
         let treasure = content().treasure;
-        let out = zone_config("ss_pirate_arena", &values, &[], &[], &treasure);
+        let empty = Arena {
+            scene: "ss_pirate_arena".to_owned(),
+            docks: Vec::new(),
+            pickups: vec![[800.0, 50.0, 1200.0], [900.0, 50.0, 1240.0]],
+            ..content().arenas[0].clone()
+        };
+        let out = zone_config(&empty, &values, &[], &treasure);
         assert_eq!(&out[..4], &[94, 0, 12, 0]);
         let name = 15;
         assert_eq!(&out[4..8], &(name as u32).to_le_bytes());
@@ -979,7 +1013,9 @@ mod tests {
             .map(|(_, f)| if *f == Field::Bool { 1 } else { 4 })
             .sum();
         assert_eq!(body[scalars - 1], 1, "the last debug flag");
-        assert_eq!(&body[scalars..scalars + 4], &761_f32.to_le_bytes());
+        // The treasure area is the chests' centre.
+        assert_eq!(&body[scalars..scalars + 4], &850_f32.to_le_bytes());
+        assert_eq!(&body[scalars + 4..scalars + 8], &1220_f32.to_le_bytes());
         assert_eq!(
             body.len(),
             scalars + 8 + 1 + 16,
@@ -991,7 +1027,11 @@ mod tests {
             enter: [813.6, 53.3, 713.3],
         };
         let red = ["pir_red".to_owned()];
-        let docked = zone_config("ss_pirate_arena", &values, &[dock], &red, &treasure);
+        let one = Arena {
+            docks: vec![dock],
+            ..empty.clone()
+        };
+        let docked = zone_config(&one, &values, &red, &treasure);
         assert_eq!(docked.len(), out.len() + 4 * 16 + 4 * 13 + 3 * 4 + 7);
         // From the end: three empty lists, then the record after Enter (EnterRadius, three values,
         // the tint, TintColor, an empty string, FlagImageSetId, an empty string).
@@ -1152,6 +1192,12 @@ mod tests {
             4 + 4 + 16 + 8 + 4 + 8 + 4 + 12
         );
         assert_eq!(destroy_pickup(1, true).len(), 4 + 4 + 8 + 1 + 4);
+        // UpdatePlayerState as `sub_CA5620` reads it: guid, four u32, a bool.
+        let state = player_state(7, 100, 3);
+        assert_eq!(state.len(), 4 + 8 + 4 * 4 + 1);
+        assert_eq!(&state[..4], &[94, 0, 17, 0]);
+        assert_eq!(&state[16..20], &100_i32.to_le_bytes(), "health");
+        assert_eq!(&state[24..28], &3_u32.to_le_bytes(), "the hold");
         assert_eq!(
             player_gold(7, 30)[4 + 8 + 4..4 + 8 + 8],
             30_u32.to_le_bytes()
@@ -1198,9 +1244,11 @@ mod tests {
             "too fast to be true"
         );
         let taken = sail(&mut round, [100.0, 50.0, 0.0], 1_000 + hops);
-        assert_eq!(taken, [destroy_pickup(1, true)]);
+        let health = ship.health;
+        assert_eq!(taken, [destroy_pickup(1, true), player_state(7, health, 1)]);
         let banked = sail(&mut round, dock, 1_000 + 2 * hops);
-        assert_eq!(banked, [player_gold(7, treasure.value), refresh_ui()]);
+        let gold = player_gold(7, treasure.value);
+        assert_eq!(banked, [gold, refresh_ui(), player_state(7, health, 0)]);
         let back = 1_000 + hops + u64::from(treasure.respawn_seconds) * 1000;
         assert!(round.respawn(back - 1, &points, treasure).is_empty());
         assert_eq!(
@@ -1234,25 +1282,30 @@ mod tests {
             |at: [f32; 3], now, ship: &Ship| round.sail(7, at, now, &place, treasure, ship);
         assert!(sail(home, 0, &one).is_empty());
         let first_chest = sail(points[0], 10_000, &one);
+        let state = |hold| player_state(7, content.ship.health, hold);
         assert_eq!(
             first_chest,
-            [destroy_pickup(1, true)],
+            [destroy_pickup(1, true), state(1)],
             "a full hold takes no more"
         );
         let second_chest = sail(points[1], 11_000, &two);
-        assert_eq!(second_chest, [destroy_pickup(2, true)]);
+        assert_eq!(second_chest, [destroy_pickup(2, true), state(2)]);
         assert!(
             sail(other, 20_000, &two).is_empty(),
             "another base's pad banks nothing"
         );
         let first = sail(home, 30_000, &two);
-        assert_eq!(first, [player_gold(7, treasure.value), refresh_ui()]);
+        assert_eq!(
+            first,
+            [player_gold(7, treasure.value), refresh_ui(), state(1)]
+        );
         assert!(sail(home, 30_999, &two).is_empty(), "one chest a second");
         let second = sail(home, 31_000, &two);
-        assert_eq!(second, [player_gold(7, 2 * treasure.value), refresh_ui()]);
+        let gold = player_gold(7, 2 * treasure.value);
+        assert_eq!(second, [gold, refresh_ui(), state(0)]);
 
         // Twenty reports 50 ms apart, each 12 m on, reach a chest 240 m out within a second: past
-        // the bound (70 m), so the chest stays; a fresh slack per report would have let it go.
+        // the bound (50 m), so the chest stays; a fresh slack per report would have let it go.
         let ahead = Arena {
             pickups: vec![[240.0, 50.0, 0.0]],
             ..place.clone()
@@ -1298,7 +1351,13 @@ mod tests {
         };
         assert!(loads(&|_| {}), "the shipped content");
         let long = "x".repeat(MAX_TEXT + 1);
-        let refused: [(&str, &dyn Fn(&mut serde_json::Value)); 13] = [
+        let refused: [(&str, &dyn Fn(&mut serde_json::Value)); 15] = [
+            ("a hold unit other than one chest", &|c| {
+                c["zone_config"]["ShipHoldMinValue"] = 0.into()
+            }),
+            ("an arena without chests", &|c| {
+                c["arenas"][0]["pickups"] = serde_json::json!([])
+            }),
             ("a speed bound under the fastest ship", &|c| {
                 c["treasure"]["max_speed"] = 29.0.into()
             }),
