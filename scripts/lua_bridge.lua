@@ -660,6 +660,15 @@ local function runCommand(command)
       bar:ExitGame()
       result.pressed = true
     end
+    -- L960: the minigame handler's own quit (the encounter "QuitGame" event's target).
+    if command.handler == true then
+      local handler = rawget(_G, "MiniGameHandler")
+      if type(handler) ~= "table" or type(handler.QuitGame) ~= "function" then
+        error("MiniGameHandler:QuitGame is unavailable", 0)
+      end
+      handler:QuitGame()
+      result.handler_quit = true
+    end
     return result
   elseif name == "key" or name == "move" then
     error("unsupported: the client Lua cannot inject keys or movement; use interact, click or chat", 0)

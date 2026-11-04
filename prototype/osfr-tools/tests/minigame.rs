@@ -528,15 +528,27 @@ fn prize_wheel_landing_is_server_selected_and_stop_report_cannot_pay() {
     assert!(duplicate.reward_packets.is_empty());
 }
 
-/// T856: flag `+616` (end-of-game dialog on 39/19, `009bf190`) stays on for every run; a card
-/// run is no exception, because the dialogless handler runs Lua `:QuitGameWithNoEndGameScreen`,
-/// which re-enters the minigame leave while the 39/19 handler is on the stack and overflows the
-/// client. A card run's start still waits for its ticket request (39/37).
+/// T856: flag `+616` (end-of-game dialog on 39/19, `009bf190`) stays on for Flash and card runs:
+/// a card exit through the dialogless handler (Lua `:QuitGameWithNoEndGameScreen`) overflowed the
+/// client. L960: an encounter with no end screen of its own (fishing) may clear it. A card run's
+/// start still waits for its ticket request (39/37). The name predates L960 (protected test).
 #[test]
 fn every_run_keeps_the_end_dialog_and_a_card_run_starts_after_its_ticket() {
     let mut dialogless = spec();
     dialogless.flags[4] = 0;
     assert!(MinigameRuns::new(1).unwrap().offer(dialogless).is_err());
+    // L960: an encounter with no end screen of its own (fishing) may clear it; its 39/19 then
+    // takes the client's no-end-screen path, which restores the HUD (native 2026-11-04).
+    let mut fishing = RunSpec::empty(
+        73,
+        4,
+        RunMode::Encounter {
+            encounter_id: 77,
+            player_guid: 0x0102_0304_0506_0708,
+        },
+    );
+    fishing.flags[4] = 0;
+    assert!(MinigameRuns::new(1).unwrap().offer(fishing).unwrap().accepted);
 
     let mut runs = MinigameRuns::new(61_000_001).unwrap();
     let before = runs.snapshot().unwrap();

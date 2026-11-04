@@ -120,6 +120,9 @@ fn running() -> (InventoryFixture, FishingService) {
         )
         .unwrap();
     assert_eq!(packet_ids(&offer), vec![(39, 16), (41, 107)]);
+    // L960: fishing asks for no end screen (the fifth flag, +616): the 39/16 header (15), six i32
+    // fields, members-only, three 69-byte reward bundles and the goal count put the flags at 251.
+    assert_eq!(offer.replies[0][251..256], [1, 1, 1, 1, 0]);
     let instance = service.instance_id(PLAYER).unwrap();
     let mut start = vec![39, 0, 5];
     start.extend(instance.to_le_bytes());

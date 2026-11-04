@@ -306,7 +306,7 @@ impl FishingService {
     fn begin_spec(
         &mut self,
         guid: u64,
-        spec: RunSpec,
+        mut spec: RunSpec,
         area_key: &str,
         fisherman_level: u32,
         anchor: Vec4,
@@ -317,6 +317,9 @@ impl FishingService {
         cap: Option<CatchCap>,
         rewards: RewardState,
     ) -> Result<Change, Error> {
+        // L960: fishing has no end screen; 39/19 then takes the client's no-end-screen path,
+        // which restores its HUD (see `RunSpec::validate`).
+        spec.flags[4] = 0;
         if guid == 0
             || fisherman_level == 0
             || !finite_vec(anchor)

@@ -104,10 +104,12 @@ impl RunSpec {
             || self.objectives.len() % INFO_OBJECTIVE_BYTES != 0
             || self.objectives.len() / INFO_OBJECTIVE_BYTES > 4096
             || self.flags.iter().any(|flag| *flag > 1)
-            // Flag `+616` asks for the end-of-game dialog on 39/19 (`009bf190`). Every run keeps
-            // it: without the flag the handler runs Lua `:QuitGameWithNoEndGameScreen`, which
-            // re-enters the minigame leave and overflows the client's stack (T856).
-            || self.flags[4] != 1
+            // Flag `+616` asks for the end-of-game dialog on 39/19 (`009bf190`). Flash and card
+            // runs keep it: without the flag the handler runs Lua `:QuitGameWithNoEndGameScreen`,
+            // which re-entered the leave and overflowed the client on a card exit (T856). L960: an
+            // encounter with no end screen of its own (fishing) clears it, so that Lua restores
+            // the HUD; with the flag set, 39/19 left fishing's HUD half hidden (native 2026-11-04).
+            || (self.flags[4] != 1 && !matches!(self.mode, RunMode::Encounter { .. }))
             || self.preload_file.len() > 1024
             || self
                 .preload_file
