@@ -201,6 +201,13 @@ impl Gameplay {
             self.refresh_npc_quest_eligibility(current_unix_seconds());
             return Ok(out);
         }
+        // L958: a quit in the race ends it through the results screen, unpaid; its Close returns
+        // the player as at a race end.
+        if let Some(replies) = derby.forfeit(inner, now_ms)? {
+            out.replies = replies;
+            out.changed = true;
+            return Ok(out);
+        }
         // Client quit is 39/6; the pending-game cancel at 009bef50 is 39/7.
         if inner.starts_with(&[39, 0, 6]) || inner.starts_with(&[39, 0, 7]) {
             return self.cancel_derby(inner, character);

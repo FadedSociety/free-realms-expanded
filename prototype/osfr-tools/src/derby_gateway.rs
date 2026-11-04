@@ -735,7 +735,29 @@ impl DerbyGateway {
         Ok(replies)
     }
 
-    /// Retire an offer or running match without a reward. Malformed, foreign and stale cancellation
+    /// L958: a quit in the race, ended through the results screen (`DerbyService::forfeit`).
+    /// `None` when the packet is not a forfeit.
+    pub fn forfeit(&mut self, inner: &[u8], now_ms: u64) -> io::Result<Option<Vec<Vec<u8>>>> {
+        let Some(service) = &self.service else {
+            return Ok(None);
+        };
+        let owner = self
+            .owner
+            .ok_or_else(|| invalid("derby service has no authenticated owner"))?;
+        let mut staged = service.clone();
+        let Some(actions) = staged
+            .forfeit(owner, inner, now_ms)
+            .map_err(|error| invalid(error.to_string()))?
+        else {
+            return Ok(None);
+        };
+        let replies = packets_for_owner(&actions, owner)?;
+        self.service = Some(staged);
+        Ok(Some(replies))
+    }
+
+    /// Retire an offer or a match before its race without a reward (a quit in the race is
+    /// [`Self::forfeit`]). Malformed, foreign and stale cancellation
     /// requests return no packets and leave the live service untouched.
     pub fn cancel(&mut self, packet: &[u8]) -> io::Result<Vec<Vec<u8>>> {
         let Some(service) = &self.service else {
@@ -782,7 +804,8 @@ impl DerbyGateway {
         let instance = self
             .service
             .as_ref()
-            .filter(|service| service.phase() == DerbyPhase::Results)
+            // L958: a forfeited race shows the results but is not a completion.
+            .filter(|service| service.phase() == DerbyPhase::Results && !service.forfeited())
             .map(DerbyService::instance_id)?;
         if instance <= 0 || self.paid_matches.contains(&instance) {
             return None;

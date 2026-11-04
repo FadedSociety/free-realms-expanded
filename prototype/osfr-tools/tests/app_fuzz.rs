@@ -1168,17 +1168,12 @@ fn active_derby_hostile_records_cancel_and_tick_transitions_are_bounded() {
     let quit = gateway
         .handle_at(&wrap(&derby_quit_request(instance)), 4_200)
         .unwrap();
-    assert!(!gateway.gameplay().unwrap().derby_active());
+    // L958: a quit in the race shows the results unpaid; their Close returns the player.
+    assert!(gateway.gameplay().unwrap().derby_active());
     assert!(
         quit.applications
             .iter()
             .any(|packet| packet.starts_with(&[39, 0, 6]))
-    );
-    assert!(
-        quit.replies
-            .iter()
-            .filter_map(|packet| unwrap_reply(packet))
-            .any(|packet| packet.starts_with(&[39, 0, 19]))
     );
     let after_quit = gateway.snapshot();
     assert_eq!(
@@ -1189,6 +1184,23 @@ fn active_derby_hostile_records_cancel_and_tick_transitions_are_bounded() {
         .handle_at(&wrap(&derby_quit_request(instance)), 4_300)
         .unwrap();
     assert_eq!(gateway.snapshot(), after_quit);
+    assert_eq!(
+        gateway.gameplay().unwrap().derby_phase(),
+        Some(osfr_tools::derby::DerbyPhase::Results),
+        "the second quit leaves the results"
+    );
+    gateway.tick_at(60_000).unwrap();
+    assert_eq!(
+        gateway.gameplay().unwrap().derby_phase(),
+        Some(osfr_tools::derby::DerbyPhase::CloseEnabled)
+    );
+    gateway.handle_at(&wrap(&[26, 0, 42, 0]), 60_100).unwrap();
+    assert!(!gateway.gameplay().unwrap().derby_active());
+    assert_eq!(
+        gateway.snapshot().gameplay.as_ref().unwrap().inventory.coins,
+        before_quit_coins,
+        "a forfeit pays nothing"
+    );
 
     let (mut gateway, npc, instance) = fixture.active_derby();
     let guid = gateway.state().guid;

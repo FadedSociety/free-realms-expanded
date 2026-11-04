@@ -811,6 +811,25 @@ fn result_below_threshold_changes_nothing() {
     );
 }
 
+/// L958: a quit in the race shows the derby results unpaid; once they allow it, the player's
+/// Close returns them as at a race end.
+fn close_forfeit(game: &mut Gameplay, character: &CharacterState, instance: i32, now: &mut u64) {
+    assert!(game.derby_active(), "the results screen still belongs to the derby");
+    // A tick while the results still show is where a completion would pay.
+    *now += 100;
+    game.tick(character, *now).unwrap();
+    assert_eq!(game.derby_phase(), Some(osfr_tools::derby::DerbyPhase::Results));
+    // A second quit there changes nothing.
+    *now += 100;
+    send(game, character, &quit_request(instance), *now);
+    assert_eq!(game.derby_phase(), Some(osfr_tools::derby::DerbyPhase::Results));
+    *now += 60_000;
+    game.tick(character, *now).unwrap();
+    *now += 100;
+    send(game, character, &[26, 0, 42, 0], *now);
+    assert!(!game.derby_active(), "the results' Close returns the player");
+}
+
 #[test]
 fn a_cancelled_license_match_credits_and_pays_nothing() {
     let fixture = Fixture::new(CHARACTER);
@@ -830,11 +849,11 @@ fn a_cancelled_license_match_credits_and_pays_nothing() {
     now += 1_000;
     let quit = send(&mut game, &character, &quit_request(instance), now);
     assert!(quit.changed);
-    assert!(!game.derby_active());
     assert!(
-        quit.replies.iter().any(|packet| packet[..3] == [39, 0, 19]),
-        "the quit retires the minigame state"
+        !quit.replies.iter().any(|packet| packet[..3] == [39, 0, 19]),
+        "L958: the quit shows the results first"
     );
+    close_forfeit(&mut game, &character, instance, &mut now);
     assert_eq!(counts(&game, LICENSE_TO_DRIVE), vec![0, 0]);
     assert_eq!(pending_turnin(&game), None);
     assert!(
@@ -1104,7 +1123,7 @@ fn two_players_finish_their_own_matches_independently() {
         now,
     );
     assert!(quit.changed);
-    assert!(!a.derby_active());
+    close_forfeit(&mut a, &first.character(MAD_JACK), instance, &mut now);
     assert_eq!(counts(&a, LICENSE_TO_DRIVE), vec![0, 0]);
     assert_eq!(coins(&a), a_coins);
     assert_eq!(counts(&b, LICENSE_TO_DRIVE), vec![0, 0]);
@@ -1478,7 +1497,7 @@ fn a_cancelled_match_does_not_credit_stunt_double() {
         now,
     );
     assert!(quit.changed);
-    assert!(!game.derby_active());
+    close_forfeit(&mut game, &fixture.character(MAD_JACK), instance, &mut now);
     assert_eq!(counts(&game, STUNT_DOUBLE), vec![0]);
     assert_eq!(pending_turnin(&game), None);
     assert_eq!(coins(&game), coins_before, "cancelling pays nothing");

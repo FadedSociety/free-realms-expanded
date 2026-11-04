@@ -867,6 +867,8 @@ pub struct DerbyService {
     results_until_ms: Option<u64>,
     lobby_deadline_ms: Option<u64>,
     closed: BTreeSet<ParticipantKey>,
+    /// L958: the race was ended by its player's quit; it is not a completion.
+    forfeited: bool,
     npc_driving: Option<NpcDriving>,
     npc_stepped_ms: Option<u64>,
     npc_bumped_ms: BTreeMap<ParticipantKey, u64>,
@@ -983,6 +985,7 @@ impl DerbyService {
             results_until_ms: None,
             lobby_deadline_ms: None,
             closed: BTreeSet::new(),
+            forfeited: false,
             npc_driving: None,
             npc_stepped_ms: None,
             npc_bumped_ms: BTreeMap::new(),
@@ -1202,16 +1205,21 @@ impl DerbyService {
     }
 
     /// Retire an unfinished match without a reward. `26/42` is the offer/results-panel close;
-    /// `39/6` is the native mid-game quit and `39/7` cancels a pending game. The 39 records must
-    /// name this live instance. Client CancelMiniGame `009bef50` calls `009bdc60`, which writes
-    /// subtype 7 through `008a4420` as `[39, u16, i32, i32, i32]`. `None` is inert.
+    /// `39/6` is the native quit before the race (in the race it is [`Self::forfeit`]) and `39/7`
+    /// cancels a pending game. The 39 records must name this live instance. Client CancelMiniGame
+    /// `009bef50` calls `009bdc60`, which writes subtype 7 through `008a4420` as
+    /// `[39, u16, i32, i32, i32]`. `None` is inert.
     pub fn cancel(
         &mut self,
         sender: ParticipantKey,
         packet: &[u8],
     ) -> Result<Option<Vec<u8>>, DerbyError> {
+        // L958: while the results hold (before their Close opens) a 39 record (a second quit, the
+        // client's 39/7) changes nothing; aborting there sent 39/19 alone and brought the player
+        // back with no HUD. Once the Close is open, the client's 39/6 is that close.
         if !self.is_connected_human(sender)
             || matches!(self.phase, DerbyPhase::Closed | DerbyPhase::Aborted)
+            || (packet.starts_with(&[39, 0]) && self.phase == DerbyPhase::Results)
         {
             return Ok(None);
         }
@@ -1792,6 +1800,33 @@ impl DerbyService {
             }
         }
         (!tied && high > 0).then_some(key)
+    }
+
+    /// L958: the HUD Leave (39/6 [instance, -1, -1]) in a race ends it through the results screen
+    /// a race end shows (GameState 10, then 11 and the player's Close), as a forfeit: no
+    /// completion, so no payout and no quest credit. Answering 39/19 alone left the client with no
+    /// end screen and no HUD (native 2026-11-04); the generic loss set showed no screen at all.
+    pub fn forfeit(
+        &mut self,
+        sender: ParticipantKey,
+        packet: &[u8],
+        now_ms: u64,
+    ) -> Result<Option<Vec<DerbyAction>>, DerbyError> {
+        let quit = packet.len() == 15
+            && packet[..3] == [39, 0, 6]
+            && read_i32(packet, 3) == self.instance_id
+            && read_i32(packet, 7) == -1
+            && read_i32(packet, 11) == -1;
+        if !quit || self.phase != DerbyPhase::Running || !self.is_connected_human(sender) {
+            return Ok(None);
+        }
+        self.forfeited = true;
+        self.finish_match(now_ms).map(Some)
+    }
+
+    /// L958: the race was ended by its player's quit.
+    pub fn forfeited(&self) -> bool {
+        self.forfeited
     }
 
     pub fn finish_match(&mut self, now_ms: u64) -> Result<Vec<DerbyAction>, DerbyError> {

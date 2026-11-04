@@ -631,6 +631,59 @@ fn inactive_close_is_inert() {
     assert_eq!(gateway.phase(), None);
 }
 
+/// L958: a quit in the race ends it through the results screen, unpaid; the results' Close then
+/// retires it. A stale or malformed quit, or one before the race, is not a forfeit.
+#[test]
+fn a_quit_in_the_race_forfeits_through_the_results_unpaid() {
+    let fixture = Fixture::new();
+    let mut gateway = DerbyGateway::load(&fixture.path, None).unwrap().unwrap();
+    gateway.begin(&character()).unwrap();
+    let instance = gateway.instance_id().unwrap();
+    assert!(gateway.forfeit(&quit_request(instance), 1_000).unwrap().is_none(), "not raced yet");
+    gateway.start(&start_request(instance)).unwrap();
+    gateway.handle(&register(), 2_000).unwrap();
+    for phase_value in 3..=8 {
+        gateway
+            .handle(&phase(phase_value), 2_000 + phase_value as u64)
+            .unwrap();
+    }
+    for value in (0..=4).rev() {
+        gateway
+            .handle(&countdown(value), 3_000 + (4 - value) as u64)
+            .unwrap();
+    }
+    assert_eq!(gateway.phase(), Some(DerbyPhase::Running));
+    assert!(gateway.forfeit(&quit_request(instance + 1), 3_100).unwrap().is_none());
+    let mut odd = quit_request(instance);
+    odd[7] = 0;
+    assert!(gateway.forfeit(&odd, 3_100).unwrap().is_none());
+    assert_eq!(gateway.phase(), Some(DerbyPhase::Running));
+
+    let results = gateway
+        .forfeit(&quit_request(instance), 3_200)
+        .unwrap()
+        .expect("the quit forfeits");
+    assert!(
+        messages(&results).contains(&DerbyMessage::GameState(10)),
+        "the results screen goes out"
+    );
+    assert!(results.iter().all(|packet| !packet.starts_with(&[39, 0, 19])));
+    assert_eq!(gateway.phase(), Some(DerbyPhase::Results));
+    assert!(gateway.active());
+    assert!(gateway.take_completion().is_none(), "a forfeit is not a completion");
+    assert!(gateway.forfeit(&quit_request(instance), 3_300).unwrap().is_none(), "once");
+    // A second quit or the client's 39/7 on the results screen changes nothing.
+    assert!(gateway.cancel(&quit_request(instance)).unwrap().is_empty());
+    let mut ack = quit_request(instance);
+    ack[2] = 7;
+    assert!(gateway.cancel(&ack).unwrap().is_empty());
+    assert_eq!(gateway.phase(), Some(DerbyPhase::Results));
+    gateway.tick(60_000).unwrap();
+    assert_eq!(gateway.phase(), Some(DerbyPhase::CloseEnabled));
+    assert!(gateway.close(&[26, 0, 42, 0]).unwrap());
+    assert!(!gateway.active());
+}
+
 #[test]
 fn offer_cancel_and_running_quit_retire_without_rewards_and_stale_quit_is_inert() {
     let fixture = Fixture::new();
@@ -1128,6 +1181,11 @@ fn gameplay_routes_the_npc_offer_and_closes_a_fabricated_contact_without_paying(
         .handle_in_world(&quit_request(instance), &character, 3_500)
         .unwrap();
     assert!(quit.changed);
+    // L958: a quit in the race shows the results unpaid; their Close returns the player.
+    assert!(game.derby_active());
+    game.tick(&character, 60_000).unwrap();
+    game.handle_in_world(&[26, 0, 42, 0], &character, 60_100)
+        .unwrap();
     assert!(!game.derby_active());
     assert_eq!(game.state().inventory.coins, before_coins);
     assert_eq!(game.state().derby, None);
@@ -1399,6 +1457,12 @@ fn leaving_or_resetting_before_results_pays_nothing() {
         .handle_in_world(&quit_request(instance), &character, 3_500)
         .unwrap();
     assert!(quit.changed);
+    // L958: a quit in the race shows the results unpaid; their Close returns the player.
+    assert!(game.derby_active());
+    let results = game.tick(&character, 60_000).unwrap();
+    assert!(results.replies.iter().all(|packet| !packet.starts_with(&[50, 0, 1])));
+    game.handle_in_world(&[26, 0, 42, 0], &character, 60_100)
+        .unwrap();
     assert!(!game.derby_active());
     let after_quit = game.state();
     assert_eq!(after_quit.inventory.coins, before_coins);
