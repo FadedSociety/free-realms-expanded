@@ -224,8 +224,27 @@ class AssetDelivery:
                 self.sources[name] = (path, len(raw), crc, hashlib.sha256(raw).hexdigest())
                 self.substituted[name] = (crc, wire)
 
+        # L966: a stand-in for a file today's manifest lacks altogether (`references/stand-ins`, each
+        # explained in its README) gets its own `.z` row, so the client asks for it at all: the plain
+        # Pirate's Plunder arena water's material is in no client manifest.
+        new_rows = []
+        stand_ins = (references / "stand-ins").resolve()
+        if stand_ins.is_dir():
+            for path in sorted(stand_ins.iterdir()):
+                name = path.name.lower()
+                if name in self.manifest or name == "readme.txt" or not path.is_file():
+                    continue
+                raw = path.read_bytes()
+                if len(raw) > MAX_ASSET or not raw.strip(b"\0"):
+                    continue
+                crc = zlib.crc32(raw)
+                wire = 8 + len(zlib.compress(raw, 6))
+                self.manifest[name] = (crc, wire)
+                self.sources[name] = (path, len(raw), crc, hashlib.sha256(raw).hexdigest())
+                new_rows.append(f"{name}.z,{crc},{wire}")
+
         self.client_rows = 0
-        self.extra_rows = []
+        self.extra_rows = new_rows
         if client is not None:
             self._add_client_pack(Path(client))
         # The served manifest carries the client's own pack rows, so the client's

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source": "L963 (R): Pirate's Plunder arenas. Docks are each arena's Port/PortBell areas (client ss_pirate_arenaAreas.xml, ss_pir_arena3Areas.xml, ss_pir_arena4Areas.xml). The live per-zone ZoneConfig never shipped (field names: the server loader ShipZoneConfigLoad 010680f0 compiled into the client). The camera values are the client's compiled defaults (constructor 0106b090; Pitch, MinPitch and MaxPitch in degrees as the loader 0106b1e0 reads them). The ship physics values are the client's compiled defaults (constructor 0106ae50) except the speeds (MinSpeed, MaxSpeed, TurboSpeed), which are (R) as is the one gear; angles in degrees as the loaders 0106a560 and 0106a3a0 read them. Colours are the client's PirateColorFromName names (R slot order); the flag and the damage states' mast aliases are the mast actors' texture aliases (skullx01, dmg00-dmg03; R thresholds). These ZoneConfig values follow the client constructor 01067ac0: Gravity 9.81, PhysicsSimulationRate 60, ZoneBubble 12/12/2, parking 2/4/20/20/1/15, repulsor 10/30/100, shove-out 10/30, AllowablePhysicsDelta 12, PickupEmptyTime 3, FlyingTreasureHeight 1.2, ShipPickupCount 12. Every other ZoneConfig value is (R), MaxPlayers, MaxScore, PlayTime, ZoneReadyWaitTime and MaxDrawDistance included (the constructor's 1/1/0/0/0 are per-zone placeholders).",
+  "source": "L963 (R): Pirate's Plunder arenas. Docks are each arena's Port/PortBell areas (client ss_pirate_arenaAreas.xml, ss_pir_arena3Areas.xml, ss_pir_arena4Areas.xml). The live per-zone ZoneConfig never shipped (field names: the server loader ShipZoneConfigLoad 010680f0 compiled into the client). The camera values are the client's compiled defaults (constructor 0106b090; Pitch, MinPitch and MaxPitch in degrees as the loader 0106b1e0 reads them). The ship physics values are the client's compiled defaults (constructor 0106ae50) except the speeds (MinSpeed, MaxSpeed, TurboSpeed), which are (R) as is the one gear; angles in degrees as the loaders 0106a560 and 0106a3a0 read them. Colours are the client's PirateColorFromName names (R slot order); the flag and the damage states' mast aliases are the mast actors' texture aliases (skullx01, dmg00-dmg03; R thresholds). These ZoneConfig values follow the client constructor 01067ac0: Gravity 9.81, PhysicsSimulationRate 60, ZoneBubble 12/12/2, parking 2/4/20/20/1/15, repulsor 10/30/100, shove-out 10/30, AllowablePhysicsDelta 12, PickupEmptyTime 3, FlyingTreasureHeight 1.2, ShipPickupCount 12. Every other ZoneConfig value is (R), MaxPlayers, MaxScore, PlayTime, ZoneReadyWaitTime and MaxDrawDistance included (the constructor's 1/1/0/0/0 are per-zone placeholders). Treasure (L966): every value is (R); pickup points lie between each arena's docks and their middle (60% of the way in, plus the middle), on the water level; chest models from the client's Models.txt. Spawns and pickups (L966) come from the arenas' terrain heights (osfr-terrain grids of the arena chunks): spawns 35 m off each dock where a 15 m disc lies at least 6 m under WaterLevel, chests on a 20 m grid of such water, at least 40 m from docks and 60 m apart. The chest value 3250 follows live gameplay video ('COLLECTED 3250 GOLD'); PlayTime 540 the 2010 player guide (nine minutes; the video's timer reads 8:45 a minute in). Docks (L966 rework): each bank is the arena's Port/PortBell area (the pad, where every ship starts and banks), each enter its base's shipwash cave prop from the 2014 chunks (steering in opens Ship Selection); Treasure Isle's slots follow its loading-screen map colours (Port_1 red, the shark cave). Chests stay over 70 m from every pad. EnterRadius 20 and HoldUnloadPerSecond 1 are (R); max_speed 40 is 1.33x TurboSpeed 30 (R). Effect ids (client ActorParticleEmitterDefinitions.xml by name): TreasureXMark 22036 bbe_pir_chest_treasure_x, TreasureFill 22101 bbe_pir_dock_treasure_fill, ShipChestFull/Empty 22369/22368 bbe_pir_ship_hud_chest_full/empty.",
   "arenas": [
     {
       "scene": "ss_pirate_arena",
@@ -12,35 +12,124 @@
         0.082702
       ],
       "docks": [
+        {
+          "bank": [
+            880,
+            52,
+            723
+          ],
+          "enter": [
+            813.6,
+            53.3,
+            713.3
+          ]
+        },
+        {
+          "bank": [
+            448,
+            52,
+            879
+          ],
+          "enter": [
+            469.3,
+            55.1,
+            945.9
+          ]
+        },
+        {
+          "bank": [
+            995,
+            52,
+            765
+          ],
+          "enter": [
+            1053.7,
+            52.5,
+            720.4
+          ]
+        },
+        {
+          "bank": [
+            667,
+            52,
+            726
+          ],
+          "enter": [
+            732.6,
+            52.6,
+            732.0
+          ]
+        },
+        {
+          "bank": [
+            1127,
+            52,
+            908
+          ],
+          "enter": [
+            1111.5,
+            52.7,
+            975.4
+          ]
+        },
+        {
+          "bank": [
+            539,
+            52,
+            788
+          ],
+          "enter": [
+            453.8,
+            57.0,
+            747.2
+          ]
+        }
+      ],
+      "pickups": [
         [
-          880,
-          52,
-          723
+          788.0,
+          50,
+          863.0
         ],
         [
-          995,
-          52,
-          765
+          848.0,
+          50,
+          843.0
         ],
         [
-          1127,
-          52,
-          908
+          708.0,
+          50,
+          863.0
         ],
         [
-          667,
-          52,
-          726
+          768.0,
+          50,
+          923.0
         ],
         [
-          539,
-          52,
-          788
+          848.0,
+          50,
+          903.0
         ],
         [
-          448,
-          52,
-          879
+          648.0,
+          50,
+          803.0
+        ],
+        [
+          908.0,
+          50,
+          803.0
+        ],
+        [
+          708.0,
+          50,
+          923.0
+        ],
+        [
+          648.0,
+          50,
+          863.0
         ]
       ]
     },
@@ -54,35 +143,119 @@
         0.082702
       ],
       "docks": [
+        {
+          "bank": [
+            1199,
+            53,
+            851
+          ],
+          "enter": [
+            1120.5,
+            53.5,
+            862.2
+          ]
+        },
+        {
+          "bank": [
+            1339,
+            53,
+            904
+          ],
+          "enter": [
+            1396.7,
+            51.1,
+            884.7
+          ]
+        },
+        {
+          "bank": [
+            1168,
+            53,
+            1075
+          ],
+          "enter": [
+            1247.6,
+            56.6,
+            1074.6
+          ]
+        },
+        {
+          "bank": [
+            907,
+            53,
+            1040
+          ],
+          "enter": [
+            821.7,
+            53.1,
+            1028.4
+          ]
+        },
+        {
+          "bank": [
+            689,
+            53,
+            856
+          ],
+          "enter": [
+            657.8,
+            55.2,
+            925.0
+          ]
+        },
+        {
+          "bank": [
+            909,
+            53,
+            888
+          ],
+          "enter": [
+            986.0,
+            52.8,
+            877.8
+          ]
+        }
+      ],
+      "pickups": [
         [
-          1199,
-          53,
-          851
+          1049.0,
+          50,
+          931.0
         ],
         [
-          1339,
-          53,
-          904
+          1029.0,
+          50,
+          991.0
         ],
         [
-          1168,
-          53,
-          1075
+          1049.0,
+          50,
+          871.0
         ],
         [
-          907,
-          53,
-          1040
+          1089.0,
+          50,
+          991.0
         ],
         [
-          689,
-          53,
-          856
+          929.0,
+          50,
+          971.0
         ],
         [
-          909,
-          53,
-          888
+          989.0,
+          50,
+          831.0
+        ],
+        [
+          1149.0,
+          50,
+          951.0
+        ],
+        [
+          1049.0,
+          50,
+          811.0
         ]
       ]
     },
@@ -96,35 +269,109 @@
         0.082702
       ],
       "docks": [
+        {
+          "bank": [
+            1161,
+            53,
+            477
+          ],
+          "enter": [
+            1093.8,
+            52.3,
+            491.5
+          ]
+        },
+        {
+          "bank": [
+            1199,
+            53,
+            647
+          ],
+          "enter": [
+            1141.2,
+            58.0,
+            702.8
+          ]
+        },
+        {
+          "bank": [
+            1311,
+            53,
+            707
+          ],
+          "enter": [
+            1383.3,
+            52.9,
+            727.0
+          ]
+        },
+        {
+          "bank": [
+            961,
+            53,
+            621
+          ],
+          "enter": [
+            933.3,
+            56.3,
+            671.3
+          ]
+        },
+        {
+          "bank": [
+            931,
+            53,
+            479
+          ],
+          "enter": [
+            1018.2,
+            55.2,
+            487.9
+          ]
+        },
+        {
+          "bank": [
+            801,
+            53,
+            697
+          ],
+          "enter": [
+            730.1,
+            52.9,
+            739.8
+          ]
+        }
+      ],
+      "pickups": [
         [
-          1161,
-          53,
-          477
+          1061.0,
+          50,
+          637.0
         ],
         [
-          1199,
-          53,
-          647
+          1121.0,
+          50,
+          617.0
         ],
         [
-          1311,
-          53,
-          707
+          1061.0,
+          50,
+          697.0
         ],
         [
-          961,
-          53,
-          621
+          1161.0,
+          50,
+          557.0
         ],
         [
-          931,
-          53,
-          479
+          1061.0,
+          50,
+          757.0
         ],
         [
-          801,
-          53,
-          697
+          1221.0,
+          50,
+          537.0
         ]
       ]
     }
@@ -137,7 +384,7 @@
     "ShipPickupCount": 12,
     "UseShipTargetHighlight": 1,
     "ZoneReadyWaitTime": 30,
-    "PlayTime": 180,
+    "PlayTime": 540,
     "RespawnTime": 5,
     "InvincibleAfterRespawnTime": 3,
     "TeleportTime": 1,
@@ -172,7 +419,11 @@
     "RepulsorPushAccel": 30,
     "RepulsorPushRange": 100,
     "ShoveOutSpeed": 10,
-    "ShoveOutAccel": 30
+    "ShoveOutAccel": 30,
+    "TreasureXMarkEffectId": 22036,
+    "TreasureFillEffectId": 22101,
+    "ShipChestFullEffectId": 22369,
+    "ShipChestEmptyEffectId": 22368
   },
   "ship": {
     "actors": [
@@ -188,6 +439,7 @@
     "mast_max_health": 40,
     "hull_strength": 1.0,
     "hold_capacity": 5,
+    "hold_unload_per_second": 1,
     "damage_states": [
       {
         "health": 75,
@@ -293,5 +545,15 @@
     "pir_orange",
     "pir_violet",
     "pir_black"
-  ]
+  ],
+  "treasure": {
+    "chest_model": 1662,
+    "dock_chest_model": 1923,
+    "value": 3250,
+    "pickup_radius": 15.0,
+    "bank_radius": 25.0,
+    "respawn_seconds": 20,
+    "max_speed": 40.0,
+    "enter_radius": 20.0
+  }
 }

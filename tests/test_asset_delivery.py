@@ -108,6 +108,23 @@ class AssetDeliveryTests(unittest.TestCase):
         self.assertEqual(zlib.decompress(body[8:]), raw)
         self.assertIn(f'flag.dme.z,{crc},{len(body)}'.encode(), delivery.served_manifest)
 
+    def test_a_stand_in_for_a_file_no_manifest_lists_gets_its_own_compressed_row(self):
+        # L966: the arena water's material is in no manifest; its stand-in is announced and served.
+        stand_ins = self.root / 'references/stand-ins'
+        stand_ins.mkdir(parents=True)
+        raw = b'stand-in water material' * 3
+        (stand_ins / 'water.dma').write_bytes(raw)
+        (stand_ins / 'README.txt').write_text('why each stand-in exists')
+        # A name the manifest already lists keeps its own row.
+        (stand_ins / 'track.gcnk').write_bytes(b'not this one')
+        delivery = AssetDelivery(self.root, self.manifest)
+        crc = zlib.crc32(raw)
+        body, _ = delivery.get(f'/1/water.dma.z?{crc}')
+        self.assertEqual(zlib.decompress(body[8:]), raw)
+        self.assertIn(f'water.dma.z,{crc},{len(body)}'.encode(), delivery.served_manifest)
+        self.assertNotIn(b'readme.txt', delivery.served_manifest.lower())
+        self.assertEqual(delivery.get(self.request('track.gcnk'))[0], self.raw['track.gcnk'])
+
     def test_wrong_crc_unknown_asset_and_path_escape_are_refused(self):
         for request in ['/562/track.gcnk?0', '/562/missing.gcnk?1', '/562/../track.gcnk?1', '/562/%2e%2e%2ftrack.gcnk?1', '/x/track.gcnk?1']:
             self.assertIsNone(self.delivery.get(request))

@@ -1642,6 +1642,78 @@ fn games_window_play_opens_a_feeling_the_beat_song() {
     assert_eq!(i32::from_le_bytes(offer[11..15].try_into().unwrap()), 204);
 }
 
+/// A ship report as the client's frame update sends it (UpdateShipPhysics, 117 bytes): the guid,
+/// a flag and a stamp, the identity rotation, the position row, a vec4 and four values.
+fn ship_report(guid: u64, at: [f32; 3]) -> Vec<u8> {
+    let mut packet = vec![94, 0, 16, 0];
+    packet.extend(guid.to_le_bytes());
+    packet.extend([0; 9]);
+    let rows = [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0];
+    for value in rows.into_iter().chain([at[0], at[1], at[2], 1.0]) {
+        packet.extend(f32::to_le_bytes(value));
+    }
+    packet.extend([0; 32]);
+    packet
+}
+
+/// L966: in a Pirate's Plunder match the client's ship reports take a chest within reach and bank
+/// it at the player's dock: the chest goes (DestroyProxiedPickup), then the gold shows (UpdatePlayer
+/// and RefreshUI).
+#[test]
+fn a_pirates_ship_takes_a_chest_and_banks_it_at_its_dock() {
+    let fixture = Fixture::new(PLOT);
+    let mut gateway = fixture.gateway_at(fixture.state(false, true), &fixture.node, 60.0);
+    tick(&mut gateway, 1_500);
+    play(&mut gateway, 1059, 2_000);
+    let loaded = [13_u16, 10].map(|op| send(&mut gateway, &op.to_le_bytes(), 2_100));
+    let start: Vec<_> = loaded.iter().flat_map(inners).map(<[u8]>::to_vec).collect();
+    let ship = (start.iter())
+        .find(|p| p.starts_with(&[94, 0, 9, 0]))
+        .expect("the ship");
+    let guid = u64::from_le_bytes(ship[4..12].try_into().unwrap());
+    assert!(
+        start.iter().any(|p| p.starts_with(&[94, 0, 28, 0])),
+        "the chests"
+    );
+    let content_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let content = osfr_tools::ship_combat::Content::load(&content_dir)
+        .unwrap()
+        .unwrap();
+    let arena = &content.arenas[0];
+    let chest = arena.pickups[1];
+    let gone: &[u8] = &[94, 0, 29, 0, 2, 0, 0, 0];
+    let took = |out: &GatewayOutcome| inners(out).iter().any(|p| p.starts_with(gone));
+    // The client is ready at once (clients, assets, physics); the countdown then runs. Reports
+    // before Playing take nothing, even one with the chest in reach of an earlier one.
+    send(&mut gateway, &[94, 0, 3, 0, 0x1a, 0, 0, 0], 2_200);
+    let dock = arena.docks[0].bank;
+    assert!(!took(&send(&mut gateway, &ship_report(guid, dock), 2_250)));
+    assert!(!took(&send(&mut gateway, &ship_report(guid, chest), 6_250)));
+    let playing: &[u8] = &[94, 0, 2, 0, 10, 0, 0, 0];
+    let mut now = 6_300;
+    while !inners(&tick(&mut gateway, now))
+        .iter()
+        .any(|p| *p == playing)
+    {
+        now += 500;
+        assert!(now < 30_000, "Playing");
+    }
+    assert!(inners(&send(&mut gateway, &ship_report(guid, dock), now + 100)).is_empty());
+    let other = send(&mut gateway, &ship_report(guid + 1, chest), now + 4_000);
+    assert!(!took(&other), "another ship's report takes nothing");
+    let taken = send(&mut gateway, &ship_report(guid, chest), now + 4_000);
+    assert!(took(&taken), "chest 2 taken");
+    let banked = send(&mut gateway, &ship_report(guid, dock), now + 8_000);
+    let gold = (inners(&banked).into_iter())
+        .find(|p| p.starts_with(&[94, 0, 8, 0]))
+        .expect("the gold");
+    assert_eq!(gold[16..20], content.treasure.value.to_le_bytes());
+    assert!(
+        inners(&banked).iter().any(|p| *p == [94, 0, 4, 0]),
+        "RefreshUI"
+    );
+}
+
 /// L963: Play on the Pirate's Plunder row (1059) zones into the first arena; once it loads the start
 /// packets go out (the player's own ship among them) and Play again is the busy refusal. The match
 /// then runs on its timeouts and clock alone (a silent client) to Exiting and zones back.
@@ -1662,7 +1734,8 @@ fn games_window_play_zones_into_a_pirates_arena() {
     );
     let exiting: &[u8] = &[94, 0, 2, 0, 13, 0, 0, 0];
     let (mut exited, mut back) = (false, false);
-    for second in 3..=400 {
+    // Three report timeouts, the countdown, PlayTime (540 s), Game Over's timeout and the exit beat.
+    for second in 3..=900 {
         let out = tick(&mut gateway, second * 1_000);
         exited |= inners(&out).iter().any(|p| *p == exiting);
         if out.began_zoning {
