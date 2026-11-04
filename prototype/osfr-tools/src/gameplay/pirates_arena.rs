@@ -62,7 +62,14 @@ impl Gameplay {
             ship_combat::player_count(1, 0),
             ship_combat::game_state(ship_combat::WAITING_FOR_CLIENTS),
             // The local player's ship: the client makes its local player from it (00a6c3b0).
-            ship_combat::create_ship(character.guid, 0, arena.docks[0], &content.ship),
+            // Dock slot 0's colour (`load` keeps the list non-empty).
+            ship_combat::create_ship(
+                character.guid,
+                0,
+                arena.docks[0],
+                &content.ship,
+                &content.colours[0],
+            ),
             // Its camera's config, which the ship camera reads from its first frame.
             ship_combat::camera_config(&content.camera),
         ];

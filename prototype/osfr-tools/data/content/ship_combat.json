@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source": "L963 (R): Pirate's Plunder arenas. Docks are each arena's Port/PortBell areas (client ss_pirate_arenaAreas.xml, ss_pir_arena3Areas.xml, ss_pir_arena4Areas.xml). Every ZoneConfig value is (R): the live per-zone config never shipped (field names: the server loader ShipZoneConfigLoad 010680f0 compiled into the client). The camera values are the client's compiled defaults (constructor 0106b090; Pitch, MinPitch and MaxPitch in degrees as the loader 0106b1e0 reads them). The ship physics values are the client's compiled defaults (constructor 0106ae50) except the speeds (MinSpeed, MaxSpeed, TurboSpeed), which are (R) as is the one gear; angles in degrees as the loaders 0106a560 and 0106a3a0 read them.",
+  "source": "L963 (R): Pirate's Plunder arenas. Docks are each arena's Port/PortBell areas (client ss_pirate_arenaAreas.xml, ss_pir_arena3Areas.xml, ss_pir_arena4Areas.xml). The live per-zone ZoneConfig never shipped (field names: the server loader ShipZoneConfigLoad 010680f0 compiled into the client). The camera values are the client's compiled defaults (constructor 0106b090; Pitch, MinPitch and MaxPitch in degrees as the loader 0106b1e0 reads them). The ship physics values are the client's compiled defaults (constructor 0106ae50) except the speeds (MinSpeed, MaxSpeed, TurboSpeed), which are (R) as is the one gear; angles in degrees as the loaders 0106a560 and 0106a3a0 read them. Colours are the client's PirateColorFromName names (R slot order); the flag and the damage states' mast aliases are the mast actors' texture aliases (skullx01, dmg00-dmg03; R thresholds). These ZoneConfig values follow the client constructor 01067ac0: Gravity 9.81, PhysicsSimulationRate 60, ZoneBubble 12/12/2, parking 2/4/20/20/1/15, repulsor 10/30/100, shove-out 10/30, AllowablePhysicsDelta 12, PickupEmptyTime 3, FlyingTreasureHeight 1.2, ShipPickupCount 12. Every other ZoneConfig value is (R), MaxPlayers, MaxScore, PlayTime, ZoneReadyWaitTime and MaxDrawDistance included (the constructor's 1/1/0/0/0 are per-zone placeholders).",
   "arenas": [
     {
       "scene": "ss_pirate_arena",
@@ -134,7 +134,7 @@
   "zone_config": {
     "MaxPlayers": 6,
     "MaxScore": 1000,
-    "ShipPickupCount": 10,
+    "ShipPickupCount": 12,
     "UseShipTargetHighlight": 1,
     "ZoneReadyWaitTime": 30,
     "PlayTime": 180,
@@ -145,27 +145,34 @@
     "MinDriftingTime": 1,
     "MaxDriftingTime": 3,
     "MaxSinkingTime": 4,
-    "ParkingAlignTime": 1,
-    "ParkingSelectTime": 0,
-    "ParkingEnterSpeed": 5,
-    "ParkingExitSpeed": 5,
-    "ZoneBubbleRadius": 1500,
-    "ZoneBubbleObjectRadius": 1500,
-    "ZoneBubbleFloraRadius": 500,
+    "ParkingAlignTime": 2,
+    "ParkingSelectTime": 4,
+    "ParkingEnterSpeed": 20,
+    "ParkingExitSpeed": 20,
+    "ZoneBubbleRadius": 12,
+    "ZoneBubbleObjectRadius": 12,
+    "ZoneBubbleFloraRadius": 2,
     "MaxDrawDistance": 1500,
-    "PhysicsSimulationRate": 30,
-    "Gravity": -9.8,
+    "PhysicsSimulationRate": 60,
+    "Gravity": 9.81,
     "WaterLevel": 50,
-    "AllowablePhysicsDelta": 5,
-    "PickupEmptyTime": 5,
-    "FlyingTreasureHeight": 10,
+    "AllowablePhysicsDelta": 12,
+    "PickupEmptyTime": 3,
+    "FlyingTreasureHeight": 1.2,
     "ProjectileMax": 32,
     "ProjectileRadius": 1,
     "ProjectileLifetime": 4,
     "ShipHoldMinValue": 1,
     "ShipNameplateVisibleRange": 200,
     "TreasureAreaPositionX": 761,
-    "TreasureAreaPositionZ": 719
+    "TreasureAreaPositionZ": 719,
+    "ParkingAlignSpin": 1,
+    "ParkingAlignPush": 15,
+    "RepulsorPushSpeed": 10,
+    "RepulsorPushAccel": 30,
+    "RepulsorPushRange": 100,
+    "ShoveOutSpeed": 10,
+    "ShoveOutAccel": 30
   },
   "ship": {
     "actors": [
@@ -183,8 +190,23 @@
     "hold_capacity": 5,
     "damage_states": [
       {
+        "health": 75,
+        "mast_alias": "dmg00",
+        "effect_id": 0
+      },
+      {
+        "health": 50,
+        "mast_alias": "dmg01",
+        "effect_id": 0
+      },
+      {
+        "health": 25,
+        "mast_alias": "dmg02",
+        "effect_id": 0
+      },
+      {
         "health": 0,
-        "name": "",
+        "mast_alias": "dmg03",
         "effect_id": 0
       }
     ],
@@ -237,7 +259,7 @@
         "TurboMaxAngularSpeed": 90.0
       }
     ],
-    "name": "Jolly Roger"
+    "flag": "skullx01"
   },
   "camera": {
     "OffsetX": 0.0,
@@ -263,5 +285,13 @@
     "IndicatorPulseSizeMod": 5.0,
     "IndicatorPulseTime": 3.0,
     "IndicatorPulseIntervalTime": 0.6
-  }
+  },
+  "colours": [
+    "pir_red",
+    "pir_green",
+    "pir_blue",
+    "pir_orange",
+    "pir_violet",
+    "pir_black"
+  ]
 }

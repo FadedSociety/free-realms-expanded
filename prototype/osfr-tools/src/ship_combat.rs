@@ -29,6 +29,22 @@ pub const CAMERA_CONFIG: u16 = 13;
 const MAX_TEXT: usize = 128;
 /// (R) Sanity bound on each match timing (countdown, report timeout, `PlayTime`), in seconds.
 const MAX_SECONDS: f64 = 3600.0;
+/// The client's pirate colours (`PirateColorFromName` 00c9aa40); the ship actors' texture aliases
+/// carry the same names.
+const COLOURS: [&str; 8] = [
+    "pir_red",
+    "pir_green",
+    "pir_blue",
+    "pir_orange",
+    "pir_violet",
+    "pir_black",
+    "pir_white",
+    "pir_yellow",
+];
+/// CreateProxiedShip's two trailing strings are `SoeUtil::StringFixed<14>` (the packet's destructor
+/// 00a679a0): 13 bytes and a terminator fit inline (longer ones spill to the heap, 00a55500, so this
+/// keeps content to the client's own size, not a crash bound).
+const MAX_FIXED: usize = 13;
 pub const CONTENT_FILE: &str = "ship_combat.json";
 /// Player status (35/20) that turns the client's ship combat processor on: bit 23 of the
 /// character status word. `BaseClient::DispatchBasePlayerUpdate` 0092f460 shifts the word (actor
@@ -74,6 +90,8 @@ pub struct Content {
     pub zone_config: BTreeMap<String, f64>,
     /// The player's ship (R).
     pub ship: Ship,
+    /// The ships' colours by dock slot (`COLOURS`; R order).
+    pub colours: Vec<String>,
     /// CameraConfig values by the loader's field names (`CAMERA_FIELDS`); a missing key is 0.
     pub camera: BTreeMap<String, f64>,
 }
@@ -95,8 +113,8 @@ pub struct Ship {
     pub hold_capacity: i32,
     /// The ship's states by health (the config's 40-byte list at +71, `sub_A677C0`/`A5C090`): the
     /// client picks the first whose threshold the health is not below (`sub_1087AB0`) and indexes
-    /// the list with it (`sub_C9E510`), so an empty list crashes it (native 2026-11-04). (R)
-    /// values: names and effects of the live states never shipped.
+    /// the list with it (`sub_C9E510`), so an empty list crashes it (native 2026-11-04); highest
+    /// threshold first. The mast aliases are the actors' own; thresholds and effect ids are (R).
     pub damage_states: Vec<DamageState>,
     /// The physics config by the loader's names (`PHYSICS_FIELDS`); a missing key is 0.
     pub physics: BTreeMap<String, f64>,
@@ -104,16 +122,19 @@ pub struct Ship {
     /// its current gear every frame (`sub_FF02A0`), so an empty list crashes it (native
     /// 2026-11-04).
     pub gears: Vec<BTreeMap<String, f64>>,
-    /// The ship's name (the last string of the packet, R).
-    pub name: String,
+    /// The rear mast's flag, one of its texture aliases (`skullx01`, `anchor`, `octopus`...): the
+    /// packet's last string. (R) The live game let the player choose (SelectShip, later).
+    pub flag: String,
 }
 
-/// One ship state: a health threshold, a name and an effect id (R).
+/// One ship state: a health threshold, the sails' look and an effect id (R).
 #[derive(Clone, Debug, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct DamageState {
     pub health: i32,
-    pub name: String,
+    /// The masts' texture alias for this state (the loader's `MastTextureAlias`; the mast actors
+    /// carry `dmg00` to `dmg03`).
+    pub mast_alias: String,
     pub effect_id: i32,
 }
 
@@ -158,9 +179,15 @@ impl Content {
                 && i32::try_from(a.zone_id).is_ok_and(|id| id > 0)
         };
         let ship = &content.ship;
-        let ship_ok = (ship.actors.iter().chain([&ship.collision, &ship.name])).all(|t| text_ok(t))
+        let ship_ok = (ship.actors.iter().chain([&ship.collision])).all(|t| text_ok(t))
+            && ship.flag.len() <= MAX_FIXED
             && !ship.damage_states.is_empty()
-            && ship.damage_states.iter().all(|state| text_ok(&state.name))
+            && (ship.damage_states.windows(2)).all(|w| w[0].health > w[1].health)
+            && ship.damage_states.iter().all(|state| state.health >= 0)
+            && ship
+                .damage_states
+                .iter()
+                .all(|state| text_ok(&state.mast_alias))
             && only(&ship.physics, PHYSICS_FIELDS)
             && !ship.gears.is_empty()
             && ship.gears.iter().all(|gear| only(gear, GEAR_FIELDS));
@@ -176,6 +203,8 @@ impl Content {
             || !content.zone_config.keys().all(|key| known(key))
             || !only(&content.camera, CAMERA_FIELDS)
             || !ship_ok
+            || content.colours.is_empty()
+            || !(content.colours.iter()).all(|colour| COLOURS.contains(&colour.as_str()))
             || !timings.iter().all(|s| (0.0..=MAX_SECONDS).contains(s))
         {
             return Err(invalid("invalid ship combat content"));
@@ -544,9 +573,9 @@ pub fn camera_config(values: &BTreeMap<String, f64>) -> Vec<u8> {
 ///   4 values, two lists and a string;
 /// - the physics config (00a66c00): `PHYSICS_FIELDS`, the collision asset, the gears (each
 ///   `GEAR_FIELDS` and an empty name) and an empty name;
-/// - two strings (R: the player's and the ship's names).
+/// - the ship's colour name (`COLOURS`) and its flag alias (two `StringFixed<14>`).
 /// Every other value is 0 and every other list is empty (R).
-pub fn create_ship(guid: u64, slot: u32, position: [f32; 3], ship: &Ship) -> Vec<u8> {
+pub fn create_ship(guid: u64, slot: u32, position: [f32; 3], ship: &Ship, colour: &str) -> Vec<u8> {
     let mut b = Vec::new();
     let count = |n: usize| u32::try_from(n).unwrap_or(u32::MAX).to_le_bytes();
     let zeros = |b: &mut Vec<u8>, words: usize| b.extend(std::iter::repeat_n(0_u8, words * 4));
@@ -576,7 +605,7 @@ pub fn create_ship(guid: u64, slot: u32, position: [f32; 3], ship: &Ship) -> Vec
     b.extend(count(ship.damage_states.len()));
     for state in &ship.damage_states {
         b.extend(state.health.to_le_bytes());
-        string(&mut b, &state.name);
+        string(&mut b, &state.mast_alias);
         b.extend(state.effect_id.to_le_bytes());
     }
     string(&mut b, "");
@@ -589,8 +618,8 @@ pub fn create_ship(guid: u64, slot: u32, position: [f32; 3], ship: &Ship) -> Vec
         string(&mut b, "");
     }
     string(&mut b, "");
-    string(&mut b, "");
-    string(&mut b, &ship.name);
+    string(&mut b, colour);
+    string(&mut b, &ship.flag);
     packet(CREATE_PROXIED_SHIP, &b)
 }
 
@@ -693,7 +722,7 @@ mod tests {
     #[test]
     fn create_ship_matches_the_readers_shape() {
         let ship = content().ship;
-        let out = create_ship(7, 0, [880.0, 52.0, 723.0], &ship);
+        let out = create_ship(7, 0, [880.0, 52.0, 723.0], &ship, "pir_red");
         assert_eq!(&out[..4], &[94, 0, 9, 0]);
         assert_eq!(&out[4..12], &7_u64.to_le_bytes());
         let actors: usize = (ship.actors.iter().chain([&ship.collision]))
@@ -701,13 +730,21 @@ mod tests {
             .sum();
         // guid, u8, slot, four vec4; the config: actors, 31 values, a vec3, a u8, two lists and a
         // string; the physics config: 31 values, the collision asset, the gears (12 values and a
-        // name each) and a name; two strings.
+        // name each) and a name; the colour and the flag.
         let states: usize = (ship.damage_states.iter())
-            .map(|s| 4 + 4 + s.name.len() + 4)
+            .map(|s| 4 + 4 + s.mast_alias.len() + 4)
             .sum();
         let physics = 4 * 31 + 4 + ship.collision.len() + 4 + ship.gears.len() * (48 + 4) + 4;
         let fixed = 8 + 1 + 4 + 64 + actors + 4 * 31 + 12 + 1 + 8 + states + 4 + physics;
-        assert_eq!(out.len(), 4 + fixed + 4 + 4 + ship.name.len());
+        let tail = [
+            &7_u32.to_le_bytes()[..],
+            b"pir_red",
+            &(ship.flag.len() as u32).to_le_bytes(),
+            ship.flag.as_bytes(),
+        ]
+        .concat();
+        assert!(out.ends_with(&tail), "the colour, then the flag, last");
+        assert_eq!(out.len(), 4 + fixed + tail.len());
         let health_at = 4 + 8 + 1 + 4 + 64 + actors;
         assert_eq!(&out[health_at..health_at + 4], &ship.health.to_le_bytes());
     }
@@ -751,13 +788,20 @@ mod tests {
         };
         assert!(loads(&|_| {}), "the shipped content");
         let long = "x".repeat(MAX_TEXT + 1);
-        let refused: [(&str, &dyn Fn(&mut serde_json::Value)); 7] = [
+        let refused: [(&str, &dyn Fn(&mut serde_json::Value)); 10] = [
             ("no damage state", &|c| {
                 c["ship"]["damage_states"] = serde_json::json!([])
             }),
             ("no gear", &|c| c["ship"]["gears"] = serde_json::json!([])),
-            ("a long ship name", &|c| {
-                c["ship"]["name"] = long.clone().into()
+            ("a flag past StringFixed<14>", &|c| {
+                c["ship"]["flag"] = "x".repeat(MAX_FIXED + 1).into()
+            }),
+            ("no colour", &|c| c["colours"] = serde_json::json!([])),
+            ("thresholds out of order", &|c| {
+                c["ship"]["damage_states"][0]["health"] = 10.into()
+            }),
+            ("a colour the client lacks", &|c| {
+                c["colours"] = serde_json::json!(["pir_pink"])
             }),
             ("a long arena scene", &|c| {
                 c["arenas"][0]["scene"] = long.clone().into()
