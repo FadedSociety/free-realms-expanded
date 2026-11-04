@@ -129,16 +129,18 @@ impl GameplayFixture {
     }
 
     fn build(with_opening: bool) -> Self {
-        let source = std::env::var_os("OSFR_DERBY_ROUTE_CONTENT")
-            .map(PathBuf::from)
-            .unwrap_or_else(|| {
-                PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-                    .join("../../../lab/build/w104/scratch/content")
-            });
+        // The repo's own content as a release ships it, `data/release` over `data/content` (L970:
+        // the lab scratch copy this read was removed in the 2026-11-04 cleanse).
+        // OSFR_DERBY_ROUTE_CONTENT still points it at another prepared directory.
+        let crate_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        let sources = match std::env::var_os("OSFR_DERBY_ROUTE_CONTENT") {
+            Some(dir) => vec![PathBuf::from(dir)],
+            None => vec![crate_dir.join("data/release"), crate_dir.join("data/content")],
+        };
+        let find = |file: &str| sources.iter().map(|s| s.join(file)).find(|p| p.is_file());
         assert!(
-            source.join("inventory.json").is_file() && source.join("profiles.json").is_file(),
-            "derby route fixture needs a prepared gameplay content directory: {}",
-            source.display()
+            find("inventory.json").is_some() && find("profiles.json").is_some(),
+            "derby route fixture needs gameplay content with inventory.json and profiles.json: {sources:?}"
         );
         let path = std::env::temp_dir().join(format!(
             "osfr-derby-gameplay-{}-{}",
@@ -146,7 +148,7 @@ impl GameplayFixture {
             NEXT.fetch_add(1, Ordering::Relaxed)
         ));
         fs::create_dir(&path).unwrap();
-        for file in [
+        let mut files = vec![
             "inventory.json",
             "profiles.json",
             "categories.json",
@@ -155,23 +157,22 @@ impl GameplayFixture {
             "quests.json",
             "quest-journal.bin",
             "zones.json",
-        ] {
-            let source_file = source.join(file);
-            if source_file.is_file() {
-                fs::copy(&source_file, path.join(file)).unwrap();
-            }
-        }
+        ];
+        // The busy-refusal test opens a harvesting run, which loads only with the opening
+        // campaign (`content_presence::OPENING` and the opening loaders' reads).
         if with_opening {
-            for entry in fs::read_dir(&source).unwrap() {
-                let source_file = entry.unwrap().path();
-                let extension = source_file.extension().and_then(|value| value.to_str());
-                if source_file.is_file()
-                    && matches!(extension, Some("json" | "bin"))
-                    && source_file.file_name().and_then(|value| value.to_str())
-                        != Some("item-catalogue.json")
-                {
-                    fs::copy(&source_file, path.join(source_file.file_name().unwrap())).unwrap();
-                }
+            files.extend([
+                "opening.json",
+                "opening-abilities.json",
+                "encounters.json",
+                "encounter-template.bin",
+                "journal-text.json",
+                "harvesting.json",
+            ]);
+        }
+        for file in files {
+            if let Some(source_file) = find(file) {
+                fs::copy(&source_file, path.join(file)).unwrap();
             }
         }
         fs::create_dir(path.join("npcs")).unwrap();
