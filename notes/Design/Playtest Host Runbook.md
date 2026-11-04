@@ -1,3 +1,5 @@
+> Snapshot written up to 2026-10-16. Verify every claim against the current code and fresh evidence before relying on it.
+
 # Playtest Host Runbook
 
 **Readiness: dry-run only.** Do not invite players until the blocking gates at the end pass. Bare internet stays closed. Friends use an encrypted VPN.

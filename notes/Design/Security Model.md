@@ -4,6 +4,8 @@ task: W75
 updated: 2026-10-19
 status: proposed; lead review required
 ---
+> Snapshot written up to 2026-10-16. Verify every claim against the current code and fresh evidence before relying on it.
+
 
 # Security Model
 

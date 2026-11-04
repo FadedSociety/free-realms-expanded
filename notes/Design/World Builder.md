@@ -1,3 +1,5 @@
+> Snapshot written up to 2026-10-16. Verify every claim against the current code and fresh evidence before relying on it.
+
 # World Builder
 
 The owner's direction (2026-10-15): build the world **from inside the running game**. A builder places an NPC, gives it a new quest, links quests, and sends a quest to everyone online. Example: an admin scavenger hunt. The admin places an NPC, posts hint photos, and the first players to find it get goodies. Everything persists past a server restart.

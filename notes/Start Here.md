@@ -1,36 +1,14 @@
----
-project: CartoonMMO
-status: local-rust-gameplay-verified
-created: 2026-10-08
----
+# Free Realms revival: start here
 
-# Free Realms revival
+A Rust server for the original Free Realms client (the 2014 PC build): the gateway, login, accounts, gameplay and minigames, with a launcher (separate repo) that installs the client and the server for players.
 
-Restore **Free Realms**, with Rust as the preferred implementation language. CartoonMMO remains the workspace name. FusionFall and Toontown are secondary references.
+- **[[Project Map]]**: where the code lives. It is generated from the code by `scripts/project_map.py`; rerun it after a merge.
+- **`notes/Native Map/`**: the decoded client functions. Read these before tracing client behaviour by hand.
+- **`notes/Research/` and `notes/Design/`**: evidence and design references written up to 2026-10-16. They are snapshots: check every claim against the code and fresh evidence before relying on it.
+- **Cited notes:** the content data, tests and audit scripts cite some older pages as provenance: `notes/Build Guides/Content/` (NPCs, dungeons, jobs), a few `Build Guides/Gameplay` pages, and some `Autopilot` and `Reviews` notes. They stay while something cites them. They are snapshots too.
+- **Releases** go out on the repository's Releases page and install through the launcher. A release is proven only by a clean launcher install with real play (client downloads from the community host; no lab-only files).
 
-**Current step:** the actual client now completes a reconstructed enemy quest, earns coin/item rewards, equips native gear and finishes a checkpoint activity against Rust. Restart restores 35 coins, reward quantity 10, equipped pants and the 18.456-second activity record. Original full quest/minigame restoration remains ahead; inventory text search needs diagnosis. Preserved inputs and community research remain available.
-
-- [[Project Map]] — **where everything lives**: binaries, modules by system, tests and gates, scripts, lab and notes (agents start here)
-- [[Design/Build Ledger|Build Ledger]] and [[Design/Build Plan|Build Plan]] — verified state per system, and the living plan with its update log
-- [[Design/Project Brief|Project brief]] — direction and open decisions
-- [[Tasks]] — current work and next actions
-- [[Build Guides]] — one guide per feature (Kart Racing, Housing, TCG, UI, network...) with every mapped function and how it works; the build reference
-- [[Research/Target Intake|Target intake]] — record the client and analysis route
-- [[Research/Free Realms Recovery|Recovery report]] — verified results, evidence, and gaps
-- [[Design/Rust Revival Roadmap|Rust roadmap]] — measurable milestones toward a playable game
-- [[Research/Toolbox|Toolbox]] — installed skills, tools, and local paths
-- [[Research/Universal Modder Assessment|Universal Modder assessment]] — useful skills, archive research, and tool results
-- [[Research/Community Asset Validation|Community asset validation]] — existing extractors and model readers actually run
-- [[Research/Client Baseline|Client baseline]] — actual game startup, local tracing, and remaining blockers
-- [[Research/Rust Gateway Milestone|Rust gateway milestone]] — verified walking, packet-loss recovery, and save/restart/restore
-- [[Research/Gameplay Milestone|Gameplay milestone]] — actual quest/reward/equipment/activity loop and restart evidence
-- [[Research/Gameplay Coverage|Gameplay coverage]] — original versus reconstructed behavior and known gaps
-- [[Journal/2026-10-08 Setup|Setup journal]] — what was prepared
-
-## Folder map
-
-The vault lives at `%USERPROFILE%\Documents\Projects\CartoonMMO\project\notes`.
-
-The Git working directory is its parent, `project`. Original prototype code belongs in `project\prototype`.
-
-Original game files and analysis outputs belong in `%USERPROFILE%\Documents\Projects\CartoonMMO\lab`. That folder has separate places for originals, working copies, decompiled code, extracted assets, captures, and manifests.
+## How work is done
+1. **Refresh first:** re-index the code graph, and read the current code and fresh evidence (the client's decoded functions, the fan wikis, gameplay video). Never plan from notes older than the code.
+2. **Minigames and systems go top down,** from the launcher's assets to the loading screen's Go button, the Games-window rows, enter and quit with the UI intact, the match board, the arena and actor assets, the UI elements, and real input. Each step is proven natively.
+3. **Every change** has tests, an independent review and the full test suite before it merges.

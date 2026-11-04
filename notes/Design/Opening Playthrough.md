@@ -1,3 +1,5 @@
+> Snapshot written up to 2026-10-16. Verify every claim against the current code and fresh evidence before relying on it.
+
 # Opening playthrough
 
 Status: active implementation and recovery. Requested by the owner after the first local gameplay milestone. This note is the acceptance contract and links implementation/review evidence; it is not a completion claim.

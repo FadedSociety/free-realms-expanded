@@ -1,3 +1,5 @@
+> Snapshot written up to 2026-10-16. Verify every claim against the current code and fresh evidence before relying on it.
+
 # Public Transport
 
 Design only (lead, 2026-10-16; replaces the W137 worker brief). How players reach a public realm **without installing a VPN**, using the unmodified 2014 client. The VPN stays the answer for the ~10-friend playtest ([[Playtest Host Runbook]]). Related: [[Security Model]] (S03, S05, S15, I10–I12, Decisions), [[../Research/Key-pair Login Contract]], [[../Research/Launcher Login Client]], [[Shared World]], [[Build Plan]].

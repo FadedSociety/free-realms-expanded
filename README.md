@@ -23,13 +23,13 @@ The goal is not only to restore Free Realms but to let the community **expand** 
 
 > **Unofficial fan project.** Free Realms Expanded is a non-commercial fan project. It is not affiliated with, endorsed by or sponsored by Daybreak Game Company or Sony.
 >
-> **Status:** active development. The original client plays real content against our server on a developer's machine today. There is no public server yet.
+> **Status:** early preview. Server builds are published on the [Releases page](https://github.com/FadedSociety/free-realms-expanded/releases) and install through the [launcher](https://github.com/FadedSociety/free-realms-launcher), which also downloads the client from the community host. Each player runs the server on their own PC; there is no public shared server yet.
 >
 > **What still needs doing:** see [ROADMAP.md](ROADMAP.md). It explains each unfinished area in depth, lists the bugs found in the latest real-client test, and says how you can help.
 
 ## What's new
 
-About 750 changes landed between 10 and 26 October 2026. Here is the current build, grouped by area. Two labels are used throughout:
+This section describes the build as of 26 October 2026, grouped by area. What changed since then is listed per release on the [Releases page](https://github.com/FadedSociety/free-realms-expanded/releases). Two labels are used throughout:
 
 - **Seen in the real client:** someone ran the original Windows client against our server and watched it work.
 - **Tests only:** automated tests or our scripted test player exercised it, but nobody has watched it in the real client yet. Treat these as "should work", not "works".
@@ -109,7 +109,7 @@ Building an MMO's worth of content takes good tools. The server includes a devel
 
 - **Our server code, tools and notes.** The Rust server, the Studio, the scripts and the design notes are our own work. Community projects were read as references while building it (see [Credits](#credits)).
 - **Gameplay data.** `prototype/osfr-tools/data/content` holds NPC tables, quests, stores, vendors, pets, rides and more as JSON. It was built from the original client's data files, so it includes quoted in-game text such as item names, dialog lines and quest text. Some rows were derived from community projects (FreeRealms-Legacy and Sanctuary) and from the Free Realms Wiki, and each row's provenance fields say where it came from. Numbers we had to invent are marked **(R)**, for reconstructed.
-- **Notes on how the client works.** The notes under [notes/Native Map](notes/Native%20Map/Native%20Map.md) and [notes/Build Guides](notes/Build%20Guides/Build%20Guides.md) are our own descriptions of how the original client behaves.
+- **Notes on how the client works.** The notes under [notes/Native Map](notes/Native%20Map/Native%20Map.md) are our own descriptions of how the original client behaves, function by function. `notes/Research` holds our evidence write-ups, and the content data cites some older pages under `notes/Build Guides/Content` as provenance.
 - **What it does not contain:** no game binaries, no asset packs and no extracted art. You need your own legally obtained copy of the original client to play.
 
 ```text
@@ -128,7 +128,7 @@ The launcher lives in its own repository: <https://github.com/FadedSociety/free-
 
 ## Getting started
 
-Running a server from a bare checkout is not possible yet. The game server needs a startup snapshot and several reference packages prepared from the original client and from captured game traffic, and those are not in this repository. A reproducible setup for contributors is on the [roadmap](ROADMAP.md). To run the original client you also need your own copy of it.
+To play, install through the launcher. Running a server from a bare checkout is not possible yet. The game server needs a startup snapshot and several reference packages prepared from the original client and from captured game traffic, and those are not in this repository. A reproducible setup for contributors is on the [roadmap](ROADMAP.md). To run the original client you also need your own copy of it.
 
 What you can do today is read the code, data and notes, and build and test the server with a current stable Rust (the crate uses edition 2024). It is developed on Windows with the `x86_64-pc-windows-gnu` toolchain. Other platforms have not been tried.
 
@@ -143,7 +143,7 @@ A few things to know:
 - The first build is slow, and a full test run takes about ten minutes. A test build folder can reach tens of gigabytes; setting `CARGO_PROFILE_DEV_DEBUG=0` and deleting its `debug` folder afterwards keeps that down.
 - Tests that need the private reference data are marked as ignored. We have not yet confirmed that a bare checkout runs the whole suite cleanly.
 - For how the maintainers run a private test realm, see the [Playtest Host Runbook](notes/Design/Playtest%20Host%20Runbook.md). It assumes the private data.
-- For where each piece of the code lives, see the [Project Map](notes/Project%20Map.md). Its layout is accurate, but it was last refreshed in mid-October.
+- For where each piece of the code lives, see the [Project Map](notes/Project%20Map.md). It is generated from the code by `scripts/project_map.py`.
 
 ## Project principles
 
@@ -156,11 +156,10 @@ A few things to know:
 ## Documentation
 
 - [Roadmap](ROADMAP.md): what still needs doing, known bugs, and how to help
-- [Build Plan](notes/Design/Build%20Plan.md) and [Build Ledger](notes/Design/Build%20Ledger.md): the working plan and the per-system status. Both were last refreshed in mid-October, so this page and the roadmap are newer.
+- [Start Here](notes/Start%20Here.md): how the repository and the work are organised
 - [Security Model](notes/Design/Security%20Model.md) and [Public Transport](notes/Design/Public%20Transport.md): how login and networking are meant to be secured
 - [Studio Toolkit](notes/Design/Studio%20Toolkit.md) and [World Builder](notes/Design/World%20Builder.md)
-- [Build Guides](notes/Build%20Guides/Build%20Guides.md): one guide per game system, built from the client map
-- [Project journal](MODLOG.md)
+- [Releases](https://github.com/FadedSociety/free-realms-expanded/releases): what each server release changed
 
 ## Credits
 

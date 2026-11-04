@@ -1,6 +1,6 @@
 # What's still being worked on
 
-Free Realms Expanded can already run a good part of the original game against our own server, but a lot is unfinished. This page is the honest list. For each area it says what works today, what is missing and why, and how an outside contributor could help. For what the current build does, see [What's new in the README](README.md#whats-new).
+Free Realms Expanded can already run a good part of the original game against our own server, but a lot is unfinished. This page is the honest list. For each area it says what works today, what is missing and why, and how an outside contributor could help. For what the current build does, see [What's new in the README](README.md#whats-new). This page was last fully updated on 26 October 2026; the [release notes](https://github.com/FadedSociety/free-realms-expanded/releases) list what changed since.
 
 The areas are ordered by roughly how many players each one touches. The first ones matter to everybody who logs in. The last ones matter to a smaller group.
 

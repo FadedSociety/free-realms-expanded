@@ -5,6 +5,8 @@ updated: 2026-10-16
 status: W86c skin, build, 13 tests and window captures proven; full launcher partly proven
 plan: Build Plan 3.5 and 1.7
 ---
+> Snapshot written up to 2026-10-16. Verify every claim against the current code and fresh evidence before relying on it.
+
 
 # Rust Launcher
 

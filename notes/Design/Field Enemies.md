@@ -4,6 +4,8 @@ task: W102
 updated: 2026-10-16
 status: PARTLY PROVEN
 ---
+> Snapshot written up to 2026-10-16. Verify every claim against the current code and fresh evidence before relying on it.
+
 
 # Field Enemies
 

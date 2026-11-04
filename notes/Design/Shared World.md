@@ -4,6 +4,8 @@ task: W108
 updated: 2026-10-16
 status: proposed; Claude lead review required
 ---
+> Snapshot written up to 2026-10-16. Verify every claim against the current code and fresh evidence before relying on it.
+
 
 # Shared World
 
