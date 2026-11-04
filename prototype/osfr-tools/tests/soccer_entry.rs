@@ -370,9 +370,14 @@ fn quitting_before_a_result_cancels_without_a_payout() {
         quit.replies
             .iter()
             .any(|reply| reply.starts_with(&[39, 0, 19])),
-        "ordinary quit removes the run"
+        "ordinary quit shows the result screen"
     );
-    assert!(quit.scene_zoning.is_some(), "quit returns to the world");
+    // L957: a quit in play is a forfeit; the player's Close returns them, as at a match end.
+    assert!(quit.scene_zoning.is_none(), "the end screen comes first");
+    let closed = game
+        .handle_in_world(&[26, 0, 42, 0], &character, 1_550)
+        .unwrap();
+    assert!(closed.scene_zoning.is_some(), "the Close returns to the world");
     assert!(!game.is_soccer_active());
     assert_eq!(game.inventory_state().coins, coins_before);
     game.tick(&character, 2_000).unwrap();
@@ -834,9 +839,11 @@ fn consecutive_matches_get_fresh_instance_ids_and_ignore_stale_lifecycle_packets
         quit_replies
             .iter()
             .any(|reply| reply.starts_with(&[39, 0, 19])),
-        "the first quit removes its run: {quit_replies:?}"
+        "the first quit shows its result screen: {quit_replies:?}"
     );
-    assert!(quit.began_zoning, "quitting returns to the world");
+    // L957: the forfeit's Close returns the player.
+    let closed = gateway_send(&mut gateway, &[26, 0, 42, 0], first_loaded + 250);
+    assert!(closed.began_zoning, "the Close returns to the world");
 
     // The client loads the return scene before it can use the portal again.
     gateway_send(&mut gateway, &13u16.to_le_bytes(), first_loaded + 300);

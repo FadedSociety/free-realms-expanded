@@ -572,6 +572,29 @@ impl MinigameRuns {
         })
     }
 
+    /// L957: a quit in play settled as a loss with no reward. The loss result set ends with 39/19
+    /// as a match end does, so the client shows its end screen and the player's Close returns
+    /// them. 39/19 alone (the shared cancel) left the client on its end-screen path (flag +616)
+    /// with nothing to show, and its HUD never came back (native 2026-11-04, soccer).
+    pub fn forfeit(&mut self, instance_id: i32) -> io::Result<RunOutcome> {
+        let Some(run) = self.current.as_mut() else {
+            return Ok(RunOutcome::default());
+        };
+        if run.instance_id != instance_id || run.state != RunState::Playing {
+            return Ok(RunOutcome::default());
+        }
+        let mut replies = vec![payload_packet(instance_id, run.spec.game_id, "OnGameLostMsg")?];
+        replies.extend(result_packets(instance_id, run.spec.game_id, false, 0, 0, 0)?);
+        run.state = RunState::Lost;
+        Ok(RunOutcome {
+            accepted: true,
+            changed: true,
+            state: Some(RunState::Lost),
+            replies,
+            ..Default::default()
+        })
+    }
+
     /// Settle one activity result. Win grants use a stable run-derived key and
     /// losses cannot carry one. A win must carry its grant: an activity whose
     /// win legitimately pays nothing (a content zero award or a reached daily

@@ -691,7 +691,8 @@ fn a_loss_or_quit_does_not_credit_the_quest() {
         "a loss changes only the Station Cash wallet"
     );
 
-    // A quit before full time removes the run and credits nothing.
+    // L957: a quit before full time is a forfeit: a loss result and the end screen (39/19),
+    // no credit; the player's Close returns them.
     let at = player.stamp();
     let instance = enter_match(&mut player.game, &player.character, SNOWHILL_SOCCER, at);
     let quit = send(
@@ -701,17 +702,15 @@ fn a_loss_or_quit_does_not_credit_the_quest() {
         at + 500,
     );
     player.now = at + 500;
+    assert_eq!(game_over(&quit.replies), (SNOWHILL_SOCCER as i32, 0));
     assert!(
         quit.replies
             .iter()
             .any(|packet| packet.starts_with(&[39, 0, 19])),
-        "the quit removes the run"
+        "the quit shows the result screen"
     );
     assert!(!any_quest_progress(&quit));
-    assert!(
-        !player.game.is_soccer_active(),
-        "the quit releases the player"
-    );
+    player.close_results();
     for _ in 0..4 {
         let now = player.stamp();
         let later = player.game.tick(&player.character, now).unwrap();
@@ -798,7 +797,7 @@ fn refusals_and_the_two_player_case() {
     assert_eq!(counts(&second.game, SCRIMMAGE), [0]);
     assert!(second.game.is_soccer_active());
     second.send(&lifecycle(6, instance));
-    assert!(!second.game.is_soccer_active());
+    second.close_results();
     assert_eq!(counts(&second.game, SCRIMMAGE), [0]);
 
     first.return_to_landon();

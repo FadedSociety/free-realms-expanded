@@ -1355,20 +1355,34 @@ impl SoccerService {
         Ok(offered)
     }
 
-    /// Route shared 39/* lifecycle messages to MinigameRuns. A cancellation
+    /// Route shared 39/* lifecycle messages to MinigameRuns. A cancellation or a quit in play
     /// also removes the soccer roster entry and releases any held ball.
     pub fn handle_minigame_lifecycle(
         &mut self,
         session: u64,
         packet: &[u8],
     ) -> io::Result<LifecycleChange> {
-        let outcome = self
+        let runs = &mut self
             .runs
             .get_mut(&session)
             .ok_or_else(|| invalid("soccer minigame session is not offered"))?
-            .runs
-            .handle_client(packet)?;
-        let soccer_events = if outcome.state == Some(RunState::Cancelled) {
+            .runs;
+        // L957: the HUD Leave (39/6 [instance, -1, -1]) in play is a forfeit, so the client gets
+        // its end screen and the player's Close returns them; before play the shared cancel stands.
+        let quit = packet.len() == 15 && packet.starts_with(&[39, 0, 6]) && packet[7..] == [0xFF; 8];
+        let forfeit = if quit {
+            runs.forfeit(i32::from_le_bytes([packet[3], packet[4], packet[5], packet[6]]))?
+        } else {
+            RunOutcome::default()
+        };
+        let forfeited = forfeit.accepted;
+        let outcome = if forfeited {
+            forfeit
+        } else {
+            runs.handle_client(packet)?
+        };
+        let left = forfeited || outcome.state == Some(RunState::Cancelled);
+        let soccer_events = if left {
             self.leave(session)?
         } else {
             Vec::new()

@@ -466,7 +466,8 @@ fn a_loss_or_cancel_does_not_advance() {
         .unwrap();
     assert_eq!(counts(&game), [0]);
 
-    // A cancel before full time sends 39/19, pays nothing and credits nothing.
+    // L957: a quit before full time is a forfeit: the loss result set ending in 39/19 (so the
+    // client shows its end screen), no pay and no credit; the player's Close releases them.
     let mut game = player(&fixture, OTHER);
     let other = character_at(OTHER);
     let coins_before = game.inventory_state().coins;
@@ -475,13 +476,15 @@ fn a_loss_or_cancel_does_not_advance() {
     let quit = game
         .handle_in_world(&lifecycle(6, instance), &other, 1_350)
         .unwrap();
+    let over = index(&quit.replies, &[39, 0, 18]).expect("the quit settles as a result");
+    assert_eq!(quit.replies[over][15], 0, "a loss");
     assert!(
-        quit.replies
-            .iter()
-            .any(|reply| reply.starts_with(&[39, 0, 19])),
-        "the quit removes the run"
+        index(&quit.replies, &[39, 0, 19]).is_some_and(|remove| remove > over),
+        "the result screen follows"
     );
-    assert!(!game.is_soccer_active());
+    assert!(game.is_soccer_active(), "the end screen is still up");
+    game.handle_in_world(&[26, 0, 42, 0], &other, 1_400).unwrap();
+    assert!(!game.is_soccer_active(), "the Close releases the player");
     assert_eq!(counts(&game), [0]);
     assert_eq!(game.inventory_state().coins, coins_before);
     assert!(

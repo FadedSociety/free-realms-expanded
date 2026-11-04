@@ -757,6 +757,71 @@ fn solo_bots_match_runs_through_shared_lifecycle_to_one_win_payment() {
     );
 }
 
+/// L957: the HUD Leave in play is a forfeit: a loss result ending in 39/19, the player off the
+/// pitch and the run kept for the player's Close. Before play it stays the shared cancel.
+#[test]
+fn a_quit_in_play_forfeits_and_a_quit_before_play_cancels() {
+    let mut service = service();
+    service.join(KICKER, 0, 0).expect("join");
+    service.fill_bots_for_solo(KICKER).expect("fill solo roster");
+    service
+        .offer_minigame(KICKER, 1201, 1, reward_grant(KICKER, 1))
+        .expect("offer");
+    let instance = service.instance_id(KICKER).unwrap();
+    service
+        .handle_minigame_lifecycle(KICKER, &minigame_request(5, instance))
+        .expect("start packet");
+    service.mark_started(KICKER).expect("start match");
+
+    // A quit for another instance, or without the -1 fields, changes nothing.
+    let stale = service
+        .handle_minigame_lifecycle(KICKER, &minigame_request(6, instance + 1))
+        .expect("stale quit");
+    assert!(!stale.run.accepted);
+    let mut odd = minigame_request(6, instance);
+    odd[7] = 0;
+    let odd = service
+        .handle_minigame_lifecycle(KICKER, &odd)
+        .expect("odd quit");
+    assert!(!odd.run.accepted);
+    assert_eq!(service.run_state(KICKER), Some(RunState::Playing));
+
+    let quit = service
+        .handle_minigame_lifecycle(KICKER, &minigame_request(6, instance))
+        .expect("quit");
+    assert_eq!(quit.run.state, Some(RunState::Lost));
+    let subs: Vec<u8> = quit.run.replies.iter().map(|reply| reply[2]).collect();
+    assert_eq!(subs, [14, 18, 47, 19], "the loss result set, then the end screen");
+    assert_eq!(quit.run.replies[1][15], 0, "a loss");
+    assert!(quit.run.reward_packets.is_empty(), "a forfeit pays nothing");
+    assert!(service.player(KICKER).is_none(), "the player is off the pitch");
+    assert!(service.cancelled(), "the solo match stops, so nothing settles or pays");
+    // The client's automatic 39/7 and a second quit leave the end screen as it is.
+    for again in [minigame_request(7, instance), minigame_request(6, instance)] {
+        service
+            .handle_minigame_lifecycle(KICKER, &again)
+            .expect("the end screen holds");
+        assert_eq!(service.run_state(KICKER), Some(RunState::Lost));
+    }
+    let closed = service
+        .handle_minigame_lifecycle(KICKER, &[26, 0, 42, 0])
+        .expect("close");
+    assert_eq!(closed.run.state, Some(RunState::Closed));
+
+    // Before play, the quit is the shared cancel.
+    let mut offered = crate::service();
+    offered.join(KICKER, 0, 0).expect("join");
+    offered.fill_bots_for_solo(KICKER).expect("fill solo roster");
+    offered
+        .offer_minigame(KICKER, 1201, 1, reward_grant(KICKER, 1))
+        .expect("offer");
+    let instance = offered.instance_id(KICKER).unwrap();
+    let early = offered
+        .handle_minigame_lifecycle(KICKER, &minigame_request(6, instance))
+        .expect("early quit");
+    assert_eq!(early.run.state, Some(RunState::Cancelled));
+}
+
 #[test]
 fn disconnect_mid_match_cancels_run_and_never_pays() {
     let mut service = service();

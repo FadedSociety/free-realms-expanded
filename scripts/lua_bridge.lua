@@ -644,6 +644,23 @@ local function runCommand(command)
     end
     ui.DoClosestInteraction()
     return { ok = true }
+  elseif name == "exitbar" then
+    -- The minigame title bar (the HUD X's Leave bar): where its window sits, and, with press, its
+    -- Leave action (MinigameTitleBar:ExitGame, which ends in Ui.QuitMiniGame).
+    local bar = rawget(_G, "MinigameTitleBar")
+    if type(bar) ~= "table" or type(bar.GetWindow) ~= "function" then
+      error("MinigameTitleBar is unavailable", 0)
+    end
+    local window = bar.GetWindow()
+    local result = { ok = true, visible = bar.visible == true }
+    pcall(function() result.x, result.y = window:GetPosition() end)
+    pcall(function() result.w, result.h = window:GetSize() end)
+    pcall(function() result.canvas_w, result.canvas_h = rawget(_G, "Window").GetCanvasSize() end)
+    if command.press == true then
+      bar:ExitGame()
+      result.pressed = true
+    end
+    return result
   elseif name == "key" or name == "move" then
     error("unsupported: the client Lua cannot inject keys or movement; use interact, click or chat", 0)
   end
