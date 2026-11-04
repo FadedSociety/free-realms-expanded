@@ -174,6 +174,9 @@ pub enum Kind {
     Music,
     /// L962: a Tower Defense game against the server; the row's id is its MiniGameData row.
     TowerDefense,
+    /// L963: Pirate's Plunder; the row's id is MiniGameData 54, the content of the world-tunnel
+    /// Games row 1059.
+    Pirates,
 }
 
 /// One published activity: a battle of the frozen package.
@@ -538,7 +541,8 @@ impl Catalogue {
             | Kind::Fishing { .. }
             | Kind::Checkers
             | Kind::Music
-            | Kind::TowerDefense => {}
+            | Kind::TowerDefense
+            | Kind::Pirates => {}
             // (R) Soccer is a world activity, not a combat-job gate. Its row
             // still honors the configured level floor; the original gate is unknown.
             Kind::Soccer => {
@@ -591,7 +595,8 @@ impl Catalogue {
             | Kind::Fishing { .. }
             | Kind::Checkers
             | Kind::Music
-            | Kind::TowerDefense => true,
+            | Kind::TowerDefense
+            | Kind::Pirates => true,
         }
     }
 
@@ -691,7 +696,8 @@ impl Catalogue {
             | Kind::Fishing { .. }
             | Kind::Checkers
             | Kind::Music
-            | Kind::TowerDefense => return None,
+            | Kind::TowerDefense
+            | Kind::Pirates => return None,
         })
     }
 
@@ -795,6 +801,7 @@ fn runs(row: &LiveRow, a: &Activity) -> bool {
         | Kind::Checkers
         | Kind::Music
         | Kind::TowerDefense => row.entry_type == ENTRY_CLIENT_TUNNEL && row.content_id == a.id,
+        Kind::Pirates => row.entry_type == ENTRY_WORLD_TUNNEL && row.content_id == a.id,
     }
 }
 

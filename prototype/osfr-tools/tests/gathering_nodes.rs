@@ -1642,6 +1642,37 @@ fn games_window_play_opens_a_feeling_the_beat_song() {
     assert_eq!(i32::from_le_bytes(offer[11..15].try_into().unwrap()), 204);
 }
 
+/// L963: Play on the Pirate's Plunder row (1059) zones into the first arena; once it loads the start
+/// packets go out (the player's own ship among them) and Play again is the busy refusal. The match
+/// then runs on its timeouts and clock alone (a silent client) to Exiting and zones back.
+#[test]
+fn games_window_play_zones_into_a_pirates_arena() {
+    let fixture = Fixture::new(PLOT);
+    let mut gateway = fixture.gateway_at(fixture.state(false, true), &fixture.node, 60.0);
+    tick(&mut gateway, 1_500);
+    let entered = play(&mut gateway, 1059, 2_000);
+    assert!(said(&entered, "ss_pirate_arena"), "the arena zone");
+    let loaded = [13_u16, 10].map(|op| send(&mut gateway, &op.to_le_bytes(), 2_100));
+    let ship = (loaded.iter().flat_map(inners)).any(|p| p.starts_with(&[94, 0, 9, 0]));
+    assert!(ship, "CreateProxiedShip after the load");
+    let again = play(&mut gateway, 1059, 2_200);
+    assert_eq!(
+        chat_text(&again).trim_end(),
+        "Finish what you are doing before starting an activity."
+    );
+    let exiting: &[u8] = &[94, 0, 2, 0, 13, 0, 0, 0];
+    let (mut exited, mut back) = (false, false);
+    for second in 3..=400 {
+        let out = tick(&mut gateway, second * 1_000);
+        exited |= inners(&out).iter().any(|p| *p == exiting);
+        if out.began_zoning {
+            back = true;
+            break;
+        }
+    }
+    assert!(exited && back, "Exiting, then the zone back");
+}
+
 /// L962: Play on the Easy "Penguin Produce" row (532) offers Tower Defense game 350 with the movie's
 /// preload list; its data goes out once, a cleared map (stages 0-20 reported) wins once and pays once,
 /// and after the close Play on a Hard row (195) offers game 150.

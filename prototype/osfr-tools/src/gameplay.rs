@@ -46,6 +46,7 @@ pub use admin_move::{AdminMove, MoveTarget};
 mod card_launch;
 mod checkers_table;
 mod music_table;
+mod pirates_arena;
 mod coin_authoring;
 mod collection_pickup;
 mod content_presence;
@@ -261,6 +262,10 @@ pub struct Gameplay {
     /// L962: this session's Tower Defense run (session-local); `None` without its content. Boxed:
     /// `Gameplay` is cloned on the stack per packet, and inline it overflowed a deep test's 2 MB stack.
     tower_defense: Option<Box<crate::tower_defense::TowerDefense>>,
+    /// L963: Pirate's Plunder's arenas and values (`ship_combat.json`); `None` without the file.
+    ship_combat: Option<Arc<crate::ship_combat::Content>>,
+    /// L963: the open Pirate's Plunder match (session-local); boxed like the Tower Defense run.
+    pirates: Option<Box<pirates_arena::PirateArena>>,
     /// T765: the session's Trading Card Game launches (type-16 runs and one-time tickets).
     card_launches: Option<crate::card_game::Launches>,
     /// T560: the daily wheel (`gameplay/daily_wheel.rs`); only its day stamp is saved.
@@ -1143,6 +1148,7 @@ impl Gameplay {
         let fishing = fishing_spots.as_deref();
         let music = music_table::load_music(npc_content)?;
         let tower_defense = tower_defense_table::load_tower_defense(npc_content)?;
+        let ship_combat = crate::ship_combat::Content::load(npc_content)?.map(Arc::new);
         let games = portal_games::games(
             kart,
             derby_ref,
@@ -1151,6 +1157,7 @@ impl Gameplay {
             fishing,
             music.as_ref(),
             tower_defense.as_deref(),
+            ship_combat.is_some(),
         );
         let activities = portal_games::with_live(activities, folders, &daily_wheel, games)?;
         if let (Some(spots), Some(interaction)) = (&fishing_spots, &mut npc_interaction) {
@@ -1272,6 +1279,8 @@ impl Gameplay {
             checkers: crate::checkers::CheckersTable::fresh()?,
             music,
             tower_defense,
+            ship_combat,
+            pirates: None,
             card_launches,
             daily_wheel,
             portal_refreshed_ms: None,
@@ -1935,6 +1944,7 @@ impl Gameplay {
     pub fn tick(&mut self, character: &CharacterState, now_ms: u64) -> io::Result<Outcome> {
         let counters_before = self.achievement_counters();
         let fishing = self.supervise_fishing(character, now_ms)?;
+        let fishing = self.supervise_pirates(fishing, now_ms)?;
         let mut out = self.tick_world(character, now_ms)?;
         self.tick_gathering_nodes(now_ms, &mut out)?;
         self.tick_live_placements(now_ms, &mut out); // world visibility only, never saved
@@ -2164,6 +2174,9 @@ impl Gameplay {
             return Ok(out);
         }
         if let Some(out) = self.handle_tower_defense(inner, character.guid, now_ms)? {
+            return Ok(out);
+        }
+        if let Some(out) = self.handle_pirates(inner, now_ms)? {
             return Ok(out);
         }
         if self.chess.as_ref().is_some_and(ChessService::is_active)
@@ -2806,6 +2819,7 @@ impl Gameplay {
                 }
             }
             ["win"] => self.developer_win(now_ms, out)?,
+            ["pirates", rest @ ..] => self.developer_pirates(rest, character, out)?,
             ["duel", rest @ ..] => {
                 let id = match rest {
                     [id] => id.parse::<u32>().ok().filter(|id| *id > 0),

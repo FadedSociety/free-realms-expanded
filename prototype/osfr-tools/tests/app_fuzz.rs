@@ -838,6 +838,8 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     result.push(("card_game", [vec![39, 0, 37], vec![0xff; 12]].concat()));
     // L962: a movie report with no open minigame is answered by nothing.
     result.push(("minigame_movie", [vec![39, 0, 14], vec![0xff; 12]].concat()));
+    // L963: a ship combat packet (any sub-op) with no open match is answered by nothing.
+    result.push(("ship_combat", [vec![94, 0, 0xff, 0xff], vec![0xff; 4]].concat()));
     result.push(("gameplay.handle_in_world", vec![39, 0, 0xff, 0xff]));
     result.push(("combat", words(36, 10, &[1, 0, 0, u32::MAX, u32::MAX])));
     result.push(("combat", words(36, 12, &[u32::MAX])));

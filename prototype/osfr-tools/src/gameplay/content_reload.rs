@@ -83,6 +83,7 @@ impl Gameplay {
                             self.fishing_spots.as_deref(),
                             self.music.as_ref(),
                             self.tower_defense.as_deref(),
+                            self.ship_combat.is_some(),
                         ),
                     )?;
                     if let Some(visibility) = self.npc_visibility.as_mut() {

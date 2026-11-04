@@ -557,6 +557,9 @@ fn application_handler(body: &[u8]) -> &'static str {
         // L962: a movie's 39/14 report (a stage, a score) often needs no reply; without a name the
         // staged gameplay was dropped as unknown, losing the engine's state for that report.
         (Some(39), _) if body.get(2) == Some(&14) => "minigame_movie",
+        // L963: Pirate's Plunder's family; its report word (sub 3) often needs no reply, so a
+        // silent one must keep the staged match, as for the 39/14 movie reports.
+        (Some(94), _) => "ship_combat",
         // W174: handled in gameplay.rs, where a refusal can send nothing. Naming them keeps
         // the gateway from logging an understood request as "unknown application message".
         (Some(26), Some(13)) => "class_selection",
@@ -1511,6 +1514,13 @@ impl Gateway {
                         }
                         return Err(invalid("position before world initialization"));
                     }
+                    if gameplay.as_ref().is_some_and(Gameplay::pirates_active) {
+                        // L963: the ship owns movement; the client parks its hidden character at
+                        // the origin, which is no move to validate (or to snap back).
+                        let why = Some("ship_combat_owns_movement".into());
+                        set_trace(&mut trace, event_index, "ignored", None, why, Some("ignore"));
+                        continue;
+                    }
                     let elapsed = last_movement_ms
                         .map(|last| Duration::from_millis(now_ms.saturating_sub(last)))
                         .unwrap_or(Duration::from_secs(1));
@@ -1829,6 +1839,7 @@ impl Gateway {
             && !game.accepts_kart_loading_application(&[33, 0])
             && !game.derby_active()
             && !game.is_soccer_active()
+            && !game.pirates_active()
         {
             return Ok(self.pet_tick(now_ms));
         }
@@ -2006,6 +2017,7 @@ mod radial_routing {
         assert_eq!(application_handler(&[53, 0, 24, 2, 0, 0, 0]), "pets");
         assert_eq!(application_handler(&[39, 0, 37, 1, 0, 0, 0]), "card_game");
         assert_eq!(application_handler(&[39, 0, 14, 1, 0, 0, 0]), "minigame_movie");
+        assert_eq!(application_handler(&[94, 0, 3, 0, 1, 0, 0, 0]), "ship_combat");
         assert_eq!(
             application_handler(&[53, 0, 19, 1, 0, 0, 0, 0, 0, 0, 0]),
             "pets"

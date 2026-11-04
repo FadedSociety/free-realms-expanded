@@ -39,6 +39,8 @@ occupations!(
     Music,
     // L962: a Tower Defense game against the server; (R) it closes the checkers gates.
     TowerDefense,
+    // L963: a Pirate's Plunder match in its arena; (R) the derby's gates.
+    Pirates,
     // T765: a Trading Card Game run (the client's card DLL window is open).
     CardGame,
     Encounter,
@@ -97,6 +99,7 @@ impl Occupation {
             Checkers => "a checkers game",
             Music => "a Feeling the Beat! song",
             TowerDefense => "a Tower Defense game",
+            Pirates => "a Pirate's Plunder match",
             CardGame => "a card game",
             Encounter | FieldEngaged => "a fight",
             Derby => "a derby",
@@ -117,7 +120,7 @@ impl Occupation {
             | Music | TowerDefense | CardGame | Fishing | Encounter => {
                 (true, true, true, true, false)
             }
-            Derby | Soccer | Kart => (true, true, true, true, true),
+            Derby | Soccer | Kart | Pirates => (true, true, true, true, true),
             FieldEngaged => (false, false, true, false, false),
             // (R) A lot is its own scene: leave it before travelling, riding or starting an
             // activity; pets may follow (the lot's pet autospawn flag); housing owns movement.
@@ -161,6 +164,7 @@ impl Gameplay {
             }
             Occupation::TowerDefense => (self.tower_defense.as_deref())
                 .is_some_and(crate::tower_defense::TowerDefense::is_active),
+            Occupation::Pirates => self.pirates.is_some(),
             Occupation::CardGame => self
                 .card_launches
                 .as_ref()
@@ -229,6 +233,7 @@ mod tests {
                 Checkers,
                 Music,
                 TowerDefense,
+                Pirates,
                 CardGame,
                 Encounter,
                 Derby,
@@ -253,6 +258,7 @@ mod tests {
                 Checkers,
                 Music,
                 TowerDefense,
+                Pirates,
                 CardGame,
                 Encounter,
                 Derby,
@@ -276,6 +282,7 @@ mod tests {
                 Checkers,
                 Music,
                 TowerDefense,
+                Pirates,
                 CardGame,
                 Encounter,
                 Derby,
@@ -299,6 +306,7 @@ mod tests {
                 Checkers,
                 Music,
                 TowerDefense,
+                Pirates,
                 CardGame,
                 Encounter,
                 Derby,
@@ -307,7 +315,10 @@ mod tests {
                 Kart
             ]
         );
-        assert_eq!(members(|g| g.location), [Derby, Soccer, Kart, Housing]);
+        assert_eq!(
+            members(|g| g.location),
+            [Pirates, Derby, Soccer, Kart, Housing]
+        );
         // A style card is refused wherever starting an activity is, except at home.
         assert_eq!(
             members(|g| g.style_card),
@@ -322,6 +333,7 @@ mod tests {
                 Checkers,
                 Music,
                 TowerDefense,
+                Pirates,
                 CardGame,
                 Encounter,
                 Derby,

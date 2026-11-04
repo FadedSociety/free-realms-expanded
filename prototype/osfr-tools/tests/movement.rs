@@ -532,6 +532,9 @@ fn replay_run(directory: &Path, manifest: Manifest) -> ReplayStats {
     let mut current_zone = 0u32;
     let mut last_position_time: Option<f64> = None;
     let mut expected: Option<ExpectedDiscontinuity> = None;
+    // L963: from the server's first ship combat packet to the next zone transition the ship owns
+    // movement and the gateway ignores the hidden character's reports (it sits at the origin).
+    let mut ship_match = false;
     let mut client_sequences = std::collections::HashSet::new();
     let mut last_client_sequence: Option<u16> = None;
     let mut last_position_sequence: Option<u16> = None;
@@ -658,7 +661,11 @@ fn replay_run(directory: &Path, manifest: Manifest) -> ReplayStats {
                     if let Some(zone) = parse_zone_details(inner) {
                         current_zone = zone;
                     }
+                    if inner.starts_with(&94u16.to_le_bytes()) {
+                        ship_match = true;
+                    }
                     if inner.get(..2) == Some(&31u16.to_le_bytes()) {
+                        ship_match = false;
                         if let Ok(transition) = zone_transition::decode(child) {
                             if transition.id >= 0 {
                                 current_zone = transition.id as u32;
@@ -737,6 +744,10 @@ fn replay_run(directory: &Path, manifest: Manifest) -> ReplayStats {
                             }
                         }
                         stats.position_updates += 1;
+                        if ship_match {
+                            stats.ignored += 1;
+                            continue;
+                        }
                         *stats.state_counts.entry(update.state).or_default() += 1;
                         *stats.unknown_counts.entry(update.unknown).or_default() += 1;
                         if direction_index == 0 && packet.opcode == 13 {

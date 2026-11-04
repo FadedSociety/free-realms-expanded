@@ -114,6 +114,7 @@ pub mod rewards;
 pub mod road_graph;
 pub mod security_log;
 pub mod session;
+pub mod ship_combat;
 pub mod smelting;
 pub mod soccer;
 pub mod soccer_ball;

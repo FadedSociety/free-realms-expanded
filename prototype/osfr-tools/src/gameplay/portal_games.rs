@@ -31,7 +31,8 @@ pub(super) fn with_live(
 /// MiniGameData row, (L100) every game the mining, harvesting and (L103) mail sorting engines
 /// (`type8`, in that order) offer and (L102) every fishing hole, as Games window join rows keyed
 /// by their MiniGameData rows, and (L104) the checkers table. (L961) Every Feeling the Beat!
-/// game `music_game.json` carries, and (L962) every Tower Defense game `tower_defense.json` carries.
+/// game `music_game.json` carries, (L962) every Tower Defense game `tower_defense.json` carries and
+/// (L963) Pirate's Plunder when `ship_combat.json` is present.
 pub(super) fn games(
     kart: Option<&KartGateway>,
     derby: Option<&DerbyGateway>,
@@ -40,6 +41,7 @@ pub(super) fn games(
     fishing: Option<&FishingSpots>,
     music: Option<&MusicGame>,
     tower_defense: Option<&TowerDefense>,
+    pirates: bool,
 ) -> Vec<Activity> {
     let kart = kart.map(KartGateway::minigame_ids).unwrap_or_default();
     // L931: every hosted derby row is a Games window join key, so Play starts the row chosen.
@@ -100,6 +102,7 @@ pub(super) fn games(
         .chain([game_row(crate::checkers::GAME_ID as u32, Kind::Checkers)])
         .chain(songs)
         .chain(maps)
+        .chain(pirates.then(|| game_row(crate::ship_combat::GAME_ID, Kind::Pirates)))
         .collect()
 }
 
@@ -191,7 +194,7 @@ impl Gameplay {
             }
             // L961: the server's own movies start nothing during another activity (a groom session
             // keeps travel open, so the portal's travel gate alone lets them through).
-            Kind::Checkers | Kind::Music | Kind::TowerDefense if busy => {
+            Kind::Checkers | Kind::Music | Kind::TowerDefense | Kind::Pirates if busy => {
                 Ok(refused(&Denied::Busy.message()))
             }
             // L104: the checkers table (it stages itself).
@@ -200,6 +203,16 @@ impl Gameplay {
             Kind::Music => self.begin_music(id),
             // L962: Tower Defense game `id` (it stages itself).
             Kind::TowerDefense => self.begin_tower_defense(id),
+            // L963: a solo match in the first arena (R: the live game matched one to five players
+            // through queue 5). A refusal answers with its line.
+            Kind::Pirates => self.commit_if_changed(|staged| {
+                let mut out = Outcome::default();
+                let text = staged.begin_pirates(1, character, &mut out)?;
+                if !out.changed {
+                    out.replies.push(chat::system(&text));
+                }
+                Ok(out)
+            }),
             _ => Err(invalid("not a Games window game row")),
         }
     }

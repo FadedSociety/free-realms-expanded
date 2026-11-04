@@ -1,0 +1,267 @@
+{
+  "schema_version": 1,
+  "source": "L963 (R): Pirate's Plunder arenas. Docks are each arena's Port/PortBell areas (client ss_pirate_arenaAreas.xml, ss_pir_arena3Areas.xml, ss_pir_arena4Areas.xml). Every ZoneConfig value is (R): the live per-zone config never shipped (field names: the server loader ShipZoneConfigLoad 010680f0 compiled into the client). The camera values are the client's compiled defaults (constructor 0106b090; Pitch, MinPitch and MaxPitch in degrees as the loader 0106b1e0 reads them). The ship physics values are the client's compiled defaults (constructor 0106ae50) except the speeds (MinSpeed, MaxSpeed, TurboSpeed), which are (R) as is the one gear; angles in degrees as the loaders 0106a560 and 0106a3a0 read them.",
+  "arenas": [
+    {
+      "scene": "ss_pirate_arena",
+      "zone_id": 9401,
+      "rotation": [
+        0.0,
+        0.996574,
+        0.0,
+        0.082702
+      ],
+      "docks": [
+        [
+          880,
+          52,
+          723
+        ],
+        [
+          995,
+          52,
+          765
+        ],
+        [
+          1127,
+          52,
+          908
+        ],
+        [
+          667,
+          52,
+          726
+        ],
+        [
+          539,
+          52,
+          788
+        ],
+        [
+          448,
+          52,
+          879
+        ]
+      ]
+    },
+    {
+      "scene": "ss_pir_arena3",
+      "zone_id": 9402,
+      "rotation": [
+        0.0,
+        0.996574,
+        0.0,
+        0.082702
+      ],
+      "docks": [
+        [
+          1199,
+          53,
+          851
+        ],
+        [
+          1339,
+          53,
+          904
+        ],
+        [
+          1168,
+          53,
+          1075
+        ],
+        [
+          907,
+          53,
+          1040
+        ],
+        [
+          689,
+          53,
+          856
+        ],
+        [
+          909,
+          53,
+          888
+        ]
+      ]
+    },
+    {
+      "scene": "ss_pir_arena4",
+      "zone_id": 9403,
+      "rotation": [
+        0.0,
+        0.996574,
+        0.0,
+        0.082702
+      ],
+      "docks": [
+        [
+          1161,
+          53,
+          477
+        ],
+        [
+          1199,
+          53,
+          647
+        ],
+        [
+          1311,
+          53,
+          707
+        ],
+        [
+          961,
+          53,
+          621
+        ],
+        [
+          931,
+          53,
+          479
+        ],
+        [
+          801,
+          53,
+          697
+        ]
+      ]
+    }
+  ],
+  "countdown_seconds": 5,
+  "report_timeout_seconds": 20,
+  "zone_config": {
+    "MaxPlayers": 6,
+    "MaxScore": 1000,
+    "ShipPickupCount": 10,
+    "UseShipTargetHighlight": 1,
+    "ZoneReadyWaitTime": 30,
+    "PlayTime": 180,
+    "RespawnTime": 5,
+    "InvincibleAfterRespawnTime": 3,
+    "TeleportTime": 1,
+    "InvincibleAfterTeleportTime": 2,
+    "MinDriftingTime": 1,
+    "MaxDriftingTime": 3,
+    "MaxSinkingTime": 4,
+    "ParkingAlignTime": 1,
+    "ParkingSelectTime": 0,
+    "ParkingEnterSpeed": 5,
+    "ParkingExitSpeed": 5,
+    "ZoneBubbleRadius": 1500,
+    "ZoneBubbleObjectRadius": 1500,
+    "ZoneBubbleFloraRadius": 500,
+    "MaxDrawDistance": 1500,
+    "PhysicsSimulationRate": 30,
+    "Gravity": -9.8,
+    "WaterLevel": 50,
+    "AllowablePhysicsDelta": 5,
+    "PickupEmptyTime": 5,
+    "FlyingTreasureHeight": 10,
+    "ProjectileMax": 32,
+    "ProjectileRadius": 1,
+    "ProjectileLifetime": 4,
+    "ShipHoldMinValue": 1,
+    "ShipNameplateVisibleRange": 200,
+    "TreasureAreaPositionX": 761,
+    "TreasureAreaPositionZ": 719
+  },
+  "ship": {
+    "actors": [
+      "pirship_hum_lrg_mainbody_bbe.adr",
+      "pirship_hum_lrg_forwardmast_bbe.adr",
+      "pirship_hum_lrg_rearmast_bbe.adr",
+      "pirship_hum_lrg_midmast_bbe.adr",
+      ""
+    ],
+    "collision": "pirship_hum_lrg_mainbody_bbe.cdt",
+    "health": 100,
+    "mast_min_health": 20,
+    "mast_max_health": 40,
+    "hull_strength": 1.0,
+    "hold_capacity": 5,
+    "damage_states": [
+      {
+        "health": 0,
+        "name": "",
+        "effect_id": 0
+      }
+    ],
+    "physics": {
+      "SpeedFactor": 1.0,
+      "Mass": 10.0,
+      "CenterOfMassZ": 0.0,
+      "Length": 10.0,
+      "Width": 5.0,
+      "Height": 5.0,
+      "Spinniness": 0.01,
+      "MaxSpin": 2.5,
+      "MinSpeed": -5.0,
+      "MaxSpeed": 20.0,
+      "TurboSpeed": 30.0,
+      "ExceedMaxSpeedTime": 1.0,
+      "ReverseJetStreamSpeed": 20.0,
+      "StationaryTurnRadius": 10.0,
+      "StraightenWeight": 0.5,
+      "StraightenMax": 2.5,
+      "AutoAimRadius": 100.0,
+      "DraftConeRadius": 0.0,
+      "DraftConeAngle": 0.0,
+      "DraftHeadingDiff": 0.0,
+      "DraftSpdMultiplier": 0.0,
+      "DraftAccel": 4.0,
+      "CollisionMin": 1.0,
+      "TerrainBounceDelay": 0.1,
+      "TerrainBounciness": 1.0,
+      "TerrainLowBounciness": 0.75,
+      "TerrainLowBouncePush": 0.5,
+      "TerrainBounceThreshhold": 0.6,
+      "TerrainBounceSpin": 1.0,
+      "ShipBounceDelay": 1.0,
+      "ShipBounciness": 1.0
+    },
+    "gears": [
+      {
+        "ShiftUpSpeed": 1000.0,
+        "ShiftDownSpeed": 0.0,
+        "BaseAcceleration": 10.0,
+        "BaseDeceleration": 5.0,
+        "TurboAcceleration": 20.0,
+        "BrakeDeceleration": 15.0,
+        "SidewaysDeceleration": 10.0,
+        "AngularAcceleration": 180.0,
+        "TurboAngularAcceleration": 180.0,
+        "AngularDeceleration": 360.0,
+        "MaxAngularSpeed": 60.0,
+        "TurboMaxAngularSpeed": 90.0
+      }
+    ],
+    "name": "Jolly Roger"
+  },
+  "camera": {
+    "OffsetX": 0.0,
+    "OffsetY": 2.0,
+    "OffsetZ": 1.0,
+    "TargetHeight": 0.0,
+    "Distance": 120.0,
+    "MinDistance": 80.0,
+    "MaxDistance": 200.0,
+    "Pitch": 22.5,
+    "MinPitch": -90.0,
+    "MaxPitch": 90.0,
+    "OverHeadRenderDistance": 1000.0,
+    "OverHeadScale": 0.07,
+    "OverHeadShipEffectYOffset": 0.0,
+    "UseShipHeightForOverHead": 0,
+    "ZoneBubbleRadius": 12,
+    "ZoneBubbleObjectRadius": 12,
+    "ZoneBubbleFloraRadius": 2,
+    "IndicatorScreenRatioX": 220.0,
+    "IndicatorScreenRatioY": 220.0,
+    "IndicatorSizeMod": 50.0,
+    "IndicatorPulseSizeMod": 5.0,
+    "IndicatorPulseTime": 3.0,
+    "IndicatorPulseIntervalTime": 0.6
+  }
+}
