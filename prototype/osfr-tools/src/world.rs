@@ -591,6 +591,13 @@ impl NpcVisibility {
         Ok(result)
     }
 
+    /// These drawn actors answer a click as NPC content, each under its own guid.
+    pub fn bind_content_keys(&mut self, actors: impl IntoIterator<Item = u64>) {
+        for actor in actors {
+            self.content_keys.insert(actor, actor);
+        }
+    }
+
     /// T491/T775: [`Self::load`] for play. Rows tagged with a `client_areas.json` season stay
     /// in the table; every view shows them only while that season is active at the wall clock,
     /// so a season boundary spawns or despawns them through the normal 35/2 / 35/3 diff without

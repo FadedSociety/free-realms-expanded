@@ -21,7 +21,9 @@ use osfr_tools::{
     kart_gateway::{DEFAULT_MENU_STRING_ID, KartGateway},
     mining,
     npc_interaction::NpcInteraction,
+    quest_engine::{CharacterEligibility, QuestEngine, QuestEvent, QuestStatus},
     social_chat::ActionBudgets,
+    tower_defense::TdContent,
     world::NpcVisibility,
 };
 use serde_json::{Value, json};
@@ -736,6 +738,93 @@ fn the_derby_driver_offers_the_derby_when_a_package_exists() {
         racings,
         "a live derby is not entered twice"
     );
+}
+
+/// A click on a table lists its games, not Talk; a choice offers that game; a player already in
+/// a game gets no menu and a far player gets nothing.
+#[test]
+fn a_tower_defense_table_lists_its_games_and_offers_the_choice() {
+    const TABLE: u64 = 100_000_033_710; // Easy Penguin Defense
+    let td = TdContent::load(&data()).unwrap();
+    let position = (td.tables.iter()).find(|t| t.npc == TABLE).unwrap().position;
+    let content = Content::new();
+    fs::copy(data().join("tower_defense.json"), content.0.join("tower_defense.json")).unwrap();
+    let shipped = read_json(&data().join("tower_defense.json"));
+    let name_of = |id: i64| {
+        let rows = shipped["games"].as_array().unwrap();
+        let row = rows.iter().find(|g| g["game_id"].as_i64() == Some(id)).unwrap();
+        row["name_id"].as_u64().unwrap() as u32
+    };
+    let mut gateway = gateway_at(&content, content.state(), position);
+    let menu = bodies(&click(&mut gateway, TABLE, NOW));
+    let options = [350, 351, 352].map(|id| menu_option(&menu, name_of(id)).expect("the game's row"));
+    assert_eq!(options, [1, 2, 3], "the games alone: a table has nobody to talk to");
+
+    let started = choose(&mut gateway, TABLE, options[1], NOW + 100);
+    let replies = bodies(&started);
+    let offer = replies.iter().find(|p| p.starts_with(&[39, 0, 16])).expect("the 39/16 offer");
+    assert_eq!(i32::from_le_bytes(offer[11..15].try_into().unwrap()), 351);
+
+    let again = bodies(&click(&mut gateway, TABLE, NOW + 200));
+    assert!(again.iter().all(|p| !p.starts_with(&[26, 0, 9, 0])), "busy: no menu");
+
+    let away = [position[0] + 500.0, position[1], position[2]];
+    let mut far = gateway_at(&content, content.state(), away);
+    let menu = bodies(&click(&mut far, TABLE, NOW));
+    assert!(menu.iter().all(|p| !p.starts_with(&[26, 0, 9, 0])), "out of reach");
+}
+
+/// A chain: the table's click, its three wins in order, then the giver takes the turn-in. The
+/// next chain opens only once this one is done.
+#[test]
+fn a_tower_defense_chain_runs_from_the_table_to_the_turn_in() {
+    const FIRST: u32 = 3_170_001;
+    const NEXT: u32 = 3_170_002;
+    const ARCI_JOAN: u64 = 9_500_000_726;
+    const TABLE: u64 = 100_000_033_710;
+    let eligibility = || CharacterEligibility {
+        nonmember_quest_limit: 10,
+        ..CharacterEligibility::default()
+    };
+    let mut engine = QuestEngine::from_split_content(&data(), 1, eligibility(), None).unwrap();
+    assert!(!engine.can_offer(NEXT, ARCI_JOAN), "the first chain comes first");
+    assert_eq!(engine.offer(FIRST, ARCI_JOAN).denial, None);
+    assert!(engine.accept(FIRST).changed);
+    let win = |minigame_id| QuestEvent::FinishMinigame { minigame_id };
+    assert!(!engine.on_event(win(350)).unwrap().changed, "the table first");
+    let click = QuestEvent::InteractNpc { npc_id: TABLE };
+    assert!(engine.on_event(click).unwrap().changed);
+    assert!(!engine.on_event(win(351)).unwrap().changed, "the games in order");
+    for game in [350, 351, 352] {
+        assert!(engine.on_event(win(game)).unwrap().changed, "{game}");
+    }
+    let back = QuestEvent::TalkToNpc { npc_id: ARCI_JOAN };
+    assert!(engine.on_event(back).unwrap().changed);
+    engine.begin_turnin(FIRST, ARCI_JOAN);
+    assert_eq!(engine.state().pending_turnin, Some(FIRST));
+    let mut done = engine.state().clone();
+    done.pending_turnin = None;
+    (done.quests.get_mut(&FIRST).unwrap()).status = QuestStatus::Completed;
+    let engine = QuestEngine::from_split_content(&data(), 1, eligibility(), Some(done)).unwrap();
+    assert!(engine.can_offer(NEXT, ARCI_JOAN));
+}
+
+/// Every shipped table is bound to the one spawn that draws it, and stands where it does.
+#[test]
+fn every_tower_defense_table_is_bound_to_its_spawn() {
+    let content = data();
+    let td = TdContent::load(&content).unwrap();
+    assert_eq!(td.tables.len(), 20);
+    let extras = read_json(&content.join("npc_spawns_extra.json"));
+    let bodies = extras["records"].as_array().unwrap();
+    for table in &td.tables {
+        let mut drawn = bodies.iter().filter(|b| b["spawn_guid"].as_u64() == Some(table.npc));
+        let spawn = drawn.next().expect("the table's spawn");
+        assert!(drawn.next().is_none(), "table {}", table.npc);
+        assert_eq!(spawn["name"], table.name.as_str());
+        let stands: [f32; 3] = serde_json::from_value(spawn["position"].clone()).unwrap();
+        assert_eq!(stands, table.position);
+    }
 }
 
 #[test]

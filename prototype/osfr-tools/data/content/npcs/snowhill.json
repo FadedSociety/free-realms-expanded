@@ -849,15 +849,13 @@
       "title_or_role": [
         "Pixie."
       ],
-      "roles": [
-        "ambient"
-      ],
+      "roles": ["quest_giver"],
       "enemy_kind": null,
       "location_evidence": [
         "\"Next to Easy Penguin Defense mini-game\" (wiki). The client says the Penguin Defense games are \"just outside the town hall\" (63326794)."
       ],
       "quests_given": [],
-      "quest_ids_given": [],
+      "quest_ids_given": [3170001, 3170002, 3170003],
       "quests_given_text": [],
       "quests_accepted": [],
       "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",

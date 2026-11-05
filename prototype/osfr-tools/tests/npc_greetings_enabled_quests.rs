@@ -323,6 +323,18 @@ const BINDINGS: &[Binding] = &[
 /// unbound id that is not listed here.
 const BLANK_WITH_REASON: &[(u64, &str)] = &[
     (
+        9500000726,
+        "Arci Joan (giver of the Tower Defense chain 3170001-3): her client lines are the chain's own offers (391189), not a greeting",
+    ),
+    (
+        9500000135,
+        "General Spattonug (giver of the Tower Defense chain 3170004-6): his client lines are the chain's own offers (391325), not a greeting",
+    ),
+    (
+        9500000507,
+        "Napoleon (giver of the Tower Defense chain 3170010-12): his client lines are the chain's own offers (391446), not a greeting",
+    ),
+    (
         9000000023,
         "Beth Callahan (T743 talk target of 3090027): the client names her only in third person (387592 'Speak to Beth Callahan', the objective text, and Doctor Callahan's offer speech 387576 that sends the player to her); quest-lines/objective-specs-fixed.json q3090027 records no first-person line, so none is recovered.",
     ),

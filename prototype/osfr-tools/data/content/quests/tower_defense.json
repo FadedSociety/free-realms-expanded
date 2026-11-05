@@ -1,0 +1,1577 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3170001,
+      "title_string_id": 391190,
+      "intro_text_string_id": 391189,
+      "description_string_id": 391191,
+      "end_text_string_id": 391192,
+      "giver_npc_id": 9500000726,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "interact_actor",
+          "id": 1,
+          "actor_guid": 100000033710,
+          "text_string_id": 391195,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Click on the Easy Penguin Defense table: the table of this name nearest the giver (lab/references/quest-table-20261102/quests.json wiki:fr_quest_defending_the_fish_c76b85)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "minigame_id": 350,
+          "count": 1,
+          "text_string_id": 391198,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Penguin Produce, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_defending_the_fish_c76b85)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 3,
+          "minigame_id": 351,
+          "count": 1,
+          "text_string_id": 391200,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete A Fishy Situation, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_defending_the_fish_c76b85)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 4,
+          "minigame_id": 352,
+          "count": 1,
+          "text_string_id": 391202,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete My Fish, MINE!, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_defending_the_fish_c76b85)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "npc_id": 9500000726,
+          "text_string_id": 391204,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Arci Joan (lab/references/quest-table-20261102/quests.json wiki:fr_quest_defending_the_fish_c76b85)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 56736,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Snowhill Defender Cap (lab/references/quest-table-20261102/quests.json wiki:fr_quest_defending_the_fish_c76b85)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56734,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Snowhill Defender Gloves (lab/references/quest-table-20261102/quests.json wiki:fr_quest_defending_the_fish_c76b85)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56759,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Snowhill Defended (lab/references/quest-table-20261102/quests.json wiki:fr_quest_defending_the_fish_c76b85)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The wiki lists items only (lab/references/quest-table-20261102/quests.json wiki:fr_quest_defending_the_fish_c76b85)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "lab/references/quest-table-20261102/quests.json wiki:fr_quest_defending_the_fish_c76b85"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3170002,
+      "title_string_id": 391210,
+      "intro_text_string_id": 391209,
+      "description_string_id": 391211,
+      "end_text_string_id": 391212,
+      "giver_npc_id": 9500000726,
+      "prerequisite_quest_ids": [
+        3170001
+      ],
+      "objectives": [
+        {
+          "kind": "interact_actor",
+          "id": 1,
+          "actor_guid": 100000033707,
+          "text_string_id": 391218,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Click on the Medium Penguin Defense table: the table of this name nearest the giver (lab/references/quest-table-20261102/quests.json wiki:fr_quest_smelly_stockpile_577ea4)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "minigame_id": 250,
+          "count": 1,
+          "text_string_id": 391198,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Penguin Produce, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_smelly_stockpile_577ea4)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 3,
+          "minigame_id": 251,
+          "count": 1,
+          "text_string_id": 391200,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete A Fishy Situation, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_smelly_stockpile_577ea4)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 4,
+          "minigame_id": 252,
+          "count": 1,
+          "text_string_id": 391202,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete My Fish, MINE!, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_smelly_stockpile_577ea4)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "npc_id": 9500000726,
+          "text_string_id": 391204,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Arci Joan (lab/references/quest-table-20261102/quests.json wiki:fr_quest_smelly_stockpile_577ea4)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 56735,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Snowhill Defender Boots (lab/references/quest-table-20261102/quests.json wiki:fr_quest_smelly_stockpile_577ea4)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56733,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Snowhill Defender Tunic (lab/references/quest-table-20261102/quests.json wiki:fr_quest_smelly_stockpile_577ea4)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56763,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Snowhill Guarded (lab/references/quest-table-20261102/quests.json wiki:fr_quest_smelly_stockpile_577ea4)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The wiki lists items only (lab/references/quest-table-20261102/quests.json wiki:fr_quest_smelly_stockpile_577ea4)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "lab/references/quest-table-20261102/quests.json wiki:fr_quest_smelly_stockpile_577ea4"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3170003,
+      "title_string_id": 391267,
+      "intro_text_string_id": 391266,
+      "description_string_id": 391268,
+      "end_text_string_id": 391269,
+      "giver_npc_id": 9500000726,
+      "prerequisite_quest_ids": [
+        3170002
+      ],
+      "objectives": [
+        {
+          "kind": "interact_actor",
+          "id": 1,
+          "actor_guid": 100000033719,
+          "text_string_id": 391272,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Click on the Hard Penguin Defense table: the table of this name nearest the giver (lab/references/quest-table-20261102/quests.json wiki:fr_quest_fishy_strategy_e2ef18)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "minigame_id": 150,
+          "count": 1,
+          "text_string_id": 391198,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Penguin Produce, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_fishy_strategy_e2ef18)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 3,
+          "minigame_id": 151,
+          "count": 1,
+          "text_string_id": 391200,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete A Fishy Situation, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_fishy_strategy_e2ef18)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 4,
+          "minigame_id": 152,
+          "count": 1,
+          "text_string_id": 391202,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete My Fish, MINE!, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_fishy_strategy_e2ef18)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "npc_id": 9500000726,
+          "text_string_id": 391204,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Arci Joan (lab/references/quest-table-20261102/quests.json wiki:fr_quest_fishy_strategy_e2ef18)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 56732,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Snowhill Defender Leggings (lab/references/quest-table-20261102/quests.json wiki:fr_quest_fishy_strategy_e2ef18)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56731,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Snowhill Defender Pack (lab/references/quest-table-20261102/quests.json wiki:fr_quest_fishy_strategy_e2ef18)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56767,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Snowhill Protected (lab/references/quest-table-20261102/quests.json wiki:fr_quest_fishy_strategy_e2ef18)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The wiki lists items only (lab/references/quest-table-20261102/quests.json wiki:fr_quest_fishy_strategy_e2ef18)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "lab/references/quest-table-20261102/quests.json wiki:fr_quest_fishy_strategy_e2ef18"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3170004,
+      "title_string_id": 391326,
+      "intro_text_string_id": 391325,
+      "description_string_id": 391327,
+      "end_text_string_id": 391328,
+      "giver_npc_id": 9500000135,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "interact_actor",
+          "id": 1,
+          "actor_guid": 100000002783,
+          "text_string_id": 391332,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Click on the Easy Briarwood Defense table: the table of this name nearest the giver (lab/references/quest-table-20261102/quests.json wiki:fr_quest_tangled_barricade_2b67db)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "minigame_id": 353,
+          "count": 1,
+          "text_string_id": 391334,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Weed Killing!, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_tangled_barricade_2b67db)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 3,
+          "minigame_id": 354,
+          "count": 1,
+          "text_string_id": 391336,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Plants Alive!, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_tangled_barricade_2b67db)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 4,
+          "minigame_id": 355,
+          "count": 1,
+          "text_string_id": 391338,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Weeding the Weeds!, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_tangled_barricade_2b67db)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "npc_id": 9500000135,
+          "text_string_id": 391340,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to General Spattonug (lab/references/quest-table-20261102/quests.json wiki:fr_quest_tangled_barricade_2b67db)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 56758,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Briarwood Defended (lab/references/quest-table-20261102/quests.json wiki:fr_quest_tangled_barricade_2b67db)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56740,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Briarwood Defender Gloves (lab/references/quest-table-20261102/quests.json wiki:fr_quest_tangled_barricade_2b67db)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56742,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Briarwood Defender Cap (lab/references/quest-table-20261102/quests.json wiki:fr_quest_tangled_barricade_2b67db)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The wiki lists items only (lab/references/quest-table-20261102/quests.json wiki:fr_quest_tangled_barricade_2b67db)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "lab/references/quest-table-20261102/quests.json wiki:fr_quest_tangled_barricade_2b67db"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3170005,
+      "title_string_id": 391345,
+      "intro_text_string_id": 391344,
+      "description_string_id": 391346,
+      "end_text_string_id": 391347,
+      "giver_npc_id": 9500000135,
+      "prerequisite_quest_ids": [
+        3170004
+      ],
+      "objectives": [
+        {
+          "kind": "interact_actor",
+          "id": 1,
+          "actor_guid": 100000002788,
+          "text_string_id": 391351,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Click on the Medium Briarwood Defense table: the table of this name nearest the giver (lab/references/quest-table-20261102/quests.json wiki:fr_quest_mushroom_guard_1358d4)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "minigame_id": 253,
+          "count": 1,
+          "text_string_id": 391353,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Weed Killing!, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_mushroom_guard_1358d4)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 3,
+          "minigame_id": 254,
+          "count": 1,
+          "text_string_id": 391336,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Plants Alive!, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_mushroom_guard_1358d4)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 4,
+          "minigame_id": 255,
+          "count": 1,
+          "text_string_id": 391338,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Weeding the Weeds!, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_mushroom_guard_1358d4)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "npc_id": 9500000135,
+          "text_string_id": 391340,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to General Spattonug (lab/references/quest-table-20261102/quests.json wiki:fr_quest_mushroom_guard_1358d4)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 56762,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Briarwood Guarded (lab/references/quest-table-20261102/quests.json wiki:fr_quest_mushroom_guard_1358d4)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56741,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Briarwood Defender Boots (lab/references/quest-table-20261102/quests.json wiki:fr_quest_mushroom_guard_1358d4)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56739,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Briarwood Defender Tunic (lab/references/quest-table-20261102/quests.json wiki:fr_quest_mushroom_guard_1358d4)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The wiki lists items only (lab/references/quest-table-20261102/quests.json wiki:fr_quest_mushroom_guard_1358d4)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "lab/references/quest-table-20261102/quests.json wiki:fr_quest_mushroom_guard_1358d4"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3170006,
+      "title_string_id": 391364,
+      "intro_text_string_id": 391363,
+      "description_string_id": 391365,
+      "end_text_string_id": 391366,
+      "giver_npc_id": 9500000135,
+      "prerequisite_quest_ids": [
+        3170005
+      ],
+      "objectives": [
+        {
+          "kind": "interact_actor",
+          "id": 1,
+          "actor_guid": 100000002793,
+          "text_string_id": 391372,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Click on the Hard Briarwood Defense table: the table of this name nearest the giver (lab/references/quest-table-20261102/quests.json wiki:fr_quest_briarwood_stronghold_d7fcc7)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "minigame_id": 153,
+          "count": 1,
+          "text_string_id": 391353,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Weed Killing!, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_briarwood_stronghold_d7fcc7)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 3,
+          "minigame_id": 154,
+          "count": 1,
+          "text_string_id": 391336,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Plants Alive!, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_briarwood_stronghold_d7fcc7)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 4,
+          "minigame_id": 155,
+          "count": 1,
+          "text_string_id": 391338,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Weeding the Weeds!, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_briarwood_stronghold_d7fcc7)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "npc_id": 9500000135,
+          "text_string_id": 391340,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to General Spattonug (lab/references/quest-table-20261102/quests.json wiki:fr_quest_briarwood_stronghold_d7fcc7)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 56766,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Briarwood Protected (lab/references/quest-table-20261102/quests.json wiki:fr_quest_briarwood_stronghold_d7fcc7)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56738,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Briarwood Defender Leggings (lab/references/quest-table-20261102/quests.json wiki:fr_quest_briarwood_stronghold_d7fcc7)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56737,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Briarwood Defender Pack (lab/references/quest-table-20261102/quests.json wiki:fr_quest_briarwood_stronghold_d7fcc7)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The wiki lists items only (lab/references/quest-table-20261102/quests.json wiki:fr_quest_briarwood_stronghold_d7fcc7)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "lab/references/quest-table-20261102/quests.json wiki:fr_quest_briarwood_stronghold_d7fcc7"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3170007,
+      "title_string_id": 391390,
+      "intro_text_string_id": 391391,
+      "description_string_id": 391399,
+      "end_text_string_id": 391394,
+      "giver_npc_id": 9500000271,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "interact_actor",
+          "id": 1,
+          "actor_guid": 100000003227,
+          "text_string_id": 391431,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Click on the Easy Garden Defense table: the table of this name nearest the giver (lab/references/quest-table-20261102/quests.json wiki:fr_quest_gunning_the_beasties_6ed324)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "minigame_id": 356,
+          "count": 1,
+          "text_string_id": 391437,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Crop Dusting, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_gunning_the_beasties_6ed324)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 3,
+          "minigame_id": 357,
+          "count": 1,
+          "text_string_id": 391434,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Gardening 101, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_gunning_the_beasties_6ed324)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 4,
+          "minigame_id": 358,
+          "count": 1,
+          "text_string_id": 391440,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Barnyard Bonanza, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_gunning_the_beasties_6ed324)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "npc_id": 9500000271,
+          "text_string_id": 391443,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Houston (lab/references/quest-table-20261102/quests.json wiki:fr_quest_gunning_the_beasties_6ed324)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 56761,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Garden Defended (lab/references/quest-table-20261102/quests.json wiki:fr_quest_gunning_the_beasties_6ed324)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56748,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Garden Defender Cap (lab/references/quest-table-20261102/quests.json wiki:fr_quest_gunning_the_beasties_6ed324)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56746,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Garden Defender Gloves (lab/references/quest-table-20261102/quests.json wiki:fr_quest_gunning_the_beasties_6ed324)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The wiki lists items only (lab/references/quest-table-20261102/quests.json wiki:fr_quest_gunning_the_beasties_6ed324)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "lab/references/quest-table-20261102/quests.json wiki:fr_quest_gunning_the_beasties_6ed324"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3170008,
+      "title_string_id": 391470,
+      "intro_text_string_id": 391471,
+      "description_string_id": 391468,
+      "end_text_string_id": 391473,
+      "giver_npc_id": 9500000271,
+      "prerequisite_quest_ids": [
+        3170007
+      ],
+      "objectives": [
+        {
+          "kind": "interact_actor",
+          "id": 1,
+          "actor_guid": 100000003237,
+          "text_string_id": 391486,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Click on the Medium Garden Defense table: the table of this name nearest the giver (lab/references/quest-table-20261102/quests.json wiki:fr_quest_dwarven_bulwark_df35db)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "minigame_id": 256,
+          "count": 1,
+          "text_string_id": 391437,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Crop Dusting, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_dwarven_bulwark_df35db)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 3,
+          "minigame_id": 257,
+          "count": 1,
+          "text_string_id": 391434,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Gardening 101, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_dwarven_bulwark_df35db)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 4,
+          "minigame_id": 258,
+          "count": 1,
+          "text_string_id": 391440,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Barnyard Bonanza, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_dwarven_bulwark_df35db)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "npc_id": 9500000271,
+          "text_string_id": 391443,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Houston (lab/references/quest-table-20261102/quests.json wiki:fr_quest_dwarven_bulwark_df35db)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 56765,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Garden Guarded (lab/references/quest-table-20261102/quests.json wiki:fr_quest_dwarven_bulwark_df35db)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56747,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Garden Defender Boots (lab/references/quest-table-20261102/quests.json wiki:fr_quest_dwarven_bulwark_df35db)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56745,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Garden Defender Tunic (lab/references/quest-table-20261102/quests.json wiki:fr_quest_dwarven_bulwark_df35db)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The wiki lists items only (lab/references/quest-table-20261102/quests.json wiki:fr_quest_dwarven_bulwark_df35db)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "lab/references/quest-table-20261102/quests.json wiki:fr_quest_dwarven_bulwark_df35db"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3170009,
+      "title_string_id": 391518,
+      "intro_text_string_id": 391519,
+      "description_string_id": 391516,
+      "end_text_string_id": 391517,
+      "giver_npc_id": 9500000271,
+      "prerequisite_quest_ids": [
+        3170008
+      ],
+      "objectives": [
+        {
+          "kind": "interact_actor",
+          "id": 1,
+          "actor_guid": 100000003236,
+          "text_string_id": 391531,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Click on the Hard Garden Defense table: the table of this name nearest the giver (lab/references/quest-table-20261102/quests.json wiki:fr_quest_bastion_of_the_green_thumbs_aaeee2)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "minigame_id": 156,
+          "count": 1,
+          "text_string_id": 391437,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Crop Dusting, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_bastion_of_the_green_thumbs_aaeee2)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 3,
+          "minigame_id": 157,
+          "count": 1,
+          "text_string_id": 391434,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Gardening 101, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_bastion_of_the_green_thumbs_aaeee2)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 4,
+          "minigame_id": 158,
+          "count": 1,
+          "text_string_id": 391440,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Barnyard Bonanza, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_bastion_of_the_green_thumbs_aaeee2)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "npc_id": 9500000271,
+          "text_string_id": 391443,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Houston (lab/references/quest-table-20261102/quests.json wiki:fr_quest_bastion_of_the_green_thumbs_aaeee2)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 56769,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Garden Protected (lab/references/quest-table-20261102/quests.json wiki:fr_quest_bastion_of_the_green_thumbs_aaeee2)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56744,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Garden Defender Leggings (lab/references/quest-table-20261102/quests.json wiki:fr_quest_bastion_of_the_green_thumbs_aaeee2)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56743,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Garden Defender Pack (lab/references/quest-table-20261102/quests.json wiki:fr_quest_bastion_of_the_green_thumbs_aaeee2)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The wiki lists items only (lab/references/quest-table-20261102/quests.json wiki:fr_quest_bastion_of_the_green_thumbs_aaeee2)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "lab/references/quest-table-20261102/quests.json wiki:fr_quest_bastion_of_the_green_thumbs_aaeee2"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3170010,
+      "title_string_id": 391447,
+      "intro_text_string_id": 391446,
+      "description_string_id": 391448,
+      "end_text_string_id": 391449,
+      "giver_npc_id": 9500000507,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "interact_actor",
+          "id": 1,
+          "actor_guid": 100000033383,
+          "text_string_id": 391456,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Click on the Easy Bixie Defense table: the table of this name nearest the giver (lab/references/quest-table-20261102/quests.json wiki:fr_quest_protecting_the_honey_vats_15fd91)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "minigame_id": 359,
+          "count": 1,
+          "text_string_id": 391458,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Protect the Hive, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_protecting_the_honey_vats_15fd91)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 3,
+          "minigame_id": 360,
+          "count": 1,
+          "text_string_id": 391460,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Honey, I'm Home, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_protecting_the_honey_vats_15fd91)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 4,
+          "minigame_id": 361,
+          "count": 1,
+          "text_string_id": 391462,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete We've Come for the Honey!, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_protecting_the_honey_vats_15fd91)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "npc_id": 9500000507,
+          "text_string_id": 391464,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Napoleon (lab/references/quest-table-20261102/quests.json wiki:fr_quest_protecting_the_honey_vats_15fd91)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 56760,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Bixies Defended (lab/references/quest-table-20261102/quests.json wiki:fr_quest_protecting_the_honey_vats_15fd91)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56752,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Bixie Defender Gloves (lab/references/quest-table-20261102/quests.json wiki:fr_quest_protecting_the_honey_vats_15fd91)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56754,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Bixie Defender Cap (lab/references/quest-table-20261102/quests.json wiki:fr_quest_protecting_the_honey_vats_15fd91)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The wiki lists items only (lab/references/quest-table-20261102/quests.json wiki:fr_quest_protecting_the_honey_vats_15fd91)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "lab/references/quest-table-20261102/quests.json wiki:fr_quest_protecting_the_honey_vats_15fd91"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3170011,
+      "title_string_id": 391477,
+      "intro_text_string_id": 391476,
+      "description_string_id": 391478,
+      "end_text_string_id": 391479,
+      "giver_npc_id": 9500000507,
+      "prerequisite_quest_ids": [
+        3170010
+      ],
+      "objectives": [
+        {
+          "kind": "interact_actor",
+          "id": 1,
+          "actor_guid": 100000033388,
+          "text_string_id": 391492,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Click on the Medium Bixie Defense table: the table of this name nearest the giver (lab/references/quest-table-20261102/quests.json wiki:fr_quest_honey_safeguard_438697)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "minigame_id": 259,
+          "count": 1,
+          "text_string_id": 391458,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Protect the Hive, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_honey_safeguard_438697)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 3,
+          "minigame_id": 260,
+          "count": 1,
+          "text_string_id": 391460,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Honey, I'm Home, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_honey_safeguard_438697)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 4,
+          "minigame_id": 261,
+          "count": 1,
+          "text_string_id": 391462,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete We've Come for the Honey!, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_honey_safeguard_438697)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "npc_id": 9500000507,
+          "text_string_id": 391464,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Napoleon (lab/references/quest-table-20261102/quests.json wiki:fr_quest_honey_safeguard_438697)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 56764,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Bixies Guarded (lab/references/quest-table-20261102/quests.json wiki:fr_quest_honey_safeguard_438697)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56753,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Bixie Defender Boots (lab/references/quest-table-20261102/quests.json wiki:fr_quest_honey_safeguard_438697)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56751,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Bixie Defender Tunic (lab/references/quest-table-20261102/quests.json wiki:fr_quest_honey_safeguard_438697)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The wiki lists items only (lab/references/quest-table-20261102/quests.json wiki:fr_quest_honey_safeguard_438697)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "lab/references/quest-table-20261102/quests.json wiki:fr_quest_honey_safeguard_438697"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3170012,
+      "title_string_id": 391523,
+      "intro_text_string_id": 391522,
+      "description_string_id": 391524,
+      "end_text_string_id": 391525,
+      "giver_npc_id": 9500000507,
+      "prerequisite_quest_ids": [
+        3170011
+      ],
+      "objectives": [
+        {
+          "kind": "interact_actor",
+          "id": 1,
+          "actor_guid": 100000033379,
+          "text_string_id": 391547,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Click on the Hard Bixie Defense table: the table of this name nearest the giver (lab/references/quest-table-20261102/quests.json wiki:fr_quest_golden_aegis_ba340e)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "minigame_id": 159,
+          "count": 1,
+          "text_string_id": 391458,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Protect the Hive, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_golden_aegis_ba340e)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 3,
+          "minigame_id": 160,
+          "count": 1,
+          "text_string_id": 391460,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Honey, I'm Home, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_golden_aegis_ba340e)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 4,
+          "minigame_id": 161,
+          "count": 1,
+          "text_string_id": 391462,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete We've Come for the Honey!, in the wiki's order (lab/references/quest-table-20261102/quests.json wiki:fr_quest_golden_aegis_ba340e)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "npc_id": 9500000507,
+          "text_string_id": 391464,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Napoleon (lab/references/quest-table-20261102/quests.json wiki:fr_quest_golden_aegis_ba340e)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 56768,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Bixies Protected (lab/references/quest-table-20261102/quests.json wiki:fr_quest_golden_aegis_ba340e)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56750,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Bixie Defender Leggings (lab/references/quest-table-20261102/quests.json wiki:fr_quest_golden_aegis_ba340e)."
+                }
+              ]
+            },
+            {
+              "definition_id": 56749,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Bixie Defender Pack (lab/references/quest-table-20261102/quests.json wiki:fr_quest_golden_aegis_ba340e)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The wiki lists items only (lab/references/quest-table-20261102/quests.json wiki:fr_quest_golden_aegis_ba340e)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "lab/references/quest-table-20261102/quests.json wiki:fr_quest_golden_aegis_ba340e"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3170013,
+      "title_string_id": 384835,
+      "intro_text_string_id": 384841,
+      "description_string_id": 384836,
+      "end_text_string_id": 384844,
+      "giver_npc_id": 9500000273,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "minigame_id": 356,
+          "count": 1,
+          "text_string_id": 384837,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The row the giver's table lists (lab/references/quest-table-20261102/quests.json wiki:fr_quest_defending_the_farm_3b9ef3)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000273,
+          "text_string_id": 384839,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to the giver (lab/references/quest-table-20261102/quests.json wiki:fr_quest_defending_the_farm_3b9ef3)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 17,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "17 coins (lab/references/quest-table-20261102/quests.json wiki:fr_quest_defending_the_farm_3b9ef3)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "lab/references/quest-table-20261102/quests.json wiki:fr_quest_defending_the_farm_3b9ef3"
+        }
+      ],
+      "enabled": true
+    }
+  ]
+}

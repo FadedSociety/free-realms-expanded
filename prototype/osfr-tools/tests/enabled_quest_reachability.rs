@@ -109,6 +109,8 @@ struct Catalogue {
     drawable: BTreeSet<u64>,
     /// Authored NPC ids whose `roles` array carries `quest_giver`.
     giver_role_npcs: BTreeSet<u64>,
+    /// Every drawn actor's runtime guid, content or not.
+    drawn_actors: BTreeSet<u64>,
     /// Shipped id sets the graded objective targets must resolve in.
     targets: Targets,
 }
@@ -121,9 +123,9 @@ impl Catalogue {
         // placed/extra/excluded filters the 35/2 update uses, and `content_key`
         // maps the runtime guid to the content NPC. Re-filtering authored rows
         // here would silently fork a loader rule.
-        let drawable = visibility
-            .teleport_targets(OPEN_WORLD_ZONE)
-            .into_iter()
+        let drawn = visibility.teleport_targets(OPEN_WORLD_ZONE);
+        let drawn_actors = drawn.iter().map(|target| target.guid).collect();
+        let drawable = (drawn.into_iter())
             .filter_map(|target| visibility.content_key(target.guid))
             .collect();
         let giver_role_npcs = read_quest_giver_rows(root);
@@ -140,6 +142,7 @@ impl Catalogue {
             quests,
             by_id,
             drawable,
+            drawn_actors,
             giver_role_npcs,
             targets,
         })
@@ -352,8 +355,12 @@ impl Catalogue {
                 }
                 self.target_violation(violations, owner, goal["npc_id"].as_u64());
             }
+            // The click names the runtime actor, which need not be NPC content (a game table).
             "interact_actor" => {
-                self.target_violation(violations, owner, goal["actor_guid"].as_u64());
+                let actor = goal["actor_guid"].as_u64().unwrap_or(0);
+                if !self.drawn_actors.contains(&actor) {
+                    violations.push(format!("{owner}: actor {actor} is not drawn"));
+                }
             }
             "reach_poi" => {
                 if goal["poi_id"].as_u64().unwrap_or(0) == 0 {

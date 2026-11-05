@@ -1749,7 +1749,7 @@ fn games_window_play_zones_into_a_pirates_arena() {
 }
 
 /// L962: Play on the Easy "Penguin Produce" row (532) offers Tower Defense game 350 with the movie's
-/// preload list; its data goes out once, a cleared map (stages 0-20 reported) wins once and pays once,
+/// preload list; its data goes out once, a cleared map (stages 0-10 reported) wins once and pays once,
 /// and after the close Play on a Hard row (195) offers game 150.
 #[test]
 fn games_window_play_opens_a_tower_defense_map() {
@@ -1791,7 +1791,7 @@ fn games_window_play_opens_a_tower_defense_map() {
     assert!(!said(&twice, "OnMapDataMsg"), "the data goes out once");
 
     let before = coins(&gateway);
-    for stage in 0..=20 {
+    for stage in 0..=10 {
         let text = format!("FRServer_CompletedStage	{stage}");
         send(&mut gateway, &payload(id, &text), 3_000 + stage);
     }

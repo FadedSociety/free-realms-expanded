@@ -38142,7 +38142,7 @@
         "Bixie Defense tables, Sanctuary (128604021)"
       ],
       "quests_given": [],
-      "quest_ids_given": [],
+      "quest_ids_given": [3170010, 3170011, 3170012],
       "quests_given_text": [
         "Medium and Hard Bixie Defense challenge quests (128604021, 1077251242; titles unknown)"
       ],

@@ -891,6 +891,42 @@ fn goal_activate_packet(goal: &Goal) -> Vec<u8> {
     bytes
 }
 
+/// 47/2 and 45/2 (readers `00a8d330`, `009b5740`): a goal's count moved. The panel row and the
+/// offer's record each keep their own copy.
+pub fn goal_progress_packets(goal: u32, count: u32) -> [Vec<u8>; 2] {
+    [FAMILY_UI, FAMILY_OBJECTIVE].map(|family| {
+        let mut bytes = family.to_le_bytes().to_vec();
+        bytes.push(2);
+        bytes.extend(goal.to_le_bytes());
+        bytes.extend(count.to_le_bytes());
+        bytes
+    })
+}
+
+/// 47/3 and 45/3 (`00a8d0a0`, `009b2690`): the goal is met. 45/3's last word adds to the client's
+/// per-category total (`009b6700`); ours is 0 until a goal's value is known (R).
+pub fn goal_done_packets(goal: u32) -> [Vec<u8>; 2] {
+    let mut panel = FAMILY_UI.to_le_bytes().to_vec();
+    panel.push(3);
+    panel.extend(goal.to_le_bytes());
+    let mut record = FAMILY_OBJECTIVE.to_le_bytes().to_vec();
+    record.push(3);
+    for word in [goal, 0, 0] {
+        record.extend(word.to_le_bytes());
+    }
+    [panel, record]
+}
+
+/// 47/4 and 45/4 (`00a8d0e0`, `009b4600`): the goal is broken.
+pub fn goal_failed_packets(goal: u32) -> [Vec<u8>; 2] {
+    [FAMILY_UI, FAMILY_OBJECTIVE].map(|family| {
+        let mut bytes = family.to_le_bytes().to_vec();
+        bytes.push(4);
+        bytes.extend(goal.to_le_bytes());
+        bytes
+    })
+}
+
 /// Server acknowledgement 39/17; client reader `009b9550`.
 fn start_ack_packet(instance_id: i32, game_id: i32) -> Vec<u8> {
     family39_header(17, instance_id, game_id)

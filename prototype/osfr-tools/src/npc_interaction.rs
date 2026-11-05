@@ -93,6 +93,10 @@ pub enum NpcAction {
     Soccer,
     /// (R) Go fishing (W160). Offered only by NPCs named in `fishing_spots.json`.
     Fish,
+    /// (R) Play this Tower Defense game. Offered only by its tables, `tower_defense.json` `tables`.
+    TowerDefense {
+        game: u32,
+    },
     /// (R) Learn a job from its trainer (W176). Offered only by NPCs named in `job_trainers.json`.
     Learn {
         profile: i32,
@@ -184,6 +188,18 @@ pub enum NpcInteractionError {
     CoinShop(io::ErrorKind),
 }
 
+/// A world table: not a person, so it has no row in `npcs/`, only what a click needs.
+#[derive(Clone, Debug, PartialEq)]
+pub struct TableMenu {
+    pub name: String,
+    pub position: [f32; 3],
+    /// A game id and its name id per row.
+    pub games: Vec<(u32, u32)>,
+}
+
+/// The Tower Defense tables by NPC content key.
+pub type TableMenus = BTreeMap<u64, TableMenu>;
+
 pub enum NpcSelection {
     Talk(DialogueContext),
     Quest(QuestOutcome),
@@ -196,6 +212,8 @@ pub enum NpcSelection {
     Soccer,
     /// The caller decides whether the trip may start (`FishingService::enter`).
     Fish,
+    /// The caller offers this game (`Gameplay::begin_tower_defense`).
+    TowerDefense(u32),
     /// The caller decides whether the job is taught (`Profiles::learn`).
     Learn(Trainer),
 }
@@ -206,7 +224,7 @@ struct NpcRegionFile {
     records: Vec<NpcRecord>,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Clone, Default, Deserialize)]
 struct NpcRecord {
     npc_id: u64,
     name: String,
@@ -326,6 +344,7 @@ struct NpcContent {
     /// (R) L932: NPCs whose menu offers a soccer match, and the label's locale id.
     soccer_gates: BTreeSet<u64>,
     soccer_string_id: u32,
+    tower_defense_tables: TableMenus,
     /// (R) NPCs whose menu offers a fishing trip, and the label's locale id (W160).
     fish_gates: BTreeSet<u64>,
     fish_string_id: u32,
@@ -451,6 +470,7 @@ impl NpcInteraction {
                 derby_string_id: 0,
                 soccer_gates: BTreeSet::new(),
                 soccer_string_id: 0,
+                tower_defense_tables: BTreeMap::new(),
                 fish_gates: BTreeSet::new(),
                 fish_string_id: 0,
                 job_trainers: BTreeMap::new(),
@@ -494,6 +514,20 @@ impl NpcInteraction {
         content.soccer_gates = known.into_iter().collect();
         content.soccer_string_id = string_id;
         unknown
+    }
+
+    /// (R) Make each Tower Defense table clickable, its games listed in its menu.
+    pub fn set_tower_defense_tables(&mut self, tables: &TableMenus) {
+        let content = Arc::make_mut(&mut self.content);
+        for (&npc_id, table) in tables {
+            content.npcs.entry(npc_id).or_insert_with(|| NpcRecord {
+                npc_id,
+                name: table.name.clone(),
+                position: Some(table.position),
+                ..NpcRecord::default()
+            });
+        }
+        content.tower_defense_tables.clone_from(tables);
     }
 
     /// (R) List a fishing trip in these NPCs' menus (W160). Returns the ids that are not NPC
@@ -641,6 +675,7 @@ impl NpcInteraction {
             NpcAction::Derby => Ok(NpcSelection::Derby),
             NpcAction::Soccer => Ok(NpcSelection::Soccer),
             NpcAction::Fish => Ok(NpcSelection::Fish),
+            NpcAction::TowerDefense { game } => Ok(NpcSelection::TowerDefense(game)),
             NpcAction::Learn { profile } => {
                 let trainer = self
                     .content
@@ -1034,6 +1069,13 @@ impl NpcInteraction {
         }
         if self.content.fish_gates.contains(&npc.npc_id) {
             options.push((NpcAction::Fish, self.content.fish_string_id));
+        }
+        if let Some(table) = self.content.tower_defense_tables.get(&npc.npc_id) {
+            // (R) A table has nobody to talk to: "click on it and select <game>" (wiki).
+            options.retain(|(action, _)| !matches!(action, NpcAction::Talk));
+            let rows = (table.games.iter())
+                .map(|&(game, name)| (NpcAction::TowerDefense { game }, name));
+            options.extend(rows);
         }
         for trainer in self
             .content

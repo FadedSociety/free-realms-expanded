@@ -23,11 +23,12 @@ use crate::{
     minigame::{
         self, Activity, ActivityFinish, Goal, MinigameRuns, RunMode, RunOutcome, RunSpec, RunState,
     },
+    npc_interaction::{TableMenu, TableMenus},
     rewards::{RewardDisplay, RewardGrant, RewardState},
 };
 use serde::Deserialize;
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, BTreeSet},
     fs,
     io::{self, Read},
     path::Path,
@@ -42,7 +43,7 @@ pub const CONTENT_FILE: &str = "tower_defense.json";
 pub const PRELOAD_FILE: &str = "TowerDefenseAssets.txt";
 /// (R) Run ids of their own, apart from every other minigame's.
 pub const FIRST_INSTANCE_ID: i32 = 150_000_001;
-const MAX_CONTENT: u64 = 64 * 1024;
+const MAX_CONTENT: u64 = 1024 * 1024;
 const MAX_GAMES: usize = 64;
 const MAX_TEXT: usize = 512;
 /// `Game.MAP_*`: the movie's map row has 25 columns (ID to ENEMY_HP_MULTI).
@@ -54,9 +55,11 @@ const MAP_STAGES: usize = 8;
 const TOWER_COLUMNS: usize = 22;
 const ENEMY_COLUMNS: usize = 11;
 const MAX_STAGES: u32 = 999;
+/// A map holds far fewer towers; this only bounds what a scripted client can make us remember.
+const MAX_TOWERS: usize = 1024;
 
 /// `tower_defense.json`: one game per MiniGameData row, plus the tower and enemy rows the games share.
-#[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct TdContent {
     pub schema_version: u32,
@@ -68,10 +71,49 @@ pub struct TdContent {
     /// (R) The least time a stage can take, so a scripted client cannot win in a burst of reports.
     pub min_stage_ms: u32,
     pub games: Vec<TdGameRow>,
+    /// The world's tables and what a click on each lists.
+    #[serde(default)]
+    pub tables: Vec<TdTable>,
     /// TowerData rows (`Game.TOWER_*`): ID, TOWER_ID (the type), RANK, ...
     pub towers: Vec<String>,
     /// EnemyData rows (`Game.ENEMY_*`): ID, SWF_NAME, ...
     pub enemies: Vec<String>,
+}
+
+/// What moves a goal's count.
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum GoalCount {
+    Win,
+    Build,
+    Upgrade,
+    /// Built towers of a type, a limit not to pass.
+    Avoid,
+    Score,
+}
+
+/// How one of a game's `goals` counts.
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct GoalRule {
+    pub goal: u32,
+    pub counts: GoalCount,
+    /// The tower type watched (`TOWER_TOWER_ID`), for `Build`, `Upgrade` and `Avoid`.
+    #[serde(default)]
+    pub tower: i32,
+    /// What meets the goal; for `Avoid`, the most that may be built.
+    pub target: u32,
+}
+
+/// One world table: its NPC content key and the games its menu lists, in order.
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct TdTable {
+    pub npc: u64,
+    pub name: String,
+    /// Where its spawn stands, for the click's range check.
+    pub position: [f32; 3],
+    pub games: Vec<u32>,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
@@ -88,9 +130,12 @@ pub struct TdGameRow {
     pub towers: Vec<i32>,
     /// The map's enemy ids, in wave order.
     pub enemies: Vec<i32>,
-    /// What the offer lists (39/16). Nothing reports progress on them yet.
+    /// What the offer lists (39/16).
     #[serde(default)]
     pub goals: Vec<Goal>,
+    /// How those goals count. Empty, nothing ticks.
+    #[serde(default)]
+    pub progress: Vec<GoalRule>,
 }
 
 impl TdContent {
@@ -125,7 +170,13 @@ impl TdContent {
             else {
                 return Err(invalid("tower defense map lives or stages"));
             };
+            let watched = |rule: &GoalRule| {
+                game.goals.iter().any(|goal| goal.id == rule.goal)
+                    && (matches!(rule.counts, GoalCount::Win | GoalCount::Score)
+                        || game.towers.contains(&rule.tower))
+            };
             if game.game_id <= 0
+                || !game.progress.iter().all(watched)
                 || map[MAP_GAME_ID].parse() != Ok(game.game_id)
                 || !(1..=5).contains(&game.difficulty)
                 || game.towers.is_empty()
@@ -181,6 +232,30 @@ impl TdContent {
         }
         Ok(levels)
     }
+
+    /// Each table's menu, a game id and its name per row; a table with no known game is an error.
+    fn table_menus(&self, levels: &BTreeMap<i32, Level>) -> io::Result<TableMenus> {
+        let mut menus = BTreeMap::new();
+        for table in &self.tables {
+            let games = (table.games.iter())
+                .map(|&game| {
+                    let level = i32::try_from(game).ok().and_then(|id| levels.get(&id))?;
+                    Some((game, u32::try_from(level.row.name_id).ok()?))
+                })
+                .collect::<Option<Vec<_>>>()
+                .filter(|rows| !rows.is_empty())
+                .ok_or_else(|| invalid("a tower defense table lists an unknown game"))?;
+            let menu = TableMenu {
+                name: table.name.clone(),
+                position: table.position,
+                games,
+            };
+            if menus.insert(table.npc, menu).is_some() {
+                return Err(invalid("duplicate tower defense table"));
+            }
+        }
+        Ok(menus)
+    }
 }
 
 /// A row's fields without its trailing `^`: exactly `count` of them, with no tab or NUL to break the text.
@@ -216,6 +291,56 @@ struct Play {
     lives: u32,
     /// The last accepted running total.
     score: f64,
+}
+
+/// What the open game's goals have counted, and which are settled.
+#[derive(Clone, Debug, Default)]
+struct GoalTally {
+    /// Towers built, by tower type.
+    built: BTreeMap<i32, u32>,
+    /// Upgraded towers: tower type, the movie's tower number.
+    upgraded: BTreeSet<(i32, u32)>,
+    /// The last count sent, by goal.
+    sent: BTreeMap<u32, u32>,
+    settled: BTreeSet<u32>,
+}
+
+/// What the reports so far mean for the goals: a new count, then a goal met or broken. The panel
+/// shows a count only for building and upgrading (`F60aMWGo3a0_66.00`). (R) Their order and the
+/// banner per goal are unseen until a native run; a game with no `progress` sends none of this.
+fn goal_ticks(rules: &[GoalRule], tally: &mut GoalTally, score: u32, won: bool) -> Vec<Vec<u8>> {
+    let mut packets = Vec::new();
+    for rule in rules {
+        if tally.settled.contains(&rule.goal) {
+            continue;
+        }
+        let built = tally.built.get(&rule.tower).copied().unwrap_or(0);
+        let upgraded = (tally.upgraded.iter()).filter(|(kind, _)| *kind == rule.tower).count();
+        let count = match rule.counts {
+            GoalCount::Win => u32::from(won),
+            GoalCount::Build | GoalCount::Avoid => built,
+            GoalCount::Upgrade => u32::try_from(upgraded).unwrap_or(u32::MAX),
+            GoalCount::Score => score,
+        };
+        if matches!(rule.counts, GoalCount::Build | GoalCount::Upgrade)
+            && tally.sent.get(&rule.goal).copied().unwrap_or(0) != count
+        {
+            tally.sent.insert(rule.goal, count);
+            packets.extend(minigame::goal_progress_packets(rule.goal, count));
+        }
+        let (met, broken) = match rule.counts {
+            GoalCount::Avoid => (won && count <= rule.target, count > rule.target),
+            _ => (count >= rule.target, false),
+        };
+        if met {
+            tally.settled.insert(rule.goal);
+            packets.extend(minigame::goal_done_packets(rule.goal));
+        } else if broken {
+            tally.settled.insert(rule.goal);
+            packets.extend(minigame::goal_failed_packets(rule.goal));
+        }
+    }
+    packets
 }
 
 struct Finish {
@@ -283,6 +408,10 @@ impl TdOutcome {
 #[derive(Clone)]
 pub struct TowerDefense {
     levels: Arc<BTreeMap<i32, Level>>,
+    tables: Arc<TableMenus>,
+    /// Tower row id (`TOWER_ID`) to its type, for the movie's tower reports.
+    tower_kinds: Arc<BTreeMap<u32, i32>>,
+    tally: GoalTally,
     win_coins: u32,
     min_stage_ms: u32,
     runs: MinigameRuns,
@@ -290,9 +419,24 @@ pub struct TowerDefense {
 }
 
 impl TowerDefense {
+    /// What a click on each world table lists.
+    pub fn tables(&self) -> &TableMenus {
+        &self.tables
+    }
+
     pub fn new(content: &TdContent) -> io::Result<Self> {
+        let levels = content.levels()?;
+        let tower_kinds = (content.towers.iter())
+            .filter_map(|row| {
+                let mut fields = row.split('^');
+                Some((fields.next()?.parse().ok()?, fields.next()?.parse().ok()?))
+            })
+            .collect();
         Ok(Self {
-            levels: Arc::new(content.levels()?),
+            tower_kinds: Arc::new(tower_kinds),
+            tally: GoalTally::default(),
+            tables: Arc::new(content.table_menus(&levels)?),
+            levels: Arc::new(levels),
             win_coins: content.win_coins,
             min_stage_ms: content.min_stage_ms,
             runs: MinigameRuns::new(FIRST_INSTANCE_ID)?,
@@ -339,6 +483,7 @@ impl TowerDefense {
         if !offered.accepted {
             return Ok(None);
         }
+        self.tally = GoalTally::default();
         self.play = Some(Play {
             game_id,
             started_ms: 0,
@@ -406,7 +551,8 @@ impl TowerDefense {
         {
             return Err(invalid("tower defense text for another game"));
         }
-        let level = &self.levels[&play.game_id];
+        let levels = Arc::clone(&self.levels);
+        let level = &levels[&play.game_id];
         let (lives, stages) = (level.lives, level.stages);
         let fields: Vec<&str> = text.split('\t').collect();
         // Connect, pause and close reports are harmless at any time.
@@ -448,7 +594,7 @@ impl TowerDefense {
         };
         let floor_ms = u64::from(stages) * u64::from(self.min_stage_ms);
         let number = |text: &str| text.parse::<u32>().ok();
-        let out = match fields.as_slice() {
+        let mut out = match fields.as_slice() {
             ["FRServer_ReadyForGameData"] => TdOutcome::refused("the game's data was already sent"),
             ["FRServer_CompletedStage", stage] => match (number(stage), play.stage) {
                 (Some(0), None) => {
@@ -477,11 +623,24 @@ impl TowerDefense {
                 }
                 Err(reason) => TdOutcome::refused(reason),
             },
+            ["FRServer_TowerBuilt", _, row] => {
+                if let Some(kind) = number(row).and_then(|row| self.tower_kinds.get(&row)) {
+                    *self.tally.built.entry(*kind).or_default() += 1;
+                }
+                TdOutcome::ack()
+            }
+            ["FRServer_TowerUpgraded", tower, row, _] => {
+                let kind = number(row).and_then(|row| self.tower_kinds.get(&row));
+                if let (Some(kind), Some(tower)) = (kind, number(tower))
+                    && self.tally.upgraded.len() < MAX_TOWERS
+                {
+                    self.tally.upgraded.insert((*kind, tower));
+                }
+                TdOutcome::ack()
+            }
             // The movie keeps its money, towers and kills; these only tell the server what it did.
             ["FRServer_ScoreIncrement", _]
             | ["FRServer_EnemyDied", _]
-            | ["FRServer_TowerBuilt", _, _]
-            | ["FRServer_TowerUpgraded", _, _, _]
             | ["FRServer_TowerSold", _]
             | ["FRServer_MoneySpent", _]
             | ["FRServer_MoneyEarned", _]
@@ -496,7 +655,13 @@ impl TowerDefense {
                     }
                 });
                 match verdict {
-                    Ok(total) => self.settle(instance, &play, true, total, now_ms, payer)?,
+                    Ok(total) => {
+                        // Bounded by `checked_total`; `as` floors a finite total.
+                        let ticks = goal_ticks(&level.row.progress, &mut self.tally, total as u32, true);
+                        let mut won = self.settle(instance, &play, true, total, now_ms, payer)?;
+                        won.replies.splice(0..0, ticks);
+                        won
+                    }
                     Err(reason) => TdOutcome {
                         refused: Some(reason),
                         ..self.settle(instance, &play, false, play.score, now_ms, None)?
@@ -511,6 +676,8 @@ impl TowerDefense {
         };
         if out.accepted {
             self.play = Some(play);
+            let ticks = goal_ticks(&level.row.progress, &mut self.tally, play.score as u32, false);
+            out.replies.extend(ticks);
         }
         Ok(out)
     }
@@ -588,6 +755,61 @@ mod tests {
     use super::*;
     use std::path::PathBuf;
 
+    /// The goal packets a report sent, as (family, sub, goal, count) with 0 where none is carried.
+    fn ticks(out: &TdOutcome) -> Vec<(u16, u8, u32, u32)> {
+        (out.replies.iter())
+            .filter(|p| p.starts_with(&[47, 0]) || p.starts_with(&[45, 0]))
+            .map(|p| {
+                let word = |at: usize| (p.get(at..at + 4)).map_or(0, |w| u32::from_le_bytes(w.try_into().unwrap()));
+                (u16::from(p[0]), p[2], word(3), if p[2] == 2 { word(7) } else { 0 })
+            })
+            .collect()
+    }
+
+    /// Crop Dusting - Hard: upgrade 4 Garden, upgrade 4 Dwarf, no more than 2 Water Guns, 930,000.
+    #[test]
+    fn tower_reports_tick_the_games_goals() {
+        let mut td = TowerDefense::new(&content()).unwrap();
+        let instance = start(&mut td, 156);
+        let upgrade = |td: &mut TowerDefense, tower: u32| {
+            let text = format!("FRServer_TowerUpgraded\t{tower}\t121\t1");
+            say(td, instance, &text, 3_000)
+        };
+        // A Garden Tower built moves nothing: this goal counts upgrades.
+        assert!(ticks(&say(&mut td, instance, "FRServer_TowerBuilt\t1\t30", 3_000)).is_empty());
+        assert_eq!(ticks(&upgrade(&mut td, 9)), [(47, 2, 3, 1), (45, 2, 3, 1)]);
+        assert!(ticks(&upgrade(&mut td, 9)).is_empty(), "the same tower again");
+        for tower in [10, 11] {
+            upgrade(&mut td, tower);
+        }
+        let met = ticks(&upgrade(&mut td, 12));
+        assert_eq!(met, [(47, 2, 3, 4), (45, 2, 3, 4), (47, 3, 3, 0), (45, 3, 3, 0)]);
+        assert!(ticks(&upgrade(&mut td, 13)).is_empty(), "a met goal is closed");
+        // Two Water Guns are allowed; the third breaks the goal, once.
+        for tower in [20, 21] {
+            let text = format!("FRServer_TowerBuilt\t{tower}\t70");
+            assert!(ticks(&say(&mut td, instance, &text, 3_000)).is_empty());
+        }
+        let broken = say(&mut td, instance, "FRServer_TowerBuilt\t22\t70", 3_000);
+        assert_eq!(ticks(&broken), [(47, 4, 4, 0), (45, 4, 4, 0)]);
+        let score = say(&mut td, instance, "FRServer_ScoreSet\t930000", 3_000);
+        assert_eq!(ticks(&score), [(47, 3, 5, 0), (45, 3, 5, 0)]);
+        // A row no game has counts for nothing.
+        assert!(ticks(&say(&mut td, instance, "FRServer_TowerBuilt\t23\t9999", 3_000)).is_empty());
+    }
+
+    /// A win meets the Primary and an unbroken "don't build", ahead of the result.
+    #[test]
+    fn a_win_settles_the_goals_before_the_result() {
+        let mut td = TowerDefense::new(&content()).unwrap();
+        let instance = start(&mut td, 256);
+        clear_stages(&mut td, instance, 25);
+        let won = say(&mut td, instance, "FRServer_GameWon\t4321", 60_000);
+        assert_eq!(ticks(&won), [(47, 3, 1, 0), (45, 3, 1, 0), (47, 3, 4, 0), (45, 3, 4, 0)]);
+        assert!(won.replies[0].starts_with(&[47, 0, 3]));
+        assert!(result(&won).is_some());
+    }
+
     fn content() -> TdContent {
         TdContent::load(&PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content")).unwrap()
     }
@@ -663,7 +885,7 @@ mod tests {
         let expected: Vec<i32> = (150..=161).chain(250..=261).chain(350..=361).collect();
         assert_eq!(ids, expected);
         let level = &td.levels[&150];
-        assert_eq!((level.lives, level.stages), (10, 40));
+        assert_eq!((level.lives, level.stages), (15, 50));
         assert_eq!(level.texts[0], "OnGameDataMsg\t150");
         assert!(level.texts[1].starts_with("OnMapDataMsg\t150^150^1^1^1^"));
         assert!(
@@ -872,6 +1094,15 @@ mod tests {
         let mut cases = Vec::new();
         let mut c = good.clone();
         c.games[0].goals[0].category = 6;
+        cases.push(c);
+        let mut c = good.clone();
+        c.tables[0].games.push(999);
+        cases.push(c);
+        let mut c = good.clone();
+        c.tables[0].games.clear();
+        cases.push(c);
+        let mut c = good.clone();
+        c.tables.push(c.tables[0].clone());
         cases.push(c);
         let mut c = good.clone();
         c.games[0].map = c.games[0].map.trim_end_matches('^').to_owned();

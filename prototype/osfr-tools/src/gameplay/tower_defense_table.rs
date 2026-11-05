@@ -11,6 +11,21 @@ pub(super) fn load_tower_defense(content: &Path) -> io::Result<Option<Box<TowerD
     TowerDefense::new(&TdContent::load(content)?).map(|td| Some(Box::new(td)))
 }
 
+/// Makes the world's tables clickable: each answers as NPC content under its own guid.
+pub(super) fn bind_tables(
+    td: &Option<Box<TowerDefense>>,
+    interaction: &mut Option<NpcInteraction>,
+    visibility: &mut Option<crate::world::NpcVisibility>,
+) {
+    let Some(td) = td else { return };
+    if let Some(interaction) = interaction {
+        interaction.set_tower_defense_tables(td.tables());
+    }
+    if let Some(visibility) = visibility {
+        visibility.bind_content_keys(td.tables().keys().copied());
+    }
+}
+
 impl Gameplay {
     /// Play on a Tower Defense row: the 39/16 offer, or one refusal line.
     pub(super) fn begin_tower_defense(&mut self, id: u32) -> io::Result<Outcome> {

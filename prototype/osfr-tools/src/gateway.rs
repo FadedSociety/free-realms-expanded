@@ -557,6 +557,8 @@ fn application_handler(body: &[u8]) -> &'static str {
         // L962: a movie's 39/14 report (a stage, a score) often needs no reply; without a name the
         // staged gameplay was dropped as unknown, losing the engine's state for that report.
         (Some(39), _) if body.get(2) == Some(&14) => "minigame_movie",
+        // How to Play closing (reader `009bea10`). "Show again?" has nothing to save yet.
+        (Some(39), _) if matches!(body.get(2), Some(25 | 26)) => "minigame_tutorial",
         // L963: Pirate's Plunder's family; its report word (sub 3) often needs no reply, so a
         // silent one must keep the staged match, as for the 39/14 movie reports.
         (Some(94), _) => "ship_combat",
@@ -2017,6 +2019,8 @@ mod radial_routing {
         assert_eq!(application_handler(&[53, 0, 24, 2, 0, 0, 0]), "pets");
         assert_eq!(application_handler(&[39, 0, 37, 1, 0, 0, 0]), "card_game");
         assert_eq!(application_handler(&[39, 0, 14, 1, 0, 0, 0]), "minigame_movie");
+        assert_eq!(application_handler(&[39, 0, 25, 1, 0, 0, 0]), "minigame_tutorial");
+        assert_eq!(application_handler(&[39, 0, 26, 1, 0, 0, 0]), "minigame_tutorial");
         assert_eq!(application_handler(&[94, 0, 3, 0, 1, 0, 0, 0]), "ship_combat");
         assert_eq!(
             application_handler(&[53, 0, 19, 1, 0, 0, 0, 0, 0, 0, 0]),

@@ -27131,7 +27131,7 @@
         "Bristlewood (wiki)."
       ],
       "quests_given": [],
-      "quest_ids_given": [],
+      "quest_ids_given": [3170004, 3170005, 3170006],
       "quests_given_text": [
         "The three Briarwood Defense games: \"Complete each Easy/Medium/Hard Briarwood Defense game for General Spattonug in Briarwood\" (client 2344760986, 2877740620, 1635910719; titles 2707697741, 831642615, 2270528556)."
       ],

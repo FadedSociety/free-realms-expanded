@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source": "L962 (R): Sanctuary's authored tower defense tables (BubbaJoeX fork, AGPL-3.0, src/Resources/Minigames/TowerDefense), resolved per game by lab/tools/td_content.py; names, descriptions, icons and difficulty from the client's MiniGameData.txt (TYPE 14). The live tables never shipped. Goals (R): no capture holds a live offer, so each game's goals are the fanbyte wiki's Primary, Secondary, Bonus and Elite lines matched to client text ids (the unprefixed name; the shared description of its category), the same at every difficulty; a line with no client text is left out.",
+  "source": "L962 (R): Sanctuary's authored tower defense tables (BubbaJoeX fork, AGPL-3.0, src/Resources/Minigames/TowerDefense), resolved per game by lab/tools/td_content.py; names, descriptions, icons and difficulty from the client's MiniGameData.txt (TYPE 14). The live tables never shipped. Money, lives, stages and goals follow the wiki game pages and video frames; goal text ids are the client locale's.",
   "win_coins": 10,
   "min_stage_ms": 1000,
   "games": [
@@ -10,7 +10,7 @@
       "description_id": 46016,
       "icon_id": 920,
       "difficulty": 5,
-      "map": "150^150^1^1^1^1^25^10^40^35^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.8^",
+      "map": "150^150^1^1^1^1^30^15^50^50^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.8^",
       "towers": [
         8,
         0,
@@ -31,24 +31,64 @@
         },
         {
           "id": 2,
-          "name_id": 94820,
+          "name_id": 94843,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 4
         },
         {
           "id": 3,
-          "name_id": 94817,
+          "name_id": 94844,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 4
         },
         {
           "id": 4,
-          "name_id": 94818,
+          "name_id": 94845,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
+          "name_id": 94846,
           "description_id": 78617,
           "category": 5,
           "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "upgrade",
+          "tower": 8,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 7,
+          "target": 4
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 17,
+          "target": 2
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 905000
         }
       ]
     },
@@ -58,7 +98,7 @@
       "description_id": 46016,
       "icon_id": 920,
       "difficulty": 5,
-      "map": "151^151^1^1^2^1^25^10^40^35^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.88^",
+      "map": "151^151^1^1^2^1^30^15^50^50^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.88^",
       "towers": [
         8,
         0,
@@ -80,24 +120,64 @@
         },
         {
           "id": 2,
-          "name_id": 94820,
+          "name_id": 94843,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 4
         },
         {
           "id": 3,
-          "name_id": 94829,
+          "name_id": 94844,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 4
         },
         {
           "id": 4,
-          "name_id": 94822,
+          "name_id": 94845,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
+          "name_id": 94851,
           "description_id": 78617,
           "category": 5,
           "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "upgrade",
+          "tower": 8,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 7,
+          "target": 4
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 17,
+          "target": 2
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 842000
         }
       ]
     },
@@ -107,7 +187,7 @@
       "description_id": 46016,
       "icon_id": 920,
       "difficulty": 5,
-      "map": "152^152^1^1^3^1^25^10^40^35^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.96^",
+      "map": "152^152^1^1^3^1^30^15^50^50^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.96^",
       "towers": [
         8,
         0,
@@ -130,24 +210,64 @@
         },
         {
           "id": 2,
-          "name_id": 94820,
+          "name_id": 94843,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 4
         },
         {
           "id": 3,
-          "name_id": 94817,
+          "name_id": 94844,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 4
         },
         {
           "id": 4,
-          "name_id": 94826,
+          "name_id": 94845,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
+          "name_id": 94856,
           "description_id": 78617,
           "category": 5,
           "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "upgrade",
+          "tower": 8,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 7,
+          "target": 4
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 17,
+          "target": 2
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 1110000
         }
       ]
     },
@@ -157,7 +277,7 @@
       "description_id": 46019,
       "icon_id": 921,
       "difficulty": 5,
-      "map": "153^153^1^2^1^1^25^10^40^35^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.8^",
+      "map": "153^153^1^2^1^1^30^15^50^35^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.8^",
       "towers": [
         5,
         4,
@@ -178,17 +298,64 @@
         },
         {
           "id": 2,
-          "name_id": 94858,
+          "name_id": 94885,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 4
         },
         {
           "id": 3,
-          "name_id": 94859,
+          "name_id": 94886,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 4
+        },
+        {
+          "id": 4,
+          "name_id": 94887,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
+          "name_id": 94888,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "upgrade",
+          "tower": 5,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 1,
+          "target": 4
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 18,
+          "target": 1
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 922000
         }
       ]
     },
@@ -198,7 +365,7 @@
       "description_id": 46019,
       "icon_id": 921,
       "difficulty": 5,
-      "map": "154^154^1^2^2^1^25^10^40^35^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.88^",
+      "map": "154^154^1^2^2^1^30^15^50^35^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.88^",
       "towers": [
         5,
         4,
@@ -220,17 +387,64 @@
         },
         {
           "id": 2,
-          "name_id": 94870,
+          "name_id": 94885,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 4
         },
         {
           "id": 3,
-          "name_id": 94871,
+          "name_id": 94886,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 4
+        },
+        {
+          "id": 4,
+          "name_id": 94887,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
+          "name_id": 94893,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "upgrade",
+          "tower": 5,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 1,
+          "target": 4
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 18,
+          "target": 1
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 998000
         }
       ]
     },
@@ -240,7 +454,7 @@
       "description_id": 46019,
       "icon_id": 921,
       "difficulty": 5,
-      "map": "155^155^1^2^3^1^25^10^40^35^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.96^",
+      "map": "155^155^1^2^3^1^30^15^50^35^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.96^",
       "towers": [
         5,
         4,
@@ -263,24 +477,64 @@
         },
         {
           "id": 2,
-          "name_id": 94858,
+          "name_id": 94885,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 4
         },
         {
           "id": 3,
-          "name_id": 94859,
+          "name_id": 94886,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 4
         },
         {
           "id": 4,
-          "name_id": 94841,
+          "name_id": 94887,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
+          "name_id": 94898,
           "description_id": 78617,
           "category": 5,
           "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "upgrade",
+          "tower": 5,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 1,
+          "target": 4
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 18,
+          "target": 1
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 1010000
         }
       ]
     },
@@ -290,7 +544,7 @@
       "description_id": 46022,
       "icon_id": 919,
       "difficulty": 5,
-      "map": "156^156^1^3^1^1^25^10^40^35^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.8^",
+      "map": "156^156^1^3^1^1^30^15^50^30^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.8^",
       "towers": [
         2,
         6,
@@ -310,11 +564,65 @@
           "category": 1
         },
         {
+          "id": 2,
+          "name_id": 94927,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false,
+          "total": 4
+        },
+        {
           "id": 3,
-          "name_id": 94901,
+          "name_id": 94928,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 4
+        },
+        {
+          "id": 4,
+          "name_id": 94929,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
+          "name_id": 94930,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "upgrade",
+          "tower": 2,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 11,
+          "target": 4
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 6,
+          "target": 2
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 930000
         }
       ]
     },
@@ -324,7 +632,7 @@
       "description_id": 46022,
       "icon_id": 919,
       "difficulty": 5,
-      "map": "157^157^1^3^2^1^25^10^40^35^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.88^",
+      "map": "157^157^1^3^2^1^30^15^50^30^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.88^",
       "towers": [
         2,
         6,
@@ -346,24 +654,64 @@
         },
         {
           "id": 2,
-          "name_id": 94912,
+          "name_id": 94927,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 4
         },
         {
           "id": 3,
-          "name_id": 94913,
+          "name_id": 94928,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 4
         },
         {
           "id": 4,
-          "name_id": 94957,
+          "name_id": 94929,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
+          "name_id": 94935,
           "description_id": 78617,
           "category": 5,
           "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "upgrade",
+          "tower": 2,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 11,
+          "target": 4
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 6,
+          "target": 2
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 820000
         }
       ]
     },
@@ -373,7 +721,7 @@
       "description_id": 46022,
       "icon_id": 919,
       "difficulty": 5,
-      "map": "158^158^1^3^3^1^25^10^40^35^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.96^",
+      "map": "158^158^1^3^3^1^30^15^50^30^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.96^",
       "towers": [
         2,
         6,
@@ -396,24 +744,64 @@
         },
         {
           "id": 2,
-          "name_id": 94912,
+          "name_id": 94927,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 4
         },
         {
           "id": 3,
-          "name_id": 94914,
-          "description_id": 94914,
+          "name_id": 94928,
+          "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 4
         },
         {
           "id": 4,
-          "name_id": 94925,
+          "name_id": 94929,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
+          "name_id": 94940,
           "description_id": 78617,
           "category": 5,
           "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "upgrade",
+          "tower": 2,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 11,
+          "target": 4
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 6,
+          "target": 2
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 868000
         }
       ]
     },
@@ -423,7 +811,7 @@
       "description_id": 46025,
       "icon_id": 918,
       "difficulty": 5,
-      "map": "159^159^1^4^1^3^25^10^40^35^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.8^",
+      "map": "159^159^1^4^1^3^30^15^50^35^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.8^",
       "towers": [
         3,
         9,
@@ -444,24 +832,64 @@
         },
         {
           "id": 2,
-          "name_id": 94954,
+          "name_id": 94969,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 4
         },
         {
           "id": 3,
-          "name_id": 94956,
-          "description_id": 94956,
+          "name_id": 94970,
+          "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 4
         },
         {
           "id": 4,
-          "name_id": 94957,
+          "name_id": 94971,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
+          "name_id": 94972,
           "description_id": 78617,
           "category": 5,
           "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "upgrade",
+          "tower": 3,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 16,
+          "target": 4
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 9,
+          "target": 2
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 918000
         }
       ]
     },
@@ -471,7 +899,7 @@
       "description_id": 46025,
       "icon_id": 918,
       "difficulty": 5,
-      "map": "160^160^1^4^2^3^25^10^40^35^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.88^",
+      "map": "160^160^1^4^2^3^30^15^50^35^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.88^",
       "towers": [
         3,
         9,
@@ -490,6 +918,67 @@
           "name_id": 94815,
           "description_id": 78609,
           "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94969,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false,
+          "total": 4
+        },
+        {
+          "id": 3,
+          "name_id": 94970,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true,
+          "total": 4
+        },
+        {
+          "id": 4,
+          "name_id": 94971,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
+          "name_id": 94977,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "upgrade",
+          "tower": 3,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 16,
+          "target": 4
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 9,
+          "target": 2
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 752000
         }
       ]
     },
@@ -499,7 +988,7 @@
       "description_id": 46025,
       "icon_id": 918,
       "difficulty": 5,
-      "map": "161^161^1^4^3^3^25^10^40^35^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.96^",
+      "map": "161^161^1^4^3^3^30^15^50^35^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.96^",
       "towers": [
         3,
         9,
@@ -521,24 +1010,64 @@
         },
         {
           "id": 2,
-          "name_id": 94942,
+          "name_id": 94969,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 4
         },
         {
           "id": 3,
-          "name_id": 94943,
+          "name_id": 94970,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 4
         },
         {
           "id": 4,
-          "name_id": 94952,
+          "name_id": 94971,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
+          "name_id": 94982,
           "description_id": 78617,
           "category": 5,
           "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "upgrade",
+          "tower": 3,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 16,
+          "target": 4
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 9,
+          "target": 2
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 1000000
         }
       ]
     },
@@ -548,7 +1077,7 @@
       "description_id": 46016,
       "icon_id": 920,
       "difficulty": 3,
-      "map": "250^250^1^1^1^1^30^15^30^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.65^",
+      "map": "250^250^1^1^1^1^30^15^25^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.65^",
       "towers": [
         8,
         0,
@@ -572,21 +1101,61 @@
           "name_id": 94820,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 4
         },
         {
           "id": 3,
-          "name_id": 94817,
+          "name_id": 94829,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 3
         },
         {
           "id": 4,
-          "name_id": 94818,
+          "name_id": 94830,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
+          "name_id": 94831,
           "description_id": 78617,
           "category": 5,
           "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 8,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 17,
+          "target": 3
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 0,
+          "target": 2
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 375000
         }
       ]
     },
@@ -596,7 +1165,7 @@
       "description_id": 46016,
       "icon_id": 920,
       "difficulty": 3,
-      "map": "251^251^1^1^2^1^30^15^30^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.715^",
+      "map": "251^251^1^1^2^1^30^15^25^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.715^",
       "towers": [
         8,
         0,
@@ -621,21 +1190,61 @@
           "name_id": 94820,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 4
         },
         {
           "id": 3,
           "name_id": 94829,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 3
         },
         {
           "id": 4,
-          "name_id": 94822,
+          "name_id": 94830,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
+          "name_id": 94836,
           "description_id": 78617,
           "category": 5,
           "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 8,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 17,
+          "target": 3
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 0,
+          "target": 2
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 310000
         }
       ]
     },
@@ -645,7 +1254,7 @@
       "description_id": 46016,
       "icon_id": 920,
       "difficulty": 3,
-      "map": "252^252^1^1^3^1^30^15^30^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.78^",
+      "map": "252^252^1^1^3^1^30^15^25^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.78^",
       "towers": [
         8,
         0,
@@ -671,21 +1280,61 @@
           "name_id": 94820,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 4
         },
         {
           "id": 3,
-          "name_id": 94817,
+          "name_id": 94829,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 3
         },
         {
           "id": 4,
-          "name_id": 94826,
+          "name_id": 94830,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
+          "name_id": 94841,
           "description_id": 78617,
           "category": 5,
           "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 8,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 17,
+          "target": 3
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 0,
+          "target": 2
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 315000
         }
       ]
     },
@@ -695,7 +1344,7 @@
       "description_id": 46019,
       "icon_id": 921,
       "difficulty": 3,
-      "map": "253^253^1^2^1^1^30^15^30^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.65^",
+      "map": "253^253^1^2^1^1^30^15^25^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.65^",
       "towers": [
         5,
         4,
@@ -716,17 +1365,64 @@
         },
         {
           "id": 2,
-          "name_id": 94858,
+          "name_id": 94870,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 4
         },
         {
           "id": 3,
-          "name_id": 94859,
+          "name_id": 94871,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 3
+        },
+        {
+          "id": 4,
+          "name_id": 94872,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
+          "name_id": 94873,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 5,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 4,
+          "target": 3
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 1,
+          "target": 2
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 275000
         }
       ]
     },
@@ -736,7 +1432,7 @@
       "description_id": 46019,
       "icon_id": 921,
       "difficulty": 3,
-      "map": "254^254^1^2^2^1^30^15^30^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.715^",
+      "map": "254^254^1^2^2^1^30^15^25^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.715^",
       "towers": [
         5,
         4,
@@ -761,14 +1457,61 @@
           "name_id": 94870,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 4
         },
         {
           "id": 3,
           "name_id": 94871,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 3
+        },
+        {
+          "id": 4,
+          "name_id": 94872,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
+          "name_id": 94878,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 5,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 4,
+          "target": 3
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 1,
+          "target": 2
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 240000
         }
       ]
     },
@@ -778,7 +1521,7 @@
       "description_id": 46019,
       "icon_id": 921,
       "difficulty": 3,
-      "map": "255^255^1^2^3^1^30^15^30^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.78^",
+      "map": "255^255^1^2^3^1^30^15^25^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.78^",
       "towers": [
         5,
         4,
@@ -801,24 +1544,64 @@
         },
         {
           "id": 2,
-          "name_id": 94858,
+          "name_id": 94870,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 4
         },
         {
           "id": 3,
-          "name_id": 94859,
+          "name_id": 94871,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 3
         },
         {
           "id": 4,
+          "name_id": 94872,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
           "name_id": 94841,
           "description_id": 78617,
           "category": 5,
           "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 5,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 4,
+          "target": 3
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 1,
+          "target": 2
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 315000
         }
       ]
     },
@@ -828,7 +1611,7 @@
       "description_id": 46022,
       "icon_id": 919,
       "difficulty": 3,
-      "map": "256^256^1^3^1^1^30^15^30^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.65^",
+      "map": "256^256^1^3^1^1^30^15^25^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.65^",
       "towers": [
         2,
         6,
@@ -848,11 +1631,65 @@
           "category": 1
         },
         {
+          "id": 2,
+          "name_id": 94912,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false,
+          "total": 4
+        },
+        {
           "id": 3,
-          "name_id": 94901,
+          "name_id": 94913,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 3
+        },
+        {
+          "id": 4,
+          "name_id": 94914,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
+          "name_id": 94915,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 2,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 19,
+          "target": 3
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 11,
+          "target": 2
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 270000
         }
       ]
     },
@@ -862,7 +1699,7 @@
       "description_id": 46022,
       "icon_id": 919,
       "difficulty": 3,
-      "map": "257^257^1^3^2^1^30^15^30^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.715^",
+      "map": "257^257^1^3^2^1^30^15^25^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.715^",
       "towers": [
         2,
         6,
@@ -887,21 +1724,61 @@
           "name_id": 94912,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 4
         },
         {
           "id": 3,
           "name_id": 94913,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 3
         },
         {
           "id": 4,
-          "name_id": 94957,
+          "name_id": 94914,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
+          "name_id": 94920,
           "description_id": 78617,
           "category": 5,
           "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 2,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 19,
+          "target": 3
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 11,
+          "target": 2
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 250000
         }
       ]
     },
@@ -911,7 +1788,7 @@
       "description_id": 46022,
       "icon_id": 919,
       "difficulty": 3,
-      "map": "258^258^1^3^3^1^30^15^30^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.78^",
+      "map": "258^258^1^3^3^1^30^15^25^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.78^",
       "towers": [
         2,
         6,
@@ -937,21 +1814,61 @@
           "name_id": 94912,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 4
         },
         {
           "id": 3,
-          "name_id": 94914,
-          "description_id": 94914,
+          "name_id": 94913,
+          "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 3
         },
         {
           "id": 4,
+          "name_id": 94914,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
           "name_id": 94925,
           "description_id": 78617,
           "category": 5,
           "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 2,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 19,
+          "target": 3
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 11,
+          "target": 2
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 258000
         }
       ]
     },
@@ -961,7 +1878,7 @@
       "description_id": 46025,
       "icon_id": 918,
       "difficulty": 3,
-      "map": "259^259^1^4^1^3^30^15^30^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.65^",
+      "map": "259^259^1^4^1^3^30^15^25^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.65^",
       "towers": [
         3,
         9,
@@ -985,21 +1902,61 @@
           "name_id": 94954,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 4
         },
         {
           "id": 3,
-          "name_id": 94956,
-          "description_id": 94956,
+          "name_id": 94955,
+          "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 3
         },
         {
           "id": 4,
+          "name_id": 94956,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
           "name_id": 94957,
           "description_id": 78617,
           "category": 5,
           "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 3,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 9,
+          "target": 3
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 10,
+          "target": 2
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 260000
         }
       ]
     },
@@ -1009,35 +1966,7 @@
       "description_id": 46025,
       "icon_id": 918,
       "difficulty": 3,
-      "map": "260^260^1^4^2^3^30^15^30^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.715^",
-      "towers": [
-        3,
-        9,
-        10,
-        16
-      ],
-      "enemies": [
-        18,
-        19,
-        20,
-        21
-      ],
-      "goals": [
-        {
-          "id": 1,
-          "name_id": 94815,
-          "description_id": 78609,
-          "category": 1
-        }
-      ]
-    },
-    {
-      "game_id": 261,
-      "name_id": 388931,
-      "description_id": 46025,
-      "icon_id": 918,
-      "difficulty": 3,
-      "map": "261^261^1^4^3^3^30^15^30^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.78^",
+      "map": "260^260^1^4^2^3^30^15^25^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.715^",
       "towers": [
         3,
         9,
@@ -1059,24 +1988,153 @@
         },
         {
           "id": 2,
-          "name_id": 94942,
+          "name_id": 94954,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 4
         },
         {
           "id": 3,
-          "name_id": 94943,
+          "name_id": 94955,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 3
         },
         {
           "id": 4,
-          "name_id": 94952,
+          "name_id": 94956,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
+          "name_id": 94962,
           "description_id": 78617,
           "category": 5,
           "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 3,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 9,
+          "target": 3
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 10,
+          "target": 2
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 267000
+        }
+      ]
+    },
+    {
+      "game_id": 261,
+      "name_id": 388931,
+      "description_id": 46025,
+      "icon_id": 918,
+      "difficulty": 3,
+      "map": "261^261^1^4^3^3^30^15^25^40^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.78^",
+      "towers": [
+        3,
+        9,
+        10,
+        16
+      ],
+      "enemies": [
+        18,
+        19,
+        20,
+        21
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94954,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false,
+          "total": 4
+        },
+        {
+          "id": 3,
+          "name_id": 94955,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true,
+          "total": 3
+        },
+        {
+          "id": 4,
+          "name_id": 94956,
+          "description_id": 78073,
+          "category": 4,
+          "bonus": true,
+          "failure_condition": true
+        },
+        {
+          "id": 5,
+          "name_id": 94967,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 3,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 9,
+          "target": 3
+        },
+        {
+          "goal": 4,
+          "counts": "avoid",
+          "tower": 10,
+          "target": 2
+        },
+        {
+          "goal": 5,
+          "counts": "score",
+          "target": 264000
         }
       ]
     },
@@ -1086,7 +2144,7 @@
       "description_id": 46016,
       "icon_id": 920,
       "difficulty": 1,
-      "map": "350^350^1^1^1^1^40^20^20^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.5^",
+      "map": "350^350^1^1^1^1^40^15^10^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.5^",
       "towers": [
         8,
         0,
@@ -1110,14 +2168,16 @@
           "name_id": 94820,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 4
         },
         {
           "id": 3,
           "name_id": 94817,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 1
         },
         {
           "id": 4,
@@ -1125,6 +2185,30 @@
           "description_id": 78617,
           "category": 5,
           "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 8,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 8,
+          "target": 1
+        },
+        {
+          "goal": 4,
+          "counts": "score",
+          "target": 178000
         }
       ]
     },
@@ -1134,7 +2218,7 @@
       "description_id": 46016,
       "icon_id": 920,
       "difficulty": 1,
-      "map": "351^351^1^1^2^1^40^20^20^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.55^",
+      "map": "351^351^1^1^2^1^40^15^10^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.55^",
       "towers": [
         8,
         0,
@@ -1159,14 +2243,16 @@
           "name_id": 94820,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 4
         },
         {
           "id": 3,
-          "name_id": 94829,
+          "name_id": 94817,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 1
         },
         {
           "id": 4,
@@ -1174,6 +2260,30 @@
           "description_id": 78617,
           "category": 5,
           "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 8,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 8,
+          "target": 1
+        },
+        {
+          "goal": 4,
+          "counts": "score",
+          "target": 160000
         }
       ]
     },
@@ -1183,7 +2293,7 @@
       "description_id": 46016,
       "icon_id": 920,
       "difficulty": 1,
-      "map": "352^352^1^1^3^1^40^20^20^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.6^",
+      "map": "352^352^1^1^3^1^40^15^10^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.6^",
       "towers": [
         8,
         0,
@@ -1209,14 +2319,16 @@
           "name_id": 94820,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 4
         },
         {
           "id": 3,
           "name_id": 94817,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 1
         },
         {
           "id": 4,
@@ -1224,6 +2336,30 @@
           "description_id": 78617,
           "category": 5,
           "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 8,
+          "target": 4
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 8,
+          "target": 1
+        },
+        {
+          "goal": 4,
+          "counts": "score",
+          "target": 140000
         }
       ]
     },
@@ -1233,7 +2369,7 @@
       "description_id": 46019,
       "icon_id": 921,
       "difficulty": 1,
-      "map": "353^353^1^2^1^1^40^20^20^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.5^",
+      "map": "353^353^1^2^1^1^40^15^10^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.5^",
       "towers": [
         5,
         4,
@@ -1257,14 +2393,47 @@
           "name_id": 94858,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 2
         },
         {
           "id": 3,
           "name_id": 94859,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 2
+        },
+        {
+          "id": 4,
+          "name_id": 94860,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 5,
+          "target": 2
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 4,
+          "target": 2
+        },
+        {
+          "goal": 4,
+          "counts": "score",
+          "target": 106000
         }
       ]
     },
@@ -1274,7 +2443,7 @@
       "description_id": 46019,
       "icon_id": 921,
       "difficulty": 1,
-      "map": "354^354^1^2^2^1^40^20^20^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.55^",
+      "map": "354^354^1^2^2^1^40^15^10^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.55^",
       "towers": [
         5,
         4,
@@ -1296,17 +2465,50 @@
         },
         {
           "id": 2,
-          "name_id": 94870,
+          "name_id": 94858,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 2
         },
         {
           "id": 3,
-          "name_id": 94871,
+          "name_id": 94859,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 2
+        },
+        {
+          "id": 4,
+          "name_id": 94864,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 5,
+          "target": 2
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 4,
+          "target": 2
+        },
+        {
+          "goal": 4,
+          "counts": "score",
+          "target": 80000
         }
       ]
     },
@@ -1316,7 +2518,7 @@
       "description_id": 46019,
       "icon_id": 921,
       "difficulty": 1,
-      "map": "355^355^1^2^3^1^40^20^20^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.6^",
+      "map": "355^355^1^2^3^1^40^15^10^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.6^",
       "towers": [
         5,
         4,
@@ -1342,21 +2544,47 @@
           "name_id": 94858,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 2
         },
         {
           "id": 3,
           "name_id": 94859,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 2
         },
         {
           "id": 4,
-          "name_id": 94841,
+          "name_id": 94868,
           "description_id": 78617,
           "category": 5,
           "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 5,
+          "target": 2
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 4,
+          "target": 2
+        },
+        {
+          "goal": 4,
+          "counts": "score",
+          "target": 115500
         }
       ]
     },
@@ -1366,7 +2594,7 @@
       "description_id": 46022,
       "icon_id": 919,
       "difficulty": 1,
-      "map": "356^356^1^3^1^1^40^20^20^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.5^",
+      "map": "356^356^1^3^1^1^40^15^10^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.5^",
       "towers": [
         2,
         6,
@@ -1386,11 +2614,51 @@
           "category": 1
         },
         {
+          "id": 2,
+          "name_id": 94900,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false,
+          "total": 2
+        },
+        {
           "id": 3,
           "name_id": 94901,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 2
+        },
+        {
+          "id": 4,
+          "name_id": 94902,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 2,
+          "target": 2
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 19,
+          "target": 2
+        },
+        {
+          "goal": 4,
+          "counts": "score",
+          "target": 121500
         }
       ]
     },
@@ -1400,7 +2668,7 @@
       "description_id": 46022,
       "icon_id": 919,
       "difficulty": 1,
-      "map": "357^357^1^3^2^1^40^20^20^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.55^",
+      "map": "357^357^1^3^2^1^40^15^10^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.55^",
       "towers": [
         2,
         6,
@@ -1422,24 +2690,50 @@
         },
         {
           "id": 2,
-          "name_id": 94912,
+          "name_id": 94900,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 2
         },
         {
           "id": 3,
-          "name_id": 94913,
+          "name_id": 94901,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 2
         },
         {
           "id": 4,
-          "name_id": 94957,
+          "name_id": 94906,
           "description_id": 78617,
           "category": 5,
           "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 2,
+          "target": 2
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 19,
+          "target": 2
+        },
+        {
+          "goal": 4,
+          "counts": "score",
+          "target": 132000
         }
       ]
     },
@@ -1449,7 +2743,7 @@
       "description_id": 46022,
       "icon_id": 919,
       "difficulty": 1,
-      "map": "358^358^1^3^3^1^40^20^20^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.6^",
+      "map": "358^358^1^3^3^1^40^15^10^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.6^",
       "towers": [
         2,
         6,
@@ -1472,24 +2766,50 @@
         },
         {
           "id": 2,
-          "name_id": 94912,
+          "name_id": 94900,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 2
         },
         {
           "id": 3,
-          "name_id": 94914,
-          "description_id": 94914,
+          "name_id": 94901,
+          "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 2
         },
         {
           "id": 4,
-          "name_id": 94925,
+          "name_id": 94910,
           "description_id": 78617,
           "category": 5,
           "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 2,
+          "target": 2
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 19,
+          "target": 2
+        },
+        {
+          "goal": 4,
+          "counts": "score",
+          "target": 128000
         }
       ]
     },
@@ -1499,7 +2819,7 @@
       "description_id": 46025,
       "icon_id": 918,
       "difficulty": 1,
-      "map": "359^359^1^4^1^3^40^20^20^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.5^",
+      "map": "359^359^1^4^1^3^40^15^10^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.5^",
       "towers": [
         3,
         9,
@@ -1520,24 +2840,50 @@
         },
         {
           "id": 2,
-          "name_id": 94954,
+          "name_id": 94942,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 2
         },
         {
           "id": 3,
-          "name_id": 94956,
-          "description_id": 94956,
+          "name_id": 94943,
+          "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 2
         },
         {
           "id": 4,
-          "name_id": 94957,
+          "name_id": 94944,
           "description_id": 78617,
           "category": 5,
           "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 3,
+          "target": 2
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 9,
+          "target": 2
+        },
+        {
+          "goal": 4,
+          "counts": "score",
+          "target": 80500
         }
       ]
     },
@@ -1547,35 +2893,7 @@
       "description_id": 46025,
       "icon_id": 918,
       "difficulty": 1,
-      "map": "360^360^1^4^2^3^40^20^20^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.55^",
-      "towers": [
-        3,
-        9,
-        10,
-        16
-      ],
-      "enemies": [
-        18,
-        19,
-        20,
-        21
-      ],
-      "goals": [
-        {
-          "id": 1,
-          "name_id": 94815,
-          "description_id": 78609,
-          "category": 1
-        }
-      ]
-    },
-    {
-      "game_id": 361,
-      "name_id": 388930,
-      "description_id": 46025,
-      "icon_id": 918,
-      "difficulty": 1,
-      "map": "361^361^1^4^3^3^40^20^20^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.6^",
+      "map": "360^360^1^4^2^3^40^15^10^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.55^",
       "towers": [
         3,
         9,
@@ -1600,14 +2918,91 @@
           "name_id": 94942,
           "description_id": 78611,
           "category": 2,
-          "bonus": false
+          "bonus": false,
+          "total": 2
         },
         {
           "id": 3,
           "name_id": 94943,
           "description_id": 78613,
           "category": 4,
-          "bonus": true
+          "bonus": true,
+          "total": 2
+        },
+        {
+          "id": 4,
+          "name_id": 94948,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 3,
+          "target": 2
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 9,
+          "target": 2
+        },
+        {
+          "goal": 4,
+          "counts": "score",
+          "target": 73000
+        }
+      ]
+    },
+    {
+      "game_id": 361,
+      "name_id": 388930,
+      "description_id": 46025,
+      "icon_id": 918,
+      "difficulty": 1,
+      "map": "361^361^1^4^3^3^40^15^10^45^1^10^0.05^50^0.75^1^1^5000^5000^4^300^0.015^1^50^0.6^",
+      "towers": [
+        3,
+        9,
+        10,
+        16
+      ],
+      "enemies": [
+        18,
+        19,
+        20,
+        21
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94942,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false,
+          "total": 2
+        },
+        {
+          "id": 3,
+          "name_id": 94943,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true,
+          "total": 2
         },
         {
           "id": 4,
@@ -1616,6 +3011,304 @@
           "category": 5,
           "bonus": false
         }
+      ],
+      "progress": [
+        {
+          "goal": 1,
+          "counts": "win",
+          "target": 1
+        },
+        {
+          "goal": 2,
+          "counts": "build",
+          "tower": 3,
+          "target": 2
+        },
+        {
+          "goal": 3,
+          "counts": "upgrade",
+          "tower": 9,
+          "target": 2
+        },
+        {
+          "goal": 4,
+          "counts": "score",
+          "target": 68000
+        }
+      ]
+    }
+  ],
+  "tables": [
+    {
+      "npc": 100000001438,
+      "name": "Hard Garden Defense",
+      "position": [
+        37.90963,
+        63.10709,
+        1253.726
+      ],
+      "games": [
+        256,
+        257
+      ]
+    },
+    {
+      "npc": 100000001959,
+      "name": "Penguin Defense",
+      "position": [
+        -423.0313,
+        -3.04582,
+        -1203.419
+      ],
+      "games": [
+        351,
+        350
+      ]
+    },
+    {
+      "npc": 100000002779,
+      "name": "Briarwood Defense",
+      "position": [
+        -665.2297,
+        -71.50876,
+        2252.648
+      ],
+      "games": [
+        353,
+        254
+      ]
+    },
+    {
+      "npc": 100000002783,
+      "name": "Easy Briarwood Defense",
+      "position": [
+        -663.7136,
+        -70.40159,
+        2282.975
+      ],
+      "games": [
+        353,
+        354,
+        355
+      ]
+    },
+    {
+      "npc": 100000002788,
+      "name": "Medium Briarwood Defense",
+      "position": [
+        -654.0468,
+        -70.38953,
+        2287.213
+      ],
+      "games": [
+        253,
+        254,
+        255
+      ]
+    },
+    {
+      "npc": 100000002793,
+      "name": "Hard Briarwood Defense",
+      "position": [
+        -640.7,
+        -68.385,
+        2296.4
+      ],
+      "games": [
+        153,
+        154,
+        155
+      ]
+    },
+    {
+      "npc": 100000003225,
+      "name": "Garden Defense",
+      "position": [
+        -2077.945,
+        -54.70136,
+        212.3831
+      ],
+      "games": [
+        356,
+        257
+      ]
+    },
+    {
+      "npc": 100000003227,
+      "name": "Easy Garden Defense",
+      "position": [
+        -2061.388,
+        -54.47231,
+        203.3583
+      ],
+      "games": [
+        356,
+        357,
+        358
+      ]
+    },
+    {
+      "npc": 100000003236,
+      "name": "Hard Garden Defense",
+      "position": [
+        -2089.134,
+        -56.81547,
+        348.1839
+      ],
+      "games": [
+        156,
+        157,
+        158
+      ]
+    },
+    {
+      "npc": 100000003237,
+      "name": "Medium Garden Defense",
+      "position": [
+        -2104.745,
+        -57.62448,
+        346.1435
+      ],
+      "games": [
+        256,
+        257,
+        258
+      ]
+    },
+    {
+      "npc": 100000004094,
+      "name": "Easy Bixie Defense",
+      "position": [
+        -565.6613,
+        2.810159,
+        532.6673
+      ],
+      "games": [
+        359,
+        360,
+        361
+      ]
+    },
+    {
+      "npc": 100000004627,
+      "name": "Tower Defense",
+      "position": [
+        -1566.94,
+        -40.18036,
+        -628.3112
+      ],
+      "games": [
+        259
+      ]
+    },
+    {
+      "npc": 100000033379,
+      "name": "Hard Bixie Defense",
+      "position": [
+        -1269.1733,
+        -14.237309,
+        283.70575
+      ],
+      "games": [
+        159,
+        160,
+        161
+      ]
+    },
+    {
+      "npc": 100000033383,
+      "name": "Easy Bixie Defense",
+      "position": [
+        -1276.0964,
+        -14.32795,
+        286.45676
+      ],
+      "games": [
+        359,
+        360,
+        361
+      ]
+    },
+    {
+      "npc": 100000033384,
+      "name": "Bixie Defense",
+      "position": [
+        -1277.4462,
+        -14.38915,
+        293.5682
+      ],
+      "games": [
+        359,
+        260
+      ]
+    },
+    {
+      "npc": 100000033388,
+      "name": "Medium Bixie Defense",
+      "position": [
+        -1273.1497,
+        -14.253798,
+        298.9679
+      ],
+      "games": [
+        259,
+        260,
+        261
+      ]
+    },
+    {
+      "npc": 100000033706,
+      "name": "Penguin Defense",
+      "position": [
+        287.75372,
+        26.32821,
+        361.773
+      ],
+      "games": [
+        351,
+        350
+      ]
+    },
+    {
+      "npc": 100000033707,
+      "name": "Medium Penguin Defense",
+      "position": [
+        294.63943,
+        23.92808,
+        340.13834
+      ],
+      "games": [
+        250,
+        251,
+        252
+      ]
+    },
+    {
+      "npc": 100000033710,
+      "name": "Easy Penguin Defense",
+      "position": [
+        294.10706,
+        25.14097,
+        357.43976
+      ],
+      "games": [
+        350,
+        351,
+        352
+      ]
+    },
+    {
+      "npc": 100000033719,
+      "name": "Hard Penguin Defense",
+      "position": [
+        300.55817,
+        25.583588,
+        347.31277
+      ],
+      "games": [
+        150,
+        151,
+        152
       ]
     }
   ],
