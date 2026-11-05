@@ -70,7 +70,7 @@ const FORGING: Station = Station {
     noun: "forging",
     wrong_job: "Switch to Blacksmith before forging.",
     pending: "Accept the forging objective and finish its earlier steps first.",
-    shortage: "Forging requires 10 Copper Bars, 5 Turquoise, 5 Wooden Planks and 5 Thorny Fasteners.",
+    shortage: "Forging requires 10 Copper Bars, 5 Turquoise, 2 Wooden Planks and 4 Thorny Fasteners.",
     outside: "forging completion is outside a Blacksmith station",
     changed: "forging ingredients changed before completion",
     success: Some(

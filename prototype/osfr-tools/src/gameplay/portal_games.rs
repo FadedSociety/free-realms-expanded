@@ -186,24 +186,11 @@ impl Gameplay {
                 Some(Err(denied)) => Ok(refused(denied.message())),
                 None => Ok(refused(DerbyEntryDenied::Unavailable.message())),
             },
-            // L098: a recipe row starts the recipe book anywhere (R). L936: it switches into the
-            // recipe's job first, staged with the start, so a refused start changes nothing.
-            Kind::Recipe { recipe_id, job } => {
+            // L098: a recipe row starts the recipe book anywhere (R).
+            Kind::Recipe { recipe_id, .. } => {
                 let recipe = i32::try_from(recipe_id).map_err(|_| invalid("recipe id"))?;
-                let has_job = (self.profiles.as_ref())
-                    .is_some_and(|p| p.state().unlocked.contains(&job.profile_id()));
-                if !has_job {
-                    return Ok(alert(MISSING_JOB_TEXT));
-                }
-                let mut staged = self.clone();
                 let mut out = Outcome::default();
-                staged.enter_activity_job(job.profile_id(), character.guid, &mut out)?;
-                let mut start = Outcome::default();
-                if !staged.start_recipe(recipe, true, character, now_ms, &mut start)? {
-                    return Ok(start);
-                }
-                *self = staged;
-                out.absorb(start);
+                self.start_recipe(recipe, true, character, now_ms, &mut out)?;
                 Ok(out)
             }
             // L100 (R): a node's gates without the node: idle, the gather job unlocked, the game

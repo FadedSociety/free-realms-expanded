@@ -270,6 +270,10 @@ fn native_header_info_payload_launch_and_finish_match_compiled_community() {
     // The community vector sends the job id; the client filters on the job's type (`00c8ff30`).
     let mut info = vector("info");
     info[31..35].copy_from_slice(&12_i32.to_le_bytes());
+    // The card reads game 139's own Games window row, not the fixture's words.
+    info[15..19].copy_from_slice(&386081_i32.to_le_bytes());
+    info[23..27].copy_from_slice(&22054_i32.to_le_bytes());
+    info[27..31].copy_from_slice(&1_i32.to_le_bytes());
     assert_eq!(offer.replies, vec![info]);
     assert_eq!(
         payload_packet(id(&g), "OnConnectMsg").unwrap(),
@@ -382,7 +386,7 @@ fn original_handshake_initializes_grid_mappings_queues_and_mold_once() {
     let map = t.iter().find(|s| s.starts_with("OnBuildMapMsg")).unwrap();
     assert!(map.starts_with("OnBuildMapMsg\t14\t14\t"));
     assert_eq!(g.state().active.as_ref().unwrap().board.len(), 196);
-    assert_eq!(g.requirements(), [(21785, 10), (2752, 5), (55, 5), (56, 5)]);
+    assert_eq!(g.requirements(), [(21785, 10), (2752, 5), (55, 2), (56, 4)]);
     let prior = g.state().clone();
     assert!(send(&mut g, "OnStartLevelMsg\t0").replies.is_empty());
     assert_eq!(g.state(), &prior);
@@ -454,7 +458,7 @@ fn quota_then_native_next_level_awards_fixed_recipe_once_even_after_reload() {
     assert!(won.completed);
     assert_eq!(g.state().completed, 1);
     let tx = won.transaction.unwrap();
-    assert_eq!(tx.consumes, [(21785, 10), (2752, 5), (55, 5), (56, 5)]);
+    assert_eq!(tx.consumes, [(21785, 10), (2752, 5), (55, 2), (56, 4)]);
     assert_eq!(tx.grants, [(30280, 1)]);
     let catalog: Value =
         serde_json::from_str(include_str!("../data/content/recipes.json")).unwrap();
@@ -756,4 +760,33 @@ fn private_original_content_movie_metadata_and_real_board_roundtrip() {
     let out = send(&mut g, "FRServer_GameOver");
     assert!(out.replies.iter().any(|p| p[0..3] == [39, 0, 18]));
     assert!(g.cancel().transaction.is_none());
+}
+
+/// A finished recipe stays saved for its late packets, but the opening's start, supplies and
+/// default all keep meaning the hammer.
+#[test]
+fn another_recipe_leaves_the_opening_on_the_hammer() {
+    let catalog: Value =
+        serde_json::from_str(include_str!("../data/content/recipes.json")).unwrap();
+    let row = (catalog["records"].as_array().unwrap().iter())
+        .find(|row| row["key"] == "blacksmith.quick_shot_bow")
+        .unwrap();
+    let inputs: Vec<(i32, u32)> = (row["ingredients"].as_array().unwrap().iter())
+        .map(|item| {
+            (
+                item["definition_id"].as_i64().unwrap() as i32,
+                item["count"].as_u64().unwrap() as u32,
+            )
+        })
+        .collect();
+    let f = Fixture::new();
+    let mut g = f.load(None);
+    let hammer = g.opening_requirements().to_vec();
+    g.begin_recipe(16, "blacksmith.quick_shot_bow", 20, true, &inputs)
+        .unwrap();
+    assert_eq!(g.requirements(), inputs);
+    g.cancel();
+    assert_eq!(g.opening_requirements(), hammer);
+    g.begin(16).unwrap();
+    assert_eq!(g.requirements(), hammer, "the default start is the hammer");
 }

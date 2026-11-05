@@ -324,7 +324,7 @@ const BLACKSMITH_PROFILE: i32 = 16;
 const ANVIL: [f32; 3] = [354.3665, 48.24031, 316.3203];
 /// Blacksmith recipe 11 at the world anvil and its inputs (as in `crafting_stations_route.rs`).
 const ANVIL_RECIPE: i32 = 11;
-const ANVIL_INPUTS: [(i32, u32); 4] = [(21785, 10), (2752, 5), (55, 5), (56, 5)];
+const ANVIL_INPUTS: [(i32, u32); 4] = [(21785, 10), (2752, 5), (55, 2), (56, 4)];
 
 fn node(name: &str) -> NodeActor {
     let content = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");

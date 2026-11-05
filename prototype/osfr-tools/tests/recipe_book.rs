@@ -27,7 +27,7 @@ const GUMBO: i32 = 35; // chef, rank 1
 const BRIARMELON: i32 = 57; // chef, rank 20
 const HAMMER: i32 = 11; // blacksmith, rank 1
 const GUMBO_INPUTS: [(i32, u32); 4] = [(2875, 3), (2881, 3), (2890, 3), (2899, 3)];
-const HAMMER_INPUTS: [(i32, u32); 4] = [(21785, 10), (2752, 5), (55, 5), (56, 5)];
+const HAMMER_INPUTS: [(i32, u32); 4] = [(21785, 10), (2752, 5), (55, 2), (56, 4)];
 
 struct Fixture {
     dir: PathBuf,

@@ -1986,7 +1986,7 @@ fn start_tutorial_craft_refuses_wrong_job_pending_shortage_and_learned() {
         CraftingJob::Blacksmith,
         "Switch to Blacksmith before forging.",
         "Accept the forging objective and finish its earlier steps first.",
-        "Forging requires 10 Copper Bars, 5 Turquoise, 5 Wooden Planks and 5 Thorny Fasteners.",
+        "Forging requires 10 Copper Bars, 5 Turquoise, 2 Wooden Planks and 4 Thorny Fasteners.",
         "forging recipe is locked or ingredients are missing",
     );
     assert_tutorial_refusals(

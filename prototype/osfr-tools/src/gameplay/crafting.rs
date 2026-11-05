@@ -3,6 +3,10 @@
 use super::movie::{Movie, elapsed_if_due};
 use super::*;
 
+fn missing_job_alert() -> Vec<u8> {
+    crate::activity_portal::join_error(crate::activity_portal::MISSING_JOB_TEXT)
+}
+
 impl Gameplay {
     /// The running movie, first in the gate's intercept order. At most one can
     /// be active; the order is what the five separate blocks used to encode.
@@ -212,7 +216,7 @@ impl Gameplay {
             CraftingJob::Blacksmith => Spec {
                 switch: "Switch to Blacksmith before forging.",
                 pending: "Accept the forging objective and finish its earlier steps first.",
-                shortage: "Forging requires 10 Copper Bars, 5 Turquoise, 5 Wooden Planks and 5 Thorny Fasteners.",
+                shortage: "Forging requires 10 Copper Bars, 5 Turquoise, 2 Wooden Planks and 4 Thorny Fasteners.",
                 note: Some(
                     "Original Spunky Scrapper Hammer controls; board tuning, consumption and tint choice are reconstructed.",
                 ),
@@ -236,9 +240,9 @@ impl Gameplay {
             return Ok(());
         }
         let missing = match job {
-            CraftingJob::Chef => self.cooking.as_ref().unwrap().requirements(),
-            CraftingJob::Blacksmith => self.forging.as_ref().unwrap().requirements(),
-            CraftingJob::Miner => self.smelting.as_ref().unwrap().requirements(),
+            CraftingJob::Chef => self.cooking.as_ref().unwrap().opening_requirements(),
+            CraftingJob::Blacksmith => self.forging.as_ref().unwrap().opening_requirements(),
+            CraftingJob::Miner => self.smelting.as_ref().unwrap().opening_requirements(),
         }
         .iter()
         .any(|(id, n)| self.material_count(*id) < u64::from(*n));
@@ -247,9 +251,9 @@ impl Gameplay {
             return Ok(());
         }
         let key = match job {
-            CraftingJob::Chef => self.cooking.as_ref().unwrap().recipe_key(),
-            CraftingJob::Blacksmith => self.forging.as_ref().unwrap().recipe_key(),
-            CraftingJob::Miner => self.smelting.as_ref().unwrap().recipe_key(),
+            CraftingJob::Chef => self.cooking.as_ref().unwrap().opening_recipe_key(),
+            CraftingJob::Blacksmith => self.forging.as_ref().unwrap().opening_recipe_key(),
+            CraftingJob::Miner => self.smelting.as_ref().unwrap().opening_recipe_key(),
         }
         .to_owned();
         let rank = self.recipe_rank(profile);
@@ -311,7 +315,7 @@ impl Gameplay {
     /// here that a canary could bypass or duplicate. A pack with no class content (supported by
     /// `load`) has no recipe-book player at all, so refuse before building one. True when the
     /// craft started.
-    pub(super) fn start_recipe(
+    fn begin_recipe(
         &mut self,
         recipe_id: i32,
         anywhere: bool,
@@ -370,6 +374,73 @@ impl Gameplay {
         Ok(true)
     }
 
+    /// `job`'s last recipe, and the opening's own.
+    fn craft_recipe_keys(&self, job: CraftingJob) -> Option<(&str, &str)> {
+        Some(match job {
+            CraftingJob::Chef => {
+                let engine = self.cooking.as_ref()?;
+                (engine.recipe_key(), engine.opening_recipe_key())
+            }
+            CraftingJob::Blacksmith => {
+                let engine = self.forging.as_ref()?;
+                (engine.recipe_key(), engine.opening_recipe_key())
+            }
+            CraftingJob::Miner => {
+                let engine = self.smelting.as_ref()?;
+                (engine.recipe_key(), engine.opening_recipe_key())
+            }
+        })
+    }
+
+    /// One job rule for both doors, the station and the Games window: a recipe of another job
+    /// switches into it, and a job the player lacks gets the client's own alert. True when the
+    /// craft started.
+    pub(super) fn start_recipe(
+        &mut self,
+        recipe_id: i32,
+        anywhere: bool,
+        character: &CharacterState,
+        now_ms: u64,
+        out: &mut Outcome,
+    ) -> io::Result<bool> {
+        let job = crate::recipe_book::job_of(&self.recipe_catalog, recipe_id);
+        match (job.map(|job| job.profile_id()), self.profiles.as_ref()) {
+            (Some(job), Some(profiles)) if profiles.active() != job => {
+                if profiles.state().unlocked.contains(&job) {
+                    return self.start_recipe_in_job(job, recipe_id, anywhere, character, now_ms, out);
+                }
+                out.replies.push(missing_job_alert());
+                Ok(false)
+            }
+            _ => self.begin_recipe(recipe_id, anywhere, character, now_ms, out),
+        }
+    }
+
+    /// L936: the switch is staged with the start, so a refused start changes nothing. A job whose
+    /// outfit is short stays unswitched and `begin_recipe` refuses it. Apart from `start_recipe`
+    /// so the copy is on the stack only when a job changes.
+    fn start_recipe_in_job(
+        &mut self,
+        job: i32,
+        recipe_id: i32,
+        anywhere: bool,
+        character: &CharacterState,
+        now_ms: u64,
+        out: &mut Outcome,
+    ) -> io::Result<bool> {
+        let mut staged = self.clone();
+        let mut switched = Outcome::default();
+        staged.enter_activity_job(job, character.guid, &mut switched)?;
+        let mut start = Outcome::default();
+        let started = staged.begin_recipe(recipe_id, anywhere, character, now_ms, &mut start)?;
+        if started {
+            *self = staged;
+            out.absorb(switched);
+        }
+        out.absorb(start);
+        Ok(started)
+    }
+
     pub(super) fn station_interaction_26_8(
         &self,
         inner: &[u8],
@@ -387,14 +458,19 @@ impl Gameplay {
         if self.activity_busy() {
             return Ok(None);
         }
-        Ok(Some(Outcome {
-            replies: vec![crate::recipe_book::open_window(
+        // A job the player lacks has nothing to list. Any other opens; the start switches into it.
+        let reply = if profiles.state().unlocked.contains(&job.profile_id()) {
+            crate::recipe_book::open_window(
                 job,
-                profiles.active(),
                 character.zone_id,
                 character.position,
                 &self.crafting_stations(),
-            )],
+            )
+        } else {
+            missing_job_alert()
+        };
+        Ok(Some(Outcome {
+            replies: vec![reply],
             ..Outcome::default()
         }))
     }
@@ -516,7 +592,9 @@ impl Gameplay {
                 1
             };
             let opening_recipe = job.opening_recipe_id();
-            if self.opening_craft_pending(opening_recipe) {
+            // Only the opening's own recipe counts for its objective.
+            let own = self.craft_recipe_keys(job).is_some_and(|(last, own)| last == own);
+            if own && self.opening_craft_pending(opening_recipe) {
                 let progress = self
                     .opening
                     .as_mut()

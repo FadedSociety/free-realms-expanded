@@ -206,26 +206,7 @@ fn recipe_book_refusals_change_nothing() {
     let away = g.snapshot();
     book_start(&mut g, GUMBO);
     assert_eq!(g.snapshot(), away);
-    // Wrong active job. Profile 1 has no equipped Chest/Legs, so the switch is
-    // refused and the player stays Chef; profile 43 has the required outfit
-    // slots and actually switches, which is the case this block must exercise.
     position(&mut g, station, 2_000_000);
-    select(&mut g, 43);
-    let other_job = g.snapshot();
-    assert_eq!(
-        other_job
-            .gameplay
-            .as_ref()
-            .unwrap()
-            .profiles
-            .as_ref()
-            .unwrap()
-            .active,
-        43,
-        "the wrong-job fixture must actually switch jobs"
-    );
-    book_start(&mut g, GUMBO);
-    assert_eq!(g.snapshot(), other_job);
     // Malformed lengths never start a run.
     select(&mut g, 45);
     let ready = g.snapshot();

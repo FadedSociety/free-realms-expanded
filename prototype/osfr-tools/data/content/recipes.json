@@ -3492,6 +3492,2043 @@
       }
     },
     {
+      "key": "blacksmith.alley_fighter_hammer",
+      "name": "Alley Fighter Hammer",
+      "recipe_id": 20,
+      "candidate_recipe_id": null,
+      "recipe_item_definition_id": 2515,
+      "job": "blacksmith",
+      "job_profile_id": 16,
+      "required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": 148,
+      "ingredients": [
+        {
+          "definition_id": 21787,
+          "count": 10
+        },
+        {
+          "definition_id": 2751,
+          "count": 5
+        },
+        {
+          "definition_id": 55,
+          "count": 3
+        },
+        {
+          "definition_id": 56,
+          "count": 4
+        }
+      ],
+      "output": {
+        "definition_id": 30400,
+        "count": 1
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "MiniGameData row 148 is TYPE 8; Blacksmith job profile 16."
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; pattern 2515 Param1=20 and MinProfileRank=1; output id 30400 is one tint variant."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: ingredient ids and counts."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Output tint, one output and the sample board."
+        }
+      ],
+      "experience_points": 0,
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Local stable key; the client row exposes numeric ids, not this slug."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: client-facing blacksmith recipe name."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: recipe job."
+        },
+        "job_profile_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: job/profile mapping; profile 16."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "Client MiniGameData and job guide: crafting TYPE 8."
+        },
+        "experience_points": {
+          "kind": "reconstructed",
+          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+        },
+        "output.definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: output item definition 30400; first tint (R) of Alley Fighter Hammer."
+        },
+        "output.count": {
+          "kind": "reconstructed",
+          "evidence": "(R) One output, as the forging sample; historical quantity is unknown."
+        },
+        "recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Value 20 is the pattern item Param1 recipe index."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 2515, Param1 20."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern 2515 MinProfileRank 1."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 148 is the forging game named Alley Fighter Hammer; Games window row in data/content/activity_catalogue.json."
+        },
+        "ingredients[0].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 21787."
+        },
+        "ingredients[0].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 10."
+        },
+        "ingredients[1].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 2751."
+        },
+        "ingredients[1].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 5."
+        },
+        "ingredients[2].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 55."
+        },
+        "ingredients[2].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 3."
+        },
+        "ingredients[3].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 56."
+        },
+        "ingredients[3].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 4."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.anguish_aid_bonesaw",
+      "name": "Anguish Aid Bonesaw",
+      "recipe_id": 21,
+      "candidate_recipe_id": null,
+      "recipe_item_definition_id": 2516,
+      "job": "blacksmith",
+      "job_profile_id": 16,
+      "required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": 149,
+      "ingredients": [
+        {
+          "definition_id": 21787,
+          "count": 10
+        },
+        {
+          "definition_id": 2751,
+          "count": 5
+        },
+        {
+          "definition_id": 54,
+          "count": 3
+        },
+        {
+          "definition_id": 56,
+          "count": 4
+        }
+      ],
+      "output": {
+        "definition_id": 30390,
+        "count": 1
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "MiniGameData row 149 is TYPE 8; Blacksmith job profile 16."
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; pattern 2516 Param1=21 and MinProfileRank=1; output id 30390 is one tint variant."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: ingredient ids and counts."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Output tint, one output and the sample board."
+        }
+      ],
+      "experience_points": 0,
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Local stable key; the client row exposes numeric ids, not this slug."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: client-facing blacksmith recipe name."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: recipe job."
+        },
+        "job_profile_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: job/profile mapping; profile 16."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "Client MiniGameData and job guide: crafting TYPE 8."
+        },
+        "experience_points": {
+          "kind": "reconstructed",
+          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+        },
+        "output.definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: output item definition 30390; first tint (R) of Anguish Aid Bonesaw."
+        },
+        "output.count": {
+          "kind": "reconstructed",
+          "evidence": "(R) One output, as the forging sample; historical quantity is unknown."
+        },
+        "recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Value 21 is the pattern item Param1 recipe index."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 2516, Param1 21."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern 2516 MinProfileRank 1."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 149 is the forging game named Anguish Aid Bonesaw; Games window row in data/content/activity_catalogue.json."
+        },
+        "ingredients[0].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 21787."
+        },
+        "ingredients[0].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 10."
+        },
+        "ingredients[1].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 2751."
+        },
+        "ingredients[1].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 5."
+        },
+        "ingredients[2].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 54."
+        },
+        "ingredients[2].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 3."
+        },
+        "ingredients[3].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 56."
+        },
+        "ingredients[3].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 4."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.biting_mongoose_blade",
+      "name": "Biting Mongoose Blade",
+      "recipe_id": 18,
+      "candidate_recipe_id": null,
+      "recipe_item_definition_id": 2513,
+      "job": "blacksmith",
+      "job_profile_id": 16,
+      "required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": 146,
+      "ingredients": [
+        {
+          "definition_id": 21786,
+          "count": 10
+        },
+        {
+          "definition_id": 2750,
+          "count": 5
+        },
+        {
+          "definition_id": 56,
+          "count": 1
+        },
+        {
+          "definition_id": 54,
+          "count": 4
+        }
+      ],
+      "output": {
+        "definition_id": 30350,
+        "count": 1
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "MiniGameData row 146 is TYPE 8; Blacksmith job profile 16."
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; pattern 2513 Param1=18 and MinProfileRank=1; output id 30350 is one tint variant."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: ingredient ids and counts."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Output tint, one output and the sample board."
+        }
+      ],
+      "experience_points": 0,
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Local stable key; the client row exposes numeric ids, not this slug."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: client-facing blacksmith recipe name."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: recipe job."
+        },
+        "job_profile_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: job/profile mapping; profile 16."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "Client MiniGameData and job guide: crafting TYPE 8."
+        },
+        "experience_points": {
+          "kind": "reconstructed",
+          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+        },
+        "output.definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: output item definition 30350; first tint (R) of Biting Mongoose Blade."
+        },
+        "output.count": {
+          "kind": "reconstructed",
+          "evidence": "(R) One output, as the forging sample; historical quantity is unknown."
+        },
+        "recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Value 18 is the pattern item Param1 recipe index."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 2513, Param1 18."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern 2513 MinProfileRank 1."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 146 is the forging game named Biting Mongoose Blade; Games window row in data/content/activity_catalogue.json."
+        },
+        "ingredients[0].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 21786."
+        },
+        "ingredients[0].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 10."
+        },
+        "ingredients[1].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 2750."
+        },
+        "ingredients[1].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 5."
+        },
+        "ingredients[2].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 56."
+        },
+        "ingredients[2].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 1."
+        },
+        "ingredients[3].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 54."
+        },
+        "ingredients[3].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 4."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.brutal_blast_bow",
+      "name": "Brutal Blast Bow",
+      "recipe_id": 67,
+      "candidate_recipe_id": null,
+      "recipe_item_definition_id": 49383,
+      "job": "blacksmith",
+      "job_profile_id": 16,
+      "required_job_rank": 20,
+      "minigame_type_id": 8,
+      "minigame_id": 368,
+      "ingredients": [
+        {
+          "definition_id": 21789,
+          "count": 10
+        },
+        {
+          "definition_id": 2747,
+          "count": 5
+        },
+        {
+          "definition_id": 55,
+          "count": 4
+        },
+        {
+          "definition_id": 53,
+          "count": 4
+        }
+      ],
+      "output": {
+        "definition_id": 30490,
+        "count": 1
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "MiniGameData row 368 is TYPE 8; Blacksmith job profile 16."
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; pattern 49383 Param1=67 and MinProfileRank=20; output id 30490 is one tint variant."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: ingredient ids and counts."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Output tint, one output and the sample board."
+        }
+      ],
+      "experience_points": 0,
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Local stable key; the client row exposes numeric ids, not this slug."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: client-facing blacksmith recipe name."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: recipe job."
+        },
+        "job_profile_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: job/profile mapping; profile 16."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "Client MiniGameData and job guide: crafting TYPE 8."
+        },
+        "experience_points": {
+          "kind": "reconstructed",
+          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+        },
+        "output.definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: output item definition 30490; first tint (R) of Brutal Blast Bow."
+        },
+        "output.count": {
+          "kind": "reconstructed",
+          "evidence": "(R) One output, as the forging sample; historical quantity is unknown."
+        },
+        "recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Value 67 is the pattern item Param1 recipe index."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 49383, Param1 67."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern 49383 MinProfileRank 20."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 368 is the forging game named Brutal Blast Bow; Games window row in data/content/activity_catalogue.json."
+        },
+        "ingredients[0].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 21789."
+        },
+        "ingredients[0].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 10."
+        },
+        "ingredients[1].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 2747."
+        },
+        "ingredients[1].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 5."
+        },
+        "ingredients[2].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 55."
+        },
+        "ingredients[2].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 4."
+        },
+        "ingredients[3].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 53."
+        },
+        "ingredients[3].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 4."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.chivalrous_guardian_hammer",
+      "name": "Chivalrous Guardian Hammer",
+      "recipe_id": 23,
+      "candidate_recipe_id": null,
+      "recipe_item_definition_id": 2518,
+      "job": "blacksmith",
+      "job_profile_id": 16,
+      "required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": 163,
+      "ingredients": [
+        {
+          "definition_id": 21787,
+          "count": 10
+        },
+        {
+          "definition_id": 2751,
+          "count": 5
+        },
+        {
+          "definition_id": 55,
+          "count": 2
+        },
+        {
+          "definition_id": 56,
+          "count": 2
+        },
+        {
+          "definition_id": 54,
+          "count": 2
+        }
+      ],
+      "output": {
+        "definition_id": 30380,
+        "count": 1
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "MiniGameData row 163 is TYPE 8; Blacksmith job profile 16."
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; pattern 2518 Param1=23 and MinProfileRank=1; output id 30380 is one tint variant."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: ingredient ids and counts."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Output tint, one output and the sample board."
+        }
+      ],
+      "experience_points": 0,
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Local stable key; the client row exposes numeric ids, not this slug."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: client-facing blacksmith recipe name."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: recipe job."
+        },
+        "job_profile_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: job/profile mapping; profile 16."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "Client MiniGameData and job guide: crafting TYPE 8."
+        },
+        "experience_points": {
+          "kind": "reconstructed",
+          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+        },
+        "output.definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: output item definition 30380; first tint (R) of Chivalrous Guardian Hammer."
+        },
+        "output.count": {
+          "kind": "reconstructed",
+          "evidence": "(R) One output, as the forging sample; historical quantity is unknown."
+        },
+        "recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Value 23 is the pattern item Param1 recipe index."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 2518, Param1 23."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern 2518 MinProfileRank 1."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 163 is the forging game named Chivalrous Guardian Hammer; Games window row in data/content/activity_catalogue.json."
+        },
+        "ingredients[0].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 21787."
+        },
+        "ingredients[0].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 10."
+        },
+        "ingredients[1].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 2751."
+        },
+        "ingredients[1].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 5."
+        },
+        "ingredients[2].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 55."
+        },
+        "ingredients[2].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 2."
+        },
+        "ingredients[3].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 56."
+        },
+        "ingredients[3].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 2."
+        },
+        "ingredients[4].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 54."
+        },
+        "ingredients[4].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 2."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.dancing_monkey_bokken",
+      "name": "Dancing Monkey Bokken",
+      "recipe_id": 13,
+      "candidate_recipe_id": null,
+      "recipe_item_definition_id": 2508,
+      "job": "blacksmith",
+      "job_profile_id": 16,
+      "required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": 141,
+      "ingredients": [
+        {
+          "definition_id": 21785,
+          "count": 10
+        },
+        {
+          "definition_id": 2752,
+          "count": 5
+        },
+        {
+          "definition_id": 54,
+          "count": 2
+        },
+        {
+          "definition_id": 55,
+          "count": 4
+        }
+      ],
+      "output": {
+        "definition_id": 30290,
+        "count": 1
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "MiniGameData row 141 is TYPE 8; Blacksmith job profile 16."
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; pattern 2508 Param1=13 and MinProfileRank=1; output id 30290 is one tint variant."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: ingredient ids and counts."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Output tint, one output and the sample board."
+        }
+      ],
+      "experience_points": 0,
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Local stable key; the client row exposes numeric ids, not this slug."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: client-facing blacksmith recipe name."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: recipe job."
+        },
+        "job_profile_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: job/profile mapping; profile 16."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "Client MiniGameData and job guide: crafting TYPE 8."
+        },
+        "experience_points": {
+          "kind": "reconstructed",
+          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+        },
+        "output.definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: output item definition 30290; first tint (R) of Dancing Monkey Bokken."
+        },
+        "output.count": {
+          "kind": "reconstructed",
+          "evidence": "(R) One output, as the forging sample; historical quantity is unknown."
+        },
+        "recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Value 13 is the pattern item Param1 recipe index."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 2508, Param1 13."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern 2508 MinProfileRank 1."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 141 is the forging game named Dancing Monkey Bokken; Games window row in data/content/activity_catalogue.json."
+        },
+        "ingredients[0].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 21785."
+        },
+        "ingredients[0].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 10."
+        },
+        "ingredients[1].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 2752."
+        },
+        "ingredients[1].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 5."
+        },
+        "ingredients[2].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 54."
+        },
+        "ingredients[2].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 2."
+        },
+        "ingredients[3].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 55."
+        },
+        "ingredients[3].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 4."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.diving_hawk_scythe",
+      "name": "Diving Hawk Scythe",
+      "recipe_id": 22,
+      "candidate_recipe_id": null,
+      "recipe_item_definition_id": 2517,
+      "job": "blacksmith",
+      "job_profile_id": 16,
+      "required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": 162,
+      "ingredients": [
+        {
+          "definition_id": 21787,
+          "count": 10
+        },
+        {
+          "definition_id": 2751,
+          "count": 5
+        },
+        {
+          "definition_id": 54,
+          "count": 3
+        },
+        {
+          "definition_id": 56,
+          "count": 4
+        }
+      ],
+      "output": {
+        "definition_id": 30410,
+        "count": 1
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "MiniGameData row 162 is TYPE 8; Blacksmith job profile 16."
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; pattern 2517 Param1=22 and MinProfileRank=1; output id 30410 is one tint variant."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: ingredient ids and counts."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Output tint, one output and the sample board."
+        }
+      ],
+      "experience_points": 0,
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Local stable key; the client row exposes numeric ids, not this slug."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: client-facing blacksmith recipe name."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: recipe job."
+        },
+        "job_profile_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: job/profile mapping; profile 16."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "Client MiniGameData and job guide: crafting TYPE 8."
+        },
+        "experience_points": {
+          "kind": "reconstructed",
+          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+        },
+        "output.definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: output item definition 30410; first tint (R) of Diving Hawk Scythe."
+        },
+        "output.count": {
+          "kind": "reconstructed",
+          "evidence": "(R) One output, as the forging sample; historical quantity is unknown."
+        },
+        "recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Value 22 is the pattern item Param1 recipe index."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 2517, Param1 22."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern 2517 MinProfileRank 1."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 162 is the forging game named Diving Hawk Scythe; Games window row in data/content/activity_catalogue.json."
+        },
+        "ingredients[0].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 21787."
+        },
+        "ingredients[0].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 10."
+        },
+        "ingredients[1].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 2751."
+        },
+        "ingredients[1].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 5."
+        },
+        "ingredients[2].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 54."
+        },
+        "ingredients[2].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 3."
+        },
+        "ingredients[3].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 56."
+        },
+        "ingredients[3].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 4."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.eclipse_infused_wand",
+      "name": "Eclipse Infused Wand",
+      "recipe_id": 64,
+      "candidate_recipe_id": null,
+      "recipe_item_definition_id": 49385,
+      "job": "blacksmith",
+      "job_profile_id": 16,
+      "required_job_rank": 10,
+      "minigame_type_id": 8,
+      "minigame_id": 365,
+      "ingredients": [
+        {
+          "definition_id": 21787,
+          "count": 10
+        },
+        {
+          "definition_id": 2751,
+          "count": 5
+        },
+        {
+          "definition_id": 55,
+          "count": 4
+        },
+        {
+          "definition_id": 57,
+          "count": 3
+        }
+      ],
+      "output": {
+        "definition_id": 30420,
+        "count": 1
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "MiniGameData row 365 is TYPE 8; Blacksmith job profile 16."
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; pattern 49385 Param1=64 and MinProfileRank=10; output id 30420 is one tint variant."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: ingredient ids and counts."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Output tint, one output and the sample board."
+        }
+      ],
+      "experience_points": 0,
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Local stable key; the client row exposes numeric ids, not this slug."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: client-facing blacksmith recipe name."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: recipe job."
+        },
+        "job_profile_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: job/profile mapping; profile 16."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "Client MiniGameData and job guide: crafting TYPE 8."
+        },
+        "experience_points": {
+          "kind": "reconstructed",
+          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+        },
+        "output.definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: output item definition 30420; first tint (R) of Eclipse Infused Wand."
+        },
+        "output.count": {
+          "kind": "reconstructed",
+          "evidence": "(R) One output, as the forging sample; historical quantity is unknown."
+        },
+        "recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Value 64 is the pattern item Param1 recipe index."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 49385, Param1 64."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern 49385 MinProfileRank 10."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 365 is the forging game named Eclipse Infused Wand; Games window row in data/content/activity_catalogue.json."
+        },
+        "ingredients[0].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 21787."
+        },
+        "ingredients[0].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 10."
+        },
+        "ingredients[1].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 2751."
+        },
+        "ingredients[1].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 5."
+        },
+        "ingredients[2].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 55."
+        },
+        "ingredients[2].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 4."
+        },
+        "ingredients[3].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 57."
+        },
+        "ingredients[3].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 3."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.intrepid_protector_axe",
+      "name": "Intrepid Protector Axe",
+      "recipe_id": 31,
+      "candidate_recipe_id": null,
+      "recipe_item_definition_id": 2526,
+      "job": "blacksmith",
+      "job_profile_id": 16,
+      "required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": 171,
+      "ingredients": [
+        {
+          "definition_id": 2747,
+          "count": 5
+        },
+        {
+          "definition_id": 56,
+          "count": 4
+        },
+        {
+          "definition_id": 54,
+          "count": 2
+        },
+        {
+          "definition_id": 55,
+          "count": 2
+        }
+      ],
+      "output": {
+        "definition_id": 30500,
+        "count": 1
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "MiniGameData row 171 is TYPE 8; Blacksmith job profile 16."
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; pattern 2526 Param1=31 and MinProfileRank=1; output id 30500 is one tint variant."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: ingredient ids and counts."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Output tint, one output and the sample board."
+        }
+      ],
+      "experience_points": 0,
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Local stable key; the client row exposes numeric ids, not this slug."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: client-facing blacksmith recipe name."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: recipe job."
+        },
+        "job_profile_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: job/profile mapping; profile 16."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "Client MiniGameData and job guide: crafting TYPE 8."
+        },
+        "experience_points": {
+          "kind": "reconstructed",
+          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+        },
+        "output.definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: output item definition 30500; first tint (R) of Intrepid Protector Axe."
+        },
+        "output.count": {
+          "kind": "reconstructed",
+          "evidence": "(R) One output, as the forging sample; historical quantity is unknown."
+        },
+        "recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Value 31 is the pattern item Param1 recipe index."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 2526, Param1 31."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern 2526 MinProfileRank 1."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 171 is the forging game named Intrepid Protector Axe; Games window row in data/content/activity_catalogue.json."
+        },
+        "ingredients[0].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 2747."
+        },
+        "ingredients[0].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 5."
+        },
+        "ingredients[1].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 56."
+        },
+        "ingredients[1].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 4."
+        },
+        "ingredients[2].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 54."
+        },
+        "ingredients[2].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 2."
+        },
+        "ingredients[3].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 55."
+        },
+        "ingredients[3].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 2."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.lunar_enchanted_wand",
+      "name": "Lunar Enchanted Wand",
+      "recipe_id": 19,
+      "candidate_recipe_id": null,
+      "recipe_item_definition_id": 2514,
+      "job": "blacksmith",
+      "job_profile_id": 16,
+      "required_job_rank": 5,
+      "minigame_type_id": 8,
+      "minigame_id": 147,
+      "ingredients": [
+        {
+          "definition_id": 2750,
+          "count": 5
+        },
+        {
+          "definition_id": 21786,
+          "count": 10
+        },
+        {
+          "definition_id": 57,
+          "count": 3
+        },
+        {
+          "definition_id": 55,
+          "count": 3
+        }
+      ],
+      "output": {
+        "definition_id": 7186,
+        "count": 1
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "MiniGameData row 147 is TYPE 8; Blacksmith job profile 16."
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; pattern 2514 Param1=19 and MinProfileRank=5; output id 7186 is one tint variant."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: ingredient ids and counts."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Output tint, one output and the sample board."
+        }
+      ],
+      "experience_points": 0,
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Local stable key; the client row exposes numeric ids, not this slug."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: client-facing blacksmith recipe name."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: recipe job."
+        },
+        "job_profile_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: job/profile mapping; profile 16."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "Client MiniGameData and job guide: crafting TYPE 8."
+        },
+        "experience_points": {
+          "kind": "reconstructed",
+          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+        },
+        "output.definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: output item definition 7186; first tint (R) of Lunar Enchanted Wand."
+        },
+        "output.count": {
+          "kind": "reconstructed",
+          "evidence": "(R) One output, as the forging sample; historical quantity is unknown."
+        },
+        "recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Value 19 is the pattern item Param1 recipe index."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 2514, Param1 19."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern 2514 MinProfileRank 5."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 147 is the forging game named Lunar Enchanted Wand; Games window row in data/content/activity_catalogue.json."
+        },
+        "ingredients[0].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 2750."
+        },
+        "ingredients[0].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 5."
+        },
+        "ingredients[1].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 21786."
+        },
+        "ingredients[1].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 10."
+        },
+        "ingredients[2].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 57."
+        },
+        "ingredients[2].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 3."
+        },
+        "ingredients[3].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 55."
+        },
+        "ingredients[3].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 3."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.pain_relief_bonesaw",
+      "name": "Pain Relief Bonesaw",
+      "recipe_id": 25,
+      "candidate_recipe_id": null,
+      "recipe_item_definition_id": 2520,
+      "job": "blacksmith",
+      "job_profile_id": 16,
+      "required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": 165,
+      "ingredients": [
+        {
+          "definition_id": 21788,
+          "count": 10
+        },
+        {
+          "definition_id": 2748,
+          "count": 5
+        },
+        {
+          "definition_id": 54,
+          "count": 4
+        },
+        {
+          "definition_id": 56,
+          "count": 3
+        }
+      ],
+      "output": {
+        "definition_id": 30450,
+        "count": 1
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "MiniGameData row 165 is TYPE 8; Blacksmith job profile 16."
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; pattern 2520 Param1=25 and MinProfileRank=1; output id 30450 is one tint variant."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: ingredient ids and counts."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Output tint, one output and the sample board."
+        }
+      ],
+      "experience_points": 0,
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Local stable key; the client row exposes numeric ids, not this slug."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: client-facing blacksmith recipe name."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: recipe job."
+        },
+        "job_profile_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: job/profile mapping; profile 16."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "Client MiniGameData and job guide: crafting TYPE 8."
+        },
+        "experience_points": {
+          "kind": "reconstructed",
+          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+        },
+        "output.definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: output item definition 30450; first tint (R) of Pain Relief Bonesaw."
+        },
+        "output.count": {
+          "kind": "reconstructed",
+          "evidence": "(R) One output, as the forging sample; historical quantity is unknown."
+        },
+        "recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Value 25 is the pattern item Param1 recipe index."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 2520, Param1 25."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern 2520 MinProfileRank 1."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 165 is the forging game named Pain Relief Bonesaw; Games window row in data/content/activity_catalogue.json."
+        },
+        "ingredients[0].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 21788."
+        },
+        "ingredients[0].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 10."
+        },
+        "ingredients[1].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 2748."
+        },
+        "ingredients[1].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 5."
+        },
+        "ingredients[2].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 54."
+        },
+        "ingredients[2].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 4."
+        },
+        "ingredients[3].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 56."
+        },
+        "ingredients[3].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 3."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.power_charmed_wand",
+      "name": "Power Charmed Wand",
+      "recipe_id": 14,
+      "candidate_recipe_id": null,
+      "recipe_item_definition_id": 2509,
+      "job": "blacksmith",
+      "job_profile_id": 16,
+      "required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": 142,
+      "ingredients": [
+        {
+          "definition_id": 21785,
+          "count": 10
+        },
+        {
+          "definition_id": 2750,
+          "count": 5
+        },
+        {
+          "definition_id": 55,
+          "count": 3
+        },
+        {
+          "definition_id": 57,
+          "count": 2
+        }
+      ],
+      "output": {
+        "definition_id": 30301,
+        "count": 1
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "MiniGameData row 142 is TYPE 8; Blacksmith job profile 16."
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; pattern 2509 Param1=14 and MinProfileRank=1; output id 30301 is one tint variant."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: ingredient ids and counts."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Output tint, one output and the sample board."
+        }
+      ],
+      "experience_points": 0,
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Local stable key; the client row exposes numeric ids, not this slug."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: client-facing blacksmith recipe name."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: recipe job."
+        },
+        "job_profile_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: job/profile mapping; profile 16."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "Client MiniGameData and job guide: crafting TYPE 8."
+        },
+        "experience_points": {
+          "kind": "reconstructed",
+          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+        },
+        "output.definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: output item definition 30301; first tint (R) of Power Charmed Wand."
+        },
+        "output.count": {
+          "kind": "reconstructed",
+          "evidence": "(R) One output, as the forging sample; historical quantity is unknown."
+        },
+        "recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Value 14 is the pattern item Param1 recipe index."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 2509, Param1 14."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern 2509 MinProfileRank 1."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 142 is the forging game named Power Charmed Wand; Games window row in data/content/activity_catalogue.json."
+        },
+        "ingredients[0].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 21785."
+        },
+        "ingredients[0].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 10."
+        },
+        "ingredients[1].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 2750."
+        },
+        "ingredients[1].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 5."
+        },
+        "ingredients[2].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 55."
+        },
+        "ingredients[2].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 3."
+        },
+        "ingredients[3].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 57."
+        },
+        "ingredients[3].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 2."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.quick_shot_bow",
+      "name": "Quick Shot Bow",
+      "recipe_id": 10,
+      "candidate_recipe_id": null,
+      "recipe_item_definition_id": 2505,
+      "job": "blacksmith",
+      "job_profile_id": 16,
+      "required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": 138,
+      "ingredients": [
+        {
+          "definition_id": 21785,
+          "count": 10
+        },
+        {
+          "definition_id": 2752,
+          "count": 5
+        },
+        {
+          "definition_id": 55,
+          "count": 2
+        },
+        {
+          "definition_id": 53,
+          "count": 4
+        }
+      ],
+      "output": {
+        "definition_id": 30250,
+        "count": 1
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "MiniGameData row 138 is TYPE 8; Blacksmith job profile 16."
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; pattern 2505 Param1=10 and MinProfileRank=1; output id 30250 is one tint variant."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: ingredient ids and counts."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Output tint, one output and the sample board."
+        }
+      ],
+      "experience_points": 0,
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Local stable key; the client row exposes numeric ids, not this slug."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: client-facing blacksmith recipe name."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: recipe job."
+        },
+        "job_profile_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: job/profile mapping; profile 16."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "Client MiniGameData and job guide: crafting TYPE 8."
+        },
+        "experience_points": {
+          "kind": "reconstructed",
+          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+        },
+        "output.definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: output item definition 30250; first tint (R) of Quick Shot Bow."
+        },
+        "output.count": {
+          "kind": "reconstructed",
+          "evidence": "(R) One output, as the forging sample; historical quantity is unknown."
+        },
+        "recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Value 10 is the pattern item Param1 recipe index."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 2505, Param1 10."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern 2505 MinProfileRank 1."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 138 is the forging game named Quick Shot Bow; Games window row in data/content/activity_catalogue.json."
+        },
+        "ingredients[0].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 21785."
+        },
+        "ingredients[0].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 10."
+        },
+        "ingredients[1].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 2752."
+        },
+        "ingredients[1].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 5."
+        },
+        "ingredients[2].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 55."
+        },
+        "ingredients[2].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 2."
+        },
+        "ingredients[3].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 53."
+        },
+        "ingredients[3].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 4."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.rowdy_rumbler_hammer",
+      "name": "Rowdy Rumbler Hammer",
+      "recipe_id": 16,
+      "candidate_recipe_id": null,
+      "recipe_item_definition_id": 2511,
+      "job": "blacksmith",
+      "job_profile_id": 16,
+      "required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": 144,
+      "ingredients": [
+        {
+          "definition_id": 21786,
+          "count": 10
+        },
+        {
+          "definition_id": 2750,
+          "count": 5
+        },
+        {
+          "definition_id": 55,
+          "count": 2
+        },
+        {
+          "definition_id": 56,
+          "count": 5
+        }
+      ],
+      "output": {
+        "definition_id": 30340,
+        "count": 1
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "MiniGameData row 144 is TYPE 8; Blacksmith job profile 16."
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; pattern 2511 Param1=16 and MinProfileRank=1; output id 30340 is one tint variant."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: ingredient ids and counts."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Output tint, one output and the sample board."
+        }
+      ],
+      "experience_points": 0,
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Local stable key; the client row exposes numeric ids, not this slug."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: client-facing blacksmith recipe name."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: recipe job."
+        },
+        "job_profile_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: job/profile mapping; profile 16."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "Client MiniGameData and job guide: crafting TYPE 8."
+        },
+        "experience_points": {
+          "kind": "reconstructed",
+          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+        },
+        "output.definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: output item definition 30340; first tint (R) of Rowdy Rumbler Hammer."
+        },
+        "output.count": {
+          "kind": "reconstructed",
+          "evidence": "(R) One output, as the forging sample; historical quantity is unknown."
+        },
+        "recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Value 16 is the pattern item Param1 recipe index."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 2511, Param1 16."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern 2511 MinProfileRank 1."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 144 is the forging game named Rowdy Rumbler Hammer; Games window row in data/content/activity_catalogue.json."
+        },
+        "ingredients[0].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 21786."
+        },
+        "ingredients[0].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 10."
+        },
+        "ingredients[1].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 2750."
+        },
+        "ingredients[1].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 5."
+        },
+        "ingredients[2].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 55."
+        },
+        "ingredients[2].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 2."
+        },
+        "ingredients[3].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 56."
+        },
+        "ingredients[3].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 5."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.savage_sting_bow",
+      "name": "Savage Sting Bow",
+      "recipe_id": 65,
+      "candidate_recipe_id": null,
+      "recipe_item_definition_id": 49382,
+      "job": "blacksmith",
+      "job_profile_id": 16,
+      "required_job_rank": 15,
+      "minigame_type_id": 8,
+      "minigame_id": 366,
+      "ingredients": [
+        {
+          "definition_id": 21788,
+          "count": 10
+        },
+        {
+          "definition_id": 2748,
+          "count": 5
+        },
+        {
+          "definition_id": 53,
+          "count": 5
+        },
+        {
+          "definition_id": 55,
+          "count": 3
+        }
+      ],
+      "output": {
+        "definition_id": 30430,
+        "count": 1
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "MiniGameData row 366 is TYPE 8; Blacksmith job profile 16."
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; pattern 49382 Param1=65 and MinProfileRank=15; output id 30430 is one tint variant."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: ingredient ids and counts."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Output tint, one output and the sample board."
+        }
+      ],
+      "experience_points": 0,
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Local stable key; the client row exposes numeric ids, not this slug."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: client-facing blacksmith recipe name."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: recipe job."
+        },
+        "job_profile_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: job/profile mapping; profile 16."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "Client MiniGameData and job guide: crafting TYPE 8."
+        },
+        "experience_points": {
+          "kind": "reconstructed",
+          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+        },
+        "output.definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: output item definition 30430; first tint (R) of Savage Sting Bow."
+        },
+        "output.count": {
+          "kind": "reconstructed",
+          "evidence": "(R) One output, as the forging sample; historical quantity is unknown."
+        },
+        "recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Value 65 is the pattern item Param1 recipe index."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 49382, Param1 65."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern 49382 MinProfileRank 15."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 366 is the forging game named Savage Sting Bow; Games window row in data/content/activity_catalogue.json."
+        },
+        "ingredients[0].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 21788."
+        },
+        "ingredients[0].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 10."
+        },
+        "ingredients[1].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 2748."
+        },
+        "ingredients[1].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 5."
+        },
+        "ingredients[2].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 53."
+        },
+        "ingredients[2].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 5."
+        },
+        "ingredients[3].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 55."
+        },
+        "ingredients[3].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 3."
+        }
+      }
+    },
+    {
       "key": "blacksmith.spunky_scrapper_hammer.sample",
       "name": "Spunky Scrapper Hammer",
       "recipe_id": 11,
@@ -3513,11 +5550,11 @@
         },
         {
           "definition_id": 55,
-          "count": 5
+          "count": 2
         },
         {
           "definition_id": 56,
-          "count": 5
+          "count": 4
         }
       ],
       "output": {
@@ -3613,16 +5650,703 @@
           "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 55; Comment='Wooden Plank'."
         },
         "ingredients[2].count": {
-          "kind": "reconstructed",
-          "evidence": "(R) Local src/forging.rs sample count; original anvil count is not recovered."
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table, video -zp-94_-ImE_27.00: count 2."
         },
         "ingredients[3].definition_id": {
           "kind": "legacy",
           "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 56; Comment='Thorny Fasteners'."
         },
         "ingredients[3].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table, video -zp-94_-ImE_27.00: count 4."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.stalking_panther_scythe",
+      "name": "Stalking Panther Scythe",
+      "recipe_id": 26,
+      "candidate_recipe_id": null,
+      "recipe_item_definition_id": 2521,
+      "job": "blacksmith",
+      "job_profile_id": 16,
+      "required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": 166,
+      "ingredients": [
+        {
+          "definition_id": 21788,
+          "count": 10
+        },
+        {
+          "definition_id": 2748,
+          "count": 5
+        },
+        {
+          "definition_id": 54,
+          "count": 4
+        },
+        {
+          "definition_id": 56,
+          "count": 3
+        }
+      ],
+      "output": {
+        "definition_id": 30470,
+        "count": 1
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "MiniGameData row 166 is TYPE 8; Blacksmith job profile 16."
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; pattern 2521 Param1=26 and MinProfileRank=1; output id 30470 is one tint variant."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: ingredient ids and counts."
+        },
+        {
           "kind": "reconstructed",
-          "evidence": "(R) Local src/forging.rs sample count; original anvil count is not recovered."
+          "evidence": "(R) Output tint, one output and the sample board."
+        }
+      ],
+      "experience_points": 0,
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Local stable key; the client row exposes numeric ids, not this slug."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: client-facing blacksmith recipe name."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: recipe job."
+        },
+        "job_profile_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: job/profile mapping; profile 16."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "Client MiniGameData and job guide: crafting TYPE 8."
+        },
+        "experience_points": {
+          "kind": "reconstructed",
+          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+        },
+        "output.definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: output item definition 30470; first tint (R) of Stalking Panther Scythe."
+        },
+        "output.count": {
+          "kind": "reconstructed",
+          "evidence": "(R) One output, as the forging sample; historical quantity is unknown."
+        },
+        "recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Value 26 is the pattern item Param1 recipe index."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 2521, Param1 26."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern 2521 MinProfileRank 1."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 166 is the forging game named Stalking Panther Scythe; Games window row in data/content/activity_catalogue.json."
+        },
+        "ingredients[0].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 21788."
+        },
+        "ingredients[0].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 10."
+        },
+        "ingredients[1].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 2748."
+        },
+        "ingredients[1].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 5."
+        },
+        "ingredients[2].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 54."
+        },
+        "ingredients[2].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 4."
+        },
+        "ingredients[3].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 56."
+        },
+        "ingredients[3].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 3."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.stalwart_protector_hammer",
+      "name": "Stalwart Protector Hammer",
+      "recipe_id": 27,
+      "candidate_recipe_id": null,
+      "recipe_item_definition_id": 2522,
+      "job": "blacksmith",
+      "job_profile_id": 16,
+      "required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": 167,
+      "ingredients": [
+        {
+          "definition_id": 21788,
+          "count": 10
+        },
+        {
+          "definition_id": 2748,
+          "count": 5
+        },
+        {
+          "definition_id": 54,
+          "count": 2
+        },
+        {
+          "definition_id": 56,
+          "count": 3
+        },
+        {
+          "definition_id": 55,
+          "count": 2
+        }
+      ],
+      "output": {
+        "definition_id": 30440,
+        "count": 1
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "MiniGameData row 167 is TYPE 8; Blacksmith job profile 16."
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; pattern 2522 Param1=27 and MinProfileRank=1; output id 30440 is one tint variant."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: ingredient ids and counts."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Output tint, one output and the sample board."
+        }
+      ],
+      "experience_points": 0,
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Local stable key; the client row exposes numeric ids, not this slug."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: client-facing blacksmith recipe name."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: recipe job."
+        },
+        "job_profile_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: job/profile mapping; profile 16."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "Client MiniGameData and job guide: crafting TYPE 8."
+        },
+        "experience_points": {
+          "kind": "reconstructed",
+          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+        },
+        "output.definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: output item definition 30440; first tint (R) of Stalwart Protector Hammer."
+        },
+        "output.count": {
+          "kind": "reconstructed",
+          "evidence": "(R) One output, as the forging sample; historical quantity is unknown."
+        },
+        "recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Value 27 is the pattern item Param1 recipe index."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 2522, Param1 27."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern 2522 MinProfileRank 1."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 167 is the forging game named Stalwart Protector Hammer; Games window row in data/content/activity_catalogue.json."
+        },
+        "ingredients[0].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 21788."
+        },
+        "ingredients[0].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 10."
+        },
+        "ingredients[1].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 2748."
+        },
+        "ingredients[1].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 5."
+        },
+        "ingredients[2].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 54."
+        },
+        "ingredients[2].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 2."
+        },
+        "ingredients[3].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 56."
+        },
+        "ingredients[3].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 3."
+        },
+        "ingredients[4].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 55."
+        },
+        "ingredients[4].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 2."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.striking_serpent_sword",
+      "name": "Striking Serpent Sword",
+      "recipe_id": 30,
+      "candidate_recipe_id": null,
+      "recipe_item_definition_id": 2525,
+      "job": "blacksmith",
+      "job_profile_id": 16,
+      "required_job_rank": 20,
+      "minigame_type_id": 8,
+      "minigame_id": 170,
+      "ingredients": [
+        {
+          "definition_id": 2747,
+          "count": 5
+        },
+        {
+          "definition_id": 21789,
+          "count": 10
+        },
+        {
+          "definition_id": 54,
+          "count": 4
+        },
+        {
+          "definition_id": 56,
+          "count": 4
+        }
+      ],
+      "output": {
+        "definition_id": 30530,
+        "count": 1
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "MiniGameData row 170 is TYPE 8; Blacksmith job profile 16."
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; pattern 2525 Param1=30 and MinProfileRank=20; output id 30530 is one tint variant."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: ingredient ids and counts."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Output tint, one output and the sample board."
+        }
+      ],
+      "experience_points": 0,
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Local stable key; the client row exposes numeric ids, not this slug."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: client-facing blacksmith recipe name."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: recipe job."
+        },
+        "job_profile_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: job/profile mapping; profile 16."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "Client MiniGameData and job guide: crafting TYPE 8."
+        },
+        "experience_points": {
+          "kind": "reconstructed",
+          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+        },
+        "output.definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: output item definition 30530; first tint (R) of Striking Serpent Sword."
+        },
+        "output.count": {
+          "kind": "reconstructed",
+          "evidence": "(R) One output, as the forging sample; historical quantity is unknown."
+        },
+        "recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Value 30 is the pattern item Param1 recipe index."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 2525, Param1 30."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern 2525 MinProfileRank 20."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 170 is the forging game named Striking Serpent Sword; Games window row in data/content/activity_catalogue.json."
+        },
+        "ingredients[0].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 2747."
+        },
+        "ingredients[0].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 5."
+        },
+        "ingredients[1].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 21789."
+        },
+        "ingredients[1].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 10."
+        },
+        "ingredients[2].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 54."
+        },
+        "ingredients[2].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 4."
+        },
+        "ingredients[3].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 56."
+        },
+        "ingredients[3].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 4."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.strong_scrapper_hammer",
+      "name": "Strong Scrapper Hammer",
+      "recipe_id": 24,
+      "candidate_recipe_id": null,
+      "recipe_item_definition_id": 2519,
+      "job": "blacksmith",
+      "job_profile_id": 16,
+      "required_job_rank": 15,
+      "minigame_type_id": 8,
+      "minigame_id": 164,
+      "ingredients": [
+        {
+          "definition_id": 21788,
+          "count": 10
+        },
+        {
+          "definition_id": 2748,
+          "count": 5
+        },
+        {
+          "definition_id": 56,
+          "count": 5
+        },
+        {
+          "definition_id": 55,
+          "count": 3
+        }
+      ],
+      "output": {
+        "definition_id": 30460,
+        "count": 1
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "MiniGameData row 164 is TYPE 8; Blacksmith job profile 16."
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; pattern 2519 Param1=24 and MinProfileRank=15; output id 30460 is one tint variant."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: ingredient ids and counts."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Output tint, one output and the sample board."
+        }
+      ],
+      "experience_points": 0,
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Local stable key; the client row exposes numeric ids, not this slug."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: client-facing blacksmith recipe name."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: recipe job."
+        },
+        "job_profile_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: job/profile mapping; profile 16."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "Client MiniGameData and job guide: crafting TYPE 8."
+        },
+        "experience_points": {
+          "kind": "reconstructed",
+          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+        },
+        "output.definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: output item definition 30460; first tint (R) of Strong Scrapper Hammer."
+        },
+        "output.count": {
+          "kind": "reconstructed",
+          "evidence": "(R) One output, as the forging sample; historical quantity is unknown."
+        },
+        "recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Value 24 is the pattern item Param1 recipe index."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 2519, Param1 24."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern 2519 MinProfileRank 15."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 164 is the forging game named Strong Scrapper Hammer; Games window row in data/content/activity_catalogue.json."
+        },
+        "ingredients[0].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 21788."
+        },
+        "ingredients[0].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 10."
+        },
+        "ingredients[1].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 2748."
+        },
+        "ingredients[1].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 5."
+        },
+        "ingredients[2].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 56."
+        },
+        "ingredients[2].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 5."
+        },
+        "ingredients[3].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 55."
+        },
+        "ingredients[3].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 3."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.trauma_support_shockrod",
+      "name": "Trauma Support Shockrod",
+      "recipe_id": 29,
+      "candidate_recipe_id": null,
+      "recipe_item_definition_id": 2524,
+      "job": "blacksmith",
+      "job_profile_id": 16,
+      "required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": 169,
+      "ingredients": [
+        {
+          "definition_id": 2747,
+          "count": 5
+        },
+        {
+          "definition_id": 21789,
+          "count": 10
+        },
+        {
+          "definition_id": 56,
+          "count": 4
+        },
+        {
+          "definition_id": 54,
+          "count": 4
+        }
+      ],
+      "output": {
+        "definition_id": 30510,
+        "count": 1
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "MiniGameData row 169 is TYPE 8; Blacksmith job profile 16."
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; pattern 2524 Param1=29 and MinProfileRank=1; output id 30510 is one tint variant."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: ingredient ids and counts."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Output tint, one output and the sample board."
+        }
+      ],
+      "experience_points": 0,
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Local stable key; the client row exposes numeric ids, not this slug."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: client-facing blacksmith recipe name."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: recipe job."
+        },
+        "job_profile_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: job/profile mapping; profile 16."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "Client MiniGameData and job guide: crafting TYPE 8."
+        },
+        "experience_points": {
+          "kind": "reconstructed",
+          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+        },
+        "output.definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: output item definition 30510; first tint (R) of Trauma Support Shockrod."
+        },
+        "output.count": {
+          "kind": "reconstructed",
+          "evidence": "(R) One output, as the forging sample; historical quantity is unknown."
+        },
+        "recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Value 29 is the pattern item Param1 recipe index."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 2524, Param1 29."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern 2524 MinProfileRank 1."
+        },
+        "minigame_id": {
+          "kind": "client",
+          "evidence": "MiniGameData row 169 is the forging game named Trauma Support Shockrod; Games window row in data/content/activity_catalogue.json."
+        },
+        "ingredients[0].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 2747."
+        },
+        "ingredients[0].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 5."
+        },
+        "ingredients[1].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 21789."
+        },
+        "ingredients[1].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 10."
+        },
+        "ingredients[2].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 56."
+        },
+        "ingredients[2].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 4."
+        },
+        "ingredients[3].definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 54."
+        },
+        "ingredients[3].count": {
+          "kind": "wiki",
+          "evidence": "local freerealms-wiki blacksmith recipe list; forging sheet section 1 table: count 4."
         }
       }
     },

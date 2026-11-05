@@ -92,7 +92,7 @@ use crate::{
 };
 use serde::Deserialize;
 use std::{
-    collections::BTreeSet,
+    collections::{BTreeMap, BTreeSet},
     fs,
     io::{self, Read},
     path::Path,
@@ -286,6 +286,32 @@ enum Runner {
 }
 
 /// L095: the live rows in `directory`, or none when the file is absent.
+/// What a game's own Games window row says on its offer card.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct OfferText {
+    pub name_id: i32,
+    pub description_id: i32,
+    pub difficulty: i32,
+}
+
+/// Each game row's offer text by game id, from `directory`'s catalogue or the bundled one.
+pub fn offer_texts(directory: &Path) -> io::Result<BTreeMap<i32, OfferText>> {
+    let mut rows = load_live(directory)?;
+    if rows.is_empty() {
+        rows = load_live(&crate::content::bundled_content())?;
+    }
+    // Wire values: some rows hold -1 (0xFFFFFFFF) as their difficulty.
+    let texts = (rows.iter().filter(|row| row.entry_type == 2)).map(|row| {
+        let text = OfferText {
+            name_id: row.name_id.cast_signed(),
+            description_id: row.description_id.cast_signed(),
+            difficulty: row.difficulty.cast_signed(),
+        };
+        (row.content_id.cast_signed(), text)
+    });
+    Ok(texts.collect())
+}
+
 pub fn load_live(directory: &Path) -> io::Result<Vec<LiveRow>> {
     let path = directory.join(CATALOGUE_FILE);
     if !path.is_file() {

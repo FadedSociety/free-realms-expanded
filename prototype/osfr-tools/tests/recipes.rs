@@ -109,7 +109,7 @@ fn shipped_recipes_load_and_all_item_references_exist() {
         &ids,
     )
     .unwrap();
-    assert_eq!(catalog.records.len(), 32);
+    assert_eq!(catalog.records.len(), 52);
 
     for recipe in &catalog.records {
         assert!(ids.contains(&recipe.output.definition_id));
@@ -129,7 +129,7 @@ fn shipped_recipes_load_and_all_item_references_exist() {
         &ids,
     )
     .unwrap();
-    assert_eq!(unresolved.records.len(), 82);
+    assert_eq!(unresolved.records.len(), 62);
     assert!(
         unresolved
             .records
@@ -151,7 +151,7 @@ fn shipped_recipes_load_and_all_item_references_exist() {
             .iter()
             .filter(|row| row.job == CraftingJob::Blacksmith)
             .count(),
-        64
+        44
     );
     assert_eq!(
         unresolved
@@ -180,7 +180,7 @@ fn every_loaded_recipe_item_exists_in_runtime_item_catalogue() {
         &ids,
     )
     .expect("every loaded recipe item must have a runtime definition");
-    assert_eq!(catalog.records.len(), 32);
+    assert_eq!(catalog.records.len(), 52);
 }
 
 #[test]
@@ -260,7 +260,7 @@ fn unresolved_candidate_ids_do_not_silently_shadow_loaded_rows() {
 fn lookups_cover_job_rank_and_output() {
     let catalog = shipped();
     assert_eq!(catalog.by_job(CraftingJob::Chef).count(), 26);
-    assert_eq!(catalog.by_job(CraftingJob::Blacksmith).count(), 1);
+    assert_eq!(catalog.by_job(CraftingJob::Blacksmith).count(), 21);
     assert_eq!(catalog.by_job(CraftingJob::Miner).count(), 5);
     assert_eq!(catalog.by_output(21785).next().unwrap().name, "Copper Bar");
     assert_eq!(

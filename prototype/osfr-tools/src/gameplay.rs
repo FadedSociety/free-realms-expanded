@@ -2310,7 +2310,7 @@ impl Gameplay {
             for id in [910006, 910015] {
                 if !accepted_before.contains(&id) && accepted(&staged, id) {
                     let forging = staged.forging.as_ref().ok_or_else(|| unloaded("forging"))?;
-                    let mut supplies = forging.requirements().to_vec();
+                    let mut supplies = forging.opening_requirements().to_vec();
                     if id == 910015 {
                         // The reinforcement step first requires smelting.
                         // Give its inputs, rather than free bars that would
@@ -2321,7 +2321,7 @@ impl Gameplay {
                                 .smelting
                                 .as_ref()
                                 .ok_or_else(|| invalid("reinforcement requires smelting content"))?
-                                .requirements()
+                                .opening_requirements()
                                 .iter()
                                 .copied(),
                         );

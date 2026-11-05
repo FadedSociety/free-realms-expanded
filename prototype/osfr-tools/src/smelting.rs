@@ -3,10 +3,11 @@
 //! The caller must stage this clonable service together with inventory, apply
 //! `transaction` atomically, and persist before committing either state. The
 //! movie reports its own play; these checks are not an authoritative simulation.
+use crate::activity_portal::OfferText;
 use crate::recipes::{CraftingJob, RecipeCatalog, RecipeFile};
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::{HashMap, HashSet},
+    collections::{BTreeMap, HashMap, HashSet},
     fs,
     io::{self, Read},
     path::Path,
@@ -131,6 +132,7 @@ pub type SmeltingOutcome = crate::recipe_book::CraftOutcome;
 #[derive(Clone, Debug)]
 pub struct Smelting {
     content: Arc<Content>,
+    offers: Arc<BTreeMap<i32, OfferText>>,
     recipes: HashMap<String, Recipe>,
     state: SmeltingState,
     results_presented: bool,
@@ -163,6 +165,7 @@ impl Smelting {
         }
         Ok(Self {
             content: Arc::new(content),
+            offers: Arc::new(crate::activity_portal::offer_texts(directory)?),
             recipes,
             state,
             results_presented: false,
@@ -173,6 +176,13 @@ impl Smelting {
     }
     pub fn active(&self) -> bool {
         self.state.active.is_some()
+    }
+    /// The file's own recipe, the opening's. `recipe_key` and `requirements` follow the last run.
+    pub fn opening_recipe_key(&self) -> &str {
+        &self.content.recipe.key
+    }
+    pub fn opening_requirements(&self) -> &[(i32, u32)] {
+        &self.recipes[&self.content.recipe.key].consumes
     }
     pub fn requirements(&self) -> &[(i32, u32)] {
         &self.selected_recipe().consumes
@@ -245,12 +255,7 @@ impl Smelting {
     /// (R) Compatibility entry for the default recipe; the gateway must use
     /// `begin_recipe` with learned state, rank, and actual inventory.
     pub fn begin(&mut self, profile: i32) -> io::Result<SmeltingOutcome> {
-        let key = self
-            .state
-            .active_recipe_key
-            .as_deref()
-            .unwrap_or(&self.content.recipe.key)
-            .to_owned();
+        let key = self.content.recipe.key.clone();
         let available = self
             .recipes
             .get(&key)
@@ -567,7 +572,14 @@ impl Smelting {
         let game_id = self.selected_game_id();
         let mut b = header_with_game(16, id, game_id);
         let job_type = crate::minigame::offer_job_type(PROFILE);
-        for n in [c.name_id, c.icon_id, c.description_id, 1, job_type, 9] {
+        // A recipe's own row titles the card; the sample game has none.
+        let text = self.offers.get(&game_id).copied().unwrap_or(OfferText {
+            name_id: c.name_id,
+            description_id: c.description_id,
+            difficulty: 1,
+        });
+        let (name, description) = (text.name_id, text.description_id);
+        for n in [name, c.icon_id, description, text.difficulty, job_type, 9] {
             b.extend(n.to_le_bytes());
         }
         b.push(0); // MembersOnly.

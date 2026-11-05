@@ -285,8 +285,8 @@ pub fn near_any(stations: &[Station], job: CraftingJob, zone_id: u32, position: 
 }
 
 /// The answer to client 26/8 on a station actor of `job`: the recipe window, or
-/// the refusal line a 26/24 start there would give (wrong job, then no station
-/// in reach). (R) The original station-interaction policy was not recovered.
+/// the refusal line a 26/24 start there would give (no station in reach). Live
+/// opened it on any job and switched at the offer (`-zp-94_-ImE_24.00`).
 ///
 /// The window is server command 26/25 `CommandPacketShowRecipeWindow` (ctor
 /// `00a987a0`, sub 0x19): family-26 dispatcher jump table `00aa2620` case 25
@@ -297,14 +297,10 @@ pub fn near_any(stations: &[Station], job: CraftingJob, zone_id: u32, position: 
 /// `RecipeHandler:Show` opens the window.
 pub fn open_window(
     job: CraftingJob,
-    active_profile: i32,
     zone_id: u32,
     position: [f32; 3],
     stations: &[Station],
 ) -> Vec<u8> {
-    if job.profile_id() != active_profile {
-        return Refusal::WrongJob(job).feedback();
-    }
     if !near_any(stations, job, zone_id, position) {
         return Refusal::NoStation(job).feedback();
     }
@@ -323,6 +319,14 @@ fn has_ingredients(required: &[(i32, u32)], available: &[(i32, u32)]) -> bool {
             .sum::<u64>()
             >= u64::from(*needed)
     })
+}
+
+/// The job a recipe belongs to, when the catalogue has it.
+pub fn job_of(catalog: &RecipeCatalog, recipe_id: i32) -> Option<CraftingJob> {
+    let id = u32::try_from(recipe_id).ok()?;
+    (catalog.records.iter())
+        .find(|recipe| recipe.recipe_id == Some(id))
+        .map(|recipe| recipe.job)
 }
 
 /// Start the recipe the client named. Validates in the order that reveals the

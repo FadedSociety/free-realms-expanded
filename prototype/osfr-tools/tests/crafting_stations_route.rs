@@ -16,7 +16,7 @@ mod s6;
 mod station;
 
 use osfr_tools::{
-    game_store,
+    activity_portal, game_store,
     gameplay::{Gameplay, GameplayState},
     gateway::{Gateway, GatewayOutcome},
     inventory::InventoryItem,
@@ -86,7 +86,7 @@ const CASES: [Case; 3] = [
         station: WORLD_ANVIL,
         station_guid: 100_000_003_600,
         filter: 12,
-        inputs: &[(21785, 10), (2752, 5), (55, 5), (56, 5)],
+        inputs: &[(21785, 10), (2752, 5), (55, 2), (56, 4)],
         output: 30280,
         output_quantity: 1,
     },
@@ -442,15 +442,16 @@ fn a_refused_world_station_request_changes_nothing() {
 
 #[test]
 fn a_wrong_job_recipe_request_changes_nothing() {
-    // Chef recipe 70 at the cooking table while the active job is Miner, the
+    // Chef recipe 70 at the cooking table on a Miner who has no Chef job, the
     // gateway-level partner of `recipe_book_route` (which needs private
-    // content). The wrong-job refusal must not start a run or touch the save.
+    // content). The refusal must not start a run or touch the save.
     let case = &CASES[0];
     let (gateway, content, reference) = gateway_at(case, case.station);
     let mut state = gateway.snapshot().gameplay.unwrap();
     let profiles = state.profiles.as_mut().unwrap();
     profiles.active = CraftingJob::Miner.profile_id();
     profiles.unlocked.insert(profiles.active);
+    profiles.unlocked.remove(&CraftingJob::Chef.profile_id());
     let mut gateway = Gateway::load_gameplay(
         &reference,
         gateway.snapshot().character,
@@ -483,11 +484,35 @@ fn a_wrong_job_recipe_request_changes_nothing() {
         recipe_at(&gateway, case.craft).is_none(),
         "the Chef recipe must not start on the Miner"
     );
-    let chat = s6::chat_texts(&outcome.replies);
-    assert!(
-        chat.iter().any(|text| text.contains("Switch to Chef")),
-        "{chat:?}"
-    );
+    assert_eq!(sent(&outcome), [missing_job()]);
+}
+
+/// A job the player has is one start away: live switched at the offer (`-zp-94_-ImE_24.00`).
+#[test]
+fn a_recipe_of_another_owned_job_switches_into_it_and_starts() {
+    let case = &CASES[0];
+    let (gateway, content, reference) = gateway_at(case, case.station);
+    let (mut miner, _) = reload(&gateway, &content, &reference, |saved| {
+        let profiles = saved.gameplay.as_mut().unwrap().profiles.as_mut().unwrap();
+        profiles.active = CraftingJob::Miner.profile_id();
+        profiles.unlocked.insert(profiles.active);
+    });
+    let outcome = book_start(&mut miner, case.recipe);
+    assert!(outcome.gameplay_changed);
+    let profiles = miner.snapshot().gameplay.unwrap().profiles.unwrap();
+    assert_eq!(profiles.active, CraftingJob::Chef.profile_id());
+    assert!(recipe_at(&miner, case.craft).is_some(), "the run started");
+}
+
+/// The packets a reply list holds, unwrapped.
+fn sent(outcome: &GatewayOutcome) -> Vec<Vec<u8>> {
+    (outcome.replies.iter())
+        .map(|packet| inner(packet).to_vec())
+        .collect()
+}
+
+fn missing_job() -> Vec<u8> {
+    activity_portal::join_error(activity_portal::MISSING_JOB_TEXT)
 }
 
 /// Client 26/8 (`008b6bc0`): actor GUID and a zero flag.
@@ -577,21 +602,37 @@ fn a_station_of_another_job_or_out_of_reach_answers_the_refusal_line() {
         let profiles = saved.gameplay.as_mut().unwrap().profiles.as_mut().unwrap();
         profiles.active = CraftingJob::Miner.profile_id();
         profiles.unlocked.insert(profiles.active);
+        profiles.unlocked.remove(&CraftingJob::Chef.profile_id());
     });
     let (mut away, _) = reload(&gateway, &content, &reference, |saved| {
         saved.character.position[0] += 100.0;
     });
-    for (gateway, line) in [
-        (&mut miner, "Switch to Chef to make that recipe."),
-        (&mut away, "Move closer to a cooking station."),
-    ] {
-        let before = gateway.snapshot();
-        let outcome = interact(gateway, case.station_guid);
-        assert!(windows(&outcome).is_empty(), "{line}");
-        assert_eq!(s6::chat_texts(&outcome.replies), [line]);
-        assert!(!outcome.state_changed && !outcome.gameplay_changed);
-        assert_eq!(gateway.snapshot(), before, "a refusal changes nothing");
-    }
+    let before = miner.snapshot();
+    let outcome = interact(&mut miner, case.station_guid);
+    assert_eq!(sent(&outcome), [missing_job()], "a job the player lacks");
+    assert!(!outcome.state_changed && !outcome.gameplay_changed);
+    assert_eq!(miner.snapshot(), before, "a refusal changes nothing");
+
+    let before = away.snapshot();
+    let outcome = interact(&mut away, case.station_guid);
+    assert!(windows(&outcome).is_empty());
+    let line = "Move closer to a cooking station.";
+    assert_eq!(s6::chat_texts(&outcome.replies), [line]);
+    assert!(!outcome.state_changed && !outcome.gameplay_changed);
+    assert_eq!(away.snapshot(), before, "a refusal changes nothing");
+}
+
+#[test]
+fn a_station_opens_on_any_job_the_player_has() {
+    let case = &CASES[0];
+    let (gateway, content, reference) = gateway_at(case, case.station);
+    let (mut miner, _) = reload(&gateway, &content, &reference, |saved| {
+        let profiles = saved.gameplay.as_mut().unwrap().profiles.as_mut().unwrap();
+        profiles.active = CraftingJob::Miner.profile_id();
+        profiles.unlocked.insert(profiles.active);
+    });
+    let outcome = interact(&mut miner, case.station_guid);
+    assert_eq!(windows(&outcome), [window(10)]);
 }
 
 #[test]

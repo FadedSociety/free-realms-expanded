@@ -619,3 +619,42 @@ fn cooking_recipe_rejections_leave_state_unchanged() {
     );
     assert_eq!(game.state(), &state);
 }
+
+/// The card reads the recipe's own Games window row: name, text and dots at 15, 23 and 27. The
+/// sample game has no row and keeps its content's words.
+#[test]
+fn a_recipe_offer_shows_its_own_row() {
+    let field = |packet: &[u8], at: usize| {
+        i32::from_le_bytes(packet[at..at + 4].try_into().unwrap())
+    };
+    let catalog: Value =
+        serde_json::from_str(include_str!("../data/content/recipes.json")).unwrap();
+    let recipes = catalog["records"].as_array().unwrap();
+    for (minigame, name, dots) in [(173, 386_024, 1), (190, 386_054, 3)] {
+        let row = (recipes.iter())
+            .find(|row| row["minigame_id"] == minigame)
+            .unwrap();
+        let key = row["key"].as_str().unwrap();
+        let available: Vec<_> = (row["ingredients"].as_array().unwrap().iter())
+            .map(|item| {
+                (
+                    item["definition_id"].as_i64().unwrap() as i32,
+                    item["count"].as_u64().unwrap() as u32,
+                )
+            })
+            .collect();
+        let mut fixture = Fixture::new();
+        fixture.content["recipe"] = json!({"key": key});
+        fixture.write();
+        let mut game = fixture.load(None);
+        let offered = game.begin_recipe(45, key, 20, true, &available).unwrap();
+        let card = &offered.replies[0];
+        assert_eq!(
+            (field(card, 15), field(card, 23), field(card, 27)),
+            (name, 20_520, dots)
+        );
+    }
+    let offered = Fixture::new().load(None).begin(45).unwrap();
+    let card = &offered.replies[0];
+    assert_eq!((field(card, 15), field(card, 23), field(card, 27)), (501, 502, 1));
+}

@@ -260,6 +260,10 @@ fn native_payload_info_and_game_over_equal_compiled_community_vectors() {
     // The community vector sends the job id; the client filters on the job's type (`00c8ff30`).
     let mut info = vector("info");
     info[31..35].copy_from_slice(&9_i32.to_le_bytes());
+    // The card reads game 77's own Games window row, not the fixture's words.
+    info[15..19].copy_from_slice(&386068_i32.to_le_bytes());
+    info[23..27].copy_from_slice(&37273_i32.to_le_bytes());
+    info[27..31].copy_from_slice(&1_i32.to_le_bytes());
     assert_eq!(g.begin(14).unwrap().replies[0], info);
     let mut start = vec![39, 0, 5];
     for n in [id(&g), -1, 77] {
