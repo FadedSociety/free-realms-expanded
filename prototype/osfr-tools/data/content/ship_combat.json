@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source": "L963 (R): Pirate's Plunder arenas. Docks are each arena's Port/PortBell areas (client ss_pirate_arenaAreas.xml, ss_pir_arena3Areas.xml, ss_pir_arena4Areas.xml). The live per-zone ZoneConfig never shipped (field names: the server loader ShipZoneConfigLoad 010680f0 compiled into the client). The camera values are the client's compiled defaults (constructor 0106b090; Pitch, MinPitch and MaxPitch in degrees as the loader 0106b1e0 reads them). The ship physics values are the client's compiled defaults (constructor 0106ae50) except the speeds (MinSpeed, MaxSpeed, TurboSpeed), which are (R) as is the one gear; angles in degrees as the loaders 0106a560 and 0106a3a0 read them. Colours are the client's PirateColorFromName names (R slot order); the flag and the damage states' mast aliases are the mast actors' texture aliases (skullx01, dmg00-dmg03; R thresholds). These ZoneConfig values follow the client constructor 01067ac0: Gravity 9.81, PhysicsSimulationRate 60, ZoneBubble 12/12/2, parking 2/4/20/20/1/15, repulsor 10/30/100, shove-out 10/30, AllowablePhysicsDelta 12, PickupEmptyTime 3, FlyingTreasureHeight 1.2, ShipPickupCount 12. Every other ZoneConfig value is (R), MaxPlayers, MaxScore, PlayTime, ZoneReadyWaitTime and MaxDrawDistance included (the constructor's 1/1/0/0/0 are per-zone placeholders). Treasure (L966): every value is (R); pickup points lie between each arena's docks and their middle (60% of the way in, plus the middle), on the water level; chest models from the client's Models.txt. Spawns and pickups (L966) come from the arenas' terrain heights (osfr-terrain grids of the arena chunks): spawns 35 m off each dock where a 15 m disc lies at least 6 m under WaterLevel, Shipwreck Cove's chests on a 20 m grid of such water, at least 40 m from docks and 60 m apart. The chest value 3250 follows live gameplay video ('COLLECTED 3250 GOLD'); PlayTime 540 the 2010 player guide (nine minutes; the video's timer reads 8:45 a minute in). Docks (L966 rework): each bank is the arena's Port/PortBell area (the pad, where every ship starts and banks), each enter its base's shipwash cave prop from the 2014 chunks (steering in opens Ship Selection); Treasure Isle's slots follow its loading-screen map colours (Port_1 red, the shark cave). Shipwreck Cove's chests stay over 70 m from every pad. EnterRadius 20 and HoldUnloadPerSecond 1 are (R); max_speed 40 is 1.33x TurboSpeed 30 (R). Effect ids (client ActorParticleEmitterDefinitions.xml by name): TreasureXMark 22036 bbe_pir_chest_treasure_x, TreasureFill 22101 bbe_pir_dock_treasure_fill, ShipChestFull/Empty 22369/22368 bbe_pir_ship_hud_chest_full/empty. X spots (L967): Treasure Isle's and Arctic Bay's chests lie at the X marks of their loading-screen maps (three each), fitted to the dock bells by least squares and snapped to deep water; the 'Treasure N m' marker points at their centre (Treasure Isle: 509 m from red's pad, the game showed 537). Shipwreck Cove keeps terrain-picked points until its map turns up.",
+  "source": "L963 (R): Pirate's Plunder arenas. Docks are each arena's Port/PortBell areas (client ss_pirate_arenaAreas.xml, ss_pir_arena3Areas.xml, ss_pir_arena4Areas.xml). The live per-zone ZoneConfig never shipped (field names: the server loader ShipZoneConfigLoad 010680f0 compiled into the client). The camera values are the client's compiled defaults (constructor 0106b090; Pitch, MinPitch and MaxPitch in degrees as the loader 0106b1e0 reads them). The ship physics values are the client's compiled defaults (constructor 0106ae50) except the speeds (MinSpeed, MaxSpeed, TurboSpeed), which are (R) as is the one gear; angles in degrees as the loaders 0106a560 and 0106a3a0 read them. Colours are the client's PirateColorFromName names (R slot order); the flag and the damage states' mast aliases are the mast actors' texture aliases (skullx01, dmg00-dmg03; R thresholds). These ZoneConfig values follow the client constructor 01067ac0: Gravity 9.81, PhysicsSimulationRate 60, ZoneBubble 12/12/2, parking 2/4/20/20/1/15, repulsor 10/30/100, shove-out 10/30, AllowablePhysicsDelta 12, PickupEmptyTime 3, FlyingTreasureHeight 1.2, ShipPickupCount 12. Every other ZoneConfig value is (R), MaxPlayers, MaxScore, PlayTime, ZoneReadyWaitTime and MaxDrawDistance included (the constructor's 1/1/0/0/0 are per-zone placeholders). Treasure (L966): every value is (R); pickup points lie between each arena's docks and their middle (60% of the way in, plus the middle), on the water level; chest models from the client's Models.txt. Spawns and pickups (L966) come from the arenas' terrain heights (osfr-terrain grids of the arena chunks): spawns 35 m off each dock where a 15 m disc lies at least 6 m under WaterLevel, Shipwreck Cove's chests on a 20 m grid of such water, at least 40 m from docks and 60 m apart. The chest value 3250 follows live gameplay video ('COLLECTED 3250 GOLD'); PlayTime 540 the 2010 player guide (nine minutes; the video's timer reads 8:45 a minute in). Docks (L966 rework): each bank is the arena's Port/PortBell area (the pad, where every ship starts and banks), each enter its base's shipwash cave prop from the 2014 chunks (steering in opens Ship Selection); Treasure Isle's slots follow its loading-screen map colours (Port_1 red, the shark cave). Shipwreck Cove's chests stay over 70 m from every pad. EnterRadius 20 and HoldUnloadPerSecond 1 are (R); max_speed 40 is 1.33x TurboSpeed 30 (R). WaterLevel 53.6 and the chests at 53.5 sit on the drawn sea, the height the client's own ship reset uses (DAT_0187c6cc); the X marks lie at WaterLevel, so the constructor's 50 hid them under it. Effect ids are composite ids from the client's ActorCompositeEffectDefinitions.xml, by name (BBE_PFX_pir_*); the client's own default ProjectileLightEffectId 16401 is one. Ship defaults follow the constructor 0106b680. X spots (L967): Treasure Isle's and Arctic Bay's chests lie at the X marks of their loading-screen maps (three each), fitted to the dock bells by least squares and snapped to deep water; the 'Treasure N m' marker points at their centre (Treasure Isle: 509 m from red's pad, the game showed 537). Shipwreck Cove keeps terrain-picked points until its map turns up.",
   "arenas": [
     {
       "scene": "ss_pirate_arena",
@@ -90,17 +90,17 @@
       "pickups": [
         [
           938.8,
-          50,
+          53.5,
           1235.6
         ],
         [
           870.6,
-          50,
+          53.5,
           1228.2
         ],
         [
           784.7,
-          50,
+          53.5,
           1232.6
         ]
       ]
@@ -193,42 +193,42 @@
       "pickups": [
         [
           1049.0,
-          50,
+          53.5,
           931.0
         ],
         [
           1029.0,
-          50,
+          53.5,
           991.0
         ],
         [
           1049.0,
-          50,
+          53.5,
           871.0
         ],
         [
           1089.0,
-          50,
+          53.5,
           991.0
         ],
         [
           929.0,
-          50,
+          53.5,
           971.0
         ],
         [
           989.0,
-          50,
+          53.5,
           831.0
         ],
         [
           1149.0,
-          50,
+          53.5,
           951.0
         ],
         [
           1049.0,
-          50,
+          53.5,
           811.0
         ]
       ]
@@ -321,17 +321,17 @@
       "pickups": [
         [
           1033.1,
-          50,
+          53.5,
           1130.2
         ],
         [
           1073.4,
-          50,
+          53.5,
           1128.2
         ],
         [
           930.6,
-          50,
+          53.5,
           1142.5
         ]
       ]
@@ -369,7 +369,7 @@
     "MaxDrawDistance": 1500,
     "PhysicsSimulationRate": 60,
     "Gravity": 9.81,
-    "WaterLevel": 50,
+    "WaterLevel": 53.6,
     "AllowablePhysicsDelta": 12,
     "PickupEmptyTime": 3,
     "FlyingTreasureHeight": 1.2,
@@ -385,10 +385,28 @@
     "RepulsorPushRange": 100,
     "ShoveOutSpeed": 10,
     "ShoveOutAccel": 30,
-    "TreasureXMarkEffectId": 22036,
-    "TreasureFillEffectId": 22101,
-    "ShipChestFullEffectId": 22369,
-    "ShipChestEmptyEffectId": 22368
+    "PickupWarmupEffectId": 16201,
+    "RespawnSplashEffectId": 16491,
+    "WhirlpoolEffectId": 16025,
+    "WhirlpoolExitEffectId": 16395,
+    "CameraShakeEffectId": 16295,
+    "FireballImpactEffectId": 15902,
+    "PickupWastedEffectId": 16130,
+    "ProjectileFireEffectId": 15900,
+    "ProjectileLandImpactEffectId": 15899,
+    "ProjectileWaterImpactEffectId": 15968,
+    "ProjectileTrailEffectId": 16114,
+    "ShipSinkEffectId": 16168,
+    "ShipWhirlpoolExitEffectId": 16139,
+    "ShipRepairEffectId": 16163,
+    "ShipSpeedEffectId": 15982,
+    "ShipRapidFireEffectId": 16166,
+    "ShipLongShotEffectId": 16164,
+    "ShipFirepowerEffectId": 15983,
+    "TreasureXMarkEffectId": 16247,
+    "TreasureFillEffectId": 16292,
+    "ShipChestFullEffectId": 16435,
+    "ShipChestEmptyEffectId": 16434
   },
   "ship": {
     "actors": [
@@ -399,6 +417,27 @@
       ""
     ],
     "collision": "pirship_hum_lrg_mainbody_bbe.cdt",
+    "config": {
+      "HomeHealingPerSecond": 100,
+      "PainZonePerSecond": 20,
+      "LongShotAngle": 0.6,
+      "LongShotSpeed": 1.8,
+      "Unnamed168": 0.2618,
+      "ProjectileImpactEffectId": 15902,
+      "ShipImpactEffectId": 16167,
+      "DeathCloudEffectId": 15986,
+      "DeathFireEffectId": 16492,
+      "LeftWakeEffectId": 16074,
+      "RightWakeEffectId": 16250,
+      "RestingWakeEffectId": 16211,
+      "WakeOffsetX": 1.0,
+      "WakeOffsetZ": 5.0,
+      "ProjectileLightEffectId": 16401,
+      "ReloadBarScale": 12.0,
+      "HudYOffset": 1.0,
+      "SpecialMoveCooldown": 10.0,
+      "SpecialMovePushVel": 20.0
+    },
     "health": 100,
     "mast_min_health": 20,
     "mast_max_health": 40,
@@ -414,17 +453,17 @@
       {
         "health": 50,
         "mast_alias": "dmg01",
-        "effect_id": 0
+        "effect_id": 15977
       },
       {
         "health": 25,
         "mast_alias": "dmg02",
-        "effect_id": 0
+        "effect_id": 15978
       },
       {
         "health": 0,
         "mast_alias": "dmg03",
-        "effect_id": 0
+        "effect_id": 15979
       }
     ],
     "physics": {
@@ -491,7 +530,7 @@
     "MaxPitch": 90.0,
     "OverHeadRenderDistance": 1000.0,
     "OverHeadScale": 0.07,
-    "OverHeadShipEffectYOffset": 0.0,
+    "OverHeadShipEffectYOffset": 14.0,
     "UseShipHeightForOverHead": 0,
     "ZoneBubbleRadius": 12,
     "ZoneBubbleObjectRadius": 12,
@@ -512,7 +551,13 @@
     "pir_black"
   ],
   "treasure": {
-    "chest_model": 1923,
+    "chest_model": 1786,
+    "chest_alias": "pir_gold",
+    "chest_effect": 16438,
+    "dock_effects": [[16238, 16446], [16240, 16445], [16239, 16443], [16242, 16442], [16243, 16447], [16234, 16444]],
+    "chest_warmup": 0.0,
+    "chest_warmup_effect": 0,
+    "chest_end_effect": 16493,
     "dock_chest_model": 1923,
     "value": 3250,
     "pickup_radius": 15.0,

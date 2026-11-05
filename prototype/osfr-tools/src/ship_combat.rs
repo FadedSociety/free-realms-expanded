@@ -39,6 +39,7 @@ pub const UPDATE_PLAYER_STATE: u16 = 17;
 pub const PLAYER_AWARDS: u16 = 24;
 pub const CREATE_PROXIED_PICKUP: u16 = 28;
 pub const DESTROY_PROXIED_PICKUP: u16 = 29;
+pub const MARK_TREASURE_PICKUPS: u16 = 30;
 /// UpdateShipPhysics' body as the transport admits it (`soe::DIRECT_SHAPES`, 117 with the header).
 const SHIP_PHYSICS_BODY: usize = 113;
 /// (R) Most pickup points an arena carries.
@@ -148,8 +149,23 @@ impl Content {
 #[derive(Clone, Debug, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct Treasure {
-    /// The chest a pickup shows (`Models.txt`: bronze 1662, silver 1664, gold 1663).
+    /// The chest a pickup shows: `ss_pir_treasure_chest` 1786, whose idle is the bobbing
+    /// `ss_pir_treasure_chest_loop_anim` (`Models.txt`).
     pub chest_model: u32,
+    /// Its look, one of the actor's texture aliases (pir_gold, pir_silver, pir_bronze).
+    pub chest_alias: String,
+    /// The effect kept on it. Every effect id on this wire is a composite id
+    /// (`ActorCompositeEffectDefinitions.xml`, looked up by `sub_7C4710`), not an emitter's.
+    pub chest_effect: u32,
+    /// Each dock slot's BankEffectId (the coloured symbol on the pad) and HomeEntranceEffectId (the
+    /// cave's coloured wash).
+    #[serde(default)]
+    pub dock_effects: Vec<[u32; 2]>,
+    /// Seconds of warm-up before it shows, and the effect meanwhile.
+    pub chest_warmup: f32,
+    pub chest_warmup_effect: u32,
+    /// The pickup's last effect (+0x28, R: when taken).
+    pub chest_end_effect: u32,
     /// The chest on a dock (`ss_pir_dock_treasure_chest_bbe` 1923), the dock list's TreasureChestId.
     pub dock_chest_model: u32,
     /// Gold for each chest banked.
@@ -177,6 +193,9 @@ pub struct Ship {
     pub actors: [String; 5],
     /// CollisionDataAsset: the ship config's sixth string and the physics config's collision asset.
     pub collision: String,
+    /// `SHIP_FIELDS` by name; a missing key is 0.
+    #[serde(default)]
+    pub config: BTreeMap<String, f64>,
     pub health: i32,
     pub mast_min_health: i32,
     pub mast_max_health: i32,
@@ -288,6 +307,8 @@ impl Content {
                 })
         };
         let treasure_ok = t.chest_model > 0
+            && text_ok(&t.chest_alias)
+            && t.chest_warmup.is_finite()
             && t.dock_chest_model > 0
             && t.value > 0
             && [t.pickup_radius, t.bank_radius, t.enter_radius]
@@ -308,6 +329,7 @@ impl Content {
                 .iter()
                 .all(|state| text_ok(&state.mast_alias))
             && only(&ship.physics, PHYSICS_FIELDS)
+            && only(&ship.config, SHIP_FIELDS)
             && f64::from(t.max_speed) >= fastest
             && ship.health >= 1
             && (1..=1000).contains(&ship.hold_unload_per_second)
@@ -596,7 +618,8 @@ pub fn zone_config(
     body.extend(u32::try_from(docks.len()).unwrap_or(0).to_le_bytes());
     for (slot, at) in docks.iter().enumerate() {
         let tint = colours.get(slot).map_or("", String::as_str);
-        dock(&mut body, at, tint, treasure);
+        let effects = treasure.dock_effects.get(slot).copied().unwrap_or_default();
+        dock(&mut body, at, tint, effects, treasure);
     }
     for _ in 0..3 {
         body.extend(0_u32.to_le_bytes());
@@ -607,9 +630,9 @@ pub fn zone_config(
 /// One record of ZoneConfig's dock list (+384): reader `sub_A5B660`, named and offset-checked
 /// against the server loader `EntryPointConfigLoad` 01066750, whose ShipSpawn and AI fields stay
 /// server-side. Bank at the pad, Enter at the cave; the chest and flag sit at the pad (R);
-/// TreasureChestId is the dock chest, TintName the slot's colour; effects, angles (radians on the
-/// wire), the flag texture and image set and the tutorial movie are 0 or empty (R).
-fn dock(body: &mut Vec<u8>, at: &Dock, tint: &str, treasure: &Treasure) {
+/// TreasureChestId is the dock chest, TintName the slot's colour, the effects `dock_effects`; angles
+/// (radians on the wire), the flag texture and image set and the tutorial movie are 0 or empty (R).
+fn dock(body: &mut Vec<u8>, at: &Dock, tint: &str, effects: [u32; 2], treasure: &Treasure) {
     let point = |body: &mut Vec<u8>, [x, y, z]: [f32; 3]| {
         for value in [x, y, z, 1.0] {
             body.extend(value.to_le_bytes());
@@ -618,8 +641,8 @@ fn dock(body: &mut Vec<u8>, at: &Dock, tint: &str, treasure: &Treasure) {
     let word = |body: &mut Vec<u8>, value: u32| body.extend(value.to_le_bytes());
     point(body, at.bank); // Bank
     body.extend(treasure.bank_radius.to_le_bytes());
-    word(body, 0); // BankEffectId
-    word(body, 0); // HomeEntranceEffectId
+    word(body, effects[0]); // BankEffectId
+    word(body, effects[1]); // HomeEntranceEffectId
     word(body, treasure.dock_chest_model); // TreasureChestId
     point(body, at.bank); // Chest
     word(body, 0); // TreasureChestAngle
@@ -638,10 +661,9 @@ fn dock(body: &mut Vec<u8>, at: &Dock, tint: &str, treasure: &Treasure) {
     string(body, ""); // TutorialMovieFilename
 }
 
-/// CreateProxiedPickup (0x1c), reader `sub_A5A5F0`, handler 00a5f860: pickup `id` at `at` showing
-/// `model`. The handler wants an id, a scale above 0 and a model; the reader's other values, the
-/// string and the effects are 0 or empty (R).
-pub fn create_pickup(id: u32, at: [f32; 3], model: u32) -> Vec<u8> {
+/// CreateProxiedPickup (0x1c), reader `sub_A5A5F0`, handler 00a5f860: pickup `id` at `at`, showing
+/// `treasure`'s chest (`sub_CAC8D0`).
+pub fn create_pickup(id: u32, at: [f32; 3], treasure: &Treasure) -> Vec<u8> {
     let mut body = id.to_le_bytes().to_vec();
     let [x, y, z] = at;
     // The position, the model's scale (`sub_CAC8D0` hands it to the actor, whose floor of 0.01 made
@@ -649,11 +671,30 @@ pub fn create_pickup(id: u32, at: [f32; 3], model: u32) -> Vec<u8> {
     for value in [x, y, z, 1.0, 1.0, 1.0] {
         body.extend(value.to_le_bytes());
     }
-    body.extend(model.to_le_bytes());
-    body.extend([0; 8]); // two values (R: an effect at +44)
-    string(&mut body, "");
-    body.extend([0; 12]); // three values (R: effects at +92/+96)
+    body.extend(treasure.chest_model.to_le_bytes());
+    // The effect `sub_CAC4F0` keeps on the pickup once its actor loads, and an animation (R 0).
+    body.extend(treasure.chest_effect.to_le_bytes());
+    body.extend(0_u32.to_le_bytes());
+    // The actor's texture alias: the chest's look (`ss_pir_treasure_chest.adr`: gold, silver, bronze).
+    string(&mut body, &treasure.chest_alias);
+    // A warm-up before the actor shows, its effect, and the effect at +0x28 (`sub_CAC8D0`).
+    body.extend(treasure.chest_warmup.to_le_bytes());
+    body.extend(treasure.chest_warmup_effect.to_le_bytes());
+    body.extend(treasure.chest_end_effect.to_le_bytes());
     packet(CREATE_PROXIED_PICKUP, &body)
+}
+
+/// MarkTreasurePickups (0x1e), handler 00a5fd20: the X spots as (x, z) pairs. The client lays
+/// `TreasureXMarkEffectId` on each at WaterLevel, once, when Countdown starts (00a64960, 00a60a90),
+/// so this goes out before it.
+pub fn mark_treasure(points: &[[f32; 3]]) -> Vec<u8> {
+    // `load` bounds the list by MAX_PICKUPS.
+    let mut body = (points.len() as u32).to_le_bytes().to_vec();
+    for [x, _, z] in points {
+        body.extend(x.to_le_bytes());
+        body.extend(z.to_le_bytes());
+    }
+    packet(MARK_TREASURE_PICKUPS, &body)
 }
 
 /// DestroyProxiedPickup (0x1d), reader `sub_A5A7E0`: pickup `id`, two values (R 0), then whether it
@@ -775,7 +816,7 @@ const MAX_DOCKS: usize = 6;
 /// The pickups to show at the start, ids from 1.
 pub fn show_pickups(points: &[[f32; 3]], treasure: &Treasure) -> Vec<Vec<u8>> {
     (points.iter().zip(1..))
-        .map(|(at, id)| create_pickup(id, *at, treasure.chest_model))
+        .map(|(at, id)| create_pickup(id, *at, treasure))
         .collect()
 }
 
@@ -869,7 +910,7 @@ impl Plunder {
         for ((point, until), id) in points.iter().zip(&mut self.taken_until).zip(1..) {
             if until.is_some_and(|at| at <= now_ms) {
                 *until = None;
-                out.push(create_pickup(id, *point, treasure.chest_model));
+                out.push(create_pickup(id, *point, treasure));
             }
         }
         out
@@ -898,6 +939,35 @@ fn write_fields(body: &mut Vec<u8>, fields: &[(&str, Field)], values: &BTreeMap<
 fn only(values: &BTreeMap<String, f64>, fields: &[(&str, Field)]) -> bool {
     (values.keys()).all(|key| fields.iter().any(|(name, _)| name == key))
 }
+
+/// The ship config's words after HoldUnloadPerSecond, in the reader's order (`sub_A683D0`), named by
+/// the server loader 0106b940. +0xa8 has no loader key.
+const SHIP_FIELDS: &[(&str, Field)] = &[
+    ("HomeHealingPerSecond", Field::I32),
+    ("PainZonePerSecond", Field::I32),
+    ("LongShotAngle", Field::F32),
+    ("LongShotSpeed", Field::F32),
+    ("Unnamed168", Field::F32),
+    ("ProjectileImpactEffectId", Field::I32),
+    ("ShipImpactEffectId", Field::I32),
+    ("FrozenEffectId", Field::I32),
+    ("DeathCloudEffectId", Field::I32),
+    ("DeathFireEffectId", Field::I32),
+    ("LeftWakeEffectId", Field::I32),
+    ("RightWakeEffectId", Field::I32),
+    ("RestingWakeEffectId", Field::I32),
+    ("WakeOffsetX", Field::F32),
+    ("WakeOffsetZ", Field::F32),
+    ("ProjectileLightEffectId", Field::I32),
+    ("ProjectileLightOffsetX", Field::F32),
+    ("ProjectileLightOffsetY", Field::F32),
+    ("ProjectileLightOffsetZ", Field::F32),
+    ("ReloadBarScale", Field::F32),
+    ("HudYOffset", Field::F32),
+    ("SpecialMoveCooldown", Field::F32),
+    ("SpecialMovePushVel", Field::F32),
+    ("HackedHullHeading", Field::F32),
+];
 
 /// The ship physics config's fields in the reader's order (`sub_A66C00`, struct order), named as
 /// the server loader names them (0106a560; defaults: the constructor 0106ae50). The reader stops
@@ -1041,9 +1111,7 @@ pub fn create_ship(guid: u64, slot: u32, position: [f32; 3], ship: &Ship, colour
     b.extend(ship.hull_strength.to_le_bytes());
     b.extend(ship.hold_capacity.to_le_bytes());
     b.extend(ship.hold_unload_per_second.to_le_bytes());
-    zeros(&mut b, 9 + 7);
-    zeros(&mut b, 3); // the vec3
-    zeros(&mut b, 5);
+    write_fields(&mut b, SHIP_FIELDS, &ship.config);
     b.push(0);
     zeros(&mut b, 4);
     zeros(&mut b, 1); // the list at +67, empty (R)
@@ -1304,14 +1372,18 @@ mod tests {
         assert_eq!(ship_position(&out), Some((7, [880.0, 52.0, 723.0])));
         assert_eq!(ship_position(&out[..116]), None);
         assert_eq!(ship_position(&report(7, [f32::NAN, 0.0, 0.0])), None);
+        let marks = mark_treasure(&[[3.0, 50.0, 4.0]]);
+        assert_eq!(marks[..8], [94, 0, 30, 0, 1, 0, 0, 0]);
+        assert_eq!(marks[8..12], 3_f32.to_le_bytes());
+        assert_eq!(marks[12..], 4_f32.to_le_bytes());
         assert_eq!(
-            create_pickup(1, [0.0; 3], 1662)[4 + 4 + 16..][..4],
+            create_pickup(1, [0.0; 3], &content().treasure)[4 + 4 + 16..][..4],
             1_f32.to_le_bytes(),
             "the scale"
         );
         assert_eq!(
-            create_pickup(1, [0.0; 3], 1662).len(),
-            4 + 4 + 16 + 8 + 4 + 8 + 4 + 12
+            create_pickup(1, [0.0; 3], &content().treasure).len(),
+            4 + 4 + 16 + 8 + 4 + 8 + 4 + content().treasure.chest_alias.len() + 12
         );
         assert_eq!(destroy_pickup(1, true).len(), 4 + 4 + 8 + 1 + 4);
         // UpdatePlayerState as `sub_CA5620` reads it: guid, four u32, a bool.
@@ -1375,7 +1447,7 @@ mod tests {
         assert!(round.respawn(back - 1, &points, treasure).is_empty());
         assert_eq!(
             round.respawn(back, &points, treasure),
-            [create_pickup(1, points[0], treasure.chest_model)]
+            [create_pickup(1, points[0], treasure)]
         );
     }
 
