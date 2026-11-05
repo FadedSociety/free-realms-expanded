@@ -1735,17 +1735,21 @@ fn games_window_play_zones_into_a_pirates_arena() {
         "Finish what you are doing before starting an activity."
     );
     let exiting: &[u8] = &[94, 0, 2, 0, 13, 0, 0, 0];
-    let (mut exited, mut back) = (false, false);
+    let (mut exited, mut back, mut board) = (false, false, 0);
+    let before = coins(&gateway);
     // Three report timeouts, the countdown, PlayTime (540 s), Game Over's timeout and the exit beat.
     for second in 3..=900 {
         let out = tick(&mut gateway, second * 1_000);
         exited |= inners(&out).iter().any(|p| *p == exiting);
+        board += inners(&out).iter().filter(|p| p.starts_with(&[94, 0, 24, 0])).count();
         if out.began_zoning {
             back = true;
             break;
         }
     }
     assert!(exited && back, "Exiting, then the zone back");
+    assert_eq!(board, 1, "PlayerAwards opens the results board, once");
+    assert_eq!(coins(&gateway), before + 10, "the content's win_coins, once");
 }
 
 /// L962: Play on the Easy "Penguin Produce" row (532) offers Tower Defense game 350 with the movie's

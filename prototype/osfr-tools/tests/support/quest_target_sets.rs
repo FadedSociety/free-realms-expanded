@@ -21,6 +21,7 @@
 //!   | kart claim (`Gameplay::handle_kart_entry`/tick) | entered row id (28, 628-634) | `KartGateway::minigame_ids` (`kart_gates.json` + the playable `kart_rows.json` rows) |
 //!   | finished derby (`Gameplay::pay_derby_completion`) | entered row id | `DerbyGateway::rows` (`derby_entry.json` default + `derby_rows.json`) |
 //!   | won song (`Gameplay::handle_music` -> `npc_minigame_win_id_only`, L961) | game id | `music_game.json` `games[].game_id` |
+//!   | finished Pirate's Plunder match (`Gameplay::settle_pirates`) | arena's row | `ship_combat.json` `arenas[].minigame_id` |
 //!   | won Tower Defense game (`Gameplay::handle_tower_defense` -> `npc_minigame_win_id_only`, L962) | game id | `tower_defense.json` `games[].game_id` |
 //!
 //!   Chess sends the row id as the 39/18 game id through its `RunSpec`; it reports
@@ -86,7 +87,7 @@ use osfr_tools::{
     music_game,
     pets::PetContent,
     recipes::{CraftingJob, RecipeCatalog},
-    soccer_entry, tower_defense,
+    ship_combat, soccer_entry, tower_defense,
 };
 use serde_json::Value;
 use std::{
@@ -232,6 +233,12 @@ impl Targets {
         if root.join(tower_defense::CONTENT_FILE).is_file() {
             for game in tower_defense::TdContent::load(root)?.games {
                 targets.producer(u32::try_from(game.game_id).map_err(io::Error::other)?, []);
+            }
+        }
+        // Every arena's row: a finished match reports the gold banked and first place.
+        if let Some(content) = ship_combat::Content::load(root)? {
+            for arena in &content.arenas {
+                targets.producer(arena.minigame_id, [MinigameFact::Score, MinigameFact::Placement]);
             }
         }
         // `FishingSpots::load` owns the file; a paid catch credits the spot's

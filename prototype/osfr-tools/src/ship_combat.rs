@@ -17,7 +17,8 @@ use std::{
 };
 
 pub const FAMILY: u16 = 94;
-/// Pirate's Plunder's MiniGameData row: the content of Games row 1059 (entry type 1, category 20).
+/// The Games window's join key for Pirate's Plunder (Games row 1059, entry type 1, category 20).
+/// Row 54 is another game's; a match credits its arena's `minigame_id`, TYPE 13 rows 1032-1034.
 pub const GAME_ID: u32 = 54;
 pub const UPDATE_GAME_STATE: u16 = 2;
 pub const UPDATE_PLAYER_GAME_STATES: u16 = 3;
@@ -29,6 +30,8 @@ pub const REFRESH_UI: u16 = 4;
 pub const UPDATE_PLAYER: u16 = 8;
 pub const UPDATE_SHIP_PHYSICS: u16 = 16;
 pub const UPDATE_PLAYER_STATE: u16 = 17;
+/// PlayerAwards: what opens the results board (`00a65780`).
+pub const PLAYER_AWARDS: u16 = 24;
 pub const CREATE_PROXIED_PICKUP: u16 = 28;
 pub const DESTROY_PROXIED_PICKUP: u16 = 29;
 /// UpdateShipPhysics' body as the transport admits it (`soe::DIRECT_SHAPES`, 117 with the header).
@@ -92,6 +95,10 @@ pub struct Content {
     pub countdown_seconds: u32,
     /// (R) Seconds a phase waits for the client's report before it moves on anyway.
     pub report_timeout_seconds: u32,
+    /// (R) Seconds the results board stays up if the player never closes it.
+    pub results_timeout_seconds: u32,
+    /// (R) What finishing a match pays; no source gives an amount.
+    pub win_coins: u32,
     /// ZoneConfig values by the loader's field names (`ZONE_FIELDS`); a missing key is 0.
     pub zone_config: BTreeMap<String, f64>,
     /// The player's ship (R).
@@ -180,6 +187,9 @@ pub struct Arena {
     pub scene: String,
     /// (R) The zone id the transition names; one of our own.
     pub zone_id: u32,
+    /// The MiniGameData row a finished match credits (TYPE 13; 1034 names Shipwreck Cove, which
+    /// is `ss_pir_arena3`; the other two rows carry no name, R).
+    pub minigame_id: u32,
     /// The docks by slot, coloured `colours[slot]`; slot 0 is the solo player's (red, as live).
     pub docks: Vec<Dock>,
     /// (R) The spawn rotation (x, y, z, w), as the fishing holes send it.
@@ -275,6 +285,7 @@ impl Content {
         let timings = [
             f64::from(content.countdown_seconds),
             f64::from(content.report_timeout_seconds),
+            f64::from(content.results_timeout_seconds),
             play,
         ];
         if content.schema_version != 1
@@ -308,6 +319,7 @@ pub struct Match {
     countdown_ms: u64,
     play_ms: u64,
     timeout_ms: u64,
+    results_ms: u64,
 }
 
 impl Match {
@@ -321,6 +333,7 @@ impl Match {
             // `load` bounds it to 0..=MAX_SECONDS; `as` floors it.
             play_ms: (play * 1000.0) as u64,
             timeout_ms: u64::from(content.report_timeout_seconds) * 1000,
+            results_ms: u64::from(content.results_timeout_seconds) * 1000,
         }
     }
 
@@ -357,7 +370,8 @@ impl Match {
                 COUNTDOWN_READY => COUNTDOWN,
                 COUNTDOWN if waited >= self.countdown_ms => PLAYING,
                 PLAYING if waited >= self.play_ms => GAME_OVER,
-                GAME_OVER if gate(0x400) => EXITING,
+                // The player's close (`00a4fb50`), or the board's own timeout.
+                GAME_OVER if self.reported & 0x800 != 0 || waited >= self.results_ms => EXITING,
                 _ => break,
             };
             self.state = next;
@@ -609,6 +623,16 @@ pub fn destroy_pickup(id: u32, taken: bool) -> Vec<u8> {
     packet(DESTROY_PROXIED_PICKUP, &body)
 }
 
+/// PlayerAwards (reader `00a65780`): a u32 count of records (20 bytes on the wire, `00a58f50`). A
+/// solo match has no trophies to hand out, and trophy icons are unknown (R), so the list is empty;
+/// the reader allows that.
+pub fn player_awards() -> Vec<u8> {
+    let mut packet = FAMILY.to_le_bytes().to_vec();
+    packet.extend(PLAYER_AWARDS.to_le_bytes());
+    packet.extend(0_u32.to_le_bytes());
+    packet
+}
+
 /// UpdatePlayer (8), handler 00a67110: `guid`, then the record `sub_A665E0` with bit 0 only: the
 /// player's gold (+0x10, which the standings sort and show, `PiratesStandings:SetPlayerGold`) and
 /// two values (+0x14/+0x18, R 0).
@@ -692,6 +716,11 @@ pub fn show_pickups(points: &[[f32; 3]], treasure: &Treasure) -> Vec<Vec<u8>> {
 }
 
 impl Plunder {
+    /// The gold banked so far.
+    pub fn gold(&self) -> u32 {
+        self.gold
+    }
+
     pub fn new(points: usize) -> Self {
         Self {
             taken_until: vec![None; points],
@@ -1086,9 +1115,31 @@ mod tests {
         assert_eq!(game.advance(2_100 + countdown + play), [GAME_OVER]);
         assert!(!game.finished(2_200 + countdown + play));
         let exit = 2_200 + countdown + play;
-        assert_eq!(game.report(0x400, exit), [EXITING]);
+        assert!(game.report(0x400, exit).is_empty(), "only the player's close ends the board");
+        assert_eq!(game.report(0x800, exit), [EXITING]);
         assert!(!game.finished(exit + 1_999), "Exiting shows first");
         assert!(game.finished(exit + 2_000));
+    }
+
+    /// A player who walks away from the board still gets home.
+    #[test]
+    fn the_results_board_times_out() {
+        let content = content();
+        let mut game = Match::new(&content);
+        game.loaded(0);
+        game.report(0x2 | 0x8 | 0x10, 0);
+        let countdown = u64::from(content.countdown_seconds) * 1000;
+        game.advance(countdown);
+        let over = countdown + (content.zone_config["PlayTime"] * 1000.0) as u64;
+        assert_eq!(game.advance(over), [GAME_OVER]);
+        let results = u64::from(content.results_timeout_seconds) * 1000;
+        assert!(game.advance(over + results - 1).is_empty());
+        assert_eq!(game.advance(over + results), [EXITING]);
+    }
+
+    #[test]
+    fn the_awards_list_opens_with_its_count() {
+        assert_eq!(player_awards(), [94, 0, 24, 0, 0, 0, 0, 0]);
     }
 
     #[test]

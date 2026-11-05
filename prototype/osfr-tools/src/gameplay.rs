@@ -1962,6 +1962,7 @@ impl Gameplay {
         self.tick_consumable_effects(character.guid, now_ms, &mut out);
         out.replies.splice(0..0, fishing.replies);
         out.scene_zoning = fishing.scene_zoning.or(out.scene_zoning.take());
+        out.changed |= fishing.changed; // a match's pay on the clock must save now
         self.settle_achievement_counters(&counters_before, &mut out)?;
         Ok(out)
     }

@@ -133,8 +133,12 @@ impl Gameplay {
         }
         let mut out = Outcome::default();
         if let Some(bits) = ship_combat::client_states(inner) {
-            out.replies = states(arena.game.report(bits, now_ms));
+            let moved = arena.game.report(bits, now_ms);
+            self.send_states(moved, now_ms, &mut out)?;
         }
+        let Some(arena) = self.pirates.as_mut() else {
+            return Ok(Some(out));
+        };
         // L966: the client's own ship report, while the clock runs.
         let report = ship_combat::ship_position(inner);
         let content = self.ship_combat.as_deref();
@@ -152,6 +156,68 @@ impl Gameplay {
         Ok(Some(out))
     }
 
+    /// The states' packets. Game Over also opens the results board and settles the match; the
+    /// state machine reaches it once.
+    fn send_states(&mut self, moved: Vec<u32>, now_ms: u64, out: &mut Outcome) -> io::Result<()> {
+        for state in moved {
+            out.replies.push(ship_combat::game_state(state));
+            if state == ship_combat::GAME_OVER {
+                out.replies.push(ship_combat::player_awards());
+                self.settle_pirates(now_ms, out)?;
+            }
+        }
+        Ok(())
+    }
+
+    /// The match's credit and pay, for the arena's own row. (R) `won`: any finish is first place
+    /// in a solo match. The score is the gold banked; nothing else is measured.
+    fn settle_pirates(&mut self, now_ms: u64, out: &mut Outcome) -> io::Result<()> {
+        let Some(arena) = self.pirates.as_ref() else {
+            return Ok(());
+        };
+        let Some(content) = self.ship_combat.clone() else {
+            return Ok(());
+        };
+        let Some(place) = content.arenas.get(arena.arena) else {
+            return Ok(());
+        };
+        let (gold, guid) = (arena.plunder.gold(), arena.return_to.guid);
+        let result = crate::quest_engine::MinigameResult {
+            won: true,
+            elapsed_seconds: None,
+            score: Some(gold),
+            placement: Some(1),
+            knocked_out: false,
+        };
+        self.credit_minigame(place.minigame_id, result, out)?;
+        let grant = crate::rewards::RewardGrant {
+            coins: content.win_coins,
+            items: Vec::new(),
+            job_xp: BTreeMap::new(),
+            sc: 0,
+            display: crate::rewards::RewardDisplay {
+                source_guid: guid,
+                player_guid: guid,
+                reward_kind: 0,
+                icon_id: 0,
+                name_id: 0,
+                rows: Vec::new(),
+            },
+        };
+        let rewards = self.reward_snapshot();
+        let key = format!("pirates-match-{now_ms}");
+        match crate::rewards::apply_grant(&rewards, &grant, &key) {
+            Ok((next, replies)) => {
+                out.replies.extend(replies);
+                self.adopt_reward_state(next, out)
+            }
+            Err(error) => {
+                eprintln!("pirates payout refused: {error}");
+                Ok(())
+            }
+        }
+    }
+
     /// Per tick, onto the fishing supervision's `out`: the states the clock brings, then the way
     /// back once Exiting went out.
     pub(super) fn supervise_pirates(
@@ -164,8 +230,12 @@ impl Gameplay {
         };
         if arena.pending.is_none() {
             arena.game.loaded(now_ms);
-            out.replies.extend(states(arena.game.advance(now_ms)));
+            let moved = arena.game.advance(now_ms);
+            self.send_states(moved, now_ms, &mut out)?;
         }
+        let Some(arena) = self.pirates.as_mut() else {
+            return Ok(out);
+        };
         let content = self.ship_combat.as_deref();
         if arena.game.state() == ship_combat::PLAYING
             && let Some(content) = content
@@ -187,6 +257,3 @@ impl Gameplay {
     }
 }
 
-fn states(states: Vec<u32>) -> Vec<Vec<u8>> {
-    states.into_iter().map(ship_combat::game_state).collect()
-}

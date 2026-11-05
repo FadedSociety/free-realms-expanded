@@ -5,6 +5,7 @@
     {
       "scene": "ss_pirate_arena",
       "zone_id": 9401,
+      "minigame_id": 1032,
       "rotation": [
         0.0,
         0.996574,
@@ -106,6 +107,7 @@
     {
       "scene": "ss_pir_arena3",
       "zone_id": 9402,
+      "minigame_id": 1034,
       "rotation": [
         0.0,
         0.996574,
@@ -232,6 +234,7 @@
     {
       "scene": "ss_pir_arena4",
       "zone_id": 9403,
+      "minigame_id": 1033,
       "rotation": [
         0.0,
         0.996574,
@@ -333,9 +336,11 @@
   ],
   "countdown_seconds": 5,
   "report_timeout_seconds": 20,
+  "results_timeout_seconds": 60,
+  "win_coins": 10,
   "zone_config": {
     "MaxPlayers": 6,
-    "MaxScore": 1000,
+    "MaxScore": 100000,
     "ShipPickupCount": 12,
     "UseShipTargetHighlight": 1,
     "ZoneReadyWaitTime": 30,
@@ -391,7 +396,7 @@
     "mast_min_health": 20,
     "mast_max_health": 40,
     "hull_strength": 1.0,
-    "hold_capacity": 5,
+    "hold_capacity": 8,
     "hold_unload_per_second": 1,
     "damage_states": [
       {
@@ -500,7 +505,7 @@
     "pir_black"
   ],
   "treasure": {
-    "chest_model": 1662,
+    "chest_model": 1923,
     "dock_chest_model": 1923,
     "value": 3250,
     "pickup_radius": 15.0,
