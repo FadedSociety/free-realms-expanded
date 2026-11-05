@@ -269,6 +269,7 @@ pub struct Gameplay {
     ship_combat: Option<Arc<crate::ship_combat::Content>>,
     /// L963: the open Pirate's Plunder match (session-local); boxed like the Tower Defense run.
     pirates: Option<Box<pirates_arena::PirateArena>>,
+    character_name: String,
     /// T765: the session's Trading Card Game launches (type-16 runs and one-time tickets).
     card_launches: Option<crate::card_game::Launches>,
     /// T560: the daily wheel (`gameplay/daily_wheel.rs`); only its day stamp is saved.
@@ -1294,6 +1295,7 @@ impl Gameplay {
             tower_defense,
             ship_combat,
             pirates: None,
+            character_name: String::new(),
             card_launches,
             daily_wheel,
             portal_refreshed_ms: None,
@@ -4761,6 +4763,7 @@ impl Gameplay {
 
     pub fn apply_identity(&mut self, identity: &CharacterIdentity) -> io::Result<bool> {
         self.remember_identity_look(identity);
+        self.set_character_name(identity.display_name());
         if self.profiles.is_none() {
             return Ok(false);
         }

@@ -4,6 +4,7 @@
   "arenas": [
     {
       "scene": "ss_pirate_arena",
+      "name_id": 426861,
       "zone_id": 9401,
       "minigame_id": 1032,
       "rotation": [
@@ -106,6 +107,7 @@
     },
     {
       "scene": "ss_pir_arena3",
+      "name_id": 420997,
       "zone_id": 9402,
       "minigame_id": 1034,
       "rotation": [
@@ -233,6 +235,7 @@
     },
     {
       "scene": "ss_pir_arena4",
+      "name_id": 426862,
       "zone_id": 9403,
       "minigame_id": 1033,
       "rotation": [

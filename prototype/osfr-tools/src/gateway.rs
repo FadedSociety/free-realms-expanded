@@ -1136,6 +1136,9 @@ impl Gateway {
         gameplay.set_world_dir(self.world_dir.clone())?;
         gameplay.set_stock_text(self.stock_text.clone());
         gameplay.set_role(self.role);
+        if let Some(identity) = &self.identity {
+            gameplay.set_character_name(identity.display_name());
+        }
         self.gameplay = Some(gameplay);
         Ok(())
     }

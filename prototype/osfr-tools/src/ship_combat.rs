@@ -20,6 +20,11 @@ pub const FAMILY: u16 = 94;
 /// The Games window's join key for Pirate's Plunder (Games row 1059, entry type 1, category 20).
 /// Row 54 is another game's; a match credits its arena's `minigame_id`, TYPE 13 rows 1032-1034.
 pub const GAME_ID: u32 = 54;
+/// MiniGameData TYPE of the Pirates rows: the client's HUD rule hangs on it (Lua 35774, 30209).
+pub const MINIGAME_TYPE: i32 = 13;
+/// The rows' description (427743) and the Shipwreck Cove row's icon, the one row that has one (R).
+pub const OFFER_DESCRIPTION: i32 = 427_743;
+pub const OFFER_ICON: i32 = 30_434;
 pub const UPDATE_GAME_STATE: u16 = 2;
 pub const UPDATE_PLAYER_GAME_STATES: u16 = 3;
 pub const SET_PLAYER_COUNT: u16 = 7;
@@ -213,6 +218,8 @@ pub struct DamageState {
 pub struct Arena {
     /// The client scene (`ss_pirate_arena`, `ss_pir_arena3`, `ss_pir_arena4`).
     pub scene: String,
+    /// The map's locale name, which its offer shows (`IZ4GPcc7vXk_136.00`).
+    pub name_id: i32,
     /// (R) The zone id the transition names; one of our own.
     pub zone_id: u32,
     /// The MiniGameData row a finished match credits (TYPE 13; 1034 names Shipwreck Cove, which
@@ -407,6 +414,12 @@ impl Match {
             sent.push(next);
         }
         sent
+    }
+
+    /// The player left the match: straight to Exiting, whatever state it was in.
+    pub fn quit(&mut self, now_ms: u64) {
+        self.state = EXITING;
+        self.since_ms = Some(now_ms);
     }
 
     /// Exiting went out a moment ago (the client needs a beat to act on it before the zone back
@@ -671,6 +684,27 @@ pub fn player_gold(guid: u64, gold: u32) -> Vec<u8> {
     body.extend(1_u32.to_le_bytes());
     body.extend(gold.to_le_bytes());
     body.extend([0; 8]);
+    packet(UPDATE_PLAYER, &body)
+}
+
+/// UpdatePlayer (8) with bits 3 and 4: what the standings row shows. Bit 3 (`sub_A665E0`): the ship's
+/// name, then `sub_A5A370`: a value, the flag icon (+0x230, `SetPlayerFlag`) and a string. Bit 4: the
+/// name record (`sub_8E7290`: three values, R 0, the first and last name, which `sub_726400` joins),
+/// the AI's locale name (0 for a human), the index 00a67110 checks against the list at processor
+/// +0x420 (R: -1) and the row's colour (+0x1d8, `SetPlayerColor`).
+pub fn player_card(guid: u64, name: &str, flag: u32, colour: u32) -> Vec<u8> {
+    let mut body = guid.to_le_bytes().to_vec();
+    body.extend(0x18_u32.to_le_bytes());
+    string(&mut body, "");
+    body.extend(0_u32.to_le_bytes());
+    body.extend(flag.to_le_bytes());
+    string(&mut body, "");
+    body.extend([0; 12]);
+    string(&mut body, name);
+    string(&mut body, "");
+    body.extend(0_u32.to_le_bytes());
+    body.extend((-1_i32).to_le_bytes());
+    body.extend(colour.to_le_bytes());
     packet(UPDATE_PLAYER, &body)
 }
 

@@ -1685,7 +1685,8 @@ fn a_pirates_ship_takes_a_chest_and_banks_it_at_its_dock() {
     tick(&mut gateway, 1_500);
     play(&mut gateway, 1059, 2_000);
     let loaded = [13_u16, 10].map(|op| send(&mut gateway, &op.to_le_bytes(), 2_100));
-    let start: Vec<_> = loaded.iter().flat_map(inners).map(<[u8]>::to_vec).collect();
+    let go = press_go(&mut gateway, &loaded, 2_150);
+    let start: Vec<_> = inners(&go).into_iter().map(<[u8]>::to_vec).collect();
     let ship = (start.iter())
         .find(|p| p.starts_with(&[94, 0, 9, 0]))
         .expect("the ship");
@@ -1804,6 +1805,57 @@ fn a_game_table_offers_chess_and_checkers() {
     }
 }
 
+/// The offer in `loaded` (39/16) answered with Go (39/5).
+fn press_go(gateway: &mut Gateway, loaded: &[GatewayOutcome], now_ms: u64) -> GatewayOutcome {
+    let offer = (loaded.iter().flat_map(inners))
+        .find(|p| p.starts_with(&[39, 0, 16]))
+        .expect("the offer");
+    let mut go = vec![39, 0, 5];
+    go.extend(&offer[3..7]);
+    go.extend([255; 8]);
+    send(gateway, &go, now_ms)
+}
+
+/// Closing the offer leaves the arena before anything started.
+#[test]
+fn closing_a_pirates_offer_zones_back() {
+    let fixture = Fixture::new(PLOT);
+    let mut gateway = fixture.gateway_at(fixture.state(false, true), &fixture.node, 60.0);
+    tick(&mut gateway, 1_500);
+    play(&mut gateway, 1059, 2_000);
+    for op in [13_u16, 10] {
+        send(&mut gateway, &op.to_le_bytes(), 2_100);
+    }
+    let closed = send(&mut gateway, &[26, 0, 42, 0], 3_000);
+    assert!(inners(&closed).iter().any(|p| p.starts_with(&[39, 0, 19])), "the offer closed");
+    assert!(tick(&mut gateway, 5_500).began_zoning, "the zone back");
+}
+
+/// The X in play ends the match at once: the run closes as a loss, Exiting goes out and the player
+/// zones back, unpaid.
+#[test]
+fn quitting_a_pirates_match_zones_back_unpaid() {
+    let fixture = Fixture::new(PLOT);
+    let mut gateway = fixture.gateway_at(fixture.state(false, true), &fixture.node, 60.0);
+    tick(&mut gateway, 1_500);
+    play(&mut gateway, 1059, 2_000);
+    let loaded = [13_u16, 10].map(|op| send(&mut gateway, &op.to_le_bytes(), 2_100));
+    let offer: Vec<u8> = (loaded.iter().flat_map(inners))
+        .find(|p| p.starts_with(&[39, 0, 16]))
+        .expect("the offer")
+        .to_vec();
+    press_go(&mut gateway, &loaded, 2_150);
+    let before = coins(&gateway);
+    let mut quit = vec![39, 0, 6];
+    quit.extend(&offer[3..7]);
+    quit.extend([255; 8]);
+    let left = send(&mut gateway, &quit, 3_000);
+    assert!(inners(&left).iter().any(|p| p.starts_with(&[39, 0, 19])), "the run closed");
+    assert!(inners(&left).iter().any(|p| *p == [94, 0, 2, 0, 13, 0, 0, 0]), "Exiting");
+    assert!(tick(&mut gateway, 5_500).began_zoning, "the zone back");
+    assert_eq!(coins(&gateway), before, "a quit pays nothing");
+}
+
 /// L963: Play on the Pirate's Plunder row (1059) zones into the first arena; once it loads the start
 /// packets go out (the player's own ship among them) and Play again is the busy refusal. The match
 /// then runs on its timeouts and clock alone (a silent client) to Exiting and zones back.
@@ -1815,8 +1867,11 @@ fn games_window_play_zones_into_a_pirates_arena() {
     let entered = play(&mut gateway, 1059, 2_000);
     assert!(said(&entered, "ss_pirate_arena"), "the arena zone");
     let loaded = [13_u16, 10].map(|op| send(&mut gateway, &op.to_le_bytes(), 2_100));
-    let ship = (loaded.iter().flat_map(inners)).any(|p| p.starts_with(&[94, 0, 9, 0]));
-    assert!(ship, "CreateProxiedShip after the load");
+    let is_ship = |p: &[u8]| p.starts_with(&[94, 0, 9, 0]);
+    assert!(!loaded.iter().flat_map(inners).any(is_ship), "no ship before Go");
+    let go = press_go(&mut gateway, &loaded, 2_150);
+    assert!(inners(&go).into_iter().any(is_ship), "CreateProxiedShip on Go");
+    assert!(inners(&go).iter().any(|p| *p == [94, 0, 4, 0]), "the standings show at once");
     let again = play(&mut gateway, 1059, 2_200);
     assert_eq!(
         chat_text(&again).trim_end(),
