@@ -461,7 +461,7 @@ use Blocker::{Giver, Minigame, NoJobGate, NoProfile, Prerequisite, Unselectable}
 /// count for the protected test list.
 #[test]
 fn the_other_fifteen_still_have_a_blocker() {
-    const OFF: [(u32, &[Blocker]); 14] = [
+    const OFF: [(u32, &[Blocker]); 13] = [
         (3_000_039, &[Giver, Prerequisite]),
         (3_020_031, &[Giver, Prerequisite]),
         (3_040_003, &[NoJobGate(120), Unselectable(120)]),
@@ -471,7 +471,6 @@ fn the_other_fifteen_still_have_a_blocker() {
         (3_050_018, &[Prerequisite]),
         (3_070_026, &[Giver]),
         (3_120_010, &[NoJobGate(121), NoProfile(121)]),
-        (3_130_007, &[Minigame(376)]),
         (3_150_014, &[Prerequisite]),
         (3_150_015, &[Prerequisite]),
         (3_160_016, &[Prerequisite]),

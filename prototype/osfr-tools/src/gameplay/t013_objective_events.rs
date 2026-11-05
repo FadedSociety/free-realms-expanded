@@ -2453,3 +2453,111 @@ fn an_absent_service_falls_through_to_the_opening_event() {
     assert_eq!(case.game.forging_tick_ms, None);
     assert_eq!(case.game.type8_tick_ms, None);
 }
+
+/// L934: a Games window ore row is refused below its Miner rank, then plays and credits its own
+/// game (`FinishMinigame 93`) and its own ore (`GatherResource 2740`); Mining Practice (375) pays
+/// nothing yet still credits its game, once.
+#[test]
+fn games_window_ore_rows_credit_their_own_game_and_ore() {
+    use crate::activity_portal::Kind;
+    use crate::harvest_nodes::Gather;
+    let (mut game, scratch) = gathering_game(
+        crate::mining::MINER_PROFILE_ID,
+        1,
+        definition_many(
+            1,
+            vec![
+                (1, ObjectiveKind::GatherResource { resource_id: 2740 }, 1),
+                (2, ObjectiveKind::FinishMinigame { minigame_id: 93 }, 1),
+                (3, ObjectiveKind::FinishMinigame { minigame_id: 375 }, 1),
+            ],
+            false,
+        ),
+    );
+    // The shipped file's shape: Tin Mining pays tin ore, Mining Practice pays nothing.
+    let board = type8_board(1);
+    let tin_output = json!([{"value": 601, "definition_id": 2740, "cluster_quantity": 1}]);
+    let variant = |id: i32, name: i32, description: i32, outputs: &Value| {
+        json!({
+            "game_id": id, "name_id": name, "description_id": description, "icon_id": 909,
+            "selectable": board.selectable, "tiles": board.tiles, "goals": board.goals,
+            "outputs": outputs,
+        })
+    };
+    let content = json!({
+        "schema_version": 1, "game_id": crate::mining::MINING_GAME_ID,
+        "profile_id": crate::mining::MINER_PROFILE_ID, "name_id": 7910, "description_id": 7911,
+        "icon_id": 909,
+        "games": [
+            variant(93, 74_881, 7_911, &tin_output),
+            variant(375, 92_481, 92_528, &json!([])),
+        ],
+        "spec": board,
+    });
+    fs::write(
+        scratch.0.join(mining::CONTENT_FILE),
+        serde_json::to_vec(&content).unwrap(),
+    )
+    .unwrap();
+    game.mining = Some(
+        Type8Engine::load(
+            &scratch.0,
+            mining::CONTENT_FILE,
+            mining::MINING_GAME_ID,
+            mining::FIRST_MINING_INSTANCE,
+            None,
+        )
+        .expect("mining content with ore rows"),
+    );
+    let (_, character) = gather_node(&game, "Copper Vein", 0);
+    let row = Kind::Gather {
+        gather: Gather::Mining,
+    };
+    let counts = |game: &Gameplay| {
+        game.npc_quests
+            .as_ref()
+            .unwrap()
+            .progress(1)
+            .unwrap()
+            .counts
+            .clone()
+    };
+
+    let run_of = |game: &Gameplay| {
+        let mining = game.mining.as_ref().unwrap();
+        mining.state().active.as_ref().unwrap().instance_id
+    };
+
+    // Below rank 5 Tin Mining is refused and nothing changes.
+    game.profiles.as_mut().unwrap().set_experience(0);
+    let before = game.state();
+    let refused = game.begin_portal_game(93, row, &character, 1_000).unwrap();
+    assert!(
+        chat_texts(&refused.replies)
+            .iter()
+            .any(|text| text.contains("Miner rank is too low")),
+        "{:?}",
+        chat_texts(&refused.replies)
+    );
+    assert_eq!(game.state(), before);
+
+    // At rank 20 it plays, pays one tin ore and credits the ore and the game, once.
+    game.profiles.as_mut().unwrap().set_experience(1_000_000);
+    game.begin_portal_game(93, row, &character, 2_000).unwrap();
+    let instance = run_of(&game);
+    finish_type8(&mut game, &character, instance, 1, 3_000);
+    assert_eq!(item_count(&game, 2740), 1);
+    assert_eq!(item_count(&game, 2739), 0, "no copper ore");
+    assert_eq!(counts(&game), vec![1, 1, 0]);
+    send(&mut game, &character, &[26, 0, 42, 0], 4_000);
+
+    // Practice: no outputs, no XP, but the finished game credits.
+    let xp = game.job_level(crate::mining::MINER_PROFILE_ID);
+    game.begin_portal_game(375, row, &character, 5_000).unwrap();
+    let instance = run_of(&game);
+    let items = game.inventory.state().clone();
+    finish_type8(&mut game, &character, instance, 1, 6_000);
+    assert_eq!(game.inventory.state(), &items, "practice paid an item");
+    assert_eq!(game.job_level(crate::mining::MINER_PROFILE_ID), xp);
+    assert_eq!(counts(&game), vec![1, 1, 1]);
+}

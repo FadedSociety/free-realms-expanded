@@ -242,6 +242,16 @@ impl Gather {
         Ok(())
     }
 
+    /// L934: the job rank a Games window row of `game` asks (L106 mail, L934 ore); harvesting rows
+    /// carry no rank requirement.
+    pub fn rank_floor(self, game: i32) -> u32 {
+        match self {
+            Self::Mining => crate::mining::rank_floor(game),
+            Self::Harvesting => 0,
+            Self::Mail => crate::mail_sorting::rank_floor(game),
+        }
+    }
+
     /// Lowercase noun for the developer-command sentences.
     pub(crate) fn noun(self) -> &'static str {
         match self {

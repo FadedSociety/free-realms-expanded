@@ -79,6 +79,390 @@
           "value": 602
         }
       ]
+    },
+    {
+      "description_id": 7911,
+      "game_id": 93,
+      "goals": [
+        {
+          "icon_id": 909,
+          "index": 0,
+          "per_reward": 1,
+          "quota": 6,
+          "value": 601
+        },
+        {
+          "icon_id": 909,
+          "index": 1,
+          "per_reward": 2,
+          "quota": 6,
+          "value": 602
+        }
+      ],
+      "icon_id": 909,
+      "name_id": 74881,
+      "outputs": [
+        {
+          "cluster_quantity": 1,
+          "definition_id": 2740,
+          "value": 601
+        },
+        {
+          "cluster_quantity": 2,
+          "definition_id": 2740,
+          "value": 602
+        }
+      ],
+      "selectable": [
+        401,
+        402,
+        403,
+        404,
+        405
+      ],
+      "source": "MiniGameData 93 Tin Mining (difficulty 2). Output 2740 is the Tin Ore the Tin Bar recipe consumes (recipes.json miner.tin_bar). Board, quotas and cluster sizes are the copper board's (R).",
+      "tiles": [
+        {
+          "category": 400,
+          "icon_id": 1,
+          "value": 401
+        },
+        {
+          "category": 400,
+          "icon_id": 2,
+          "value": 402
+        },
+        {
+          "category": 400,
+          "icon_id": 3,
+          "value": 403
+        },
+        {
+          "category": 400,
+          "icon_id": 4,
+          "value": 404
+        },
+        {
+          "category": 400,
+          "icon_id": 5,
+          "value": 405
+        },
+        {
+          "category": 600,
+          "icon_id": 909,
+          "value": 601
+        },
+        {
+          "category": 600,
+          "icon_id": 909,
+          "value": 602
+        }
+      ]
+    },
+    {
+      "description_id": 7911,
+      "game_id": 95,
+      "goals": [
+        {
+          "icon_id": 909,
+          "index": 0,
+          "per_reward": 1,
+          "quota": 6,
+          "value": 601
+        },
+        {
+          "icon_id": 909,
+          "index": 1,
+          "per_reward": 2,
+          "quota": 6,
+          "value": 602
+        }
+      ],
+      "icon_id": 909,
+      "name_id": 74818,
+      "outputs": [
+        {
+          "cluster_quantity": 1,
+          "definition_id": 2741,
+          "value": 601
+        },
+        {
+          "cluster_quantity": 2,
+          "definition_id": 2741,
+          "value": 602
+        }
+      ],
+      "selectable": [
+        401,
+        402,
+        403,
+        404,
+        405
+      ],
+      "source": "MiniGameData 95 Iron Mining (difficulty 3). Output 2741 is the Iron Ore the Iron Bar recipe consumes (recipes.json miner.iron_bar). Board, quotas and cluster sizes are the copper board's (R).",
+      "tiles": [
+        {
+          "category": 400,
+          "icon_id": 1,
+          "value": 401
+        },
+        {
+          "category": 400,
+          "icon_id": 2,
+          "value": 402
+        },
+        {
+          "category": 400,
+          "icon_id": 3,
+          "value": 403
+        },
+        {
+          "category": 400,
+          "icon_id": 4,
+          "value": 404
+        },
+        {
+          "category": 400,
+          "icon_id": 5,
+          "value": 405
+        },
+        {
+          "category": 600,
+          "icon_id": 909,
+          "value": 601
+        },
+        {
+          "category": 600,
+          "icon_id": 909,
+          "value": 602
+        }
+      ]
+    },
+    {
+      "description_id": 7911,
+      "game_id": 97,
+      "goals": [
+        {
+          "icon_id": 909,
+          "index": 0,
+          "per_reward": 1,
+          "quota": 6,
+          "value": 601
+        },
+        {
+          "icon_id": 909,
+          "index": 1,
+          "per_reward": 2,
+          "quota": 6,
+          "value": 602
+        }
+      ],
+      "icon_id": 909,
+      "name_id": 74884,
+      "outputs": [
+        {
+          "cluster_quantity": 1,
+          "definition_id": 2742,
+          "value": 601
+        },
+        {
+          "cluster_quantity": 2,
+          "definition_id": 2742,
+          "value": 602
+        }
+      ],
+      "selectable": [
+        401,
+        402,
+        403,
+        404,
+        405
+      ],
+      "source": "MiniGameData 97 Silver Mining (difficulty 4). Output 2742 is the Silver Ore the Silver Bar recipe consumes (recipes.json miner.silver_bar). Board, quotas and cluster sizes are the copper board's (R).",
+      "tiles": [
+        {
+          "category": 400,
+          "icon_id": 1,
+          "value": 401
+        },
+        {
+          "category": 400,
+          "icon_id": 2,
+          "value": 402
+        },
+        {
+          "category": 400,
+          "icon_id": 3,
+          "value": 403
+        },
+        {
+          "category": 400,
+          "icon_id": 4,
+          "value": 404
+        },
+        {
+          "category": 400,
+          "icon_id": 5,
+          "value": 405
+        },
+        {
+          "category": 600,
+          "icon_id": 909,
+          "value": 601
+        },
+        {
+          "category": 600,
+          "icon_id": 909,
+          "value": 602
+        }
+      ]
+    },
+    {
+      "description_id": 7911,
+      "game_id": 99,
+      "goals": [
+        {
+          "icon_id": 909,
+          "index": 0,
+          "per_reward": 1,
+          "quota": 6,
+          "value": 601
+        },
+        {
+          "icon_id": 909,
+          "index": 1,
+          "per_reward": 2,
+          "quota": 6,
+          "value": 602
+        }
+      ],
+      "icon_id": 909,
+      "name_id": 16225,
+      "outputs": [
+        {
+          "cluster_quantity": 1,
+          "definition_id": 2743,
+          "value": 601
+        },
+        {
+          "cluster_quantity": 2,
+          "definition_id": 2743,
+          "value": 602
+        }
+      ],
+      "selectable": [
+        401,
+        402,
+        403,
+        404,
+        405
+      ],
+      "source": "MiniGameData 99 Gold Mining (difficulty 5). Output 2743 is the Gold Ore the Gold Bar recipe consumes (recipes.json miner.gold_bar). Board, quotas and cluster sizes are the copper board's (R).",
+      "tiles": [
+        {
+          "category": 400,
+          "icon_id": 1,
+          "value": 401
+        },
+        {
+          "category": 400,
+          "icon_id": 2,
+          "value": 402
+        },
+        {
+          "category": 400,
+          "icon_id": 3,
+          "value": 403
+        },
+        {
+          "category": 400,
+          "icon_id": 4,
+          "value": 404
+        },
+        {
+          "category": 400,
+          "icon_id": 5,
+          "value": 405
+        },
+        {
+          "category": 600,
+          "icon_id": 909,
+          "value": 601
+        },
+        {
+          "category": 600,
+          "icon_id": 909,
+          "value": 602
+        }
+      ]
+    },
+    {
+      "description_id": 92528,
+      "game_id": 375,
+      "goals": [
+        {
+          "icon_id": 909,
+          "index": 0,
+          "per_reward": 1,
+          "quota": 6,
+          "value": 601
+        },
+        {
+          "icon_id": 909,
+          "index": 1,
+          "per_reward": 2,
+          "quota": 6,
+          "value": 602
+        }
+      ],
+      "icon_id": 909,
+      "name_id": 92481,
+      "outputs": [],
+      "selectable": [
+        401,
+        402,
+        403,
+        404,
+        405
+      ],
+      "source": "MiniGameData 375 Mining Practice. Client text 1121237594 says the practice game gives no rewards, so it has no outputs and pays no XP (apply_type8). Board and quotas are the copper board's (R).",
+      "tiles": [
+        {
+          "category": 400,
+          "icon_id": 1,
+          "value": 401
+        },
+        {
+          "category": 400,
+          "icon_id": 2,
+          "value": 402
+        },
+        {
+          "category": 400,
+          "icon_id": 3,
+          "value": 403
+        },
+        {
+          "category": 400,
+          "icon_id": 4,
+          "value": 404
+        },
+        {
+          "category": 400,
+          "icon_id": 5,
+          "value": 405
+        },
+        {
+          "category": 600,
+          "icon_id": 909,
+          "value": 601
+        },
+        {
+          "category": 600,
+          "icon_id": 909,
+          "value": 602
+        }
+      ]
     }
   ],
   "icon_id": 909,

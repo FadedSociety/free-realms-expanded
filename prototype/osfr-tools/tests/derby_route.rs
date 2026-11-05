@@ -168,6 +168,7 @@ impl GameplayFixture {
                 "encounter-template.bin",
                 "journal-text.json",
                 "harvesting.json",
+                "item-table.json",
             ]);
         }
         for file in files {

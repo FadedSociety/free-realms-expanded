@@ -720,14 +720,19 @@ fn shipped_minigame_producers_are_pinned() {
         // row 1030 is a soccer row. L961: the Feeling the Beat! songs 201-204. L962: the Tower Defense
         // games 150-161, 250-261, 350-361 and the basic 450-457. Pirate's Plunder's arenas are
         // 1032-1034.
+        // L934: checkers 21, Copper Mining 91, Tin/Iron/Silver/Gold Mining 93/95/97/99, the
+        // Harvesting regions 109/113/115/117/119, Mining Practice 375 and the six Mail Sorting
+        // towns 376-381 credit at runtime; the table reads them from the loaded content.
         vec![
-            18, 20, 28, 39, 40, 41, 42, 43, 44, 46, 66, 67, 77, 111, 134, 135, 136, 137, 138, 139,
-            141, 142, 144, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159,
-            160, 161, 162, 163, 164, 165, 166, 167, 169, 170, 171, 173, 174, 175, 178, 179, 180,
-            181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197,
-            198, 199, 201, 202, 203, 204, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260,
-            261, 289, 290, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 350, 351,
-            352, 353, 354, 355, 356, 357, 358, 359, 360, 361, 365, 366, 368, 450, 451, 452, 453,
+
+            18, 20, 21, 28, 39, 40, 41, 42, 43, 44, 46, 66, 67, 77, 91, 93, 95, 97, 99, 109, 111,
+            113, 115, 117, 119, 134, 135, 136, 137, 138, 139, 141, 142, 144, 146, 147, 148, 149,
+            150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166,
+            167, 169, 170, 171, 173, 174, 175, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187,
+            188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 201, 202, 203, 204, 250,
+            251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 289, 290, 322, 323, 324, 325,
+            326, 327, 328, 329, 330, 331, 332, 333, 350, 351, 352, 353, 354, 355, 356, 357, 358,
+            359, 360, 361, 365, 366, 368, 375, 376, 377, 378, 379, 380, 381, 450, 451, 452, 453,
             454, 455, 456, 457, 596, 597, 598, 599, 600, 601, 604, 607, 615, 616, 624, 627, 628,
             629, 630, 631, 632, 633, 634, 1030, 1032, 1033, 1034,
         ],
@@ -783,6 +788,20 @@ fn shipped_minigame_producers_are_pinned() {
     // Chess settles with a zero score, so only its server-measured time is a fact.
     assert!(catalogue.targets.reports(66, MinigameFact::Elapsed));
     assert!(!catalogue.targets.reports(66, MinigameFact::Score));
+    // L934: the Type8 boards (ore, regions, towns, practice) settle on a server-built 39/18 with
+    // the run's score and time; checkers settles like chess, a measured time and a zero score.
+    for type8 in [18, 91, 93, 95, 97, 99, 375, 109, 113, 119, 376, 381] {
+        assert!(
+            catalogue.targets.reports(type8, MinigameFact::Score),
+            "{type8}"
+        );
+        assert!(
+            catalogue.targets.reports(type8, MinigameFact::Elapsed),
+            "{type8}"
+        );
+    }
+    assert!(catalogue.targets.reports(21, MinigameFact::Elapsed));
+    assert!(!catalogue.targets.reports(21, MinigameFact::Score));
     assert!(!catalogue.targets.reports(599, MinigameFact::Score));
     // L932: a soccer win reports the team's goals (score) and the whole-second match time; the
     // match has no placement or knock-out fact.

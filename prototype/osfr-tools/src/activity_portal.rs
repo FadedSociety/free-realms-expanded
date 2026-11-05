@@ -647,7 +647,14 @@ impl Catalogue {
             // L106: a mail town opens at its Postman rank floor.
             Kind::Gather { gather } => {
                 viewer.jobs.contains(&gather.job())
-                    && (gather != Gather::Mail || viewer.postman >= a.required_level)
+                    && match gather {
+                        Gather::Mail => viewer.postman >= a.required_level,
+                        // L934: an ore row opens at its Miner rank.
+                        Gather::Mining => {
+                            viewer.crafts[CraftingJob::Miner as usize] >= a.required_level
+                        }
+                        Gather::Harvesting => true,
+                    }
             }
             Kind::Kart
             | Kind::Derby

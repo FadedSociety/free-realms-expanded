@@ -264,7 +264,8 @@ fn the_shipped_harvesting_file_offers_each_plot_game_with_the_recovered_produce(
     )
     .expect("the shipped harvesting file loads with its games");
     let offered: Vec<i32> = engine.games().map(|(game, _)| game).collect();
-    assert_eq!(offered, [109, 111, 115, 117]);
+    // L934: Chugaroot Farm (113) and Thorny Tillage (119) are Games window rows with no plot.
+    assert_eq!(offered, [109, 111, 113, 115, 117, 119]);
 
     let file = read(&shipped);
     let base = &file["spec"];

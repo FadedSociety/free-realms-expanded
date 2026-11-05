@@ -839,6 +839,62 @@ fn a_mail_row_opens_at_its_postman_rank() {
     );
 }
 
+/// L934: an ore row opens at its Miner rank floor (Tin 401, game 93: rank 5; Gold 578, game 99:
+/// rank 17); Copper (91) and Mining Practice (375) ask none.
+#[test]
+fn an_ore_row_opens_at_its_miner_rank() {
+    let mining = |game: i32| Activity {
+        required_level: Gather::Mining.rank_floor(game),
+        ..game_row(
+            game as u32,
+            Kind::Gather {
+                gather: Gather::Mining,
+            },
+        )
+    };
+    let catalogue = Catalogue::new(vec![row(96, 0)])
+        .unwrap()
+        .with_live(
+            vec![
+                live_row(2, 401, 19, 74_881, 93),
+                live_row(2, 578, 19, 16_225, 99),
+                live_row(2, 400, 19, 16_221, 91),
+                live_row(2, 1113, 19, 92_481, 375),
+            ],
+            None,
+            [93, 99, 91, 375].map(mining).to_vec(),
+        )
+        .unwrap();
+    let jobs = std::collections::BTreeSet::from([Gather::Mining.job()]);
+    let joins = |miner: u32| -> Vec<(u32, u8)> {
+        // Chef, Blacksmith, Miner.
+        let viewer = Viewer {
+            crafts: [20, 20, miner],
+            jobs: &jobs,
+            ..FIGHTER
+        };
+        let list = decode_list(&catalogue.minigame_list_packet(viewer).unwrap());
+        (list.rows.iter().zip(&list.flags))
+            .map(|(r, f)| (r[0], f.0))
+            .collect()
+    };
+    assert_eq!(
+        joins(4),
+        [(401, 0), (578, 0), (400, 1), (1113, 1)],
+        "rank 4"
+    );
+    assert_eq!(
+        joins(5),
+        [(401, 1), (578, 0), (400, 1), (1113, 1)],
+        "rank 5"
+    );
+    assert_eq!(
+        joins(17),
+        [(401, 1), (578, 1), (400, 1), (1113, 1)],
+        "rank 17"
+    );
+}
+
 #[test]
 fn live_rows_refuse_bad_rows_and_a_battle_shadowing_a_live_id() {
     let base = || Catalogue::new(vec![row(96, 0)]).unwrap();

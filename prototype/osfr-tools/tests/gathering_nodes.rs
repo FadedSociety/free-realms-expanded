@@ -338,6 +338,21 @@ impl Fixture {
         fs::copy(source, self.directory.join(mining::CONTENT_FILE)).unwrap();
         self
     }
+
+    /// L934: the shipped regions, Chugaroot Farm (113) and Thorny Tillage (119) among them.
+    fn with_shipped_harvesting(self) -> Self {
+        let source = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/harvesting.json");
+        fs::copy(source, self.directory.join(harvesting::CONTENT_FILE)).unwrap();
+        self
+    }
+
+    /// L934: the release item table beside the campaign inventory, which lacks the iron, silver
+    /// and gold ore and some produce the shipped boards pay.
+    fn with_release_items(self) -> Self {
+        let source = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/release/item-table.json");
+        fs::copy(source, self.directory.join("item-table.json")).unwrap();
+        self
+    }
 }
 
 impl Drop for Fixture {
@@ -1424,8 +1439,13 @@ fn games_window_play_starts_the_rows_gather_game_away_from_every_node() {
         active(&gateway, MINING).is_some(),
         "Copper Mining run offered"
     );
+    // L934: Tin Mining (row 401) is open now, so a run in progress refuses it as busy.
     let tin = play(&mut gateway, 401, 2_100);
-    assert!(said(&tin, "not open yet"), "{}", chat_text(&tin));
+    assert!(
+        said(&tin, "Finish what you are doing"),
+        "{}",
+        chat_text(&tin)
+    );
 }
 
 /// L103: Mail Sorting runs on a third Type8 engine for the Postman. Play on the live Sanctuary
@@ -1945,4 +1965,136 @@ fn a_campaign_without_plot_games_refuses_the_plot_and_keeps_the_mushrooms() {
     let mut again = fixture.gateway_at(fixture.state(true, true), &mushroom(), 2.0);
     let started = click(&mut again, mushroom().guid, 2_000);
     assert_eq!(started_game(&started).0, 111);
+}
+
+/// L934: the Games window ore rows (row, MiniGameData game, the ore it pays, the Miner rank it
+/// asks), and every ore the Miner's bars smelt.
+const ORE_ROWS: [(u32, i32, i32); 4] = [
+    (401, 93, 2740),
+    (402, 95, 2741),
+    (577, 97, 2742),
+    (578, 99, 2743),
+];
+const ORES: [i32; 5] = [2739, 2740, 2741, 2742, 2743];
+
+/// The handshake a client sends after the 39/16 offer, up to the first level.
+fn begin_level(gateway: &mut Gateway, id: i32, base_ms: u64) {
+    for (step, packet) in [
+        frame(5, id, -1),
+        payload(id, "OnConnectMsg"),
+        payload(id, "OnStartGameMsg"),
+        payload(id, "OnStartLevelMsg"),
+    ]
+    .iter()
+    .enumerate()
+    {
+        send(gateway, packet, base_ms + 20 * step as u64);
+    }
+}
+
+/// L934: Tin, Iron, Silver and Gold Mining start from their Games window rows at their Miner
+/// rank (a lower Miner is refused and nothing changes), play the shipped board and pay their own
+/// ore, once, and no other ore.
+#[test]
+fn games_window_ore_rows_pay_their_own_ore_at_their_miner_rank() {
+    let fixture = Fixture::new(MINING)
+        .with_shipped_mining()
+        .with_release_items();
+    let miner = |xp: u32| {
+        let mut state = fixture.state(true, true);
+        let profiles = state.profiles.as_mut().unwrap();
+        profiles.experience.insert(MINER_PROFILE_ID, xp);
+        state
+    };
+    for (row, game, paid) in ORE_ROWS {
+        let mut novice = fixture.gateway_at(miner(0), &fixture.node, 60.0);
+        let before = novice.snapshot();
+        let refused = play(&mut novice, row, 2_000);
+        assert!(
+            said(&refused, "Miner rank is too low"),
+            "row {row}: {}",
+            chat_text(&refused)
+        );
+        assert_eq!(
+            novice.snapshot(),
+            before,
+            "row {row}: a refused Play changed state"
+        );
+
+        let mut gateway = fixture.gateway_at(miner(1_000_000), &fixture.node, 60.0);
+        tick(&mut gateway, 1_500);
+        let started = play(&mut gateway, row, 2_000);
+        assert_eq!(started_game(&started).0, game, "row {row}");
+        let id = active(&gateway, MINING).expect("the ore run is offered") as i32;
+        begin_level(&mut gateway, id, 2_100);
+        finish_shipped_mining(&mut gateway, id, 2_200);
+        send(&mut gateway, &payload(id, "OnNextLevelMsg"), 5_000);
+        assert_eq!(mining_run(&gateway).phase, Type8Phase::Won, "row {row}");
+        for ore in ORES {
+            let expected = if ore == paid { 12 } else { 0 };
+            assert_eq!(count(&gateway, ore), expected, "row {row}: ore {ore}");
+        }
+        let paid_state = gateway.snapshot();
+        send(&mut gateway, &payload(id, "OnNextLevelMsg"), 5_100);
+        assert_eq!(
+            gateway.snapshot(),
+            paid_state,
+            "row {row}: a replayed win paid again"
+        );
+    }
+}
+
+/// L934: Mining Practice (row 1113, game 375) plays to a win and pays nothing: no ore, no job XP.
+#[test]
+fn mining_practice_finishes_and_pays_nothing() {
+    let fixture = Fixture::new(MINING)
+        .with_shipped_mining()
+        .with_release_items();
+    let mut gateway = fixture.gateway_at(fixture.state(true, true), &fixture.node, 60.0);
+    tick(&mut gateway, 1_500);
+    let started = play(&mut gateway, 1113, 2_000);
+    assert_eq!(started_game(&started), (375, 92481, 92528));
+    let id = active(&gateway, MINING).expect("the practice run is offered") as i32;
+    let before = (
+        gameplay_json(&gateway)["inventory"].clone(),
+        xp(&gateway, MINING),
+    );
+    begin_level(&mut gateway, id, 2_100);
+    finish_shipped_mining(&mut gateway, id, 2_200);
+    send(&mut gateway, &payload(id, "OnNextLevelMsg"), 5_000);
+    assert_eq!(mining_run(&gateway).phase, Type8Phase::Won);
+    assert_eq!(gameplay_json(&gateway)["mining"]["completed"], json!(1));
+    assert_eq!(
+        (
+            gameplay_json(&gateway)["inventory"].clone(),
+            xp(&gateway, MINING)
+        ),
+        before,
+        "practice paid something"
+    );
+}
+
+/// L934: Chugaroot Farm (row 412, game 113) and Thorny Tillage (row 1036, game 119) start from
+/// the Games window with their recovered names; the produce they pay is pinned against the
+/// recovered region table in `farm_plots.rs`.
+#[test]
+fn games_window_starts_chugaroot_and_thorny_harvesting() {
+    let fixture = Fixture::new(HARVEST)
+        .with_shipped_harvesting()
+        .with_release_items();
+    for (row, game) in [(412, 113), (1036, 119)] {
+        let mut gateway = fixture.gateway_at(fixture.state(true, true), &fixture.node, 60.0);
+        tick(&mut gateway, 1_500);
+        let started = play(&mut gateway, row, 2_000);
+        let region = harvesting::region(game).unwrap();
+        assert_eq!(
+            started_game(&started),
+            (game, region.name_id, region.description_id),
+            "row {row}"
+        );
+        assert!(
+            active(&gateway, HARVEST).is_some(),
+            "row {row}: no run offered"
+        );
+    }
 }

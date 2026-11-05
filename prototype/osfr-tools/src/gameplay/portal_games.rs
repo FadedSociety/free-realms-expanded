@@ -74,16 +74,10 @@ pub(super) fn games(
         .filter_map(|(gather, engine)| Some((gather, engine?)))
         .flat_map(|(gather, engine)| {
             (engine.games()).filter_map(move |(game, _)| {
-                let row = game_row(u32::try_from(game).ok()?, Kind::Gather { gather });
-                // L106: a mail town's row asks its Postman rank floor.
-                let floor = if gather == Gather::Mail {
-                    crate::mail_sorting::rank_floor(game)
-                } else {
-                    0
-                };
+                // L106/L934: a mail town's or an ore's row asks its job rank floor.
                 Some(Activity {
-                    required_level: floor,
-                    ..row
+                    required_level: gather.rank_floor(game),
+                    ..game_row(u32::try_from(game).ok()?, Kind::Gather { gather })
                 })
             })
         });
@@ -211,10 +205,11 @@ impl Gameplay {
                     Err(denied) => return Ok(refused(&denied.message())),
                     Ok(()) => {}
                 }
-                if gather == Gather::Mail
-                    && self.job_level(gather.job()) < crate::mail_sorting::rank_floor(game)
-                {
-                    return Ok(refused("Your Postman rank is too low for that route."));
+                if self.job_level(gather.job()) < gather.rank_floor(game) {
+                    return Ok(refused(&format!(
+                        "Your {} rank is too low for that game.",
+                        gather.word()
+                    )));
                 }
                 let Some(spec) = self.type8(gather).and_then(|e| e.spec_for(Some(game))) else {
                     return Ok(refused("Gathering is not available in this campaign."));

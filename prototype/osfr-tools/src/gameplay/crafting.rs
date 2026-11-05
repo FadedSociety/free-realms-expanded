@@ -734,19 +734,25 @@ impl Gameplay {
             if let Some(nodes) = self.gathering_nodes.as_mut() {
                 nodes.paid();
             }
-        } else if gather == Gather::Mail && result.completed {
-            // L103 (R): a sorted run pays Postman XP, once, on the engine's own win.
+        } else if result.completed {
+            // An item-less win, once, on the engine's own win. L103 (R): a sorted run pays Postman
+            // XP. L934: Mining Practice has no outputs and pays nothing (the client calls it a
+            // practice game with no rewards), but it is still a finished minigame.
             if self.profiles.as_ref().map(Profiles::active) != Some(gather.job()) {
-                return Err(invalid(
-                    "mail sorting completion is outside the accepted Postman job",
-                ));
+                return Err(invalid(format!(
+                    "{} completion is outside the accepted {} job",
+                    gather.noun(),
+                    gather.word()
+                )));
             }
             self.npc_minigame_win(&result.replies, out)?;
-            let xp = self.activity_xp(
-                gather.job(),
-                crate::mail_sorting::RECONSTRUCTED_POSTMAN_XP_PER_WIN,
-            );
-            self.award_job_xp(xp, out)?;
+            if gather == Gather::Mail {
+                let xp = self.activity_xp(
+                    gather.job(),
+                    crate::mail_sorting::RECONSTRUCTED_POSTMAN_XP_PER_WIN,
+                );
+                self.award_job_xp(xp, out)?;
+            }
         } else {
             // T787: the client's `FRServer_GameOver` presents the 39/18 record after
             // the win already credited the id-only event; only its facts are new.

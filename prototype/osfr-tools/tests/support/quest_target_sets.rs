@@ -15,8 +15,10 @@
 //!   | settled soccer (`Gameplay::tick_world` -> `npc_minigame_win`) | game id | `soccer.json` `games[].id` |
 //!   | chess result (`Gameplay::apply_chess` -> `npc_minigame_win`) | row id | `chess.json` `rows[].row_id` |
 //!   | craft win (`gameplay/crafting.rs`; facts only for a Blacksmith recipe) | recipe game id | `recipes.json` `records[].minigame_id` |
-//!   | mining win (`Gameplay::apply_type8` -> `npc_minigame_win`) | 18 | `mining::MINING_GAME_ID` |
-//!   | harvesting win (`Gameplay::apply_type8` -> `npc_minigame_win`) | 111 | `Gameplay`'s `HARVESTING_GAME_ID` |
+//!   | mining win (`Gameplay::apply_type8` -> `npc_minigame_win`) | 18 and each Games window ore row | `mining.json` `games[].game_id` (L934) |
+//!   | harvesting win (`Gameplay::apply_type8` -> `npc_minigame_win`) | 111 and each region | `harvesting.json` `games[].game_id` |
+//!   | mail sorting win (`Gameplay::apply_type8` -> `npc_minigame_win`) | each town | `mail_sorting.json` `games[].game_id` (L934) |
+//!   | checkers win (`Gameplay::handle_checkers` -> `npc_minigame_win`) | 21 | `checkers::GAME_ID` (L934) |
 //!   | paid fishing catch (`Gameplay::handle_fishing`) | spot game id | `fishing_spots.json` `spots[].game_id` |
 //!   | kart claim (`Gameplay::handle_kart_entry`/tick) | entered row id (28, 628-634) | `KartGateway::minigame_ids` (`kart_gates.json` + the playable `kart_rows.json` rows) |
 //!   | finished derby (`Gameplay::pay_derby_completion`) | entered row id | `DerbyGateway::rows` (`derby_entry.json` default + `derby_rows.json`) |
@@ -76,13 +78,14 @@
 
 use super::quest_records::as_u32;
 use osfr_tools::{
-    activity_portal, chess_service,
+    activity_portal, checkers, chess_service,
     derby_gateway::DerbyGateway,
     harvest_nodes::GatheringNodes,
     harvesting,
     inventory::Inventory,
     item_bar::Effects,
     kart_gateway::KartGateway,
+    mail_sorting,
     mining::{self, Type8Engine},
     music_game,
     pets::PetContent,
@@ -96,8 +99,8 @@ use std::{
     path::Path,
 };
 
-/// `src/gameplay.rs`'s private `HARVESTING_GAME_ID`: the one harvesting game the
-/// server loads, so the only harvesting id `finish_minigame` can receive.
+/// `src/gameplay.rs`'s private `HARVESTING_GAME_ID`: the harvesting file's own game, which
+/// `Type8Engine::load` binds (its `games` regions come from the loaded content).
 pub const HARVESTING_GAME_ID: u32 = 111;
 /// `Gameplay::local_gather_drop` match keys for the opening local drops. These
 /// are gather event resource keys, not item definition ids.
@@ -249,42 +252,45 @@ impl Targets {
             targets.producer(spot, []);
         }
 
-        let mining = root.join(mining::CONTENT_FILE);
-        if mining.is_file() {
-            let engine = Type8Engine::load(
-                root,
+        // L934: every game each Type8 file offers is a producer, read from the loaded content so a
+        // new board registers itself: mining (18 and its ore rows), harvesting (111 and its
+        // regions) and mail sorting (the six towns). Each win is a server-built 39/18 with the
+        // run's score and time, and each output definition is a `gather` target.
+        for (file, game, first_instance) in [
+            (
                 mining::CONTENT_FILE,
                 mining::MINING_GAME_ID,
                 mining::FIRST_MINING_INSTANCE,
-                None,
-            )?;
-            targets.producer(mining::MINING_GAME_ID as u32, SCORE_AND_ELAPSED);
-            targets.gather.extend(
-                engine
-                    .spec()
-                    .outputs
-                    .iter()
-                    .filter_map(|output| u32::try_from(output.definition_id).ok()),
-            );
-        }
-        let harvest = root.join(harvesting::CONTENT_FILE);
-        if harvest.is_file() {
-            let engine = Type8Engine::load(
-                root,
+            ),
+            (
                 harvesting::CONTENT_FILE,
                 HARVESTING_GAME_ID as i32,
                 harvesting::FIRST_INSTANCE_ID,
-                None,
-            )?;
-            targets.producer(HARVESTING_GAME_ID, SCORE_AND_ELAPSED);
-            targets.gather.extend(
-                engine
-                    .spec()
-                    .outputs
-                    .iter()
-                    .filter_map(|output| u32::try_from(output.definition_id).ok()),
-            );
+            ),
+            (
+                mail_sorting::CONTENT_FILE,
+                mail_sorting::GAME_ID,
+                mail_sorting::FIRST_INSTANCE_ID,
+            ),
+        ] {
+            if !root.join(file).is_file() {
+                continue;
+            }
+            let engine = Type8Engine::load(root, file, game, first_instance, None)?;
+            for (id, spec) in engine.games() {
+                if let Ok(id) = u32::try_from(id) {
+                    targets.producer(id, SCORE_AND_ELAPSED);
+                }
+                targets.gather.extend(
+                    spec.outputs
+                        .iter()
+                        .filter_map(|output| u32::try_from(output.definition_id).ok()),
+                );
+            }
         }
+        // L934: the checkers table is always on (`portal_games::games`); a won game's 39/18
+        // carries the measured time and a zero score, like chess.
+        targets.producer(checkers::GAME_ID as u32, [MinigameFact::Elapsed]);
 
         // `Gameplay::load` merges the optional catalogue under the same root.
         if root.join("inventory.json").is_file() {

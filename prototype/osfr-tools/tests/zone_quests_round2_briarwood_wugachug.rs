@@ -359,7 +359,7 @@ fn the_other_ten_stay_off_until_their_blocker_lifts() {
         (3_090_020, Some(77_549)),
         (3_090_023, None),
         (3_090_032, None),
-        (3_100_025, Some(2_743)),
+        (3_100_025, None),
         (3_100_027, Some(2_747)),
     ];
     let targets = Targets::load(&content_dir(), &reference_content()).unwrap();

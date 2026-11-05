@@ -48,6 +48,22 @@ pub mod lifecycle;
 pub const TYPE8_GAME_FAMILY: u16 = 39;
 pub const MINING_GAME_ID: i32 = 18;
 pub const COPPER_MINING_GAME_ID: i32 = 91;
+
+/// L934: the Miner rank a Games window ore row asks. The live rows carried RequirementSets
+/// 15-18 (Tin 93, Iron 95, Silver 97, Gold 99), client Requirements 17-20 =
+/// `CheckRankLastProfileByType` profile type 9 at rank 5/9/13/17. (R) Type 9 is the Miner's own
+/// profile type (the fourth dword of its profile record). Copper 91, Mining Practice 375 and the
+/// node game 18 carried none.
+pub fn rank_floor(game: i32) -> u32 {
+    match game {
+        93 => 5,
+        95 => 9,
+        97 => 13,
+        99 => 17,
+        _ => 0,
+    }
+}
+
 /// Gateway content file name for the reconstructed Mining18 board.
 pub const CONTENT_FILE: &str = "mining.json";
 /// ORIGINAL: the opening content binds the accepted Miner job to profile 14.
