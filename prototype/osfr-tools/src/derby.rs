@@ -302,12 +302,45 @@ pub struct DerbyPickup {
     pub response_parameters_bits: [u32; 3],
 }
 
+/// (R) When power-ups appear. The capture has nothing on the floor at the start, the first 12.4 s
+/// after Go, then more a few seconds apart, and a spot's pickup back after it is taken.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct PickupSchedule {
+    pub first_ms: u64,
+    /// Between one spot's first appearance and the next's.
+    pub gap_ms: u64,
+    /// From a pickup being taken to its spot filling again.
+    pub respawn_ms: u64,
+    /// What a spot holds next, by pickup id, in turn; a spot not listed keeps its pickup.
+    #[serde(default)]
+    pub turns: BTreeMap<u32, Vec<PickupTurn>>,
+}
+
+/// One turn of a spot: a different pickup at the same place (capture: spot 2 held 469, then 943).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct PickupTurn {
+    pub definition_id: u32,
+    pub kind: PickupKind,
+    pub unknown_floats_bits: [u32; 2],
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct DerbyPickupBody {
     pub id: u32,
     pub definition_id: u32,
     pub position_bits: [u32; 4],
     pub unknown_floats_bits: [u32; 2],
+}
+
+fn pickup_body(pickup: &DerbyPickup) -> DerbyPickupBody {
+    DerbyPickupBody {
+        id: pickup.id,
+        definition_id: pickup.definition_id,
+        position_bits: pickup.position_bits,
+        unknown_floats_bits: pickup.unknown_floats_bits,
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -876,6 +909,9 @@ pub struct DerbyService {
     countdown_acks: BTreeSet<ParticipantKey>,
     countdown_value: u32,
     pickups: BTreeMap<u32, DerbyPickup>,
+    pickup_schedule: Option<PickupSchedule>,
+    /// Pickups off the floor until their time: the time, then the pickup.
+    pickups_due: BTreeMap<u32, (u64, DerbyPickup)>,
     contact_times: BTreeMap<(ParticipantKey, ParticipantKey), u64>,
     started_at_ms: Option<u64>,
     results_until_ms: Option<u64>,
@@ -997,6 +1033,8 @@ impl DerbyService {
             countdown_acks: BTreeSet::new(),
             countdown_value: 4,
             pickups: pickup_map,
+            pickup_schedule: None,
+            pickups_due: BTreeMap::new(),
             contact_times: BTreeMap::new(),
             started_at_ms: None,
             results_until_ms: None,
@@ -1277,6 +1315,7 @@ impl DerbyService {
         }
         self.phase = DerbyPhase::Aborted;
         self.pickups.clear();
+        self.pickups_due.clear();
         Ok(Some(crate::minigame::state_remove_packet(
             self.instance_id,
             self.game_id,
@@ -1364,16 +1403,11 @@ impl DerbyService {
                 }),
             )?;
         }
-        for pickup in self.pickups.values() {
-            self.push_broadcast(
-                &mut actions,
-                DerbyMessage::CreatePickup(DerbyPickupBody {
-                    id: pickup.id,
-                    definition_id: pickup.definition_id,
-                    position_bits: pickup.position_bits,
-                    unknown_floats_bits: pickup.unknown_floats_bits,
-                }),
-            )?;
+        if self.pickup_schedule.is_none() {
+            for pickup in self.pickups.values() {
+                let create = DerbyMessage::CreatePickup(pickup_body(pickup));
+                self.push_broadcast(&mut actions, create)?;
+            }
         }
         self.phase = DerbyPhase::WaitingForState(3);
         self.push_broadcast(&mut actions, DerbyMessage::GameState(3))?;
@@ -1492,6 +1526,13 @@ impl DerbyService {
         if count == 0 {
             self.phase = DerbyPhase::Running;
             self.started_at_ms = Some(now_ms);
+            if let Some(schedule) = &self.pickup_schedule {
+                let (first, gap) = (schedule.first_ms, schedule.gap_ms);
+                for (turn, (id, pickup)) in std::mem::take(&mut self.pickups).into_iter().enumerate() {
+                    let wait = first.saturating_add(gap.saturating_mul(turn as u64));
+                    self.pickups_due.insert(id, (now_ms.saturating_add(wait), pickup));
+                }
+            }
             let mut actions = self.broadcast_one(DerbyMessage::GameState(9))?;
             // Retail sends every car's health right after state 9. The client zeroes a car's
             // controls while its health field is 0 (`00af6cb0`), so without this no key drives.
@@ -1502,6 +1543,11 @@ impl DerbyService {
         }
         self.countdown_value -= 1;
         self.countdown_actions(self.countdown_value)
+    }
+
+    /// Timed power-ups (see [`PickupSchedule`]); without one they all lie out from the start.
+    pub fn set_pickup_schedule(&mut self, schedule: Option<PickupSchedule>) {
+        self.pickup_schedule = schedule;
     }
 
     fn countdown_actions(&self, count: u32) -> Result<Vec<DerbyAction>, DerbyError> {
@@ -1788,6 +1834,11 @@ impl DerbyService {
                     Some(now_ms.saturating_add(self.rules.ultimate_duration_ms));
             }
         }
+        // Case 2 sets the car's boost to the first parameter (`009f39b0`), so it carries the total.
+        let parameters_bits = match pickup.kind {
+            PickupKind::Boost => [driver.state.boost.to_bits(), 0, 0],
+            _ => pickup.response_parameters_bits,
+        };
         let mut actions = Vec::new();
         self.push_broadcast(&mut actions, DerbyMessage::DestroyPickup(id))?;
         self.push_broadcast(
@@ -1795,9 +1846,25 @@ impl DerbyService {
             DerbyMessage::PickupHitResponse {
                 key: sender,
                 kind: pickup.kind as u32,
-                parameters_bits: pickup.response_parameters_bits,
+                parameters_bits,
             },
         )?;
+        if let Some(schedule) = &mut self.pickup_schedule {
+            let mut next = pickup.clone();
+            if let Some(turns) = schedule.turns.get_mut(&id).filter(|turns| !turns.is_empty()) {
+                let turn = turns.remove(0);
+                turns.push(PickupTurn {
+                    definition_id: next.definition_id,
+                    kind: next.kind,
+                    unknown_floats_bits: next.unknown_floats_bits,
+                });
+                next.definition_id = turn.definition_id;
+                next.kind = turn.kind;
+                next.unknown_floats_bits = turn.unknown_floats_bits;
+            }
+            let at = now_ms.saturating_add(schedule.respawn_ms);
+            self.pickups_due.insert(id, (at, next));
+        }
         if matches!(
             pickup.kind,
             PickupKind::Shield | PickupKind::AttackUp | PickupKind::Ultimate
@@ -1947,6 +2014,16 @@ impl DerbyService {
             return Ok(Vec::new());
         }
         let mut actions = Vec::new();
+        let due: Vec<u32> = (self.pickups_due.iter())
+            .filter(|(_, (at, _))| *at <= now_ms)
+            .map(|(id, _)| *id)
+            .collect();
+        for id in due {
+            if let Some((_, pickup)) = self.pickups_due.remove(&id) {
+                self.push_broadcast(&mut actions, DerbyMessage::CreatePickup(pickup_body(&pickup)))?;
+                self.pickups.insert(id, pickup);
+            }
+        }
         let respawned: Vec<_> = self
             .drivers
             .iter()

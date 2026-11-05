@@ -93,7 +93,7 @@
     "max_pose_age_ms": 5000,
     "max_damage_per_contact": 200,
     "lobby_timeout_ms": 120000,
-    "pickup_radius": 3.0,
+    "pickup_radius": 5.0,
     "health_pickup": 25,
     "boost_pickup": 25.0,
     "shield_duration_ms": 5000,
@@ -113,7 +113,135 @@
       "value_b": 940
     }
   },
-  "pickups": [],
+  "pickups": [
+    {
+      "id": 1,
+      "definition_id": 469,
+      "kind": "health",
+      "position_bits": [
+        1131331846,
+        1096810496,
+        1132855296,
+        1065353216
+      ],
+      "unknown_floats_bits": [
+        1069547520,
+        1374
+      ],
+      "response_parameters_bits": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 2,
+      "definition_id": 469,
+      "kind": "health",
+      "position_bits": [
+        1131331846,
+        1096810496,
+        1129840640,
+        1065353216
+      ],
+      "unknown_floats_bits": [
+        1069547520,
+        1374
+      ],
+      "response_parameters_bits": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 3,
+      "definition_id": 943,
+      "kind": "boost",
+      "position_bits": [
+        1135280128,
+        1080033280,
+        1133510656,
+        1065353216
+      ],
+      "unknown_floats_bits": [
+        1069547520,
+        1349
+      ],
+      "response_parameters_bits": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 4,
+      "definition_id": 486,
+      "kind": "shield",
+      "position_bits": [
+        1127937343,
+        1092467294,
+        1131543462,
+        1065353216
+      ],
+      "unknown_floats_bits": [
+        1069547520,
+        1274
+      ],
+      "response_parameters_bits": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "pickup_schedule": {
+    "first_ms": 12400,
+    "gap_ms": 5000,
+    "respawn_ms": 20000,
+    "turns": {
+      "1": [
+        {
+          "definition_id": 472,
+          "kind": "attack_up",
+          "unknown_floats_bits": [
+            1069547520,
+            1374
+          ]
+        }
+      ],
+      "2": [
+        {
+          "definition_id": 943,
+          "kind": "boost",
+          "unknown_floats_bits": [
+            1069547520,
+            1349
+          ]
+        }
+      ],
+      "3": [
+        {
+          "definition_id": 469,
+          "kind": "health",
+          "unknown_floats_bits": [
+            1069547520,
+            1374
+          ]
+        }
+      ],
+      "4": [
+        {
+          "definition_id": 474,
+          "kind": "ultimate",
+          "unknown_floats_bits": [
+            1069547520,
+            1274
+          ]
+        }
+      ]
+    }
+  },
   "completion_reward_coins": 25,
   "completion_reward_xp": 10
 }

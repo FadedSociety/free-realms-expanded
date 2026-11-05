@@ -74,7 +74,7 @@ const FROZEN_SHA256: &[(&str, &str)] = &[
     (
         "derby_entry.json",
         // L959: the seven AI drivers (`npc_drivers`, the live 35/2 names and models).
-        "03e992eed482c18b936c6031b1251b2f993588ddfea97108bb71629ec34d280a",
+        "aa4cca58d9f93d728ee62a33f524928d83c1ff44629ce57b8f51b4c5be4862fa",
     ),
     (
         "derby_gates.json",

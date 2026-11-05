@@ -74,6 +74,9 @@ pub struct DerbyGatewayContent {
     pub rules: DerbyRules,
     #[serde(default)]
     pub pickups: Vec<DerbyPickup>,
+    /// When `pickups` appear; none lays them all out at the start.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pickup_schedule: Option<crate::derby::PickupSchedule>,
     /// (R) Flat coins for finishing a match, paid once per match instance. A package with zero
     /// coins and zero XP pays nothing, so an operator file without these keys still loads; its
     /// finished matches still enter the ledger and still credit `finish_minigame`.
@@ -392,6 +395,7 @@ fn resolve_row(
         npc_drivers: default.npc_drivers.clone(),
         rules,
         pickups: row.pickups.unwrap_or_else(|| default.pickups.clone()),
+        pickup_schedule: default.pickup_schedule.clone(),
         completion_reward_coins: row
             .completion_reward_coins
             .unwrap_or(default.completion_reward_coins),
@@ -681,6 +685,7 @@ impl DerbyGateway {
             .set_npc_drivers(package.npc_drivers.clone())
             .map_err(|error| invalid(error.to_string()))?;
         service.set_name_id(self.row_names.get(&package.game_id).copied());
+        service.set_pickup_schedule(package.pickup_schedule.clone());
         service.set_lobby_deadline(now_ms);
         let offer = service
             .offer_packet()

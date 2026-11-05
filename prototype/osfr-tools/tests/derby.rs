@@ -1,9 +1,11 @@
+use std::collections::BTreeMap;
+
 use osfr_tools::{
     content::MinigameRequirement,
     derby::{
         DEMO_DERBY_TYPE_ID, DerbyAction, DerbyConfig, DerbyDriver, DerbyMessage, DerbyPhase, DerbyPickup,
         DerbyPickupBody, DerbyRules, DerbyService, DerbyVehicleTemplate, ParticipantKey,
-        PickupKind, SUBTYPE_SPECS, VehicleCreate, VehicleHitReport, VehiclePose, VehicleState,
+        PickupKind, PickupSchedule, PickupTurn, SUBTYPE_SPECS, VehicleCreate, VehicleHitReport, VehiclePose, VehicleState,
         decode_inner, encode_inner,
     },
 };
@@ -538,6 +540,53 @@ fn each_participant_gets_their_own_placement() {
     tied.finish_match(7_000).unwrap();
     assert_eq!(tied.participant_result(OWNER).unwrap().placement, 1);
     assert_eq!(tied.participant_result(OTHER).unwrap().placement, 1);
+}
+
+/// Nothing lies out at the start. Spots fill on the schedule, and a taken spot returns as its
+/// next turn; boost's answer carries the car's new total.
+#[test]
+fn a_schedule_lays_out_pickups_after_go_and_refills_them() {
+    let created = |actions: &[DerbyAction]| -> Vec<(u32, u32)> {
+        (messages(actions).into_iter())
+            .filter_map(|message| match message {
+                DerbyMessage::CreatePickup(body) => Some((body.id, body.definition_id)),
+                _ => None,
+            })
+            .collect()
+    };
+    let spots = vec![pickup(1, PickupKind::Boost, 0.0), pickup(2, PickupKind::Health, 10.0)];
+    let mut derby = service(&[OWNER, OTHER], spots);
+    let turn = PickupTurn {
+        definition_id: 472,
+        kind: PickupKind::AttackUp,
+        unknown_floats_bits: [0; 2],
+    };
+    derby.set_pickup_schedule(Some(PickupSchedule {
+        first_ms: 1_000,
+        gap_ms: 500,
+        respawn_ms: 2_000,
+        turns: BTreeMap::from([(1, vec![turn])]),
+    }));
+    run_to_live(&mut derby, &[OWNER, OTHER]);
+    let go = 4_100; // the last countdown answer in `run_to_live`
+    assert!(created(&derby.tick(go + 999).unwrap()).is_empty(), "nothing yet");
+    assert_eq!(created(&derby.tick(go + 1_000).unwrap()), [(1, 901)]);
+    assert_eq!(created(&derby.tick(go + 1_500).unwrap()), [(2, 902)]);
+    let request = encode_inner(&DerbyMessage::PickupHitRequest {
+        key: OWNER,
+        position_bits: [0.0_f32.to_bits(), 0, 0, 0],
+    })
+    .unwrap();
+    derby.handle_client(OWNER, &pose(OWNER, [0.0, 0.0, 0.0]), go + 1_600).unwrap();
+    let taken = derby.handle_client(OWNER, &request, go + 1_700).unwrap();
+    let boost = derby.driver(OWNER).unwrap().boost;
+    assert!(messages(&taken).iter().any(|message| matches!(
+        message,
+        DerbyMessage::PickupHitResponse { parameters_bits, .. }
+            if parameters_bits[0] == boost.to_bits()
+    )));
+    assert!(created(&derby.tick(go + 3_699).unwrap()).is_empty());
+    assert_eq!(created(&derby.tick(go + 3_700).unwrap()), [(1, 472)], "the spot's next turn");
 }
 
 #[test]

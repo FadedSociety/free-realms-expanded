@@ -329,6 +329,7 @@ fn content() -> DerbyGatewayContent {
             },
         },
         pickups: Vec::new(),
+        pickup_schedule: None,
         completion_reward_coins: COMPLETION_COINS,
         completion_reward_xp: COMPLETION_XP,
         reward: None,

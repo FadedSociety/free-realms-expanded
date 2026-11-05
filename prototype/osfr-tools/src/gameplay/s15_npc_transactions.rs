@@ -208,6 +208,7 @@ fn derby_content() -> DerbyGatewayContent {
             },
         },
         pickups: Vec::new(),
+        pickup_schedule: None,
         completion_reward_coins: 0,
         completion_reward_xp: 0,
         reward: None,

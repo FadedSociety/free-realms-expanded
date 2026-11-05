@@ -881,7 +881,8 @@ fn malformed_content_is_refused_and_the_shipped_definition_is_real() {
     assert_eq!(shipped.completion_reward_coins, COMPLETION_COINS);
     assert_eq!(shipped.completion_reward_xp, COMPLETION_XP);
     assert!(shipped.reward.is_none());
-    assert!(shipped.pickups.is_empty());
+    assert_eq!(shipped.pickups.len(), 4, "the capture's four spots");
+    assert!(shipped.pickup_schedule.is_some(), "nothing on the floor at Go");
     // L931: the live human 34/10 create, as captured (`opus/minigames/derby.md`): a blank name.
     assert_eq!(
         shipped.vehicle.name,
