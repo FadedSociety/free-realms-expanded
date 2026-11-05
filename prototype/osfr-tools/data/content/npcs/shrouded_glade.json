@@ -9052,7 +9052,9 @@
         "The client does not name the town here, and a tournament line puts \"Dalar vs. Kimmy - Snowhill - Luca's Lounge\" (798405251). Video: nameplate with the title \"Checkers & Chess\" and the Shrouded Glade Warpstone prompt (O2CxtPU7yb0/00024, 3zu01m-iE8k/00010). One weak source for the place; see Conflicts 12."
       ],
       "quests_given": [],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3180004
+      ],
       "quests_given_text": [
         "A checkers challenge (title not found)."
       ],

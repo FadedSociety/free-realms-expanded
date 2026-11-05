@@ -323,6 +323,18 @@ const BINDINGS: &[Binding] = &[
 /// unbound id that is not listed here.
 const BLANK_WITH_REASON: &[(u64, &str)] = &[
     (
+        9500000130,
+        "Feari (giver of Sharpen the Mind and The Big Brain Club): her client lines are the quests' own offer text.",
+    ),
+    (
+        9500000904,
+        "Greenthumb (giver of Table Turner): the client's lines are the quest's own offer text.",
+    ),
+    (
+        9500000665,
+        "Dalar (giver of Play or Go Away!): the client's lines are the quest's own offer text.",
+    ),
+    (
         9500000726,
         "Arci Joan (giver of the Tower Defense chain 3170001-3): her client lines are the chain's own offers (391189), not a greeting",
     ),

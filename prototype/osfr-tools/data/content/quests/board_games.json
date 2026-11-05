@@ -1,0 +1,255 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3180001,
+      "title_string_id": 72887,
+      "intro_text_string_id": 72886,
+      "description_string_id": 72888,
+      "end_text_string_id": 72889,
+      "giver_npc_id": 9500000130,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "minigame_id": 21,
+          "count": 1,
+          "text_string_id": 74129,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat Feari at Checkers (lab/references/quest-table-20261102/quests.json wiki:fr_quest_sharpen_the_mind_e01f71)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000130,
+          "text_string_id": 74133,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Feari (lab/references/quest-table-20261102/quests.json wiki:fr_quest_sharpen_the_mind_e01f71)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 75,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "75 coins (lab/references/quest-table-20261102/quests.json wiki:fr_quest_sharpen_the_mind_e01f71)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "lab/references/quest-table-20261102/quests.json wiki:fr_quest_sharpen_the_mind_e01f71"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3180002,
+      "title_string_id": 72883,
+      "intro_text_string_id": 72882,
+      "description_string_id": 72884,
+      "end_text_string_id": 72885,
+      "giver_npc_id": 9500000130,
+      "prerequisite_quest_ids": [
+        3180001
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "minigame_id": 20,
+          "count": 1,
+          "text_string_id": 74869,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Feari in a game of Chess (lab/references/quest-table-20261102/quests.json wiki:fr_quest_the_big_brain_club_fcb20a)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000130,
+          "text_string_id": 74133,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Feari (lab/references/quest-table-20261102/quests.json wiki:fr_quest_the_big_brain_club_fcb20a)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 75,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "75 coins (lab/references/quest-table-20261102/quests.json wiki:fr_quest_the_big_brain_club_fcb20a)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "lab/references/quest-table-20261102/quests.json wiki:fr_quest_the_big_brain_club_fcb20a"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3180003,
+      "title_string_id": 382990,
+      "intro_text_string_id": 382989,
+      "description_string_id": 382991,
+      "end_text_string_id": 382992,
+      "giver_npc_id": 9500000904,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "interact_actor",
+          "id": 1,
+          "actor_guid": 100000003349,
+          "text_string_id": 382997,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Click on the game table near Greenthumb: the game table nearest the giver (lab/references/quest-table-20261102/quests.json wiki:fr_quest_table_turner_6bba10)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "minigame_id": 21,
+          "count": 1,
+          "text_string_id": 382998,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win a game of Checkers (lab/references/quest-table-20261102/quests.json wiki:fr_quest_table_turner_6bba10)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9500000904,
+          "text_string_id": 383000,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Greenthumb (lab/references/quest-table-20261102/quests.json wiki:fr_quest_table_turner_6bba10)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 13,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "13 coins (lab/references/quest-table-20261102/quests.json wiki:fr_quest_table_turner_6bba10)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "lab/references/quest-table-20261102/quests.json wiki:fr_quest_table_turner_6bba10"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3180004,
+      "title_string_id": 384965,
+      "intro_text_string_id": 384964,
+      "description_string_id": 384966,
+      "end_text_string_id": 384967,
+      "giver_npc_id": 9500000665,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "interact_actor",
+          "id": 1,
+          "actor_guid": 100000001432,
+          "text_string_id": 384877,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Click on the game table: the game table nearest the giver (lab/references/quest-table-20261102/quests.json wiki:fr_quest_play_or_go_away_8a8907)."
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "minigame_id": 21,
+          "count": 1,
+          "text_string_id": 382998,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win a game of checkers (lab/references/quest-table-20261102/quests.json wiki:fr_quest_play_or_go_away_8a8907)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9500000665,
+          "text_string_id": 384988,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Dalar (lab/references/quest-table-20261102/quests.json wiki:fr_quest_play_or_go_away_8a8907)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 2,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "2 coins (lab/references/quest-table-20261102/quests.json wiki:fr_quest_play_or_go_away_8a8907)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "lab/references/quest-table-20261102/quests.json wiki:fr_quest_play_or_go_away_8a8907"
+        }
+      ],
+      "enabled": true
+    }
+  ]
+}

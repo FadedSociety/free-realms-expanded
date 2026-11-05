@@ -19274,7 +19274,9 @@
         "\"Standing in front of a hut at the Pixie Nursery\" (262298119)."
       ],
       "quests_given": [],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3180003
+      ],
       "quests_given_text": [
         "Miner: Simple Surveying (he wants four tin nodes mined from the rocky soil, 1148424616; the quest text sends the player southwest of the Nursery, 1081705008). Wugachug's bixie problem: Tugaboom sends the player to him for a way to keep bixies out of the sasparilla (1501524061, 1684021860, 1050862503). Scattered seed sacks \"getting daft in his old age\" (1361896316, 406542141). Titles for the last two not found."
       ],

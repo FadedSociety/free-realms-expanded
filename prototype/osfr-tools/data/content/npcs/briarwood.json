@@ -25216,7 +25216,10 @@
         "Briarwood (client 1178193499). The wiki lists Checkers & Chess in both Bristlewood and Briarheart."
       ],
       "quests_given": [],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3180001,
+        3180002
+      ],
       "quests_given_text": [
         "\"Defeat Feari in a game of Chess/Checkers in Briarwood\" (client 1333727472, 4014009523). Titles not found."
       ],
