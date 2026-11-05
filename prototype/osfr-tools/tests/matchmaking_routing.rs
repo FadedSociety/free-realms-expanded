@@ -254,3 +254,19 @@ fn malformed_known_requests_are_rejected_and_activity_portal_still_works() {
             .any(|reply| reply.starts_with(&[167, 0, 1, 1]))
     );
 }
+
+/// The client asks at login and its lobby option tables stay empty without an answer, so a player
+/// with no developer tools gets the catalogue too.
+#[test]
+fn an_ordinary_player_gets_the_lobby_catalogue() {
+    let mut game = game();
+    let before = game.state();
+    let reply = game
+        .handle_in_world(&[102, 0, 1, 0], &character(), 1_000)
+        .unwrap();
+    assert_eq!(reply.replies.len(), 1);
+    assert_eq!(&reply.replies[0][..4], &[102, 0, 2, 0]);
+    assert!(!reply.changed);
+    assert!(game.accepts_kart_loading_application(&[102, 0, 1, 0]), "asked while a zone loads");
+    assert_eq!(game.state(), before);
+}

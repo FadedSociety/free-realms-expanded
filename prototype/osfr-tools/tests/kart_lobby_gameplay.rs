@@ -73,29 +73,15 @@ fn private_lobby_opt_in_exact_request_full_reply_and_no_save_changes() {
     let fixture = Fixture::new();
     let mut game = Gameplay::load(&fixture.0, None).unwrap();
     let before = game.state();
-    // No catalogue remains inert, including with developer tools enabled.
-    game.set_dev_tools(true);
-    game.set_role(osfr_tools::account_store::AccountRole::Admin);
-    assert!(
-        game.handle_in_world(&[102, 0, 1, 0], &character(), 0)
-            .unwrap()
-            .replies
-            .is_empty()
-    );
+    // A folder with no catalogue answers from the bundled one.
+    let bundled = game.handle_in_world(&[102, 0, 1, 0], &character(), 0).unwrap();
+    assert_eq!(bundled.replies.len(), 1);
     assert_eq!(game.state(), before);
 
     let body = fixture.catalogue();
     let bytes_before = fs::read(fixture.0.join("kart_lobby.json")).unwrap();
     let mut game = Gameplay::load(&fixture.0, None).unwrap();
     let before = game.state();
-    assert!(
-        game.handle_in_world(&[102, 0, 1, 0], &character(), 0)
-            .unwrap()
-            .replies
-            .is_empty()
-    );
-    game.set_dev_tools(true);
-    game.set_role(osfr_tools::account_store::AccountRole::Admin);
     for time in [1, 2] {
         let reply = game
             .handle_in_world(&[102, 0, 1, 0], &character(), time)
@@ -118,19 +104,13 @@ fn private_lobby_opt_in_exact_request_full_reply_and_no_save_changes() {
             .is_empty()
     );
     for malformed in [vec![102, 0, 1], vec![102, 0, 1, 0, 0]] {
-        assert!(game.handle_in_world(&malformed, &character(), 4).is_err());
+        let ignored = game.handle_in_world(&malformed, &character(), 4).unwrap();
+        assert!(ignored.replies.is_empty());
         assert_eq!(game.state(), before);
     }
     assert_eq!(
         fs::read(fixture.0.join("kart_lobby.json")).unwrap(),
         bytes_before
-    );
-    game.set_dev_tools(false);
-    assert!(
-        game.handle_in_world(&[102, 0, 1, 0], &character(), 5)
-            .unwrap()
-            .replies
-            .is_empty()
     );
 }
 

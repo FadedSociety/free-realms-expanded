@@ -1099,7 +1099,11 @@ impl Gameplay {
         {
             return Err(invalid("multiple active minigames in snapshot"));
         }
-        let lobby_path = directory.join("kart_lobby.json");
+        let lobby_path = [directory, bundled_npc_content.as_path()]
+            .map(|folder| folder.join("kart_lobby.json"))
+            .into_iter()
+            .find(|path| std::fs::symlink_metadata(path).is_ok())
+            .unwrap_or_else(|| directory.join("kart_lobby.json"));
         let kart_lobby_reply = match std::fs::symlink_metadata(&lobby_path) {
             Err(error) if error.kind() == io::ErrorKind::NotFound => None,
             Err(error) => return Err(error),
@@ -1943,8 +1947,10 @@ impl Gameplay {
     }
 
     pub fn accepts_kart_loading_application(&self, inner: &[u8]) -> bool {
-        self.kart_entry.as_ref().is_some_and(|k| k.active())
-            && (inner.starts_with(&[33, 0]) || inner.starts_with(&[102, 0]))
+        // The client asks for the lobby catalogue while a zone loads, on every zone.
+        inner == [102, 0, 1, 0]
+            || self.kart_entry.as_ref().is_some_and(|k| k.active())
+                && (inner.starts_with(&[33, 0]) || inner.starts_with(&[102, 0]))
     }
 
     pub fn tick(&mut self, character: &CharacterState, now_ms: u64) -> io::Result<Outcome> {
@@ -2255,24 +2261,13 @@ impl Gameplay {
                 });
             }
         }
-        // ORIGINAL request: opcode102/sub1 has no payload. This opt-in reply
-        // serves a caller-authored catalogue; it does not launch a race or
-        // mutate quests, classes, inventory, encounters or character state.
-        if self.dev_tools && inner.starts_with(&[102, 0]) {
-            if let Some(reply) = &self.kart_lobby_reply {
-                if inner.len() < 4 {
-                    return Err(invalid("truncated native lobby request"));
-                }
-                if inner[2..4] == [1, 0] {
-                    if inner.len() != 4 {
-                        return Err(invalid("native lobby request has trailing bytes"));
-                    }
-                    return Ok(Outcome {
-                        replies: vec![reply.to_vec()],
-                        ..Outcome::default()
-                    });
-                }
-            }
+        // ORIGINAL request: opcode102/sub1 has no payload. The client's lobby option tables stay
+        // empty without this catalogue, so every player gets it; it changes no state.
+        if let (true, Some(reply)) = (inner == [102, 0, 1, 0], &self.kart_lobby_reply) {
+            return Ok(Outcome {
+                replies: vec![reply.to_vec()],
+                ..Outcome::default()
+            });
         }
         if let Some(outcome) = self.handle_activity_portal(inner, character, now_ms)? {
             return Ok(outcome);
