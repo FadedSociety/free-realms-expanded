@@ -817,6 +817,45 @@ fn job_progressions(message: &[u8]) -> Vec<(u32, usize, Vec<u8>)> {
         .collect()
 }
 
+/// Owner playtest 2026-11-05: opening guides drew a second body on their world NPCs. Each now
+/// shares the world NPC, keeps its campaign steps, and leaves nothing drawn twice.
+#[test]
+fn opening_actors_never_draw_a_second_body_on_a_world_npc() {
+    use osfr_tools::{opening::OpeningEngine, opening_world, world::NpcVisibility};
+    const BARTLE: u64 = 9_000_000_021;
+    let merged = merged_content("twins");
+    let mut opening = OpeningEngine::load(&merged, None).unwrap();
+    let world = NpcVisibility::load(&merged).unwrap();
+    let is_bartle = |a: &&osfr_tools::opening::OpeningActor| a.name == "Bartle";
+    let original = opening.actors().iter().find(is_bartle).unwrap().guid;
+    let shared = opening_world::share_world_npcs(&mut opening, &world);
+    assert!(shared.contains(&BARTLE), "{shared:?}");
+    assert_eq!(shared.len(), 8, "{shared:?}");
+    let bartle = opening.actors().iter().find(|a| a.name == "Bartle").unwrap();
+    assert_eq!(bartle.guid, BARTLE);
+    assert!(!opening.wants_actor(BARTLE), "the campaign has not reached him");
+    // At the stage he gives, his clicks go to the campaign.
+    let stages = opening.stages().to_vec();
+    let his = stages.iter().position(|s| s.giver_guid == BARTLE).unwrap();
+    let mut state = opening.state().clone();
+    for stage in &stages[..his] {
+        let progress = state.stages.get_mut(&stage.id).unwrap();
+        progress.accepted = true;
+        progress.completed = true;
+        progress.rewarded = true;
+        progress.counts = stage.objectives.iter().map(|goal| goal.required).collect();
+    }
+    let mut reached = OpeningEngine::load(&merged, Some(state)).unwrap();
+    reached.rebind_actor(original, BARTLE);
+    assert!(reached.wants_actor(BARTLE));
+    for actor in opening.actors().iter().filter(|a| a.kind == "guide") {
+        if let Some(guid) = world.actor_at(actor.model_id, actor.position) {
+            assert!(shared.contains(&guid), "{} is drawn twice", actor.name);
+        }
+    }
+    let _ = fs::remove_dir_all(merged);
+}
+
 /// L107: a fresh character's job records carry no captured progress, with or without
 /// `profiles.json`; before, they showed a half-full Adventurer bar. Each starts at rank 1.
 /// The client lists every row it gets, so only the character's own jobs go out; without profile

@@ -586,14 +586,14 @@ fn wrong_job_wrong_target_and_replay_change_nothing() {
         "an unknown NPC menu choice",
     );
 
-    // Out-of-range NPC interaction returns the router's error and changes nothing; a
+    // Out-of-range NPC interaction changes nothing (the campaign wants Cleetus: its chat line); a
     // 49/14 without a server-opened end screen is a clean refusal from anywhere.
     let far = character_at([10_000.0, 0.0, 10_000.0]);
     let before = saved(&brawler);
     assert!(
         brawler
             .handle_in_world(&npc_interact(CLEETUS), &far, now + 200)
-            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
+            .is_ok_and(|out| !out.changed),
         "an out-of-range NPC interaction is refused"
     );
     assert_eq!(saved(&brawler), before);

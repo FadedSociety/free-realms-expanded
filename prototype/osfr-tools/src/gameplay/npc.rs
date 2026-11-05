@@ -70,10 +70,24 @@ impl Gameplay {
     }
 
     /// Canonical runtime-GUID -> content-key map for a client interaction target; opening-scene
-    /// actors are excluded because the opening trigger path drives them, not the NPC router.
+    /// actors are excluded because the opening trigger path drives them, not the NPC router. An
+    /// actor sharing a world NPC's body is the world NPC unless the campaign wants it now and no
+    /// world quest is waiting on it (a '?'), which both bodies used to allow side by side.
     pub(super) fn content_npc_key(&self, runtime_guid: u64) -> Option<u64> {
         let opening = self.opening.as_ref();
-        if opening.is_some_and(|o| o.actors().iter().any(|a| a.guid == runtime_guid)) {
+        let world_quest_waits = || {
+            let key = self.content_key_for_turnin(runtime_guid);
+            let engine = self.npc_quests.as_ref();
+            key.zip(engine).is_some_and(|(key, engine)| {
+                crate::quest_markers::marker_for(engine, key)
+                    == Some(crate::quest_markers::QuestMarker::TurnIn)
+            })
+        };
+        if opening.is_some_and(|o| {
+            o.actors().iter().any(|a| a.guid == runtime_guid)
+                && (!self.opening_twins.contains(&runtime_guid)
+                    || o.wants_actor(runtime_guid) && !world_quest_waits())
+        }) {
             return None;
         }
         self.content_key_for_turnin(runtime_guid)
@@ -1446,7 +1460,7 @@ impl Gameplay {
                 out.replies.push(dialogue);
             }
         }
-        let reason = if offer_outcome == "offer" {
+        let reason = if offer_outcome == "offer" || offer_outcome == "quest_choice" && !turning_in {
             None
         } else if turning_in {
             Some("quest_turnin")

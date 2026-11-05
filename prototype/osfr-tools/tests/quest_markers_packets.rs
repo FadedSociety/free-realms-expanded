@@ -270,16 +270,16 @@ fn add_notifications_bytes_match_the_reader() {
 
 #[test]
 fn remove_notifications_bytes_match_the_reader() {
-    let guids = [5, 0x0A0B_0C0D_0E0F_1011, u64::MAX];
-    let bytes = encode_remove_notifications(&guids).unwrap();
+    let rows = [(5, 7), (0x0A0B_0C0D_0E0F_1011, 8), (u64::MAX, 9)];
+    let bytes = encode_remove_notifications(&rows).unwrap();
     assert_eq!(bytes.len(), 4 + 4 + 16 * 3);
     let mut reader = Reader(&bytes);
     assert_eq!(reader.take(4), [35, 0, 11, 0]);
     assert_eq!(reader.i32(), 3);
-    for guid in guids {
-        // `008db550`: u64 guid, then two i32 words.
+    for (guid, image) in rows {
+        // `008db550`: u64 guid, then the image id the client clears by and an i32 zero.
         assert_eq!(reader.u64(), guid);
-        assert_eq!((reader.i32(), reader.i32()), (0, 0));
+        assert_eq!((reader.i32(), reader.i32()), (image, 0));
     }
     assert!(reader.0.is_empty());
 }
@@ -289,7 +289,7 @@ fn encoders_refuse_a_count_the_packet_cannot_carry() {
     let rows = vec![(1, 2, 3); MAX_ENTRIES + 1];
     assert!(encode_add_notifications(&rows).is_none());
     assert!(encode_add_notifications(&rows[..MAX_ENTRIES]).is_some());
-    let guids = vec![1; MAX_ENTRIES + 1];
+    let guids = vec![(1, 2); MAX_ENTRIES + 1];
     assert!(encode_remove_notifications(&guids).is_none());
     assert!(encode_remove_notifications(&guids[..MAX_ENTRIES]).is_some());
     assert_eq!(

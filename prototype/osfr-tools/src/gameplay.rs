@@ -226,6 +226,8 @@ pub struct Gameplay {
     games_window_craft: bool,
     type8_tick_ms: Option<u64>,
     disappearing_actors: Vec<DisappearingActor>,
+    /// Campaign actors drawn by the world (`opening_world::share_world_npcs`).
+    opening_twins: BTreeSet<u64>,
     /// Developer-only chat commands stay off unless the launcher opts in.
     dev_tools: bool,
     terrain: Option<std::sync::Arc<crate::terrain::Terrain>>,
@@ -754,7 +756,7 @@ impl Gameplay {
             dormant.profiles = profiles;
             None
         };
-        let (opening, encounter, world, journal, mut abilities) =
+        let (mut opening, encounter, world, journal, mut abilities) =
             if presence.has(directory, "opening", content_presence::OPENING) {
                 (
                     Some(OpeningEngine::load(directory, opening)?),
@@ -961,6 +963,8 @@ impl Gameplay {
         } else {
             None
         };
+        let opening_twins = (opening.as_mut().zip(npc_visibility.as_ref()))
+            .map_or_else(BTreeSet::new, |(o, v)| crate::opening_world::share_world_npcs(o, v));
         let collections =
             collection_pickup::load(npc_content, &progression_extras, &mut npc_visibility)?;
         // Overworld enemies replace their passive Legacy copies (same GUIDs).
@@ -1265,6 +1269,7 @@ impl Gameplay {
             games_window_craft: false,
             type8_tick_ms: None,
             disappearing_actors,
+            opening_twins,
             dev_tools: false,
             terrain: None,
             pathing: crate::pathing::Pathing::default(),
@@ -1859,7 +1864,7 @@ impl Gameplay {
                 .opening()?
                 .actors()
                 .iter()
-                .filter(|actor| !self.actor_hidden(actor.guid))
+                .filter(|a| !self.actor_hidden(a.guid) && !self.opening_twins.contains(&a.guid))
                 .cloned()
                 .collect();
             let world = self.world.as_ref().ok_or_else(|| unloaded("world"))?;

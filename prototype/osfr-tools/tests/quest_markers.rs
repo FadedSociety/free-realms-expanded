@@ -134,10 +134,17 @@ fn accept_moves_the_marker() {
     let character = at_merigold();
     game.update_npc_visibility(&character).unwrap();
     let before = game.quest_marker_revision();
-    offer(&mut game, &character, MERIGOLD, HIGHROAD, 2_000);
+    let offered = offer(&mut game, &character, MERIGOLD, HIGHROAD, 2_000);
     assert_ne!(game.quest_marker_revision(), before, "an offer moves it");
+    // The '!' goes with the offer. The client clears an icon only by its image id (`00960300`),
+    // and a clear goes before any new icon: `00a8e540` drops the minimap indicator by guid.
+    assert!(cleared(&offered.replies).contains(&MERIGOLD));
+    let is_clear = |packet: &Vec<u8>| packet.starts_with(&[35, 0, 11, 0]);
+    let clear_at = offered.replies.iter().position(is_clear).unwrap();
+    assert_ne!(offered.replies[clear_at][16..20], [0; 4], "the row names the drawn image");
+    let shown_at = (offered.replies.iter()).position(|packet| packet.starts_with(&[35, 0, 10, 0]));
+    assert!(shown_at.is_none_or(|at| clear_at < at));
     let accepted = accept(&mut game, &character, HIGHROAD, 2_100);
-    assert!(cleared(&accepted.replies).contains(&MERIGOLD));
     assert!(shown(&accepted.replies).contains(&(RAINA, TURN_IN)));
     assert!(
         !shown(&accepted.replies)
@@ -226,7 +233,7 @@ fn players_see_their_own_markers() {
     let (visible, batch) = second.shared_npc_view(&two, &[], &BTreeSet::new()).unwrap();
     assert!(shown(&batch).contains(&(MERIGOLD, AVAILABLE)));
     assert!(!shown(&second.quest_marker_packets(&visible)).contains(&(RAINA, TURN_IN)));
-    assert!(shown(&first.quest_marker_packets(&visible)).contains(&(RAINA, TURN_IN)));
+    assert!(shown(&accepted.replies).contains(&(RAINA, TURN_IN)));
 }
 
 #[test]
@@ -310,10 +317,10 @@ fn live_rebind_continues_the_revision_and_keeps_markers() {
         rebound > before,
         "a rebind continues past the engine it replaces"
     );
-    // The rebind restored the offer from the live state, so the next pass still owns a marker
-    // change to send for what the client already shows.
+    // The rebind restored the offer from the live state, so the client already shows the right
+    // markers: a repeat 35/10 would stack an icon (`00bf66a0`).
     let refreshed = game.update_npc_visibility(&character).unwrap();
-    assert!(marker_count(&refreshed) > 0, "the rebind refreshes markers");
+    assert_eq!(marker_count(&refreshed), 0, "nothing changed on screen");
     assert_eq!(
         game.update_npc_visibility(&character).unwrap(),
         Vec::<Vec<u8>>::new(),

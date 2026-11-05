@@ -1,8 +1,33 @@
 //! Native actors and interaction menus for the bounded opening content.
-use crate::opening::OpeningActor;
+use crate::opening::{OpeningActor, OpeningEngine};
+use crate::world::NpcVisibility;
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
-use std::{fs, io, path::Path, sync::Arc};
+use std::{collections::BTreeSet, fs, io, path::Path, sync::Arc};
+
+/// Some opening actors stand exactly where a world NPC does, so both were drawn on one spot (owner
+/// playtest 2026-11-05: two Bartles). The world NPC holds the quests, shops and trainers, the actor
+/// the campaign's steps. A guide takes the world NPC's GUID so one drawn body serves both, and
+/// `content_npc_key` gives a click to the campaign while it wants that actor. Resource actors stay
+/// as they are: a world table and its tutorial table both work. Returns the GUIDs now shared.
+pub fn share_world_npcs(
+    opening: &mut OpeningEngine,
+    visibility: &NpcVisibility,
+) -> BTreeSet<u64> {
+    let twins: Vec<_> = opening
+        .actors()
+        .iter()
+        .filter(|actor| actor.kind == "guide")
+        .filter_map(|actor| {
+            let world = visibility.actor_at(actor.model_id, actor.position)?;
+            Some((actor.guid, world))
+        })
+        .collect();
+    for &(guid, world) in &twins {
+        opening.rebind_actor(guid, world);
+    }
+    twins.into_iter().map(|(_, world)| world).collect()
+}
 
 #[derive(Deserialize)]
 struct Template {

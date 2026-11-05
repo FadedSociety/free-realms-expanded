@@ -417,6 +417,61 @@ impl OpeningEngine {
     pub fn initial_profiles(&self) -> &[i32] {
         &self.content.initial_profiles
     }
+    /// Moves an actor onto a world NPC's GUID, everywhere the campaign names it. In memory only:
+    /// saves pin `opening.json`'s hash and hold no actor GUIDs.
+    pub fn rebind_actor(&mut self, from: u64, to: u64) {
+        let swap = |guid: &mut u64| {
+            if *guid == from {
+                *guid = to;
+            }
+        };
+        let swap_trigger = |trigger: &mut OpeningTrigger| {
+            if let OpeningTrigger::Talk { actor_guid } | OpeningTrigger::Interact { actor_guid } =
+                trigger
+            {
+                swap(actor_guid);
+            }
+        };
+        for actor in &mut self.content.actors {
+            swap(&mut actor.guid);
+            actor.action.as_mut().map(swap_trigger);
+        }
+        for stage in &mut self.content.stages {
+            swap(&mut stage.giver_guid);
+            swap(&mut stage.turnin_guid);
+            for goal in &mut stage.objectives {
+                swap_trigger(&mut goal.trigger);
+            }
+        }
+    }
+
+    /// Whether the active stage needs this actor now: to offer the stage, for the talk or interact
+    /// goal it is on (any open one if the stage is unordered), or to turn it in once goals are done.
+    pub fn wants_actor(&self, guid: u64) -> bool {
+        let Some(stage) = self.active_stage() else {
+            return false;
+        };
+        let progress = &self.state.stages[&stage.id];
+        if !progress.accepted {
+            return stage.giver_guid == guid;
+        }
+        let mut open = (stage.objectives.iter().zip(&progress.counts))
+            .filter(|(goal, count)| **count < goal.required)
+            .map(|(goal, _)| goal)
+            .peekable();
+        let wanted = |goal: &OpeningObjective| {
+            matches!(goal.trigger, OpeningTrigger::Talk { actor_guid }
+                | OpeningTrigger::Interact { actor_guid } if actor_guid == guid)
+        };
+        if open.peek().is_none() {
+            stage.turnin_guid == guid
+        } else if stage.ordered {
+            open.next().is_some_and(wanted)
+        } else {
+            open.any(wanted)
+        }
+    }
+
     pub fn active_stage(&self) -> Option<&OpeningStage> {
         self.content
             .stages

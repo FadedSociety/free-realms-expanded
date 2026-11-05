@@ -587,23 +587,36 @@ impl Gameplay {
             return Vec::new();
         };
         let (mut show, mut clear) = (Vec::new(), Vec::new());
-        for (guids, refresh) in [(fresh, false), (known, true)] {
+        let mut drawn = (self.quest_markers.drawn.lock()).unwrap_or_else(|poison| poison.into_inner());
+        for (guids, respawned) in [(fresh, true), (known, false)] {
             if guids.is_empty() {
                 continue;
             }
             for (guid, key, name_id) in npcs.marker_targets(guids) {
-                match marker_for(engine, key) {
-                    Some(marker) => show.push((guid, content.image_id(marker), name_id)),
-                    None if refresh && engine.is_quest_npc(key) => clear.push(guid),
-                    None => {}
+                if respawned {
+                    drawn.remove(&guid); // A new actor carries no icon.
+                }
+                let wanted = marker_for(engine, key).map(|marker| content.image_id(marker));
+                let shown = drawn.get(&guid).copied();
+                if wanted == shown {
+                    continue;
+                }
+                if let Some(image) = shown {
+                    clear.push((guid, image));
+                    drawn.remove(&guid);
+                }
+                if let Some(image) = wanted {
+                    show.push((guid, image, name_id));
+                    drawn.insert(guid, image);
                 }
             }
         }
+        drop(drawn);
         // The encoders refuse only more than 256 rows and the view holds at most 64 NPCs, so a
         // refusal is a skipped marker for this player, logged, never an error out of the tick.
         let encoded = [
-            (!show.is_empty()).then(|| encode_add_notifications(&show)),
             (!clear.is_empty()).then(|| encode_remove_notifications(&clear)),
+            (!show.is_empty()).then(|| encode_add_notifications(&show)),
         ];
         encoded
             .into_iter()

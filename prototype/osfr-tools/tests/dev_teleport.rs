@@ -14,7 +14,7 @@ use std::{
 };
 
 const WORLD_ZONE: u32 = 0;
-const MAE_GUID: u64 = 5_715_144_128_442_925_060;
+const MAE_GUID: u64 = 9_000_000_396;
 const QUEEN_GUID: u64 = 5_715_144_128_442_925_063;
 
 fn wrap(inner: &[u8]) -> Vec<u8> {
@@ -457,7 +457,7 @@ fn private_dev_teleport_list_ambiguity_unknown_and_malformed_targets_never_move(
     }
 
     // The same guard applies to a replayed relocation: it is idempotent.
-    let relocated = say(&mut gateway, "realm goto 5715144128442925060");
+    let relocated = say(&mut gateway, "realm goto 9000000396");
     assert!(chat_text(&relocated.replies).contains("Mae Farnum"));
     let moved = gateway.snapshot();
     let replay = say(&mut gateway, "realm goto mae farnum");

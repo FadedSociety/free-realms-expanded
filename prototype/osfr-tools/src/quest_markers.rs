@@ -20,10 +20,11 @@ use crate::{
 };
 use serde::Deserialize;
 use std::{
+    collections::BTreeMap,
     fs,
     io::{self, Read},
     path::Path,
-    sync::Arc,
+    sync::{Arc, Mutex},
 };
 
 /// Optional content next to the other split files. Absent file = no markers.
@@ -97,6 +98,10 @@ impl QuestMarkerContent {
 pub struct MarkerView {
     pub content: Option<Arc<QuestMarkerContent>>,
     pub rendered: u64,
+    /// The image the client draws over each NPC. Shared with staged clones: it describes the
+    /// client's screen, not this player's state. A second 35/10 stacks an icon (`00bf66a0` appends
+    /// with no duplicate check) and a 35/11 needs the image, so only changes are sent.
+    pub drawn: Arc<Mutex<BTreeMap<u64, i32>>>,
 }
 
 fn invalid(error: impl ToString) -> io::Error {
@@ -126,17 +131,20 @@ pub fn encode_add_notifications(entries: &[(u64, i32, i32)]) -> Option<Vec<u8>> 
     npc_notifications::encode_add(&rows)
 }
 
-/// 35/11 `PlayerUpdatePacketRemoveNotifications` for runtime actor guids: an i32 count, then per
-/// entry the u64 guid and two i32 zeros (`008db550`). `None` for more than [`MAX_ENTRIES`].
-pub fn encode_remove_notifications(guids: &[u64]) -> Option<Vec<u8>> {
-    if guids.len() > MAX_ENTRIES {
+/// 35/11 `PlayerUpdatePacketRemoveNotifications` for (runtime actor guid, drawn image id) rows: an
+/// i32 count, then per entry the u64 guid, the image id and an i32 zero (`008db550`). The client
+/// clears an overhead icon only by that image id (`00932200` -> `00960300`); 0 clears nothing.
+/// `None` for more than [`MAX_ENTRIES`].
+pub fn encode_remove_notifications(entries: &[(u64, i32)]) -> Option<Vec<u8>> {
+    if entries.len() > MAX_ENTRIES {
         return None;
     }
     let mut bytes = vec![35, 0, 11, 0];
-    bytes.extend((guids.len() as i32).to_le_bytes());
-    for guid in guids {
+    bytes.extend((entries.len() as i32).to_le_bytes());
+    for (guid, image_id) in entries {
         bytes.extend(guid.to_le_bytes());
-        bytes.extend([0; 8]);
+        bytes.extend(image_id.to_le_bytes());
+        bytes.extend([0; 4]);
     }
     Some(bytes)
 }

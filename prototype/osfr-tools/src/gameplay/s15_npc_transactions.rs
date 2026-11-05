@@ -546,6 +546,23 @@ fn an_admitted_fish_entry_starts_with_end_dialog_and_opens_the_round() {
 /// (`00aa36c0` case 0x6b -> `009b0cc0` setReady) turns the start screen's "Loading..." into
 /// Go. The client's Go (39/5, `009be7d0`) gets 41/2, the 39/17 that starts the 39/16 state
 /// (`009b9550`, fishing HUD) and the fishing flag; the round then registers and casts.
+/// A guide sharing a world NPC's body takes the NPC router's clicks until the campaign wants it.
+#[test]
+fn a_shared_guide_is_the_world_npc_until_the_campaign_wants_it() {
+    let fixture = Fixture::full();
+    let game = fixture.game();
+    let opening = game.opening().unwrap();
+    assert!(!game.opening_twins.is_empty(), "the fixture has shared guides");
+    let mut routed = 0;
+    for &guide in &game.opening_twins {
+        // Some shared bodies have no NPC content, so "not wanted" need not give a key.
+        let key = game.content_npc_key(guide);
+        assert!(!opening.wants_actor(guide) || key.is_none(), "{guide}");
+        routed += usize::from(key.is_some());
+    }
+    assert!(routed > 0, "a guide the campaign does not want reaches the NPC router");
+}
+
 #[test]
 fn go_fish_sends_offer_then_ready_and_go_starts_the_round() {
     let fixture = Fixture::full();

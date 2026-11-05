@@ -117,7 +117,10 @@ fn fixture(
             }
         }
     }
-    let opening = OpeningEngine::load(&content, state.opening.clone()).unwrap();
+    let mut opening = OpeningEngine::load(&content, state.opening.clone()).unwrap();
+    let npcs = osfr_tools::content::npc_content(&content);
+    let world = osfr_tools::world::NpcVisibility::load(&npcs).unwrap();
+    osfr_tools::opening_world::share_world_npcs(&mut opening, &world);
     let stage = opening.active_stage().unwrap();
     let giver = opening
         .actors()

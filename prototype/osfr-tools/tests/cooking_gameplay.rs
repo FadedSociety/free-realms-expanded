@@ -124,7 +124,10 @@ fn fixture(stage: u32) -> (Gateway, PathBuf, PathBuf) {
 #[ignore = "requires private versioned Cooking content; no native launch"]
 fn private_chef_gather_cooking_atomic_once_gates_restore_cancel() {
     let (mut g, content, reference) = fixture(910004);
-    let engine = OpeningEngine::load(&content, g.snapshot().gameplay.unwrap().opening).unwrap();
+    let mut engine = OpeningEngine::load(&content, g.snapshot().gameplay.unwrap().opening).unwrap();
+    let npcs = osfr_tools::content::npc_content(&content);
+    let world = osfr_tools::world::NpcVisibility::load(&npcs).unwrap();
+    osfr_tools::opening_world::share_world_npcs(&mut engine, &world);
     let giver = engine.active_stage().unwrap().giver_guid;
     let leaf = engine
         .actors()

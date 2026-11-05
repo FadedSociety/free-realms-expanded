@@ -931,6 +931,19 @@ impl NpcVisibility {
         self.find_actor(actor_id)
     }
 
+    /// The drawn world NPC standing at exactly this spot with this model.
+    pub fn actor_at(&self, model_id: i32, position: [f32; 3]) -> Option<u64> {
+        self.by_zone
+            .values()
+            .flatten()
+            .find(|npc| {
+                npc.spawn.model_id == model_id
+                    && distance_squared(npc.position, position) < 0.01
+                    && !self.excluded.contains(&npc.spawn.actor_id)
+            })
+            .map(|npc| npc.spawn.actor_id)
+    }
+
     pub fn exclude_actor_guids(&mut self, actor_guids: impl IntoIterator<Item = u64>) {
         self.hide_actor_guids(actor_guids);
         self.visible.retain(|guid| !self.excluded.contains(guid));
