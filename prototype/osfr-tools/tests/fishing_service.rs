@@ -223,6 +223,20 @@ fn fish_run(change: &Change) -> FishRun {
     }
 }
 
+/// The client resends 138/6 every frame until the reply lands (`00b6c290` state 2): the same cast,
+/// so it starts nothing new and is no refusal.
+#[test]
+fn a_repeated_cast_is_the_same_cast() {
+    let (fixture, mut service) = running();
+    route(&mut service, &fixture, &register_request(), T0).unwrap();
+    let first = route(&mut service, &fixture, &cast_request(), T0 + 10).unwrap();
+    assert_eq!(packet_ids(&first), vec![(138, 8), (138, 18)]);
+    for frame in 1..=64 {
+        let again = route(&mut service, &fixture, &cast_request(), T0 + 10 + frame).unwrap();
+        assert!(packet_ids(&again).is_empty(), "frame {frame}");
+    }
+}
+
 #[test]
 fn a_cast_spawns_the_bobber_model_and_the_fish_the_bite_names() {
     let (fixture, mut service) = running();

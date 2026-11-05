@@ -870,8 +870,10 @@ impl FishingService {
                 change.changed = true;
             }
             ClientRequest::Cast { target, .. } => {
+                // State 2 of `00b6c290` resends 138/6 every frame until the reply lands, so a
+                // repeat is the same cast, not a refusal.
                 if tracked.attempt.is_some() {
-                    return Err(Error::OutOfOrder);
+                    return Ok(change);
                 }
                 // Select before any mutation, so a refused cast changes nothing.
                 let sequence = tracked.cast_sequence.wrapping_add(1).max(1);
