@@ -531,7 +531,7 @@
     "MaxPitch": 90.0,
     "OverHeadRenderDistance": 1000.0,
     "OverHeadScale": 0.07,
-    "OverHeadShipEffectYOffset": 14.0,
+    "OverHeadShipEffectYOffset": 30.0,
     "UseShipHeightForOverHead": 0,
     "ZoneBubbleRadius": 12,
     "ZoneBubbleObjectRadius": 12,
