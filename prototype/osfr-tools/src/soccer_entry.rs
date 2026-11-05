@@ -89,6 +89,17 @@ pub struct Game {
 }
 
 impl Game {
+    /// The offer card's name, icon, description and difficulty.
+    fn offer_card(&self) -> io::Result<(i32, i32, i32, i32)> {
+        let number = |value: u32| i32::try_from(value).map_err(|_| invalid("soccer row number"));
+        Ok((
+            number(self.name_id)?,
+            number(self.icon_id)?,
+            number(self.description_id)?,
+            number(self.difficulty)?,
+        ))
+    }
+
     /// L932: whether a won match counts for this row when the other team scored `conceded`.
     pub fn counts(&self, conceded: u32) -> bool {
         self.max_conceded.is_none_or(|max| conceded <= max)
@@ -746,6 +757,7 @@ impl Session {
             snap: true,
         });
         let pending = with_bot_bodies(&service, &content.bot_bodies(), character.guid, &roster)?;
+        service.set_offer_card(game.offer_card()?);
         let offered = service.offer_minigame(
             character.guid,
             game.id as i32,

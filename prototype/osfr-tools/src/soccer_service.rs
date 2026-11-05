@@ -762,6 +762,8 @@ struct SessionEntry {
 /// sender separately from the payload and the authority refuses a mismatch.
 #[derive(Clone)]
 pub struct SoccerService {
+    /// What the offer card shows: name, icon, description and difficulty.
+    offer_card: (i32, i32, i32, i32),
     authority: Authority,
     policy: AdapterPolicy,
     sessions: BTreeMap<u64, SessionEntry>,
@@ -824,6 +826,7 @@ impl SoccerService {
             bot_at: BTreeMap::new(),
             bots_filled: false,
             cancelled: false,
+            offer_card: (0, 0, 0, 1),
             setup: None,
             kicked_off: false,
             celebrating: false,
@@ -1343,6 +1346,11 @@ impl SoccerService {
     /// or R policy; the native soccer completion/reward exchange is unknown.
     /// The run id is process-wide unique (R), so a stale lifecycle packet from
     /// an earlier match can never address a later run.
+    /// The words and dots of the next offer; the client shows the card blank without them.
+    pub fn set_offer_card(&mut self, card: (i32, i32, i32, i32)) {
+        self.offer_card = card;
+    }
+
     pub fn offer_minigame(
         &mut self,
         session: u64,
@@ -1365,14 +1373,16 @@ impl SoccerService {
             .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
             .map_err(|_| invalid("soccer minigame instance counter exhausted"))?;
         let mut runs = MinigameRuns::new(instance_id)?;
-        let offered = runs.offer(RunSpec::empty(
+        let mut spec = RunSpec::empty(
             game_id,
             soccer::SOCCER_TYPE_ID,
             RunMode::Encounter {
                 encounter_id,
                 player_guid: session,
             },
-        ))?;
+        );
+        (spec.name_id, spec.icon_id, spec.description_id, spec.difficulty) = self.offer_card;
+        let offered = runs.offer(spec)?;
         if !offered.accepted {
             return Err(invalid("soccer minigame offer was refused"));
         }

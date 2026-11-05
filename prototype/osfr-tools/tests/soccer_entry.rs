@@ -1057,6 +1057,14 @@ fn the_shipped_bots_spawn_as_actors_before_their_registration() {
         !offer.iter().any(|reply| reply.starts_with(&[76, 0, 3, 0])),
         "the roster waits for the start"
     );
+    // The card shows the row's own words: without them it opens blank.
+    let card = offer.iter().find(|reply| reply.starts_with(&[39, 0, 16])).unwrap();
+    let field = |at: usize| u32::from_le_bytes(card[at..at + 4].try_into().unwrap());
+    let row = &content.games()[0];
+    assert_eq!(
+        (field(15), field(19), field(23), field(27)),
+        (row.name_id, row.icon_id, row.description_id, row.difficulty)
+    );
     let replies = session
         .handle_lifecycle(GUID, &lifecycle(5, offer_instance(&offer)), 1_000)
         .unwrap()
