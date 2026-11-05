@@ -12,9 +12,12 @@ use std::io;
 const FAMILY_MINIGAME: u16 = 39;
 const FAMILY_COMMAND: u16 = 26;
 const FAMILY_ENCOUNTER: u16 = 41;
+const FAMILY_OBJECTIVE: u16 = 45;
+const FAMILY_UI: u16 = 47;
 const HEADER_LEN: usize = 15;
-const INFO_OBJECTIVE_BYTES: usize = 0xe8;
 const EMPTY_REWARD_BUNDLES_BYTES: usize = 3 * 69;
+/// (R) The most goals one offer carries.
+pub const MAX_GOALS: usize = 64;
 /// A movie message's text length cap, its NUL included.
 const MAX_MOVIE_TEXT: u32 = 4096;
 
@@ -52,9 +55,60 @@ pub enum RunMode {
     CardClient,
 }
 
+/// One offer goal (Lua `BaseClient.MiniGameGoals`) in the wire order of the client reader
+/// `008fd770`: 34 bytes plus its reward bundle. Field map from the copy into the running game
+/// (`00c42870`), its status (`00c42280`, `00c42440`) and its prefix (`00c45c30`). An offered goal
+/// starts NotStarted (state code 0) with no progress.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Goal {
+    pub id: u32,
+    /// Global.Text ids; the client puts the category prefix in front of the name itself.
+    pub name_id: u32,
+    pub description_id: u32,
+    /// `ObjectiveCategoryPrefix*`: 1 Primary, 2 Secondary, 3 Job, 4 Bonus, 5 Elite.
+    pub category: u32,
+    #[serde(default)]
+    pub bonus: bool,
+    /// The Reward Stars column reads the goal's bundle.
+    #[serde(default)]
+    pub stars: i32,
+    #[serde(default)]
+    pub coins: i32,
+    /// Progress target; above 1 the status reads "count/total" (`ObjectiveProgressFormat`).
+    #[serde(default)]
+    pub total: u32,
+    /// Something the player must avoid: the status reads `ObjectiveStatusFailureCondition`.
+    #[serde(default)]
+    pub failure_condition: bool,
+    #[serde(default)]
+    pub members_only: bool,
+}
+
+impl Goal {
+    fn encode(&self, out: &mut Vec<u8>) {
+        for value in [self.id, self.name_id, self.description_id] {
+            out.extend(value.to_le_bytes());
+        }
+        out.push(u8::from(self.bonus));
+        // The 69-byte `008e7930` bundle, the quest writer's layout with no display rows.
+        out.push(1);
+        for value in [self.coins, self.stars, 0, 0, 0, 0] {
+            out.extend(value.to_le_bytes());
+        }
+        out.extend(1.0f32.to_le_bytes());
+        out.extend([0; 40]); // two i32, two guids, icon, name, row count, trailing i32
+        // State code 0 (NotStarted), count 0, total, failure flag.
+        for value in [0, 0, self.total, u32::from(self.failure_condition)] {
+            out.extend(value.to_le_bytes());
+        }
+        out.push(u8::from(self.members_only));
+        out.extend(self.category.to_le_bytes());
+    }
+}
+
 /// Fields needed to emit the shared 39/16 info record. The reward bundles are
-/// the three exact serialized client bundles; objectives are packed 0xe8-byte
-/// records supplied by the owning activity.
+/// the three exact serialized client bundles; the goals are the owning activity's.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct RunSpec {
@@ -67,7 +121,8 @@ pub struct RunSpec {
     pub type_id: i32,
     pub members_only: bool,
     pub reward_bundles: Vec<u8>,
-    pub objectives: Vec<u8>,
+    #[serde(default)]
+    pub objectives: Vec<Goal>,
     pub flags: [u8; 5],
     pub preload_file: String,
     pub mode: RunMode,
@@ -101,8 +156,8 @@ impl RunSpec {
             || self.profile_type < 0
             || self.reward_bundles.len() > 1024 * 1024
             || self.reward_bundles.len() < EMPTY_REWARD_BUNDLES_BYTES
-            || self.objectives.len() % INFO_OBJECTIVE_BYTES != 0
-            || self.objectives.len() / INFO_OBJECTIVE_BYTES > 4096
+            || self.objectives.len() > MAX_GOALS
+            || self.objectives.iter().any(|goal| !(1..=5).contains(&goal.category))
             || self.flags.iter().any(|flag| *flag > 1)
             // Flag `+616` asks for the end-of-game dialog on 39/19 (`009bf190`). Flash and card
             // runs keep it: without the flag the handler runs Lua `:QuitGameWithNoEndGameScreen`,
@@ -700,7 +755,7 @@ impl MinigameRuns {
         {
             return Ok(RunOutcome::default());
         }
-        let replies = match &run.spec.mode {
+        let mut replies = match &run.spec.mode {
             RunMode::Flash { movie } => vec![
                 start_ack_packet(run.instance_id, run.spec.game_id),
                 flash_launch_packet(movie),
@@ -720,6 +775,10 @@ impl MinigameRuns {
             // 39/17 runs the card manager's `Startup` (`00ad47f0`) on the ticket 39/0x28 stored.
             RunMode::CardClient => vec![start_ack_packet(run.instance_id, run.spec.game_id)],
         };
+        // (R) Ahead of 39/17, the Sanctuary fork's order: the HUD opens on the rows it finds.
+        let goals = (run.spec.objectives.iter())
+            .flat_map(|goal| [goal_row_packet(goal), goal_activate_packet(goal)]);
+        replies.splice(0..0, goals);
         self.current.as_mut().unwrap().state = RunState::Starting;
         Ok(RunOutcome {
             accepted: true,
@@ -770,10 +829,11 @@ fn info_packet(instance_id: i32, spec: &RunSpec) -> io::Result<Vec<u8>> {
     }
     bytes.push(u8::from(spec.members_only));
     bytes.extend(&spec.reward_bundles);
-    let goal_count =
-        i32::try_from(spec.objectives.len() / INFO_OBJECTIVE_BYTES).map_err(invalid)?;
+    let goal_count = i32::try_from(spec.objectives.len()).map_err(invalid)?;
     bytes.extend(goal_count.to_le_bytes());
-    bytes.extend(&spec.objectives);
+    for goal in &spec.objectives {
+        goal.encode(&mut bytes);
+    }
     bytes.extend(spec.flags);
     bytes.extend(
         i32::try_from(spec.preload_file.len())
@@ -790,6 +850,31 @@ fn info_packet(instance_id: i32, spec: &RunSpec) -> io::Result<Vec<u8>> {
     bytes.extend(0_i32.to_le_bytes());
     bytes.extend(0_i32.to_le_bytes());
     Ok(bytes)
+}
+
+/// 47/1 (dispatch `00a91bf0`, reader `00a8d1f0`, row `00cb81e0`): the goal's row in the in-game
+/// Goals panel, `BaseClient.ObjectiveHelper`. The panel opens once it holds a row (`ObjectiveWindow`).
+fn goal_row_packet(goal: &Goal) -> Vec<u8> {
+    let mut bytes = FAMILY_UI.to_le_bytes().to_vec();
+    bytes.push(1);
+    for value in [goal.id, 0, goal.name_id] {
+        bytes.extend(value.to_le_bytes());
+    }
+    bytes.extend([u8::from(goal.bonus), u8::from(goal.members_only)]);
+    bytes.extend(goal.category.to_le_bytes());
+    bytes.push(0);
+    bytes.extend(goal.total.to_le_bytes());
+    bytes
+}
+
+/// 45/1 ObjectiveActivatePacket (reader `009b56d0`, apply `009ad510`): the goal the offer listed
+/// under this id takes its total and turns InProgress.
+fn goal_activate_packet(goal: &Goal) -> Vec<u8> {
+    let mut bytes = FAMILY_OBJECTIVE.to_le_bytes().to_vec();
+    bytes.push(1);
+    bytes.extend(goal.id.to_le_bytes());
+    bytes.extend(goal.total.to_le_bytes());
+    bytes
 }
 
 /// Server acknowledgement 39/17; client reader `009b9550`.

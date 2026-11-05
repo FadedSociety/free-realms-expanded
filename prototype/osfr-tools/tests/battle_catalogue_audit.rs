@@ -917,6 +917,8 @@ fn every_battle_is_published_or_documented_guide_only() {
                 level: MAX_JOB_LEVEL,
                 crafts: [0; 3],
                 postman: 0,
+                jobs: &std::collections::BTreeSet::new(),
+                learned: &std::collections::BTreeSet::new(),
             },
             false,
         ) {

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source": "L962 (R): Sanctuary's authored tower defense tables (BubbaJoeX fork, AGPL-3.0, src/Resources/Minigames/TowerDefense), resolved per game by lab/tools/td_content.py; names, descriptions, icons and difficulty from the client's MiniGameData.txt (TYPE 14). The live tables never shipped.",
+  "source": "L962 (R): Sanctuary's authored tower defense tables (BubbaJoeX fork, AGPL-3.0, src/Resources/Minigames/TowerDefense), resolved per game by lab/tools/td_content.py; names, descriptions, icons and difficulty from the client's MiniGameData.txt (TYPE 14). The live tables never shipped. Goals (R): no capture holds a live offer, so each game's goals are the fanbyte wiki's Primary, Secondary, Bonus and Elite lines matched to client text ids (the unprefixed name; the shared description of its category), the same at every difficulty; a line with no client text is left out.",
   "win_coins": 10,
   "min_stage_ms": 1000,
   "games": [
@@ -21,6 +21,35 @@
         5,
         3,
         2
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94820,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94817,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94818,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     },
     {
@@ -41,6 +70,35 @@
         4,
         3,
         2
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94820,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94829,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94822,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     },
     {
@@ -62,6 +120,35 @@
         3,
         2,
         1
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94820,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94817,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94826,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     },
     {
@@ -81,6 +168,28 @@
         10,
         11,
         9
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94858,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94859,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        }
       ]
     },
     {
@@ -101,6 +210,28 @@
         11,
         9,
         7
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94870,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94871,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        }
       ]
     },
     {
@@ -122,6 +253,35 @@
         7,
         8,
         6
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94858,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94859,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94841,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     },
     {
@@ -141,6 +301,21 @@
         12,
         14,
         13
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 3,
+          "name_id": 94901,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        }
       ]
     },
     {
@@ -161,6 +336,35 @@
         14,
         15,
         17
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94912,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94913,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94957,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     },
     {
@@ -182,6 +386,35 @@
         15,
         17,
         16
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94912,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94914,
+          "description_id": 94914,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94925,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     },
     {
@@ -201,6 +434,35 @@
         18,
         19,
         21
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94954,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94956,
+          "description_id": 94956,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94957,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     },
     {
@@ -221,6 +483,14 @@
         19,
         20,
         21
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        }
       ]
     },
     {
@@ -241,6 +511,35 @@
         19,
         20,
         21
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94942,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94943,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94952,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     },
     {
@@ -260,6 +559,35 @@
         5,
         3,
         2
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94820,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94817,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94818,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     },
     {
@@ -280,6 +608,35 @@
         4,
         3,
         2
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94820,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94829,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94822,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     },
     {
@@ -301,6 +658,35 @@
         3,
         2,
         1
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94820,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94817,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94826,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     },
     {
@@ -320,6 +706,28 @@
         10,
         11,
         9
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94858,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94859,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        }
       ]
     },
     {
@@ -340,6 +748,28 @@
         11,
         9,
         7
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94870,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94871,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        }
       ]
     },
     {
@@ -361,6 +791,35 @@
         7,
         8,
         6
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94858,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94859,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94841,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     },
     {
@@ -380,6 +839,21 @@
         12,
         14,
         13
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 3,
+          "name_id": 94901,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        }
       ]
     },
     {
@@ -400,6 +874,35 @@
         14,
         15,
         17
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94912,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94913,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94957,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     },
     {
@@ -421,6 +924,35 @@
         15,
         17,
         16
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94912,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94914,
+          "description_id": 94914,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94925,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     },
     {
@@ -440,6 +972,35 @@
         18,
         19,
         21
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94954,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94956,
+          "description_id": 94956,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94957,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     },
     {
@@ -460,6 +1021,14 @@
         19,
         20,
         21
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        }
       ]
     },
     {
@@ -480,6 +1049,35 @@
         19,
         20,
         21
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94942,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94943,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94952,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     },
     {
@@ -499,6 +1097,35 @@
         5,
         3,
         2
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94820,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94817,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94818,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     },
     {
@@ -519,6 +1146,35 @@
         4,
         3,
         2
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94820,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94829,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94822,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     },
     {
@@ -540,6 +1196,35 @@
         3,
         2,
         1
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94820,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94817,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94826,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     },
     {
@@ -559,6 +1244,28 @@
         10,
         11,
         9
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94858,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94859,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        }
       ]
     },
     {
@@ -579,6 +1286,28 @@
         11,
         9,
         7
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94870,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94871,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        }
       ]
     },
     {
@@ -600,6 +1329,35 @@
         7,
         8,
         6
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94858,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94859,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94841,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     },
     {
@@ -619,6 +1377,21 @@
         12,
         14,
         13
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 3,
+          "name_id": 94901,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        }
       ]
     },
     {
@@ -639,6 +1412,35 @@
         14,
         15,
         17
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94912,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94913,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94957,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     },
     {
@@ -660,6 +1462,35 @@
         15,
         17,
         16
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94912,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94914,
+          "description_id": 94914,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94925,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     },
     {
@@ -679,6 +1510,35 @@
         18,
         19,
         21
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94954,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94956,
+          "description_id": 94956,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94957,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     },
     {
@@ -699,6 +1559,14 @@
         19,
         20,
         21
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        }
       ]
     },
     {
@@ -719,6 +1587,35 @@
         19,
         20,
         21
+      ],
+      "goals": [
+        {
+          "id": 1,
+          "name_id": 94815,
+          "description_id": 78609,
+          "category": 1
+        },
+        {
+          "id": 2,
+          "name_id": 94942,
+          "description_id": 78611,
+          "category": 2,
+          "bonus": false
+        },
+        {
+          "id": 3,
+          "name_id": 94943,
+          "description_id": 78613,
+          "category": 4,
+          "bonus": true
+        },
+        {
+          "id": 4,
+          "name_id": 94952,
+          "description_id": 78617,
+          "category": 5,
+          "bonus": false
+        }
       ]
     }
   ],

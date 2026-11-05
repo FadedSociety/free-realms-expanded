@@ -45,6 +45,8 @@ const VIEWER: Viewer = Viewer {
     level: 1,
     crafts: [0; 3],
     postman: 0,
+    jobs: &std::collections::BTreeSet::new(),
+    learned: &std::collections::BTreeSet::new(),
     combat_job: true,
 };
 

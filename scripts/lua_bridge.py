@@ -261,6 +261,9 @@ def main(argv=None) -> int:
     exitbar = sub.add_parser("exitbar", help="the minigame Leave bar's window; --press runs its Leave")
     exitbar.add_argument("--press", action="store_true")
     exitbar.add_argument("--handler", action="store_true", help="run MiniGameHandler:QuitGame instead")
+    games = sub.add_parser("games", help="the Games window's tiles and a category's rows; --open shows it")
+    games.add_argument("--category", type=int)
+    games.add_argument("--open", action="store_true")
     demo_parser = sub.add_parser("demo")
     demo_parser.add_argument("--wait", type=float, default=20.0,
                              help="seconds to wait for each visible step (default 20)")
@@ -282,6 +285,8 @@ def main(argv=None) -> int:
                 result = bridge.chat(args.text)
             elif args.command == "exitbar":
                 result = bridge.wait(bridge.send("exitbar", press=args.press, handler=args.handler))
+            elif args.command == "games":
+                result = bridge.wait(bridge.send("games", category=args.category, open=args.open))
             else:
                 result = bridge.interact()
     except (BridgeError, ValueError, OSError) as error:

@@ -3,7 +3,7 @@
 //! `crate::activity_portal`; the race and derby entries are the speedway gates' own.
 use super::*;
 use crate::{
-    activity_portal::{Activity, Catalogue, Kind, game_row},
+    activity_portal::{Activity, Catalogue, Kind, MISSING_JOB_TEXT, game_row, join_error},
     derby_gateway::{DerbyEntryDenied, DerbyGateway},
     fishing_service::FishingSpots,
     harvest_nodes::{Denied, payout_fits},
@@ -107,19 +107,54 @@ pub(super) fn games(
 }
 
 impl Gameplay {
+    pub(super) fn activity_viewer(&self) -> crate::activity_portal::Viewer<'_> {
+        static NO_JOBS: BTreeSet<i32> = BTreeSet::new();
+        let profile = self.profiles.as_ref().map_or(0, Profiles::active);
+        crate::activity_portal::Viewer {
+            combat_job: self
+                .abilities
+                .as_ref()
+                .is_some_and(|a| a.supports_basic(profile)),
+            level: self.job_level(profile),
+            crafts: CraftingJob::ALL.map(|job| self.job_level(job.profile_id())),
+            postman: self.job_level(crate::mail_sorting::POSTMAN_PROFILE_ID),
+            jobs: (self.profiles.as_ref()).map_or(&NO_JOBS, |p| &p.state().unlocked),
+            learned: &self.learned_recipes,
+        }
+    }
+
+    /// The facts a list's CanPlayerJoin rests on that the client never asks again for: a job
+    /// unlocked or a recipe learned (it sends 167/1/4 on a rank change only).
+    fn portal_basis(&self) -> (usize, usize) {
+        let jobs = (self.profiles.as_ref()).map_or(0, |p| p.state().unlocked.len());
+        (jobs, self.learned_recipes.len())
+    }
+
+    /// Push a fresh list after a packet that unlocked a job or taught a recipe, so the rows it
+    /// opens stop showing greyed. Nothing before the first list.
+    pub(super) fn sync_activity_list(&mut self, out: &mut Outcome) {
+        if self
+            .portal_listed
+            .is_some_and(|basis| basis != self.portal_basis())
+        {
+            self.append_activity_list(out);
+        }
+    }
+
     /// W150: the portal lists for this player (167/1/1); the live minigame rows travel in their
     /// own entry-type list (L095).
-    pub(super) fn append_activity_list(&self, out: &mut Outcome) {
+    pub(super) fn append_activity_list(&mut self, out: &mut Outcome) {
         let viewer = self.activity_viewer();
         out.replies.push(self.activities.list_packet(viewer));
         out.replies
             .extend(self.activities.minigame_list_packet(viewer));
+        self.portal_listed = Some(self.portal_basis());
     }
 
     /// L097: Play on the kart race's or the derby's Games window row: the gate's admission without
     /// the gate, then the gate's entry; L098: a recipe row through the recipe book; L100: game
-    /// `id` of a gather row; L102: a fishing hole. A refusal answers with one chat line and changes
-    /// nothing.
+    /// `id` of a gather row; L102: a fishing hole. A refusal answers with one line (B4: the
+    /// client's own 147/2 alert for a missing job, else chat) and changes nothing.
     pub(super) fn begin_portal_game(
         &mut self,
         id: u32,
@@ -130,6 +165,10 @@ impl Gameplay {
         let busy = self.activity_busy();
         let refused = |text: &str| Outcome {
             replies: vec![chat::system(text)],
+            ..Outcome::default()
+        };
+        let alert = |text_id: u32| Outcome {
+            replies: vec![join_error(text_id)],
             ..Outcome::default()
         };
         match kind {
@@ -147,11 +186,24 @@ impl Gameplay {
                 Some(Err(denied)) => Ok(refused(denied.message())),
                 None => Ok(refused(DerbyEntryDenied::Unavailable.message())),
             },
-            // L098: a recipe row starts the recipe book anywhere (R).
-            Kind::Recipe { recipe_id, .. } => {
-                let mut out = Outcome::default();
+            // L098: a recipe row starts the recipe book anywhere (R). L936: it switches into the
+            // recipe's job first, staged with the start, so a refused start changes nothing.
+            Kind::Recipe { recipe_id, job } => {
                 let recipe = i32::try_from(recipe_id).map_err(|_| invalid("recipe id"))?;
-                self.start_recipe(recipe, true, character, now_ms, &mut out)?;
+                let has_job = (self.profiles.as_ref())
+                    .is_some_and(|p| p.state().unlocked.contains(&job.profile_id()));
+                if !has_job {
+                    return Ok(alert(MISSING_JOB_TEXT));
+                }
+                let mut staged = self.clone();
+                let mut out = Outcome::default();
+                staged.enter_activity_job(job.profile_id(), character.guid, &mut out)?;
+                let mut start = Outcome::default();
+                if !staged.start_recipe(recipe, true, character, now_ms, &mut start)? {
+                    return Ok(start);
+                }
+                *self = staged;
+                out.absorb(start);
                 Ok(out)
             }
             // L100 (R): a node's gates without the node: idle, the gather job unlocked, the game
@@ -167,8 +219,10 @@ impl Gameplay {
                 } else {
                     gather.admit_job(&profiles.state().unlocked)
                 };
-                if let Err(denied) = admitted {
-                    return Ok(refused(&denied.message()));
+                match admitted {
+                    Err(Denied::NoJob(_)) => return Ok(alert(MISSING_JOB_TEXT)),
+                    Err(denied) => return Ok(refused(&denied.message())),
+                    Ok(()) => {}
                 }
                 if gather == Gather::Mail
                     && self.job_level(gather.job()) < crate::mail_sorting::rank_floor(game)

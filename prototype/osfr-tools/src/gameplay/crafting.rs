@@ -309,7 +309,8 @@ impl Gameplay {
     /// services, a server-known station in range unless `anywhere`, rank and exact inputs before
     /// the service's own `begin_recipe`; it owns the busy refusal, so there is no second check
     /// here that a canary could bypass or duplicate. A pack with no class content (supported by
-    /// `load`) has no recipe-book player at all, so refuse before building one.
+    /// `load`) has no recipe-book player at all, so refuse before building one. True when the
+    /// craft started.
     pub(super) fn start_recipe(
         &mut self,
         recipe_id: i32,
@@ -317,11 +318,11 @@ impl Gameplay {
         character: &CharacterState,
         now_ms: u64,
         out: &mut Outcome,
-    ) -> io::Result<()> {
+    ) -> io::Result<bool> {
         let Some(profile) = self.profiles.as_ref().map(Profiles::active) else {
             out.replies
                 .push(crate::recipe_book::Refusal::Unavailable.feedback());
-            return Ok(());
+            return Ok(false);
         };
         let available = self.available_ingredients();
         let player = crate::recipe_book::Player {
@@ -361,9 +362,12 @@ impl Gameplay {
                 self.forging_tick_ms = Some(now_ms);
                 self.apply_craft(CraftingJob::Blacksmith, result, character, out)?
             }
-            Err(refusal) => out.replies.push(refusal.feedback()),
+            Err(refusal) => {
+                out.replies.push(refusal.feedback());
+                return Ok(false);
+            }
         }
-        Ok(())
+        Ok(true)
     }
 
     pub(super) fn station_interaction_26_8(

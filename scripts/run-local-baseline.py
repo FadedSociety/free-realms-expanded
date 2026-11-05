@@ -51,6 +51,8 @@ parser.add_argument("--live-log", action=argparse.BooleanOptionalAction, default
 parser.add_argument("--bin-dir", type=Path, help="Directory holding osfr-gateway.exe and osfr-login.exe (default: the source checkout's target/release)")
 parser.add_argument("--dev-tools", action="store_true", help="Opt in to local developer entity teleport commands for this test run")
 parser.add_argument("--drop-server-sequence", type=int, help="Drop the first transmission of this reliable sequence to test recovery")
+parser.add_argument("--client-dir", type=Path, help="Client folder to copy for this run, under lab/ (default: lab/working/OSFR.Client/OSFR Client, the full 2014 packs); "
+                    "lab/clients/community-clean is the launcher's community install, which streams AssetsW_002+ on first use")
 run_options = parser.parse_args()
 use_rust = bool(run_options.rust_reference) or run_options.rust_gateway
 if run_options.rust_reference and run_options.rust_gateway:
@@ -67,20 +69,23 @@ if run_options.drop_server_sequence is not None and not 0 <= run_options.drop_se
     parser.error("--drop-server-sequence must fit a 16-bit sequence")
 
 lab = Path(__file__).resolve().parents[2] / "lab"
+client_source = (run_options.client_dir or lab / "working/OSFR.Client/OSFR Client").resolve()
+if not client_source.is_relative_to(lab.resolve()) or not (client_source / "FreeRealms.exe").is_file():
+    parser.error("--client-dir must be a client folder (with FreeRealms.exe) under lab/")
 if run_options.journal_text and not run_options.native_login:
     parser.error("--journal-text requires --native-login (explicit Locale8)")
 if run_options.character_select_title and not run_options.native_login:
     parser.error("--character-select-title requires --native-login")
 journal_text = validate_journal_text(run_options.journal_text, run_options.content,
-                                    lab / "working/OSFR.Client/OSFR Client", lab)
+                                    client_source, lab)
 character_select_title = validate_character_select_title(run_options.character_select_title, lab)
 lua_probe = validate_lua_probe(lab / "content/lua-probe" if run_options.lua_probe else None,
-                              lab / "working/OSFR.Client/OSFR Client", lab)
+                              client_source, lab)
 stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 run = lab / "runs" / ("client-baseline-" + stamp)
 client = run / "client"
 server = run / "server"
-shutil.copytree(lab / "working/OSFR.Client/OSFR Client", client)
+shutil.copytree(client_source, client)
 apply_journal_text(journal_text, client, run, lab)
 # World Builder text: authored strings become rows in this run's client locale copy.
 if run_options.dev_tools and (lab / "world/text.json").is_file():
@@ -134,7 +139,7 @@ if use_rust:
     # World Builder live layer: in-game builds (placed NPCs, marks, authored content) persist here.
     if run_options.dev_tools:
         server_command += ["--world", str(lab / "world"),
-                           "--client-locale", str(lab / "working/OSFR.Client/OSFR Client/locale")]
+                           "--client-locale", str(client_source / "locale")]
     # Ground heights (osfr-terrain output) for enemy movement, teleports and the Studio map.
     if (lab / "terrain").is_dir() and any((lab / "terrain").glob("zone_*.hgt")):
         server_command += ["--terrain", str(lab / "terrain")]

@@ -72,17 +72,19 @@
 //!   (category 22, art `Soccer_Briarwood.dds`; both values are the client `ActivityCategories.txt`
 //!   row 22), entry type 1, plus chess and the card-game rows. Every other activity (races,
 //!   mining ...) is simply not listed, so the client cannot ask for it.
-//! * `CanPlayerJoin` is per player: battle rows require a combat job at the configured level;
-//!   chess is open, and soccer uses its own configured level floor without a job gate. A
-//!   refused Play says why in chat (the 147/2 join-error body is not recovered). The owning
-//!   activity, never the portal request, awards.
+//! * `CanPlayerJoin` is per player and mirrors Play's own gates, so the client greys out what
+//!   Play would refuse (B4; the live server's rows were greyed, not refused): battle rows require
+//!   a combat job at the configured level; chess is open, and soccer uses its own configured
+//!   level floor without a job gate. A refused Play says why in chat, or for a gather or recipe
+//!   row's missing job with the client's own 147/2 alert. The owning activity, never the portal
+//!   request, awards.
 //! * For battles, chess and soccer the preferred/featured/tutorial/AppSystem/chest fields and the two
 //!   unknown dwords are 0.
 //!   Image names come from each row's client category (`bandit_hideout_detail.dds` for battles and
 //!   `Soccer_Briarwood.dds` for soccer).
-//! * (R) A card-game row is listed, so the client can ask, and Play answers with the client's own
-//!   "currently unavailable" line (Global.Text 140987): there is no card service yet. Rows publish
-//!   entry type 1 like every other row.
+//! * (R) A card-game row is listed greyed while the card game is closed; a forged Play answers
+//!   with the client's own "currently unavailable" line (Global.Text 140987). Rows publish entry
+//!   type 1 like every other row.
 
 use crate::{
     card_game, chess_service::ChessService, harvest_nodes::Gather, recipes::CraftingJob,
@@ -90,6 +92,7 @@ use crate::{
 };
 use serde::Deserialize;
 use std::{
+    collections::BTreeSet,
     fs,
     io::{self, Read},
     path::Path,
@@ -97,6 +100,13 @@ use std::{
 };
 
 const FAMILY: u16 = 167;
+/// The 147/2 ActivityJoinErrorPacket (`00be7360`): `u16 147`, `u8 2`, `u32` Global.Text id, shown
+/// by `ActivityPortal:OnJoinError` as a yellow alert.
+const JOIN_ERROR_FAMILY: u16 = 147;
+const SUB_JOIN_ERROR: u8 = 2;
+/// Client `CodeStringMappings.txt` JoinFailedYouAreMissingProfile: "You can't play this minigame
+/// because you don't have the required job."
+pub const MISSING_JOB_TEXT: u32 = 116_214;
 const SERVICE_ACTIVITY: u8 = 1;
 const SUB_LIST: u8 = 1;
 const SUB_PLAY: u8 = 2;
@@ -292,7 +302,7 @@ pub fn load_live(directory: &Path) -> io::Result<Vec<LiveRow>> {
 
 /// What the server knows about the asking player.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct Viewer {
+pub struct Viewer<'a> {
     /// The active job is a combat job.
     pub combat_job: bool,
     /// Level of the active job.
@@ -302,6 +312,10 @@ pub struct Viewer {
     pub crafts: [u32; 3],
     /// L106: the Postman rank, for the Mail Sorting rows' floors.
     pub postman: u32,
+    /// The jobs the player has (unlocked profile ids): a gather or recipe row needs its job.
+    pub jobs: &'a BTreeSet<i32>,
+    /// The recipes the player has learned: a recipe row needs its recipe.
+    pub learned: &'a BTreeSet<u32>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -333,6 +347,14 @@ impl Refusal {
             Self::NotOpen => "That activity is not open yet.".into(),
         }
     }
+}
+
+/// 147/2 with a client Global.Text id (FINDINGS `join-error-147-20261102`; no capture has one).
+pub fn join_error(text_id: u32) -> Vec<u8> {
+    let mut out = JOIN_ERROR_FAMILY.to_le_bytes().to_vec();
+    out.push(SUB_JOIN_ERROR);
+    out.extend(text_id.to_le_bytes());
+    out
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -550,20 +572,10 @@ impl Catalogue {
                     return Err(Refusal::LevelTooLow(activity.required_level));
                 }
             }
-            // (R) Treasure War has no service; a Trading Card Game row starts only when the card
-            // content has a launch block (T765). A refusal comes before any state changes.
+            // A refusal comes before any state changes.
             Kind::CardGame { .. } => {
-                let launching = self
-                    .cards
-                    .as_ref()
-                    .is_some_and(|cards| cards.launch().is_some());
-                match self.card(activity.id) {
-                    Some(card) if card.category == card_game::TREASURE_WAR_CATEGORY => {
-                        return Err(Refusal::TreasureWarClosed);
-                    }
-                    Some(_) if launching => {}
-                    Some(_) => return Err(Refusal::CardGameClosed),
-                    None => return Err(Refusal::Unknown),
+                if let Some(refusal) = self.card_refusal(activity.id) {
+                    return Err(refusal);
                 }
             }
         }
@@ -574,24 +586,45 @@ impl Catalogue {
     fn card(&self, id: u32) -> Option<&card_game::Row> {
         self.cards.as_ref()?.row(id)
     }
-    /// CanPlayerJoin for a service row: battles want a combat job at the level, soccer its level
-    /// floor, a card row its data's flag; chess is open. L100 (R): a recipe row wants the
-    /// recipe's rank in its job, active or not (the client's own row requirement is
-    /// `CheckRankLastProfileByType`); the gather games listed today have no rank floor.
+
+    /// (R) Treasure War has no service; a Trading Card Game row starts only when the card content
+    /// has a launch block (T765) and its data row is joinable.
+    fn card_refusal(&self, id: u32) -> Option<Refusal> {
+        let launching = (self.cards.as_ref()).is_some_and(|cards| cards.launch().is_some());
+        match self.card(id) {
+            Some(card) if card.category == card_game::TREASURE_WAR_CATEGORY => {
+                Some(Refusal::TreasureWarClosed)
+            }
+            Some(card) if launching && card.can_player_join => None,
+            Some(_) => Some(Refusal::CardGameClosed),
+            None => Some(Refusal::Unknown),
+        }
+    }
+
+    /// CanPlayerJoin for a service row, the same gates as Play so the client greys out (client
+    /// `MinigameDetail.onHorzItemSelect`) what Play would refuse: battles want a combat job at the
+    /// level, soccer its level floor, a card row an open game and its data's flag; chess is open.
+    /// A gather or recipe row wants its job (client 116214); L100 (R) a recipe row also wants the
+    /// recipe learned and its rank in its job, active or not (the client's own row requirement is
+    /// `CheckRankLastProfileByType`); only the mail towns have a gather rank floor.
     fn can_join(&self, a: &Activity, viewer: Viewer) -> bool {
         match a.kind {
             Kind::Battle => viewer.combat_job && viewer.level >= a.required_level,
             Kind::Chess { .. } => true,
             Kind::Soccer => viewer.level >= a.required_level,
-            Kind::CardGame { .. } => self.card(a.id).is_some_and(|card| card.can_player_join),
-            Kind::Recipe { job, .. } => viewer.crafts[job as usize] >= a.required_level,
+            Kind::CardGame { .. } => self.card_refusal(a.id).is_none(),
+            Kind::Recipe { recipe_id, job } => {
+                viewer.jobs.contains(&job.profile_id())
+                    && viewer.learned.contains(&recipe_id)
+                    && viewer.crafts[job as usize] >= a.required_level
+            }
             // L106: a mail town opens at its Postman rank floor.
-            Kind::Gather {
-                gather: Gather::Mail,
-            } => viewer.postman >= a.required_level,
+            Kind::Gather { gather } => {
+                viewer.jobs.contains(&gather.job())
+                    && (gather != Gather::Mail || viewer.postman >= a.required_level)
+            }
             Kind::Kart
             | Kind::Derby
-            | Kind::Gather { .. }
             | Kind::Fishing { .. }
             | Kind::Checkers
             | Kind::Music

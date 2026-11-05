@@ -273,6 +273,8 @@ pub struct Gameplay {
     /// Last answered 167/1/4 refresh: a 4-byte request returns up to ~6.7 KB,
     /// so refreshes are answered at most once per `PORTAL_REFRESH_MS` (R).
     portal_refreshed_ms: Option<u64>,
+    /// `portal_basis` when the last 167/1/1 was built; `None` before the first.
+    portal_listed: Option<(usize, usize)>,
     kart_entry: Option<crate::kart_gateway::KartGateway>,
     /// Opt-in demolition derby package. A match is connection-local; a reconnect drops it.
     derby: Option<crate::derby_gateway::DerbyGateway>,
@@ -1284,6 +1286,7 @@ impl Gameplay {
             card_launches,
             daily_wheel,
             portal_refreshed_ms: None,
+            portal_listed: None,
             kart_entry,
             derby,
             fishing_spots,
@@ -2096,6 +2099,7 @@ impl Gameplay {
     ) -> io::Result<Outcome> {
         let counters_before = self.achievement_counters();
         let mut out = self.handle_in_world_inner(inner, character, now_ms)?;
+        self.sync_activity_list(&mut out);
         self.sync_tracked_target(character, &mut out);
         self.sync_client_objectives(&mut out);
         self.append_quest_markers(&mut out.replies);
@@ -3124,19 +3128,6 @@ impl Gameplay {
         busy.then_some(piece_077::Blocker::Busy)
     }
 
-    fn activity_viewer(&self) -> crate::activity_portal::Viewer {
-        let profile = self.profiles.as_ref().map_or(0, Profiles::active);
-        crate::activity_portal::Viewer {
-            combat_job: self
-                .abilities
-                .as_ref()
-                .is_some_and(|a| a.supports_basic(profile)),
-            level: self.job_level(profile),
-            crafts: CraftingJob::ALL.map(|job| self.job_level(job.profile_id())),
-            postman: self.job_level(crate::mail_sorting::POSTMAN_PROFILE_ID),
-        }
-    }
-
     /// While a soccer match owns the character, family-76 input and the shared
     /// lifecycle controls are consumed here. Unknown families still pass
     /// through; job/equipment changes are refused with a chat line.
@@ -3216,7 +3207,6 @@ impl Gameplay {
             return Ok(None);
         };
         let mut out = Outcome::default();
-        let viewer = self.activity_viewer();
         match request {
             Request::Refresh => {
                 // (R) Amplification bound: the client asks on job-level and
@@ -3239,7 +3229,7 @@ impl Gameplay {
                 let busy = self.warp_blocker().is_some() || missing_battle;
                 match self
                     .activities
-                    .admit(activity, viewer, busy)
+                    .admit(activity, self.activity_viewer(), busy)
                     .map(|a| (a.id, a.kind))
                 {
                     Err(refusal) => out.replies.push(chat::system(&refusal.message())),

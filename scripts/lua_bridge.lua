@@ -670,6 +670,55 @@ local function runCommand(command)
       result.handler_quit = true
     end
     return result
+  elseif name == "games" then
+    -- The Games window as the client Lua sees it: the category tiles (`Activities.Ref.Categories`)
+    -- and, with category, that tile's rows (`Activities.Category<id>`, columns `Activities_col`:
+    -- join = CanPlayerJoin, 0 greys Play).
+    -- A nil art name shows as "<nil>"; it is what MinigameDetail's ImageLoader turns into
+    -- img://undefined. open = true then shows the window or that category's detail pane.
+    local dsTable = rawget(_G, "DsTable")
+    if type(dsTable) ~= "table" or type(dsTable.Find) ~= "function" then
+      error("DsTable is unavailable", 0)
+    end
+    local function cell(ds, row, col)
+      local value = ds:GetData(row, col)
+      if value == nil then
+        return "<nil>"
+      end
+      return value
+    end
+    local result = { ok = true, tiles = {}, rows = {} }
+    local tiles = dsTable.Find("Activities.Ref.Categories")
+    if tiles then
+      for i = 0, math.min(tiles:GetRowCount(), 60) - 1 do
+        result.tiles[#result.tiles + 1] = { id = cell(tiles, i, 0), thumbnail = cell(tiles, i, 3), chest = cell(tiles, i, 4) }
+      end
+    end
+    local category = tonumber(command.category)
+    if category then
+      local rows = dsTable.Find("Activities.Category" .. tostring(category))
+      if rows then
+        for i = 0, math.min(rows:GetRowCount(), 60) - 1 do
+          result.rows[#result.rows + 1] = {
+            id = cell(rows, i, 0),
+            join = cell(rows, i, 8),
+            members = cell(rows, i, 14),
+            detail = cell(rows, i, 15),
+            thumbnail = cell(rows, i, 16),
+            chest = cell(rows, i, 18),
+          }
+        end
+      end
+    end
+    if command.open == true then
+      if category then
+        rawget(_G, "MinigameDetail"):Show(category)
+      else
+        rawget(_G, "BrowserV2"):ShowGames()
+      end
+      result.opened = category or "games"
+    end
+    return result
   elseif name == "key" or name == "move" then
     error("unsupported: the client Lua cannot inject keys or movement; use interact, click or chat", 0)
   end

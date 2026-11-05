@@ -227,6 +227,8 @@ fn the_battle_loads_and_is_published_with_the_expected_values() {
                     level: REQUIRED_LEVEL,
                     crafts: [0; 3],
                     postman: 0,
+                    jobs: &std::collections::BTreeSet::new(),
+                    learned: &std::collections::BTreeSet::new(),
                 },
                 false
             )
@@ -242,6 +244,8 @@ fn the_battle_loads_and_is_published_with_the_expected_values() {
                 level: REQUIRED_LEVEL - 1,
                 crafts: [0; 3],
                 postman: 0,
+                jobs: &std::collections::BTreeSet::new(),
+                learned: &std::collections::BTreeSet::new(),
             },
             false
         ),
@@ -255,6 +259,8 @@ fn the_battle_loads_and_is_published_with_the_expected_values() {
                 level: 20,
                 crafts: [0; 3],
                 postman: 0,
+                jobs: &std::collections::BTreeSet::new(),
+                learned: &std::collections::BTreeSet::new(),
             },
             false
         ),
@@ -267,6 +273,8 @@ fn the_battle_loads_and_is_published_with_the_expected_values() {
         level: REQUIRED_LEVEL,
         crafts: [0; 3],
         postman: 0,
+        jobs: &std::collections::BTreeSet::new(),
+        learned: &std::collections::BTreeSet::new(),
     }));
     let published = rows.iter().find(|row| row.id == THUGAMUG).unwrap();
     assert_eq!(published.title, TITLE);
@@ -278,6 +286,8 @@ fn the_battle_loads_and_is_published_with_the_expected_values() {
         level: REQUIRED_LEVEL - 1,
         crafts: [0; 3],
         postman: 0,
+        jobs: &std::collections::BTreeSet::new(),
+        learned: &std::collections::BTreeSet::new(),
     }));
     assert!(
         !refused

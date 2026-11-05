@@ -1,7 +1,7 @@
 use osfr_tools::{inventory, minigame, profiles, rewards};
 
 use inventory::Inventory;
-use minigame::{Activity, ActivityFinish, MinigameRuns, RunMode, RunSpec, RunState};
+use minigame::{Activity, ActivityFinish, Goal, MinigameRuns, RunMode, RunSpec, RunState};
 use profiles::ProfileState;
 use rewards::{RewardBundleRow, RewardDisplay, RewardGrant, RewardState};
 use serde_json::{Value, json};
@@ -322,6 +322,112 @@ fn flash_start_play_win_close_has_exact_packet_bytes_and_once_only_reward() {
     assert!(!duplicate_close.accepted);
     assert!(!duplicate_close.changed);
     assert_eq!(runs.state(123), Some(RunState::Closed));
+}
+
+/// B7, D19: the offer's goals in the wire order of the client reader `008fd770`: id, name, text,
+/// bonus, a 69-byte reward bundle (coins, stars), state code 0 (NotStarted), count, total, the
+/// failure flag, members-only and, last, the category prefix. The rest of the record is unchanged.
+#[test]
+fn offer_goals_follow_the_client_goal_reader() {
+    let mut offer_spec = spec();
+    offer_spec.objectives = vec![
+        Goal {
+            id: 1,
+            name_id: 94_822,
+            description_id: 94_822,
+            category: 1,
+            bonus: false,
+            stars: 30,
+            coins: 5,
+            total: 160_000,
+            failure_condition: false,
+            members_only: false,
+        },
+        Goal {
+            id: 2,
+            name_id: 94_829,
+            description_id: 78_630,
+            category: 4,
+            bonus: true,
+            stars: 10,
+            coins: 0,
+            total: 3,
+            failure_condition: true,
+            members_only: true,
+        },
+    ];
+    let mut runs = MinigameRuns::new(7).unwrap();
+    let info = runs.offer(offer_spec.clone()).unwrap().replies.remove(0);
+    let i32_at = |at: usize| i32::from_le_bytes(info[at..at + 4].try_into().unwrap());
+    let mut at = 3 + 12 + 24 + 1 + offer_spec.reward_bundles.len();
+    assert_eq!(i32_at(at), 2, "goal count");
+    at += 4;
+    for goal in &offer_spec.objectives {
+        let words =
+            |from: usize, n: usize| -> Vec<i32> { (0..n).map(|k| i32_at(from + 4 * k)).collect() };
+        assert_eq!(
+            words(at, 3),
+            [
+                goal.id as i32,
+                goal.name_id as i32,
+                goal.description_id as i32
+            ]
+        );
+        assert_eq!(info[at + 12], u8::from(goal.bonus));
+        let bundle = at + 13;
+        assert_eq!(info[bundle], 1);
+        assert_eq!(words(bundle + 1, 2), [goal.coins, goal.stars]);
+        let after = bundle + 69;
+        let failure = i32::from(goal.failure_condition);
+        assert_eq!(words(after, 4), [0, 0, goal.total as i32, failure]);
+        assert_eq!(info[after + 16], u8::from(goal.members_only));
+        assert_eq!(i32_at(after + 17), goal.category as i32);
+        at = after + 21;
+    }
+    let mut plain = offer_spec.clone();
+    plain.objectives.clear();
+    let tail = expected_info(7, &plain);
+    let tail_from = 3 + 12 + 24 + 1 + plain.reward_bundles.len() + 4;
+    assert_eq!(
+        info[at..],
+        tail[tail_from..],
+        "flags, preload and tail follow the goals"
+    );
+
+    // 47/1 and 45/1 per goal ahead of 39/17: the client finds each goal by the offer's id.
+    let started = runs.handle_client(&request(5, 7)).unwrap();
+    let activate = |goal: &Goal| {
+        let mut packet = vec![45, 0, 1];
+        packet.extend(goal.id.to_le_bytes());
+        packet.extend(goal.total.to_le_bytes());
+        packet
+    };
+    let row = |goal: &Goal| {
+        let mut packet = vec![47, 0, 1];
+        for value in [goal.id, 0, goal.name_id] {
+            packet.extend(value.to_le_bytes());
+        }
+        packet.extend([u8::from(goal.bonus), u8::from(goal.members_only)]);
+        packet.extend(goal.category.to_le_bytes());
+        packet.push(0);
+        packet.extend(goal.total.to_le_bytes());
+        packet
+    };
+    assert_eq!(started.replies[0], row(&offer_spec.objectives[0]));
+    assert_eq!(started.replies[1], activate(&offer_spec.objectives[0]));
+    assert_eq!(started.replies[2], row(&offer_spec.objectives[1]));
+    assert_eq!(started.replies[3], activate(&offer_spec.objectives[1]));
+    assert_eq!(started.replies[4][..3], [39, 0, 17]);
+
+    let mut bad = spec();
+    bad.objectives = vec![Goal {
+        category: 6,
+        ..offer_spec.objectives[0].clone()
+    }];
+    assert!(
+        MinigameRuns::new(8).unwrap().offer(bad).is_err(),
+        "no such category prefix"
+    );
 }
 
 #[test]

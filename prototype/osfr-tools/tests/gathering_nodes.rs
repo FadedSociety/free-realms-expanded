@@ -12,6 +12,7 @@ mod node_content;
 
 use osfr_tools::{
     account_store::AccountRole,
+    activity_portal::{MISSING_JOB_TEXT, join_error},
     character_store::CharacterState,
     game_store,
     gameplay::{Gameplay, GameplayState},
@@ -1369,9 +1370,8 @@ fn games_window_play_starts_the_rows_gather_game_away_from_every_node() {
     let before = none.snapshot();
     let refused = play(&mut none, 410, 2_000);
     assert!(
-        said(&refused, "You need to be a Chef"),
-        "{}",
-        chat_text(&refused)
+        inners(&refused).contains(&join_error(MISSING_JOB_TEXT).as_slice()),
+        "B4: the client's own missing-job alert (147/2 116214)"
     );
     assert_eq!(none.snapshot(), before, "a refused Play changes nothing");
 
@@ -1474,9 +1474,8 @@ fn games_window_play_sorts_mail_for_the_postman() {
     let before = none.snapshot();
     let refused = play(&mut none, 414, 2_000);
     assert!(
-        said(&refused, "You need to be a Postman"),
-        "{}",
-        chat_text(&refused)
+        inners(&refused).contains(&join_error(MISSING_JOB_TEXT).as_slice()),
+        "B4: the client's own missing-job alert (147/2 116214)"
     );
     assert_eq!(none.snapshot(), before, "a refused Play changes nothing");
 

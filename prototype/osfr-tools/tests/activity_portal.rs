@@ -64,6 +64,8 @@ const FIGHTER: Viewer = Viewer {
     level: 5,
     crafts: [0; 3],
     postman: 0,
+    jobs: &std::collections::BTreeSet::new(),
+    learned: &std::collections::BTreeSet::new(),
 };
 
 /// Bounded little-endian reader that mirrors the client stream (flag on short read).
@@ -174,10 +176,8 @@ fn can_join_is_per_player() {
     assert_eq!(joins(FIGHTER), [1, 0], "level 5 misses the level 9 row");
     assert_eq!(
         joins(Viewer {
-            combat_job: true,
             level: 9,
-            crafts: [0; 3],
-            postman: 0,
+            ..FIGHTER
         }),
         [1, 1]
     );
@@ -185,8 +185,7 @@ fn can_join_is_per_player() {
         joins(Viewer {
             combat_job: false,
             level: 20,
-            crafts: [0; 3],
-            postman: 0,
+            ..FIGHTER
         }),
         [0, 0],
         "a non-combat job joins nothing"
@@ -288,6 +287,8 @@ fn admission_follows_the_rules_in_order() {
         level: 9,
         crafts: [0; 3],
         postman: 0,
+        jobs: &std::collections::BTreeSet::new(),
+        learned: &std::collections::BTreeSet::new(),
     };
     assert_eq!(catalogue.admit(12302, nine, false).unwrap().id, 12302);
 }
@@ -300,6 +301,8 @@ fn forged_ids_never_admit_and_reveal_nothing() {
         level: 0,
         crafts: [0; 3],
         postman: 0,
+        jobs: &std::collections::BTreeSet::new(),
+        learned: &std::collections::BTreeSet::new(),
     };
     for id in [0, 1, 95, 97, 0x8000_0000, u32::MAX] {
         for busy in [false, true] {
@@ -423,6 +426,8 @@ fn chess_rows_follow_battles_and_open_without_a_combat_job() {
         level: 0,
         crafts: [0; 3],
         postman: 0,
+        jobs: &std::collections::BTreeSet::new(),
+        learned: &std::collections::BTreeSet::new(),
     };
     let list = decode_list(&catalogue.list_packet(civilian));
     assert_eq!(list.rows.len(), 3);
@@ -485,6 +490,8 @@ fn card_rows_match_the_client_reader() {
         level: 0,
         crafts: [0; 3],
         postman: 0,
+        jobs: &std::collections::BTreeSet::new(),
+        learned: &std::collections::BTreeSet::new(),
     }));
     assert_eq!(list.rows.len(), 17);
     for (n, data) in cards.rows().iter().enumerate() {
@@ -512,7 +519,10 @@ fn card_rows_match_the_client_reader() {
             list.strings[n],
             (data.detail_image.clone(), data.thumbnail_image.clone())
         );
-        assert_eq!(list.flags[n], (u8::from(data.can_player_join), 0));
+        // B4: CanPlayerJoin is Play's gate, so a closed card game (no launch block) and Treasure
+        // War grey out.
+        let open = cards.launch().is_some() && data.category != card_game::TREASURE_WAR_CATEGORY;
+        assert_eq!(list.flags[n], (u8::from(open && data.can_player_join), 0));
     }
     let lobby = &list.rows[0];
     assert_eq!((lobby[0], lobby[12]), (7, u32::MAX));
@@ -665,8 +675,21 @@ fn live_rows_publish_the_live_values_and_play_their_service_rows() {
         .collect();
     assert_eq!(
         joinable,
-        [(515, 1), (63, 0), (8, 1), (62, 1), (65, 1), (516, 1)],
-        "chess, a kart row with no race, wheel, the race and the derby (L097)"
+        [(515, 1), (63, 0), (8, 1), (62, 1), (65, 1), (516, 0)],
+        "chess, a kart row with no race, wheel, race, derby (L097); B4: copper wants Miner + recipe"
+    );
+    let miner = BTreeSet::from([CraftingJob::Miner.profile_id()]);
+    let copper = BTreeSet::from([4]);
+    let smelter = Viewer {
+        jobs: &miner,
+        learned: &copper,
+        ..FIGHTER
+    };
+    let rows = decode_list(&catalogue.minigame_list_packet(smelter).unwrap());
+    assert_eq!(
+        rows.flags.last(),
+        Some(&(1, 0)),
+        "a Miner who knows the recipe"
     );
 
     assert_eq!(catalogue.admit(37, FIGHTER, false).unwrap().id, 12_370);
@@ -710,7 +733,9 @@ fn live_rows_publish_the_live_values_and_play_their_service_rows() {
 
 /// L100: a recipe row is joinable from its recipe's rank in its job, whichever job is active
 /// (the live tin smelting row asked Miner rank 5); a gather row joins the game its engine offers
-/// by MiniGameData row, and a live gather row no engine offers stays closed.
+/// by MiniGameData row, and a live gather row no engine offers stays closed. B4: like Play, a
+/// recipe row also wants its job and the recipe learned, and a gather row its job, so the client
+/// greys out what Play would refuse.
 #[test]
 fn recipe_rows_open_at_their_rank_and_gather_rows_join_their_game() {
     let tin = Activity {
@@ -738,16 +763,34 @@ fn recipe_rows_open_at_their_rank_and_gather_rows_join_their_game() {
             vec![tin, game_row(109, harvest), game_row(111, harvest)],
         )
         .unwrap();
-    let joins = |crafts: [u32; 3]| -> Vec<(u32, u8)> {
-        let viewer = Viewer { crafts, ..FIGHTER };
+    let both = BTreeSet::from([CraftingJob::Miner.profile_id(), Gather::Harvesting.job()]);
+    let tin_learned = BTreeSet::from([5]);
+    let joins = |crafts: [u32; 3], jobs: &BTreeSet<i32>, learned: &BTreeSet<u32>| {
+        let viewer = Viewer {
+            crafts,
+            jobs,
+            learned,
+            ..FIGHTER
+        };
         let list = decode_list(&catalogue.minigame_list_packet(viewer).unwrap());
         (list.rows.iter().zip(&list.flags))
             .map(|(r, f)| (r[0], f.0))
-            .collect()
+            .collect::<Vec<_>>()
     };
     // Chef, Blacksmith, Miner.
-    assert_eq!(joins([20, 20, 4]), [(569, 0), (410, 1), (412, 0)]);
-    assert_eq!(joins([1, 1, 5]), [(569, 1), (410, 1), (412, 0)]);
+    let open = |crafts| joins(crafts, &both, &tin_learned);
+    assert_eq!(open([20, 20, 4]), [(569, 0), (410, 1), (412, 0)]);
+    assert_eq!(open([1, 1, 5]), [(569, 1), (410, 1), (412, 0)]);
+    assert_eq!(
+        joins([1, 1, 5], &both, &BTreeSet::new()),
+        [(569, 0), (410, 1), (412, 0)],
+        "an unlearned recipe is greyed"
+    );
+    assert_eq!(
+        joins([1, 1, 5], &BTreeSet::new(), &tin_learned),
+        [(569, 0), (410, 0), (412, 0)],
+        "without the job neither the recipe nor the gather row opens"
+    );
 
     let started = catalogue.admit(410, FIGHTER, false).unwrap();
     assert_eq!((started.id, started.kind), (109, harvest));
@@ -779,15 +822,21 @@ fn a_mail_row_opens_at_its_postman_rank() {
             vec![seaside],
         )
         .unwrap();
-    let joins = |postman: u32| {
-        let list = decode_list(
-            &catalogue
-                .minigame_list_packet(Viewer { postman, ..FIGHTER })
-                .unwrap(),
-        );
-        list.flags[0].0
+    let postman_job = BTreeSet::from([Gather::Mail.job()]);
+    let joins = |postman: u32, jobs: &BTreeSet<i32>| {
+        let viewer = Viewer {
+            postman,
+            jobs,
+            ..FIGHTER
+        };
+        decode_list(&catalogue.minigame_list_packet(viewer).unwrap()).flags[0].0
     };
-    assert_eq!((joins(4), joins(5)), (0, 1));
+    assert_eq!((joins(4, &postman_job), joins(5, &postman_job)), (0, 1));
+    assert_eq!(
+        joins(5, &BTreeSet::new()),
+        0,
+        "a mail row wants the Postman job"
+    );
 }
 
 #[test]

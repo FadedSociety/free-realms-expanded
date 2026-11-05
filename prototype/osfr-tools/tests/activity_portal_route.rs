@@ -312,7 +312,8 @@ fn world_entry_lists_the_card_game_rows() {
             TRADING_CARD
         };
         assert_eq!(row.category, category, "card row {id} category");
-        assert!(row.can_join, "card row {id}: PLAY! is on for everyone");
+        // B4: PLAY! is Play's own gate, greyed while the shipped card game has no launch block.
+        assert!(!row.can_join, "card row {id}: closed, so greyed");
     }
     // The field battle keeps its own (hidden) row beside them.
     assert_eq!(

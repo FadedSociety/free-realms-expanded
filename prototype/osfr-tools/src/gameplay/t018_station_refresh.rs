@@ -185,6 +185,55 @@ fn the_games_window_row_starts_and_completes_the_recipe_away_from_the_station() 
     let _ = fs::remove_dir_all(dir);
 }
 
+/// B4, L936: Play on the copper bar's row from another job switches into the Miner and starts
+/// the recipe; without the Miner job it answers the client's own missing-job alert (147/2
+/// 116214) and changes nothing.
+#[test]
+fn the_games_window_recipe_row_switches_into_its_job_and_wants_the_job() {
+    let dir = live_dir();
+    fs::create_dir_all(&dir).unwrap();
+    station::write_placements(&dir, Some(station::AWAY));
+    let content = content_directory();
+    let game_with = |miner: bool| {
+        let mut state = Gameplay::load(&content, None).unwrap().state();
+        let profiles = state.profiles.as_mut().unwrap();
+        assert_ne!(profiles.active, 14, "the fixture starts in another job");
+        if miner {
+            profiles.unlocked.insert(14);
+        } else {
+            profiles.unlocked.remove(&14);
+        }
+        stock_recipe(&mut state);
+        let mut game = Gameplay::load(&content, Some(state)).unwrap();
+        game.set_world_dir(Some(dir.clone())).unwrap();
+        game
+    };
+    let mut play = vec![167, 0, 1, 2];
+    play.extend(516_u32.to_le_bytes());
+    play.extend(0_u32.to_le_bytes());
+
+    let mut game = game_with(true);
+    let started = game
+        .handle_in_world(&play, &character_at(station::NEAR), 2_500)
+        .unwrap();
+    let text = String::from_utf8_lossy(&started.replies.concat()).into_owned();
+    assert!(!text.contains("Switch to"), "{text}");
+    assert_eq!(game.profiles.as_ref().map(Profiles::active), Some(14));
+    assert!(game.smelting.as_ref().is_some_and(Smelting::active));
+
+    let mut game = game_with(false);
+    let before = game.state();
+    let refused = game
+        .handle_in_world(&play, &character_at(station::NEAR), 2_500)
+        .unwrap();
+    let alert = crate::activity_portal::join_error(crate::activity_portal::MISSING_JOB_TEXT);
+    assert_eq!(refused.replies, [alert]);
+    assert!(!refused.changed);
+    assert_eq!(game.state(), before);
+
+    let _ = fs::remove_dir_all(dir);
+}
+
 #[test]
 fn removed_station_changes_recipe_start_and_completion_coordinates() {
     let dir = live_dir();

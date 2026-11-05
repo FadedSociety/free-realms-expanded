@@ -21,7 +21,7 @@
 //! content's `win_coins`.
 use crate::{
     minigame::{
-        self, Activity, ActivityFinish, MinigameRuns, RunMode, RunOutcome, RunSpec, RunState,
+        self, Activity, ActivityFinish, Goal, MinigameRuns, RunMode, RunOutcome, RunSpec, RunState,
     },
     rewards::{RewardDisplay, RewardGrant, RewardState},
 };
@@ -88,6 +88,9 @@ pub struct TdGameRow {
     pub towers: Vec<i32>,
     /// The map's enemy ids, in wave order.
     pub enemies: Vec<i32>,
+    /// What the offer lists (39/16). Nothing reports progress on them yet.
+    #[serde(default)]
+    pub goals: Vec<Goal>,
 }
 
 impl TdContent {
@@ -127,6 +130,11 @@ impl TdContent {
                 || !(1..=5).contains(&game.difficulty)
                 || game.towers.is_empty()
                 || game.enemies.is_empty()
+                || game.goals.len() > minigame::MAX_GOALS
+                || game
+                    .goals
+                    .iter()
+                    .any(|goal| !(1..=5).contains(&goal.category))
             {
                 return Err(invalid("invalid tower defense game"));
             }
@@ -324,6 +332,7 @@ impl TowerDefense {
         spec.icon_id = row.icon_id;
         spec.difficulty = row.difficulty;
         spec.preload_file = PRELOAD_FILE.into();
+        spec.objectives.clone_from(&row.goals);
         let lives = level.lives;
         // `offer` changes nothing on an error or a refusal.
         let offered = self.runs.offer(spec)?;
@@ -827,10 +836,43 @@ mod tests {
         );
     }
 
+    /// B7, D19: every game's offer lists its goals, the Primary first.
+    #[test]
+    fn every_shipped_game_offers_its_goals() {
+        let content = content();
+        for game in &content.games {
+            assert_eq!(
+                game.goals.first().map(|g| g.category),
+                Some(1),
+                "{}",
+                game.game_id
+            );
+            // The client adds the category prefix itself; the 94xxx names carry none.
+            assert!(
+                game.goals.iter().all(|g| g.name_id >= 94_000),
+                "{}",
+                game.game_id
+            );
+            let mut td = TowerDefense::new(&content).unwrap();
+            let offered = td.begin(game.game_id).unwrap().unwrap();
+            let bundles = 3 + 12 + 24 + 1 + 3 * 69;
+            let count = &offered.replies[0][bundles..bundles + 4];
+            assert_eq!(
+                count,
+                (game.goals.len() as i32).to_le_bytes(),
+                "{}",
+                game.game_id
+            );
+        }
+    }
+
     #[test]
     fn bad_content_is_refused() {
         let good = content();
         let mut cases = Vec::new();
+        let mut c = good.clone();
+        c.games[0].goals[0].category = 6;
+        cases.push(c);
         let mut c = good.clone();
         c.games[0].map = c.games[0].map.trim_end_matches('^').to_owned();
         cases.push(c);

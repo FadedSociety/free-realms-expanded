@@ -92,6 +92,8 @@ fn games_window_rows_open_only_for_tracks_that_run() {
         level: 1,
         crafts: [0; 3],
         postman: 0,
+        jobs: &std::collections::BTreeSet::new(),
+        learned: &std::collections::BTreeSet::new(),
     };
     let opened = catalogue.admit(62, viewer, false).unwrap();
     assert_eq!((opened.id, opened.kind), (28, Kind::Kart));
