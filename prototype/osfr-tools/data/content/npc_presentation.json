@@ -99,6 +99,7 @@
     {"name_string_id": 140726, "name": "Easy Garden Defense", "cursor_id": 17, "sub_text_name_string_id": 1114},
     {"name_string_id": 140732, "name": "Medium Garden Defense", "cursor_id": 17, "sub_text_name_string_id": 1114},
     {"name_string_id": 3386, "name": "Tower Defense", "cursor_id": 17, "sub_text_name_string_id": 1114},
+    {"name_string_id": 31028, "name": "Pirates Plunder", "cursor_id": 17},
     {"name_string_id": 140746, "name": "Bixie Defense", "cursor_id": 17, "sub_text_name_string_id": 1114, "notifications": [{"kind": 6, "image_id": 69, "state": 65, "name_id": 140746, "subtext_id": 1114}]},
     {"name_string_id": 382885, "name": "Checkers & Chess", "cursor_id": 17, "notifications": [{"kind": 6, "image_id": 20, "state": 334, "name_id": 382885, "subtext_id": 0}]},
     {"name_string_id": 382902, "name": "Baxi Sparkletoes", "cursor_id": 17, "sub_text_name_string_id": 47154, "notifications": [{"kind": 1, "image_id": 12, "state": 1, "name_id": 382902, "subtext_id": 47154}]},

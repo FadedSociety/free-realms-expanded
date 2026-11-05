@@ -11,18 +11,26 @@ pub(super) fn load_tower_defense(content: &Path) -> io::Result<Option<Box<TowerD
     TowerDefense::new(&TdContent::load(content)?).map(|td| Some(Box::new(td)))
 }
 
-/// Makes the world's tables clickable: each answers as NPC content under its own guid.
+/// Makes the world's game tables and the dock's book stands clickable: each answers as NPC content
+/// under its own guid.
 pub(super) fn bind_tables(
     td: &Option<Box<TowerDefense>>,
+    ships: &Option<Arc<crate::ship_combat::Content>>,
     interaction: &mut Option<NpcInteraction>,
     visibility: &mut Option<crate::world::NpcVisibility>,
 ) {
-    let Some(td) = td else { return };
+    let stands = ships.as_ref().map(|ships| ships.stand_menus()).unwrap_or_default();
     if let Some(interaction) = interaction {
-        interaction.set_tower_defense_tables(td.tables());
+        interaction.set_pirates_stands(&stands);
+        if let Some(td) = td {
+            interaction.set_tower_defense_tables(td.tables());
+        }
     }
     if let Some(visibility) = visibility {
-        visibility.bind_content_keys(td.tables().keys().copied());
+        visibility.bind_content_keys(stands.keys().copied());
+        if let Some(td) = td {
+            visibility.bind_content_keys(td.tables().keys().copied());
+        }
     }
 }
 

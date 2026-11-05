@@ -752,6 +752,7 @@ impl Gameplay {
                         npc_interaction::NpcAction::Derby => "derby",
                         npc_interaction::NpcAction::Soccer { .. } => "soccer",
                         npc_interaction::NpcAction::TowerDefense { .. } => "tower_defense",
+                        npc_interaction::NpcAction::Pirates { .. } => "pirates",
                         npc_interaction::NpcAction::Fish => "fish",
                         npc_interaction::NpcAction::Learn { .. } => "learn",
                     };
@@ -924,6 +925,21 @@ impl Gameplay {
                     npc_event(select_event(runtime_guid, Some(key), option_id, "soccer"));
                     // L932: staged, so a refusal leaves the player exactly as they were.
                     out = self.commit_if_changed(|staged| staged.begin_soccer_gate(game, character))?;
+                    out.replies.insert(0, END_DIALOG_26_4.to_vec());
+                }
+                Ok(NpcSelection::Pirates(arena)) => {
+                    consume_menu = true;
+                    npc_event(select_event(runtime_guid, Some(key), option_id, "pirates"));
+                    // Staged, as for the Games window's row; a refusal answers with its line.
+                    out = self.commit_if_changed(|staged| {
+                        let mut out = Outcome::default();
+                        let arena = usize::try_from(arena).unwrap_or(0);
+                        let text = staged.begin_pirates(arena, character, &mut out)?;
+                        if !out.changed {
+                            out.replies.push(chat::system(&text));
+                        }
+                        Ok(out)
+                    })?;
                     out.replies.insert(0, END_DIALOG_26_4.to_vec());
                 }
                 Ok(NpcSelection::TowerDefense(game)) => {

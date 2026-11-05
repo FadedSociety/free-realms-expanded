@@ -99,6 +99,10 @@ pub enum NpcAction {
     TowerDefense {
         game: u32,
     },
+    /// (R) Sail a Pirate's Plunder match in this arena. Offered by the dock's book stands.
+    Pirates {
+        arena: u32,
+    },
     /// (R) Learn a job from its trainer (W176). Offered only by NPCs named in `job_trainers.json`.
     Learn {
         profile: i32,
@@ -216,8 +220,24 @@ pub enum NpcSelection {
     Fish,
     /// The caller offers this game (`Gameplay::begin_tower_defense`).
     TowerDefense(u32),
+    /// The caller decides whether the match may start (`Gameplay::begin_pirates`).
+    Pirates(u32),
     /// The caller decides whether the job is taught (`Profiles::learn`).
     Learn(Trainer),
+}
+
+impl NpcContent {
+    /// Props that answer a click: they are not people, so `npcs/` has no row for them.
+    fn add_props(&mut self, props: &TableMenus) {
+        for (&npc_id, prop) in props {
+            self.npcs.entry(npc_id).or_insert_with(|| NpcRecord {
+                npc_id,
+                name: prop.name.clone(),
+                position: Some(prop.position),
+                ..NpcRecord::default()
+            });
+        }
+    }
 }
 
 #[derive(Deserialize)]
@@ -348,6 +368,8 @@ struct NpcContent {
     /// The rows a gate lists: game id, name id.
     soccer_rows: Vec<(u32, u32)>,
     tower_defense_tables: TableMenus,
+    /// The dock's book stands; each row is an arena and its label.
+    pirates_stands: TableMenus,
     /// (R) NPCs whose menu offers a fishing trip, and the label's locale id (W160).
     fish_gates: BTreeSet<u64>,
     fish_string_id: u32,
@@ -474,6 +496,7 @@ impl NpcInteraction {
                 soccer_gates: BTreeSet::new(),
                 soccer_rows: Vec::new(),
                 tower_defense_tables: BTreeMap::new(),
+                pirates_stands: BTreeMap::new(),
                 fish_gates: BTreeSet::new(),
                 fish_string_id: 0,
                 job_trainers: BTreeMap::new(),
@@ -522,15 +545,15 @@ impl NpcInteraction {
     /// (R) Make each Tower Defense table clickable, its games listed in its menu.
     pub fn set_tower_defense_tables(&mut self, tables: &TableMenus) {
         let content = Arc::make_mut(&mut self.content);
-        for (&npc_id, table) in tables {
-            content.npcs.entry(npc_id).or_insert_with(|| NpcRecord {
-                npc_id,
-                name: table.name.clone(),
-                position: Some(table.position),
-                ..NpcRecord::default()
-            });
-        }
+        content.add_props(tables);
         content.tower_defense_tables.clone_from(tables);
+    }
+
+    /// (R) Make each of the dock's book stands clickable, its arenas listed in its menu.
+    pub fn set_pirates_stands(&mut self, stands: &TableMenus) {
+        let content = Arc::make_mut(&mut self.content);
+        content.add_props(stands);
+        content.pirates_stands.clone_from(stands);
     }
 
     /// (R) List a fishing trip in these NPCs' menus (W160). Returns the ids that are not NPC
@@ -679,6 +702,7 @@ impl NpcInteraction {
             NpcAction::Soccer { game } => Ok(NpcSelection::Soccer(game)),
             NpcAction::Fish => Ok(NpcSelection::Fish),
             NpcAction::TowerDefense { game } => Ok(NpcSelection::TowerDefense(game)),
+            NpcAction::Pirates { arena } => Ok(NpcSelection::Pirates(arena)),
             NpcAction::Learn { profile } => {
                 let trainer = self
                     .content
@@ -1082,6 +1106,11 @@ impl NpcInteraction {
             let rows = (table.games.iter())
                 .map(|&(game, name)| (NpcAction::TowerDefense { game }, name));
             options.extend(rows);
+        }
+        if let Some(stand) = self.content.pirates_stands.get(&npc.npc_id) {
+            // (R) "Click this bookstand to register yer ship" (427889): a stand is only a way in.
+            options.retain(|(action, _)| !matches!(action, NpcAction::Talk));
+            options.extend(stand.games.iter().map(|&(arena, name)| (NpcAction::Pirates { arena }, name)));
         }
         for trainer in self
             .content

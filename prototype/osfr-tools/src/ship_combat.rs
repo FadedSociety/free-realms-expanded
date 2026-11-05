@@ -109,6 +109,34 @@ pub struct Content {
     pub camera: BTreeMap<String, f64>,
     /// The treasure round's values (R).
     pub treasure: Treasure,
+    /// The dock's book stands (`sg_signinbook_01`), the world's way in.
+    #[serde(default)]
+    pub stands: Vec<Stand>,
+}
+
+/// One stand: its spawn, and the arena its menu sails (R: arena 1 until the others load natively).
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct Stand {
+    pub npc: u64,
+    pub name: String,
+    /// The menu row's label.
+    pub label_id: u32,
+    /// Where its spawn stands, for the click's range check.
+    pub position: [f32; 3],
+    pub arena: u32,
+}
+
+impl Content {
+    /// The stands as the NPC menu takes them.
+    pub fn stand_menus(&self) -> crate::npc_interaction::TableMenus {
+        let menu = |stand: &Stand| crate::npc_interaction::TableMenu {
+            name: stand.name.clone(),
+            position: stand.position,
+            games: vec![(stand.arena, stand.label_id)],
+        };
+        self.stands.iter().map(|stand| (stand.npc, menu(stand))).collect()
+    }
 }
 
 /// The treasure round (R values: the live per-zone files never shipped).

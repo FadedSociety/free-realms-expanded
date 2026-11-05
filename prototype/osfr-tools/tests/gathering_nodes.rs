@@ -1716,6 +1716,32 @@ fn a_pirates_ship_takes_a_chest_and_banks_it_at_its_dock() {
     );
 }
 
+/// A dock book stand lists the match and a choice zones into the arena, as the Games row does.
+#[test]
+fn a_dock_book_stand_sails_a_pirates_match() {
+    const STAND: u64 = 100_000_001_910;
+    let fixture = Fixture::new(PLOT);
+    let content_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let content = osfr_tools::ship_combat::Content::load(&content_dir)
+        .unwrap()
+        .expect("the shipped arenas");
+    let stand = content.stands.iter().find(|s| s.npc == STAND).unwrap();
+    let mut at = fixture.node.clone();
+    at.position[..3].copy_from_slice(&stand.position);
+    let mut gateway = fixture.gateway_at(fixture.state(false, true), &at, 1.0);
+    tick(&mut gateway, 1_500);
+    let mut click = vec![26, 0, 8, 0];
+    click.extend(STAND.to_le_bytes());
+    click.push(0);
+    let menu = send(&mut gateway, &click, 2_000);
+    assert!(inners(&menu).iter().any(|p| p.starts_with(&[26, 0, 9, 0])), "the stand's menu");
+    let mut choose = vec![26, 0, 10, 0];
+    choose.extend(STAND.to_le_bytes());
+    choose.extend(1_i32.to_le_bytes());
+    let entered = send(&mut gateway, &choose, 2_100);
+    assert!(said(&entered, "ss_pirate_arena"), "the arena zone");
+}
+
 /// L963: Play on the Pirate's Plunder row (1059) zones into the first arena; once it loads the start
 /// packets go out (the player's own ship among them) and Play again is the busy refusal. The match
 /// then runs on its timeouts and clock alone (a silent client) to Exiting and zones back.

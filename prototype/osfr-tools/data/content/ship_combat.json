@@ -335,6 +335,10 @@
     }
   ],
   "countdown_seconds": 5,
+  "stands": [
+    {"npc": 100000001910, "name": "Pirates Plunder", "label_id": 31028, "position": [-468.5345, -44.96833, -1295.797], "arena": 1},
+    {"npc": 100000001911, "name": "Pirates Plunder", "label_id": 31028, "position": [-477.7754, -44.96833, -1311.275], "arena": 1}
+  ],
   "report_timeout_seconds": 20,
   "results_timeout_seconds": 60,
   "win_coins": 10,
