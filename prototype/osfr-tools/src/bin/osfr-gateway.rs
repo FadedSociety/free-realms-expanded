@@ -41,6 +41,8 @@ mod admin_move;
 mod ambient;
 #[path = "osfr_gateway/delivery.rs"]
 mod delivery;
+#[path = "osfr_gateway/direct_packets.rs"]
+mod direct_packets;
 #[path = "osfr_gateway/encounter_invites.rs"]
 mod encounter_invites;
 #[path = "osfr_gateway/gm_menu_routing.rs"]
@@ -1287,43 +1289,9 @@ impl Session {
                     return Ok(false);
                 }
             };
-            if let Some(trace) = &self.trace {
-                let summary = trace::protocol_summary(&message);
-                trace.record(json!({
-                    "event":"packet","session":self.id.0,"peer":self.peer.to_string(),
-                    "direction":"in","transport":{"soe_opcode":5,"soe_name":"DirectApplication","mode":"direct"},
-                    "family":summary.family,"subtype":summary.subtype,
-                    "family_name":summary.family.zip(summary.subtype).and_then(|(f,s)| trace::family_subtype_name(f,s)),
-                    "body_len":summary.body.len(),"body_head_hex":trace::hex_prefix(summary.body, summary.sensitive),
-                    "outcome":"received"
-                }))?;
-            }
             self.last_activity = Instant::now();
             self.received += 1;
-            // L965: the ship report comes every client frame; once a character is selected, keep the
-            // newest for the tick (before that it is refused at once, as any message is).
-            let selected = self.selected_character || options.account_store.is_none();
-            if selected
-                && message
-                    .get(7..)
-                    .is_some_and(|inner| inner.starts_with(&SHIP_REPORT))
-            {
-                let stamp = |report: &[u8]| osfr_tools::le::u64(report, 20);
-                let held = self.ship_report.as_deref();
-                if held.is_none_or(|held| stamp(held) <= stamp(&message)) {
-                    self.ship_report = Some(message);
-                }
-                return Ok(false);
-            }
-            self.dispatch_message(
-                &message,
-                options,
-                now_ms,
-                world,
-                membership,
-                sessions,
-                Some((5, None, "direct", false)),
-            )?;
+            self.take_direct(message, options, now_ms, world, membership, sessions)?;
             return Ok(false);
         }
         let packets = match decode_controls(&self.codec, wire) {
@@ -1520,6 +1488,9 @@ impl Session {
                     {
                         return Ok(true);
                     }
+                }
+                opcode if opcode >> 8 == 5 => {
+                    self.multi_direct(&packet, options, now_ms, world, membership, sessions)?;
                 }
                 _ => {
                     if let Some(trace) = &self.trace {

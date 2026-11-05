@@ -1,5 +1,5 @@
 use miniz_oxide::deflate::compress_to_vec_zlib;
-use osfr_tools::soe::{Codec, seeded_crc32};
+use osfr_tools::soe::{Codec, admit_direct, seeded_crc32};
 
 const SEED: u32 = 0x12345678;
 fn pose() -> Vec<u8> {
@@ -130,4 +130,28 @@ fn direct_ship_physics_is_admitted_at_its_exact_length_only() {
     let mut fire = ship(117);
     fire[9] = 20; // FireAtLocation is not admitted direct.
     assert!(codec.decode_direct_datagram(&wire(&fire, true, 3)).is_err());
+}
+
+/// A Multi sub-packet's tunnel passes the same shape list as a lone direct packet.
+#[test]
+fn tunnels_out_of_multi_frames_keep_to_the_admitted_shapes() {
+    let tunnel = |inner: &[u8]| {
+        let mut out = vec![0, 1];
+        out.extend(u32::try_from(inner.len()).unwrap().to_le_bytes());
+        out.extend(inner);
+        out
+    };
+    let mut fire = vec![94, 0, 20, 0];
+    fire.resize(24, 0);
+    let message = admit_direct(tunnel(&fire)).unwrap();
+    assert_eq!(message[0], 5);
+    assert_eq!(message[7..], fire[..]);
+    let mut report = vec![94, 0, 16, 0];
+    report.resize(117, 0);
+    assert!(admit_direct(tunnel(&report)).is_ok());
+    let mut other = vec![94, 0, 21, 0];
+    other.resize(24, 0);
+    assert!(admit_direct(tunnel(&other)).is_err(), "a shape off the list");
+    assert!(admit_direct(tunnel(&fire[..23])).is_err(), "the wrong length");
+    assert!(admit_direct(vec![0; 300]).is_err(), "over the bound");
 }
