@@ -117,6 +117,7 @@ impl Gameplay {
             // Its camera's config, which the ship camera reads from its first frame.
             ship_combat::camera_config(&content.camera),
         ];
+        pending.push(ship_combat::mark_treasure(&arena.pickups));
         pending.extend(ship_combat::show_pickups(&arena.pickups, &content.treasure));
         // The standings show from the first frame, not the first bank.
         pending.push(ship_combat::refresh_ui());
