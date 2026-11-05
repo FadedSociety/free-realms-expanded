@@ -798,6 +798,22 @@ mod tests {
         assert!(ticks(&say(&mut td, instance, "FRServer_TowerBuilt\t23\t9999", 3_000)).is_empty());
     }
 
+    /// The basic rows stand on their tables with three goals: no limit and no Elite.
+    #[test]
+    fn the_basic_rows_are_games_of_their_own() {
+        let content = content();
+        for id in 450..=457 {
+            let game = content.games.iter().find(|g| g.game_id == id).unwrap();
+            assert_eq!(game.goals.len(), 3, "{id}");
+            assert_eq!(game.progress.len(), 3, "{id}");
+        }
+        let td = TowerDefense::new(&content).unwrap();
+        let basic = (content.tables.iter()).find(|t| t.name == "Garden Defense").unwrap();
+        assert_eq!(basic.games, [453, 455]);
+        assert_eq!(td.levels[&454].stages, 10);
+        assert_eq!(td.levels[&453].stages, 10);
+    }
+
     /// A win meets the Primary and an unbroken "don't build", ahead of the result.
     #[test]
     fn a_win_settles_the_goals_before_the_result() {
@@ -882,7 +898,11 @@ mod tests {
     fn shipped_content_resolves_every_game_into_its_rows() {
         let td = TowerDefense::new(&content()).unwrap();
         let ids: Vec<_> = td.game_ids().collect();
-        let expected: Vec<i32> = (150..=161).chain(250..=261).chain(350..=361).collect();
+        let expected: Vec<i32> = (150..=161)
+            .chain(250..=261)
+            .chain(350..=361)
+            .chain(450..=457)
+            .collect();
         assert_eq!(ids, expected);
         let level = &td.levels[&150];
         assert_eq!((level.lives, level.stages), (15, 50));

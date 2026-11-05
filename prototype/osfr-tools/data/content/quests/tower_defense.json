@@ -1529,7 +1529,7 @@
         {
           "kind": "finish_minigame",
           "id": 1,
-          "minigame_id": 356,
+          "minigame_id": 453,
           "count": 1,
           "text_string_id": 384837,
           "source": [
