@@ -40,6 +40,9 @@ pub const PLAYER_AWARDS: u16 = 24;
 pub const CREATE_PROXIED_PICKUP: u16 = 28;
 pub const DESTROY_PROXIED_PICKUP: u16 = 29;
 pub const MARK_TREASURE_PICKUPS: u16 = 30;
+pub const RESET_PROXIED_SHIP: u16 = 11;
+/// (R) How long a ship stays held at a whirlpool's exit (the loader's ExitFrozenTime).
+const WHIRLPOOL_HOLD_MS: u64 = 1_500;
 /// UpdateShipPhysics' body as the transport admits it (`soe::DIRECT_SHAPES`, 117 with the header).
 const SHIP_PHYSICS_BODY: usize = 113;
 /// (R) Most pickup points an arena carries.
@@ -250,6 +253,23 @@ pub struct Arena {
     pub rotation: [f32; 4],
     /// (R) Where chests lie (on the water between the docks).
     pub pickups: Vec<[f32; 3]>,
+    /// Whirlpools; each drops a ship on the far side of the map.
+    #[serde(default)]
+    pub whirlpools: Vec<Whirlpool>,
+}
+
+/// One whirlpool (ZoneConfig's +416 list, record `sub_A59140`; loader 01064f80's names). The client
+/// draws `WhirlpoolEffectId` at the vortex and `WhirlpoolExitEffectId` at the teleport point
+/// (00a602a0); the server moves the ship.
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct Whirlpool {
+    pub vortex: [f32; 3],
+    pub radius: f32,
+    pub teleport: [f32; 3],
+    /// TeleportAngle and TeleportSpeed, as the record carries them.
+    pub angle: f32,
+    pub speed: f32,
 }
 
 /// One base. Every ship, player or AI, starts at its own.
@@ -300,6 +320,12 @@ impl Content {
                 && i32::try_from(a.zone_id).is_ok_and(|id| id > 0)
                 && a.pickups.len() <= MAX_PICKUPS
                 && a.docks.iter().all(apart)
+                && (a.whirlpools.iter()).all(|w| {
+                    (w.vortex.iter().chain(&w.teleport)).all(|v| v.is_finite())
+                        && w.radius > 0.0
+                        && w.angle.is_finite()
+                        && w.speed.is_finite()
+                })
                 && a.pickups.iter().all(|p| {
                     p.iter().all(|v| v.is_finite())
                         && (a.docks.iter())
@@ -621,7 +647,18 @@ pub fn zone_config(
         let effects = treasure.dock_effects.get(slot).copied().unwrap_or_default();
         dock(&mut body, at, tint, effects, treasure);
     }
-    for _ in 0..3 {
+    body.extend(u32::try_from(arena.whirlpools.len()).unwrap_or(0).to_le_bytes());
+    for pool in &arena.whirlpools {
+        let [x, y, z] = pool.vortex;
+        for value in [x, y, z, 1.0, pool.radius] {
+            body.extend(value.to_le_bytes());
+        }
+        let [x, y, z] = pool.teleport;
+        for value in [x, y, z, 1.0, pool.angle, pool.speed] {
+            body.extend(value.to_le_bytes());
+        }
+    }
+    for _ in 0..2 {
         body.extend(0_u32.to_le_bytes());
     }
     packet(ZONE_CONFIG, &body)
@@ -682,6 +719,19 @@ pub fn create_pickup(id: u32, at: [f32; 3], treasure: &Treasure) -> Vec<u8> {
     body.extend(treasure.chest_warmup_effect.to_le_bytes());
     body.extend(treasure.chest_end_effect.to_le_bytes());
     packet(CREATE_PROXIED_PICKUP, &body)
+}
+
+/// ResetProxiedShip (11), reader `sub_CA5CB0`, handler 00ca68f0: ship `guid`, its 4x4 transform and a
+/// speed. The client holds the ship (flag 0x100) until the next UpdatePlayerState.
+pub fn reset_ship(guid: u64, [x, y, z]: [f32; 3], speed: f32) -> Vec<u8> {
+    let mut body = guid.to_le_bytes().to_vec();
+    let rows = [
+        1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, x, y, z, 1.0, speed,
+    ];
+    for value in rows {
+        body.extend(value.to_le_bytes());
+    }
+    packet(RESET_PROXIED_SHIP, &body)
 }
 
 /// MarkTreasurePickups (0x1e), handler 00a5fd20: the X spots as (x, z) pairs. The client lays
@@ -804,6 +854,8 @@ pub struct Plunder {
     gold: u32,
     /// When the hold last banked a chest.
     unloaded_ms: Option<u64>,
+    /// A whirlpool holds the ship until then; its reports count for nothing.
+    held_until: Option<u64>,
 }
 
 /// (R) Slack on the speed bound for a report's jitter (metres), once per anchor.
@@ -833,7 +885,19 @@ impl Plunder {
             hold: 0,
             gold: 0,
             unloaded_ms: None,
+            held_until: None,
         }
+    }
+
+    /// The whirlpool's hold ending: the state that lets the ship go, as Playing's did.
+    pub fn release(&mut self, guid: u64, now_ms: u64, ship: &Ship) -> Option<Vec<u8>> {
+        let until = self.held_until?;
+        if now_ms < until {
+            return None;
+        }
+        self.held_until = None;
+        self.anchor = self.anchor.map(|(at, _)| (at, now_ms));
+        Some(player_state(guid, ship.health, self.hold))
     }
 
     /// The round starts at `start_ms` (when Playing began) with the ship on its own pad (dock slot
@@ -863,10 +927,19 @@ impl Plunder {
         let (Some((from, since)), Some(home)) = (self.anchor, place.docks.first()) else {
             return Vec::new();
         };
+        if self.held_until.is_some() {
+            return Vec::new();
+        }
         // Elapsed time in seconds; `as` is exact well past any match length.
         let seconds = now_ms.saturating_sub(since) as f32 / 1000.0;
         if treasure.max_speed * seconds + REPORT_SLACK < distance(from, at) {
             return Vec::new();
+        }
+        let mut pools = place.whirlpools.iter();
+        if let Some(pool) = pools.find(|p| distance(p.vortex, at) <= p.radius) {
+            self.anchor = Some((pool.teleport, now_ms));
+            self.held_until = Some(now_ms.saturating_add(WHIRLPOOL_HOLD_MS));
+            return vec![reset_ship(guid, pool.teleport, pool.speed)];
         }
         let home = home.bank;
         let capacity = u32::try_from(ship.hold_capacity).unwrap_or(0);
@@ -1159,6 +1232,7 @@ mod tests {
         let empty = Arena {
             scene: "ss_pirate_arena".to_owned(),
             docks: Vec::new(),
+            whirlpools: Vec::new(),
             pickups: vec![[800.0, 50.0, 1200.0], [900.0, 50.0, 1240.0]],
             ..content().arenas[0].clone()
         };
@@ -1363,6 +1437,37 @@ mod tests {
         }
         body.extend([0; 32]); // a vec4 and four values
         packet(UPDATE_SHIP_PHYSICS, &body)
+    }
+
+    /// A ship in a vortex goes to the exit, held; its reports count for nothing until the hold
+    /// ends, and the speed bound then counts from the exit.
+    #[test]
+    fn a_whirlpool_moves_the_ship_and_lets_it_go() {
+        let content = content();
+        let (treasure, ship) = (&content.treasure, &content.ship);
+        let place = Arena {
+            whirlpools: vec![Whirlpool {
+                vortex: [100.0, 53.5, 0.0],
+                radius: 18.0,
+                teleport: [900.0, 52.0, 0.0],
+                angle: 0.0,
+                speed: 10.0,
+            }],
+            ..content.arenas[0].clone()
+        };
+        let mut round = Plunder::new(place.pickups.len());
+        round.anchor = Some(([95.0, 52.0, 0.0], 1_000));
+        let moved = round.sail(7, [100.0, 52.0, 0.0], 2_000, &place, treasure, ship);
+        assert_eq!(moved, [reset_ship(7, [900.0, 52.0, 0.0], 10.0)]);
+        assert_eq!(moved[0].len(), 4 + 8 + 64 + 4);
+        assert_eq!(moved[0][..4], [94, 0, 11, 0]);
+        let held = round.sail(7, [100.0, 52.0, 0.0], 2_100, &place, treasure, ship);
+        assert!(held.is_empty(), "held");
+        assert_eq!(round.release(7, 2_100, ship), None);
+        let free = round.release(7, 2_000 + WHIRLPOOL_HOLD_MS, ship);
+        assert_eq!(free, Some(player_state(7, ship.health, 0)));
+        assert_eq!(round.release(7, 9_000, ship), None, "once");
+        assert_eq!(round.anchor, Some(([900.0, 52.0, 0.0], 2_000 + WHIRLPOOL_HOLD_MS)));
     }
 
     #[test]

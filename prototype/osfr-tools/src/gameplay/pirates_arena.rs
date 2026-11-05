@@ -366,6 +366,8 @@ impl Gameplay {
         {
             let back = (arena.plunder).respawn(now_ms, &place.pickups, &content.treasure);
             out.replies.extend(back);
+            let guid = arena.return_to.guid;
+            out.replies.extend(arena.plunder.release(guid, now_ms, &content.ship));
         }
         if arena.game.finished(now_ms) {
             let back = arena.return_to.clone();
