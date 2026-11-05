@@ -1491,6 +1491,8 @@ impl ChessTable {
             ..Default::default()
         };
         self.event(&mut out, player_id, EVENT_MOVE_INVALID, &[])?;
+        // The movie has moved its piece and waits: only a new turn lets the player act again.
+        self.event(&mut out, player_id, EVENT_TURN_START, &[])?;
         Ok(out)
     }
 

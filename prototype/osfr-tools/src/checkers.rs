@@ -22,7 +22,9 @@
 //! `VS_AI`, so the client waits for the server's moves instead of choosing them; a side with no
 //! legal move at its turn loses.
 use crate::{
-    minigame::{Activity, ActivityFinish, MinigameRuns, RunMode, RunOutcome, RunSpec, RunState},
+    minigame::{
+        Activity, ActivityFinish, Goal, MinigameRuns, RunMode, RunOutcome, RunSpec, RunState,
+    },
     power_ups::Rng,
     rewards::{RewardDisplay, RewardGrant, RewardState},
 };
@@ -33,6 +35,7 @@ pub const TURN_END: u8 = 2;
 pub const MOVE: u8 = 10;
 pub const MOVE_JUMPED: u8 = 11;
 pub const MOVE_KING: u8 = 12;
+pub const MOVE_INVALID: u8 = 20;
 pub const INIT: u8 = 0;
 pub const BOARD: u8 = 30;
 /// The client's side.
@@ -289,6 +292,32 @@ pub const FIRST_INSTANCE_ID: i32 = 21_000_001;
 // ponytail: a constant; move it to content with any other checkers tuning.
 pub const WIN_COINS: u32 = 10;
 
+/// The Goals panel, from the client's text ids (wiki, `hBXYh5wDFIs_0.00`). Nothing ticks them yet.
+fn goals() -> Vec<Goal> {
+    let goal = |id, name_id, description_id, category, total| Goal {
+        id,
+        name_id,
+        description_id,
+        category,
+        bonus: category == 4,
+        stars: 0,
+        coins: 0,
+        total,
+        failure_condition: false,
+        members_only: false,
+    };
+    vec![
+        goal(1, 47799, 47800, 1, 0),
+        goal(2, 47795, 47796, 2, 5),
+        goal(3, 93570, 93571, 4, 4),
+        goal(4, 102282, 47796, 4, 2),
+        Goal {
+            failure_condition: true,
+            ..goal(5, 93594, 93595, 5, 0)
+        },
+    ]
+}
+
 /// What one packet did at the table, for gameplay to apply.
 #[derive(Default)]
 pub struct TableOutcome {
@@ -395,6 +424,7 @@ impl CheckersTable {
         spec.description_id = DESCRIPTION_ID;
         spec.icon_id = ICON_ID;
         spec.preload_file = PRELOAD_FILE.into();
+        spec.objectives = goals();
         let mut staged = self.clone();
         let offered = staged.runs.offer(spec)?;
         if !offered.accepted {
@@ -498,9 +528,11 @@ impl CheckersTable {
                     say(&mut out, &message(TURN_START, &[HUMAN]))?;
                 }
                 (Some(Request::Move { start, path }), Some(board)) if self.won.is_none() => {
-                    // (R) A move the rules refuse is dropped without a reply (the movie has no
-                    // MOVE_INVALID handler); an honest client never sends one.
+                    // (R) The movie has no MOVE_INVALID handler, so a refused move answers with a
+                    // new turn, which re-opens its moves. An honest client never sends one.
                     let Ok(events) = board.play(HUMAN, start, &path) else {
+                        say(&mut out, &message(MOVE_INVALID, &[HUMAN]))?;
+                        say(&mut out, &message(TURN_START, &[HUMAN]))?;
                         return Ok(out);
                     };
                     for event in events {
@@ -732,8 +764,11 @@ mod tests {
             &payload_packet(instance, "OnMoveMsg\t21\t13").unwrap(),
             2_000,
         );
-        assert!(!refused.unwrap().unwrap().changed);
+        let refused = refused.unwrap().unwrap();
+        assert!(!refused.changed);
         assert_eq!(table.board, before, "a refused move changes nothing");
+        let answer = ["OnCheckersEventMsg	20	0", "OnCheckersEventMsg	1	0"];
+        assert_eq!(texts(&refused), answer, "the turn comes back");
         let out = table.route(
             &payload_packet(instance, "OnMoveMsg\t21\t17").unwrap(),
             2_100,

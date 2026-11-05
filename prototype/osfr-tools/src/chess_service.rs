@@ -115,6 +115,9 @@ pub struct ChessContent {
     /// Provenance note for the content checker; never gameplay input.
     #[serde(default)]
     pub source: Option<String>,
+    /// What the Goals panel lists, on every row. Nothing ticks them yet.
+    #[serde(default)]
+    pub goals: Vec<crate::minigame::Goal>,
     /// "white" or "black". (R) One-player rows say "random order" in the
     /// locale; a fixed colour keeps the run deterministic and tunable.
     pub human_side: String,
@@ -399,7 +402,7 @@ impl ChessService {
         let mut staged = self.clone();
         let offered = staged
             .runs
-            .offer(run_spec(&row))
+            .offer(run_spec(&row, &self.content.goals))
             .map_err(|_| EntryDenied::Unavailable)?;
         if !offered.accepted {
             return Err(EntryDenied::Busy);
@@ -644,7 +647,7 @@ impl ChessRow {
     }
 }
 
-fn run_spec(row: &ChessRow) -> RunSpec {
+fn run_spec(row: &ChessRow, goals: &[crate::minigame::Goal]) -> RunSpec {
     let mut spec = RunSpec::empty(
         row.row_id as i32,
         chess::GAME_TYPE,
@@ -657,6 +660,7 @@ fn run_spec(row: &ChessRow) -> RunSpec {
     spec.description_id = chess::DESCRIPTION_ID;
     spec.difficulty = row.difficulty as i32;
     spec.preload_file = chess::PRELOAD_FILE.to_owned();
+    spec.objectives = goals.to_vec();
     spec
 }
 
