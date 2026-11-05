@@ -20,8 +20,13 @@ pub const CUMULATIVE_ACK: u16 = 21;
 const MAX_DATAGRAM: usize = 65_507;
 /// The direct (unreliable) application packets the client sends, by inner header and exact length:
 /// the kart pose (C33/6) and Pirate's Plunder's UpdateShipPhysics (94/16: guid, a flag, a stamp, the
-/// ship's transform and velocity; `ShipCombatFrameUpdate` 00ca7480 sends it unreliable every frame).
-const DIRECT_SHAPES: &[([u8; 4], usize)] = &[([33, 0, 6, 0], 89), ([94, 0, 16, 0], 117)];
+/// ship's transform and velocity; `ShipCombatFrameUpdate` 00ca7480 sends it unreliable every frame)
+/// and FireAtLocation (94/20: a vec4 and the side, 00ca7050).
+const DIRECT_SHAPES: &[([u8; 4], usize)] = &[
+    ([33, 0, 6, 0], 89),
+    ([94, 0, 16, 0], 117),
+    ([94, 0, 20, 0], 24),
+];
 /// (R) Inflate bound for a direct packet, above every admitted shape: an unadmitted shape up to
 /// this size is refused by name, a larger payload by size ("exceeds configured limit").
 const MAX_DIRECT: usize = 256;
@@ -32,6 +37,33 @@ const MAX_REORDER_BUFFERED: usize = 2 * 1024 * 1024;
 // (R) Bound an incomplete logical message to 30 seconds; a reliable fragment has
 // no independent continuation marker, so expiry makes this receiver unusable.
 const REASSEMBLY_TIMEOUT: Duration = Duration::from_secs(30);
+
+/// A direct packet's tunnel, whether it came alone or inside a Multi frame: the opcode's high byte,
+/// a flag, the inner length, then the inner packet, which must be one of `DIRECT_SHAPES`. The
+/// application message `05` + the tunnel.
+pub fn admit_direct(payload: Vec<u8>) -> Result<Vec<u8>, Error> {
+    if payload.len() > MAX_DIRECT {
+        return Err(Error::PayloadTooLarge);
+    }
+    let inner_len = payload.len().saturating_sub(6);
+    if payload.len() < 10
+        || payload[0] != 0
+        || !matches!(payload[1], 0 | 1)
+        || payload[2..6] != u32::try_from(inner_len).unwrap_or(u32::MAX).to_le_bytes()
+    {
+        return Err(Error::InvalidDirectEnvelope);
+    }
+    let inner = &payload[6..];
+    if !(DIRECT_SHAPES.iter()).any(|(head, len)| inner.starts_with(head) && inner.len() == *len)
+    {
+        let word = |i: usize| u16::from_le_bytes([inner[i], inner[i + 1]]);
+        return Err(Error::UnadmittedDirect(word(0), word(2), inner.len()));
+    }
+    let mut application = Vec::with_capacity(payload.len() + 1);
+    application.push(5);
+    application.extend(payload);
+    Ok(application)
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Error {
@@ -219,25 +251,7 @@ impl Codec {
         } else {
             bounded.copy_bounded(encoded)?
         };
-        // The tunnel: the opcode's high byte, a flag, the inner length, then the inner packet.
-        let inner_len = payload.len().saturating_sub(6);
-        if payload.len() < 10
-            || payload[0] != 0
-            || !matches!(payload[1], 0 | 1)
-            || payload[2..6] != u32::try_from(inner_len).unwrap_or(u32::MAX).to_le_bytes()
-        {
-            return Err(Error::InvalidDirectEnvelope);
-        }
-        let inner = &payload[6..];
-        if !(DIRECT_SHAPES.iter()).any(|(head, len)| inner.starts_with(head) && inner.len() == *len)
-        {
-            let word = |i: usize| u16::from_le_bytes([inner[i], inner[i + 1]]);
-            return Err(Error::UnadmittedDirect(word(0), word(2), inner.len()));
-        }
-        let mut application = Vec::with_capacity(payload.len() + 1);
-        application.push(5);
-        application.extend(payload);
-        Ok(application)
+        admit_direct(payload)
     }
 
     fn copy_bounded(&self, bytes: &[u8]) -> Result<Vec<u8>, Error> {
