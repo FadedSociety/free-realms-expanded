@@ -631,8 +631,10 @@ fn dock(body: &mut Vec<u8>, at: &Dock, tint: &str, treasure: &Treasure) {
 pub fn create_pickup(id: u32, at: [f32; 3], model: u32) -> Vec<u8> {
     let mut body = id.to_le_bytes().to_vec();
     let [x, y, z] = at;
-    for value in [x, y, z, 1.0, 0.0, 1.0] {
-        body.extend(value.to_le_bytes()); // the position, then (R) 0 and the scale
+    // The position, the model's scale (`sub_CAC8D0` hands it to the actor, whose floor of 0.01 made
+    // a 0 a speck) and a value the handler needs above 0 (00a5f860, R: a radius).
+    for value in [x, y, z, 1.0, 1.0, 1.0] {
+        body.extend(value.to_le_bytes());
     }
     body.extend(model.to_le_bytes());
     body.extend([0; 8]); // two values (R: an effect at +44)
@@ -760,11 +762,13 @@ impl Plunder {
     }
 
     /// The round starts at `start_ms` (when Playing began) with the ship on its own pad (dock slot
-    /// 0, where every ship starts): the speed bound counts from there. Once.
-    pub fn begin(&mut self, place: &Arena, start_ms: u64) {
-        if self.anchor.is_none() {
+    /// 0, where every ship starts): the speed bound counts from there. Once; true that time.
+    pub fn begin(&mut self, place: &Arena, start_ms: u64) -> bool {
+        let first = self.anchor.is_none();
+        if first {
             self.anchor = place.docks.first().map(|dock| (dock.bank, start_ms));
         }
+        first
     }
 
     /// The ship `guid` reports `at` in `place` (its own dock is the first): before `begin`, or
@@ -1266,6 +1270,11 @@ mod tests {
         assert_eq!(ship_position(&out), Some((7, [880.0, 52.0, 723.0])));
         assert_eq!(ship_position(&out[..116]), None);
         assert_eq!(ship_position(&report(7, [f32::NAN, 0.0, 0.0])), None);
+        assert_eq!(
+            create_pickup(1, [0.0; 3], 1662)[4 + 4 + 16..][..4],
+            1_f32.to_le_bytes(),
+            "the scale"
+        );
         assert_eq!(
             create_pickup(1, [0.0; 3], 1662).len(),
             4 + 4 + 16 + 8 + 4 + 8 + 4 + 12

@@ -147,9 +147,16 @@ impl Gameplay {
             && let Some(start) = arena.game.playing_since()
             && let Some(place) = content.arenas.get(arena.arena)
         {
-            // The round starts with the ship on its pad when Playing began.
-            arena.plunder.begin(place, start);
             let (treasure, ship) = (&content.treasure, &content.ship);
+            // The round starts with the ship on its pad when Playing began, and that lets the ship
+            // go: until its first UpdatePlayerState it has no health, so the keys do nothing
+            // (`ControllerShip` 00af8120), and it sits held by the flag the client set on building
+            // the physics (0x100, 00ca2470). A report proves the physics exists (00ca7480), so the
+            // flag cannot come back after this.
+            if arena.plunder.begin(place, start) {
+                out.replies
+                    .push(ship_combat::player_state(guid, ship.health, 0));
+            }
             let earned = (arena.plunder).sail(guid, at, now_ms, place, treasure, ship);
             out.replies.extend(earned);
         }

@@ -1717,7 +1717,15 @@ fn a_pirates_ship_takes_a_chest_and_banks_it_at_its_dock() {
         now += 500;
         assert!(now < 30_000, "Playing");
     }
-    assert!(inners(&send(&mut gateway, &ship_report(guid, dock), now + 100)).is_empty());
+    // The client takes keys only from a ship with health and without its held flag: its first
+    // report in Playing, and only that one, sets both.
+    let first = send(&mut gateway, &ship_report(guid, dock), now + 100);
+    let state = (inners(&first).into_iter())
+        .find(|p| p.starts_with(&[94, 0, 17, 0]))
+        .expect("the ship let go");
+    assert_eq!(state[12..16], 0_u32.to_le_bytes(), "the flags");
+    assert_eq!(state[16..20], content.ship.health.to_le_bytes(), "the health");
+    assert!(inners(&send(&mut gateway, &ship_report(guid, dock), now + 200)).is_empty());
     // The leg from the pad to the chest at the speed bound, with a second to spare.
     let leg = (chest[0] - dock[0]).hypot(chest[2] - dock[2]) / content.treasure.max_speed;
     let leg_ms = (leg.ceil() as u64 + 1) * 1000;
