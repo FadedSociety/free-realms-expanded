@@ -988,6 +988,8 @@ pub struct QuestEngine {
     live_events: BTreeMap<u32, bool>,
     /// T465: split content `excludes_quest_ids`, validated symmetric at load.
     exclusions: BTreeMap<u32, Vec<u32>>,
+    /// Quests that need any one of a list completed (`Quest::prerequisite_any_quest_ids`).
+    any_prerequisites: BTreeMap<u32, Vec<u32>>,
     location_quests: BTreeMap<u32, BTreeSet<u32>>,
     poi_locations: BTreeMap<u32, (u32, [f32; 3], f32)>,
     /// T499: moves whenever anything `quest_markers::marker_for` reads changes (a method's
@@ -1287,6 +1289,16 @@ impl QuestEngine {
             .map(|quest| (quest.id, false))
             .collect();
         engine.exclusions = exclusions;
+        engine.any_prerequisites = quests
+            .iter()
+            .filter(|quest| !quest.prerequisite_any_quest_ids.is_empty())
+            .map(|quest| (quest.id, quest.prerequisite_any_quest_ids.clone()))
+            .collect();
+        for (id, any) in &engine.any_prerequisites {
+            if any.iter().any(|other| other == id || !quest_ids.contains(other)) {
+                return Err(invalid("quest any-of prerequisite names itself or an unknown quest"));
+            }
+        }
         engine.index_location_quests();
         if let Some(id) = engine
             .state
@@ -1486,6 +1498,7 @@ impl QuestEngine {
             disabled,
             live_events: BTreeMap::new(),
             exclusions: BTreeMap::new(),
+            any_prerequisites: BTreeMap::new(),
             location_quests: BTreeMap::new(),
             poi_locations: BTreeMap::new(),
             revision: 0,
@@ -2616,6 +2629,13 @@ impl QuestEngine {
                 .get(id)
                 .is_none_or(|progress| progress.status != QuestStatus::Completed)
         }) {
+            return Some(QuestDenial::Prerequisite);
+        }
+        let completed = |id: &u32| {
+            (self.state.quests.get(id)).is_some_and(|p| p.status == QuestStatus::Completed)
+        };
+        if (self.any_prerequisites.get(&definition.id)).is_some_and(|ids| !ids.iter().any(completed))
+        {
             return Some(QuestDenial::Prerequisite);
         }
         if definition

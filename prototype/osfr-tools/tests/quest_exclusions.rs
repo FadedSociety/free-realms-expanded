@@ -230,6 +230,55 @@ fn star(records: &mut [Value], leaves: usize) {
     }
 }
 
+/// Any one listed quest opens the quest, whichever branch it was, and a bad list is refused.
+#[test]
+fn any_one_branch_opens_a_quest_that_lists_them() {
+    const FOLLOW_UP: u32 = 3_000_059;
+    let fixture = Fixture::new();
+    let scratch = fixture.path().join("any-of");
+    copy_tree(&content_dir().join("quests"), &scratch.join("quests"));
+    copy_tree(&content_dir().join("npcs"), &scratch.join("npcs"));
+    fs::copy(content_dir().join("jobs.json"), scratch.join("jobs.json")).unwrap();
+    let any_of = |ids: &'static [u32]| {
+        move |records: &mut Vec<Value>| {
+            let record = (records.iter_mut())
+                .find(|record| record["id"].as_u64() == Some(u64::from(FOLLOW_UP)))
+                .unwrap();
+            record["prerequisite_quest_ids"] = Value::Array(Vec::new());
+            record["prerequisite_any_quest_ids"] = ids.into();
+        }
+    };
+    let engine = load_with(&scratch, any_of(&[HIGHROAD, COBBLESTONE, STILLWATER])).unwrap();
+    let eligibility = CharacterEligibility {
+        player_level: 20,
+        nonmember_quest_limit: 99,
+        member_quest_limit: 99,
+        ..CharacterEligibility::default()
+    };
+    let fresh = QuestEngine::from_split_content(&scratch, 1, eligibility.clone(), None).unwrap();
+    assert!(!fresh.can_offer(FOLLOW_UP, RICKY_DANGER), "no branch is done");
+    let file = fs::read(content_dir().join("quests/adventurer.json")).unwrap();
+    let document: Value = serde_json::from_slice(&file).unwrap();
+    let records = document["records"].as_array().unwrap();
+    for branch in [HIGHROAD, COBBLESTONE, STILLWATER] {
+        let mut state = engine.state().clone();
+        let goals = records
+            .iter()
+            .find(|record| record["id"].as_u64() == Some(u64::from(branch)))
+            .map_or(0, |record| record["objectives"].as_array().unwrap().len());
+        let done = QuestProgress {
+            status: QuestStatus::Completed,
+            counts: vec![1; goals],
+        };
+        state.quests.insert(branch, done);
+        let loaded = QuestEngine::from_split_content(&scratch, 1, eligibility.clone(), Some(state));
+        assert!(loaded.unwrap().can_offer(FOLLOW_UP, RICKY_DANGER), "{branch}");
+    }
+    for bad in [&[FOLLOW_UP][..], &[999_999_999][..]] {
+        assert!(load_with(&scratch, any_of(bad)).is_err(), "{bad:?}");
+    }
+}
+
 #[test]
 fn bad_exclusion_data_is_refused_at_load() {
     let fixture = Fixture::new();

@@ -520,6 +520,10 @@ pub struct Quest {
     /// loader requires at most 16 distinct other quests, each listing this one back.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub excludes_quest_ids: Vec<u32>,
+    /// One of these must be completed first: exclusive branches that lead to one quest, such as
+    /// the three "Introduce Yourself" quests. `prerequisite_quest_ids` needs all of its list.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub prerequisite_any_quest_ids: Vec<u32>,
     pub objectives: Vec<ContentGoal>,
     pub rewards: Vec<RewardGrant>,
     pub source: Vec<SourceTag>,
@@ -992,6 +996,14 @@ impl ContentDb {
                 reference(
                     &owner,
                     "prerequisite_quest_ids",
+                    quest_id,
+                    quests.contains(&quest_id.to_string()),
+                )?;
+            }
+            for quest_id in &row.prerequisite_any_quest_ids {
+                reference(
+                    &owner,
+                    "prerequisite_any_quest_ids",
                     quest_id,
                     quests.contains(&quest_id.to_string()),
                 )?;

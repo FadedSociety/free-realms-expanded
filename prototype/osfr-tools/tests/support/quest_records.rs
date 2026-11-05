@@ -137,10 +137,13 @@ pub fn read_quests(root: &Path) -> Vec<RawQuest> {
             let giver_npc_id = record["giver_npc_id"]
                 .as_u64()
                 .unwrap_or_else(|| panic!("{}: quest {id} has no giver", path.display()));
+            // Any one of `prerequisite_any_quest_ids` opens the quest; the first stands for them.
+            let any_of = record["prerequisite_any_quest_ids"].as_array();
             let prerequisite_quest_ids = record["prerequisite_quest_ids"]
                 .as_array()
                 .into_iter()
                 .flatten()
+                .chain(any_of.and_then(|ids| ids.first()))
                 .map(|value| {
                     as_u32(value).unwrap_or_else(|| {
                         panic!("{}: quest {id} prerequisite id is invalid", path.display())

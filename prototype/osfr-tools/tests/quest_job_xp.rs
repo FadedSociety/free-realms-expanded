@@ -1091,7 +1091,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             "kart_driver.json",
             BURDEN_OF_FAME,
             RAINA,
-            &[INTRODUCE_YOURSELF],
+            &[],
             5,
             Some(KART_DRIVER),
             KART_DRIVER,
