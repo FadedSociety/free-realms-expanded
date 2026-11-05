@@ -713,10 +713,29 @@ const SHOTS: usize = 0;
 const STEALS: usize = 1;
 const DODGES: usize = 2;
 const KNOCKDOWNS: usize = 3;
+/// What a lost match pays: `percent` of the win's coins and job XP, or `None` for nothing at all.
+fn played_grant(win: &RewardGrant, percent: u32) -> Option<RewardGrant> {
+    let share = |value: u32| u32::try_from(u64::from(value) * u64::from(percent) / 100).unwrap_or(value);
+    let mut grant = win.clone();
+    grant.coins = share(win.coins);
+    grant.job_xp = (win.job_xp.iter())
+        .map(|(&profile, &xp)| (profile, share(xp)))
+        .filter(|(_, xp)| *xp > 0)
+        .collect();
+    (grant.coins > 0 || !grant.job_xp.is_empty()).then_some(grant)
+}
+
 /// L947: a player's results row (76/15 words, R past the live goal in word 3 and knockdown in 1).
 const PLAYER_STEALS: usize = 0;
 const PLAYER_KNOCKDOWNS: usize = 1;
+const PLAYER_DODGES: usize = 2;
 const PLAYER_GOALS: usize = 3;
+const PLAYER_SCORE: usize = 4;
+/// (R) What each counts toward the row's score: the client's tooltip names goals, knockdowns,
+/// steals and dodges (416504). Fitted to the boards in `xnSYw_7vi5E_418.00`, not an exact fit.
+const GOAL_POINTS: u32 = 140_250;
+const STEAL_POINTS: u32 = 25_000;
+const DODGE_POINTS: u32 = 30_025;
 
 /// L947: what the scoreboard and the results board count.
 #[derive(Clone, Debug, Default)]
@@ -769,6 +788,8 @@ pub struct SoccerService {
     tally: Tally,
     /// L942: the power-ups on the pitch, when the content has them.
     pickups: Option<crate::soccer_pickups::Pickups>,
+    /// The share of a win's reward a lost match pays (`soccer.json` `reward.loss_percent`).
+    loss_percent: u32,
     /// L948: the ball feed: when it last went out, in play, the kick effect, and each kicker's
     /// state hold.
     ball_sent_at: f32,
@@ -808,6 +829,7 @@ impl SoccerService {
             celebrating: false,
             tally: Tally::default(),
             pickups: None,
+            loss_percent: 0,
             ball_sent_at: 0.0,
             ball_live: false,
             ball_effect: [0.0; 2],
@@ -890,10 +912,21 @@ impl SoccerService {
     }
 
     /// L955: the player's own juke (client 76/14 states 4-6, the Ctrl dodge): no tackle lands on
-    /// them for `soccer_bots::DODGE_TIME`.
-    pub fn player_juke(&mut self, player: u64) {
+    /// them for `soccer_bots::DODGE_TIME`. A juke that counts is a dodge on the results board.
+    pub fn player_juke(&mut self, player: u64) -> Vec<ServiceEvent> {
+        if self.cancelled || self.authority.phase() != MatchPhase::Running {
+            return Vec::new();
+        }
         let now = self.authority.server_time();
-        crate::soccer_bots::juke(&mut self.bot_memory, player, now);
+        if crate::soccer_bots::juke(&mut self.bot_memory, player, now) {
+            self.count(player, &[DODGES], &[PLAYER_DODGES])
+        } else {
+            Vec::new()
+        }
+    }
+
+    pub fn set_loss_percent(&mut self, percent: u32) {
+        self.loss_percent = percent;
     }
 
     /// L942: run power-ups on the pitch (see `soccer_pickups`).
@@ -1436,11 +1469,14 @@ impl SoccerService {
             authority: &self.authority,
             team: run.team,
         };
-        let settlement = self
-            .authority
-            .outcome()
-            .and_then(|outcome| (outcome.winner == Some(run.team)).then_some((live, &run.grant)));
-        run.runs.finish(run.instance_id, &activity, settlement)
+        let won = (self.authority.outcome()).is_some_and(|outcome| outcome.winner == Some(run.team));
+        if won {
+            return run.runs.finish(run.instance_id, &activity, Some((live, &run.grant)));
+        }
+        match played_grant(&run.grant, self.loss_percent) {
+            Some(grant) => (run.runs).finish_loss_with_grant(run.instance_id, &activity, (live, &grant)),
+            None => run.runs.finish(run.instance_id, &activity, None),
+        }
     }
 
     /// Session departure. The roster entry is removed; if the leaver held the
@@ -1924,6 +1960,9 @@ impl SoccerService {
         for &stat in player_stats {
             row[stat] += 1;
         }
+        row[PLAYER_SCORE] = row[PLAYER_GOALS] * GOAL_POINTS
+            + row[PLAYER_STEALS] * STEAL_POINTS
+            + row[PLAYER_DODGES] * DODGE_POINTS;
         vec![ServiceEvent::Setup(SoccerPacket::UpdatePlayerStats {
             player,
             words: *row,

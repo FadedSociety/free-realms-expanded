@@ -22,7 +22,7 @@
     "LTHUMB": "NUMLOCK",
     "RTHUMB": "5"
   },
-  "zones": {"sg_soccer": "Soccer", "sg_dm_": "Vehicle", "sg_kt_": "Vehicle", "sg_fishing": "Fishing"},
+  "zones": {"sg_soccer": "Soccer", "sh_soccer": "Soccer", "bw_soccer": "Soccer", "sg_dm_": "Vehicle", "sg_kt_": "Vehicle", "sg_fishing": "Fishing"},
   "contexts": {
     "Soccer": {
       "camera": false,

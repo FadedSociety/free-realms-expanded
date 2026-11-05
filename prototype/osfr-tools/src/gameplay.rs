@@ -252,7 +252,8 @@ pub struct Gameplay {
     /// Soccer content and one live session-only match. Neither is persisted;
     /// a reconnect drops the match without a grant.
     soccer_content: Option<Arc<crate::soccer_entry::Content>>,
-    soccer: Option<crate::soccer_entry::Session>,
+    /// Boxed, as the Tower Defense run is: `Gameplay` is cloned on the stack per packet.
+    soccer: Option<Box<crate::soccer_entry::Session>>,
     /// T022 (R): single-player chess rows and this session's table. The table
     /// is session-only, but its daily reward ledger is restored from
     /// `GameplayState::chess`, so a reconnect cannot reset the cap.
@@ -1140,8 +1141,7 @@ impl Gameplay {
             }
         }
         if let (Some(soccer), Some(interaction)) = (&soccer_content, &mut npc_interaction) {
-            let (npcs, label) = (soccer.gate_npcs(), soccer.gate_menu_string_id());
-            for npc in interaction.set_soccer_gates(npcs, label) {
+            for npc in interaction.set_soccer_gates(soccer.gate_npcs(), soccer.gate_rows()) {
                 npc_event(
                     serde_json::json!({"event": "soccer_gate_unknown_npc", "content_key": npc}),
                 );
@@ -1708,15 +1708,11 @@ impl Gameplay {
     }
 
     pub fn soccer_score(&self) -> Option<[u32; 2]> {
-        self.soccer
-            .as_ref()
-            .map(crate::soccer_entry::Session::score)
+        self.soccer.as_deref().map(crate::soccer_entry::Session::score)
     }
 
     pub fn soccer_phase(&self) -> Option<crate::soccer_match::MatchPhase> {
-        self.soccer
-            .as_ref()
-            .map(crate::soccer_entry::Session::phase)
+        self.soccer.as_deref().map(crate::soccer_entry::Session::phase)
     }
 
     /// True while a demolition derby match or its results screen belongs to this session.

@@ -677,7 +677,7 @@ impl MinigameRuns {
         activity: &A,
         settlement: Option<(&RewardState, &RewardGrant)>,
     ) -> io::Result<RunOutcome> {
-        self.finish_inner(instance_id, activity, settlement, false)
+        self.finish_inner(instance_id, activity, settlement, Payout::Strict)
     }
 
     /// Settle a won run that pays nothing. The named entry point keeps
@@ -688,7 +688,18 @@ impl MinigameRuns {
         instance_id: i32,
         activity: &A,
     ) -> io::Result<RunOutcome> {
-        self.finish_inner(instance_id, activity, None, true)
+        self.finish_inner(instance_id, activity, None, Payout::UnpaidWin)
+    }
+
+    /// Settle a lost run that still pays: soccer's "played" share, where a loss can level the job
+    /// up. The named entry point keeps [`Self::finish`] refusing a grant on a loss.
+    pub fn finish_loss_with_grant<A: Activity>(
+        &mut self,
+        instance_id: i32,
+        activity: &A,
+        settlement: (&RewardState, &RewardGrant),
+    ) -> io::Result<RunOutcome> {
+        self.finish_inner(instance_id, activity, Some(settlement), Payout::PaidLoss)
     }
 
     fn finish_inner<A: Activity>(
@@ -696,7 +707,7 @@ impl MinigameRuns {
         instance_id: i32,
         activity: &A,
         settlement: Option<(&RewardState, &RewardGrant)>,
-        unpaid_win: bool,
+        payout: Payout,
     ) -> io::Result<RunOutcome> {
         let Some(run) = self.current.as_ref() else {
             return Ok(RunOutcome::default());
@@ -707,10 +718,10 @@ impl MinigameRuns {
         let Some(result) = activity.finish() else {
             return Ok(RunOutcome::default());
         };
-        if !result.won && settlement.is_some() {
+        if !result.won && settlement.is_some() && payout != Payout::PaidLoss {
             return Err(invalid("a loss cannot carry a minigame grant"));
         }
-        if result.won && settlement.is_none() && !unpaid_win {
+        if result.won && settlement.is_none() && payout != Payout::UnpaidWin {
             return Err(invalid("a won minigame must carry its grant"));
         }
         let score = activity.score();
@@ -925,6 +936,14 @@ pub fn goal_failed_packets(goal: u32) -> [Vec<u8>; 2] {
         bytes.extend(goal.to_le_bytes());
         bytes
     })
+}
+
+/// Which unusual settlement a caller chose by name (see [`MinigameRuns::finish`]).
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Payout {
+    Strict,
+    UnpaidWin,
+    PaidLoss,
 }
 
 /// Server acknowledgement 39/17; client reader `009b9550`.

@@ -89,8 +89,10 @@ pub enum NpcAction {
     Race,
     /// (R) Start the solo demolition derby. Offered only by NPCs named in `derby_gates.json`.
     Derby,
-    /// (R) L932: start a soccer match. Offered only by NPCs named in `soccer.json` `gates`.
-    Soccer,
+    /// (R) L932: start this soccer row. Offered only by NPCs named in `soccer.json` `gates`.
+    Soccer {
+        game: u32,
+    },
     /// (R) Go fishing (W160). Offered only by NPCs named in `fishing_spots.json`.
     Fish,
     /// (R) Play this Tower Defense game. Offered only by its tables, `tower_defense.json` `tables`.
@@ -208,8 +210,8 @@ pub enum NpcSelection {
     Race,
     /// The caller decides whether the derby may start (`DerbyGateway::admit`).
     Derby,
-    /// The caller decides whether the match may start (`Gameplay::begin_soccer_gate`).
-    Soccer,
+    /// The caller decides whether this row may start (`Gameplay::begin_soccer_gate`).
+    Soccer(u32),
     /// The caller decides whether the trip may start (`FishingService::enter`).
     Fish,
     /// The caller offers this game (`Gameplay::begin_tower_defense`).
@@ -343,7 +345,8 @@ struct NpcContent {
     derby_string_id: u32,
     /// (R) L932: NPCs whose menu offers a soccer match, and the label's locale id.
     soccer_gates: BTreeSet<u64>,
-    soccer_string_id: u32,
+    /// The rows a gate lists: game id, name id.
+    soccer_rows: Vec<(u32, u32)>,
     tower_defense_tables: TableMenus,
     /// (R) NPCs whose menu offers a fishing trip, and the label's locale id (W160).
     fish_gates: BTreeSet<u64>,
@@ -469,7 +472,7 @@ impl NpcInteraction {
                 derby_gates: BTreeSet::new(),
                 derby_string_id: 0,
                 soccer_gates: BTreeSet::new(),
-                soccer_string_id: 0,
+                soccer_rows: Vec::new(),
                 tower_defense_tables: BTreeMap::new(),
                 fish_gates: BTreeSet::new(),
                 fish_string_id: 0,
@@ -504,15 +507,15 @@ impl NpcInteraction {
         unknown
     }
 
-    /// (R) L932: List a soccer match in these NPCs' menus. Returns unknown content keys like
+    /// (R) L932: List these soccer rows in these NPCs' menus. Returns unknown content keys like
     /// [`Self::set_race_gates`].
-    pub fn set_soccer_gates(&mut self, npcs: &[u64], string_id: u32) -> Vec<u64> {
+    pub fn set_soccer_gates(&mut self, npcs: &[u64], rows: Vec<(u32, u32)>) -> Vec<u64> {
         let (known, unknown): (Vec<u64>, Vec<u64>) = npcs
             .iter()
             .partition(|npc| self.content.npcs.contains_key(*npc));
         let content = Arc::make_mut(&mut self.content);
         content.soccer_gates = known.into_iter().collect();
-        content.soccer_string_id = string_id;
+        content.soccer_rows = rows;
         unknown
     }
 
@@ -673,7 +676,7 @@ impl NpcInteraction {
             }
             NpcAction::Race => Ok(NpcSelection::Race),
             NpcAction::Derby => Ok(NpcSelection::Derby),
-            NpcAction::Soccer => Ok(NpcSelection::Soccer),
+            NpcAction::Soccer { game } => Ok(NpcSelection::Soccer(game)),
             NpcAction::Fish => Ok(NpcSelection::Fish),
             NpcAction::TowerDefense { game } => Ok(NpcSelection::TowerDefense(game)),
             NpcAction::Learn { profile } => {
@@ -1065,7 +1068,10 @@ impl NpcInteraction {
             options.push((NpcAction::Derby, self.content.derby_string_id));
         }
         if self.content.soccer_gates.contains(&npc.npc_id) {
-            options.push((NpcAction::Soccer, self.content.soccer_string_id));
+            // (R) A gate's radial is its rows alone (`jCjxTaJfPt0_34.00`, 2010).
+            options.retain(|(action, _)| !matches!(action, NpcAction::Talk));
+            let rows = self.content.soccer_rows.iter();
+            options.extend(rows.map(|&(game, name)| (NpcAction::Soccer { game }, name)));
         }
         if self.content.fish_gates.contains(&npc.npc_id) {
             options.push((NpcAction::Fish, self.content.fish_string_id));

@@ -42,7 +42,7 @@ impl Gameplay {
                 out.replies.extend(switch.replies);
                 out.nearby.extend(switch.nearby);
                 out.scene_zoning = Some(session.scene().clone());
-                self.soccer = Some(session);
+                self.soccer = Some(Box::new(session));
                 out.changed = true;
             }
             Err(_) => out
@@ -52,22 +52,20 @@ impl Gameplay {
         Ok(())
     }
 
-    /// L932: a soccer gate (`soccer.json` `gates`) starts the gate's Games window row, or the
+    /// L932: a soccer gate (`soccer.json` `gates`) starts the row chosen from its menu, or the
     /// row an open quest objective names, the way the portal's Play does.
-    pub(super) fn begin_soccer_gate(&mut self, character: &CharacterState) -> io::Result<Outcome> {
+    pub(super) fn begin_soccer_gate(
+        &mut self,
+        game: u32,
+        character: &CharacterState,
+    ) -> io::Result<Outcome> {
         let mut out = Outcome::default();
         if self.warp_blocker().is_some() {
             let busy = crate::activity_portal::Refusal::Busy.message();
             out.replies.push(chat::system(&busy));
             return Ok(out);
         }
-        let game = self.soccer_content.as_ref().and_then(|c| c.gate_game());
-        match game {
-            Some(game) => self.begin_soccer(game, character, &mut out)?,
-            None => out
-                .replies
-                .push(chat::system("Soccer is not available right now.")),
-        }
+        self.begin_soccer(game, character, &mut out)?;
         Ok(out)
     }
 }

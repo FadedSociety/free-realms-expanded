@@ -204,14 +204,15 @@ pub fn won_by_tackle(memory: &mut BTreeMap<u64, BotMemory>, tackler: u64, victim
     knock_down(memory, tackler, victim, now);
 }
 
-/// L955: the client's juke (states 4 Juke, 5 JukeWithBall, 6 Juke360WithBall).
-pub fn juke(memory: &mut BTreeMap<u64, BotMemory>, player: u64, now: f32) {
+/// L955: the client's juke (states 4 Juke, 5 JukeWithBall, 6 Juke360WithBall). Whether it counted.
+pub fn juke(memory: &mut BTreeMap<u64, BotMemory>, player: u64, now: f32) -> bool {
     let mind = memory.entry(player).or_default();
     if now < mind.juke_ready_at {
-        return;
+        return false;
     }
     mind.juke_ready_at = now + JUKE_COOLDOWN;
     mind.dodge_until = now + DODGE_TIME;
+    true
 }
 
 /// L944: a player's Soccer Star stats as sent in 76/19 words 0..5 (the client's stat-name table order,

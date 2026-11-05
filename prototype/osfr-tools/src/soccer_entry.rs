@@ -72,6 +72,12 @@ pub struct Game {
     /// ask for them credit on the win alone.
     #[serde(default)]
     pub max_conceded: Option<u32>,
+    /// Which of `arenas` the row plays on; with none, the captured pitch.
+    #[serde(default)]
+    pub arena: Option<String>,
+    /// Which of `teams` the row plays against; with none, the captured Snowspurs.
+    #[serde(default)]
+    pub opponent: Option<String>,
     /// L952: a client Lua `Table.Method` the match runs at its first kickoff (BaseUi 47/7), such
     /// as the Soccer Tutorial row's `SoccerTutorial.StartSoccerTut`, which opens the client's own
     /// tutorial pages over the match.
@@ -87,6 +93,24 @@ impl Game {
     pub fn counts(&self, conceded: u32) -> bool {
         self.max_conceded.is_none_or(|max| conceded <= max)
     }
+}
+
+/// One pitch. All three share a mesh and a rotation, so each is the captured pitch moved on the
+/// map: `delta` is x and z from `sg_soccer`, measured between the goal props.
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+struct Arena {
+    zone: String,
+    sky: String,
+    delta: [f32; 2],
+}
+
+/// An opposing team: its name on the board and its four players, by slot.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct Team {
+    name_id: u32,
+    bots: Vec<BotBody>,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq)]
@@ -154,6 +178,9 @@ struct RewardSettings {
     /// R job XP; empty unless an authored reward references an unlocked profile.
     #[serde(default)]
     job_xp: BTreeMap<i32, u32>,
+    /// (R) The share of this a finished, lost match pays. A forfeit pays nothing.
+    #[serde(default)]
+    loss_percent: u32,
 }
 
 /// L932: the world gates that start a match: the client's "Left/Right Side Soccer Gate" NPCs
@@ -163,10 +190,8 @@ struct RewardSettings {
 struct GateSettings {
     /// NPC content keys (`npcs/*.json` rows, drawn by `npc_spawns_extra.json`).
     npcs: Vec<u64>,
-    /// Locale id of the menu option.
-    menu_string_id: u32,
-    /// The Games window row a gate enters; an open quest objective's row still wins.
-    game_id: u32,
+    /// The Games window rows the gate's menu lists; an open quest objective's row still wins.
+    games: Vec<u32>,
 }
 
 /// L940: the roster with each bot's body: its AddNpc right before its 76/3, then its 35/9 and
@@ -240,10 +265,27 @@ fn bot_actor(guid: u64, name: i32, model: i32, position: [f32; 3]) -> io::Result
     crate::world::unframe_tunnel(&crate::startup_world::build_add_npc(&actor))
 }
 
+/// 76/7's world floats: the box the client normalises against (`00b7b4c0`, `00b75660`) and the
+/// ball's spot.
+const CONFIG_X: [usize; 3] = [0, 8, 157];
+const CONFIG_Z: [usize; 3] = [4, 12, 165];
+
+fn move_config(config: &mut [u8], [dx, dz]: [f32; 2]) -> io::Result<()> {
+    for (offsets, delta) in [(CONFIG_X, dx), (CONFIG_Z, dz)] {
+        for at in offsets {
+            let bad = || invalid("soccer setup match config");
+            let word = config.get_mut(at..at + 4).ok_or_else(bad)?;
+            let value = <[u8; 4]>::try_from(&*word).map_err(|_| bad())?;
+            word.copy_from_slice(&(f32::from_le_bytes(value) + delta).to_le_bytes());
+        }
+    }
+    Ok(())
+}
+
 /// L946: how long a goal's celebration holds the next kickoff (live: step 17 to 18, 3.1 s) and
 /// the half-time board holds the second half (R).
 const GOAL_CELEBRATION_MS: u64 = 3_100;
-const HALF_TIME_MS: u64 = 5_000;
+const HALF_TIME_MS: u64 = 10_000;
 
 /// L940: the player status word while a soccer match runs: bit 12 (soccer) plus the normal bit 0.
 const SOCCER_STATUS: u32 = 0x1001;
@@ -258,6 +300,18 @@ pub struct Content {
     #[serde(default)]
     gates: Option<GateSettings>,
     match_config: MatchSettings,
+    /// The pitches by name (see [`Game::arena`]).
+    #[serde(default)]
+    arenas: BTreeMap<String, Arena>,
+    /// The pitch [`Self::for_game`] moved this copy to.
+    #[serde(skip)]
+    moved_to: Option<Arena>,
+    /// The opposing teams by name (see [`Game::opponent`]).
+    #[serde(default)]
+    teams: BTreeMap<String, Team>,
+    /// The name [`Self::for_game`] gave this copy's other team.
+    #[serde(skip)]
+    opponent_name: Option<u32>,
     reward: RewardSettings,
     /// L940: the live server's match setup records (see `soccer_service::Setup`).
     #[serde(default)]
@@ -325,9 +379,19 @@ impl Content {
                 return Err(invalid("soccer setup bot seat"));
             }
         }
+        let mut match_config = decode(&setup.match_config_hex)?;
+        if let Some(arena) = &self.moved_to {
+            move_config(&mut match_config, arena.delta)?;
+        }
+        let mut teams = decode(&setup.teams_hex)?;
+        if let Some(name) = self.opponent_name {
+            // 76/8 ends with the two teams' name ids and one zero byte.
+            let at = teams.len().checked_sub(5).ok_or_else(|| invalid("soccer setup teams"))?;
+            teams[at..at + 4].copy_from_slice(&name.to_le_bytes());
+        }
         Ok(Some(crate::soccer_service::Setup {
-            match_config: decode(&setup.match_config_hex)?,
-            teams: decode(&setup.teams_hex)?,
+            match_config,
+            teams,
             roles,
         }))
     }
@@ -368,13 +432,12 @@ impl Content {
         self.gates.as_ref().map_or(&[], |gates| &gates.npcs)
     }
 
-    pub fn gate_menu_string_id(&self) -> u32 {
-        self.gates.as_ref().map_or(0, |gates| gates.menu_string_id)
-    }
-
-    /// The Games window row a gate enters.
-    pub fn gate_game(&self) -> Option<u32> {
-        self.gates.as_ref().map(|gates| gates.game_id)
+    /// The rows a gate's menu lists: game id, name id.
+    pub fn gate_rows(&self) -> Vec<(u32, u32)> {
+        (self.gates.iter().flat_map(|gates| &gates.games))
+            .filter_map(|id| self.game(*id))
+            .map(|game| (game.id, game.name_id))
+            .collect()
     }
 
     /// Portal rows for this file; admission keeps its own per-player checks. A quest-only row has
@@ -407,10 +470,76 @@ impl Content {
     }
 
     pub fn entry_scene(&self) -> io::Result<ZoneTransition> {
-        entry_scene(
+        let mut scene = entry_scene(
             self.match_config.entry_position,
             self.match_config.entry_rotation,
-        )
+        )?;
+        if let Some(arena) = &self.moved_to {
+            scene.scene.clone_from(&arena.zone);
+            scene.sky.clone_from(&arena.sky);
+        }
+        Ok(scene)
+    }
+
+    /// This content as `game` plays: on its pitch, against its team.
+    fn for_game(&self, game: &Game) -> io::Result<Self> {
+        let mut content = self.in_arena(game)?;
+        let Some(name) = &game.opponent else {
+            return Ok(content);
+        };
+        let team = (self.teams.get(name)).ok_or_else(|| invalid("soccer row's opponent is unknown"))?;
+        if let Some(setup) = &mut content.setup {
+            setup.bots.retain(|bot| bot.team != 1);
+            setup.bots.extend(team.bots.iter().cloned());
+        }
+        content.opponent_name = Some(team.name_id);
+        Ok(content)
+    }
+
+    /// Every world position moved to `game`'s pitch. Bots stand relative to the centre, so they
+    /// follow.
+    fn in_arena(&self, game: &Game) -> io::Result<Self> {
+        let mut content = self.clone();
+        let Some(name) = &game.arena else {
+            return Ok(content);
+        };
+        let arena = (self.arenas.get(name)).ok_or_else(|| invalid("soccer row's arena is unknown"))?;
+        let [dx, dz] = arena.delta;
+        let settings = &mut content.match_config;
+        for spot in [&mut settings.bounds.centre, &mut settings.kickoff_spawn] {
+            spot[0] += dx;
+            spot[2] += dz;
+        }
+        settings.entry_position[0] += dx;
+        settings.entry_position[2] += dz;
+        for spot in (content.pickups.iter_mut()).flat_map(|pickups| &mut pickups.spots) {
+            spot[0] += dx;
+            spot[1] += dz;
+        }
+        content.moved_to = Some(arena.clone());
+        Ok(content)
+    }
+
+    /// The service validates the match configuration and adapter policy, and the entry must be a
+    /// legal spot on this pitch.
+    fn validate_pitch(&self) -> io::Result<()> {
+        SoccerService::new(self.config(), self.policy())?;
+        self.entry_scene()?;
+        // The player spawns at the entry position, so the authority must take it
+        // as a first position: on the pitch and one step from the kickoff.
+        let [x, y, z, _] = self.match_config.entry_position;
+        let mut probe = Authority::new(self.config())?;
+        probe.register(1, 0, 0)?;
+        probe.kickoff()?;
+        let first = Intent::Position {
+            player: 1,
+            sequence: 1,
+            position: [x, y, z],
+        };
+        probe
+            .apply(1, 0.0, first)
+            .map_err(|_| invalid("soccer entry position is not a first position on the pitch"))?;
+        Ok(())
     }
 
     pub fn config(&self) -> MatchConfig {
@@ -494,8 +623,9 @@ impl Content {
             }
         }
         if let Some(gates) = &self.gates {
-            let entry = self.game(gates.game_id).filter(|game| !game.quest_only);
-            if entry.is_none()
+            let listed = |id: &u32| self.game(*id).is_some_and(|game| !game.quest_only);
+            if !gates.games.iter().all(listed)
+                || gates.games.is_empty()
                 || gates.npcs.is_empty()
                 || gates.npcs.contains(&0)
                 || gates
@@ -507,24 +637,12 @@ impl Content {
                 return Err(invalid("soccer gates need NPCs and a Games window row"));
             }
         }
-        // The service validates the match configuration and adapter policy.
-        SoccerService::new(self.config(), self.policy())?;
-        self.entry_scene()?;
-        // The player spawns at the entry position, so the authority must take it
-        // as a first position: on the pitch and one step from the kickoff.
-        let [x, y, z, _] = self.match_config.entry_position;
-        let mut probe = Authority::new(self.config())?;
-        probe.register(1, 0, 0)?;
-        probe.kickoff()?;
-        let first = Intent::Position {
-            player: 1,
-            sequence: 1,
-            position: [x, y, z],
-        };
-        probe
-            .apply(1, 0.0, first)
-            .map_err(|_| invalid("soccer entry position is not a first position on the pitch"))?;
+        self.validate_pitch()?;
+        for game in &self.games {
+            self.for_game(game)?.validate_pitch()?;
+        }
         if self.reward.coins > i32::MAX as u32
+            || self.reward.loss_percent > 100
             || self
                 .reward
                 .job_xp
@@ -600,8 +718,10 @@ impl Session {
             .game(activity_id)
             .cloned()
             .ok_or_else(|| invalid("soccer activity is not configured"))?;
+        let content = &content.for_game(&game)?;
         let scene = content.entry_scene()?;
         let mut service = SoccerService::new(content.config(), content.policy())?;
+        service.set_loss_percent(content.reward.loss_percent);
         let hold_roster = match content.setup()? {
             Some(setup) => {
                 service.set_setup(setup);
@@ -792,8 +912,8 @@ impl Session {
             Ok(ClientPacket::ReadOnly(SoccerPacket::UpdatePlayerState {
                 player, state, ..
             })) if player == guid && (4..=6).contains(&state) => {
-                self.service.player_juke(guid);
-                return Ok(Vec::new());
+                let events = self.service.player_juke(guid);
+                return Ok(events.iter().map(ServiceEvent::inner).collect());
             }
             Ok(ClientPacket::ReadOnly(_)) => return Ok(Vec::new()),
             _ => {}
@@ -881,7 +1001,7 @@ impl Session {
     ///
     /// The win grant is applied on top of those live values, never to a
     /// snapshot captured at entry: a claim or trade made during the match stays
-    /// in place. A loss pays nothing; a duplicate call is inert.
+    /// in place. A loss pays its share, a tie is a loss, and a duplicate call is inert.
     pub fn settle(&mut self, guid: u64, live: &RewardState) -> io::Result<TickResult> {
         let mut result = TickResult::default();
         let mut service = self.service.clone();
@@ -915,6 +1035,52 @@ mod tests {
 
     /// L927: a match pays the Soccer Star's `activity_xp` when there is one, else the file's
     /// `job_xp` (empty in the shipped file: no XP).
+    /// A row's scene, entry, kickoff, ball and power-up spots all stand inside its 76/7 box.
+    #[test]
+    fn every_row_stands_on_its_own_pitch() {
+        let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/soccer.json");
+        let content = Content::load(&path).unwrap();
+        let mut zones = std::collections::BTreeSet::new();
+        for game in &content.games {
+            let moved = content.for_game(game).unwrap();
+            let config = moved.setup().unwrap().unwrap().match_config;
+            let float = |at: usize| f32::from_le_bytes(config[at..at + 4].try_into().unwrap());
+            let inside = |x: f32, z: f32| {
+                (float(0)..=float(8)).contains(&x) && (float(4)..=float(12)).contains(&z)
+            };
+            let scene = moved.entry_scene().unwrap();
+            let kickoff = moved.match_config.kickoff_spawn;
+            assert!(inside(scene.position[0], scene.position[2]), "{} entry", game.id);
+            assert!(inside(kickoff[0], kickoff[2]), "{} kickoff", game.id);
+            assert!(inside(float(157), float(165)), "{} ball", game.id);
+            for spot in &moved.pickups.as_ref().unwrap().spots {
+                assert!(inside(spot[0], spot[1]), "{} power-up", game.id);
+            }
+            zones.insert(scene.scene);
+        }
+        assert_eq!(zones.len(), 3, "the three pitches");
+    }
+
+    /// A row plays its named team: the board's name word and all four bodies change.
+    #[test]
+    fn a_row_plays_against_its_own_team() {
+        let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/soccer.json");
+        let content = Content::load(&path).unwrap();
+        let goal_stopper = content.game(323).unwrap();
+        let moved = content.for_game(goal_stopper).unwrap();
+        let teams = moved.setup().unwrap().unwrap().teams;
+        let name = u32::from_le_bytes(teams[teams.len() - 5..teams.len() - 1].try_into().unwrap());
+        assert_eq!(name, 411_067, "Goalbusters");
+        let bodies = moved.bot_bodies();
+        assert_eq!(bodies[&(1, 0)], (401_626, 1432), "Dimitri Fastcannon");
+        assert_eq!(bodies[&(1, 3)], (401_627, 1433), "their goalie");
+        assert_eq!(bodies[&(0, 1)], (401_726, 1415), "our side stays");
+        for team in content.teams.values() {
+            let slots: Vec<_> = team.bots.iter().map(|bot| (bot.team, bot.slot)).collect();
+            assert_eq!(slots, [(1, 0), (1, 1), (1, 2), (1, 3)]);
+        }
+    }
+
     #[test]
     fn a_match_pays_the_activity_xp_or_the_files_job_xp() {
         let shipped = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/soccer.json");

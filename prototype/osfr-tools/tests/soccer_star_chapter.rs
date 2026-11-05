@@ -114,6 +114,8 @@ fn chapter_fixture() -> Fixture {
     // here (`bot_ai` off); tests/soccer_bots.rs covers the bots.
     let mut soccer = read_json(&content_dir().join("soccer.json"));
     soccer["match_config"]["bot_ai"] = json!(false);
+    // The chapter pins a loss as a save with no reward; `a_lost_match_pays_its_share` covers the pay.
+    soccer["reward"]["loss_percent"] = json!(0);
     fs::write(
         fixture.path().join("soccer.json"),
         serde_json::to_vec(&soccer).unwrap(),
@@ -238,7 +240,15 @@ impl Player {
     fn win(&mut self, activity: u32) -> Outcome {
         let at = self.stamp();
         let shipped = soccer_entry::Content::load(&content_dir().join("soccer.json")).unwrap();
-        let kickoff = shipped.config().kickoff_spawn;
+        let mut kickoff = shipped.config().kickoff_spawn;
+        // The row's arena moves the captured pitch.
+        let file = read_json(&content_dir().join("soccer.json"));
+        let row = (file["games"].as_array().unwrap().iter())
+            .find(|game| game["id"] == activity)
+            .unwrap();
+        let delta = &file["arenas"][row["arena"].as_str().unwrap()]["delta"];
+        kickoff[0] += delta[0].as_f64().unwrap() as f32;
+        kickoff[2] += delta[1].as_f64().unwrap() as f32;
         enter_match(&mut self.game, &self.character, activity, at);
         shoot_from(&mut self.game, &self.character, at + 200, kickoff);
         let (replies, settled) = tick_to_full_time(&mut self.game, &self.character, at + 350);
@@ -564,6 +574,27 @@ fn the_snowy_scrimmage_is_offered_only_to_a_soccer_star() {
             .is_none(),
         "the next record is not offered while the scrimmage is open"
     );
+}
+
+/// A finished, lost match pays half the win's coins and credits no quest.
+#[test]
+fn a_lost_match_pays_its_share() {
+    let fixture = chapter_fixture();
+    let mut soccer = read_json(&fixture.path().join("soccer.json"));
+    soccer["reward"]["loss_percent"] = json!(50);
+    fs::write(fixture.path().join("soccer.json"), serde_json::to_vec(&soccer).unwrap()).unwrap();
+    let mut player = Player::join(&fixture, CHARACTER);
+    player.become_soccer_star();
+    player.take_scrimmage();
+    let coins_before = coins(&player.game);
+    let at = player.stamp();
+    enter_match(&mut player.game, &player.character, SNOWHILL_SOCCER, at);
+    let (replies, lost_at) = tick_to_full_time(&mut player.game, &player.character, at + 200);
+    player.now = lost_at;
+    assert_eq!(game_over(&replies), (SNOWHILL_SOCCER as i32, 0));
+    player.close_results();
+    assert_eq!(coins(&player.game), coins_before + 5);
+    assert_eq!(counts(&player.game, SCRIMMAGE), [0]);
 }
 
 #[test]

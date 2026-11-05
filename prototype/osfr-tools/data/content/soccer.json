@@ -1,9 +1,23 @@
 {
   "schema_version": 1,
   "source": "MiniGameData rows 42/43/44 (type 12) and client Resources/ActivityCategories.txt row 22 (Soccer_Briarwood.dds); L932: the quest-only type-12 rows 322-333 (Soccer Star quest line, names Global.Text 402582-402618 and 414908-414912) share this one pitch and roster and differ only in the row a win credits and each row's own win condition; the match, roster, reward and adapter values are reconstructed (R) and remain tunable. Pitch geometry (R) from the live 2014 capture OpenSourceFreeRealms ofrserver Packets/packets_soccer_minigame.pcapng, 76/1 UpdatePlayerPos: kickoff formation at frame 6451 mirrors through centre (226.7, 0, 212.9); every player position lies in x 200.4..253.0, z 196.4..229.6, y -0.009..0.04; the human player is first placed at (230.64, 0, 210.22) (frame 5534), used here as the entry spawn (this server sends no 76/1 placement); entry rotation (0, 0, 0, 1) is that capture's opcode-31 value. L932 gates: NPC keys 9500001022 / 9500001023 are the client's Right / Left Side Soccer Gate (Global.Text 416257 / 416258; the quest objectives say 'Click the soccer gate', Global.Text 402694, 402788, 402796), menu label Global.Text 3212 'Soccer Lobby'; (R) a gate enters Snowhill Soccer (row 43), the field it stands at, with the quest row override of the games list.",
+  "arenas": {
+    "sg": {"zone": "sg_soccer", "sky": "sky_wilds24.xml", "delta": [0.0, 0.0]},
+    "sh": {"zone": "sh_soccer", "sky": "sky_snowhill24.xml", "delta": [-2.736, 58.234]},
+    "bw": {"zone": "bw_soccer", "sky": "sky_briarwood24.xml", "delta": [63.978, 10.633]}
+  },
+  "teams": {
+    "snowspurs": {"name_id": 411070, "bots": [{"name": "\"Iron Foot\" Ronnie", "team": 1, "slot": 0, "name_string_id": 401707, "model_id": 1434}, {"name": "Snowspurs Leftwing", "team": 1, "slot": 1, "name_string_id": 401712, "model_id": 1426}, {"name": "Snowspurs Rightwing", "team": 1, "slot": 2, "name_string_id": 401713, "model_id": 1412}, {"name": "Snowhill Goalie", "team": 1, "slot": 3, "name_string_id": 401711, "model_id": 1436}]},
+    "goalbusters": {"name_id": 411067, "bots": [{"name": "Dimitri Fastcannon", "team": 1, "slot": 0, "name_string_id": 401626, "model_id": 1432}, {"name": "Goalbusters Leftwing", "team": 1, "slot": 1, "name_string_id": 401628, "model_id": 1407}, {"name": "Goalbusters Rightwing", "team": 1, "slot": 2, "name_string_id": 401629, "model_id": 1424}, {"name": "Goalbusters Goalie", "team": 1, "slot": 3, "name_string_id": 401627, "model_id": 1433}]},
+    "black_widows": {"name_id": 411068, "bots": [{"name": "Fabio \"Fancy Feet\"", "team": 1, "slot": 0, "name_string_id": 401691, "model_id": 1417}, {"name": "Black Widows Leftwing", "team": 1, "slot": 1, "name_string_id": 416324, "model_id": 1421}, {"name": "Black Widows Rightwing", "team": 1, "slot": 2, "name_string_id": 401701, "model_id": 1429}, {"name": "Black Widows Goalie", "team": 1, "slot": 3, "name_string_id": 401698, "model_id": 1420}]},
+    "mud_hoppers": {"name_id": 411069, "bots": [{"name": "Waldo Sidewinder", "team": 1, "slot": 0, "name_string_id": 401703, "model_id": 1418}, {"name": "Mudhoppers Leftwing", "team": 1, "slot": 1, "name_string_id": 401704, "model_id": 1435}, {"name": "Mudhoppers Rightwing", "team": 1, "slot": 2, "name_string_id": 401705, "model_id": 1425}, {"name": "Mudhoppers Goalie", "team": 1, "slot": 3, "name_string_id": 401706, "model_id": 1581}]},
+    "twinkletoes": {"name_id": 411071, "bots": [{"name": "Francesca \"The Invincible\"", "team": 1, "slot": 0, "name_string_id": 401714, "model_id": 1423}, {"name": "Twinkletoes Leftwing", "team": 1, "slot": 1, "name_string_id": 401716, "model_id": 1419}, {"name": "Twinkletoes Rightwing", "team": 1, "slot": 2, "name_string_id": 401717, "model_id": 1437}, {"name": "Twinkletoes Goalie", "team": 1, "slot": 3, "name_string_id": 401715, "model_id": 1582}]},
+    "cheetahs": {"name_id": 411072, "bots": [{"name": "Hank \"Hat Trick\"", "team": 1, "slot": 0, "name_string_id": 401718, "model_id": 1416}, {"name": "Cheetahs Leftwing", "team": 1, "slot": 1, "name_string_id": 401720, "model_id": 1422}, {"name": "Cheetahs Rightwing", "team": 1, "slot": 2, "name_string_id": 401724, "model_id": 1431}, {"name": "Cheetahs Goalie", "team": 1, "slot": 3, "name_string_id": 401719, "model_id": 1430}]}
+  },
   "games": [
     {
       "id": 42,
+      "arena": "sg",
       "name_id": 37944,
       "description_id": 37947,
       "icon_id": 15,
@@ -13,6 +27,7 @@
     },
     {
       "id": 43,
+      "arena": "sh",
       "name_id": 37945,
       "description_id": 37948,
       "icon_id": 20992,
@@ -22,6 +37,7 @@
     },
     {
       "id": 44,
+      "arena": "bw",
       "name_id": 37946,
       "description_id": 37949,
       "icon_id": 20992,
@@ -31,6 +47,7 @@
     },
     {
       "id": 1030,
+      "arena": "sh",
       "name_id": 407373,
       "description_id": 407374,
       "icon_id": 20992,
@@ -42,6 +59,8 @@
     },
     {
       "id": 322,
+      "opponent": "snowspurs",
+      "arena": "sh",
       "name_id": 402582,
       "description_id": 37947,
       "icon_id": 20992,
@@ -52,6 +71,8 @@
     },
     {
       "id": 323,
+      "opponent": "goalbusters",
+      "arena": "sh",
       "name_id": 402586,
       "description_id": 37947,
       "icon_id": 20992,
@@ -63,6 +84,8 @@
     },
     {
       "id": 324,
+      "opponent": "black_widows",
+      "arena": "bw",
       "name_id": 402590,
       "description_id": 37947,
       "icon_id": 20992,
@@ -73,6 +96,8 @@
     },
     {
       "id": 325,
+      "opponent": "mud_hoppers",
+      "arena": "sh",
       "name_id": 402598,
       "description_id": 37947,
       "icon_id": 20992,
@@ -83,6 +108,8 @@
     },
     {
       "id": 326,
+      "opponent": "snowspurs",
+      "arena": "sh",
       "name_id": 402606,
       "description_id": 37947,
       "icon_id": 20992,
@@ -93,6 +120,8 @@
     },
     {
       "id": 327,
+      "opponent": "twinkletoes",
+      "arena": "sh",
       "name_id": 402610,
       "description_id": 37947,
       "icon_id": 20992,
@@ -103,6 +132,8 @@
     },
     {
       "id": 328,
+      "opponent": "cheetahs",
+      "arena": "sh",
       "name_id": 402618,
       "description_id": 37947,
       "icon_id": 20992,
@@ -113,6 +144,8 @@
     },
     {
       "id": 329,
+      "opponent": "goalbusters",
+      "arena": "sh",
       "name_id": 414908,
       "description_id": 37947,
       "icon_id": 20992,
@@ -123,6 +156,8 @@
     },
     {
       "id": 330,
+      "opponent": "black_widows",
+      "arena": "bw",
       "name_id": 414909,
       "description_id": 37947,
       "icon_id": 20992,
@@ -133,6 +168,8 @@
     },
     {
       "id": 331,
+      "opponent": "mud_hoppers",
+      "arena": "sh",
       "name_id": 414910,
       "description_id": 37947,
       "icon_id": 20992,
@@ -143,6 +180,8 @@
     },
     {
       "id": 332,
+      "opponent": "twinkletoes",
+      "arena": "sh",
       "name_id": 414911,
       "description_id": 37947,
       "icon_id": 20992,
@@ -153,6 +192,8 @@
     },
     {
       "id": 333,
+      "opponent": "cheetahs",
+      "arena": "sh",
       "name_id": 414912,
       "description_id": 37947,
       "icon_id": 20992,
@@ -167,8 +208,7 @@
       9500001022,
       9500001023
     ],
-    "menu_string_id": 3212,
-    "game_id": 43
+    "games": [42, 43, 1030]
   },
   "match_config": {
     "bounds": {
@@ -219,7 +259,8 @@
   },
   "reward": {
     "coins": 10,
-    "job_xp": {}
+    "job_xp": {},
+    "loss_percent": 50
   },
   "setup": {
     "source": "L940: the live server's match setup records, live capture OpenSourceFreeRealms ofrserver Packets/packets_soccer_minigame.pcapng (server to client, family 76): 76/7 match config (221 bytes: pitch box 200.4..253 x 195..230.81, tuning floats, ball model sg_soccerball_bbe.adr, ball spawn 226.7 / 2.0 / 212.9) and 76/8 teams (sweetpea / ocean) as sent; 76/21 tuning floats (fields 36 and 41 are small integers carried as float bits) and 76/19 stat words of each role as sent to the human (team 0 slot 0), its teammates (team_0), the other side (team_1) and the two keepers (slot 3). Native 2026-11-03: without them the client draws no players, ball or HUD after Go.",

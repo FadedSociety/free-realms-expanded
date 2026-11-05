@@ -32,7 +32,8 @@ const RIGHT_GATE: u64 = 9_500_001_022;
 const LEFT_GATE: u64 = 9_500_001_023;
 const NOT_A_GATE: u64 = 9_000_000_140;
 /// Global.Text 3212 "Soccer Lobby", the gates' menu label.
-const SOCCER_LABEL: u32 = 3_212;
+/// Snowhill Soccer, the row the tests take from the gate's radial.
+const SOCCER_LABEL: u32 = 37_945;
 /// `Models.txt` row 271 = invisible_cube.adr.
 const INVISIBLE_CUBE: u32 = 271;
 const SNOWHILL_SOCCER: i32 = 43;
@@ -112,6 +113,10 @@ fn a_gate_offers_the_soccer_lobby_and_enters_snowhill_soccer() {
     let fixture = fixture();
     for gate in [RIGHT_GATE, LEFT_GATE] {
         let mut game = gateway_player(&fixture, gate, false);
+        let menu = interact(&mut game, &at(gate), gate, 1_500);
+        for row in [37_944, SOCCER_LABEL, 407_373] {
+            menu_option(&menu, row);
+        }
         assert_eq!(
             enter_by_gate(&mut game, gate),
             SNOWHILL_SOCCER,
@@ -153,8 +158,9 @@ fn a_gate_must_name_npcs_and_a_games_window_row() {
     let path = directory.join("soccer.json");
     let mut refusals = Vec::new();
     for (field, value) in [
-        ("game_id", json!(SLOWING_THE_SNOWSPURS)),
-        ("game_id", json!(7)),
+        ("games", json!([SLOWING_THE_SNOWSPURS])),
+        ("games", json!([7])),
+        ("games", json!([])),
         ("npcs", json!([])),
         ("npcs", json!([RIGHT_GATE, RIGHT_GATE])),
     ] {

@@ -93,6 +93,8 @@ fn short_match_content() -> Vec<u8> {
     let mut shipped: Value =
         serde_json::from_slice(&fs::read(content_dir().join("soccer.json")).unwrap()).unwrap();
     for game in shipped["games"].as_array_mut().unwrap() {
+        // The synthetic pitch below stands at the origin, on no arena.
+        game.as_object_mut().unwrap().remove("arena");
         if game["id"] == GOAL_STOPPER {
             game["max_conceded"] = json!(0);
         }

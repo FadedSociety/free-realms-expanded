@@ -470,7 +470,7 @@ impl Gameplay {
     }
 
     pub(super) fn soccer_mut(&mut self) -> io::Result<&mut crate::soccer_entry::Session> {
-        self.soccer.as_mut().ok_or_else(|| unloaded("soccer"))
+        self.soccer.as_deref_mut().ok_or_else(|| unloaded("soccer"))
     }
 }
 

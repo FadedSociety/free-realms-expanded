@@ -750,7 +750,7 @@ impl Gameplay {
                         npc_interaction::NpcAction::Shop => "shop",
                         npc_interaction::NpcAction::Race => "race",
                         npc_interaction::NpcAction::Derby => "derby",
-                        npc_interaction::NpcAction::Soccer => "soccer",
+                        npc_interaction::NpcAction::Soccer { .. } => "soccer",
                         npc_interaction::NpcAction::TowerDefense { .. } => "tower_defense",
                         npc_interaction::NpcAction::Fish => "fish",
                         npc_interaction::NpcAction::Learn { .. } => "learn",
@@ -919,11 +919,11 @@ impl Gameplay {
                         )),
                     }
                 }
-                Ok(NpcSelection::Soccer) => {
+                Ok(NpcSelection::Soccer(game)) => {
                     consume_menu = true;
                     npc_event(select_event(runtime_guid, Some(key), option_id, "soccer"));
                     // L932: staged, so a refusal leaves the player exactly as they were.
-                    out = self.commit_if_changed(|staged| staged.begin_soccer_gate(character))?;
+                    out = self.commit_if_changed(|staged| staged.begin_soccer_gate(game, character))?;
                     out.replies.insert(0, END_DIALOG_26_4.to_vec());
                 }
                 Ok(NpcSelection::TowerDefense(game)) => {
