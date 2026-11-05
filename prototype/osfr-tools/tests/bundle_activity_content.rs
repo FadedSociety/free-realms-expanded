@@ -69,7 +69,7 @@ const FROZEN_SHA256: &[(&str, &str)] = &[
     ),
     (
         "kart_gates.json",
-        "ec5e11866055d7aa53cb8024a17a3c1d97978ac47de4f4d827b93a9a8c39745f",
+        "2bb93ba4b847d11582830a13e566c12fcd9f729a1c18f2343248c760dbb9e384",
     ),
     (
         "derby_entry.json",

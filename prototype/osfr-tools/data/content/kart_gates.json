@@ -7,6 +7,6 @@
     9500001020,
     9500000630
   ],
-  "reward_cooldown_s": 300,
+  "reward_cooldown_s": 0,
   "minigame_id": 28
 }

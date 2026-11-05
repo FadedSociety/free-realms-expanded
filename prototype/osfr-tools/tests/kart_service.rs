@@ -1461,6 +1461,22 @@ fn legitimate_ordered_race_finishes_and_offers_the_reward_once() {
     assert_eq!(service.observations(), 0);
 }
 
+/// The finish holds the board, then state 11 brings its Close X, once.
+#[test]
+fn the_results_board_gets_its_close_after_a_hold() {
+    let (mut service, context) = started();
+    drive_lap(&mut service, &context, 15_000);
+    drive_lap(&mut service, &context, 20_000);
+    assert_eq!(service.phase(), RacePhase::Finished);
+    let close = inner(GAME_STATE_SUBTYPE, &11_i32.to_le_bytes());
+    let mut seen = 0;
+    for step in 0..2_000 {
+        let outcome = service.tick(at(20_000 + step * 100)).unwrap();
+        seen += replies(&outcome).iter().filter(|reply| **reply == close).count();
+    }
+    assert_eq!(seen, 1);
+}
+
 #[test]
 fn refusals_move_nothing_but_the_attempt_budget() {
     let (mut service, context) = started();
@@ -3560,7 +3576,9 @@ fn shield_use_refreshes_the_deadline_and_the_caller_clears_it_at_the_edges() {
     drive_lap(&mut finished, &context, 20_000);
     assert_eq!(finished.phase(), RacePhase::Finished);
     assert!(finished.snapshot().unwrap().shield_expiry.is_none());
-    assert!(finished.tick(start + 30_000).unwrap().replies().is_empty());
+    // Only the results board's close: no shield expiry after the finish.
+    let close = inner(GAME_STATE_SUBTYPE, &11_i32.to_le_bytes());
+    assert_eq!(finished.tick(start + 30_000).unwrap().replies(), [close]);
 }
 
 #[test]

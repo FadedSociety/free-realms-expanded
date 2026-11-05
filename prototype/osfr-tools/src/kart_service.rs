@@ -227,8 +227,12 @@ pub const MAX_GATE_CURTAIN_NORMAL_Y: f32 = 0.05;
 pub const MAX_GATE_CURTAIN_PLANARITY_M: f32 = 0.05;
 /// RECONSTRUCTED bound: one leaf may not span more than this corner-to-corner.
 pub const MAX_GATE_CURTAIN_SPAN_M: f32 = 400.0;
-/// ORIGINAL: the client's game-state guard is `state < 0xb`; the captured sequence is 3..9.
+/// ORIGINAL: the captured sequence is 3..9. This bounds the content's schedule; the client's 33/1
+/// has no range check (`00ba74d0`), and 10 and 11 go out at the finish.
 pub const MAX_GAME_STATE: i32 = 10;
+/// (R) How long the results board holds before state 11 brings its Close X (`00ba6530`, hidden by
+/// `RaceResults:Show`); the derby holds its own board the same way.
+pub const RESULTS_HOLD_MS: u64 = 3_000;
 
 /// RECONSTRUCTED content: one ordered gate volume. Original gate geometry is unrecovered; the lead's
 /// content supplies a labelled reconstruction.
@@ -959,6 +963,8 @@ pub struct KartService {
     weapons: WeaponState,
     weapon_pose: Option<WeaponObservation>,
     reward_taken: bool,
+    /// When state 11 goes out. Not saved: a reconnect keeps the race, not this hold.
+    close_at_ms: Option<u64>,
 }
 
 fn finite(values: [f32; 3]) -> bool {
@@ -1430,6 +1436,7 @@ impl KartService {
             weapons: WeaponState::default(),
             weapon_pose: None,
             reward_taken: false,
+            close_at_ms: None,
         })
     }
 
@@ -1531,6 +1538,7 @@ impl KartService {
         self.observations = 0;
         self.countdown_sent = None;
         self.reward_taken = false;
+        self.close_at_ms = None;
         Ok(ServiceOutcome::Handled {
             replies: Vec::new(),
             reward_ready: false,
@@ -1700,6 +1708,10 @@ impl KartService {
                     }
                 }
             }
+        }
+        if self.close_at_ms.is_some_and(|at| now_ms >= at) {
+            self.close_at_ms = None;
+            replies.push(kart_entry::encode_inner(GAME_STATE_SUBTYPE, &11_i32.to_le_bytes()));
         }
         // Timed pickup returns fire only inside a live racing window: after Go, before the race
         // window closes, never on a clock that predates the last accepted claim (a stale tick must
@@ -2356,6 +2368,7 @@ impl KartService {
             weapons: snapshot.weapons,
             weapon_pose: snapshot.weapon_pose,
             reward_taken: snapshot.reward_taken,
+            close_at_ms: None,
         })
     }
 
@@ -2580,6 +2593,9 @@ impl KartService {
         if finished {
             replies.extend(self.weapons.clear());
             self.weapon_pose = None;
+            let ended = 10_i32.to_le_bytes();
+            replies.push(kart_entry::encode_inner(GAME_STATE_SUBTYPE, &ended));
+            self.close_at_ms = Some(now_ms.saturating_add(RESULTS_HOLD_MS));
         }
         Ok(ServiceOutcome::Handled {
             replies,
