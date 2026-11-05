@@ -187,7 +187,7 @@ How a game is *entered* is shared too. The client has five entry routes, all end
 | Order | Field | Use |
 |---|---|---|
 | header | `u16 39, u8 16`, three `i32` | the first `i32` is the instance id that keys the state. Native Cooking info was `(46000001, -1, 46)`: instance, group `-1`, game id. |
-| 1-5 | five `i32` | name string id, icon id, description string id, difficulty, **profile type** (the job profile the game wants; the "Profile Type" column and the job switch message come from here, not from the tables) |
+| 1-5 | five `i32` | name string id, icon id, description string id, difficulty, **profile type** (the job TYPE the game wants, not the job id: the client compares it to each job record's type, `00c8ff30`, `0090c500`; the "Profile Type" column and the job switch message come from here, not from the tables) |
 | 6 | `i32` | **game type id** (record `+0x250`) |
 | 7 | `u8` | members only (`+0x254`) |
 | 8 | three reward bundles | reward, member reward, preview (reader `008e7930`) |

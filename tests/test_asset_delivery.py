@@ -94,6 +94,19 @@ class AssetDeliveryTests(unittest.TestCase):
         track = self.raw['track.gcnk']
         self.assertIn(f'track.gcnk,{zlib.crc32(track)},{len(track)}'.encode(), delivery.served_manifest)
 
+    def test_a_launcher_like_run_keeps_the_players_manifest(self):
+        # A launcher install holds these names in read-only packs: a changed row would make its good
+        # copy stale, and the client refuses to store a replacement over a read-only entry.
+        older = self.root / 'references/older-client-substitutes'
+        older.mkdir(parents=True)
+        (older / 'pond.gcnk').write_bytes(b'older pond terrain')
+        row = f'pond.gcnk,{zlib.crc32(b"host pond")},9'
+        (self.root / 'references/stand-ins').mkdir(parents=True)
+        (self.root / 'references/stand-ins/lab_only.dma').write_bytes(b'lab water')
+        delivery = AssetDelivery(self.root, self.manifest + b'\n' + row.encode(), lab_rows=False)
+        self.assertIn(row.encode(), delivery.served_manifest)
+        self.assertNotIn(b'lab_only.dma', delivery.served_manifest)
+
     def test_an_older_copy_of_a_compressed_row_is_announced_by_its_envelope(self):
         # L922: a `.z` row (here a model) gets the older bytes' CRC and the length of the envelope served.
         older = self.root / 'references/older-client-substitutes'

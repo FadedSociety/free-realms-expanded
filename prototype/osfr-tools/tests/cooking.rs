@@ -261,7 +261,10 @@ fn native_vector(name: &str) -> Vec<u8> {
 fn native_protocol_matches_compiled_community_vectors() {
     let f = Fixture::new();
     let mut g = f.load(None);
-    assert_eq!(g.begin(45).unwrap().replies[0], vector("info"));
+    // The community vector sends the job id; the client filters on the job's type (`00c8ff30`).
+    let mut info = vector("info");
+    info[31..35].copy_from_slice(&10_i32.to_le_bytes());
+    assert_eq!(g.begin(45).unwrap().replies[0], info);
     let launched = start(&mut g);
     assert_eq!(launched.replies[0], vector("start"));
     assert_eq!(launched.replies[1], vector("launch"));

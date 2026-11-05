@@ -107,6 +107,20 @@ impl Goal {
     }
 }
 
+/// MiniGameInfo.ProfileType for a job game: the job's TYPE, not its id. The start screen's Switch
+/// Jobs list holds the owned jobs of this type (`00c8ff30`; `encounter.rs` sends the combat type),
+/// and any non-zero value enables its button. Types are the captured job records'. Mail Sorting's
+/// Postman record has type 0, so its offer stays 0.
+pub const fn offer_job_type(job: i32) -> i32 {
+    match job {
+        14 => 9,
+        45 => 10,
+        16 => 12,
+        137 => 21,
+        _ => 0,
+    }
+}
+
 /// Fields needed to emit the shared 39/16 info record. The reward bundles are
 /// the three exact serialized client bundles; the goals are the owning activity's.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]

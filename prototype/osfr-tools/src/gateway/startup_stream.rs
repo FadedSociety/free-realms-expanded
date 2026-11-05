@@ -109,6 +109,11 @@ impl Gateway {
     ) -> io::Result<()> {
         if let Some(profiles) = profiles {
             data.jobs.active_profile_id = profiles.active as u32;
+            // The client's rows are the jobs the character has: its job list and arrows offer each
+            // one, and a locked row would only be refused. An unlock adds its row (38/15, 38/21).
+            data.jobs.profiles.retain(|row| {
+                i32::try_from(row.map_key).is_ok_and(|id| profiles.unlocked.contains(&id))
+            });
         }
         for row in &mut data.jobs.profiles {
             let id =

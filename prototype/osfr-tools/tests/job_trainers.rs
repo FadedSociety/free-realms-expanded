@@ -622,6 +622,53 @@ fn equipped(gateway: &Gateway, job: i32) -> usize {
         .count()
 }
 
+/// Every character starts with Brawler unlocked and undressed, and its kit holds gloves the
+/// captured rows have no slot for. Dressing it on the first switch used to end the session.
+#[test]
+fn a_new_character_can_switch_to_the_brawler_it_starts_with() {
+    let content = Content::new();
+    // The release layout: Brawler undressed, and no slot 6 row, though the job allows that slot.
+    let path = content.0.join("inventory.json");
+    let mut inventory: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+    let rows = inventory["initial_state"]["equipment"]
+        .as_array_mut()
+        .unwrap();
+    rows.retain(|row| !(row["profile_id"] == 43 && row["slot"] == 6));
+    for row in rows.iter_mut().filter(|row| row["profile_id"] == 43) {
+        row["item_id"] = 0.into();
+    }
+    fs::write(&path, serde_json::to_vec(&inventory).unwrap()).unwrap();
+    let base = Gameplay::load(&content.0, None).expect("the content loads");
+    let mut gateway = gateway_at(&content, base.state(), [0.0, 0.0, 0.0]);
+
+    let switched = switch(&mut gateway, 43, 1_000).expect("the switch keeps the session");
+    assert!(
+        bodies(&switched)
+            .iter()
+            .any(|reply| reply.starts_with(&[38, 0, 21, 0])),
+        "the client gets the activation"
+    );
+    let mut saved = gameplay_json(&gateway);
+    assert_eq!(saved["profiles"]["active"], 43);
+    let gloves = saved["inventory"]["equipment"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["profile_id"] == 43 && row["slot"] == 6)
+        .expect("the gloves got their row");
+    assert_ne!(gloves["item_id"], 0, "the gloves are worn");
+
+    // The save keeps its extra row across a reload; a row the job does not allow is still refused.
+    let state: GameplayState = serde_json::from_value(saved.clone()).unwrap();
+    Gameplay::load(&content.0, Some(state)).expect("the dressed save reloads");
+    saved["inventory"]["equipment"]
+        .as_array_mut()
+        .unwrap()
+        .push(serde_json::json!({"profile_id": 43, "slot": 99, "item_id": 0, "category": 99}));
+    let state: GameplayState = serde_json::from_value(saved).unwrap();
+    assert!(Gameplay::load(&content.0, Some(state)).is_err());
+}
+
 fn job_select(job: i32) -> Vec<u8> {
     let mut packet = vec![26, 0, 13, 0];
     packet.extend(job.to_le_bytes());
@@ -735,6 +782,14 @@ fn an_ordinary_player_learns_each_trainers_job_once_and_only_switches_to_a_compl
         );
         assert!(
             said(&bodies(&learned), "You learned the"),
+            "{}",
+            trainer.job
+        );
+        // The job joins the client's list at once, so it can be picked without a relog.
+        assert!(
+            bodies(&learned)
+                .iter()
+                .any(|reply| reply.starts_with(&[38, 0, 15, 0])),
             "{}",
             trainer.job
         );

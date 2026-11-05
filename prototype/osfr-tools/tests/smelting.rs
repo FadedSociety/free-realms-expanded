@@ -257,7 +257,10 @@ fn native_vector(name: &str) -> Vec<u8> {
 fn native_payload_info_and_game_over_equal_compiled_community_vectors() {
     let f = Fixture::new();
     let mut g = f.load(None);
-    assert_eq!(g.begin(14).unwrap().replies[0], vector("info"));
+    // The community vector sends the job id; the client filters on the job's type (`00c8ff30`).
+    let mut info = vector("info");
+    info[31..35].copy_from_slice(&9_i32.to_le_bytes());
+    assert_eq!(g.begin(14).unwrap().replies[0], info);
     let mut start = vec![39, 0, 5];
     for n in [id(&g), -1, 77] {
         start.extend(n.to_le_bytes());

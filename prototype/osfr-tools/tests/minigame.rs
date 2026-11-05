@@ -262,6 +262,13 @@ fn grant() -> RewardGrant {
 }
 
 #[test]
+fn job_games_offer_their_jobs_type_not_its_id() {
+    for (job, job_type) in [(14, 9), (45, 10), (16, 12), (137, 21), (4, 0)] {
+        assert_eq!(minigame::offer_job_type(job), job_type, "job {job}");
+    }
+}
+
+#[test]
 fn flash_start_play_win_close_has_exact_packet_bytes_and_once_only_reward() {
     let fixture = Fixture::new(10);
     let initial_reward = fixture.reward_state();

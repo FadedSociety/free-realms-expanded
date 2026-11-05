@@ -817,9 +817,10 @@ fn job_progressions(message: &[u8]) -> Vec<(u32, usize, Vec<u8>)> {
         .collect()
 }
 
-/// L107: a fresh character's job records start at rank 1 with no XP and no stars, with or without
-/// `profiles.json`; before, they carried the captured player's progress (a half-full Adventurer
-/// bar). The overlay's configured rank offsets are the walked ones.
+/// L107: a fresh character's job records carry no captured progress, with or without
+/// `profiles.json`; before, they showed a half-full Adventurer bar. Each starts at rank 1.
+/// The client lists every row it gets, so only the character's own jobs go out; without profile
+/// state every job does. The overlay's configured rank offsets are the walked ones.
 #[test]
 fn a_fresh_character_starts_every_job_at_rank_one() {
     let fresh = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -841,13 +842,21 @@ fn a_fresh_character_starts_every_job_at_rank_one() {
     let mut capture = Gateway::load_from_content(&merged, state.clone()).unwrap();
     let captured = job_progressions(&startup_and_world(&mut capture, &state, &version)[7]);
     assert!(captured.iter().any(|(_, _, bytes)| bytes[..] != fresh));
+    let unlocked: Vec<u32> = read_json(&merged.join("profiles.json"))["default_state"]["unlocked"]
+        .as_array()
+        .map(|ids| ids.iter().map(|id| id.as_u64().unwrap() as u32).collect())
+        .unwrap_or_default();
     for directory in [&merged, &bare] {
         let mut gateway =
             Gateway::load_gameplay_from_content(state.clone(), directory, None).unwrap();
         let jobs = job_progressions(&startup_and_world(&mut gateway, &state, &version)[7]);
-        assert!(jobs.len() >= captured.len());
+        let owned = |id: &u32| directory == &bare || unlocked.contains(id);
         for (id, _) in &configured {
-            assert!(jobs.iter().any(|(job, _, _)| job == id), "job {id} has no record");
+            let sent = jobs.iter().any(|(job, _, _)| job == id);
+            assert_eq!(sent, owned(id), "job {id} in {}", directory.display());
+        }
+        if directory == &bare {
+            assert!(jobs.len() >= captured.len());
         }
         for (id, offset, bytes) in jobs {
             if let Some(&(_, rank_offset)) = configured.iter().find(|(job, _)| *job == id) {

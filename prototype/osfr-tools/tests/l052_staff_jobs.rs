@@ -241,13 +241,14 @@ fn staff_jobs_come_from_the_login_role_and_go_with_a_demotion() {
     let fixture = Fixture::new("role");
     let (_, replies) = fixture.log_in(PLAYER);
     let player = ids(&self_jobs(&replies));
-    assert_eq!(player.len(), 16, "the 16 player jobs are unchanged");
+    assert_eq!(player, [1, 43], "a new player gets only the jobs it owns");
     assert!(!player.contains(&REFEREE) && !player.contains(&ENFORCER));
     for account in [MODERATOR, ADMIN] {
         let (_, replies) = fixture.log_in(account);
         let staff = ids(&self_jobs(&replies));
-        assert_eq!(staff[..16], player[..], "{account}");
-        assert_eq!(staff[16..], [REFEREE, ENFORCER], "{account}");
+        let owned = player.len();
+        assert_eq!(staff[..owned], player[..], "{account}");
+        assert_eq!(staff[owned..], [REFEREE, ENFORCER], "{account}");
     }
     // A moderator saves (the atomic character save) while wearing the Referee job, is demoted
     // and logs in again from that save: both jobs are gone, the real job is back, and the save

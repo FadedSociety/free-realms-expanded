@@ -395,7 +395,7 @@ fn run_spec(engine: &Type8Engine) -> RunSpec {
     spec.name_id = MINING_NAME_ID;
     spec.icon_id = MINING_ICON_ID;
     spec.description_id = MINING_DESCRIPTION_ID;
-    spec.profile_type = engine.profile_id();
+    spec.profile_type = osfr_tools::minigame::offer_job_type(engine.profile_id());
     spec.preload_file = engine.preload_file().to_owned();
     spec
 }

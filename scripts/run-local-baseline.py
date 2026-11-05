@@ -172,7 +172,8 @@ endpoint = f"127.0.0.1:{front.getsockname()[1]}"
 # appended so the card window's faces can resolve, and only those: nothing is
 # offered whose bytes the client's own pack lacks.
 manifest_bytes = (client / "Assets_manifest.txt").read_bytes()
-asset_delivery = AssetDelivery(lab, manifest_bytes, client)
+# A full launcher install (packs past the stock ten) is what a player runs: it keeps their manifest.
+asset_delivery = AssetDelivery(lab, manifest_bytes, client, lab_rows=not (client / "Assets_010.pack").is_file())
 # The card window's own asset set (`tcg/AssetsTcg_manifest.txt`) is answered under /tcg/: its CRC
 # check passes against this run's local copy, and the local TCG pack already holds every file.
 tcg_routes = {}

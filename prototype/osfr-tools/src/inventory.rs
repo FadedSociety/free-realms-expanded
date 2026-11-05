@@ -528,11 +528,25 @@ impl Inventory {
             }
         }
         let initial_state = manifest.initial_state;
-        let supported_equipment = initial_state
+        let mut supported_equipment = initial_state
             .as_ref()
             .unwrap_or(&manifest.default_state)
             .equipment
             .clone();
+        // A job's slots can outgrow the captured rows, as the Brawler's gloves (slot 6) do.
+        for (&profile_id, profile) in &profiles {
+            for &slot in &profile.slots {
+                let known = |row: &EquippedItem| row.profile_id == profile_id && row.slot == slot;
+                if !supported_equipment.iter().any(known) {
+                    supported_equipment.push(EquippedItem {
+                        profile_id,
+                        slot,
+                        item_id: 0,
+                        category: slot,
+                    });
+                }
+            }
+        }
         let content = Arc::new(Content {
             player_guid: manifest.player_guid,
             default_state: manifest.default_state,
@@ -997,9 +1011,11 @@ impl Inventory {
         if self.content.spans.is_empty() {
             return Ok(());
         }
-        let expected: BTreeSet<_> = self
-            .content
-            .supported_equipment
+        // Every captured row must survive; a row beyond them is checked against the job below.
+        let captured = self.content.initial_state.as_ref();
+        let expected: BTreeSet<_> = captured
+            .unwrap_or(&self.content.default_state)
+            .equipment
             .iter()
             .map(|e| (e.profile_id, e.slot))
             .collect();
@@ -1009,7 +1025,7 @@ impl Inventory {
             .iter()
             .map(|e| (e.profile_id, e.slot))
             .collect();
-        if expected != actual {
+        if !expected.is_subset(&actual) {
             return Err(invalid(
                 "saved equipment layout differs from supported profiles",
             ));
@@ -1543,11 +1559,21 @@ impl Inventory {
         {
             return Ok(refused(&reason));
         }
+        // A save made from the captured rows has none for a later slot; `profile.slots` allows it.
+        let has_row = |entry: &EquippedItem| entry.profile_id == profile_id && entry.slot == slot;
+        if !self.state.equipment.iter().any(has_row) {
+            self.state.equipment.push(EquippedItem {
+                profile_id,
+                slot,
+                item_id: 0,
+                category: slot,
+            });
+        }
         let entry = self
             .state
             .equipment
             .iter_mut()
-            .find(|entry| entry.profile_id == profile_id && entry.slot == slot)
+            .find(|entry| has_row(entry))
             .ok_or_else(|| invalid("unknown equipment slot"))?;
         let changed = entry.item_id != id;
         let mut reply = header(38, 5);

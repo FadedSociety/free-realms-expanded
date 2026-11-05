@@ -114,7 +114,7 @@ def baseline_ini(ini: str, endpoint: str, asset_url: str) -> str:
 
 
 class AssetDelivery:
-    def __init__(self, lab: Path, manifest: bytes, client: Path | None = None):
+    def __init__(self, lab: Path, manifest: bytes, client: Path | None = None, lab_rows: bool = True):
         self.manifest = {}
         # R: index both community bare names and local .z names by one asset name.
         # Only a raw row's length is the bytes' length; a `.z` row's is the compressed
@@ -207,8 +207,10 @@ class AssetDelivery:
         # above can serve (`references/older-client-substitutes`) replaces that manifest row, so the
         # client asks for and accepts the older bytes. Fishing and soccer zone terrain exists only so.
         self.substituted = {}
+        # `lab_rows` False keeps the players' manifest: a launcher install has these names in read-only
+        # packs, so a changed row makes its good copy stale and the client cannot store the replacement.
         substitutes = (references / "older-client-substitutes").resolve()
-        if substitutes.is_dir():
+        if lab_rows and substitutes.is_dir():
             for path in sorted(substitutes.iterdir()):
                 name = path.name.lower()
                 if name not in self.manifest or name in self.sources or not path.is_file():
@@ -229,7 +231,7 @@ class AssetDelivery:
         # Pirate's Plunder arena water's material is in no client manifest.
         new_rows = []
         stand_ins = (references / "stand-ins").resolve()
-        if stand_ins.is_dir():
+        if lab_rows and stand_ins.is_dir():
             for path in sorted(stand_ins.iterdir()):
                 name = path.name.lower()
                 if name in self.manifest or name == "readme.txt" or not path.is_file():

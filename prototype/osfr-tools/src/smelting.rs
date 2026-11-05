@@ -566,7 +566,8 @@ impl Smelting {
         let c = &self.content;
         let game_id = self.selected_game_id();
         let mut b = header_with_game(16, id, game_id);
-        for n in [c.name_id, c.icon_id, c.description_id, 1, PROFILE, 9] {
+        let job_type = crate::minigame::offer_job_type(PROFILE);
+        for n in [c.name_id, c.icon_id, c.description_id, 1, job_type, 9] {
             b.extend(n.to_le_bytes());
         }
         b.push(0); // MembersOnly.

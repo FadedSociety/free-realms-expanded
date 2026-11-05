@@ -240,11 +240,11 @@ fn go_fish_at_a_cached_hole_zones_in_starts_after_the_load_and_comes_back_once()
     let world = game.current_zone().expect("the world scene");
     let out = go_fish(&mut game, SELVI, &at(SELVI), 1_000);
     assert!(out.changed);
-    assert_eq!(
-        out.replies,
-        vec![vec![26, 0, 4, 0]],
-        "only the dialog close goes now"
-    );
+    // This fixture's Fisherman has no kit, so the job joins the client's list unswitched (38/15).
+    let now: Vec<_> = (out.replies.iter())
+        .filter(|reply| !reply.starts_with(&[38, 0, 15, 0]))
+        .collect();
+    assert_eq!(now, [&vec![26, 0, 4, 0]], "only the dialog close goes now");
     let scene = out.scene_zoning.expect("a cached hole zones the player in");
     assert_eq!(
         scene,

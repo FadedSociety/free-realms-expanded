@@ -403,7 +403,7 @@ fn run_spec(engine: &Type8Engine, game_id: i32) -> io::Result<RunSpec> {
     spec.name_id = content.name_id;
     spec.icon_id = content.icon_id;
     spec.description_id = content.description_id;
-    spec.profile_type = engine.profile_id();
+    spec.profile_type = crate::minigame::offer_job_type(engine.profile_id());
     spec.preload_file = engine.preload_file().to_owned();
     Ok(spec)
 }

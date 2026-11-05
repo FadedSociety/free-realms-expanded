@@ -780,7 +780,29 @@ impl Profiles {
     }
 
     pub fn activation(&self, id: i32, inventory: &Inventory) -> io::Result<Vec<u8>> {
-        let payload = match self.staff_job(id) {
+        let payload = self.record(id, inventory)?;
+        let mut packet = vec![38, 0, 21, 0];
+        packet.extend((payload.len() as u32).to_le_bytes());
+        packet.extend(payload);
+        packet.extend(self.attachments(id, inventory)?);
+        packet.extend(3001i32.to_le_bytes());
+        packet.extend(4005i32.to_le_bytes());
+        packet.extend(0i32.to_le_bytes());
+        Ok(packet)
+    }
+
+    /// 38/15 adds a job to the client's list without switching to it and plays the new-job notice
+    /// (`ClientUpdatePacketAddProfileAbilitySetApl`, `009392c0` case 0xf: the 38/21 record alone).
+    pub fn add_packet(&self, id: i32, inventory: &Inventory) -> io::Result<Vec<u8>> {
+        let payload = self.record(id, inventory)?;
+        let mut packet = vec![38, 0, 15, 0];
+        packet.extend((payload.len() as u32).to_le_bytes());
+        packet.extend(payload);
+        Ok(packet)
+    }
+
+    fn record(&self, id: i32, inventory: &Inventory) -> io::Result<Vec<u8>> {
+        Ok(match self.staff_job(id) {
             Some(job) => job.record(),
             None => {
                 let profile = self
@@ -798,15 +820,7 @@ impl Profiles {
                 );
                 payload
             }
-        };
-        let mut packet = vec![38, 0, 21, 0];
-        packet.extend((payload.len() as u32).to_le_bytes());
-        packet.extend(payload);
-        packet.extend(self.attachments(id, inventory)?);
-        packet.extend(3001i32.to_le_bytes());
-        packet.extend(4005i32.to_le_bytes());
-        packet.extend(0i32.to_le_bytes());
-        Ok(packet)
+        })
     }
 }
 

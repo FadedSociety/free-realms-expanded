@@ -267,7 +267,10 @@ fn native_header_info_payload_launch_and_finish_match_compiled_community() {
     let mut g = f.load(None);
     assert!(g.begin(43).is_err());
     let offer = g.begin(16).unwrap();
-    assert_eq!(offer.replies, vec![vector("info")]);
+    // The community vector sends the job id; the client filters on the job's type (`00c8ff30`).
+    let mut info = vector("info");
+    info[31..35].copy_from_slice(&12_i32.to_le_bytes());
+    assert_eq!(offer.replies, vec![info]);
     assert_eq!(
         payload_packet(id(&g), "OnConnectMsg").unwrap(),
         vector("payload")

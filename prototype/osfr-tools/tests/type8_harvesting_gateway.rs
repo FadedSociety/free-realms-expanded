@@ -635,11 +635,11 @@ fn harvesting_frames_bind_region_111_and_route_only_to_the_active_run() {
         100834_i32.to_le_bytes(),
         908_i32.to_le_bytes(),
         94150_i32.to_le_bytes(),
-        CHEF_PROFILE_ID.to_le_bytes(),
+        osfr_tools::minigame::offer_job_type(CHEF_PROFILE_ID).to_le_bytes(),
     ] {
         assert!(
             info.windows(4).any(|window| window == expected),
-            "39/16 must carry the region 111 identity and Chef profile"
+            "39/16 must carry the region 111 identity and Chef job type"
         );
     }
     assert!(

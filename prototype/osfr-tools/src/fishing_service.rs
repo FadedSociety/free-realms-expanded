@@ -621,6 +621,8 @@ impl FishingService {
         spec.name_id = spot.name_id;
         spec.description_id = spot.description_id;
         spec.icon_id = spot.icon_id;
+        // B6: the offer names its job, as the other job games' offers do.
+        spec.profile_type = crate::minigame::offer_job_type(FISHERMAN_PROFILE);
         // T514: a hole whose scene the client has is fished in that scene, from its spawn. The
         // other holes keep the in-place round at the guide (R) until their scenes are cached.
         let scene = spot.scene.client_scene_cached.then(|| spot.scene.zoning());

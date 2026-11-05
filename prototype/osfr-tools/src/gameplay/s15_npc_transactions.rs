@@ -558,16 +558,22 @@ fn go_fish_sends_offer_then_ready_and_go_starts_the_round() {
     let heads: Vec<_> = entered.replies.iter().map(|p| p[..3].to_vec()).collect();
     assert_eq!(
         heads,
-        vec![vec![26, 0, 4], vec![39, 0, 16], vec![41, 0, 107]]
+        vec![
+            vec![26, 0, 4],
+            vec![38, 0, 15],
+            vec![39, 0, 16],
+            vec![41, 0, 107],
+        ]
     );
-    let offer = &entered.replies[1];
+    let offer = &entered.replies[2];
+    assert_eq!(offer[31..35], 21_i32.to_le_bytes(), "the Fisherman's job type");
     let instance = i32::from_le_bytes(offer[3..7].try_into().unwrap());
     let game_id = i32::from_le_bytes(offer[11..15].try_into().unwrap());
     // (R) ordinary entry uses the spot's game id as its encounter id (`FishingService::enter`).
     let mut ready = vec![41, 0, 107, 0];
     ready.extend(game_id.to_le_bytes());
     ready.extend(instance.to_le_bytes());
-    assert_eq!(entered.replies[2], ready, "the bare header naming this run");
+    assert_eq!(entered.replies[3], ready, "the bare header naming this run");
 
     let mut go = vec![39, 0, 5];
     let mut start = vec![39, 0, 17];

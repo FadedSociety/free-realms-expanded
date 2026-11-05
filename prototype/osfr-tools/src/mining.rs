@@ -1024,7 +1024,8 @@ impl Type8Engine {
     fn info_packet(&self, id: i32) -> Vec<u8> {
         let c = &self.content;
         let mut b = header(16, id, self.game_id);
-        for n in [c.name_id, c.icon_id, c.description_id, 1, c.profile_id, 8] {
+        let job_type = osfr_tools::minigame::offer_job_type(c.profile_id);
+        for n in [c.name_id, c.icon_id, c.description_id, 1, job_type, 8] {
             b.extend(n.to_le_bytes());
         }
         b.push(0);

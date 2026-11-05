@@ -52,6 +52,12 @@ impl Gameplay {
         let mut switch = Outcome::default();
         staged.restore_job(job, guid, &mut switch)?;
         if !staged.inventory.has_required_profile_slots(job) {
+            // Unlocked but not switched: the job still needs its client row, since a later rank-up
+            // (38/18, `009392c0` case 0x12) reads the row without a null check.
+            if first {
+                out.replies
+                    .push(self.profiles()?.add_packet(job, &self.inventory)?);
+            }
             return Ok(());
         }
         *self = staged;
@@ -93,6 +99,14 @@ impl Gameplay {
         let before = self.inventory.state().clone();
         self.grant_starter_outfit(job, reuse_owned, out)?;
         self.npc_inventory_events(&before, out)?;
+        Ok(())
+    }
+
+    /// A job unlocked without switching to it: its outfit, then its row on the client's list.
+    pub(super) fn dress_new_job(&mut self, job: i32, out: &mut Outcome) -> io::Result<()> {
+        self.give_starter_outfit(job, false, out)?;
+        out.replies
+            .push(self.profiles()?.add_packet(job, &self.inventory)?);
         Ok(())
     }
 
@@ -303,7 +317,12 @@ impl Gameplay {
                 .push(chat::system(&format!("Cannot switch classes: {error}")));
             return Ok(None);
         }
-        staged.ensure_outfit(id, &mut selection)?;
+        // A job press must never cost the player the session: the client shows no disconnect.
+        if let Err(error) = staged.ensure_outfit(id, &mut selection) {
+            out.replies
+                .push(chat::system(&format!("Cannot switch classes: {error}")));
+            return Ok(None);
+        }
         // Client ProcessProfileSwap 0x00bfb620 rejects a group without these.
         if !staged.inventory.has_required_profile_slots(id) {
             out.replies.push(chat::system(
@@ -388,6 +407,8 @@ impl Gameplay {
         // The job is not made active; the player picks it in the job list (R).
         // Inventory quest events are emitted once by the request boundary.
         self.grant_starter_outfit(trainer.profile, true, &mut out)?;
+        out.replies
+            .push(self.profiles()?.add_packet(trainer.profile, &self.inventory)?);
         out.changed = true;
         let message = if self.inventory.has_required_profile_slots(trainer.profile) {
             format!(

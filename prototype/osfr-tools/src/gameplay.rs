@@ -4454,7 +4454,7 @@ impl Gameplay {
         for id in result.unlock_profiles {
             if self.profiles_mut()?.unlock(id)? {
                 out.changed = true;
-                self.give_starter_outfit(id, false, out)?;
+                self.dress_new_job(id, out)?;
                 self.npc_quest_profiles_changed(out)?;
             }
         }
