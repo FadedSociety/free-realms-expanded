@@ -290,7 +290,7 @@ fn drive_to_results(
     for (index, npc) in npcs.iter().enumerate() {
         let at = base + 3_000 + index as u64 * 100;
         beside(gateway, key, *npc, at - 1);
-        let out = gateway_send(gateway, &hit_for(key, *npc, 100.0), at);
+        let out = gateway_send(gateway, &hit_for(key, *npc, 10_000.0), at);
         assert!(!out.is_empty(), "the contact is resolved by the server");
         assert_eq!(
             gateway.gameplay().unwrap().derby_phase(),
@@ -312,7 +312,7 @@ fn drive_to_results(
     for (index, npc) in npcs.iter().take(KNOCKOUTS_TO_WIN).enumerate() {
         let at = respawn_at + 100 + index as u64 * 100;
         beside(gateway, key, *npc, at - 1);
-        let out = gateway_send(gateway, &hit_for(key, *npc, 100.0), at);
+        let out = gateway_send(gateway, &hit_for(key, *npc, 10_000.0), at);
         if index + 1 == KNOCKOUTS_TO_WIN {
             assert_eq!(
                 gateway.gameplay().unwrap().derby_phase(),
@@ -830,7 +830,7 @@ fn finished_match_credits_once_and_replays_change_nothing() {
     assert_eq!(ledger(&gateway), vec![first]);
 
     // Replaying the record that drove the match to results changes nothing.
-    let replay = gateway_send(&mut gateway, &hit_for(key, npcs[0], 100.0), NOW + 8_500);
+    let replay = gateway_send(&mut gateway, &hit_for(key, npcs[0], 10_000.0), NOW + 8_500);
     assert!(
         replay.is_empty(),
         "the results phase ignores a contact replay"
@@ -853,7 +853,7 @@ fn finished_match_credits_once_and_replays_change_nothing() {
     assert_eq!(ledger(&gateway), vec![first], "the ledger survives");
     let before = saved_bytes(&gateway);
     for record in [
-        hit_for(key, npcs[0], 100.0),
+        hit_for(key, npcs[0], 10_000.0),
         phase_for(key, 10),
         start_request(first),
     ] {

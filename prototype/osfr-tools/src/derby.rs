@@ -702,8 +702,9 @@ fn default_contact_radius_m() -> f32 {
     5.0
 }
 
+/// Above the largest retail report seen (17,281); `derby_entry.json` sets the same.
 fn default_max_impact() -> f32 {
-    100.0
+    20_000.0
 }
 
 fn default_max_pose_age_ms() -> u64 {
@@ -864,6 +865,8 @@ struct Driver {
 pub struct DerbyService {
     instance_id: i32,
     game_id: i32,
+    /// The row's MiniGameData name, shown on the offer and the results.
+    name_id: i32,
     rules: DerbyRules,
     phase: DerbyPhase,
     drivers: BTreeMap<ParticipantKey, Driver>,
@@ -984,6 +987,7 @@ impl DerbyService {
         Ok(Self {
             instance_id,
             game_id,
+            name_id: DEMO_DERBY_LOBBY_NAME_ID,
             rules,
             phase: DerbyPhase::Lobby,
             drivers,
@@ -1067,6 +1071,11 @@ impl DerbyService {
 
     pub fn game_id(&self) -> i32 {
         self.game_id
+    }
+
+    /// The row's name; a row the table does not name keeps the lobby's.
+    pub fn set_name_id(&mut self, name_id: Option<i32>) {
+        self.name_id = name_id.unwrap_or(DEMO_DERBY_LOBBY_NAME_ID);
     }
 
     pub fn set_lobby_deadline(&mut self, now_ms: u64) {
@@ -1178,7 +1187,7 @@ impl DerbyService {
         put_i32(&mut packet, self.instance_id);
         put_i32(&mut packet, -1);
         put_i32(&mut packet, self.game_id);
-        for value in [DEMO_DERBY_LOBBY_NAME_ID, 0, 0, 1, 0, DEMO_DERBY_TYPE_ID] {
+        for value in [self.name_id, 0, 0, 1, 0, DEMO_DERBY_TYPE_ID] {
             put_i32(&mut packet, value);
         }
         packet.push(0);
@@ -1483,7 +1492,13 @@ impl DerbyService {
         if count == 0 {
             self.phase = DerbyPhase::Running;
             self.started_at_ms = Some(now_ms);
-            return self.broadcast_one(DerbyMessage::GameState(9));
+            let mut actions = self.broadcast_one(DerbyMessage::GameState(9))?;
+            // Retail sends every car's health right after state 9. The client zeroes a car's
+            // controls while its health field is 0 (`00af6cb0`), so without this no key drives.
+            for &key in self.drivers.keys() {
+                self.push_broadcast(&mut actions, self.state_message(key))?;
+            }
+            return Ok(actions);
         }
         self.countdown_value -= 1;
         self.countdown_actions(self.countdown_value)
@@ -1810,11 +1825,9 @@ impl DerbyService {
             knockouts: [state.knockouts_made, state.knockouts_taken],
             damage_dealt: state.damage_dealt,
             damage_received: state.damage_received,
-            flags: [
-                u8::from(state.shield_until_ms.is_some()),
-                u8::from(state.attack_until_ms.is_some()),
-                u8::from(state.ultimate_until_ms.is_some()),
-            ],
+            // Retail sends 1, 1, 1 on an intact car and 0s as it breaks up, so these look like its
+            // panels (R). Shield, attack and ultimate have their own 34/15 and 34/5 state.
+            flags: [1, 1, 1],
             unknown_floats_bits: [0; 4],
         })
     }
@@ -2047,8 +2060,12 @@ impl DerbyService {
                 (None, _) => anchor.map_or((from, 0.0), |anchor| chase(from, anchor, 0.0, 0.0)),
                 _ => (from, 0.0),
             };
-            if placed != Some(position) {
-                let pose = npc_pose(key, position, heading, now_ms);
+            // Every step while alive, moving or not: the client interpolates a car from its pose
+            // stream and velocity, and retail's AI poses arrive every 51 ms with a real velocity.
+            // A wreck keeps its last pose, or it would snap to heading 0 until it respawns.
+            if alive || placed != Some(position) {
+                let speed = velocity(from, position, placed.map(|_| elapsed_ms));
+                let pose = npc_pose(key, position, heading, speed, now_ms);
                 let driver = self.drivers.get_mut(&key).ok_or(UNKNOWN_DRIVER)?;
                 driver.pose = Some(pose);
                 driver.pose_at_ms = Some(now_ms);
@@ -2252,7 +2269,23 @@ fn chase(from: [f32; 3], goal: [f32; 3], reach: f32, stop: f32) -> ([f32; 3], f3
 
 /// A synthetic 34/5 pose (row-major 4x4, rotation about +Y, translation in slots 12..14) for a
 /// server-driven NPC. `sequence` rises with the clock so the client keeps the newest record.
-fn npc_pose(key: ParticipantKey, position: [f32; 3], heading: f32, sequence: u64) -> VehiclePose {
+/// Metres per second over the last step; a car placed this step has none yet.
+fn velocity(from: [f32; 3], to: [f32; 3], elapsed_ms: Option<u64>) -> [f32; 3] {
+    let Some(elapsed_ms) = elapsed_ms.filter(|ms| *ms > 0) else {
+        return [0.0; 3];
+    };
+    let seconds = elapsed_ms as f32 / 1_000.0;
+    // The ground is flat to the AI: a step's height is the goal's, not a climb.
+    [(to[0] - from[0]) / seconds, 0.0, (to[2] - from[2]) / seconds]
+}
+
+fn npc_pose(
+    key: ParticipantKey,
+    position: [f32; 3],
+    heading: f32,
+    velocity: [f32; 3],
+    sequence: u64,
+) -> VehiclePose {
     let (sin, cos) = heading.sin_cos();
     #[rustfmt::skip]
     let matrix = [
@@ -2264,8 +2297,8 @@ fn npc_pose(key: ParticipantKey, position: [f32; 3], heading: f32, sequence: u64
     VehiclePose {
         key,
         transform_bits: matrix.map(f32::to_bits),
-        vector_a_bits: [0; 4],
-        vector_b_bits: [0; 4],
+        vector_a_bits: [velocity[0], velocity[1], velocity[2], 1.0].map(f32::to_bits),
+        vector_b_bits: [0.0, 0.0, 0.0, 1.0_f32].map(f32::to_bits),
         controls_bits: [1.0_f32.to_bits(), 0, 0],
         flags: [0; 4],
         sequence,

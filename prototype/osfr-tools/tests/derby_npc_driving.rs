@@ -186,6 +186,33 @@ fn driven_npcs_wait_for_a_human_pose_then_ring_it() {
     assert_eq!(keys.len(), 7);
 }
 
+/// The client interpolates AI cars from their poses, so a moving car sends its speed.
+#[test]
+fn a_moving_ai_car_reports_its_velocity() {
+    let mut derby = service(DerbyRules::default(), Some(driving()));
+    run_to_live(&mut derby);
+    derby
+        .handle_client(HUMAN, &pose_packet(HUMAN, [0.0, 0.0, 0.0]), 4_000)
+        .unwrap();
+    let mut now = 4_000;
+    let mut speeds = Vec::new();
+    while speeds.is_empty() && now < 8_000 {
+        now += 100;
+        let step = derby.tick(now).unwrap();
+        speeds.extend(messages(&step).into_iter().filter_map(|message| match message {
+            DerbyMessage::VehiclePose(pose) if pose.key != HUMAN => {
+                let [x, _, z, _] = pose.vector_a_bits.map(f32::from_bits);
+                (x != 0.0 || z != 0.0).then(|| x.hypot(z))
+            }
+            _ => None,
+        }));
+    }
+    assert!(!speeds.is_empty(), "an AI car moved");
+    for speed in speeds {
+        assert!((speed - driving().speed_mps).abs() < 0.5, "{speed}");
+    }
+}
+
 #[test]
 fn driven_npcs_close_in_bump_and_hurt_the_human() {
     let mut service = service(DerbyRules::default(), Some(driving()));
@@ -370,7 +397,7 @@ fn out_of_bounds_driving_numbers_are_refused() {
         bad(|config| config.speed_mps = 1_000.0),
         bad(|config| config.spawn_radius_m = -1.0),
         bad(|config| config.bump_impact = 0.0),
-        bad(|config| config.bump_impact = 1_000.0),
+        bad(|config| config.bump_impact = 30_000.0),
         bad(|config| config.bump_interval_ms = 10),
     ] {
         assert!(service.set_npc_driving(Some(config)).is_err(), "{config:?}");

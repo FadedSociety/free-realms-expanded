@@ -448,7 +448,7 @@ fn finish_match(
             .derby_driver_position(*npc)
             .expect("the car has a pose");
         send(game, &character, &pose_for(key, beside), at - 1);
-        let out = send(game, &character, &hit_for(key, *npc, 100.0), at);
+        let out = send(game, &character, &hit_for(key, *npc, 10_000.0), at);
         assert!(
             out.changed,
             "the server resolves contact {index}: {}",
@@ -479,7 +479,7 @@ fn finish_match(
         let at = respawn_at + 100 + index as u64 * 100;
         let beside = game.derby_driver_position(*npc).expect("the car has a pose");
         send(game, &character, &pose_for(key, beside), at - 1);
-        let out = send(game, &character, &hit_for(key, *npc, 100.0), at);
+        let out = send(game, &character, &hit_for(key, *npc, 10_000.0), at);
         if index + 1 == KNOCKOUTS_TO_WIN {
             assert_eq!(
                 game.derby_phase(),
@@ -598,7 +598,7 @@ fn the_chapter_plays_and_credits_one_finished_derby_exactly_once() {
     let replay = send(
         &mut game,
         &fixture.character(MAD_JACK),
-        &hit_for(key, finished.npcs[0], 100.0),
+        &hit_for(key, finished.npcs[0], 10_000.0),
         now + 100,
     );
     assert!(!replay.changed);
@@ -998,7 +998,7 @@ fn a_zero_reward_package_still_credits_the_finish_once() {
     let replay = send(
         &mut game,
         &fixture.character(MAD_JACK),
-        &hit_for(key, finished.npcs[0], 100.0),
+        &hit_for(key, finished.npcs[0], 10_000.0),
         now + 100,
     );
     assert!(!replay.changed, "a replayed results record credits nothing");

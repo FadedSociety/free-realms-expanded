@@ -230,6 +230,8 @@ pub struct DerbyGateway {
     paid_matches: Vec<i32>,
     /// L931: the arena visit of the live match.
     arena: Option<ArenaVisit>,
+    /// MiniGameData name ids by row, so each offer shows its own game.
+    row_names: BTreeMap<i32, i32>,
 }
 
 /// L931: a match played in its arena scene, as a fishing hole (`gameplay/fishing_scene.rs`).
@@ -496,6 +498,12 @@ impl DerbyGateway {
             .as_ref()
             .map(|gates| gates.npcs.clone())
             .unwrap_or_default();
+        let row_names = (minigames.into_iter().flatten())
+            .filter_map(|row| {
+                let name = i32::try_from(row.name_string_id?).ok()?;
+                Some((i32::try_from(row.id).ok()?, name))
+            })
+            .collect();
         let mut game_ids = BTreeSet::from([content.game_id]);
         let mut hosted = Vec::with_capacity(rows.len() + 1);
         for row in rows {
@@ -532,6 +540,7 @@ impl DerbyGateway {
             previous_job: None,
             paid_matches: Vec::new(),
             arena: None,
+            row_names,
         })
     }
 
@@ -671,6 +680,7 @@ impl DerbyGateway {
         service
             .set_npc_drivers(package.npc_drivers.clone())
             .map_err(|error| invalid(error.to_string()))?;
+        service.set_name_id(self.row_names.get(&package.game_id).copied());
         service.set_lobby_deadline(now_ms);
         let offer = service
             .offer_packet()

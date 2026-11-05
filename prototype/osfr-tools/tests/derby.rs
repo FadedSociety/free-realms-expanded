@@ -360,6 +360,29 @@ fn all_twenty_client_records_roundtrip_with_reader_widths() {
     );
 }
 
+/// The client zeroes a car's controls while its health field is 0 (`00af6cb0`), so the last
+/// countdown ack must bring every car's health with state 9, or no key drives.
+#[test]
+fn the_race_start_sends_every_cars_health() {
+    let mut derby = service(&[OWNER], Vec::new());
+    activate(&mut derby, &[OWNER]);
+    for phase in 3..=8 {
+        let packet = encode_inner(&DerbyMessage::PlayerPhase { key: OWNER, phase }).unwrap();
+        derby.handle_client(OWNER, &packet, phase as u64).unwrap();
+    }
+    let mut last = Vec::new();
+    for count in (0..=4).rev() {
+        let packet = encode_inner(&DerbyMessage::CountdownStatus { key: OWNER, count }).unwrap();
+        last = derby.handle_client(OWNER, &packet, 100).unwrap();
+    }
+    let sent = messages(&last);
+    assert_eq!(sent.first(), Some(&DerbyMessage::GameState(9)));
+    let healthy = sent
+        .iter()
+        .filter(|message| matches!(message, DerbyMessage::VehicleState(car) if car.health > 0));
+    assert_eq!(healthy.count(), 1 + derby.npc_count() as usize, "every car");
+}
+
 #[test]
 fn solo_offer_registers_npcs_runs_client_gates_through_state_eleven_and_closes_once() {
     let mut derby = service(&[OWNER], Vec::new());

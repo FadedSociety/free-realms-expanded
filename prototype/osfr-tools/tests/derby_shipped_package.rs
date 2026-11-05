@@ -453,7 +453,7 @@ fn drive_to_results(
         // L931: the arena's cars stand apart; a hit is made beside the car it hits.
         beside(gateway, key, *npc, at - 1);
         let out = gateway
-            .handle_at(&wrap(&hit_for(key, *npc, 100.0)), at)
+            .handle_at(&wrap(&hit_for(key, *npc, 10_000.0)), at)
             .unwrap();
         assert!(
             out.gameplay_changed,
@@ -480,7 +480,7 @@ fn drive_to_results(
         let at = respawn_at + 100 + index as u64 * 100;
         beside(gateway, key, *npc, at - 1);
         let out = gateway
-            .handle_at(&wrap(&hit_for(key, *npc, 100.0)), at)
+            .handle_at(&wrap(&hit_for(key, *npc, 10_000.0)), at)
             .unwrap();
         if index == 3 {
             assert_eq!(
@@ -623,7 +623,7 @@ fn a_finished_match_pays_the_flat_reward_once() {
 
     // A replay of the record that drove the match to results cannot pay again.
     let replay = gateway
-        .handle_at(&wrap(&hit_for(key, npcs[0], 100.0)), finished_at + 100)
+        .handle_at(&wrap(&hit_for(key, npcs[0], 10_000.0)), finished_at + 100)
         .unwrap();
     assert!(!replay.gameplay_changed);
     assert!(replay.replies.is_empty());
