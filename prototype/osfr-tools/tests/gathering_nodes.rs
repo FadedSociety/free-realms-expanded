@@ -1742,6 +1742,40 @@ fn a_dock_book_stand_sails_a_pirates_match() {
     assert!(said(&entered, "ss_pirate_arena"), "the arena zone");
 }
 
+/// A game table lists chess and checkers, and each choice offers that game.
+#[test]
+fn a_game_table_offers_chess_and_checkers() {
+    const TABLE: u64 = 100_000_001_404;
+    let data = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/board_tables.json");
+    let file: serde_json::Value = serde_json::from_slice(&std::fs::read(data).unwrap()).unwrap();
+    let tables = file["tables"].as_array().unwrap();
+    assert_eq!(tables.len(), 18);
+    let table = tables.iter().find(|table| table["npc"] == TABLE).unwrap();
+    let fixture = Fixture::new(PLOT);
+    let mut at = fixture.node.clone();
+    for (axis, value) in table["position"].as_array().unwrap().iter().enumerate() {
+        at.position[axis] = value.as_f64().unwrap() as f32;
+    }
+    for (choice, game) in [(1_i32, 20_i32), (2, 21)] {
+        let mut gateway = fixture.gateway_at(fixture.state(false, true), &at, 1.0);
+        tick(&mut gateway, 1_500);
+        let mut click = vec![26, 0, 8, 0];
+        click.extend(TABLE.to_le_bytes());
+        click.push(0);
+        let menu = send(&mut gateway, &click, 2_000);
+        assert!(inners(&menu).iter().any(|p| p.starts_with(&[26, 0, 9, 0])), "the menu");
+        let mut choose = vec![26, 0, 10, 0];
+        choose.extend(TABLE.to_le_bytes());
+        choose.extend(choice.to_le_bytes());
+        let offered = send(&mut gateway, &choose, 2_100);
+        let offers: Vec<_> = (inners(&offered).into_iter())
+            .filter(|p| p.starts_with(&[39, 0, 16]))
+            .map(|p| i32::from_le_bytes(p[11..15].try_into().unwrap()))
+            .collect();
+        assert_eq!(offers, [game]);
+    }
+}
+
 /// L963: Play on the Pirate's Plunder row (1059) zones into the first arena; once it loads the start
 /// packets go out (the player's own ship among them) and Play again is the busy refusal. The match
 /// then runs on its timeouts and clock alone (a silent client) to Exiting and zones back.

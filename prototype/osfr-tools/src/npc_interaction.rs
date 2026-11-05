@@ -103,6 +103,10 @@ pub enum NpcAction {
     Pirates {
         arena: u32,
     },
+    /// (R) Play this board game. Offered by the world's game tables, `board_tables.json`.
+    BoardGame {
+        game: u32,
+    },
     /// (R) Learn a job from its trainer (W176). Offered only by NPCs named in `job_trainers.json`.
     Learn {
         profile: i32,
@@ -222,6 +226,8 @@ pub enum NpcSelection {
     TowerDefense(u32),
     /// The caller decides whether the match may start (`Gameplay::begin_pirates`).
     Pirates(u32),
+    /// The caller offers this game (`Gameplay::begin_board_game`).
+    BoardGame(u32),
     /// The caller decides whether the job is taught (`Profiles::learn`).
     Learn(Trainer),
 }
@@ -370,6 +376,8 @@ struct NpcContent {
     tower_defense_tables: TableMenus,
     /// The dock's book stands; each row is an arena and its label.
     pirates_stands: TableMenus,
+    /// The world's game tables; each row is a board game and its label.
+    board_tables: TableMenus,
     /// (R) NPCs whose menu offers a fishing trip, and the label's locale id (W160).
     fish_gates: BTreeSet<u64>,
     fish_string_id: u32,
@@ -497,6 +505,7 @@ impl NpcInteraction {
                 soccer_rows: Vec::new(),
                 tower_defense_tables: BTreeMap::new(),
                 pirates_stands: BTreeMap::new(),
+                board_tables: BTreeMap::new(),
                 fish_gates: BTreeSet::new(),
                 fish_string_id: 0,
                 job_trainers: BTreeMap::new(),
@@ -554,6 +563,13 @@ impl NpcInteraction {
         let content = Arc::make_mut(&mut self.content);
         content.add_props(stands);
         content.pirates_stands.clone_from(stands);
+    }
+
+    /// (R) Make each game table clickable, its board games listed in its menu.
+    pub fn set_board_tables(&mut self, tables: &TableMenus) {
+        let content = Arc::make_mut(&mut self.content);
+        content.add_props(tables);
+        content.board_tables.clone_from(tables);
     }
 
     /// (R) List a fishing trip in these NPCs' menus (W160). Returns the ids that are not NPC
@@ -703,6 +719,7 @@ impl NpcInteraction {
             NpcAction::Fish => Ok(NpcSelection::Fish),
             NpcAction::TowerDefense { game } => Ok(NpcSelection::TowerDefense(game)),
             NpcAction::Pirates { arena } => Ok(NpcSelection::Pirates(arena)),
+            NpcAction::BoardGame { game } => Ok(NpcSelection::BoardGame(game)),
             NpcAction::Learn { profile } => {
                 let trainer = self
                     .content
@@ -1111,6 +1128,11 @@ impl NpcInteraction {
             // (R) "Click this bookstand to register yer ship" (427889): a stand is only a way in.
             options.retain(|(action, _)| !matches!(action, NpcAction::Talk));
             options.extend(stand.games.iter().map(|&(arena, name)| (NpcAction::Pirates { arena }, name)));
+        }
+        if let Some(table) = self.content.board_tables.get(&npc.npc_id) {
+            // (R) A table has nobody to talk to, as for Tower Defense's.
+            options.retain(|(action, _)| !matches!(action, NpcAction::Talk));
+            options.extend(table.games.iter().map(|&(game, name)| (NpcAction::BoardGame { game }, name)));
         }
         for trainer in self
             .content

@@ -1156,7 +1156,7 @@ impl Gameplay {
         let tower_defense = tower_defense_table::load_tower_defense(npc_content)?;
         let ship_combat = crate::ship_combat::Content::load(npc_content)?.map(Arc::new);
         let (menus, drawn) = (&mut npc_interaction, &mut npc_visibility);
-        tower_defense_table::bind_tables(&tower_defense, &ship_combat, menus, drawn);
+        tower_defense_table::bind_tables(npc_content, &tower_defense, &ship_combat, menus, drawn)?;
         let games = portal_games::games(
             kart,
             derby_ref,
