@@ -398,6 +398,22 @@ fn final_totals_and_all_six_rounds_are_required_for_reward() {
     assert_eq!(g.state().completed, 0);
 }
 
+/// A failed round and the time between rounds put the stopwatch well past the rounds' own
+/// seconds, and that is still a win (native run 20261009T013155Z).
+#[test]
+fn a_slow_real_win_is_still_a_win() {
+    let f = Fixture::new();
+    f.write();
+    let mut g = f.load(None);
+    ready(&mut g);
+    rounds(&mut g);
+    send(&mut g, "FRServer_StatUpdate	-1	4	36");
+    for kind in 5..8 {
+        send(&mut g, &format!("FRServer_StatUpdate	-1	{kind}	6"));
+    }
+    assert!(send(&mut g, "FRServer_GameWon	900	0").changed);
+}
+
 #[test]
 fn loss_close_and_stale_attempt_never_grant() {
     let f = Fixture::new();

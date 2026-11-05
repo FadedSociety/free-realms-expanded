@@ -716,7 +716,10 @@ fn validate_totals(a: &CookingRun) -> io::Result<()> {
         .sum::<Option<f64>>()
         .ok_or_else(missing)?;
     let total = a.game_stats[0].ok_or_else(missing)?;
-    if total < rounds || total > rounds + 6.0 {
+    // The stopwatch runs on past the rounds' own seconds: a failed round and the time between
+    // rounds count (native run 20261009T013155Z lost a real win to an upper bound here). A stat
+    // is already bounded at 21,600 s where it arrives.
+    if total < rounds {
         return Err(invalid("inconsistent cooking timer total"));
     }
     Ok(())
