@@ -25,7 +25,7 @@ use osfr_tools::{
     inventory::InventoryItem,
     artifact_hunt, mail_sorting,
     mining::{
-        self, MINER_PROFILE_ID, MINING_GAME_ID, SIDE, Type8BoardSpec, Type8Goal, Type8Kind,
+        self, MINER_PROFILE_ID, MINING_GAME_ID, Type8BoardSpec, Type8Goal, Type8Kind,
         Type8Output, Type8Phase, Type8Run, lifecycle::RECONSTRUCTED_MINER_XP_PER_WIN,
     },
     npc_interaction::NpcInteractRequest,
@@ -38,9 +38,11 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
-const LEFT: usize = 3;
-const TOP: usize = 3;
-const PLAYABLE: usize = 8;
+// The shipped Copper board: ten by ten on the 13 by 13 grid.
+const SIDE: usize = 13;
+const LEFT: usize = 2;
+const TOP: usize = 1;
+const PLAYABLE: usize = 10;
 const BOTTOM: usize = TOP + PLAYABLE - 1;
 /// Manifest-defined stand-ins that exist in the private campaign inventory.
 const OUTPUTS: [i32; 4] = [2739, 879, 65834, 2436];
@@ -599,29 +601,37 @@ fn extend_chain(run: &Type8Run, value: u16, path: &mut Vec<(usize, usize)>) -> b
 
 fn chain_from(run: &Type8Run, start: (usize, usize)) -> Option<Vec<(usize, usize)>> {
     let value = run.board[start.1 * SIDE + start.0];
-    if !(400..500).contains(&value) || !run.idle[start.1 * SIDE + start.0] {
+    if !run.idle[start.1 * SIDE + start.0] {
         return None;
     }
-    let mut path = vec![start];
-    extend_chain(run, value, &mut path).then_some(path)
+    // A wildcard takes the colour of what follows, as the player's chain does.
+    let colours = match value {
+        200 => 400..500,
+        400..500 => value..value + 1,
+        _ => return None,
+    };
+    colours.into_iter().find_map(|colour| {
+        let mut path = vec![start];
+        extend_chain(run, colour, &mut path).then_some(path)
+    })
 }
 
 fn mining_chain(run: &Type8Run) -> Vec<(usize, usize)> {
     let width = SIDE;
-    for y in TOP..TOP + PLAYABLE {
-        for x in LEFT..LEFT + PLAYABLE {
+    for y in 0..SIDE {
+        for x in 0..SIDE {
             if !matches!(run.board[y * width + x], 601 | 602) {
                 continue;
             }
-            for below in (y + 1)..TOP + PLAYABLE {
+            for below in (y + 1)..SIDE {
                 if let Some(path) = chain_from(run, (x, below)) {
                     return path;
                 }
             }
         }
     }
-    for y in TOP..TOP + PLAYABLE {
-        for x in LEFT..LEFT + PLAYABLE {
+    for y in 0..SIDE {
+        for x in 0..SIDE {
             if let Some(path) = chain_from(run, (x, y)) {
                 return path;
             }
@@ -637,7 +647,7 @@ fn mining_chain(run: &Type8Run) -> Vec<(usize, usize)> {
 /// board is read only to choose legal client moves; the server still owns the
 /// quotas, drops and payout.
 fn finish_shipped_mining(gateway: &mut Gateway, id: i32, base_ms: u64) {
-    for step in 0..1000 {
+    for step in 0..6000 {
         let run = mining_run(gateway);
         if run.phase == Type8Phase::LevelComplete {
             return;
@@ -662,12 +672,16 @@ fn finish_shipped_mining(gateway: &mut Gateway, id: i32, base_ms: u64) {
             );
             continue;
         }
-        if let Some(x) =
-            (LEFT..LEFT + PLAYABLE).find(|x| matches!(run.board[BOTTOM * SIDE + x], 601 | 602))
-        {
+        // A shaped board's columns end on different rows, each above its own dropzone.
+        let foot = |x: usize| (0..SIDE - 1).find(|y| run.board[(y + 1) * SIDE + x] == 100);
+        let falling = (0..SIDE).find_map(|x| {
+            let y = foot(x)?;
+            matches!(run.board[y * SIDE + x], 601 | 602).then_some((x, y))
+        });
+        if let Some((x, y)) = falling {
             send(
                 gateway,
-                &payload(id, &format!("OnLevelEventMsg\t50\t{x}\t{BOTTOM}")),
+                &payload(id, &format!("OnLevelEventMsg\t50\t{x}\t{y}")),
                 base_ms + step * 2,
             );
             continue;
@@ -2569,8 +2583,10 @@ fn games_window_ore_rows_pay_their_own_ore_at_their_miner_rank() {
         send(&mut gateway, &payload(id, "OnNextLevelMsg"), 5_000);
         assert_eq!(mining_run(&gateway).phase, Type8Phase::Won, "row {row}");
         for ore in ORES {
-            let expected = if ore == paid { 12 } else { 0 };
-            assert_eq!(count(&gateway, ore), expected, "row {row}: ore {ore}");
+            // Twelve at the quotas; a tile that falls past a met quota still pays.
+            let held = count(&gateway, ore);
+            let right = if ore == paid { held >= 12 } else { held == 0 };
+            assert!(right, "row {row}: ore {ore} holds {held}");
         }
         let paid_state = gateway.snapshot();
         send(&mut gateway, &payload(id, "OnNextLevelMsg"), 5_100);

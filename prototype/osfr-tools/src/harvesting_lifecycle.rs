@@ -92,6 +92,7 @@ impl HarvestingLifecycle {
         snapshot: Option<HarvestingLifecycleSnapshot>,
     ) -> io::Result<Self> {
         let activity_state = snapshot.as_ref().map(|saved| saved.activity.clone());
+        let had_run = activity_state.as_ref().is_some_and(|state| state.active.is_some());
         let engine = Type8Engine::load(
             directory,
             content_file,
@@ -99,6 +100,10 @@ impl HarvestingLifecycle {
             first_instance_id,
             activity_state,
         )?;
+        // The engine dropped a board saved on another shape, so its run goes with it.
+        if had_run && engine.state().active.is_none() {
+            return Self::new(engine, game_id, player_guid);
+        }
         match snapshot {
             Some(saved) => {
                 if saved.version != 1

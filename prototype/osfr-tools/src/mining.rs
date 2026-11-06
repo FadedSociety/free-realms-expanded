@@ -299,6 +299,9 @@ struct Content {
 #[derive(Clone, Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct LevelVariant {
+    /// This level's own board, on the file's grid.
+    #[serde(default)]
+    shape: Option<Vec<i32>>,
     selectable: Vec<u16>,
     tiles: Vec<Type8Kind>,
     goals: Vec<Type8Goal>,
@@ -310,6 +313,9 @@ struct LevelVariant {
 #[derive(Clone, Debug, Deserialize)]
 struct GameVariant {
     game_id: i32,
+    /// This game's own board, on the file's grid.
+    #[serde(default)]
+    shape: Option<Vec<i32>>,
     name_id: i32,
     description_id: i32,
     icon_id: i32,
@@ -328,11 +334,15 @@ impl Content {
         content.name_id = game.name_id;
         content.description_id = game.description_id;
         content.icon_id = game.icon_id;
+        if let Some(shape) = game.shape {
+            content.spec.shape = shape;
+        }
         content.spec.selectable = game.selectable;
         content.spec.tiles = game.tiles;
         content.spec.goals = game.goals;
         content.spec.outputs = game.outputs;
-        // A saved run of one game must stay valid under every other game's content.
+        // A saved run keeps its goals under every other game's content; its board is checked at
+        // load (`Type8Engine::load`).
         if content.spec.goals.len() != self.spec.goals.len() {
             return Err(invalid("game variant changes the goal count"));
         }
@@ -346,6 +356,9 @@ impl Content {
         let mut content = self.clone();
         content.levels = rest.to_vec();
         content.level += 1;
+        if let Some(shape) = &level.shape {
+            content.spec.shape.clone_from(shape);
+        }
         content.spec.selectable.clone_from(&level.selectable);
         content.spec.tiles.clone_from(&level.tiles);
         content.spec.goals.clone_from(&level.goals);
@@ -393,14 +406,6 @@ pub struct Type8PowerupDefinition {
     pub power: u32,
 }
 
-#[derive(Clone, Copy, Debug)]
-struct Bounds {
-    left: usize,
-    top: usize,
-    width: usize,
-    height: usize,
-}
-
 #[derive(Clone, Debug)]
 pub struct Type8Engine {
     /// The game the engine is set to: its file's own until [`Self::begin_game`] picks another.
@@ -411,7 +416,6 @@ pub struct Type8Engine {
     home: i32,
     game_id: i32,
     first_instance_id: i32,
-    bounds: Bounds,
     state: Type8State,
     results_presented: bool,
 }
@@ -444,7 +448,7 @@ impl Type8Engine {
         }
         validate_asset_name(&content.preload_file, "preload file")?;
         validate_asset_name(&content.launch_movie, "launch movie")?;
-        let bounds = validate_spec(&content.spec)?;
+        validate_spec(&content.spec)?;
         validate_powerup_definitions(&content)?;
         content.validate_levels()?;
         let mut games = BTreeMap::new();
@@ -454,12 +458,24 @@ impl Type8Engine {
             }
             games.insert(game.game_id, Arc::new(content.variant(game)?));
         }
-        let state = state.unwrap_or(Type8State {
+        let mut state = state.unwrap_or(Type8State {
             version: 1,
             next_instance_id: first_instance_id,
             completed: 0,
             active: None,
         });
+        // A board saved on another shape cannot go on, and must not stop the character loading.
+        // Games and levels each have their own, and a saved run does not say which, so a board
+        // that fits none of them goes.
+        let shapes = std::iter::once(&content.spec.shape)
+            .chain(games.values().map(|game: &Arc<Content>| &game.spec.shape))
+            .chain(content.levels.iter().filter_map(|level| level.shape.as_ref()));
+        let shapes: Vec<&Vec<i32>> = shapes.collect();
+        if (state.active.as_ref())
+            .is_some_and(|run| !run.board.is_empty() && !shapes.iter().any(|shape| fits(&run.board, shape)))
+        {
+            state.active = None;
+        }
         Self::validate_state(&state)?;
         if state.next_instance_id < first_instance_id
             || state.completed > (state.next_instance_id - first_instance_id) as u32
@@ -467,7 +483,7 @@ impl Type8Engine {
             return Err(invalid("mining state outside its instance namespace"));
         }
         if let Some(run) = &state.active {
-            validate_run(run, &content.spec, bounds)?;
+            validate_run(run, &content.spec)?;
         }
         let content = Arc::new(content);
         games.insert(game_id, content.clone());
@@ -477,7 +493,6 @@ impl Type8Engine {
             home: game_id,
             game_id,
             first_instance_id,
-            bounds,
             state,
             results_presented: false,
         })
@@ -555,7 +570,7 @@ impl Type8Engine {
             return Err(invalid("mining is not playing"));
         }
         for &(x, y, value) in cells {
-            if !in_board(x, y, self.bounds) || !valid_value(value) {
+            if !in_board(x, y, &self.content.spec) || !valid_value(value) {
                 return Err(invalid("invalid mining seed"));
             }
             let i = board_index(&self.content.spec, (x, y));
@@ -606,7 +621,7 @@ impl Type8Engine {
     #[allow(dead_code)]
     pub fn has_future_move(&self) -> bool {
         match &self.state.active {
-            Some(run) => has_move(run, &self.content.spec, self.bounds),
+            Some(run) => has_move(run, &self.content.spec),
             None => false,
         }
     }
@@ -916,7 +931,7 @@ impl Type8Engine {
                             return Err(invalid("mining is paused"));
                         }
                         let chain_value =
-                            validate_chain(run, &chain, &self.content.spec, self.bounds)?;
+                            validate_chain(run, &chain, &self.content.spec)?;
                         let width = self.content.spec.width;
                         // `ServerGrid.doMatch3` adopts the chain color into every wildcard
                         // before the collected tiles are handled, so a wildcard counts as
@@ -976,7 +991,6 @@ impl Type8Engine {
                         gravity(
                             run,
                             &self.content.spec,
-                            self.bounds,
                             &mut out,
                             self.game_id,
                             &self.content.powerup_definitions,
@@ -984,7 +998,6 @@ impl Type8Engine {
                         settle_after_collect(
                             run,
                             &self.content.spec,
-                            self.bounds,
                             &mut out,
                             self.game_id,
                             &self.content.powerup_definitions,
@@ -1007,7 +1020,6 @@ impl Type8Engine {
                         apply_powerup_action(
                             run,
                             &self.content.spec,
-                            self.bounds,
                             &self.content.powerup_definitions,
                             index,
                             list,
@@ -1020,7 +1032,7 @@ impl Type8Engine {
                     let points = idle_points(list)?;
                     if run.phase == Type8Phase::Playing {
                         for (x, y) in points {
-                            if !in_board(x, y, self.bounds) {
+                            if !in_board(x, y, &self.content.spec) {
                                 return Err(invalid("idle outside mining area"));
                             }
                             let width = self.content.spec.width;
@@ -1055,7 +1067,6 @@ impl Type8Engine {
                         collect_fall(
                             run,
                             &self.content.spec,
-                            self.bounds,
                             &mut out,
                             self.game_id,
                             cell(x)?,
@@ -1151,7 +1162,7 @@ impl Type8Engine {
         out.changed = next != self.state;
         Self::validate_state(&next)?;
         if let Some(run) = &next.active {
-            validate_run(run, &self.content.spec, self.bounds)?;
+            validate_run(run, &self.content.spec)?;
         }
         if let Some(level) = advanced {
             self.content = level;
@@ -1373,7 +1384,7 @@ fn validate_powerup_definitions(content: &Content) -> io::Result<()> {
     Ok(())
 }
 
-fn validate_spec(spec: &Type8BoardSpec) -> io::Result<Bounds> {
+fn validate_spec(spec: &Type8BoardSpec) -> io::Result<()> {
     if spec.width < 6
         || spec.height < 6
         || spec.width > 32
@@ -1455,77 +1466,40 @@ fn validate_spec(spec: &Type8BoardSpec) -> io::Result<Bounds> {
             return Err(invalid("invalid mining shape code"));
         }
     }
-    let mut min_x = usize::MAX;
-    let mut min_y = usize::MAX;
-    let mut max_x = 0;
-    let mut max_y = 0;
-    let mut dropzones = Vec::new();
-    for y in 0..spec.height {
-        for x in 0..spec.width {
-            let code = spec.shape[y * spec.width + x];
-            match code {
-                0 => {}
-                1..=3 => {
-                    min_x = min_x.min(x);
-                    min_y = min_y.min(y);
-                    max_x = max_x.max(x);
-                    max_y = max_y.max(y);
-                }
-                4 => dropzones.push((x, y)),
-                code if code < 0 => {
-                    min_x = min_x.min(x);
-                    min_y = min_y.min(y);
-                    max_x = max_x.max(x);
-                    max_y = max_y.max(y);
-                }
-                _code => {
-                    min_x = min_x.min(x);
-                    min_y = min_y.min(y);
-                    max_x = max_x.max(x);
-                    max_y = max_y.max(y);
-                }
-            }
+    // A shaped board is any set of unbroken columns, each ending on a dropzone. Row and column 0
+    // stay empty: the client's fall loops (`Grid.checkFalls`) never visit them.
+    let (mut left, mut right, mut top, mut bottom) = (usize::MAX, 0, usize::MAX, 0);
+    let mut columns = 0;
+    for x in 0..spec.width {
+        let Some((first, last)) = column_span(spec, x) else {
+            continue;
+        };
+        if x == 0 || first == 0 {
+            return Err(invalid("mining board border: row and column 0 stay empty"));
         }
+        if (first..=last).any(|y| !in_board(x, y, spec)) {
+            return Err(invalid("mining column has a gap"));
+        }
+        if last + 1 >= spec.height || spec.shape[(last + 1) * spec.width + x] != 4 {
+            return Err(invalid("mining column has no dropzone"));
+        }
+        columns += 1;
+        (left, right) = (left.min(x), right.max(x));
+        (top, bottom) = (top.min(first), bottom.max(last));
     }
-    if min_x == usize::MAX {
+    if columns == 0 {
         return Err(invalid("mining board has no playable tiles"));
     }
-    let width = max_x - min_x + 1;
-    let height = max_y - min_y + 1;
-    if width < 6 || height < 6 {
+    if right - left + 1 < 6 || bottom - top + 1 < 6 {
         return Err(invalid("mining playable area too small"));
     }
-    for y in min_y..=max_y {
-        for x in min_x..=max_x {
-            if spec.shape[y * spec.width + x] == 0 {
-                return Err(invalid("mining playable area is not rectangular"));
-            }
-        }
-    }
-    let dropzone = max_y + 1;
-    if dropzone >= spec.height {
-        return Err(invalid("mining board has no dropzone row"));
-    }
-    for x in min_x..=max_x {
-        if spec.shape[dropzone * spec.width + x] != 4 {
-            return Err(invalid("mining dropzone row is incomplete"));
-        }
-    }
-    if dropzones
-        .iter()
-        .any(|(x, y)| *y != dropzone || *x < min_x || *x > max_x)
-    {
+    if spec.shape.iter().filter(|code| **code == 4).count() != columns {
         return Err(invalid("mining dropzone outside the playable area"));
     }
-    Ok(Bounds {
-        left: min_x,
-        top: min_y,
-        width,
-        height,
-    })
+    Ok(())
 }
 
-fn validate_run(run: &Type8Run, spec: &Type8BoardSpec, bounds: Bounds) -> io::Result<()> {
+fn validate_run(run: &Type8Run, spec: &Type8BoardSpec) -> io::Result<()> {
     let beyond_start = matches!(
         run.phase,
         Type8Phase::Playing | Type8Phase::LevelComplete | Type8Phase::Won | Type8Phase::Lost
@@ -1537,7 +1511,6 @@ fn validate_run(run: &Type8Run, spec: &Type8BoardSpec, bounds: Bounds) -> io::Re
         if run.board.len() != spec.width * spec.height || run.idle.len() != run.board.len() {
             return Err(invalid("mining board size mismatch"));
         }
-        let _ = bounds;
     }
     for v in &run.board {
         if !valid_value(*v) {
@@ -1748,16 +1721,20 @@ fn random_tile(
 fn gravity(
     run: &mut Type8Run,
     spec: &Type8BoardSpec,
-    bounds: Bounds,
     out: &mut Type8Outcome,
     game_id: i32,
     powerup_definitions: &[Type8PowerupDefinition],
 ) -> io::Result<()> {
     // AS2 scans columns right-to-left and holes bottom-to-top; the earliest
     // queued replacement ends lowest among the new top rows of that column.
-    for x in (bounds.left..bounds.left + bounds.width).rev() {
-        let mut target = bounds.top + bounds.height;
-        for y in (bounds.top..bounds.top + bounds.height).rev() {
+    // Each column runs from its own first tile, which is where `Grid.checkFalls`
+    // spawns: a shaped board's columns start and end on different rows.
+    for x in (0..spec.width).rev() {
+        let Some((top, bottom)) = column_span(spec, x) else {
+            continue;
+        };
+        let mut target = bottom + 1;
+        for y in (top..=bottom).rev() {
             let i = y * spec.width + x;
             let value = run.board[i];
             if value == TILE_EMPTY || value == TILE_BLOCKER {
@@ -1770,7 +1747,7 @@ fn gravity(
                 run.idle[target * spec.width + x] = false;
             }
         }
-        while target > bounds.top {
+        while target > top {
             target -= 1;
             let value = *run
                 .tile_queue
@@ -1800,15 +1777,13 @@ fn gravity(
 fn collect_fall(
     run: &mut Type8Run,
     spec: &Type8BoardSpec,
-    bounds: Bounds,
     out: &mut Type8Outcome,
     game_id: i32,
     x: usize,
     y: usize,
     powerup_definitions: &[Type8PowerupDefinition],
 ) -> io::Result<()> {
-    let bottom = bounds.top + bounds.height - 1;
-    if !in_board(x, y, bounds) || y != bottom {
+    if !in_board(x, y, spec) || column_span(spec, x).map(|(_, bottom)| bottom) != Some(y) {
         return Err(invalid("mining fall outside the bottom row"));
     }
     let value = run.board[y * spec.width + x];
@@ -1855,8 +1830,8 @@ fn collect_fall(
         game_id,
         &format!("OnLevelEventMsg\t21\t{COLLECTABLE_SCORE}\t3"),
     )?;
-    gravity(run, spec, bounds, out, game_id, powerup_definitions)?;
-    settle_after_collect(run, spec, bounds, out, game_id, powerup_definitions)
+    gravity(run, spec, out, game_id, powerup_definitions)?;
+    settle_after_collect(run, spec, out, game_id, powerup_definitions)
 }
 
 /// ORIGINAL `GameLevel.HandleCollected` through `HandleSelectableTile`: every
@@ -1902,7 +1877,6 @@ fn collect_chain_goals(
 fn settle_after_collect(
     run: &mut Type8Run,
     spec: &Type8BoardSpec,
-    bounds: Bounds,
     out: &mut Type8Outcome,
     game_id: i32,
     powerup_definitions: &[Type8PowerupDefinition],
@@ -1920,7 +1894,7 @@ fn settle_after_collect(
             run.paused = false;
         }
         message(out, run.instance_id, game_id, "OnStopLevel\t1\ttrue")?;
-    } else if !has_move(run, spec, bounds) {
+    } else if !has_move(run, spec) {
         initialize_board(run, spec, out, game_id, true, powerup_definitions)?;
     }
     Ok(())
@@ -1969,7 +1943,6 @@ fn validate_chain(
     run: &Type8Run,
     points: &[(usize, usize)],
     spec: &Type8BoardSpec,
-    bounds: Bounds,
 ) -> io::Result<Option<u16>> {
     if points.len() < 3 {
         return Err(invalid("mining chain needs at least 3 tiles"));
@@ -1978,7 +1951,7 @@ fn validate_chain(
     let mut value: Option<u16> = None;
     let mut previous: Option<(usize, usize)> = None;
     for &(x, y) in points {
-        if !in_board(x, y, bounds) || !seen.insert((x, y)) {
+        if !in_board(x, y, spec) || !seen.insert((x, y)) {
             return Err(invalid("mining chain outside board or repeated tile"));
         }
         if let Some((px, py)) = previous {
@@ -2019,7 +1992,6 @@ fn validate_chain(
 fn apply_powerup_action(
     run: &mut Type8Run,
     spec: &Type8BoardSpec,
-    bounds: Bounds,
     definitions: &[Type8PowerupDefinition],
     index: u16,
     list: &str,
@@ -2038,21 +2010,21 @@ fn apply_powerup_action(
         return Err(invalid("mining action exceeds its power"));
     }
     let pressed = points[0];
-    if !in_board(pressed.0, pressed.1, bounds)
+    if !in_board(pressed.0, pressed.1, spec)
         || run.board[board_index(spec, pressed)] != index
         || !run.idle[board_index(spec, pressed)]
     {
         return Err(invalid("mining action does not match the pressed tile"));
     }
     match index {
-        TILE_POWERUP_DYNAMITE => shatter(run, spec, bounds, &points, power, out, game_id)?,
-        TILE_POWERUP_WILDTILE => wild_tiles(run, spec, bounds, &points, power, out, game_id)?,
-        TILE_POWERUP_DESTRUCT => destruction(run, spec, bounds, &points, power, out, game_id)?,
-        TILE_POWERUP_SHUFFLE => shuffle_tiles(run, spec, bounds, &points, power, out, game_id)?,
+        TILE_POWERUP_DYNAMITE => shatter(run, spec, &points, power, out, game_id)?,
+        TILE_POWERUP_WILDTILE => wild_tiles(run, spec, &points, power, out, game_id)?,
+        TILE_POWERUP_DESTRUCT => destruction(run, spec, &points, power, out, game_id)?,
+        TILE_POWERUP_SHUFFLE => shuffle_tiles(run, spec, &points, power, out, game_id)?,
         _ => return Err(invalid("unsupported mining action")),
     }
-    gravity(run, spec, bounds, out, game_id, definitions)?;
-    if !has_move(run, spec, bounds) {
+    gravity(run, spec, out, game_id, definitions)?;
+    if !has_move(run, spec) {
         initialize_board(run, spec, out, game_id, true, definitions)?;
     }
     Ok(())
@@ -2064,13 +2036,12 @@ fn apply_powerup_action(
 fn wild_tiles(
     run: &mut Type8Run,
     spec: &Type8BoardSpec,
-    bounds: Bounds,
     points: &[(usize, usize)],
     power: usize,
     out: &mut Type8Outcome,
     game_id: i32,
 ) -> io::Result<()> {
-    let mut tiles = init_random_tiles(run, spec, bounds, is_selectable);
+    let mut tiles = init_random_tiles(run, spec, is_selectable);
     // The pressed tile turns into a wildcard first (`doWildTiles`, 1035-1046)
     // and is popped out of the array, so it is never redrawn.
     run.board[board_index(spec, points[0])] = TILE_WILDCARD;
@@ -2101,13 +2072,12 @@ fn wild_tiles(
 fn destruction(
     run: &mut Type8Run,
     spec: &Type8BoardSpec,
-    bounds: Bounds,
     points: &[(usize, usize)],
     power: usize,
     out: &mut Type8Outcome,
     game_id: i32,
 ) -> io::Result<()> {
-    let mut tiles = init_random_tiles(run, spec, bounds, |value| {
+    let mut tiles = init_random_tiles(run, spec, |value| {
         is_selectable(value) || value == TILE_BLOCKER
     });
     // `StartDestruction` 1102-1165 draws the pressed tile first and then loops
@@ -2140,13 +2110,12 @@ fn destruction(
 fn shuffle_tiles(
     run: &mut Type8Run,
     spec: &Type8BoardSpec,
-    bounds: Bounds,
     points: &[(usize, usize)],
     power: usize,
     out: &mut Type8Outcome,
     game_id: i32,
 ) -> io::Result<()> {
-    let mut candidates = init_random_tiles(run, spec, bounds, |value| {
+    let mut candidates = init_random_tiles(run, spec, |value| {
         value >= TILE_WILDCARD && value != TILE_BLOCKER && value != TILE_DROPZONE
     });
     // Recovered `StartShuffle` 1166-1249: `doWildTiles(PRESSED)` first, then the
@@ -2202,7 +2171,6 @@ fn shuffle_tiles(
 fn shatter(
     run: &mut Type8Run,
     spec: &Type8BoardSpec,
-    bounds: Bounds,
     points: &[(usize, usize)],
     power: usize,
     out: &mut Type8Outcome,
@@ -2239,7 +2207,7 @@ fn shatter(
         run.board[board_index(spec, current)] = TILE_EMPTY;
         // Recovered `ShatterAddNeighbors` order: down, up, right, left.
         for offset in [(0, 1isize), (0, -1), (1, 0), (-1, 0)] {
-            let Some(next) = neighbour(current.0, current.1, offset, bounds) else {
+            let Some(next) = neighbour(current.0, current.1, offset, spec) else {
                 continue;
             };
             let value = run.board[board_index(spec, next)];
@@ -2282,10 +2250,10 @@ pub fn shuffle_placements(
     positions: &[(usize, usize)],
 ) -> Vec<(usize, usize)> {
     let n = drawn_values.len();
-    let mut destinations = vec![positions[0]; n];
-    if n == 0 {
-        return destinations;
-    }
+    let Some(&first) = positions.first().filter(|_| n > 0) else {
+        return Vec::new();
+    };
+    let mut destinations = vec![first; n];
     // `aCurrentGrid` is only refreshed after the loop (`updateCurrentGridArray`,
     // 1247), so slot values always come from the drawn snapshot.
     let grid_value = |at: (usize, usize)| -> Option<u16> {
@@ -2330,11 +2298,11 @@ pub fn shuffle_placements(
 /// that drives the reshuffle, not a statement about tiles currently animating. The previous flood
 /// treated every neighbour of a wildcard as a match (including goal collectables and mixed
 /// colours), which reported a move on native run 143211 where the client had none.
-fn has_move(run: &Type8Run, spec: &Type8BoardSpec, bounds: Bounds) -> bool {
+fn has_move(run: &Type8Run, spec: &Type8BoardSpec) -> bool {
     const NEIGHBOURS: [(isize, isize); 4] = [(1, 0), (0, 1), (-1, 0), (0, -1)];
     const PAIRS: [(usize, usize); 6] = [(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)];
-    for y in bounds.top..bounds.top + bounds.height {
-        for x in bounds.left..bounds.left + bounds.width {
+    for y in 0..spec.height {
+        for x in 0..spec.width {
             // Recovered `ServerGrid.HasMove()` 203-207: a clickable powerup is a
             // legal move on its own, so a board holding one is never declared
             // dead. The rule holds only while such a tile is on the board.
@@ -2343,10 +2311,10 @@ fn has_move(run: &Type8Run, spec: &Type8BoardSpec, bounds: Bounds) -> bool {
                 return true;
             }
             for (first, second) in PAIRS {
-                let Some(one) = neighbour(x, y, NEIGHBOURS[first], bounds) else {
+                let Some(one) = neighbour(x, y, NEIGHBOURS[first], spec) else {
                     continue;
                 };
-                let Some(other) = neighbour(x, y, NEIGHBOURS[second], bounds) else {
+                let Some(other) = neighbour(x, y, NEIGHBOURS[second], spec) else {
                     continue;
                 };
                 let values = [
@@ -2364,14 +2332,19 @@ fn has_move(run: &Type8Run, spec: &Type8BoardSpec, bounds: Bounds) -> bool {
 }
 
 /// Step one orthogonal offset from `(x, y)`, or `None` outside the playable bounds.
-fn neighbour(x: usize, y: usize, offset: (isize, isize), bounds: Bounds) -> Option<(usize, usize)> {
+fn neighbour(
+    x: usize,
+    y: usize,
+    offset: (isize, isize),
+    spec: &Type8BoardSpec,
+) -> Option<(usize, usize)> {
     let next_x = x as isize + offset.0;
     let next_y = y as isize + offset.1;
     if next_x < 0 || next_y < 0 {
         return None;
     }
     let (next_x, next_y) = (next_x as usize, next_y as usize);
-    in_board(next_x, next_y, bounds).then_some((next_x, next_y))
+    in_board(next_x, next_y, spec).then_some((next_x, next_y))
 }
 
 /// `validate_chain`'s value rule for one three-cell path: every cell is a selectable tile or a
@@ -2394,11 +2367,28 @@ fn chain_values_match(values: [u16; 3]) -> bool {
     true
 }
 
-fn in_board(x: usize, y: usize, bounds: Bounds) -> bool {
-    x >= bounds.left
-        && x < bounds.left + bounds.width
-        && y >= bounds.top
-        && y < bounds.top + bounds.height
+/// A cell a tile can stand on: inside the grid and in the board's shape.
+fn in_board(x: usize, y: usize, spec: &Type8BoardSpec) -> bool {
+    x < spec.width && y < spec.height && holds_tile(spec.shape[y * spec.width + x])
+}
+
+fn holds_tile(code: i32) -> bool {
+    !matches!(code, 0 | 4)
+}
+
+/// A board is on this shape: no dropzone off it, and nothing stands outside it.
+fn fits(board: &[u16], shape: &[i32]) -> bool {
+    board.len() == shape.len()
+        && (board.iter().zip(shape)).all(|(tile, code)| {
+            (*tile != TILE_DROPZONE || *code == 4) && (*code != 0 || *tile == TILE_EMPTY)
+        })
+}
+
+/// The first and last row of column `x` that hold tiles. `validate_spec` keeps them unbroken.
+fn column_span(spec: &Type8BoardSpec, x: usize) -> Option<(usize, usize)> {
+    let mut rows = (0..spec.height).filter(|&y| in_board(x, y, spec));
+    let top = rows.next()?;
+    Some((top, rows.last().unwrap_or(top)))
 }
 
 fn rng(run: &mut Type8Run) -> u32 {
@@ -2441,12 +2431,11 @@ fn action_draw(run: &mut Type8Run, out: &mut Type8Outcome, game_id: i32) -> io::
 fn init_random_tiles(
     run: &Type8Run,
     spec: &Type8BoardSpec,
-    bounds: Bounds,
     eligible: impl Fn(u16) -> bool,
 ) -> Vec<(usize, usize)> {
     let mut tiles = Vec::new();
-    for y in bounds.top..bounds.top + bounds.height {
-        for x in bounds.left..bounds.left + bounds.width {
+    for y in 0..spec.height {
+        for x in 0..spec.width {
             let i = board_index(spec, (x, y));
             if run.idle[i] && eligible(run.board[i]) {
                 tiles.push((x, y));
@@ -2669,5 +2658,120 @@ fn validate_asset_name(name: &str, what: &str) -> io::Result<()> {
         Ok(())
     } else {
         Err(invalid(format!("invalid mining {what} name")))
+    }
+}
+
+#[cfg(test)]
+mod shape_tests {
+    use super::*;
+
+    const GRID: usize = 13;
+
+    /// Columns 1 to 12: the outer ones high, the middle ones low, as a funnel's are.
+    fn funnel() -> Type8BoardSpec {
+        let mut spec = mining_spec();
+        (spec.width, spec.height, spec.shape) = (GRID, GRID, vec![0; GRID * GRID]);
+        for x in 1..=12 {
+            let (top, bottom) = if (4..=9).contains(&x) { (2, 8) } else { (1, 6) };
+            for y in top..=bottom {
+                spec.shape[y * GRID + x] = 1;
+            }
+            spec.shape[(bottom + 1) * GRID + x] = 4;
+        }
+        spec
+    }
+
+    fn run_on(spec: &Type8BoardSpec) -> Type8Run {
+        let fill = |code: &i32| if holds_tile(*code) { 401 } else { TILE_EMPTY };
+        let collected = vec![0; spec.goals.len()];
+        Type8Run {
+            instance_id: 1,
+            phase: Type8Phase::Playing,
+            board: spec.shape.iter().map(fill).collect(),
+            idle: vec![true; spec.shape.len()],
+            tile_queue: (0..200).map(|i| 401 + i % 4).collect(),
+            random_queue: Vec::new(),
+            rng: 1,
+            collected,
+            score: 0,
+            remaining_ms: 1_000,
+            wall_ms: 0,
+            paused: false,
+            chains: 0,
+            reshuffles: 0,
+            end_sent: false,
+        }
+    }
+
+    /// `Grid.checkFalls`: a column's tiles settle towards its own foot, and the first queued tile
+    /// ends lowest among the new ones, under that column's own top.
+    #[test]
+    fn a_shaped_board_falls_and_refills_inside_each_column() {
+        let spec = funnel();
+        let mut run = run_on(&spec);
+        run.board[2 * GRID + 5] = 405;
+        run.board[3 * GRID + 5] = 404;
+        run.board[8 * GRID + 5] = TILE_EMPTY;
+        run.board[GRID + 12] = TILE_EMPTY;
+        run.tile_queue[..2].copy_from_slice(&[403, 402]);
+        let mut out = Type8Outcome::default();
+        gravity(&mut run, &spec, &mut out, 18, &[]).unwrap();
+
+        // Column 12 scans first, so it takes the first queued tile.
+        assert_eq!(run.board[GRID + 12], 403);
+        assert_eq!(run.board[2 * GRID + 5], 402, "the new tile stops at this column's top");
+        assert_eq!(run.board[3 * GRID + 5], 405, "the rest moved down one");
+        assert_eq!(run.board[4 * GRID + 5], 404);
+        assert_eq!(run.board[GRID + 5], TILE_EMPTY, "nothing above the column's top");
+        for (i, code) in spec.shape.iter().enumerate() {
+            assert_eq!(run.board[i] != TILE_EMPTY, holds_tile(*code), "cell {i}");
+        }
+    }
+
+    #[test]
+    fn a_tile_stands_only_on_the_shape() {
+        let spec = funnel();
+        assert!(in_board(5, 8, &spec) && !in_board(5, 1, &spec) && !in_board(5, 9, &spec));
+        assert_eq!(column_span(&spec, 5), Some((2, 8)));
+        assert_eq!(column_span(&spec, 1), Some((1, 6)));
+        assert_eq!(column_span(&spec, 0), None);
+        assert_eq!(neighbour(5, 2, (0, -1), &spec), None, "a chain cannot leave the shape");
+    }
+
+    #[test]
+    fn a_shape_the_client_cannot_fall_is_refused() {
+        validate_spec(&funnel()).unwrap();
+        let broken = |change: fn(&mut Vec<i32>)| {
+            let mut spec = funnel();
+            change(&mut spec.shape);
+            validate_spec(&spec).is_err()
+        };
+        assert!(broken(|shape| shape[5 * GRID + 5] = 0), "a gap in a column");
+        assert!(broken(|shape| shape[9 * GRID + 5] = 0), "a column with no dropzone");
+        assert!(broken(|shape| shape[5] = 1), "a tile on row 0, which the fall loops skip");
+        assert!(broken(|shape| shape[12 * GRID + 5] = 4), "a dropzone under nothing");
+    }
+
+    /// A board size change must not stop a character with a run in progress from loading.
+    #[test]
+    fn a_board_saved_on_another_grid_is_dropped_at_load() {
+        let directory = std::env::temp_dir().join(format!("type8-shape-{}", std::process::id()));
+        fs::create_dir_all(&directory).unwrap();
+        let path = write_content(&directory, 18).unwrap();
+        let file = path.file_name().unwrap().to_str().unwrap().to_owned();
+        let mut spec = funnel();
+        spec.goals.clear();
+        let saved = Type8State {
+            version: 1,
+            next_instance_id: FIRST_MINING_INSTANCE + 1,
+            completed: 0,
+            active: Some(Type8Run {
+                instance_id: FIRST_MINING_INSTANCE,
+                ..run_on(&spec)
+            }),
+        };
+        let engine = Type8Engine::load(&directory, &file, 18, FIRST_MINING_INSTANCE, Some(saved));
+        fs::remove_dir_all(&directory).unwrap();
+        assert!(!engine.unwrap().active());
     }
 }

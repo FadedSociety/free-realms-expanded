@@ -286,7 +286,7 @@ fn harvested_bundles_grant_once_from_a_serialized_completion_state() {
     let instance_id = harvesting::FIRST_INSTANCE_ID;
     let mut board = vec![0u16; width * height];
     for (slot, goal) in spec.goals.iter().enumerate() {
-        board[(height - 2) * width + slot] = goal.value;
+        board[(height - 2) * width + 1 + slot] = goal.value;
     }
     let run = Type8Run {
         instance_id,

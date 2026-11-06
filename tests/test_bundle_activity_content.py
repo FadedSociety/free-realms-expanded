@@ -136,8 +136,8 @@ class ActivityContentGateTest(unittest.TestCase):
         self.refuse("mining.json", flatten_shape, "no playable tiles")
         self.refuse(
             "mining.json",
-            lambda value: replace_shape_cell(value, 11 * 14 + 3, 1),
-            "complete dropzone row",
+            lambda value: replace_shape_cell(value, 11 * 13 + 3, 1),
+            "no dropzone",
         )
         self.refuse(
             "mining.json",

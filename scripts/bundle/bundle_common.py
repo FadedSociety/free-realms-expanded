@@ -507,41 +507,30 @@ def _is_shape_code(code: int) -> bool:
 
 
 def _check_board_shape(name: str, width: int, height: int, shape: list) -> None:
-    """Mirror `mining::validate_spec`'s shape code and playable-area checks."""
+    """Mirror `mining::validate_spec`'s shape code and per-column checks."""
     if any(not _is_shape_code(code) for code in shape):
         raise ValueError(f"content/{name} has an invalid board shape code")
-    playable = [
-        (index % width, index // width)
-        for index, code in enumerate(shape)
-        if code not in (0, 4)
-    ]
-    if not playable:
+    columns = []
+    for x in range(width):
+        rows = [y for y in range(height) if shape[y * width + x] not in (0, 4)]
+        if not rows:
+            continue
+        top, bottom = rows[0], rows[-1]
+        if x == 0 or top == 0:
+            raise ValueError(f"content/{name} has a tile on row or column 0")
+        if len(rows) != bottom - top + 1:
+            raise ValueError(f"content/{name} has a board column with a gap")
+        if bottom + 1 >= height or shape[(bottom + 1) * width + x] != 4:
+            raise ValueError(f"content/{name} has a board column with no dropzone")
+        columns.append((x, top, bottom))
+    if not columns:
         raise ValueError(f"content/{name} has no playable tiles")
-    left = min(x for x, _ in playable)
-    right = max(x for x, _ in playable)
-    top = min(y for _, y in playable)
-    bottom = max(y for _, y in playable)
+    left, right = columns[0][0], columns[-1][0]
+    top = min(column[1] for column in columns)
+    bottom = max(column[2] for column in columns)
     if right - left + 1 < 6 or bottom - top + 1 < 6:
         raise ValueError(f"content/{name} has a playable area smaller than 6x6")
-    if any(
-        shape[y * width + x] == 0
-        for y in range(top, bottom + 1)
-        for x in range(left, right + 1)
-    ):
-        raise ValueError(f"content/{name} has a playable area that is not rectangular")
-    dropzone = bottom + 1
-    if dropzone >= height or any(
-        shape[dropzone * width + x] != 4 for x in range(left, right + 1)
-    ):
-        raise ValueError(f"content/{name} has no complete dropzone row")
-    if any(
-        y != dropzone or not left <= x <= right
-        for x, y in (
-            (index % width, index // width)
-            for index, code in enumerate(shape)
-            if code == 4
-        )
-    ):
+    if sum(code == 4 for code in shape) != len(columns):
         raise ValueError(f"content/{name} has a dropzone outside the playable area")
 
 
@@ -581,6 +570,11 @@ def _check_board(
         if not isinstance(spec[key], list):
             raise ValueError(f"content/{name} spec.{key} must be an array")
     _check_board_shape(name, width, height, shape)
+    for row in value.get("games", []) + value.get("levels", []):
+        if "shape" in row:
+            if len(row["shape"]) != width * height:
+                raise ValueError(f"content/{name} has a board off the file's grid")
+            _check_board_shape(name, width, height, row["shape"])
     selectable, collectable = spec["selectable"], spec["collectable"]
     if (
         not selectable or len(selectable) > 16
