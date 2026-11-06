@@ -46,6 +46,7 @@ pub use admin_move::{AdminMove, MoveTarget};
 mod card_launch;
 mod checkers_table;
 mod music_table;
+mod kart_garage;
 mod pirates_arena;
 mod coin_authoring;
 mod collection_pickup;
@@ -269,6 +270,7 @@ pub struct Gameplay {
     ship_combat: Option<Arc<crate::ship_combat::Content>>,
     /// L963: the open Pirate's Plunder match (session-local); boxed like the Tower Defense run.
     pirates: Option<Box<pirates_arena::PirateArena>>,
+    garage: Option<Box<kart_garage::Garage>>,
     character_name: String,
     /// T765: the session's Trading Card Game launches (type-16 runs and one-time tickets).
     card_launches: Option<crate::card_game::Launches>,
@@ -1295,6 +1297,7 @@ impl Gameplay {
             tower_defense,
             ship_combat,
             pirates: None,
+            garage: None,
             character_name: String::new(),
             card_launches,
             daily_wheel,
@@ -1951,6 +1954,7 @@ impl Gameplay {
     pub fn accepts_kart_loading_application(&self, inner: &[u8]) -> bool {
         // The client asks for the lobby catalogue while a zone loads, on every zone.
         inner == [102, 0, 1, 0]
+            || self.garage.is_some() && inner.starts_with(&[139, 0])
             || self.kart_entry.as_ref().is_some_and(|k| k.active())
                 && (inner.starts_with(&[33, 0]) || inner.starts_with(&[102, 0]))
     }
@@ -2825,6 +2829,7 @@ impl Gameplay {
             }
             ["win"] => self.developer_win(now_ms, out)?,
             ["pirates", rest @ ..] => self.developer_pirates(rest, character, out)?,
+            ["garage"] => self.begin_garage(character, out)?,
             ["duel", rest @ ..] => {
                 let id = match rest {
                     [id] => id.parse::<u32>().ok().filter(|id| *id > 0),

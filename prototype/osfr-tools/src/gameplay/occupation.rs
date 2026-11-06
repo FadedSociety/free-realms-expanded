@@ -41,6 +41,8 @@ occupations!(
     TowerDefense,
     // L963: a Pirate's Plunder match in its arena; (R) the derby's gates.
     Pirates,
+    // The Kart & Demo Derby Garage, from its offer on; (R) the derby's gates.
+    Garage,
     // T765: a Trading Card Game run (the client's card DLL window is open).
     CardGame,
     Encounter,
@@ -103,6 +105,7 @@ impl Occupation {
             CardGame => "a card game",
             Encounter | FieldEngaged => "a fight",
             Derby => "a derby",
+            Garage => "the garage",
             Fishing => "fishing",
             Soccer => "a soccer match",
             Kart => "a kart race",
@@ -120,7 +123,7 @@ impl Occupation {
             | Music | TowerDefense | CardGame | Fishing | Encounter => {
                 (true, true, true, true, false)
             }
-            Derby | Soccer | Kart | Pirates => (true, true, true, true, true),
+            Derby | Soccer | Kart | Pirates | Garage => (true, true, true, true, true),
             FieldEngaged => (false, false, true, false, false),
             // (R) A lot is its own scene: leave it before travelling, riding or starting an
             // activity; pets may follow (the lot's pet autospawn flag); housing owns movement.
@@ -165,6 +168,7 @@ impl Gameplay {
             Occupation::TowerDefense => (self.tower_defense.as_deref())
                 .is_some_and(crate::tower_defense::TowerDefense::is_active),
             Occupation::Pirates => self.pirates.is_some(),
+            Occupation::Garage => self.garage.is_some(),
             Occupation::CardGame => self
                 .card_launches
                 .as_ref()
@@ -234,6 +238,7 @@ mod tests {
                 Music,
                 TowerDefense,
                 Pirates,
+                Garage,
                 CardGame,
                 Encounter,
                 Derby,
@@ -259,6 +264,7 @@ mod tests {
                 Music,
                 TowerDefense,
                 Pirates,
+                Garage,
                 CardGame,
                 Encounter,
                 Derby,
@@ -283,6 +289,7 @@ mod tests {
                 Music,
                 TowerDefense,
                 Pirates,
+                Garage,
                 CardGame,
                 Encounter,
                 Derby,
@@ -307,6 +314,7 @@ mod tests {
                 Music,
                 TowerDefense,
                 Pirates,
+                Garage,
                 CardGame,
                 Encounter,
                 Derby,
@@ -317,7 +325,7 @@ mod tests {
         );
         assert_eq!(
             members(|g| g.location),
-            [Pirates, Derby, Soccer, Kart, Housing]
+            [Pirates, Garage, Derby, Soccer, Kart, Housing]
         );
         // A style card is refused wherever starting an activity is, except at home.
         assert_eq!(
@@ -334,6 +342,7 @@ mod tests {
                 Music,
                 TowerDefense,
                 Pirates,
+                Garage,
                 CardGame,
                 Encounter,
                 Derby,

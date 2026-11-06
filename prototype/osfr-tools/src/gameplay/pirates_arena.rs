@@ -245,6 +245,9 @@ impl Gameplay {
         inner: &[u8],
         now_ms: u64,
     ) -> io::Result<Option<Outcome>> {
+        if let Some(out) = self.handle_garage(inner)? {
+            return Ok(Some(out));
+        }
         let Some(arena) = self.pirates.as_mut() else {
             return Ok(None);
         };

@@ -160,6 +160,8 @@ pub enum Kind {
     /// MiniGameData row and only a live Games window row lists them.
     Kart,
     Derby,
+    /// The Kart & Demo Derby Garage: row 1079 joins by its own id, as ContentId 121 is a dead row.
+    Garage,
     /// L098: a recipe's minigame (cooking, forging, smelting); the row's id is its MiniGameData
     /// row and Play starts `recipe_id` through the recipe book, anywhere (R). L100: `job` is the
     /// recipe's job, whose rank the row's `required_level` asks for.
@@ -590,6 +592,7 @@ impl Catalogue {
             | Kind::Checkers
             | Kind::Music
             | Kind::TowerDefense
+            | Kind::Garage
             | Kind::Pirates => {}
             // (R) Soccer is a world activity, not a combat-job gate. Its row
             // still honors the configured level floor; the original gate is unknown.
@@ -636,7 +639,8 @@ impl Catalogue {
     fn can_join(&self, a: &Activity, viewer: Viewer) -> bool {
         match a.kind {
             Kind::Battle => viewer.combat_job && viewer.level >= a.required_level,
-            Kind::Chess { .. } => true,
+            // (R) Open to all for now: a car check needs cars, with refusal 407742.
+            Kind::Chess { .. } | Kind::Garage => true,
             Kind::Soccer => viewer.level >= a.required_level,
             Kind::CardGame { .. } => self.card_refusal(a.id).is_none(),
             Kind::Recipe { recipe_id, job } => {
@@ -763,6 +767,7 @@ impl Catalogue {
             | Kind::Checkers
             | Kind::Music
             | Kind::TowerDefense
+            | Kind::Garage
             | Kind::Pirates => return None,
         })
     }
@@ -858,7 +863,7 @@ fn runs(row: &LiveRow, a: &Activity) -> bool {
         Kind::Battle => row.category == COMBAT_CATEGORY && row.name_id == a.name_id,
         Kind::Soccer => row.category == SOCCER_CATEGORY && row.name_id == a.name_id,
         Kind::Chess { row_id } => row.entry_type == ENTRY_CLIENT_TUNNEL && row.content_id == row_id,
-        Kind::CardGame { .. } => row.id == a.id,
+        Kind::CardGame { .. } | Kind::Garage => row.id == a.id,
         Kind::Kart
         | Kind::Derby
         | Kind::Recipe { .. }

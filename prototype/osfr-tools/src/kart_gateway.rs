@@ -242,7 +242,32 @@ fn load_gates(directory: &Path) -> io::Result<Option<KartGates>> {
     Ok(Some(gates))
 }
 
+/// What the garage borrows from a race: its captured offers, its kart and its scene.
+#[derive(Clone, Debug, PartialEq)]
+pub struct GarageParts {
+    pub encounter_id: u32,
+    pub loading: Vec<u8>,
+    pub ready: Vec<u8>,
+    pub vehicle: Vec<u8>,
+    pub scene: zone_transition::ZoneTransition,
+}
+
 impl KartGateway {
+    /// The race's parts for the garage; `load` keeps exactly one kart. The vehicle stops at
+    /// `vehicle_guid_offset`: what follows is 33/11's (owner, positions, flags), not the definition,
+    /// and the client drops a 139/2 that does not parse to its last byte.
+    pub fn garage_parts(&self) -> Option<GarageParts> {
+        let mut vehicle = self.content.entry.entry_vehicles.first()?.clone();
+        vehicle.attribute_block.truncate(self.content.vehicle_guid_offset);
+        Some(GarageParts {
+            encounter_id: self.content.context.encounter_id,
+            loading: self.content.details_loading.clone(),
+            ready: self.content.details_ready.clone(),
+            vehicle: vehicle.encode(),
+            scene: self.content.context.scene.clone(),
+        })
+    }
+
     pub fn load(directory: &Path, saved: Option<KartGatewayState>) -> io::Result<Option<Self>> {
         let path = directory.join("kart_entry.json");
         let metadata = match std::fs::symlink_metadata(&path) {

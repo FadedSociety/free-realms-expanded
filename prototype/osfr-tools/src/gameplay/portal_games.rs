@@ -43,6 +43,7 @@ pub(super) fn games(
     tower_defense: Option<&TowerDefense>,
     pirates: bool,
 ) -> Vec<Activity> {
+    let garage = kart.is_some().then(|| game_row(super::kart_garage::GARAGE_ROW, Kind::Garage));
     let kart = kart.map(KartGateway::minigame_ids).unwrap_or_default();
     // L931: every hosted derby row is a Games window join key, so Play starts the row chosen.
     let derby = derby.into_iter().flat_map(|derby| {
@@ -97,6 +98,7 @@ pub(super) fn games(
         .chain(songs)
         .chain(maps)
         .chain(pirates.then(|| game_row(crate::ship_combat::GAME_ID, Kind::Pirates)))
+        .chain(garage)
         .collect()
 }
 
@@ -230,7 +232,9 @@ impl Gameplay {
             }
             // L961: the server's own movies start nothing during another activity (a groom session
             // keeps travel open, so the portal's travel gate alone lets them through).
-            Kind::Checkers | Kind::Music | Kind::TowerDefense | Kind::Pirates if busy => {
+            Kind::Checkers | Kind::Music | Kind::TowerDefense | Kind::Pirates | Kind::Garage
+                if busy =>
+            {
                 Ok(refused(&Denied::Busy.message()))
             }
             // L104: the checkers table (it stages itself).
@@ -247,6 +251,12 @@ impl Gameplay {
                 if !out.changed {
                     out.replies.push(chat::system(&text));
                 }
+                Ok(out)
+            }),
+            // The garage zones in as a race does.
+            Kind::Garage => self.commit_if_changed(|staged| {
+                let mut out = Outcome::default();
+                staged.begin_garage(character, &mut out)?;
                 Ok(out)
             }),
             _ => Err(invalid("not a Games window game row")),

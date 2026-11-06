@@ -46,12 +46,14 @@ impl Gameplay {
         let hole = (self.fishing_hole.as_mut()).map(|hole| std::mem::take(&mut hole.pending));
         hole.or_else(|| self.derby_arena_loaded())
             .or_else(|| self.pirates_arena_loaded())
+            .or_else(|| self.garage_loaded())
     }
 
     /// The scene a fishing hole or (L931) the derby arena put the player in.
     pub(super) fn minigame_scene(&self) -> Option<&crate::zone_transition::ZoneTransition> {
         let hole = self.fishing_hole.as_ref().map(|hole| &hole.scene);
-        let pirates = self.pirates.as_ref().map(|arena| &arena.scene);
+        let pirates = (self.pirates.as_ref().map(|arena| &arena.scene))
+            .or_else(|| self.garage.as_ref().map(|garage| &garage.scene));
         hole.or_else(|| self.derby_arena_scene()).or(pirates)
     }
 
@@ -62,6 +64,7 @@ impl Gameplay {
         hole.is_some_and(|scene| u32::try_from(scene.id) == Ok(character.zone_id))
             || self.derby_arena_scene().is_some()
             || self.pirates.is_some()
+            || self.garage.as_ref().is_some_and(|garage| garage.entered)
     }
 
     /// A save taken in a house or a fishing hole stores the world pose, never scene coordinates.
@@ -76,7 +79,10 @@ impl Gameplay {
             .as_ref()
             .and_then(|derby| derby.arena_return().cloned());
         let pirates = self.pirates.as_ref().map(|visit| visit.return_to.clone());
-        self.house_return().or(hole).or(arena).or(pirates)
+        // Off the offer the player is still in the world and may have walked on.
+        let garage = (self.garage.as_ref().filter(|visit| visit.entered))
+            .map(|visit| visit.return_to.clone());
+        self.house_return().or(hole).or(arena).or(pirates).or(garage)
     }
 
     /// A reconnect leaves a house or a fishing hole and resumes at the world pose. The fishing
@@ -88,10 +94,13 @@ impl Gameplay {
             .as_mut()
             .and_then(crate::derby_gateway::DerbyGateway::leave_arena);
         let pirates = self.pirates.take().map(|visit| visit.return_to);
+        let garage = (self.garage.take().filter(|visit| visit.entered))
+            .map(|visit| visit.return_to);
         self.abandon_house_for_reconnect()
             .or(hole)
             .or(arena)
             .or(pirates)
+            .or(garage)
     }
 
     /// W160 per-tick upkeep: the bite timers and the end of a round that left its spot (nothing
