@@ -590,6 +590,12 @@
     "pir_black"
   ],
   "treasure": {
+    "power_ups": [
+      {"kind": "repair", "model": 1665, "effect": 16136, "chance": 10},
+      {"kind": "speed", "model": 1675, "effect": 16137, "chance": 10},
+      {"kind": "rapid_fire", "model": 1674, "effect": 16135, "chance": 10}
+    ],
+    "power_seconds": 15,
     "chest_model": 1786,
     "chest_alias": "pir_gold",
     "chest_effect": 16438,

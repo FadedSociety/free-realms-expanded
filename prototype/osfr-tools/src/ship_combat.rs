@@ -218,6 +218,12 @@ impl Content {
 #[derive(Clone, Debug, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct Treasure {
+    /// What an X spot can roll instead of a chest when it comes back. Each spot starts on a chest.
+    #[serde(default)]
+    pub power_ups: Vec<PowerUp>,
+    /// How long speed and rapid fire last (R).
+    #[serde(default)]
+    pub power_seconds: u32,
     /// The chest a pickup shows: `ss_pir_treasure_chest` 1786, whose idle is the bobbing
     /// `ss_pir_treasure_chest_loop_anim` (`Models.txt`).
     pub chest_model: u32,
@@ -334,6 +340,26 @@ pub struct Cannon {
     pub bit: u32,
     pub speed: f32,
     pub reload_seconds: f32,
+}
+
+/// One power-up an X spot can roll: its client model and effect, and its chance in 100 (R; the live
+/// `PickupSpawnChanceLoad` table never shipped). The firepower and long shot models are missing
+/// from the community files, so those two wait.
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct PowerUp {
+    pub kind: PowerKind,
+    pub model: u32,
+    pub effect: u32,
+    pub chance: u32,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum PowerKind {
+    Repair,
+    Speed,
+    RapidFire,
 }
 
 /// One flag: the masts' texture alias, its window icon (image set `icon_ui_pir_flag_*`) and its
@@ -544,6 +570,8 @@ impl Content {
                 .iter()
                 .all(|v| (0.01..=1000.0).contains(v))
             && g.damage >= 1
+            && t.power_ups.iter().map(|power| power.chance).sum::<u32>() <= 100
+            && t.power_ups.iter().all(|power| power.model > 0)
             && (content.decals.iter()).all(|d| text_ok(&d.alias))
             && (content.captains.iter()).all(|c| {
                 c.name_id > 0
@@ -911,6 +939,24 @@ fn dock(body: &mut Vec<u8>, at: &Dock, tint: &str, effects: [u32; 2], treasure: 
 /// CreateProxiedPickup (0x1c), reader `sub_A5A5F0`, handler 00a5f860: pickup `id` at `at`, showing
 /// `treasure`'s chest (`sub_CAC8D0`).
 pub fn create_pickup(id: u32, at: [f32; 3], treasure: &Treasure) -> Vec<u8> {
+    let (model, effect) = (treasure.chest_model, treasure.chest_effect);
+    pickup(id, at, (model, effect, &treasure.chest_alias), treasure)
+}
+
+/// What a spot shows: its power-up, or the chest.
+fn create_spot(id: u32, at: [f32; 3], treasure: &Treasure, power: Option<&PowerUp>) -> Vec<u8> {
+    match power {
+        Some(power) => pickup(id, at, (power.model, power.effect, ""), treasure),
+        None => create_pickup(id, at, treasure),
+    }
+}
+
+fn pickup(
+    id: u32,
+    at: [f32; 3],
+    (model, effect, alias): (u32, u32, &str),
+    treasure: &Treasure,
+) -> Vec<u8> {
     let mut body = id.to_le_bytes().to_vec();
     let [x, y, z] = at;
     // The position, the model's scale (`sub_CAC8D0` hands it to the actor, whose floor of 0.01 made
@@ -918,12 +964,12 @@ pub fn create_pickup(id: u32, at: [f32; 3], treasure: &Treasure) -> Vec<u8> {
     for value in [x, y, z, 1.0, 1.0, 1.0] {
         body.extend(value.to_le_bytes());
     }
-    body.extend(treasure.chest_model.to_le_bytes());
+    body.extend(model.to_le_bytes());
     // The effect `sub_CAC4F0` keeps on the pickup once its actor loads, and an animation (R 0).
-    body.extend(treasure.chest_effect.to_le_bytes());
+    body.extend(effect.to_le_bytes());
     body.extend(0_u32.to_le_bytes());
     // The actor's texture alias: the chest's look (`ss_pir_treasure_chest.adr`: gold, silver, bronze).
-    string(&mut body, &treasure.chest_alias);
+    string(&mut body, alias);
     // A warm-up before the actor shows, its effect, and the effect at +0x28 (`sub_CAC8D0`).
     body.extend(treasure.chest_warmup.to_le_bytes());
     body.extend(treasure.chest_warmup_effect.to_le_bytes());
@@ -967,8 +1013,14 @@ pub fn ship_lists(guid: u64, fleet: &[FleetShip], decals: &[Decal]) -> Vec<u8> {
 
 /// AnnouncerMessage (34), reader `sub_A5A9B0`, handler 00a62280, type 5: opens Ship Selection.
 pub fn open_ship_selection(guid: u64) -> Vec<u8> {
-    let mut body = 5_u32.to_le_bytes().to_vec();
-    body.extend(0_u32.to_le_bytes());
+    announce(guid, 5, 0)
+}
+
+/// AnnouncerMessage (34): `kind` 5 opens Ship Selection; 0 is a pickup line, by `sub` (2 speed,
+/// 3 rapid fire).
+fn announce(guid: u64, kind: u32, sub: u32) -> Vec<u8> {
+    let mut body = kind.to_le_bytes().to_vec();
+    body.extend(sub.to_le_bytes());
     body.extend(guid.to_le_bytes());
     body.extend(guid.to_le_bytes());
     body.extend([0; 24]);
@@ -1251,7 +1303,20 @@ pub struct Plunder {
     told: Option<(u32, u32)>,
     /// The AI ships at sea with the player.
     crew: Vec<Bot>,
+    /// What each spot holds: a power-up by its place in `Treasure::power_ups`, or a chest.
+    spots: Vec<Option<usize>>,
+    rolls: u64,
+    speed_until: u64,
+    rapid_until: u64,
+    /// The power flags the client last heard.
+    flags_told: u32,
 }
+
+/// The ship flag that gives it the Turbo speed (`sub_FEEB80` reads it as vehicle +0x2c) with its
+/// effect and sound (`sub_C9DEE0`, 00ca6040).
+const SPEEDING: u32 = 0x1_0000;
+/// The rapid fire flag, with the next effect and sound.
+const RAPID_FIRE: u32 = 0x4_0000;
 
 /// (R) Slack on the speed bound for a report's jitter (metres), once per anchor.
 /// ponytail: within one anchor window any point in the reach disc counts, so two chests on opposite
@@ -1290,6 +1355,57 @@ impl Plunder {
             next_shot: 1,
             told: None,
             crew: Vec::new(),
+            spots: vec![None; points],
+            rolls: 0x9E37_79B9_7F4A_7C15,
+            speed_until: 0,
+            rapid_until: 0,
+            flags_told: 0,
+        }
+    }
+
+    /// The power flags at `now_ms`.
+    fn flags(&self, now_ms: u64) -> u32 {
+        let speed = if now_ms < self.speed_until { SPEEDING } else { 0 };
+        speed | if now_ms < self.rapid_until { RAPID_FIRE } else { 0 }
+    }
+
+    /// The player's state as it stands.
+    fn state(&mut self, guid: u64, ship: &Ship, now_ms: u64) -> Vec<u8> {
+        self.flags_told = self.flags(now_ms);
+        ship_state(guid, self.flags_told, self.hull.health(ship), self.hold)
+    }
+
+    /// What a spot rolls as it comes back.
+    fn roll(&mut self, treasure: &Treasure) -> Option<usize> {
+        self.rolls = (self.rolls)
+            .wrapping_mul(6_364_136_223_846_793_005)
+            .wrapping_add(1_442_695_040_888_963_407);
+        let mut pick = u32::try_from((self.rolls >> 33) % 100).unwrap_or(0);
+        for (index, power) in treasure.power_ups.iter().enumerate() {
+            if pick < power.chance {
+                return Some(index);
+            }
+            pick -= power.chance;
+        }
+        None
+    }
+
+    /// Takes the power-up: the repair lands at once, the others run for `power_seconds`.
+    fn power(&mut self, guid: u64, kind: PowerKind, now_ms: u64, seconds: u32) -> Option<Vec<u8>> {
+        let until = now_ms.saturating_add(u64::from(seconds) * 1000);
+        match kind {
+            PowerKind::Repair => {
+                self.hull.damage = 0;
+                None
+            }
+            PowerKind::Speed => {
+                self.speed_until = until;
+                Some(announce(guid, 0, 2))
+            }
+            PowerKind::RapidFire => {
+                self.rapid_until = until;
+                Some(announce(guid, 0, 3))
+            }
         }
     }
 
@@ -1317,12 +1433,22 @@ impl Plunder {
         }
         let target = self.position.filter(|_| self.held_until.is_none());
         let mut out = Vec::new();
+        // Captains want chests: a power-up looks taken to them.
+        let spots = &self.spots;
+        let mut chests: Vec<_> = (self.taken_until.iter().zip(spots))
+            .map(|(until, spot)| spot.map_or(*until, |_| Some(u64::MAX)))
+            .collect();
         for bot in &mut self.crew {
             let sink = battle::sinking_ms(content).1;
-            out.extend(bot.sail(now_ms, place, &content.treasure, &mut self.taken_until, sink));
+            out.extend(bot.sail(now_ms, place, &content.treasure, &mut chests, sink));
             if let Some(target) = target {
                 let air = (&mut self.shots, &mut self.next_shot);
                 out.extend(bot.engage(target, now_ms, content, air));
+            }
+        }
+        for ((until, seen), spot) in self.taken_until.iter_mut().zip(chests).zip(spots) {
+            if spot.is_none() {
+                *until = seen;
             }
         }
         out
@@ -1383,7 +1509,8 @@ impl Plunder {
             self.told = None;
             return Vec::new();
         }
-        let aim = Aim { owner: battle::PLAYER, slot: 0, at, forward, velocity };
+        let reload = if now_ms < self.rapid_until { 0.5 } else { 1.0 };
+        let aim = Aim { owner: battle::PLAYER, slot: 0, at, forward, velocity, reload };
         let marks: Vec<Mark> = (self.crew.iter())
             .filter(|bot| bot.exposed(now_ms))
             .map(Bot::mark)
@@ -1411,6 +1538,10 @@ impl Plunder {
             }
             flying
         });
+        // A held ship hears its flags at `release`: a state now would clear the hold or the sinking.
+        if self.held_until.is_none() && self.flags(now_ms) != self.flags_told {
+            out.push(self.state(guid, ship, now_ms));
+        }
         let loaded = self.battery.loaded(ship, now_ms);
         if self.told != Some(loaded) {
             self.told = Some(loaded);
@@ -1461,10 +1592,13 @@ impl Plunder {
     fn take_hit(&mut self, ship: &Ship, damage: i32, now_ms: u64, sink_ms: u64) -> Vec<u8> {
         if self.hull.strike(ship, damage) {
             self.hold = 0;
+            self.speed_until = 0;
+            self.rapid_until = 0;
+            self.flags_told = 0;
             self.held_until = Some(now_ms.saturating_add(sink_ms));
             return ship_state(self.guid, battle::SINKING, 0, 0);
         }
-        player_state(self.guid, self.hull.health(ship), self.hold)
+        self.state(self.guid, ship, now_ms)
     }
 
     /// A sunk ship's time is up: whole again on its pad, held for the whirlpool's beat like any
@@ -1496,7 +1630,7 @@ impl Plunder {
         }
         self.held_until = None;
         self.anchor = self.anchor.map(|(at, _)| (at, now_ms));
-        Some(player_state(guid, self.hull.health(ship), self.hold))
+        Some(self.state(guid, ship, now_ms))
     }
 
     /// The round starts at `start_ms` (when Playing began) with the ship on its own pad (dock slot
@@ -1505,6 +1639,7 @@ impl Plunder {
         let first = self.anchor.is_none();
         if first {
             self.anchor = place.docks.first().map(|dock| (dock.bank, start_ms));
+            self.rolls ^= start_ms;
         }
         first
     }
@@ -1549,14 +1684,26 @@ impl Plunder {
             self.anchor = Some((at, now_ms));
         }
         let mut out = Vec::new();
-        for ((point, until), id) in place.pickups.iter().zip(&mut self.taken_until).zip(1..) {
-            if until.is_none()
-                && self.hold < capacity
-                && distance(*point, at) <= treasure.pickup_radius
+        let mut powered = false;
+        for (index, point) in place.pickups.iter().enumerate() {
+            let spot = self.spots.get(index).copied().flatten();
+            let power = spot.and_then(|at| treasure.power_ups.get(at));
+            if self.taken_until.get(index).is_none_or(Option::is_some)
+                || (power.is_none() && self.hold >= capacity)
+                || distance(*point, at) > treasure.pickup_radius
             {
-                *until = Some(now_ms.saturating_add(u64::from(treasure.respawn_seconds) * 1000));
-                self.hold += 1;
-                out.push(destroy_pickup(id, true));
+                continue;
+            }
+            let back = now_ms.saturating_add(u64::from(treasure.respawn_seconds) * 1000);
+            self.taken_until[index] = Some(back);
+            let id = u32::try_from(index + 1).unwrap_or(u32::MAX);
+            out.push(destroy_pickup(id, true));
+            match power {
+                Some(power) => {
+                    out.extend(self.power(guid, power.kind, now_ms, treasure.power_seconds));
+                    powered = true;
+                }
+                None => self.hold += 1,
             }
         }
         let due = (self.unloaded_ms).is_none_or(|last| now_ms.saturating_sub(last) >= unload_ms);
@@ -1571,13 +1718,13 @@ impl Plunder {
         if healed {
             self.hull.damage = 0;
         }
-        if self.hold != held || healed {
-            out.push(player_state(guid, self.hull.health(ship), self.hold));
+        if self.hold != held || healed || powered {
+            out.push(self.state(guid, ship, now_ms));
         }
         out
     }
 
-    /// Chests due back at `now_ms`.
+    /// Spots due back at `now_ms`: each rolls what it holds.
     pub fn respawn(
         &mut self,
         now_ms: u64,
@@ -1585,10 +1732,14 @@ impl Plunder {
         treasure: &Treasure,
     ) -> Vec<Vec<u8>> {
         let mut out = Vec::new();
-        for ((point, until), id) in points.iter().zip(&mut self.taken_until).zip(1..) {
-            if until.is_some_and(|at| at <= now_ms) {
-                *until = None;
-                out.push(create_pickup(id, *point, treasure));
+        for (index, point) in points.iter().enumerate() {
+            if self.taken_until.get(index).copied().flatten().is_some_and(|at| at <= now_ms) {
+                self.taken_until[index] = None;
+                let spot = self.roll(treasure);
+                self.spots[index] = spot;
+                let id = u32::try_from(index + 1).unwrap_or(u32::MAX);
+                let power = spot.and_then(|at| treasure.power_ups.get(at));
+                out.push(create_spot(id, *point, treasure, power));
             }
         }
         out
@@ -2343,6 +2494,58 @@ mod tests {
         }
     }
 
+    /// A spot that rolls a power-up shows it, the player takes it whatever the hold, the flag runs
+    /// its time and a captain leaves it alone.
+    #[test]
+    fn an_x_spot_can_roll_a_power_up() {
+        let mut content = content();
+        content.treasure.power_ups.truncate(0);
+        content.treasure.power_ups.push(PowerUp {
+            kind: PowerKind::Speed,
+            model: 1675,
+            effect: 16137,
+            chance: 100,
+        });
+        content.treasure.power_seconds = 10;
+        let ship = content.fleet_ship("Eel").unwrap();
+        let treasure = content.treasure.clone();
+        let mut place = content.arenas[0].clone();
+        let home = place.docks[0].bank;
+        let spot = [home[0] + 100.0, home[1], home[2]];
+        place.pickups = vec![spot];
+        let mut round = Plunder::new(1);
+        round.begin(&place, 0);
+        round.taken_until[0] = Some(100);
+        let back = round.respawn(100, &place.pickups, &treasure);
+        assert_eq!(back.len(), 1);
+        assert_eq!(back[0][..4], [94, 0, 28, 0]);
+        assert_eq!(back[0][32..36], 1675_u32.to_le_bytes(), "the model after six floats");
+        round.hold = u32::try_from(ship.hold_capacity).unwrap();
+        let took = round.sail(7, spot, 60_000, &place, &treasure, &ship);
+        assert!(took.iter().any(|p| p.starts_with(&[94, 0, 29, 0])), "a full hold still takes it");
+        assert!(took.iter().any(|p| p.starts_with(&[94, 0, 34, 0])), "the line");
+        let state = took.iter().find(|p| p.starts_with(&[94, 0, 17, 0])).unwrap();
+        assert_eq!(state[12..16], SPEEDING.to_le_bytes());
+        assert_eq!(round.hold, u32::try_from(ship.hold_capacity).unwrap());
+        let over = round.gunnery(7, 70_000, &ship, &content);
+        let state = over.iter().find(|p| p.starts_with(&[94, 0, 17, 0])).expect("the time runs out");
+        assert_eq!(state[12..16], 0_u32.to_le_bytes());
+        // Back on the spot, a captain beside it passes it by.
+        round.taken_until[0] = None;
+        let mut crew = content.crew(&place);
+        crew.truncate(1);
+        crew[0].moor(spot);
+        round.man(crew);
+        round.sail_crew(80_000, &place, &content);
+        assert_eq!(round.taken_until[0], None);
+        // A timer ending during a hold says nothing: that state would clear the hold.
+        round.speed_until = 90_100;
+        round.flags_told = SPEEDING;
+        round.held_until = Some(95_000);
+        let held = round.gunnery(7, 91_000, &ship, &content);
+        assert!(!held.iter().any(|p| p.starts_with(&[94, 0, 17, 0])));
+    }
+
     /// A ball flying metres between ticks still strikes what lies between them.
     #[test]
     fn a_ball_cannot_step_over_a_hull() {
@@ -2560,7 +2763,10 @@ mod tests {
         };
         assert!(loads(&|_| {}), "the shipped content");
         let long = "x".repeat(MAX_TEXT + 1);
-        let refused: [(&str, &dyn Fn(&mut serde_json::Value)); 23] = [
+        let refused: [(&str, &dyn Fn(&mut serde_json::Value)); 24] = [
+            ("power-ups past a hundred in a hundred", &|c| {
+                c["treasure"]["power_ups"][0]["chance"] = 101.into()
+            }),
             ("a ball that does nothing", &|c| c["gunnery"]["damage"] = 0.into()),
             ("a seat with no colour", &|c| {
                 c["colours"] = serde_json::json!(["pir_red"]);

@@ -242,6 +242,7 @@ impl Bot {
             at: self.at,
             forward: [x, 0.0, z],
             velocity: [x * self.speed, 0.0, z * self.speed],
+            reload: 1.0,
         };
         let mark = [Mark { at: target, velocity: [0.0; 3] }];
         let ship = self.ship.clone();

@@ -99,6 +99,8 @@ pub(super) struct Aim {
     pub(super) at: [f32; 3],
     pub(super) forward: [f32; 3],
     pub(super) velocity: [f32; 3],
+    /// The share of `reload_seconds` a side takes: rapid fire halves it.
+    pub(super) reload: f32,
 }
 
 /// One ship's guns: when each is loaded again, in the ship's order (one past the end is loaded),
@@ -142,7 +144,7 @@ impl Battery {
                 break;
             }
             let crew = &mut self.crews[usize::from(gun.left)];
-            let turn = (gun.reload_seconds * 1000.0 / per_side) as u64;
+            let turn = (gun.reload_seconds * aim.reload * 1000.0 / per_side) as u64;
             *crew = (*crew).max(now_ms).saturating_add(turn);
             *ready = *crew;
             // The ship's frame: the left is the bow turned a quarter (the rows `create_ship` writes).
