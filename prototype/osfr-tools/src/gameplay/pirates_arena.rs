@@ -10,9 +10,10 @@ use std::sync::atomic::{AtomicI32, Ordering};
 /// The run ids a match's offer takes, out of the other games' ranges.
 static NEXT_RUN: AtomicI32 = AtomicI32::new(63_000_001);
 
-/// What a match reports to its run: any finish is a win (R, as `settle_pirates`).
+/// What a match reports to its run: first place is a win.
 struct Round {
     gold: u32,
+    won: bool,
 }
 
 impl Activity for Round {
@@ -22,7 +23,7 @@ impl Activity for Round {
 
     fn finish(&self) -> Option<ActivityFinish> {
         Some(ActivityFinish {
-            won: true,
+            won: self.won,
             stars: 0,
             elapsed_seconds: 0,
         })
@@ -86,7 +87,8 @@ impl Gameplay {
         else {
             return Ok(format!("Usage: realm pirates <1-{}>", content.arenas.len()));
         };
-        let plunder = ship_combat::Plunder::new(arena.pickups.len());
+        let mut plunder = ship_combat::Plunder::new(arena.pickups.len());
+        let crew = content.crew(arena);
         let ship = content.opening_ship();
         // Every ship starts on its own pad; the solo player's is dock slot 0 (`load` keeps one).
         let home = arena.docks[0].bank;
@@ -114,8 +116,8 @@ impl Gameplay {
                 &content.colours,
                 &content.treasure,
             ),
-            // A solo match: the one human ship, no AI (R until the AI slice).
-            ship_combat::player_count(1, 0),
+            // One human ship, and the captains in the other seats.
+            ship_combat::player_count(1, u32::try_from(crew.len()).unwrap_or(0)),
             ship_combat::game_state(ship_combat::WAITING_FOR_CLIENTS),
             // The local player's ship: the client makes its local player from it (00a6c3b0).
             // Dock slot 0's colour (`load` keeps the list non-empty).
@@ -132,6 +134,8 @@ impl Gameplay {
             // Its camera's config, which the ship camera reads from its first frame.
             ship_combat::camera_config(&content.camera),
         ];
+        pending.extend(crew.iter().flat_map(|bot| bot.introduce(content)));
+        plunder.man(crew);
         pending.push(ship_combat::mark_treasure(&arena.pickups));
         pending.extend(ship_combat::show_pickups(&arena.pickups, &content.treasure));
         // The standings show from the first frame, not the first bank.
@@ -210,6 +214,7 @@ impl Gameplay {
             let quit = if arena.game.state() == ship_combat::GAME_OVER {
                 let round = Round {
                     gold: arena.plunder.gold(),
+                    won: arena.plunder.placement() == 1,
                 };
                 (arena.runs).finish_win_without_reward(arena.run_id, &round)?
             } else {
@@ -299,6 +304,7 @@ impl Gameplay {
                 let hold = arena.plunder.hold();
                 out.replies
                     .push(ship_combat::player_state(guid, ship.health, hold));
+                out.replies.extend(arena.plunder.launch_crew());
             }
             let earned = (arena.plunder).sail(guid, at, now_ms, place, treasure, &ship);
             out.replies.extend(earned);
@@ -378,6 +384,7 @@ impl Gameplay {
             {
                 let round = Round {
                     gold: arena.plunder.gold(),
+                    won: arena.plunder.placement() == 1,
                 };
                 let ended = (arena.runs).finish_win_without_reward(arena.run_id, &round)?;
                 out.replies.extend(ended.replies);
@@ -386,8 +393,8 @@ impl Gameplay {
         Ok(())
     }
 
-    /// The match's credit and pay, for the arena's own row. (R) `won`: any finish is first place
-    /// in a solo match. The score is the gold banked; nothing else is measured.
+    /// The match's credit and pay, for the arena's own row. First place is the win, and finishing
+    /// pays whatever the place (R). The score is the gold banked; nothing else is measured.
     fn settle_pirates(&mut self, now_ms: u64, out: &mut Outcome) -> io::Result<()> {
         let Some(arena) = self.pirates.as_ref() else {
             return Ok(());
@@ -399,11 +406,12 @@ impl Gameplay {
             return Ok(());
         };
         let (gold, guid) = (arena.plunder.gold(), arena.return_to.guid);
+        let placement = arena.plunder.placement();
         let result = crate::quest_engine::MinigameResult {
-            won: true,
+            won: placement == 1,
             elapsed_seconds: None,
             score: Some(gold),
-            placement: Some(1),
+            placement: Some(placement),
             knocked_out: false,
         };
         self.credit_minigame(place.minigame_id, result, out)?;
@@ -462,6 +470,8 @@ impl Gameplay {
             out.replies.extend(back);
             let guid = arena.return_to.guid;
             out.replies.extend(arena.plunder.release(guid, now_ms, &arena.ship));
+            let crew = arena.plunder.sail_crew(now_ms, place, &content.treasure);
+            out.replies.extend(crew);
         }
         // Balls still in the air at the whistle come down too: only DespawnProjectile ends one.
         if matches!(arena.game.state(), ship_combat::PLAYING | ship_combat::GAME_OVER)

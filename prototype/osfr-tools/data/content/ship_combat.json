@@ -412,6 +412,13 @@
     "ShipChestEmptyEffectId": 16434
   },
   "gunnery": {"speed": 35.0, "flight_seconds": 2.0, "reload_seconds": 3.0, "ball_scale": 1.0},
+  "captains": [
+    {"name_id": 427711, "ship": "Juggernaut", "flag": "octopus"},
+    {"name_id": 427712, "ship": "Cutlass", "flag": "skullx02"},
+    {"name_id": 427713, "ship": "Revenge", "flag": "cutlass01"},
+    {"name_id": 427714, "ship": "Eel", "flag": "seaturtle"},
+    {"name_id": 427715, "ship": "Cutlass", "flag": "star"}
+  ],
   "start_ship": "Cutlass",
   "fleet": [
     {"key": "Eel", "name_id": 417574, "size_id": 4087, "turning_id": 9001, "cannons": 8, "icon": 37125, "hull": "sml", "health": 70, "hold_capacity": 4, "max_speed": 26.0, "turbo_speed": 34.0, "max_turn": 90.0, "gun_beam": 2.5, "gun_height": 2.0, "gun_row": 3.0},

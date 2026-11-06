@@ -8,6 +8,9 @@
 //! ZoneConfig's wire order is the client reader `sub_A69CF0`; each field's name and type come from
 //! the server loader compiled into the client, `ShipZoneConfigLoad` 010680f0, joined by struct
 //! offset. The live per-zone values never shipped, so every value is content (R).
+mod captains;
+
+pub use captains::{Bot, Captain};
 use serde::Deserialize;
 use std::{
     collections::{BTreeMap, VecDeque},
@@ -134,6 +137,9 @@ pub struct Content {
     /// The treasure round's values (R).
     pub treasure: Treasure,
     pub gunnery: Gunnery,
+    /// The AI seats, in dock order after the player's.
+    #[serde(default)]
+    pub captains: Vec<Captain>,
     /// The dock's book stands (`sg_signinbook_01`), the world's way in.
     #[serde(default)]
     pub stands: Vec<Stand>,
@@ -530,6 +536,14 @@ impl Content {
                 .iter()
                 .all(|v| (0.01..=1000.0).contains(v))
             && (content.decals.iter()).all(|d| text_ok(&d.alias))
+            && (content.captains.iter()).all(|c| {
+                c.name_id > 0
+                    && c.flag.len() <= MAX_FIXED
+                    && content.fleet.iter().any(|f| f.key == c.ship)
+                    && content.decals.iter().any(|d| d.alias == c.flag)
+            })
+            && content.colours.len() > content.captains.len()
+            && content.fleet.iter().all(|f| f.max_turn > 0.0)
             && (content.fleet.is_empty()
                 || content.fleet.iter().any(|f| f.key == content.start_ship))
             && (1..=1000).contains(&ship.hold_unload_per_second)
@@ -1034,6 +1048,24 @@ pub fn player_gold(guid: u64, gold: u32) -> Vec<u8> {
 /// the AI's locale name (0 for a human), the index 00a67110 checks against the list at processor
 /// +0x420 (R: -1) and the row's colour (+0x1d8, `SetPlayerColor`).
 pub fn player_card(guid: u64, name: &str, ship: &Ship, decal: Option<&Decal>, colour: u32) -> Vec<u8> {
+    card(guid, name, (0, -1), ship, decal, colour)
+}
+
+/// A captain's row: no name record, but a locale id (+0x1d0, which `sub_A62FD0` shows), its slot
+/// (+0x1d4) and the slot's colour.
+fn captain_card(guid: u64, name_id: u32, slot: u32, ship: &Ship, decal: Option<&Decal>) -> Vec<u8> {
+    let seat = i32::try_from(slot).unwrap_or(-1);
+    card(guid, "", (name_id, seat), ship, decal, slot)
+}
+
+fn card(
+    guid: u64,
+    name: &str,
+    (name_id, slot): (u32, i32),
+    ship: &Ship,
+    decal: Option<&Decal>,
+    colour: u32,
+) -> Vec<u8> {
     let mut body = guid.to_le_bytes().to_vec();
     body.extend(0x18_u32.to_le_bytes());
     string(&mut body, &ship.key);
@@ -1043,8 +1075,8 @@ pub fn player_card(guid: u64, name: &str, ship: &Ship, decal: Option<&Decal>, co
     body.extend([0; 12]);
     string(&mut body, name);
     string(&mut body, "");
-    body.extend(0_u32.to_le_bytes());
-    body.extend((-1_i32).to_le_bytes());
+    body.extend(name_id.to_le_bytes());
+    body.extend(slot.to_le_bytes());
     body.extend(colour.to_le_bytes());
     packet(UPDATE_PLAYER, &body)
 }
@@ -1212,6 +1244,8 @@ pub struct Plunder {
     next_shot: u32,
     /// The left and right masks the client last heard.
     told: Option<(u32, u32)>,
+    /// The AI ships at sea with the player.
+    crew: Vec<Bot>,
 }
 
 /// (R) Slack on the speed bound for a report's jitter (metres), once per anchor.
@@ -1249,7 +1283,34 @@ impl Plunder {
             shots: VecDeque::new(),
             next_shot: 1,
             told: None,
+            crew: Vec::new(),
         }
+    }
+
+    /// Puts `crew` to sea in this round.
+    pub fn man(&mut self, crew: Vec<Bot>) {
+        self.crew = crew;
+    }
+
+    /// Where the player stands: first, unless a captain has banked more.
+    pub fn placement(&self) -> u8 {
+        let ahead = self.crew.iter().filter(|bot| bot.gold() > self.gold).count();
+        u8::try_from(ahead).unwrap_or(u8::MAX - 1) + 1
+    }
+
+    /// What lets the crew's ships go, as Playing starts.
+    pub fn launch_crew(&self) -> Vec<Vec<u8>> {
+        self.crew.iter().map(Bot::launch).collect()
+    }
+
+    /// One tick of the crew, once the round has begun: they share the player's chests.
+    pub fn sail_crew(&mut self, now_ms: u64, place: &Arena, treasure: &Treasure) -> Vec<Vec<u8>> {
+        if self.anchor.is_none() {
+            return Vec::new();
+        }
+        let chests = &mut self.taken_until;
+        let turns = self.crew.iter_mut();
+        turns.flat_map(|bot| bot.sail(now_ms, place, treasure, chests)).collect()
     }
 
     /// The hold, as UpdatePlayerState carries it.
@@ -2330,7 +2391,11 @@ mod tests {
         };
         assert!(loads(&|_| {}), "the shipped content");
         let long = "x".repeat(MAX_TEXT + 1);
-        let refused: [(&str, &dyn Fn(&mut serde_json::Value)); 20] = [
+        let refused: [(&str, &dyn Fn(&mut serde_json::Value)); 22] = [
+            ("a seat with no colour", &|c| {
+                c["colours"] = serde_json::json!(["pir_red"]);
+            }),
+            ("a ship that cannot turn", &|c| c["fleet"][0]["max_turn"] = 0.into()),
             ("no splash effect", &|c| {
                 c["zone_config"]["ProjectileWaterImpactEffectId"] = 0.into()
             }),
