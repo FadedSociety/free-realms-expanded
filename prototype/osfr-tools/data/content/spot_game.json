@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "source": "Rows from MiniGameData.txt 1040, 1042, 1044; max_find_points mirrors the movie's GameData. Reconstructed: stage_id (Fanbyte's tiers), the coins (sized against quest rewards: median 5, nine in ten at 30 or less, so a floor of 5 and about 9 to 14 for a perfect run), the goal's text ids chosen by wording, and a telescope offering all three games.",
+  "description_id": 436035,
+  "icon_id": 7533,
+  "win_coins_per_10000": 1,
+  "win_coins_min": 5,
+  "goal_name_id": 436321,
+  "goal_description_id": 93510,
+  "games": [
+    { "game_id": 1040, "name_id": 436030, "difficulty": 1, "stage_id": 1, "max_find_points": 3900 },
+    { "game_id": 1042, "name_id": 436032, "difficulty": 2, "stage_id": 3, "max_find_points": 5100 },
+    { "game_id": 1044, "name_id": 436034, "difficulty": 3, "stage_id": 5, "max_find_points": 5700 }
+  ],
+  "telescopes": [
+    { "npc": 100000004609, "position": [-1144.66, -30.94304, -386.0203] },
+    { "npc": 100000004610, "position": [-588.5467, 1.078044, -1148.451] },
+    { "npc": 100000033332, "position": [-1313.8291, -15.344327, 291.77377] }
+  ]
+}

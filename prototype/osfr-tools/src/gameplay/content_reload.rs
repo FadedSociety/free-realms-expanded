@@ -83,7 +83,7 @@ impl Gameplay {
                             ],
                             self.fishing_spots.as_deref(),
                             self.music.as_ref(),
-            self.sword.as_deref(),
+            (self.sword.as_deref(), self.spot.as_deref()),
                             self.tower_defense.as_deref(),
                             self.ship_combat.is_some(),
                         ),

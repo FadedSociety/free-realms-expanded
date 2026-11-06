@@ -9,6 +9,7 @@ use crate::{
     harvest_nodes::{Denied, payout_fits},
     kart_gateway::{EntryDenied, KartGateway},
     music_game::MusicGame,
+    spot_game::SpotGame,
     sword_game::SwordGame,
     recipes::RecipeCatalog,
     tower_defense::TowerDefense,
@@ -41,7 +42,7 @@ pub(super) fn games(
     type8: [Option<&Type8Engine>; 4],
     fishing: Option<&FishingSpots>,
     music: Option<&MusicGame>,
-    sword: Option<&SwordGame>,
+    (sword, spot): (Option<&SwordGame>, Option<&SpotGame>),
     tower_defense: Option<&TowerDefense>,
     pirates: bool,
 ) -> Vec<Activity> {
@@ -89,6 +90,8 @@ pub(super) fn games(
     });
     let songs = (music.into_iter().flat_map(MusicGame::game_ids))
         .filter_map(|game| Some(game_row(u32::try_from(game).ok()?, Kind::Music)));
+    let spots = (spot.into_iter().flat_map(SpotGame::game_ids))
+        .filter_map(|game| Some(game_row(u32::try_from(game).ok()?, Kind::Spot)));
     let maps = (tower_defense.into_iter().flat_map(TowerDefense::game_ids))
         .filter_map(|game| Some(game_row(u32::try_from(game).ok()?, Kind::TowerDefense)));
     (kart.into_iter().map(|id| game_row(id, Kind::Kart)))
@@ -98,6 +101,7 @@ pub(super) fn games(
         .chain(holes)
         .chain([game_row(crate::checkers::GAME_ID as u32, Kind::Checkers)])
         .chain(songs)
+        .chain(spots)
         .chain(sword.and_then(|game| Some(game_row(u32::try_from(game.game_id()).ok()?, Kind::Sword))))
         .chain(maps)
         .chain(pirates.then(|| game_row(crate::ship_combat::GAME_ID, Kind::Pirates)))
@@ -235,7 +239,7 @@ impl Gameplay {
             }
             // L961: the server's own movies start nothing during another activity (a groom session
             // keeps travel open, so the portal's travel gate alone lets them through).
-            Kind::Checkers | Kind::Music | Kind::Sword | Kind::TowerDefense | Kind::Pirates | Kind::Garage
+            Kind::Checkers | Kind::Music | Kind::Sword | Kind::Spot | Kind::TowerDefense | Kind::Pirates | Kind::Garage
                 if busy =>
             {
                 Ok(refused(&Denied::Busy.message()))
@@ -245,6 +249,7 @@ impl Gameplay {
             // L961: Feeling the Beat! game `id` (it stages itself).
             Kind::Music => self.begin_music(id),
             Kind::Sword => self.begin_sword(),
+            Kind::Spot => self.begin_spot(id),
             // L962: Tower Defense game `id` (it stages itself).
             Kind::TowerDefense => self.begin_tower_defense(id),
             // L963: a solo match in the first arena (R: the live game matched one to five players

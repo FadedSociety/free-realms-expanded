@@ -15,10 +15,11 @@ pub(super) fn load_tower_defense(content: &Path) -> io::Result<Option<Box<TowerD
 /// under its own guid.
 pub(super) fn bind_tables(
     content: &Path,
-    (td, ships, sword): (
+    (td, ships, sword, spot): (
         &Option<Box<TowerDefense>>,
         &Option<Arc<crate::ship_combat::Content>>,
         &Option<Box<crate::sword_game::SwordGame>>,
+        &Option<Box<crate::spot_game::SpotGame>>,
     ),
     interaction: &mut Option<NpcInteraction>,
     visibility: &mut Option<crate::world::NpcVisibility>,
@@ -26,6 +27,7 @@ pub(super) fn bind_tables(
     let stands = ships.as_ref().map(|ships| ships.stand_menus()).unwrap_or_default();
     let mut boards = super::checkers_table::board_table_menus(content)?;
     boards.extend(super::sword_table::dummy_menus(sword));
+    boards.extend(super::spot_table::telescope_menus(spot));
     if let Some(interaction) = interaction {
         interaction.set_pirates_stands(&stands);
         interaction.set_board_tables(&boards);

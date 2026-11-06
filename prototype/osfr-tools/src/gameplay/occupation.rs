@@ -40,6 +40,7 @@ occupations!(
     // L961: a Feeling the Beat! song against the server; (R) it closes the checkers gates.
     Music,
     Sword,
+    Spot,
     // L962: a Tower Defense game against the server; (R) it closes the checkers gates.
     TowerDefense,
     // L963: a Pirate's Plunder match in its arena; (R) the derby's gates.
@@ -105,6 +106,7 @@ impl Occupation {
             Checkers => "a checkers game",
             Music => "a Feeling the Beat! song",
             Sword => "a Hack 'n' Slash game",
+            Spot => "a Spot the Difference game",
             TowerDefense => "a Tower Defense game",
             Pirates => "a Pirate's Plunder match",
             CardGame => "a card game",
@@ -125,7 +127,7 @@ impl Occupation {
         let (start, warp, ride, pets, location) = match self {
             // (R) A card run closes the same gates as chess (T765).
             Forging | Smelting | Cooking | Mining | Harvesting | Mail | Artifact | Chess | Checkers
-            | Music | Sword | TowerDefense | CardGame | Fishing | Encounter => {
+            | Music | Sword | Spot | TowerDefense | CardGame | Fishing | Encounter => {
                 (true, true, true, true, false)
             }
             Derby | Soccer | Kart | Pirates | Garage => (true, true, true, true, true),
@@ -174,6 +176,7 @@ impl Gameplay {
             Occupation::Sword => {
                 (self.sword.as_deref()).is_some_and(crate::sword_game::SwordGame::is_active)
             }
+            Occupation::Spot => (self.spot.as_deref()).is_some_and(crate::spot_game::SpotGame::is_active),
             Occupation::TowerDefense => (self.tower_defense.as_deref())
                 .is_some_and(crate::tower_defense::TowerDefense::is_active),
             Occupation::Pirates => self.pirates.is_some(),
@@ -247,6 +250,7 @@ mod tests {
                 Checkers,
                 Music,
                 Sword,
+                Spot,
                 TowerDefense,
                 Pirates,
                 Garage,
@@ -275,6 +279,7 @@ mod tests {
                 Checkers,
                 Music,
                 Sword,
+                Spot,
                 TowerDefense,
                 Pirates,
                 Garage,
@@ -302,6 +307,7 @@ mod tests {
                 Checkers,
                 Music,
                 Sword,
+                Spot,
                 TowerDefense,
                 Pirates,
                 Garage,
@@ -329,6 +335,7 @@ mod tests {
                 Checkers,
                 Music,
                 Sword,
+                Spot,
                 TowerDefense,
                 Pirates,
                 Garage,
@@ -359,6 +366,7 @@ mod tests {
                 Checkers,
                 Music,
                 Sword,
+                Spot,
                 TowerDefense,
                 Pirates,
                 Garage,

@@ -65,6 +65,9 @@ impl Gameplay {
         if (self.sword.as_ref()).is_some_and(|sword| sword.game_id() as u32 == game) {
             return self.begin_sword();
         }
+        if (self.spot.as_ref()).is_some_and(|spot| spot.game_ids().any(|id| id as u32 == game)) {
+            return self.begin_spot(game);
+        }
         let mut out = Outcome::default();
         self.begin_chess(game, player_id, &mut out)?;
         Ok(out)

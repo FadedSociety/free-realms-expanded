@@ -24,6 +24,7 @@
 //!   | finished derby (`Gameplay::pay_derby_completion`) | entered row id | `DerbyGateway::rows` (`derby_entry.json` default + `derby_rows.json`) |
 //!   | won song (`Gameplay::handle_music` -> `npc_minigame_win_id_only`, L961) | game id | `music_game.json` `games[].game_id` |
 //!   | won Hack 'n' Slash (`Gameplay::handle_sword` -> `npc_minigame_win_id_only`) | game id | `sword_game.json` `game_id` |
+//!   | won Spot the Difference (`Gameplay::handle_spot` -> `npc_minigame_win_id_only`) | game id | `spot_game.json` `games[].game_id` |
 //!   | finished Pirate's Plunder match (`Gameplay::settle_pirates`) | arena's row | `ship_combat.json` `arenas[].minigame_id` |
 //!   | won Tower Defense game (`Gameplay::handle_tower_defense` -> `npc_minigame_win_id_only`, L962) | game id | `tower_defense.json` `games[].game_id` |
 //!
@@ -91,7 +92,7 @@ use osfr_tools::{
     music_game,
     pets::PetContent,
     recipes::{CraftingJob, RecipeCatalog},
-    ship_combat, soccer_entry, sword_game, tower_defense,
+    ship_combat, soccer_entry, spot_game, sword_game, tower_defense,
 };
 use serde_json::Value;
 use std::{
@@ -237,6 +238,12 @@ impl Targets {
         if root.join(sword_game::CONTENT_FILE).is_file() {
             let game = sword_game::SwordContent::load(root)?.game_id;
             targets.producer(u32::try_from(game).map_err(io::Error::other)?, []);
+        }
+        // Every `spot_game.json` game; the score is the client's, so no fact.
+        if root.join(spot_game::CONTENT_FILE).is_file() {
+            for game in spot_game::SpotContent::load(root)?.games {
+                targets.producer(u32::try_from(game.game_id).map_err(io::Error::other)?, []);
+            }
         }
         // L962: every `tower_defense.json` game; the 39/18 total is the client's, so no fact.
         if root.join(tower_defense::CONTENT_FILE).is_file() {

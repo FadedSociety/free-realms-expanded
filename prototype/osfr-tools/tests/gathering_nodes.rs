@@ -1915,6 +1915,83 @@ fn a_game_table_offers_chess_and_checkers() {
     }
 }
 
+/// Play on row 1087: the offer names the preload list, the movie launches, its tier goes out, a
+/// finished round wins once and pays once, and the job never changes. Row 1089 runs its own tier.
+#[test]
+fn games_window_play_opens_spot_the_difference_and_keeps_the_job() {
+    let fixture = Fixture::new(PLOT);
+    let mut gateway = fixture.gateway_at(fixture.state(false, true), &fixture.node, 60.0);
+    tick(&mut gateway, 1_500);
+    let job = gateway.gameplay().unwrap().active_profile();
+    let offer_of = |out: &GatewayOutcome| {
+        (inners(out).into_iter())
+            .find(|p| p.starts_with(&[39, 0, 16]))
+            .map(<[u8]>::to_vec)
+    };
+    let offered = play(&mut gateway, 1087, 2_000);
+    let offer = offer_of(&offered).expect("the 39/16 offer");
+    assert_eq!(i32::from_le_bytes(offer[11..15].try_into().unwrap()), 1040);
+    assert!(
+        (offer.windows(19)).any(|w| w == b"ForcePerception.txt"),
+        "the movie's preload list, or the start screen stays on Loading..."
+    );
+    let id = i32::from_le_bytes(offer[3..7].try_into().unwrap());
+    let started = send(&mut gateway, &frame(5, id, -1), 2_100);
+    assert!(said(&started, "ForcePerception.gfx"), "the movie launches");
+    let stage = send(&mut gateway, &payload(id, "FRServer_RequestStageId"), 2_300);
+    assert!(said(&stage, "VOnServerSetStageIdMsg\t1"), "the tier");
+
+    let before = coins(&gateway);
+    for _ in 0..5 {
+        send(&mut gateway, &payload(id, "FRServer_StatUpdate\t22\t1"), 5_000);
+    }
+    let win = payload(id, "FRServer_GameWon\t15000");
+    let won = send(&mut gateway, &win, 30_000);
+    let result = |out: &GatewayOutcome| {
+        (inners(out).into_iter())
+            .find(|p| p.starts_with(&[39, 0, 18]))
+            .map(<[u8]>::to_vec)
+    };
+    assert_eq!(result(&won).expect("the result screen")[15], 1, "won");
+    let paid = coins(&gateway) - before;
+    assert!(paid > 0, "a win pays");
+    assert!(result(&send(&mut gateway, &win, 30_100)).is_none(), "given once");
+    assert_eq!(coins(&gateway), before + paid, "and paid once");
+    assert_eq!(gateway.gameplay().unwrap().active_profile(), job);
+    send(&mut gateway, &payload(id, "FRServer_GameClose"), 30_200);
+    send(&mut gateway, &CLOSE, 31_000);
+    let next = play(&mut gateway, 1089, 33_000);
+    let offer = offer_of(&next).expect("a new game after the close");
+    assert_eq!(i32::from_le_bytes(offer[11..15].try_into().unwrap()), 1044);
+}
+
+/// A telescope lists all three games, and a choice offers that game.
+#[test]
+fn a_telescope_offers_spot_the_difference() {
+    const TELESCOPE: u64 = 100_000_033_332;
+    let fixture = Fixture::new(PLOT);
+    let mut at = fixture.node.clone();
+    at.position = [-1313.8291, -15.344327, 291.77377];
+    for (choice, game) in [(1_i32, 1040_i32), (3, 1044)] {
+        let mut gateway = fixture.gateway_at(fixture.state(false, true), &at, 1.0);
+        tick(&mut gateway, 1_500);
+        let mut click = vec![26, 0, 8, 0];
+        click.extend(TELESCOPE.to_le_bytes());
+        click.push(0);
+        let menu = send(&mut gateway, &click, 2_000);
+        assert!(inners(&menu).iter().any(|p| p.starts_with(&[26, 0, 9, 0])), "the menu");
+        let mut choose = vec![26, 0, 10, 0];
+        choose.extend(TELESCOPE.to_le_bytes());
+        choose.extend(choice.to_le_bytes());
+        let offered = send(&mut gateway, &choose, 2_100);
+        let offers: Vec<_> = (inners(&offered).into_iter())
+            .filter(|p| p.starts_with(&[39, 0, 16]))
+            .map(|p| i32::from_le_bytes(p[11..15].try_into().unwrap()))
+            .collect();
+        assert_eq!(offers, [game]);
+    }
+}
+
 /// A Practice Dummy has one menu row, and it offers Hack 'n' Slash.
 #[test]
 fn a_practice_dummy_offers_hack_n_slash() {
