@@ -411,7 +411,7 @@
     "ShipChestFullEffectId": 16435,
     "ShipChestEmptyEffectId": 16434
   },
-  "gunnery": {"speed": 35.0, "flight_seconds": 2.0, "reload_seconds": 3.0, "ball_scale": 1.0},
+  "gunnery": {"speed": 35.0, "flight_seconds": 2.0, "reload_seconds": 3.0, "ball_scale": 1.0, "damage": 4},
   "captains": [
     {"name_id": 427711, "ship": "Juggernaut", "flag": "octopus"},
     {"name_id": 427712, "ship": "Cutlass", "flag": "skullx02"},

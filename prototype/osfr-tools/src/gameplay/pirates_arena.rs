@@ -348,7 +348,11 @@ impl Gameplay {
         let (Some(mut ship), Some(place)) = (chosen, content.arenas.get(arena.arena)) else {
             return;
         };
-        if arena.game.playing_since().is_none() || !std::mem::take(&mut arena.choosing) {
+        // A ship going down has no say: the window may have opened before it was hit.
+        if arena.game.playing_since().is_none()
+            || !std::mem::take(&mut arena.choosing)
+            || arena.plunder.sunk()
+        {
             return;
         }
         let flag = content.decals.iter().find(|d| d.alias == decal);
@@ -469,18 +473,17 @@ impl Gameplay {
             let back = (arena.plunder).respawn(now_ms, &place.pickups, &content.treasure);
             out.replies.extend(back);
             let guid = arena.return_to.guid;
+            out.replies.extend(arena.plunder.refloat(guid, now_ms, place, content));
             out.replies.extend(arena.plunder.release(guid, now_ms, &arena.ship));
-            let crew = arena.plunder.sail_crew(now_ms, place, &content.treasure);
+            let crew = arena.plunder.sail_crew(now_ms, place, content);
             out.replies.extend(crew);
         }
         // Balls still in the air at the whistle come down too: only DespawnProjectile ends one.
         if matches!(arena.game.state(), ship_combat::PLAYING | ship_combat::GAME_OVER)
             && let Some(content) = content
         {
-            let splash = content.zone_config.get("ProjectileWaterImpactEffectId");
-            let splash = splash.copied().unwrap_or(0.0) as u32;
             let guid = arena.return_to.guid;
-            let guns = arena.plunder.gunnery(guid, now_ms, &arena.ship, splash);
+            let guns = arena.plunder.gunnery(guid, now_ms, &arena.ship, content);
             out.replies.extend(guns);
         }
         if arena.game.finished(now_ms) {

@@ -8,8 +8,10 @@
 //! ZoneConfig's wire order is the client reader `sub_A69CF0`; each field's name and type come from
 //! the server loader compiled into the client, `ShipZoneConfigLoad` 010680f0, joined by struct
 //! offset. The live per-zone values never shipped, so every value is content (R).
+mod battle;
 mod captains;
 
+use battle::{Aim, Battery, Hull, Mark, Shot};
 pub use captains::{Bot, Captain};
 use serde::Deserialize;
 use std::{
@@ -180,6 +182,7 @@ impl Content {
         ship.key.clone_from(&entry.key);
         ship.collision = format!("pirship_hum_{hull}_mainbody_bbe.cdt");
         ship.cannons = self.gunnery.broadsides(entry);
+        ship.hit_radius = entry.gun_row;
         // The damage states' thresholds are absolute health: they scale with the hull.
         for state in &mut ship.damage_states {
             state.health = state.health * entry.health / self.ship.health.max(1);
@@ -289,6 +292,8 @@ pub struct Gunnery {
     pub reload_seconds: f32,
     /// SpawnProjectile's model scale.
     pub ball_scale: f32,
+    /// What a ball takes off a hull.
+    pub damage: i32,
 }
 
 impl Gunnery {
@@ -357,6 +362,9 @@ pub struct Ship {
     /// Its guns, from `Content::fleet_ship`.
     #[serde(skip)]
     pub cannons: Vec<Cannon>,
+    /// How near a ball has to pass to strike it (R: half its gun row, with `ProjectileRadius`).
+    #[serde(skip)]
+    pub hit_radius: f32,
     /// `SHIP_FIELDS` by name; a missing key is 0.
     #[serde(default)]
     pub config: BTreeMap<String, f64>,
@@ -535,6 +543,7 @@ impl Content {
             && [g.speed, g.flight_seconds, g.reload_seconds, g.ball_scale]
                 .iter()
                 .all(|v| (0.01..=1000.0).contains(v))
+            && g.damage >= 1
             && (content.decals.iter()).all(|d| text_ok(&d.alias))
             && (content.captains.iter()).all(|c| {
                 c.name_id > 0
@@ -1089,8 +1098,13 @@ fn card(
 /// HoldCapacity / ShipHoldMinValue (00ca10b0) and fill per frame from the hold (00ca07c0).
 /// ponytail: full health until damage lands; then `Plunder` carries the ship's health.
 pub fn player_state(guid: u64, health: i32, hold: u32) -> Vec<u8> {
+    ship_state(guid, 0, health, hold)
+}
+
+/// UpdatePlayerState with its flags word (ship +0x1c, `sub_C9E680`).
+fn ship_state(guid: u64, flags: u32, health: i32, hold: u32) -> Vec<u8> {
     let mut body = guid.to_le_bytes().to_vec();
-    body.extend(0_u32.to_le_bytes());
+    body.extend(flags.to_le_bytes());
     body.extend(health.to_le_bytes());
     body.extend(0_u32.to_le_bytes());
     body.extend(hold.to_le_bytes());
@@ -1158,14 +1172,13 @@ pub fn fired_side(packet: &[u8]) -> Option<u32> {
 /// frame the gravity slows the climb and the velocity moves the last row) until DespawnProjectile.
 fn spawn_projectile(
     id: u32,
+    slot: u32,
     gun: &str,
     (model, scale): (u32, f32),
-    at: [f32; 3],
-    velocity: [f32; 3],
-    gravity: f32,
+    (at, velocity, gravity): ([f32; 3], [f32; 3], f32),
 ) -> Vec<u8> {
     let mut blob = Vec::with_capacity(96);
-    for word in [id, 2, 0] {
+    for word in [id, 2, slot] {
         blob.extend(word.to_le_bytes());
     }
     let [x, y, z] = at;
@@ -1208,14 +1221,6 @@ fn ship_cannons(guid: u64, (left, right): (u32, u32)) -> Vec<u8> {
     packet(UPDATE_SHIP_CANNONS, &body)
 }
 
-/// A ball in the air: it lands at `at` at `lands_ms`.
-#[derive(Clone, Debug, PartialEq)]
-struct Shot {
-    id: u32,
-    lands_ms: u64,
-    at: [f32; 3],
-}
-
 /// One player's treasure round: the arena's pickup points (each lying there, or taken until a
 /// time), the ship's last accepted report, the hold and the banked gold. The server owns it: the
 /// client only reports where its ship is.
@@ -1235,11 +1240,11 @@ pub struct Plunder {
     position: Option<[f32; 3]>,
     /// That report's bow, flat on the water and of length 1, and velocity.
     motion: Option<([f32; 3], [f32; 3])>,
-    /// When each gun is loaded again, in the ship's order; a gun past the end is loaded.
-    reloads: Vec<u64>,
-    /// When each side's crew (right, left) has finished the guns it has been given.
-    crews: [u64; 2],
-    /// The balls in the air, soonest first: every flight lasts the same.
+    /// The player's guid, for the packets `gunnery` writes.
+    guid: u64,
+    battery: Battery,
+    hull: Hull,
+    /// The balls in the air.
     shots: VecDeque<Shot>,
     next_shot: u32,
     /// The left and right masks the client last heard.
@@ -1278,8 +1283,9 @@ impl Plunder {
             held_until: None,
             position: None,
             motion: None,
-            reloads: Vec::new(),
-            crews: [0; 2],
+            guid: 0,
+            battery: Battery::default(),
+            hull: Hull::default(),
             shots: VecDeque::new(),
             next_shot: 1,
             told: None,
@@ -1303,14 +1309,23 @@ impl Plunder {
         self.crew.iter().map(Bot::launch).collect()
     }
 
-    /// One tick of the crew, once the round has begun: they share the player's chests.
-    pub fn sail_crew(&mut self, now_ms: u64, place: &Arena, treasure: &Treasure) -> Vec<Vec<u8>> {
+    /// One tick of the crew, once the round has begun: they share the player's chests, and any
+    /// that has the player abeam and in reach fires.
+    pub fn sail_crew(&mut self, now_ms: u64, place: &Arena, content: &Content) -> Vec<Vec<u8>> {
         if self.anchor.is_none() {
             return Vec::new();
         }
-        let chests = &mut self.taken_until;
-        let turns = self.crew.iter_mut();
-        turns.flat_map(|bot| bot.sail(now_ms, place, treasure, chests)).collect()
+        let target = self.position.filter(|_| self.held_until.is_none());
+        let mut out = Vec::new();
+        for bot in &mut self.crew {
+            let sink = battle::sinking_ms(content).1;
+            out.extend(bot.sail(now_ms, place, &content.treasure, &mut self.taken_until, sink));
+            if let Some(target) = target {
+                let air = (&mut self.shots, &mut self.next_shot);
+                out.extend(bot.engage(target, now_ms, content, air));
+            }
+        }
+        out
     }
 
     /// The hold, as UpdatePlayerState carries it.
@@ -1331,9 +1346,14 @@ impl Plunder {
         self.position = Some(home);
         self.held_until = Some(now_ms.saturating_add(WHIRLPOOL_HOLD_MS));
         self.hold = self.hold.min(u32::try_from(ship.hold_capacity).unwrap_or(0));
-        self.reloads.clear();
-        self.crews = [0; 2];
+        self.battery = Battery::default();
+        self.hull = Hull::default();
         self.told = None;
+    }
+
+    /// Whether the ship is going down.
+    pub fn sunk(&self) -> bool {
+        self.hull.sunk
     }
 
     /// Keeps the heading and speed of the report `sail` just took at `at`; one it turned down
@@ -1349,13 +1369,10 @@ impl Plunder {
         self.motion = Some(([x / length, 0.0, z / length], [vx * slow, 0.0, vz * slow]));
     }
 
-    /// `side` fires (1 left, 2 right, 5 both): every loaded gun there sends a ball off to land on
-    /// the water `flight_seconds` on, and its side's crew takes it next, so a side reloads in
-    /// `reload_seconds` however long the button stays down. A held ship's guns stay quiet, and so
-    /// does any other side. The client empties its bars on every press (00ca7480), so a press that
-    /// leaves guns loaded makes `gunnery` tell it again.
+    /// `side` fires (`Battery::fire`), unless the ship is held. The client empties its bars on every
+    /// press (00ca7480), so a press that leaves guns loaded makes `gunnery` tell it again.
     pub fn fire(&mut self, side: u32, now_ms: u64, ship: &Ship, content: &Content) -> Vec<Vec<u8>> {
-        let (Some(at), Some(([fx, _, fz], velocity))) = (self.position, self.motion) else {
+        let (Some(at), Some((forward, velocity))) = (self.position, self.motion) else {
             self.told = None;
             return Vec::new();
         };
@@ -1366,65 +1383,109 @@ impl Plunder {
             self.told = None;
             return Vec::new();
         }
-        let zone = |key: &str| content.zone_config.get(key).copied().unwrap_or(0.0);
-        let gravity = zone("Gravity") as f32;
-        let water = zone("WaterLevel") as f32;
-        let model = (zone("ProjectileModelId") as u32, content.gunnery.ball_scale);
-        let flight = content.gunnery.flight_seconds;
-        let most = zone("ProjectileMax") as usize;
-        let per_side = (ship.cannons.len() / 2).max(1) as f32;
-        self.reloads.resize(ship.cannons.len(), 0);
-        let mut out = Vec::new();
-        for (gun, ready) in ship.cannons.iter().zip(&mut self.reloads) {
-            if *ready > now_ms || (gun.left && side == 2) || (!gun.left && side == 1) {
-                continue;
-            }
-            // The client's pool holds no more; the gun keeps its ball.
-            if self.shots.len() >= most {
-                self.told = None;
-                break;
-            }
-            let crew = &mut self.crews[usize::from(gun.left)];
-            let turn = (gun.reload_seconds * 1000.0 / per_side) as u64;
-            *crew = (*crew).max(now_ms).saturating_add(turn);
-            *ready = *crew;
-            // The ship's frame: the left is the bow turned a quarter (the rows `create_ship` writes).
-            let [ox, oy, oz] = gun.offset;
-            let from = [at[0] + fz * ox + fx * oz, at[1] + oy, at[2] - fx * ox + fz * oz];
-            let out_of_side = if gun.left { gun.speed } else { -gun.speed };
-            let vx = velocity[0] + fz * out_of_side;
-            let vz = velocity[2] - fx * out_of_side;
-            // Up just enough to meet the water as the flight ends.
-            let vy = (water - from[1]) / flight + gravity * flight / 2.0;
-            let id = self.next_shot;
-            self.next_shot = self.next_shot.wrapping_add(1).max(1);
-            out.push(spawn_projectile(id, &gun.name, model, from, [vx, vy, vz], gravity));
-            self.shots.push_back(Shot {
-                id,
-                lands_ms: now_ms.saturating_add((flight * 1000.0) as u64),
-                at: [from[0] + vx * flight, water, from[2] + vz * flight],
-            });
+        let aim = Aim { owner: battle::PLAYER, slot: 0, at, forward, velocity };
+        let marks: Vec<Mark> = (self.crew.iter())
+            .filter(|bot| bot.exposed(now_ms))
+            .map(Bot::mark)
+            .collect();
+        let air = (&mut self.shots, &mut self.next_shot);
+        let out = self.battery.fire(side, now_ms, ship, content, (&aim, &marks), air);
+        let most = content.zone_config.get("ProjectileMax").copied().unwrap_or(0.0) as usize;
+        if self.shots.len() >= most {
+            self.told = None;
         }
         out
     }
 
-    /// The balls that came down by `now_ms`, and the guns' state whenever it changed.
-    pub fn gunnery(&mut self, guid: u64, now_ms: u64, ship: &Ship, splash: u32) -> Vec<Vec<u8>> {
-        let mut out = Vec::new();
-        while let Some(shot) = self.shots.pop_front_if(|shot| shot.lands_ms <= now_ms) {
-            out.push(despawn_projectile(shot.id, splash, shot.at));
-        }
-        let (mut left, mut right) = (0, 0);
-        for (index, gun) in ship.cannons.iter().enumerate() {
-            if self.reloads.get(index).is_none_or(|ready| *ready <= now_ms) {
-                *(if gun.left { &mut left } else { &mut right }) |= gun.bit;
+    /// The balls that struck a ship or came down by `now_ms`, and the guns' state whenever it
+    /// changed.
+    pub fn gunnery(&mut self, guid: u64, now_ms: u64, ship: &Ship, content: &Content) -> Vec<Vec<u8>> {
+        self.guid = guid;
+        let mut out = self.strikes(now_ms, ship, content);
+        let splash = content.zone_config.get("ProjectileWaterImpactEffectId");
+        let splash = splash.copied().unwrap_or(0.0) as u32;
+        self.shots.retain(|shot| {
+            let flying = shot.lands_ms > now_ms;
+            if !flying {
+                out.push(despawn_projectile(shot.id, splash, shot.at));
             }
-        }
-        if self.told != Some((left, right)) {
-            self.told = Some((left, right));
-            out.push(ship_cannons(guid, (left, right)));
+            flying
+        });
+        let loaded = self.battery.loaded(ship, now_ms);
+        if self.told != Some(loaded) {
+            self.told = Some(loaded);
+            out.push(ship_cannons(guid, loaded));
         }
         out
+    }
+
+    /// Each ball in the air against every ship but its owner's. A hit ends the ball at the hull.
+    fn strikes(&mut self, now_ms: u64, ship: &Ship, content: &Content) -> Vec<Vec<u8>> {
+        let radius = content.zone_config.get("ProjectileRadius").copied().unwrap_or(0.0) as f32;
+        let impact = ship.config.get("ProjectileImpactEffectId").copied().unwrap_or(0.0) as u32;
+        let damage = content.gunnery.damage;
+        let sink = battle::sinking_ms(content).0;
+        let mut out = Vec::new();
+        let mut shots = std::mem::take(&mut self.shots);
+        shots.retain_mut(|shot| {
+            let (from, to) = shot.flown(now_ms);
+            let mine = (shot.owner != battle::PLAYER && self.held_until.is_none())
+                .then_some(self.position)
+                .flatten()
+                .filter(|at| now_ms >= self.hull.safe_until
+                    && battle::passes(from, to, *at, ship.hit_radius + radius));
+            if let Some(at) = mine {
+                out.push(despawn_projectile(shot.id, impact, to));
+                let forward = self.motion.map_or([0.0, 0.0, 1.0], |(forward, _)| forward);
+                out.push(battle::ship_hit(self.guid, damage, battle::side_of(at, forward, to)));
+                out.push(self.take_hit(ship, damage, now_ms, sink));
+                return false;
+            }
+            let target = (self.crew.iter_mut()).find(|bot| {
+                bot.guid != shot.owner && bot.exposed(now_ms)
+                    && battle::passes(from, to, bot.at, bot.ship.hit_radius + radius)
+            });
+            if let Some(bot) = target {
+                out.push(despawn_projectile(shot.id, impact, to));
+                out.extend(bot.strike(damage, to, now_ms, sink));
+                return false;
+            }
+            true
+        });
+        self.shots = shots;
+        out
+    }
+
+    /// A ball strikes the player: the health shows, and at none the ship goes down with its hold
+    /// and stays held until `refloat`.
+    fn take_hit(&mut self, ship: &Ship, damage: i32, now_ms: u64, sink_ms: u64) -> Vec<u8> {
+        if self.hull.strike(ship, damage) {
+            self.hold = 0;
+            self.held_until = Some(now_ms.saturating_add(sink_ms));
+            return ship_state(self.guid, battle::SINKING, 0, 0);
+        }
+        player_state(self.guid, self.hull.health(ship), self.hold)
+    }
+
+    /// A sunk ship's time is up: whole again on its pad, held for the whirlpool's beat like any
+    /// other ship put somewhere, with the grace after it.
+    pub fn refloat(
+        &mut self,
+        guid: u64,
+        now_ms: u64,
+        place: &Arena,
+        content: &Content,
+    ) -> Option<Vec<u8>> {
+        if !self.hull.sunk || self.held_until.is_some_and(|until| now_ms < until) {
+            return None;
+        }
+        let home = place.docks.first()?.bank;
+        let grace = WHIRLPOOL_HOLD_MS + battle::sinking_ms(content).1;
+        self.hull.repair(now_ms.saturating_add(grace));
+        self.anchor = Some((home, now_ms));
+        self.position = Some(home);
+        self.held_until = Some(now_ms.saturating_add(WHIRLPOOL_HOLD_MS));
+        Some(reset_ship(guid, home, 0.0))
     }
 
     /// The whirlpool's hold ending: the state that lets the ship go, as Playing's did.
@@ -1435,7 +1496,7 @@ impl Plunder {
         }
         self.held_until = None;
         self.anchor = self.anchor.map(|(at, _)| (at, now_ms));
-        Some(player_state(guid, ship.health, self.hold))
+        Some(player_state(guid, self.hull.health(ship), self.hold))
     }
 
     /// The round starts at `start_ms` (when Playing began) with the ship on its own pad (dock slot
@@ -1505,8 +1566,13 @@ impl Plunder {
             self.gold = self.gold.saturating_add(treasure.value);
             out.extend([player_gold(guid, self.gold), refresh_ui()]);
         }
-        if self.hold != held {
-            out.push(player_state(guid, ship.health, self.hold));
+        // The home pad repairs (HomeHealingPerSecond outruns any hull).
+        let healed = self.hull.damage > 0 && distance(home, at) <= treasure.bank_radius;
+        if healed {
+            self.hull.damage = 0;
+        }
+        if self.hold != held || healed {
+            out.push(player_state(guid, self.hull.health(ship), self.hold));
         }
         out
     }
@@ -2129,8 +2195,8 @@ mod tests {
         let (height, climb, flight) = (float(88), float(24), content.gunnery.flight_seconds);
         let landed = height + climb * flight - 9.81 * flight * flight / 2.0;
         assert!((landed - 53.6).abs() < 0.01, "the water, at {landed}");
-        let splash = 15968;
-        let early = round.gunnery(7, 1_900, &ship, splash);
+        let splash = 15968_u32;
+        let early = round.gunnery(7, 1_900, &ship, &content);
         assert!(!early.iter().any(|p| p.starts_with(&[94, 0, 27, 0])), "still flying");
         let told = (early.iter()).find(|p| p.starts_with(&[94, 0, 19, 0])).unwrap();
         assert_eq!(told[4..12], 7_u64.to_le_bytes());
@@ -2138,8 +2204,8 @@ mod tests {
         assert_eq!(told[12..16], 2_u32.to_le_bytes(), "right");
         assert_eq!(told[16..20], 2_u32.to_le_bytes(), "left");
         assert_eq!(told[28..32], 0b0011_u32.to_le_bytes(), "left mask");
-        assert!(round.gunnery(7, 1_900, &ship, splash).is_empty(), "said once");
-        let down = round.gunnery(7, 2_000, &ship, splash);
+        assert!(round.gunnery(7, 1_900, &ship, &content).is_empty(), "said once");
+        let down = round.gunnery(7, 2_000, &ship, &content);
         let down: Vec<_> = down.iter().filter(|p| p.starts_with(&[94, 0, 27, 0])).collect();
         assert_eq!(down.len(), 4, "the first volley");
         assert_eq!(down[0][4..8], 1_u32.to_le_bytes());
@@ -2163,7 +2229,7 @@ mod tests {
         for now in (0..30_000).step_by(16) {
             fired += round.fire(5, now, &ship, &content).len();
             peak = peak.max(round.shots.len());
-            round.gunnery(7, now, &ship, 15968);
+            round.gunnery(7, now, &ship, &content);
         }
         // One volley of 24, then 24 a 3 s reload for 30 s; the pool's cap only ever lowers it.
         assert!((200..=264).contains(&fired), "{fired} balls");
@@ -2178,10 +2244,113 @@ mod tests {
         let mut round = Plunder::new(0);
         round.position = Some([1.0; 3]);
         round.steer([1.0; 3], ([0.0, 0.0, 1.0], [0.0; 3]), 40.0);
-        assert_eq!(round.gunnery(7, 0, &ship, 1).len(), 1, "full bars");
+        assert_eq!(round.gunnery(7, 0, &ship, &content).len(), 1, "full bars");
         round.held_until = Some(1_000);
         assert!(round.fire(5, 10, &ship, &content).is_empty());
-        assert_eq!(round.gunnery(7, 20, &ship, 1).len(), 1, "told again");
+        assert_eq!(round.gunnery(7, 20, &ship, &content).len(), 1, "told again");
+    }
+
+    /// A broadside into a captain: the ball ends at the hull, the health shows, and enough of them
+    /// sink it; it comes back whole on its own pad, safe for a moment.
+    #[test]
+    fn balls_sink_a_captain_and_it_comes_back() {
+        let content = content();
+        let ship = content.fleet_ship("Eel").unwrap();
+        let place = content.arenas[0].clone();
+        let mut round = Plunder::new(place.pickups.len());
+        let mut crew = content.crew(&place);
+        crew.truncate(1);
+        let at = [100.0, 53.6, 200.0];
+        crew[0].moor([at[0] + 30.0, at[1], at[2]]);
+        let guid = crew[0].guid;
+        round.man(crew);
+        round.position = Some(at);
+        round.steer(at, ([0.0, 0.0, 1.0], [0.0; 3]), 40.0);
+        round.gunnery(7, 0, &ship, &content);
+        let has = |out: &[Vec<u8>], head: [u8; 4]| out.iter().any(|p| p.starts_with(&head));
+        let mut now = 0;
+        let mut hits = 0;
+        while !round.crew[0].down() {
+            round.fire(1, now, &ship, &content);
+            let out = round.gunnery(7, now, &ship, &content);
+            hits += out.iter().filter(|p| p.starts_with(&[94, 0, 23, 0])).count();
+            if has(&out, [94, 0, 23, 0]) {
+                let hit = out.iter().find(|p| p.starts_with(&[94, 0, 23, 0])).unwrap();
+                assert_eq!(hit[4..12], guid.to_le_bytes());
+                assert_eq!(hit[12..16], (content.gunnery.damage as u32).to_le_bytes());
+                assert!(has(&out, [94, 0, 27, 0]), "the ball ends there");
+            }
+            now += 50;
+            assert!(now < 120_000, "sunk by now");
+        }
+        let health = round.crew[0].ship.health;
+        assert_eq!(hits as i32, (health + content.gunnery.damage - 1) / content.gunnery.damage);
+        let mut chests = vec![None; place.pickups.len()];
+        let bot = &mut round.crew[0];
+        let sink = battle::sinking_ms(&content);
+        let quiet = bot.sail(now, &place, &content.treasure, &mut chests, sink.1);
+        assert!(!has(&quiet, [94, 0, 16, 0]), "a sinking ship does not sail");
+        let reset = bot.sail(now + sink.0, &place, &content.treasure, &mut chests, sink.1);
+        assert!(has(&reset, [94, 0, 11, 0]), "back on its pad");
+        let later = now + sink.0 + WHIRLPOOL_HOLD_MS;
+        let free = bot.sail(later, &place, &content.treasure, &mut chests, sink.1);
+        assert!(has(&free, [94, 0, 17, 0]), "let go");
+        assert!(!bot.exposed(later), "safe for a moment");
+        assert!(bot.exposed(later + sink.1), "then fair game");
+    }
+
+    /// A captain's ball sinks the player: its hold goes, it is held, and it comes back on its pad.
+    #[test]
+    fn a_sunk_player_loses_the_hold_and_comes_back() {
+        let content = content();
+        let ship = content.fleet_ship("Eel").unwrap();
+        let place = content.arenas[0].clone();
+        let mut round = Plunder::new(place.pickups.len());
+        round.guid = 7;
+        round.position = Some([100.0, 53.6, 200.0]);
+        round.hold = 2;
+        let state = round.take_hit(&ship, 10, 0, 9_000);
+        assert_eq!(state, player_state(7, ship.health - 10, 2));
+        let state = round.take_hit(&ship, ship.health, 100, 9_000);
+        assert_eq!(state[12..16], battle::SINKING.to_le_bytes());
+        assert_eq!(round.hold, 0);
+        assert_eq!(round.refloat(7, 9_000, &place, &content), None, "still going down");
+        let home = place.docks[0].bank;
+        assert_eq!(round.refloat(7, 9_100, &place, &content), Some(reset_ship(7, home, 0.0)));
+        assert_eq!(round.position, Some(home));
+        let free = round.release(7, 9_100 + WHIRLPOOL_HOLD_MS, &ship);
+        assert_eq!(free, Some(player_state(7, ship.health, 0)));
+    }
+
+    /// The guns swing to a captain in their arc and lead it; one behind the arc they leave alone.
+    #[test]
+    fn guns_lay_on_a_mark_and_lead_it() {
+        let content = content();
+        let ship = content.fleet_ship("Eel").unwrap();
+        let place = content.arenas[0].clone();
+        let mut round = Plunder::new(place.pickups.len());
+        let mut crew = content.crew(&place);
+        crew.truncate(1);
+        crew[0].moor([140.0, 53.6, 200.0]);
+        round.man(crew);
+        let at = [100.0, 53.6, 200.0];
+        round.position = Some(at);
+        round.steer(at, ([0.0, 0.0, 1.0], [0.0; 3]), 40.0);
+        assert_eq!(round.fire(1, 0, &ship, &content).len(), 4);
+        for shot in &round.shots {
+            assert!(distance(shot.at, [140.0, 53.6, 200.0]) < 1.0, "{:?}", shot.at);
+            assert!(shot.lands_ms < 2_000, "a near mark, a short flight");
+        }
+    }
+
+    /// A ball flying metres between ticks still strikes what lies between them.
+    #[test]
+    fn a_ball_cannot_step_over_a_hull() {
+        let (a, b) = ([0.0, 0.0, 0.0], [20.0, 0.0, 0.0]);
+        assert!(battle::passes(a, b, [10.0, 0.0, 2.0], 3.0));
+        assert!(!battle::passes(a, b, [10.0, 0.0, 4.0], 3.0));
+        assert!(!battle::passes(a, b, [24.0, 0.0, 0.0], 3.0));
+        assert!(battle::passes(a, a, [1.0, 0.0, 0.0], 3.0), "no flight yet");
     }
 
     /// A report the speed bound refused aims nothing, and a forged speed cannot throw a ball far.
@@ -2199,7 +2368,7 @@ mod tests {
         assert_eq!(round.motion, Some(([0.0, 0.0, 1.0], [0.0, 0.0, 40.0])));
         assert_eq!(round.fire(5, 0, &ship, &content).len(), 8, "both sides");
         round.held_until = Some(1);
-        round.reloads.clear();
+        round.battery.reloads.clear();
         assert!(round.fire(5, 0, &ship, &content).is_empty(), "a held ship holds fire");
     }
 
@@ -2391,7 +2560,8 @@ mod tests {
         };
         assert!(loads(&|_| {}), "the shipped content");
         let long = "x".repeat(MAX_TEXT + 1);
-        let refused: [(&str, &dyn Fn(&mut serde_json::Value)); 22] = [
+        let refused: [(&str, &dyn Fn(&mut serde_json::Value)); 23] = [
+            ("a ball that does nothing", &|c| c["gunnery"]["damage"] = 0.into()),
             ("a seat with no colour", &|c| {
                 c["colours"] = serde_json::json!(["pir_red"]);
             }),

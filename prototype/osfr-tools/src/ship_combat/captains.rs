@@ -3,9 +3,11 @@
 //! standings row, the flag, the health bar and the chests over the mast. (R) The live AI (Kynapse,
 //! `EnableAI` and `NpcCount` in the zone loader) never shipped, so this behaviour follows the
 //! videos: "they collect, bank, ram and sink like players".
+use super::battle::{self, Aim, Battery, Hull, Mark, Shot};
 use super::{
-    Arena, Content, Decal, Deserialize, Ship, Treasure, destroy_pickup, distance, packet,
-    player_gold, player_state, refresh_ui, UPDATE_SHIP_PHYSICS,
+    Arena, Content, Decal, Deserialize, Ship, Treasure, UPDATE_SHIP_PHYSICS, VecDeque,
+    WHIRLPOOL_HOLD_MS, destroy_pickup, distance, packet, player_gold, player_state, refresh_ui,
+    reset_ship, ship_state,
 };
 
 /// How often a captain's ship reports: the client flies it on between reports.
@@ -34,7 +36,7 @@ pub struct Bot {
     pub name_id: u32,
     pub ship: Ship,
     flag: Option<Decal>,
-    at: [f32; 3],
+    pub(super) at: [f32; 3],
     /// Radians from +z towards +x, as `atan2(dx, dz)`.
     heading: f32,
     /// The chest it is after; none sends it home.
@@ -44,6 +46,18 @@ pub struct Bot {
     stepped_ms: Option<u64>,
     reported_ms: u64,
     unloaded_ms: u64,
+    /// The speed it last made, for the balls it fires.
+    speed: f32,
+    battery: Battery,
+    hull: Hull,
+    down: Option<Down>,
+}
+
+/// A captain out of the fight: going down, then back on its pad and held, each until a time.
+#[derive(Clone, Copy, Debug, PartialEq)]
+enum Down {
+    Sinking(u64),
+    Refloating(u64),
 }
 
 impl Content {
@@ -70,6 +84,10 @@ impl Content {
                     stepped_ms: None,
                     reported_ms: 0,
                     unloaded_ms: 0,
+                    speed: 0.0,
+                    battery: Battery::default(),
+                    hull: Hull::default(),
+                    down: None,
                 })
             })
             .collect()
@@ -88,7 +106,7 @@ impl Bot {
 
     /// What lets the ship go, as the first UpdatePlayerState does the player's.
     pub fn launch(&self) -> Vec<u8> {
-        player_state(self.guid, self.ship.health, self.hold)
+        player_state(self.guid, self.hull.health(&self.ship), self.hold)
     }
 
     /// One tick at `now_ms`: sail for the goal, take what lies in reach out of `chests` (`None`
@@ -99,16 +117,21 @@ impl Bot {
         place: &Arena,
         treasure: &Treasure,
         chests: &mut [Option<u64>],
+        grace_ms: u64,
     ) -> Vec<Vec<u8>> {
         let Some(home) = place.docks.get(self.slot as usize).map(|dock| dock.bank) else {
             return Vec::new();
         };
+        if self.down.is_some() {
+            return self.recover(now_ms, home, grace_ms);
+        }
         let step_ms = now_ms.saturating_sub(self.stepped_ms.unwrap_or(now_ms)).min(MAX_STEP_MS);
         self.stepped_ms = Some(now_ms);
         let mut out = Vec::new();
         self.choose(place, chests);
         let target = self.goal.and_then(|i| place.pickups.get(i)).copied().unwrap_or(home);
         let (speed, yaw) = self.steer(target, step_ms, home);
+        self.speed = speed;
         let capacity = u32::try_from(self.ship.hold_capacity).unwrap_or(0);
         let held = self.hold;
         for ((point, until), id) in place.pickups.iter().zip(chests.iter_mut()).zip(1..) {
@@ -129,14 +152,100 @@ impl Bot {
             self.gold = self.gold.saturating_add(treasure.value);
             out.extend([player_gold(self.guid, self.gold), refresh_ui()]);
         }
-        if self.hold != held {
-            out.push(player_state(self.guid, self.ship.health, self.hold));
+        // The home pad repairs, as the player's does.
+        let healed = self.hull.damage > 0 && distance(home, self.at) <= treasure.bank_radius;
+        if healed {
+            self.hull.damage = 0;
+        }
+        if self.hold != held || healed {
+            out.push(self.launch());
         }
         if now_ms.saturating_sub(self.reported_ms) >= REPORT_MS {
             self.reported_ms = now_ms;
             out.push(ship_physics(self.guid, now_ms, (self.heading, yaw), self.at, speed));
         }
         out
+    }
+
+    /// Sunk, it waits out the sinking, comes back whole on its pad, and is let go a beat later.
+    fn recover(&mut self, now_ms: u64, home: [f32; 3], grace_ms: u64) -> Vec<Vec<u8>> {
+        match self.down {
+            Some(Down::Sinking(until)) if until <= now_ms => {
+                self.at = home;
+                self.hull.repair(now_ms.saturating_add(WHIRLPOOL_HOLD_MS + grace_ms));
+                self.goal = None;
+                self.stepped_ms = None;
+                self.down = Some(Down::Refloating(now_ms.saturating_add(WHIRLPOOL_HOLD_MS)));
+                vec![reset_ship(self.guid, home, 0.0)]
+            }
+            Some(Down::Refloating(until)) if until <= now_ms => {
+                self.down = None;
+                vec![self.launch()]
+            }
+            _ => Vec::new(),
+        }
+    }
+
+    /// Whether a ball can strike it now.
+    pub(super) fn exposed(&self, now_ms: u64) -> bool {
+        self.down.is_none() && now_ms >= self.hull.safe_until
+    }
+
+    /// A ball struck it near `ball`: the health shows, and at none it goes down with its hold.
+    pub(super) fn strike(
+        &mut self,
+        damage: i32,
+        ball: [f32; 3],
+        now_ms: u64,
+        sink_ms: u64,
+    ) -> Vec<Vec<u8>> {
+        let (x, z) = self.heading.sin_cos();
+        let side = battle::side_of(self.at, [x, 0.0, z], ball);
+        let hit = battle::ship_hit(self.guid, damage, side);
+        if self.hull.strike(&self.ship, damage) {
+            self.hold = 0;
+            self.down = Some(Down::Sinking(now_ms.saturating_add(sink_ms)));
+            // The flag only shows the sinking: the last report's throttle would sail it on, and
+            // this tick's report may already have used `now_ms`.
+            let stopped = ship_physics(self.guid, now_ms + 1, (self.heading, 0.0), self.at, 0.0);
+            return vec![hit, stopped, ship_state(self.guid, battle::SINKING, 0, 0)];
+        }
+        vec![hit, self.launch()]
+    }
+
+    /// Where a gun of the player's aims: the ship and its way.
+    pub(super) fn mark(&self) -> Mark {
+        let (x, z) = self.heading.sin_cos();
+        Mark { at: self.at, velocity: [x * self.speed, 0.0, z * self.speed] }
+    }
+
+    /// Fires the side that has `target` in its guns' arc and reach. (R) Captains do not turn to
+    /// fight, and they aim where the player is, not where it is going, so a moving ship can dodge.
+    pub(super) fn engage(
+        &mut self,
+        target: [f32; 3],
+        now_ms: u64,
+        content: &Content,
+        air: (&mut VecDeque<Shot>, &mut u32),
+    ) -> Vec<Vec<u8>> {
+        let (x, z) = self.heading.sin_cos();
+        let (dx, dz) = (target[0] - self.at[0], target[2] - self.at[2]);
+        let range = dx.hypot(dz);
+        let reach = content.gunnery.speed * content.gunnery.flight_seconds;
+        if self.down.is_some() || range < 1.0 || range > reach || (dx * x + dz * z).abs() > 0.8 * range {
+            return Vec::new();
+        }
+        let side = battle::side_of(self.at, [x, 0.0, z], target);
+        let aim = Aim {
+            owner: self.guid,
+            slot: self.slot,
+            at: self.at,
+            forward: [x, 0.0, z],
+            velocity: [x * self.speed, 0.0, z * self.speed],
+        };
+        let mark = [Mark { at: target, velocity: [0.0; 3] }];
+        let ship = self.ship.clone();
+        self.battery.fire(side, now_ms, &ship, content, (&aim, &mark), air)
     }
 
     /// With a chest aboard it goes home, as a hold of one is worth banking (R); otherwise it wants
@@ -216,6 +325,19 @@ fn ship_physics(
 }
 
 #[cfg(test)]
+impl Bot {
+    /// Puts it somewhere and stops it, for a test.
+    pub(super) fn moor(&mut self, at: [f32; 3]) {
+        self.at = at;
+    }
+
+    /// Whether it is out of the fight.
+    pub(super) fn down(&self) -> bool {
+        self.down.is_some()
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::super::ship_position;
     use super::*;
@@ -276,17 +398,17 @@ mod tests {
         chests[1] = Some(1_000_000);
         let treasure = &content.treasure;
         let mut now = 1;
-        bot.sail(now, &place, treasure, &mut chests);
+        bot.sail(now, &place, treasure, &mut chests, 0);
         assert_eq!(bot.goal, Some(0), "the near one is gone");
         chests[1] = None;
         bot.goal = None;
-        bot.sail(now, &place, treasure, &mut chests);
+        bot.sail(now, &place, treasure, &mut chests, 0);
         assert_eq!(bot.goal, Some(1), "the nearest");
         let mut packets = Vec::new();
         while bot.gold == 0 {
             now += 100;
             assert!(now < 120_000, "banked by now");
-            packets.extend(bot.sail(now, &place, treasure, &mut chests));
+            packets.extend(bot.sail(now, &place, treasure, &mut chests, 0));
         }
         let has = |head: [u8; 4]| packets.iter().any(|p| p.starts_with(&head));
         assert!(has([94, 0, 29, 0]), "the chest goes");
@@ -294,6 +416,25 @@ mod tests {
         assert!(has([94, 0, 17, 0]), "the hold shows");
         assert_eq!(bot.gold, treasure.value);
         assert_eq!(bot.hold, 0);
+    }
+
+    /// It fires only with the player in its guns' arc and reach, from the side that faces them.
+    #[test]
+    fn a_captain_fires_on_the_beam() {
+        let content = content();
+        let place = content.arenas[0].clone();
+        let mut bot = content.crew(&place).remove(0);
+        bot.at = [0.0, 53.6, 0.0];
+        let (mut shots, mut next) = (VecDeque::new(), 1);
+        let mut fire = |bot: &mut Bot, target: [f32; 3], now: u64| {
+            bot.engage(target, now, &content, (&mut shots, &mut next)).len()
+        };
+        assert_eq!(fire(&mut bot, [0.0, 53.6, 40.0], 0), 0, "dead ahead");
+        assert_eq!(fire(&mut bot, [500.0, 53.6, 0.0], 0), 0, "out of reach");
+        let side = bot.ship.cannons.iter().filter(|gun| gun.left).count();
+        assert_eq!(fire(&mut bot, [40.0, 53.6, 0.0], 0), side, "the left side, +x");
+        assert_eq!(fire(&mut bot, [40.0, 53.6, 0.0], 10), 0, "reloading");
+        assert_eq!(fire(&mut bot, [-40.0, 53.6, 0.0], 10), side, "the other side was loaded");
     }
 
     /// A chest just inside the turning circle is still reached: the ship slows to come round.
@@ -308,7 +449,7 @@ mod tests {
         let mut chests = vec![None];
         let mut now = 1;
         while bot.hold == 0 {
-            bot.sail(now, &place, &content.treasure, &mut chests);
+            bot.sail(now, &place, &content.treasure, &mut chests, 0);
             now += 50;
             assert!(now < 30_000, "still circling at {:?}", bot.at);
         }
@@ -322,12 +463,12 @@ mod tests {
         let mut bot = content.crew(&place).remove(0);
         let mut taken = vec![Some(u64::MAX); place.pickups.len()];
         let home = bot.at;
-        bot.sail(1, &place, &content.treasure, &mut taken);
-        bot.sail(5_000, &place, &content.treasure, &mut taken);
+        bot.sail(1, &place, &content.treasure, &mut taken, 0);
+        bot.sail(5_000, &place, &content.treasure, &mut taken, 0);
         assert_eq!(bot.at, home);
         let mut free = vec![None; place.pickups.len()];
-        bot.sail(5_001, &place, &content.treasure, &mut free);
-        bot.sail(60_000, &place, &content.treasure, &mut free);
+        bot.sail(5_001, &place, &content.treasure, &mut free, 0);
+        bot.sail(60_000, &place, &content.treasure, &mut free, 0);
         let reach = 0.5 * bot.ship.physics["MaxSpeed"] as f32 + 1.0;
         assert!(distance(bot.at, home) <= reach, "{:?}", bot.at);
     }
