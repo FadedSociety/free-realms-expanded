@@ -151,6 +151,27 @@ impl Gameplay {
     /// game, `None` the engine's own. The engine starts first; only then is the shared clock
     /// stamped and the outcome applied. A failed begin therefore leaves no clock or engine
     /// state behind.
+    /// A gather run in its job. The offer goes out before the job change: a start screen that
+    /// arrives during a job change waits 2 s (`009beb70`, `TickMiniGameManager`), and once an
+    /// offer has been declined in the session that late screen never draws, stranding the player
+    /// behind a blurred scene (runs 144529Z, 145233Z).
+    pub(super) fn begin_gather_in_job(
+        &mut self,
+        gather: Gather,
+        game: Option<i32>,
+        guid: u64,
+        now_ms: u64,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        let mut switch = Outcome::default();
+        if gather.switches_job() {
+            self.enter_activity_job(gather.job(), guid, &mut switch)?;
+        }
+        self.begin_gather(gather, game, now_ms, out)?;
+        out.absorb(switch);
+        Ok(())
+    }
+
     pub(super) fn begin_gather(
         &mut self,
         gather: Gather,
@@ -434,11 +455,12 @@ impl Gameplay {
         staged.enter_activity_job(job, character.guid, &mut switched)?;
         let mut start = Outcome::default();
         let started = staged.begin_recipe(recipe_id, anywhere, character, now_ms, &mut start)?;
+        out.absorb(start);
+        // After the offer, as `begin_gather_in_job`.
         if started {
             *self = staged;
             out.absorb(switched);
         }
-        out.absorb(start);
         Ok(started)
     }
 

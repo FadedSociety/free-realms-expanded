@@ -1139,6 +1139,12 @@ fn unlocked_but_inactive_job_switches_on_a_node_click_and_the_dev_command_refuse
             "{}: the job switch sends an activation",
             game.node
         );
+        let at = |head: &[u8]| inners(&node).iter().position(|p| p.starts_with(head)).unwrap();
+        assert!(
+            at(&[39, 0, 16]) < at(&[38, 0, 21, 0]),
+            "{}: the offer goes first, or the start screen waits and may never draw",
+            game.node
+        );
         assert!(!said(&node, "Switch to the"), "{}", chat_text(&node));
         assert!(active(&gateway, game).is_some(), "{}", game.node);
         assert_eq!(
@@ -1706,6 +1712,65 @@ fn games_window_play_opens_a_feeling_the_beat_song() {
     assert_eq!(i32::from_le_bytes(offer[11..15].try_into().unwrap()), 204);
 }
 
+/// Play on row 510: the offer names the preload list, the movie launches, the rows and the sword
+/// row go out, six rounds win once and pay once, and the job never changes. A later Play reopens.
+#[test]
+fn games_window_play_opens_hack_n_slash_and_keeps_the_job() {
+    let fixture = Fixture::new(PLOT);
+    let mut gateway = fixture.gateway_at(fixture.state(false, true), &fixture.node, 60.0);
+    tick(&mut gateway, 1_500);
+    let job = gateway.gameplay().unwrap().active_profile();
+    let offer_of = |out: &GatewayOutcome| {
+        (inners(out).into_iter())
+            .find(|p| p.starts_with(&[39, 0, 16]))
+            .map(<[u8]>::to_vec)
+    };
+    let offered = play(&mut gateway, 510, 2_000);
+    let offer = offer_of(&offered).expect("the 39/16 offer");
+    assert_eq!(i32::from_le_bytes(offer[11..15].try_into().unwrap()), 79);
+    assert!(
+        (offer.windows(22)).any(|w| w == b"SwordTestingAssets.txt"),
+        "the movie's preload list, or the start screen stays on Loading..."
+    );
+    let id = i32::from_le_bytes(offer[3..7].try_into().unwrap());
+    let started = send(&mut gateway, &frame(5, id, -1), 2_100);
+    assert!(said(&started, "game_sword.gfx"), "the sword movie launches");
+    send(&mut gateway, &payload(id, "OnConnectMsg"), 2_200);
+    let data = send(
+        &mut gateway,
+        &payload(id, "FRServer_ReadyForGameData"),
+        2_300,
+    );
+    assert!(said(&data, "OnPhaseDataMsg\t7906^79^6^"), "the last round");
+    assert!(said(&data, "OnCustomDataMsg\t7901^79^3^"), "the sword row");
+
+    let before = coins(&gateway);
+    for round in 1..=6 {
+        let total = format!("FRServer_ScoreSet\t{}", round * 3_000);
+        send(&mut gateway, &payload(id, &total), 5_000 * round);
+        send(&mut gateway, &payload(id, "FRServer_CompleteLevel"), 5_000 * round);
+    }
+    send(&mut gateway, &payload(id, "FRServer_StopLevel\t6\t1"), 31_000);
+    let win = payload(id, "FRServer_GameWon\t18000\t0");
+    let won = send(&mut gateway, &win, 31_100);
+    let result = |out: &GatewayOutcome| {
+        (inners(out).into_iter())
+            .find(|p| p.starts_with(&[39, 0, 18]))
+            .map(<[u8]>::to_vec)
+    };
+    assert_eq!(result(&won).expect("the result screen")[15], 1, "won");
+    let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let paid = osfr_tools::sword_game::SwordContent::load(&content).unwrap().win_coins;
+    assert_eq!(coins(&gateway), before + i64::from(paid));
+    assert!(result(&send(&mut gateway, &win, 31_200)).is_none(), "given once");
+    assert_eq!(coins(&gateway), before + i64::from(paid), "and paid once");
+    assert_eq!(gateway.gameplay().unwrap().active_profile(), job);
+    send(&mut gateway, &payload(id, "FRServer_GameOver"), 31_300);
+    send(&mut gateway, &CLOSE, 32_000);
+    let next = play(&mut gateway, 510, 33_000);
+    assert!(offer_of(&next).is_some(), "a new game after the close");
+}
+
 /// A ship report as the client's frame update sends it (UpdateShipPhysics, 117 bytes): the guid,
 /// a flag and a stamp, the identity rotation, the position row, a vec4 and four values.
 fn ship_report(guid: u64, at: [f32; 3]) -> Vec<u8> {
@@ -1848,6 +1913,31 @@ fn a_game_table_offers_chess_and_checkers() {
             .collect();
         assert_eq!(offers, [game]);
     }
+}
+
+/// A Practice Dummy has one menu row, and it offers Hack 'n' Slash.
+#[test]
+fn a_practice_dummy_offers_hack_n_slash() {
+    const DUMMY: u64 = 100_000_003_571;
+    let fixture = Fixture::new(PLOT);
+    let mut at = fixture.node.clone();
+    at.position = [342.4284, 26.54423, 433.1978];
+    let mut gateway = fixture.gateway_at(fixture.state(false, true), &at, 1.0);
+    tick(&mut gateway, 1_500);
+    let mut click = vec![26, 0, 8, 0];
+    click.extend(DUMMY.to_le_bytes());
+    click.push(0);
+    let menu = send(&mut gateway, &click, 2_000);
+    assert!(inners(&menu).iter().any(|p| p.starts_with(&[26, 0, 9, 0])), "the menu");
+    let mut choose = vec![26, 0, 10, 0];
+    choose.extend(DUMMY.to_le_bytes());
+    choose.extend(1_i32.to_le_bytes());
+    let offered = send(&mut gateway, &choose, 2_100);
+    let offers: Vec<_> = (inners(&offered).into_iter())
+        .filter(|p| p.starts_with(&[39, 0, 16]))
+        .map(|p| i32::from_le_bytes(p[11..15].try_into().unwrap()))
+        .collect();
+    assert_eq!(offers, [79]);
 }
 
 /// The offer in `loaded` (39/16) answered with Go (39/5).

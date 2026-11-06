@@ -62,6 +62,9 @@ impl Gameplay {
         if game == CHECKERS_GAME {
             return self.begin_checkers();
         }
+        if (self.sword.as_ref()).is_some_and(|sword| sword.game_id() as u32 == game) {
+            return self.begin_sword();
+        }
         let mut out = Outcome::default();
         self.begin_chess(game, player_id, &mut out)?;
         Ok(out)

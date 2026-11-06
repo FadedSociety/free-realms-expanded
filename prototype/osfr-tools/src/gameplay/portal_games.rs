@@ -9,6 +9,7 @@ use crate::{
     harvest_nodes::{Denied, payout_fits},
     kart_gateway::{EntryDenied, KartGateway},
     music_game::MusicGame,
+    sword_game::SwordGame,
     recipes::RecipeCatalog,
     tower_defense::TowerDefense,
 };
@@ -40,6 +41,7 @@ pub(super) fn games(
     type8: [Option<&Type8Engine>; 4],
     fishing: Option<&FishingSpots>,
     music: Option<&MusicGame>,
+    sword: Option<&SwordGame>,
     tower_defense: Option<&TowerDefense>,
     pirates: bool,
 ) -> Vec<Activity> {
@@ -96,6 +98,7 @@ pub(super) fn games(
         .chain(holes)
         .chain([game_row(crate::checkers::GAME_ID as u32, Kind::Checkers)])
         .chain(songs)
+        .chain(sword.and_then(|game| Some(game_row(u32::try_from(game.game_id()).ok()?, Kind::Sword))))
         .chain(maps)
         .chain(pirates.then(|| game_row(crate::ship_combat::GAME_ID, Kind::Pirates)))
         .chain(garage)
@@ -221,10 +224,8 @@ impl Gameplay {
                 }
                 self.commit_if_changed(|staged| {
                     let mut out = Outcome::default();
-                    if gather.switches_job() {
-                        staged.enter_activity_job(gather.job(), character.guid, &mut out)?;
-                    }
-                    staged.begin_gather(gather, Some(game), now_ms, &mut out)?;
+                    let guid = character.guid;
+                    staged.begin_gather_in_job(gather, Some(game), guid, now_ms, &mut out)?;
                     Ok(out)
                 })
             }
@@ -234,7 +235,7 @@ impl Gameplay {
             }
             // L961: the server's own movies start nothing during another activity (a groom session
             // keeps travel open, so the portal's travel gate alone lets them through).
-            Kind::Checkers | Kind::Music | Kind::TowerDefense | Kind::Pirates | Kind::Garage
+            Kind::Checkers | Kind::Music | Kind::Sword | Kind::TowerDefense | Kind::Pirates | Kind::Garage
                 if busy =>
             {
                 Ok(refused(&Denied::Busy.message()))
@@ -243,6 +244,7 @@ impl Gameplay {
             Kind::Checkers => self.begin_checkers(),
             // L961: Feeling the Beat! game `id` (it stages itself).
             Kind::Music => self.begin_music(id),
+            Kind::Sword => self.begin_sword(),
             // L962: Tower Defense game `id` (it stages itself).
             Kind::TowerDefense => self.begin_tower_defense(id),
             // L963: a solo match in the first arena (R: the live game matched one to five players

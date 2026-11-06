@@ -46,6 +46,7 @@ pub use admin_move::{AdminMove, MoveTarget};
 mod card_launch;
 mod checkers_table;
 mod music_table;
+mod sword_table;
 mod identity;
 mod kart_garage;
 mod pirates_arena;
@@ -268,6 +269,7 @@ pub struct Gameplay {
     checkers: crate::checkers::CheckersTable,
     /// L961: this session's Feeling the Beat! run (session-local); `None` without its content.
     music: Option<crate::music_game::MusicGame>,
+    sword: Option<Box<crate::sword_game::SwordGame>>,
     /// L962: this session's Tower Defense run (session-local); `None` without its content. Boxed:
     /// `Gameplay` is cloned on the stack per packet, and inline it overflowed a deep test's 2 MB stack.
     tower_defense: Option<Box<crate::tower_defense::TowerDefense>>,
@@ -1176,10 +1178,12 @@ impl Gameplay {
         let fishing_spots = crate::fishing_service::FishingSpots::load(directory)?.map(Arc::new);
         let fishing = fishing_spots.as_deref();
         let music = music_table::load_music(npc_content)?;
+        let sword = sword_table::load_sword(npc_content)?;
         let tower_defense = tower_defense_table::load_tower_defense(npc_content)?;
         let ship_combat = crate::ship_combat::Content::load(npc_content)?.map(Arc::new);
         let (menus, drawn) = (&mut npc_interaction, &mut npc_visibility);
-        tower_defense_table::bind_tables(npc_content, &tower_defense, &ship_combat, menus, drawn)?;
+        let bound = (&tower_defense, &ship_combat, &sword);
+        tower_defense_table::bind_tables(npc_content, bound, menus, drawn)?;
         let games = portal_games::games(
             kart,
             derby_ref,
@@ -1187,6 +1191,7 @@ impl Gameplay {
             type8,
             fishing,
             music.as_ref(),
+            sword.as_deref(),
             tower_defense.as_deref(),
             ship_combat.is_some(),
         );
@@ -1311,6 +1316,7 @@ impl Gameplay {
             chess,
             checkers: crate::checkers::CheckersTable::fresh()?,
             music,
+            sword,
             tower_defense,
             ship_combat,
             pirates: None,
@@ -2212,6 +2218,9 @@ impl Gameplay {
         if let Some(out) = self.handle_music(inner, character.guid, now_ms)? {
             return Ok(out);
         }
+        if let Some(out) = self.handle_sword(inner, character.guid, now_ms)? {
+            return Ok(out);
+        }
         if let Some(out) = self.handle_tower_defense(inner, character.guid, now_ms)? {
             return Ok(out);
         }
@@ -2513,8 +2522,7 @@ impl Gameplay {
             nodes.begin(target);
         }
         // L936: the node switches the player into its job before the run's reward snapshot.
-        staged.enter_activity_job(gather.job(), character.guid, &mut out)?;
-        staged.begin_gather(gather, game, now_ms, &mut out)?;
+        staged.begin_gather_in_job(gather, game, character.guid, now_ms, &mut out)?;
         *self = staged;
         Ok(Some(out))
     }

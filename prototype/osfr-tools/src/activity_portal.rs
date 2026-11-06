@@ -184,6 +184,8 @@ pub enum Kind {
     /// L961 (L123's engine): a Feeling the Beat! game against the server; the row's id is its
     /// MiniGameData row (201-204).
     Music,
+    /// Hack 'n' Slash, the server's own movie.
+    Sword,
     /// L962: a Tower Defense game against the server; the row's id is its MiniGameData row.
     TowerDefense,
     /// L963: Pirate's Plunder; the row's id is MiniGameData 54, the content of the world-tunnel
@@ -591,6 +593,7 @@ impl Catalogue {
             | Kind::Fishing { .. }
             | Kind::Checkers
             | Kind::Music
+            | Kind::Sword
             | Kind::TowerDefense
             | Kind::Garage
             | Kind::Pirates => {}
@@ -666,6 +669,7 @@ impl Catalogue {
             | Kind::Fishing { .. }
             | Kind::Checkers
             | Kind::Music
+            | Kind::Sword
             | Kind::TowerDefense
             | Kind::Pirates => true,
         }
@@ -767,6 +771,7 @@ impl Catalogue {
             | Kind::Fishing { .. }
             | Kind::Checkers
             | Kind::Music
+            | Kind::Sword
             | Kind::TowerDefense
             | Kind::Garage
             | Kind::Pirates => return None,
@@ -872,6 +877,7 @@ fn runs(row: &LiveRow, a: &Activity) -> bool {
         | Kind::Fishing { .. }
         | Kind::Checkers
         | Kind::Music
+        | Kind::Sword
         | Kind::TowerDefense => row.entry_type == ENTRY_CLIENT_TUNNEL && row.content_id == a.id,
         Kind::Pirates => row.entry_type == ENTRY_WORLD_TUNNEL && row.content_id == a.id,
     }

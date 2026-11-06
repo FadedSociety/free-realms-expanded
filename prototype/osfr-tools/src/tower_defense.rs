@@ -714,7 +714,7 @@ impl TowerDefense {
     }
 }
 
-fn win_grant(player_id: u64, coins: u32, icon_id: i32, name_id: i32) -> RewardGrant {
+pub(crate) fn win_grant(player_id: u64, coins: u32, icon_id: i32, name_id: i32) -> RewardGrant {
     RewardGrant {
         coins,
         items: Vec::new(),

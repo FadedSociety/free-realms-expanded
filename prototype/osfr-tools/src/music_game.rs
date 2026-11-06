@@ -187,7 +187,7 @@ pub struct MusicOutcome {
 }
 
 impl MusicOutcome {
-    fn from_run(run: RunOutcome) -> Self {
+    pub(crate) fn from_run(run: RunOutcome) -> Self {
         Self {
             accepted: run.accepted,
             changed: run.changed,
@@ -198,14 +198,14 @@ impl MusicOutcome {
         }
     }
 
-    fn ack() -> Self {
+    pub(crate) fn ack() -> Self {
         Self {
             accepted: true,
             ..Self::default()
         }
     }
 
-    fn refused(reason: &'static str) -> Self {
+    pub(crate) fn refused(reason: &'static str) -> Self {
         Self {
             refused: Some(reason),
             ..Self::default()
@@ -224,10 +224,10 @@ struct Play {
     score: f64,
 }
 
-struct Finish {
-    won: bool,
-    score: u32,
-    elapsed_seconds: u32,
+pub(crate) struct Finish {
+    pub(crate) won: bool,
+    pub(crate) score: u32,
+    pub(crate) elapsed_seconds: u32,
 }
 
 impl Activity for Finish {
@@ -508,14 +508,14 @@ fn checked_total(text: &str, play: &Play) -> Result<f64, &'static str> {
 }
 
 /// AS2 `Number.toString` of a total: a finite, non-negative decimal.
-fn parse_score(text: &str) -> Option<f64> {
+pub(crate) fn parse_score(text: &str) -> Option<f64> {
     text.parse::<f64>()
         .ok()
         .filter(|value| value.is_finite() && *value >= 0.0)
 }
 
 /// 39/14: instance, the -1 group, the game id, then the NUL-terminated text.
-fn payload_packet(instance: i32, game_id: i32, text: &str) -> io::Result<Vec<u8>> {
+pub(crate) fn payload_packet(instance: i32, game_id: i32, text: &str) -> io::Result<Vec<u8>> {
     if text.len() > MAX_TEXT || text.contains('\0') {
         return Err(invalid("music game payload text"));
     }
@@ -530,7 +530,7 @@ fn payload_packet(instance: i32, game_id: i32, text: &str) -> io::Result<Vec<u8>
 }
 
 /// The little-endian i32 at `at`, if the packet is long enough.
-fn field(packet: &[u8], at: usize) -> Option<i32> {
+pub(crate) fn field(packet: &[u8], at: usize) -> Option<i32> {
     let bytes: [u8; 4] = packet.get(at..at + 4)?.try_into().ok()?;
     Some(i32::from_le_bytes(bytes))
 }

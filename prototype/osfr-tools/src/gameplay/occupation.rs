@@ -39,6 +39,7 @@ occupations!(
     Checkers,
     // L961: a Feeling the Beat! song against the server; (R) it closes the checkers gates.
     Music,
+    Sword,
     // L962: a Tower Defense game against the server; (R) it closes the checkers gates.
     TowerDefense,
     // L963: a Pirate's Plunder match in its arena; (R) the derby's gates.
@@ -103,6 +104,7 @@ impl Occupation {
             Chess => "a chess game",
             Checkers => "a checkers game",
             Music => "a Feeling the Beat! song",
+            Sword => "a Hack 'n' Slash game",
             TowerDefense => "a Tower Defense game",
             Pirates => "a Pirate's Plunder match",
             CardGame => "a card game",
@@ -123,7 +125,7 @@ impl Occupation {
         let (start, warp, ride, pets, location) = match self {
             // (R) A card run closes the same gates as chess (T765).
             Forging | Smelting | Cooking | Mining | Harvesting | Mail | Artifact | Chess | Checkers
-            | Music | TowerDefense | CardGame | Fishing | Encounter => {
+            | Music | Sword | TowerDefense | CardGame | Fishing | Encounter => {
                 (true, true, true, true, false)
             }
             Derby | Soccer | Kart | Pirates | Garage => (true, true, true, true, true),
@@ -168,6 +170,9 @@ impl Gameplay {
             Occupation::Checkers => self.checkers.is_active(),
             Occupation::Music => {
                 (self.music.as_ref()).is_some_and(crate::music_game::MusicGame::is_active)
+            }
+            Occupation::Sword => {
+                (self.sword.as_deref()).is_some_and(crate::sword_game::SwordGame::is_active)
             }
             Occupation::TowerDefense => (self.tower_defense.as_deref())
                 .is_some_and(crate::tower_defense::TowerDefense::is_active),
@@ -241,6 +246,7 @@ mod tests {
                 Chess,
                 Checkers,
                 Music,
+                Sword,
                 TowerDefense,
                 Pirates,
                 Garage,
@@ -268,6 +274,7 @@ mod tests {
                 Chess,
                 Checkers,
                 Music,
+                Sword,
                 TowerDefense,
                 Pirates,
                 Garage,
@@ -294,6 +301,7 @@ mod tests {
                 Chess,
                 Checkers,
                 Music,
+                Sword,
                 TowerDefense,
                 Pirates,
                 Garage,
@@ -320,6 +328,7 @@ mod tests {
                 Chess,
                 Checkers,
                 Music,
+                Sword,
                 TowerDefense,
                 Pirates,
                 Garage,
@@ -349,6 +358,7 @@ mod tests {
                 Chess,
                 Checkers,
                 Music,
+                Sword,
                 TowerDefense,
                 Pirates,
                 Garage,
