@@ -41,6 +41,9 @@ pub const CREATE_PROXIED_PICKUP: u16 = 28;
 pub const DESTROY_PROXIED_PICKUP: u16 = 29;
 pub const MARK_TREASURE_PICKUPS: u16 = 30;
 pub const RESET_PROXIED_SHIP: u16 = 11;
+pub const DESTROY_PROXIED_SHIP: u16 = 10;
+pub const SELECT_SHIP: u16 = 21;
+pub const ANNOUNCER_MESSAGE: u16 = 34;
 /// (R) How long a ship stays held at a whirlpool's exit (the loader's ExitFrozenTime).
 const WHIRLPOOL_HOLD_MS: u64 = 1_500;
 /// UpdateShipPhysics' body as the transport admits it (`soe::DIRECT_SHAPES`, 117 with the header).
@@ -110,8 +113,16 @@ pub struct Content {
     pub win_coins: u32,
     /// ZoneConfig values by the loader's field names (`ZONE_FIELDS`); a missing key is 0.
     pub zone_config: BTreeMap<String, f64>,
-    /// The player's ship (R).
+    /// The ship every other one is drawn from (R).
     pub ship: Ship,
+    /// The ships a base's cave offers (locale 417574-417588), and the one a match starts on.
+    #[serde(default)]
+    pub fleet: Vec<FleetShip>,
+    #[serde(default)]
+    pub start_ship: String,
+    /// The flags Ship Selection offers: the masts' texture aliases.
+    #[serde(default)]
+    pub decals: Vec<Decal>,
     /// The ships' colours by dock slot (`COLOURS`; R order).
     pub colours: Vec<String>,
     /// CameraConfig values by the loader's field names (`CAMERA_FIELDS`); a missing key is 0.
@@ -137,6 +148,46 @@ pub struct Stand {
 }
 
 impl Content {
+    /// Fleet ship `key` as a full config: `ship` with its hull, health, hold and handling.
+    pub fn fleet_ship(&self, key: &str) -> Option<Ship> {
+        let entry = self.fleet.iter().find(|ship| ship.key == key)?;
+        let mut ship = self.ship.clone();
+        let hull = &entry.hull;
+        let actor = |part: &str| format!("pirship_hum_{hull}_{part}_bbe.adr");
+        let mid = if hull == "lrg" {
+            actor("midmast")
+        } else {
+            String::new()
+        };
+        ship.actors = [
+            actor("mainbody"),
+            actor("forwardmast"),
+            actor("rearmast"),
+            mid,
+            String::new(),
+        ];
+        ship.key.clone_from(&entry.key);
+        ship.collision = format!("pirship_hum_{hull}_mainbody_bbe.cdt");
+        // The damage states' thresholds are absolute health: they scale with the hull.
+        for state in &mut ship.damage_states {
+            state.health = state.health * entry.health / self.ship.health.max(1);
+        }
+        ship.health = entry.health;
+        ship.hold_capacity = entry.hold_capacity;
+        ship.physics.insert("MaxSpeed".to_owned(), entry.max_speed);
+        ship.physics.insert("TurboSpeed".to_owned(), entry.turbo_speed);
+        for gear in &mut ship.gears {
+            gear.insert("MaxAngularSpeed".to_owned(), entry.max_turn);
+        }
+        Some(ship)
+    }
+
+    /// The ship a match starts on.
+    pub fn opening_ship(&self) -> Ship {
+        self.fleet_ship(&self.start_ship)
+            .unwrap_or_else(|| self.ship.clone())
+    }
+
     /// The stands as the NPC menu takes them.
     pub fn stand_menus(&self) -> crate::npc_interaction::TableMenus {
         let menu = |stand: &Stand| crate::npc_interaction::TableMenu {
@@ -186,6 +237,38 @@ pub struct Treasure {
     pub max_speed: f32,
 }
 
+/// One ship in the cave's list. The card is `sub_A5B510`'s record, which
+/// `PiratesShipSelection:PopulateShipSlot` shows (00a60c10); the rest overrides `Content::ship`.
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct FleetShip {
+    /// Its key: SelectShip names it.
+    pub key: String,
+    pub name_id: u32,
+    pub size_id: u32,
+    pub turning_id: u32,
+    pub cannons: u32,
+    pub icon: u32,
+    /// The `pirship_hum_<hull>_*` actors; the large hull alone has a mid mast.
+    pub hull: String,
+    pub health: i32,
+    pub hold_capacity: i32,
+    pub max_speed: f64,
+    pub turbo_speed: f64,
+    /// The gears' MaxAngularSpeed (degrees a second).
+    pub max_turn: f64,
+}
+
+/// One flag: the masts' texture alias, its window icon (image set `icon_ui_pir_flag_*`) and its
+/// standings icon (`icon_hud_pir_flag_*`).
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct Decal {
+    pub alias: String,
+    pub icon: u32,
+    pub hud_icon: u32,
+}
+
 /// One ship's config as CreateProxiedShip carries it (the server loader
 /// `LoadShipCombatShipProperties` 0106b940 names the fields). Values are (R).
 #[derive(Clone, Debug, Deserialize, PartialEq)]
@@ -196,6 +279,9 @@ pub struct Ship {
     pub actors: [String; 5],
     /// CollisionDataAsset: the ship config's sixth string and the physics config's collision asset.
     pub collision: String,
+    /// Its key in the cave's list; the client finds the ship it is on by this (00a62280).
+    #[serde(default)]
+    pub key: String,
     /// `SHIP_FIELDS` by name; a missing key is 0.
     #[serde(default)]
     pub config: BTreeMap<String, f64>,
@@ -358,6 +444,16 @@ impl Content {
             && only(&ship.config, SHIP_FIELDS)
             && f64::from(t.max_speed) >= fastest
             && ship.health >= 1
+            && (content.fleet.iter()).all(|f| {
+                f.health >= 1
+                    && f.hold_capacity >= 1
+                    && f64::from(t.max_speed) >= f.turbo_speed
+                    && text_ok(&f.key)
+                    && text_ok(&f.hull)
+            })
+            && (content.decals.iter()).all(|d| text_ok(&d.alias))
+            && (content.fleet.is_empty()
+                || content.fleet.iter().any(|f| f.key == content.start_ship))
             && (1..=1000).contains(&ship.hold_unload_per_second)
             && !ship.gears.is_empty()
             && ship.gears.iter().all(|gear| only(gear, GEAR_FIELDS));
@@ -721,6 +817,68 @@ pub fn create_pickup(id: u32, at: [f32; 3], treasure: &Treasure) -> Vec<u8> {
     packet(CREATE_PROXIED_PICKUP, &body)
 }
 
+/// UpdatePlayer (8) with bit 2: what the cave's window lists. `sub_A618A0` reads a count, then per
+/// ship a key and `sub_A5B510`'s record: name, a value (R 0), size, turning, cannons, cargo, icon,
+/// the ship's key. `sub_A61940` the same for flags: a key, then `sub_A5A370` (the standings icon,
+/// the window icon, the alias).
+pub fn ship_lists(guid: u64, fleet: &[FleetShip], decals: &[Decal]) -> Vec<u8> {
+    let mut body = guid.to_le_bytes().to_vec();
+    body.extend(4_u32.to_le_bytes());
+    body.extend(u32::try_from(fleet.len()).unwrap_or(0).to_le_bytes());
+    for (key, ship) in (1_u32..).zip(fleet) {
+        let card = [
+            key,
+            ship.name_id,
+            0,
+            ship.size_id,
+            ship.turning_id,
+            ship.cannons,
+            ship.hold_capacity.cast_unsigned(),
+            ship.icon,
+        ];
+        for value in card {
+            body.extend(value.to_le_bytes());
+        }
+        string(&mut body, &ship.key);
+    }
+    body.extend(u32::try_from(decals.len()).unwrap_or(0).to_le_bytes());
+    for (key, decal) in (1_u32..).zip(decals) {
+        for value in [key, decal.hud_icon, decal.icon] {
+            body.extend(value.to_le_bytes());
+        }
+        string(&mut body, &decal.alias);
+    }
+    packet(UPDATE_PLAYER, &body)
+}
+
+/// AnnouncerMessage (34), reader `sub_A5A9B0`, handler 00a62280, type 5: opens Ship Selection.
+pub fn open_ship_selection(guid: u64) -> Vec<u8> {
+    let mut body = 5_u32.to_le_bytes().to_vec();
+    body.extend(0_u32.to_le_bytes());
+    body.extend(guid.to_le_bytes());
+    body.extend(guid.to_le_bytes());
+    body.extend([0; 24]);
+    packet(ANNOUNCER_MESSAGE, &body)
+}
+
+/// DestroyProxiedShip (10), handler 00a5f120: the ship `guid`.
+pub fn destroy_ship(guid: u64) -> Vec<u8> {
+    packet(DESTROY_PROXIED_SHIP, &guid.to_le_bytes())
+}
+
+/// The client's SelectShip (21), class 00a595b0: the ship's key and the flag's alias.
+pub fn selected_ship(inner: &[u8]) -> Option<(String, String)> {
+    let mut body = inner.strip_prefix(&[94, 0, 21, 0])?;
+    let mut text = || -> Option<String> {
+        let (len, rest) = body.split_first_chunk::<4>()?;
+        let len = usize::try_from(u32::from_le_bytes(*len)).ok()?;
+        let (bytes, rest) = rest.split_at_checked(len)?;
+        body = rest;
+        String::from_utf8(bytes.to_vec()).ok()
+    };
+    Some((text()?, text()?))
+}
+
 /// ResetProxiedShip (11), reader `sub_CA5CB0`, handler 00ca68f0: ship `guid`, its 4x4 transform and a
 /// speed. The client holds the ship (flag 0x100) until the next UpdatePlayerState.
 pub fn reset_ship(guid: u64, [x, y, z]: [f32; 3], speed: f32) -> Vec<u8> {
@@ -779,17 +937,18 @@ pub fn player_gold(guid: u64, gold: u32) -> Vec<u8> {
 }
 
 /// UpdatePlayer (8) with bits 3 and 4: what the standings row shows. Bit 3 (`sub_A665E0`): the ship's
-/// name, then `sub_A5A370`: a value, the flag icon (+0x230, `SetPlayerFlag`) and a string. Bit 4: the
+/// key, then `sub_A5A370`: the flag's standings icon (`SetPlayerFlag`), its window icon and its
+/// alias (the order native runs settled). Bit 4: the
 /// name record (`sub_8E7290`: three values, R 0, the first and last name, which `sub_726400` joins),
 /// the AI's locale name (0 for a human), the index 00a67110 checks against the list at processor
 /// +0x420 (R: -1) and the row's colour (+0x1d8, `SetPlayerColor`).
-pub fn player_card(guid: u64, name: &str, flag: u32, colour: u32) -> Vec<u8> {
+pub fn player_card(guid: u64, name: &str, ship: &Ship, decal: Option<&Decal>, colour: u32) -> Vec<u8> {
     let mut body = guid.to_le_bytes().to_vec();
     body.extend(0x18_u32.to_le_bytes());
-    string(&mut body, "");
-    body.extend(0_u32.to_le_bytes());
-    body.extend(flag.to_le_bytes());
-    string(&mut body, "");
+    string(&mut body, &ship.key);
+    body.extend(decal.map_or(0, |decal| decal.hud_icon).to_le_bytes());
+    body.extend(decal.map_or(0, |decal| decal.icon).to_le_bytes());
+    string(&mut body, decal.map_or("", |decal| decal.alias.as_str()));
     body.extend([0; 12]);
     string(&mut body, name);
     string(&mut body, "");
@@ -854,8 +1013,10 @@ pub struct Plunder {
     gold: u32,
     /// When the hold last banked a chest.
     unloaded_ms: Option<u64>,
-    /// A whirlpool holds the ship until then; its reports count for nothing.
+    /// A whirlpool or a new ship holds it until then; its reports count for nothing.
     held_until: Option<u64>,
+    /// The last report the speed bound let through: where the ship really is.
+    position: Option<[f32; 3]>,
 }
 
 /// (R) Slack on the speed bound for a report's jitter (metres), once per anchor.
@@ -886,7 +1047,28 @@ impl Plunder {
             gold: 0,
             unloaded_ms: None,
             held_until: None,
+            position: None,
         }
+    }
+
+    /// The hold, as UpdatePlayerState carries it.
+    pub fn hold(&self) -> u32 {
+        self.hold
+    }
+
+    /// The last position the speed bound accepted.
+    pub fn position(&self) -> Option<[f32; 3]> {
+        self.position
+    }
+
+    /// A new ship from the cave: it starts on `home`, held for the whirlpool's beat so the client
+    /// has built its physics before `release` (a release ahead of that would not hold), and it
+    /// keeps what its hold can carry. The speed bound counts from here.
+    pub fn restart(&mut self, ship: &Ship, home: [f32; 3], now_ms: u64) {
+        self.anchor = Some((home, now_ms));
+        self.position = Some(home);
+        self.held_until = Some(now_ms.saturating_add(WHIRLPOOL_HOLD_MS));
+        self.hold = self.hold.min(u32::try_from(ship.hold_capacity).unwrap_or(0));
     }
 
     /// The whirlpool's hold ending: the state that lets the ship go, as Playing's did.
@@ -935,6 +1117,7 @@ impl Plunder {
         if treasure.max_speed * seconds + REPORT_SLACK < distance(from, at) {
             return Vec::new();
         }
+        self.position = Some(at);
         let mut pools = place.whirlpools.iter();
         if let Some(pool) = pools.find(|p| distance(p.vortex, at) <= p.radius) {
             self.anchor = Some((pool.teleport, now_ms));
@@ -991,6 +1174,11 @@ impl Plunder {
 }
 
 /// The horizontal distance between two points (the water is flat; heights differ by the hull).
+/// Whether `at` lies within `radius` of `point`.
+pub fn near(point: [f32; 3], at: [f32; 3], radius: f32) -> bool {
+    distance(point, at) <= radius
+}
+
 fn distance(a: [f32; 3], b: [f32; 3]) -> f32 {
     (a[0] - b[0]).hypot(a[2] - b[2])
 }
@@ -1194,7 +1382,7 @@ pub fn create_ship(guid: u64, slot: u32, position: [f32; 3], ship: &Ship, colour
         string(&mut b, &state.mast_alias);
         b.extend(state.effect_id.to_le_bytes());
     }
-    string(&mut b, "");
+    string(&mut b, &ship.key);
     // The physics config; its collision asset is the ship's own (R).
     write_fields(&mut b, PHYSICS_FIELDS, &ship.physics);
     string(&mut b, &ship.collision);
@@ -1468,6 +1656,50 @@ mod tests {
         assert_eq!(free, Some(player_state(7, ship.health, 0)));
         assert_eq!(round.release(7, 9_000, ship), None, "once");
         assert_eq!(round.anchor, Some(([900.0, 52.0, 0.0], 2_000 + WHIRLPOOL_HOLD_MS)));
+    }
+
+    /// Each fleet ship keeps the base physics but its own hull, health, hold and handling; the
+    /// damage states scale so a whole ship shows none.
+    #[test]
+    fn fleet_ships_differ() {
+        let content = content();
+        assert_eq!(content.opening_ship().key, "Cutlass");
+        let eel = content.fleet_ship("Eel").unwrap();
+        let big = content.fleet_ship("Juggernaut").unwrap();
+        assert_eq!(eel.actors[0], "pirship_hum_sml_mainbody_bbe.adr");
+        assert!(eel.actors[3].is_empty(), "no mid mast");
+        assert_eq!(big.actors[3], "pirship_hum_lrg_midmast_bbe.adr");
+        assert_eq!((eel.hold_capacity, big.hold_capacity), (4, 8));
+        assert!(eel.physics["MaxSpeed"] > big.physics["MaxSpeed"]);
+        assert!(eel.gears[0]["MaxAngularSpeed"] > big.gears[0]["MaxAngularSpeed"]);
+        for ship in [&eel, &big] {
+            assert!(ship.damage_states[0].health < ship.health, "{}", ship.key);
+            assert_eq!(ship.damage_states[0].effect_id, 0, "whole: no smoke");
+        }
+        assert_eq!(content.fleet_ship("Goliath"), None);
+    }
+
+    /// The cave's lists as `sub_A618A0` and `sub_A61940` read them, and SelectShip's two strings.
+    #[test]
+    fn the_caves_packets_keep_their_layout() {
+        let content = content();
+        let out = ship_lists(7, &content.fleet[..1], &content.decals[..1]);
+        assert_eq!(out[..4], [94, 0, 8, 0]);
+        assert_eq!(out[12..16], 4_u32.to_le_bytes(), "bit 2");
+        assert_eq!(out[16..20], 1_u32.to_le_bytes(), "one ship");
+        let card = &content.fleet[0];
+        assert_eq!(out[24..28], card.name_id.to_le_bytes());
+        assert_eq!(out[44..48], card.hold_capacity.to_le_bytes());
+        assert_eq!(open_ship_selection(7)[4..8], 5_u32.to_le_bytes());
+        assert_eq!(open_ship_selection(7).len(), 4 + 8 + 16 + 24);
+        let mut select = vec![94, 0, 21, 0];
+        select.extend(3_u32.to_le_bytes());
+        select.extend(b"Eel");
+        select.extend(4_u32.to_le_bytes());
+        select.extend(b"star");
+        assert_eq!(selected_ship(&select), Some(("Eel".to_owned(), "star".to_owned())));
+        assert_eq!(selected_ship(&select[..10]), None, "cut short");
+        assert_eq!(selected_ship(&[94, 0, 22, 0]), None, "another packet");
     }
 
     #[test]

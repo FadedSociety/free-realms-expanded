@@ -37,6 +37,13 @@ pub(super) struct PirateArena {
     offer: Option<Vec<Vec<u8>>>,
     /// The start packets, held until the player presses Go (`None` after).
     pending: Option<Vec<Vec<u8>>>,
+    /// The ship sailing now; the cave swaps it.
+    ship: ship_combat::Ship,
+    /// A report was inside the base's cave: its window opens once per visit.
+    in_cave: bool,
+    /// The window is open: only then does a SelectShip count, or any client could call its ship
+    /// home from the far side of the map.
+    choosing: bool,
     /// The family-39 run: the title bar, the hidden world HUD and the ways out hang on it.
     runs: MinigameRuns,
     run_id: i32,
@@ -80,6 +87,7 @@ impl Gameplay {
             return Ok(format!("Usage: realm pirates <1-{}>", content.arenas.len()));
         };
         let plunder = ship_combat::Plunder::new(arena.pickups.len());
+        let ship = content.opening_ship();
         // Every ship starts on its own pad; the solo player's is dock slot 0 (`load` keeps one).
         let home = arena.docks[0].bank;
         let [x, y, z] = home;
@@ -111,9 +119,16 @@ impl Gameplay {
             ship_combat::game_state(ship_combat::WAITING_FOR_CLIENTS),
             // The local player's ship: the client makes its local player from it (00a6c3b0).
             // Dock slot 0's colour (`load` keeps the list non-empty).
-            ship_combat::create_ship(character.guid, 0, home, &content.ship, &content.colours[0]),
-            // (R) The first flag icon and the first colour.
-            ship_combat::player_card(character.guid, &self.character_name, 1, 0),
+            ship_combat::create_ship(character.guid, 0, home, &ship, &content.colours[0]),
+            // (R) The first flag and the first colour.
+            ship_combat::player_card(
+                character.guid,
+                &self.character_name,
+                &ship,
+                content.decals.first(),
+                0,
+            ),
+            ship_combat::ship_lists(character.guid, &content.fleet, &content.decals),
             // Its camera's config, which the ship camera reads from its first frame.
             ship_combat::camera_config(&content.camera),
         ];
@@ -145,6 +160,9 @@ impl Gameplay {
             return_to: character.clone(),
             offer: Some(offer),
             pending: Some(pending),
+            ship,
+            in_cave: false,
+            choosing: false,
             runs,
             run_id,
             game_id,
@@ -246,6 +264,13 @@ impl Gameplay {
         let Some(arena) = self.pirates.as_mut() else {
             return Ok(Some(out));
         };
+        if let Some((key, decal)) = ship_combat::selected_ship(inner) {
+            self.swap_ship(&key, &decal, now_ms, &mut out);
+            return Ok(Some(out));
+        }
+        let Some(arena) = self.pirates.as_mut() else {
+            return Ok(Some(out));
+        };
         // L966: the client's own ship report, while the clock runs.
         let report = ship_combat::ship_position(inner);
         let content = self.ship_combat.as_deref();
@@ -254,20 +279,77 @@ impl Gameplay {
             && let Some(start) = arena.game.playing_since()
             && let Some(place) = content.arenas.get(arena.arena)
         {
-            let (treasure, ship) = (&content.treasure, &content.ship);
+            let treasure = &content.treasure;
+            let ship = arena.ship.clone();
             // The round starts with the ship on its pad when Playing began, and that lets the ship
             // go: until its first UpdatePlayerState it has no health, so the keys do nothing
             // (`ControllerShip` 00af8120), and it sits held by the flag the client set on building
             // the physics (0x100, 00ca2470). A report proves the physics exists (00ca7480), so the
             // flag cannot come back after this.
             if arena.plunder.begin(place, start) {
+                let hold = arena.plunder.hold();
                 out.replies
-                    .push(ship_combat::player_state(guid, ship.health, 0));
+                    .push(ship_combat::player_state(guid, ship.health, hold));
             }
-            let earned = (arena.plunder).sail(guid, at, now_ms, place, treasure, ship);
+            let earned = (arena.plunder).sail(guid, at, now_ms, place, treasure, &ship);
             out.replies.extend(earned);
+            // Steering into the base's cave opens Ship Selection, once a visit; play goes on. Only
+            // a position the speed bound accepted counts, so a forged report opens nothing, and a
+            // ship that leaves for good (three radii) loses the window.
+            let near = |radius: f32| {
+                let dock = place.docks.first();
+                let spot = arena.plunder.position();
+                dock.zip(spot)
+                    .is_some_and(|(dock, at)| ship_combat::near(dock.enter, at, radius))
+            };
+            let in_cave = near(treasure.enter_radius);
+            let open = near(treasure.enter_radius * 3.0);
+            if in_cave && !arena.in_cave {
+                out.replies.push(ship_combat::open_ship_selection(guid));
+                arena.choosing = true;
+            }
+            arena.in_cave = in_cave;
+            arena.choosing &= open;
         }
         Ok(Some(out))
+    }
+
+    /// The cave's choice, in play: the old ship goes and the new one starts on the pad. An unknown
+    /// key changes nothing; a flag off the list keeps the ship's own.
+    fn swap_ship(&mut self, key: &str, decal: &str, now_ms: u64, out: &mut Outcome) {
+        let (Some(arena), Some(content)) = (self.pirates.as_mut(), self.ship_combat.as_deref())
+        else {
+            return;
+        };
+        // An empty key keeps the ship: only the flag changed.
+        let chosen = if key.is_empty() {
+            Some(arena.ship.clone())
+        } else {
+            content.fleet_ship(key)
+        };
+        let (Some(mut ship), Some(place)) = (chosen, content.arenas.get(arena.arena)) else {
+            return;
+        };
+        if arena.game.playing_since().is_none() || !std::mem::take(&mut arena.choosing) {
+            return;
+        }
+        let flag = content.decals.iter().find(|d| d.alias == decal);
+        if let Some(flag) = flag {
+            ship.flag.clone_from(&flag.alias);
+        }
+        let shown = flag.or_else(|| content.decals.iter().find(|d| d.alias == ship.flag));
+        let guid = arena.return_to.guid;
+        let colour = &content.colours[0];
+        let home = place.docks[0].bank;
+        out.replies.extend([
+            ship_combat::destroy_ship(guid),
+            ship_combat::create_ship(guid, 0, home, &ship, colour),
+            ship_combat::player_card(guid, &self.character_name, &ship, shown, 0),
+            ship_combat::ship_lists(guid, &content.fleet, &content.decals),
+            ship_combat::refresh_ui(),
+        ]);
+        arena.plunder.restart(&ship, home, now_ms);
+        arena.ship = ship;
     }
 
     /// The states' packets. Game Over also opens the results board and settles the match; the
@@ -367,7 +449,7 @@ impl Gameplay {
             let back = (arena.plunder).respawn(now_ms, &place.pickups, &content.treasure);
             out.replies.extend(back);
             let guid = arena.return_to.guid;
-            out.replies.extend(arena.plunder.release(guid, now_ms, &content.ship));
+            out.replies.extend(arena.plunder.release(guid, now_ms, &arena.ship));
         }
         if arena.game.finished(now_ms) {
             let back = arena.return_to.clone();

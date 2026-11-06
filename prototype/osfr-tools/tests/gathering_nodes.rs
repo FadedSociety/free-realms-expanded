@@ -1816,6 +1816,87 @@ fn press_go(gateway: &mut Gateway, loaded: &[GatewayOutcome], now_ms: u64) -> Ga
     send(gateway, &go, now_ms)
 }
 
+/// Steering into the base's cave opens Ship Selection once a visit; a choice swaps the ship on the
+/// pad, and a SelectShip with no window open changes nothing.
+#[test]
+fn the_caves_window_swaps_the_ship() {
+    let fixture = Fixture::new(PLOT);
+    let mut gateway = fixture.gateway_at(fixture.state(false, true), &fixture.node, 60.0);
+    tick(&mut gateway, 1_500);
+    play(&mut gateway, 1059, 2_000);
+    let loaded = [13_u16, 10].map(|op| send(&mut gateway, &op.to_le_bytes(), 2_100));
+    let go = press_go(&mut gateway, &loaded, 2_150);
+    let ship = (inners(&go).into_iter())
+        .find(|p| p.starts_with(&[94, 0, 9, 0]))
+        .expect("the ship");
+    let guid = u64::from_le_bytes(ship[4..12].try_into().unwrap());
+    send(&mut gateway, &[94, 0, 3, 0, 0x1a, 0, 0, 0], 2_200);
+    let playing: &[u8] = &[94, 0, 2, 0, 10, 0, 0, 0];
+    let mut now = 6_300;
+    while !inners(&tick(&mut gateway, now)).iter().any(|p| *p == playing) {
+        now += 500;
+        assert!(now < 30_000, "Playing");
+    }
+    let content_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let content = osfr_tools::ship_combat::Content::load(&content_dir).unwrap().unwrap();
+    let dock = &content.arenas[0].docks[0];
+    send(&mut gateway, &ship_report(guid, dock.bank), now + 100);
+    let mut select = vec![94, 0, 21, 0];
+    select.extend(3_u32.to_le_bytes());
+    select.extend(b"Eel");
+    select.extend(0_u32.to_le_bytes());
+    let swapped = |out: &GatewayOutcome| inners(out).iter().any(|p| p.starts_with(&[94, 0, 10, 0]));
+    assert!(!swapped(&send(&mut gateway, &select, now + 200)), "no window, no swap");
+    let leg = (dock.enter[0] - dock.bank[0]).hypot(dock.enter[2] - dock.bank[2]);
+    let later = now + 200 + ((leg / content.treasure.max_speed).ceil() as u64 + 1) * 1000;
+    let window: &[u8] = &[94, 0, 34, 0, 5, 0, 0, 0];
+    let cave = send(&mut gateway, &ship_report(guid, dock.enter), later);
+    assert!(inners(&cave).iter().any(|p| p.starts_with(window)), "the window opens");
+    let again = send(&mut gateway, &ship_report(guid, dock.enter), later + 100);
+    assert!(!inners(&again).iter().any(|p| p.starts_with(window)), "once a visit");
+    let swap = send(&mut gateway, &select, later + 200);
+    assert!(swapped(&swap), "the swap");
+    assert!(!swapped(&send(&mut gateway, &select, later + 300)), "the window closed");
+    // The new ship is held until the client has built it, then let go.
+    let state: &[u8] = &[94, 0, 17, 0];
+    let held = tick(&mut gateway, later + 1_000);
+    assert!(!inners(&held).iter().any(|p| p.starts_with(state)), "still held");
+    let free = tick(&mut gateway, later + 2_000);
+    assert!(inners(&free).iter().any(|p| p.starts_with(state)), "let go");
+}
+
+/// A forged position past the speed bound opens no window, so it cannot call the ship home.
+#[test]
+fn a_forged_report_opens_no_ship_selection() {
+    let fixture = Fixture::new(PLOT);
+    let mut gateway = fixture.gateway_at(fixture.state(false, true), &fixture.node, 60.0);
+    tick(&mut gateway, 1_500);
+    play(&mut gateway, 1059, 2_000);
+    let loaded = [13_u16, 10].map(|op| send(&mut gateway, &op.to_le_bytes(), 2_100));
+    let go = press_go(&mut gateway, &loaded, 2_150);
+    let ship = (inners(&go).into_iter())
+        .find(|p| p.starts_with(&[94, 0, 9, 0]))
+        .expect("the ship");
+    let guid = u64::from_le_bytes(ship[4..12].try_into().unwrap());
+    send(&mut gateway, &[94, 0, 3, 0, 0x1a, 0, 0, 0], 2_200);
+    let playing: &[u8] = &[94, 0, 2, 0, 10, 0, 0, 0];
+    let mut now = 6_300;
+    while !inners(&tick(&mut gateway, now)).iter().any(|p| *p == playing) {
+        now += 500;
+        assert!(now < 30_000, "Playing");
+    }
+    let content_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let content = osfr_tools::ship_combat::Content::load(&content_dir).unwrap().unwrap();
+    let dock = &content.arenas[0].docks[0];
+    send(&mut gateway, &ship_report(guid, dock.bank), now + 100);
+    // Sail far away over time, then claim the cave in one hop.
+    let far = [dock.bank[0] + 2_000.0, dock.bank[1], dock.bank[2]];
+    send(&mut gateway, &ship_report(guid, far), now + 60_000);
+    let forged = send(&mut gateway, &ship_report(guid, dock.enter), now + 60_100);
+    let window: &[u8] = &[94, 0, 34, 0, 5, 0, 0, 0];
+    assert!(!inners(&forged).iter().any(|p| p.starts_with(window)));
+}
+
 /// Closing the offer leaves the arena before anything started.
 #[test]
 fn closing_a_pirates_offer_zones_back() {
