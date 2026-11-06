@@ -544,6 +544,16 @@ fn win(gateway: &mut Gateway, game: Game, id: i32, base_ms: u64) {
     send(gateway, &payload(id, "OnNextLevelMsg"), base_ms + 700);
 }
 
+/// The next level of a run `win` has just finished one level of.
+fn win_next_level(gateway: &mut Gateway, game: Game, id: i32, base_ms: u64) -> GatewayOutcome {
+    send(gateway, &payload(id, "OnStartLevelMsg"), base_ms);
+    for slot in 0..game.goals {
+        let text = format!("OnLevelEventMsg\t50\t{}\t{}", LEFT + slot, BOTTOM);
+        send(gateway, &payload(id, &text), base_ms + 600 + slot as u64);
+    }
+    send(gateway, &payload(id, "OnNextLevelMsg"), base_ms + 700)
+}
+
 fn mining_run(gateway: &Gateway) -> Type8Run {
     gateway
         .snapshot()
@@ -1990,6 +2000,90 @@ fn a_telescope_offers_spot_the_difference() {
             .collect();
         assert_eq!(offers, [game]);
     }
+}
+
+/// Two levels: clearing the first offers the second with no win; clearing the last wins once. A
+/// run that clears level 1 and then runs out of time, or leaves, has won too (R).
+#[test]
+fn a_two_level_hunt_wins_after_its_last_level_or_on_time_after_the_first() {
+    let hunt = Game {
+        node: "",
+        json_key: "artifact_hunt",
+        profile: artifact_hunt::ADVENTURER_PROFILE_ID,
+        goals: 4,
+        outputs: OUTPUTS,
+        region: None,
+    };
+    let fixture = Fixture::new(PLOT).with_activity_rates();
+    let mut spec = serde_json::to_value(board(4)).unwrap();
+    spec["outputs"] = json!([]);
+    let level = json!({
+        "selectable": spec["selectable"], "tiles": spec["tiles"], "goals": spec["goals"],
+        "duration_seconds": 30,
+    });
+    let content = json!({
+        "schema_version": 1, "game_id": 57, "profile_id": artifact_hunt::ADVENTURER_PROFILE_ID,
+        "name_id": 35604, "description_id": 35605, "icon_id": 912,
+        "preload_file": "ArtifactAssets.txt", "launch_movie": "game_artifact.gfx",
+        "levels": [level], "spec": spec,
+    });
+    let path = fixture.directory.join(artifact_hunt::CONTENT_FILE);
+    fs::write(path, serde_json::to_vec(&content).unwrap()).unwrap();
+    let completed = |gateway: &Gateway| gameplay_json(gateway)["artifact_hunt"]["completed"].clone();
+
+    // The last level wins.
+    let mut gateway = fixture.gateway_at(fixture.state(false, false), &fixture.node, 60.0);
+    tick(&mut gateway, 1_500);
+    play(&mut gateway, 413, 2_000);
+    let id = active(&gateway, hunt).expect("the hunt is offered") as i32;
+    win(&mut gateway, hunt, id, 2_100);
+    assert_eq!(completed(&gateway), 0, "level 1 is not the end");
+    let done = win_next_level(&mut gateway, hunt, id, 4_000);
+    assert!(said(&done, "OnGameWonMsg"), "the last level wins");
+    assert_eq!(completed(&gateway), 1);
+
+    // Time runs out on level 2: still a win.
+    let mut gateway = fixture.gateway_at(fixture.state(false, false), &fixture.node, 60.0);
+    tick(&mut gateway, 1_500);
+    play(&mut gateway, 413, 2_000);
+    let id = active(&gateway, hunt).expect("the hunt is offered") as i32;
+    win(&mut gateway, hunt, id, 2_100);
+    send(&mut gateway, &payload(id, "OnStartLevelMsg"), 4_000);
+    tick(&mut gateway, 40_000);
+    tick(&mut gateway, 41_000);
+    assert_eq!(completed(&gateway), 0, "the client ends the level first");
+    let ended = send(&mut gateway, &payload(id, "OnNextLevelMsg"), 41_100);
+    assert!(said(&ended, "OnGameWonMsg"), "level 1 was cleared");
+    assert_eq!(completed(&gateway), 1);
+
+    // Leaving on level 2: a win too, and the run is gone.
+    let mut gateway = fixture.gateway_at(fixture.state(false, false), &fixture.node, 60.0);
+    tick(&mut gateway, 1_500);
+    play(&mut gateway, 413, 2_000);
+    let id = active(&gateway, hunt).expect("the hunt is offered") as i32;
+    win(&mut gateway, hunt, id, 2_100);
+    send(&mut gateway, &payload(id, "OnStartLevelMsg"), 4_000);
+    send(&mut gateway, &frame(6, id, -1), 4_100);
+    assert_eq!(completed(&gateway), 1, "level 1 was cleared");
+    assert!(active(&gateway, hunt).is_none(), "and the player is free");
+
+    // Leaving in the pause after level 1, before the next level is asked for: a win too.
+    let mut gateway = fixture.gateway_at(fixture.state(false, false), &fixture.node, 60.0);
+    tick(&mut gateway, 1_500);
+    play(&mut gateway, 413, 2_000);
+    let id = active(&gateway, hunt).expect("the hunt is offered") as i32;
+    for (step, text) in ["OnConnectMsg", "OnStartGameMsg", "OnStartLevelMsg"].iter().enumerate() {
+        if step == 0 {
+            send(&mut gateway, &frame(5, id, -1), 2_100);
+        }
+        send(&mut gateway, &payload(id, text), 2_200 + step as u64);
+    }
+    for slot in 0..hunt.goals {
+        let text = format!("OnLevelEventMsg\t50\t{}\t{}", LEFT + slot, BOTTOM);
+        send(&mut gateway, &payload(id, &text), 2_700 + slot as u64);
+    }
+    send(&mut gateway, &frame(6, id, -1), 2_800);
+    assert_eq!(completed(&gateway), 1, "level 1 was cleared");
 }
 
 /// A Practice Dummy has one menu row, and it offers Hack 'n' Slash.

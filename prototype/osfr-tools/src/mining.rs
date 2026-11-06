@@ -102,6 +102,10 @@ fn default_difficulty() -> i32 {
     1
 }
 
+fn first_level() -> u32 {
+    1
+}
+
 fn default_preload_file() -> String {
     MINING_PRELOAD_FILE.to_string()
 }
@@ -282,7 +286,23 @@ struct Content {
     /// of its own game 18. Empty for every older file.
     #[serde(default)]
     games: Vec<GameVariant>,
+    /// The levels after the first, in order. Empty for a one-level game.
+    #[serde(default)]
+    levels: Vec<LevelVariant>,
+    /// This content's level, from 1; `next_level` counts it, the file never sets it.
+    #[serde(skip, default = "first_level")]
+    level: u32,
     spec: Type8BoardSpec,
+}
+
+/// What a later level replaces. The board and every other setting stay the first level's.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct LevelVariant {
+    selectable: Vec<u16>,
+    tiles: Vec<Type8Kind>,
+    goals: Vec<Type8Goal>,
+    duration_seconds: u32,
 }
 
 /// T553: what one extra game of a content file replaces: its client name, description and icon
@@ -318,6 +338,39 @@ impl Content {
         }
         validate_spec(&content.spec)?;
         Ok(content)
+    }
+
+    /// The next level's content, if the game has one.
+    fn next_level(&self) -> Option<Self> {
+        let (level, rest) = self.levels.split_first()?;
+        let mut content = self.clone();
+        content.levels = rest.to_vec();
+        content.level += 1;
+        content.spec.selectable.clone_from(&level.selectable);
+        content.spec.tiles.clone_from(&level.tiles);
+        content.spec.goals.clone_from(&level.goals);
+        content.spec.duration_seconds = level.duration_seconds;
+        Some(content)
+    }
+
+    /// Has the run cleared a level of a multi-level game? `stopped` is a level just finished,
+    /// before the client asks for the next. A one-level game never has.
+    fn cleared(&self, stopped: bool) -> bool {
+        self.level > 1 || (stopped && !self.levels.is_empty())
+    }
+
+    /// Every later level is a valid board. Its goal count is the first level's, so a run saved
+    /// on any level still validates against the file's own spec.
+    fn validate_levels(&self) -> io::Result<()> {
+        let mut at = self.clone();
+        while let Some(level) = at.next_level() {
+            if level.spec.goals.len() != self.spec.goals.len() {
+                return Err(invalid("a level changes the goal count"));
+            }
+            validate_spec(&level.spec)?;
+            at = level;
+        }
+        Ok(())
     }
 }
 
@@ -393,6 +446,7 @@ impl Type8Engine {
         validate_asset_name(&content.launch_movie, "launch movie")?;
         let bounds = validate_spec(&content.spec)?;
         validate_powerup_definitions(&content)?;
+        content.validate_levels()?;
         let mut games = BTreeMap::new();
         for game in content.games.clone() {
             if game.game_id == game_id || games.contains_key(&game.game_id) {
@@ -667,7 +721,34 @@ impl Type8Engine {
         }
         if run.wall_ms == MAX_WALL_MS || (run.phase == Type8Phase::Playing && run.remaining_ms == 0)
         {
-            run.phase = Type8Phase::Lost;
+            // (R) A run that cleared level 1 has won: the primary goal is the first level, and
+            // retail paid one that stopped there (`f3ZJ9i5YnaI`). The level ends as a success with
+            // no level left, so the client's next-level request takes the ordinary win.
+            let stopped = run.phase == Type8Phase::LevelComplete;
+            let cleared = self.content.cleared(stopped);
+            if cleared && stopped {
+                // The wall-clock cap, and the movie never asked for the next level.
+                run.phase = Type8Phase::Won;
+                next.completed = next
+                    .completed
+                    .checked_add(1)
+                    .ok_or_else(|| invalid("completion overflow"))?;
+                out.completed = true;
+                out.transaction = reward_transaction(run, &self.content.spec)?;
+                message(&mut out, run.instance_id, self.game_id, "OnGameWonMsg")?;
+                self.state = next;
+                return Ok(out);
+            }
+            run.phase = if cleared {
+                Type8Phase::LevelComplete
+            } else {
+                Type8Phase::Lost
+            };
+            if cleared {
+                let mut last = (*self.content).clone();
+                last.levels.clear();
+                self.content = Arc::new(last);
+            }
             // Whole-movie pause suppresses the native end-stage timers, so a
             // paused loss resumes the movie before StopLevel.
             if run.paused {
@@ -678,7 +759,11 @@ impl Type8Engine {
                 &mut out,
                 run.instance_id,
                 self.game_id,
-                "OnStopLevel\t1\tfalse",
+                if cleared {
+                    "OnStopLevel\t1\ttrue"
+                } else {
+                    "OnStopLevel\t1\tfalse"
+                },
             )?;
         }
         self.state = next;
@@ -721,6 +806,20 @@ impl Type8Engine {
             {
                 return Ok(Type8Outcome::default());
             }
+            // (R) Leaving after a cleared level is a win, as running out of time is. The movie is
+            // closing, so it settles here; the win message carries the quest credit.
+            if self.content.cleared(run.phase == Type8Phase::LevelComplete) {
+                let mut won = Type8Outcome {
+                    changed: true,
+                    completed: true,
+                    transaction: reward_transaction(run, &self.content.spec)?,
+                    ..Default::default()
+                };
+                message(&mut won, run.instance_id, self.game_id, "OnGameWonMsg")?;
+                won.replies.extend(self.cancel().replies);
+                self.state.completed = self.state.completed.saturating_add(1);
+                return Ok(won);
+            }
             return Ok(self.cancel());
         }
         let game = read_i32(inner, 11);
@@ -739,6 +838,7 @@ impl Type8Engine {
         let id = run.instance_id;
         let mut out = Type8Outcome::default();
         let mut presented = self.results_presented;
+        let mut advanced = None;
         if sub == 5 {
             if run.phase == Type8Phase::Offered {
                 out.replies.push(header(17, id, self.game_id));
@@ -781,8 +881,8 @@ impl Type8Engine {
                             id,
                             self.game_id,
                             &format!(
-                                "OnLevelInitMsg\t1\t{}\t3",
-                                self.content.spec.duration_seconds
+                                "OnLevelInitMsg\t{}\t{}\t3",
+                                self.content.level, self.content.spec.duration_seconds
                             ),
                         )?;
                         for (index, goal) in self.content.spec.goals.iter().enumerate() {
@@ -989,6 +1089,19 @@ impl Type8Engine {
                         )?;
                     }
                 }
+                ["OnNextLevelMsg"] if run.phase == Type8Phase::LevelComplete
+                    && !self.content.levels.is_empty() =>
+                {
+                    let level = self.content.next_level();
+                    let level = level.ok_or_else(|| invalid("no next level"))?;
+                    run.phase = Type8Phase::LevelOffered;
+                    run.collected = vec![0; level.spec.goals.len()];
+                    run.remaining_ms = level.spec.duration_seconds * 1000;
+                    run.paused = true;
+                    let text = format!("OnNextLevelMsg\t{}\t0\t0", level.level);
+                    message(&mut out, id, self.game_id, &text)?;
+                    advanced = Some(Arc::new(level));
+                }
                 ["OnNextLevelMsg"] => {
                     if run.phase == Type8Phase::LevelComplete {
                         run.phase = Type8Phase::Won;
@@ -1039,6 +1152,9 @@ impl Type8Engine {
         Self::validate_state(&next)?;
         if let Some(run) = &next.active {
             validate_run(run, &self.content.spec, self.bounds)?;
+        }
+        if let Some(level) = advanced {
+            self.content = level;
         }
         self.state = next;
         self.results_presented = presented;

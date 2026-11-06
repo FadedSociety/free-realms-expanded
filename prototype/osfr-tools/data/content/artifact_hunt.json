@@ -8,6 +8,12 @@
   "difficulty": 2,
   "preload_file": "ArtifactAssets.txt",
   "launch_movie": "game_artifact.gfx",
+  "levels": [
+    {"selectable": [403, 404, 405, 406], "tiles": [{"value": 403, "category": 400, "icon_id": 3}, {"value": 404, "category": 400, "icon_id": 4}, {"value": 405, "category": 400, "icon_id": 5}, {"value": 406, "category": 400, "icon_id": 6}], "goals": [{"index": 0, "value": 403, "quota": 15, "per_reward": 1, "icon_id": 0}, {"index": 1, "value": 404, "quota": 15, "per_reward": 1, "icon_id": 0}, {"index": 2, "value": 405, "quota": 15, "per_reward": 1, "icon_id": 0}, {"index": 3, "value": 406, "quota": 15, "per_reward": 1, "icon_id": 0}], "duration_seconds": 180},
+    {"selectable": [401, 404, 405, 406], "tiles": [{"value": 401, "category": 400, "icon_id": 1}, {"value": 404, "category": 400, "icon_id": 4}, {"value": 405, "category": 400, "icon_id": 5}, {"value": 406, "category": 400, "icon_id": 6}], "goals": [{"index": 0, "value": 401, "quota": 15, "per_reward": 1, "icon_id": 0}, {"index": 1, "value": 404, "quota": 15, "per_reward": 1, "icon_id": 0}, {"index": 2, "value": 405, "quota": 15, "per_reward": 1, "icon_id": 0}, {"index": 3, "value": 406, "quota": 15, "per_reward": 1, "icon_id": 0}], "duration_seconds": 180},
+    {"selectable": [401, 406, 407, 408], "tiles": [{"value": 401, "category": 400, "icon_id": 1}, {"value": 406, "category": 400, "icon_id": 6}, {"value": 407, "category": 400, "icon_id": 7}, {"value": 408, "category": 400, "icon_id": 8}], "goals": [{"index": 0, "value": 401, "quota": 15, "per_reward": 1, "icon_id": 0}, {"index": 1, "value": 406, "quota": 15, "per_reward": 1, "icon_id": 0}, {"index": 2, "value": 407, "quota": 15, "per_reward": 1, "icon_id": 0}, {"index": 3, "value": 408, "quota": 15, "per_reward": 1, "icon_id": 0}], "duration_seconds": 180},
+    {"selectable": [401, 403, 404, 405], "tiles": [{"value": 401, "category": 400, "icon_id": 1}, {"value": 403, "category": 400, "icon_id": 3}, {"value": 404, "category": 400, "icon_id": 4}, {"value": 405, "category": 400, "icon_id": 5}], "goals": [{"index": 0, "value": 401, "quota": 15, "per_reward": 1, "icon_id": 0}, {"index": 1, "value": 403, "quota": 15, "per_reward": 1, "icon_id": 0}, {"index": 2, "value": 404, "quota": 15, "per_reward": 1, "icon_id": 0}, {"index": 3, "value": 405, "quota": 15, "per_reward": 1, "icon_id": 0}], "duration_seconds": 180}
+  ],
   "spec": {
     "width": 11,
     "height": 11,
@@ -202,6 +208,6 @@
     "powerup_percent": 0,
     "meter_id": 0,
     "reconstructed_rules": true,
-    "rule_notice": "Recovered: game_artifact.gfx is the type-8 match-three movie of game_mining.gfx, and its text asks four kinds of artifact per level. Seen on a retail level 1: its four artifacts, quota 15, difficulty 2. Reconstructed: one level where retail has five, Mail Sorting's board tuning and the XP."
+    "rule_notice": "Recovered: game_artifact.gfx is the type-8 match-three movie of game_mining.gfx, and its text asks four kinds of artifact per level. Seen on a retail level 1: its four artifacts, quota 15, difficulty 2. Levels 2 to 5 are the wiki's rounds; round II lists five artifacts, so the Goblet is left out (R). Reconstructed: quotas and times past level 1, Mail Sorting's board tuning and the XP."
   }
 }
