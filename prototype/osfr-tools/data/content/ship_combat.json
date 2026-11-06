@@ -411,9 +411,9 @@
   },
   "start_ship": "Cutlass",
   "fleet": [
-    {"key": "Eel", "name_id": 417574, "size_id": 4087, "turning_id": 9001, "cannons": 8, "icon": 29288, "hull": "sml", "health": 70, "hold_capacity": 4, "max_speed": 26.0, "turbo_speed": 34.0, "max_turn": 90.0},
+    {"key": "Eel", "name_id": 417574, "size_id": 4087, "turning_id": 9001, "cannons": 8, "icon": 37125, "hull": "sml", "health": 70, "hold_capacity": 4, "max_speed": 26.0, "turbo_speed": 34.0, "max_turn": 90.0},
     {"key": "Cutlass", "name_id": 417578, "size_id": 4088, "turning_id": 9315, "cannons": 12, "icon": 29287, "hull": "med", "health": 100, "hold_capacity": 5, "max_speed": 22.0, "turbo_speed": 30.0, "max_turn": 60.0},
-    {"key": "Revenge", "name_id": 417582, "size_id": 4088, "turning_id": 9315, "cannons": 16, "icon": 29290, "hull": "med2", "health": 120, "hold_capacity": 6, "max_speed": 20.0, "turbo_speed": 28.0, "max_turn": 60.0},
+    {"key": "Revenge", "name_id": 417582, "size_id": 4088, "turning_id": 9315, "cannons": 16, "icon": 30792, "hull": "med2", "health": 120, "hold_capacity": 6, "max_speed": 20.0, "turbo_speed": 28.0, "max_turn": 60.0},
     {"key": "Juggernaut", "name_id": 417586, "size_id": 4089, "turning_id": 8096, "cannons": 24, "icon": 29289, "hull": "lrg", "health": 150, "hold_capacity": 8, "max_speed": 17.0, "turbo_speed": 25.0, "max_turn": 40.0}
   ],
   "decals": [
