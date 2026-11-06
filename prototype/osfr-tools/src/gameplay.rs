@@ -45,7 +45,9 @@ mod admin_move;
 pub use admin_move::{AdminMove, MoveTarget};
 mod card_launch;
 mod checkers_table;
+mod hosted_chess;
 mod music_table;
+mod outcome_merge;
 mod spot_table;
 mod sword_table;
 mod identity;
@@ -419,51 +421,8 @@ pub struct Outcome {
     pub shared_cake: Option<crate::placed_cakes::Action>,
     /// T872: an owner's lot edit the host sends to the lot's visitors after the commit.
     pub house_broadcast: Option<crate::housing_service::HouseBroadcast>,
-}
-
-impl Outcome {
-    /// Publish a staged outcome into this one. Every field is named in the
-    /// destructuring pattern, so adding an `Outcome` field fails to compile here
-    /// until its merge rule is decided.
-    fn absorb(&mut self, other: Outcome) {
-        let Outcome {
-            dev_command_denied,
-            shared_field,
-            replies,
-            changed,
-            granted_items,
-            zoning,
-            scene_zoning,
-            relocation,
-            group_heal,
-            nearby,
-            broadcast,
-            admin_move,
-            world_event,
-            boombox,
-            shared_cake,
-            house_broadcast,
-        } = other;
-        self.dev_command_denied |= dev_command_denied;
-        self.shared_field = shared_field.or(self.shared_field.take());
-        self.replies.extend(replies);
-        self.changed |= changed;
-        self.granted_items.extend(granted_items);
-        self.zoning = zoning.or(self.zoning.take());
-        self.scene_zoning = scene_zoning.or(self.scene_zoning.take());
-        self.relocation = relocation.or(self.relocation.take());
-        self.group_heal = group_heal.or(self.group_heal.take());
-        self.nearby.extend(nearby);
-        self.broadcast = broadcast.or(self.broadcast.take());
-        self.admin_move = admin_move.or(self.admin_move.take());
-        self.world_event = world_event.or(self.world_event.take());
-        self.boombox = boombox.or(self.boombox.take());
-        self.shared_cake = shared_cake.or(self.shared_cake.take());
-        self.house_broadcast = crate::housing_service::HouseBroadcast::merge(
-            self.house_broadcast.take(),
-            house_broadcast,
-        );
-    }
+    /// A table's lobby option: this lobby's list, opened by the session after the commit.
+    pub open_lobby: Option<u32>,
 }
 
 /// Horizontal distance in metres.

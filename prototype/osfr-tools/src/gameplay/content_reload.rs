@@ -159,6 +159,7 @@ mod tests {
     fn staged_outcome() -> Outcome {
         Outcome {
             dev_command_denied: true,
+            open_lobby: Some(4),
             shared_field: Some(crate::encounter::SharedFieldAction::Ability { slot: 3, target: 9 }),
             replies: vec![vec![3]],
             changed: true,

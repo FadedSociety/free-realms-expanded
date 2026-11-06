@@ -13,6 +13,8 @@ const SHOW: u8 = 6;
 const CLOSE: u8 = 7;
 const REMOVE: u8 = 8;
 const LEAVE_LOBBY: u8 = 9;
+/// (R) The widest captured lobby type has seven settings.
+const MAX_OPTIONS: u32 = 16;
 const ERROR: u8 = 11;
 const SHOW_UI: u8 = 12;
 
@@ -50,7 +52,8 @@ pub struct LobbyGame {
     pub options: Vec<(u32, u32)>,
     pub host_name: HostName,
     pub flag_46: bool,
-    pub unknown_48: u32,
+    /// Seats taken (`+0x48`). The list hides a game at its Max Players (`00a22fa0`).
+    pub players: u32,
     /// (R) The host: sub 4 compares it with the player's own guid.
     pub host: u64,
     pub tail: [u32; 3],
@@ -83,6 +86,20 @@ pub fn decode_request(inner: &[u8]) -> io::Result<Option<Request>> {
     };
     read.end()?;
     Ok(Some(request))
+}
+
+/// The host's choices in a 101/5 body (`00bb1820`): two words, the lobby type, then the setting and
+/// value pairs. The host's name follows; the server already knows it.
+pub fn create_options(body: &[u8]) -> io::Result<Vec<(u32, u32)>> {
+    let mut read = Reader(body);
+    for _ in 0..3 {
+        read.u32()?;
+    }
+    let count = read.u32()?;
+    if count > MAX_OPTIONS {
+        return Err(invalid("too many lobby options"));
+    }
+    (0..count).map(|_| Ok((read.u32()?, read.u32()?))).collect()
 }
 
 fn header(sub: u8) -> Vec<u8> {
@@ -183,7 +200,7 @@ fn encode_game(game: &LobbyGame) -> io::Result<Vec<u8>> {
         out.extend(text.as_bytes());
     }
     out.push(u8::from(game.flag_46));
-    out.extend(game.unknown_48.to_le_bytes());
+    out.extend(game.players.to_le_bytes());
     out.extend(game.host.to_le_bytes());
     for value in game.tail {
         out.extend(value.to_le_bytes());
@@ -244,7 +261,7 @@ impl Reader<'_> {
             options,
             host_name,
             flag_46: self.flag()?,
-            unknown_48: self.u32()?,
+            players: self.u32()?,
             host: self.u64()?,
             tail: [self.u32()?, self.u32()?, self.u32()?],
             flag_108: self.flag()?,
@@ -268,6 +285,22 @@ fn invalid(error: impl Into<Box<dyn std::error::Error + Send + Sync>>) -> io::Er
 mod tests {
     use super::*;
 
+    /// The real chess 101/5 (run 183054Z): Max Players, Chess, Player skill, Auto-Start.
+    #[test]
+    fn create_options_reads_the_settings_and_leaves_the_name() {
+        let mut body = Vec::new();
+        for word in [1u32, 0, 4, 4, 11, 1, 15, 24, 14, 23, 13, 15, 0, 0, 0, 5] {
+            body.extend(word.to_le_bytes());
+        }
+        body.extend(b"Alpha");
+        let options = create_options(&body).unwrap();
+        assert_eq!(options, [(11, 1), (15, 24), (14, 23), (13, 15)]);
+        assert!(create_options(&body[..20]).is_err(), "a pair cut short");
+        let mut huge = [0u8; 16];
+        huge[12..].copy_from_slice(&u32::MAX.to_le_bytes());
+        assert!(create_options(&huge).is_err(), "a count past any lobby");
+    }
+
     fn game() -> LobbyGame {
         LobbyGame {
             id: 7,
@@ -280,7 +313,7 @@ mod tests {
                 last: "Lee".into(),
             },
             flag_46: true,
-            unknown_48: 11,
+            players: 11,
             host: 0x0102_0304_0506_0708,
             tail: [12, 13, 14],
             flag_108: true,

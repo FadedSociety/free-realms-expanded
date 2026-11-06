@@ -1164,3 +1164,122 @@ fn a_settled_game_reports_its_result_and_length_for_the_earn_table() {
         line.len()
     );
 }
+
+fn hosted_content() -> ChessContent {
+    ChessContent::load(&std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/chess.json")).unwrap()
+}
+
+/// Two players, one table the World owns: each seat's run is its own, a move reaches the other
+/// seat through the relay, and a resignation ends the game for the one left.
+#[test]
+fn a_hosted_game_shares_one_table_between_two_services() {
+    const ROOM: u64 = 7;
+    let content = hosted_content();
+    let mut white = ChessService::with_seed(content.clone(), 1).unwrap();
+    let mut black = ChessService::with_seed(content, 2).unwrap();
+    let (started, white_run) = white.begin_hosted(101, ROOM, 0).unwrap();
+    // The countdown is the Go: 39/16 with its window off, then 39/17 and the movie, with no click.
+    for sub in [16, 17] {
+        assert!(started.replies.iter().any(|reply| reply.starts_with(&[39, 0, sub])), "39/{sub}");
+    }
+    let (_, black_run) = black.begin_hosted(202, ROOM, 0).unwrap();
+    assert_eq!(white_run, black_run, "each service counts its own runs");
+    assert!(matches!(white.begin_hosted(101, ROOM, 0), Err(chess_service::EntryDenied::Busy)));
+    let seat = |player_id, instance_id| ChessParticipant { player_id, instance_id };
+    let mut table = white.open_hosted(ROOM, seat(101, white_run), seat(202, black_run)).unwrap();
+    assert_eq!(white.hosted_table(), Some(ROOM));
+
+    let fixture = RewardFixture::new(101);
+    let rewards = fixture.state();
+    // One message on a seat's service: the table lent, then returned with what the other is owed.
+    let mut say = |service: &mut ChessService, player: u64, packet: Vec<u8>| {
+        service.lend(table.clone());
+        let out = service.route(player, &packet, 1_000, &rewards).unwrap().unwrap();
+        let (back, relay) = service.reclaim().unwrap();
+        table = back;
+        (out, relay)
+    };
+    let text = |instance: i32, text: &str| {
+        let mut packet = vec![39, 0, 14];
+        for value in [instance, -1, -1, text.len() as i32 + 1] {
+            packet.extend(value.to_le_bytes());
+        }
+        packet.extend(text.as_bytes());
+        packet.push(0);
+        packet
+    };
+    say(&mut white, 101, text(white_run, "OnConnectMsg"));
+    say(&mut black, 202, text(black_run, "OnConnectMsg"));
+    say(&mut white, 101, text(white_run, "OnStartGameMsg\t0"));
+    say(&mut black, 202, text(black_run, "OnStartGameMsg\t0"));
+
+    // e2 to e4, by `sq`.
+    let (moved, relay) = say(&mut white, 101, text(white_run, "OnMoveMsg\t52\t36"));
+    assert!(moved.accepted, "white's move stands");
+    assert!(relay.iter().all(|message| message.player_id == 202));
+    assert!(!relay.is_empty(), "black hears it");
+    let (refused, _) = say(&mut white, 101, text(white_run, "OnMoveMsg\t51\t35"));
+    assert!(!refused.accepted, "it is black's turn");
+}
+
+fn movie_packet(instance: i32, message: &str) -> Vec<u8> {
+    let mut packet = vec![39, 0, 14];
+    for value in [instance, -1, -1, message.len() as i32 + 1] {
+        packet.extend(value.to_le_bytes());
+    }
+    packet.extend(message.as_bytes());
+    packet.push(0);
+    packet
+}
+
+/// A draw has no acknowledgement from the movie: the seat that ended it settles on its own message,
+/// and the other is settled from outside.
+#[test]
+fn a_hosted_draw_settles_the_seat_that_did_not_end_it() {
+    const ROOM: u64 = 8;
+    let content = hosted_content();
+    let mut white = ChessService::with_seed(content.clone(), 1).unwrap();
+    let mut black = ChessService::with_seed(content, 2).unwrap();
+    let (_, white_run) = white.begin_hosted(101, ROOM, 0).unwrap();
+    let (_, black_run) = black.begin_hosted(202, ROOM, 0).unwrap();
+    let seat = |player_id, instance_id| ChessParticipant { player_id, instance_id };
+    let mut table = white.open_hosted(ROOM, seat(101, white_run), seat(202, black_run)).unwrap();
+    let fixture = RewardFixture::new(101);
+    let rewards = fixture.state();
+    let mut say = |service: &mut ChessService, player: u64, run: i32, message: &str| {
+        service.lend(table.clone());
+        service.route(player, &movie_packet(run, message), 1_000, &rewards).unwrap().unwrap();
+        table = service.reclaim().unwrap().0;
+    };
+    for message in ["OnConnectMsg", "OnStartGameMsg\t0"] {
+        say(&mut white, 101, white_run, message);
+        say(&mut black, 202, black_run, message);
+    }
+    for _ in 0..2 {
+        say(&mut white, 101, white_run, &format!("OnMoveMsg\t{}\t{}", sq(6, 0), sq(5, 2)));
+        say(&mut black, 202, black_run, &format!("OnMoveMsg\t{}\t{}", sq(6, 7), sq(5, 5)));
+        say(&mut white, 101, white_run, &format!("OnMoveMsg\t{}\t{}", sq(5, 2), sq(6, 0)));
+        say(&mut black, 202, black_run, &format!("OnMoveMsg\t{}\t{}", sq(5, 5), sq(6, 7)));
+    }
+    assert_eq!(table.result().unwrap().winner, None);
+    assert_eq!(table.unsettled(), [101], "the seat whose move ended it has settled");
+
+    white.lend(table.clone());
+    assert!(white.settle_hosted(101, 1_000, &rewards).unwrap().accepted);
+    assert!(white.reclaim().unwrap().0.all_settled());
+}
+
+#[test]
+fn a_seat_that_goes_before_the_game_starts_forfeits_it() {
+    let mut white = ChessService::with_seed(hosted_content(), 1).unwrap();
+    let (_, run) = white.begin_hosted(101, 9, 0).unwrap();
+    let seat = |player_id, instance_id| ChessParticipant { player_id, instance_id };
+    let mut table = white.open_hosted(9, seat(101, run), seat(202, run)).unwrap();
+    assert!(!table.resign(101).unwrap().accepted, "a resignation needs a game in play");
+    assert!(table.forfeit(101).unwrap().accepted);
+    assert_eq!(table.result().unwrap().winner, Some(202));
+    table.release(101);
+    assert!(!table.all_settled(), "the winner is still owed their result");
+    table.release(202);
+    assert!(table.all_settled());
+}

@@ -24,6 +24,7 @@
     "king": 10000,
     "centralisation": 1
   },
+  "hosted_row": {"row_id": 65, "difficulty": 1, "skill": 0, "success_coins": 10},
   "rows": [
     {
       "row_id": 20,

@@ -967,6 +967,9 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     result.push(("matchmaking", words(141, 13, &[u32::MAX; 2])));
     result.push(("matchmaking", words(41, 129, &[u32::MAX; 4])));
     result.push(("matchmaking", vec![101, 0, 9, 3, 0, 0, 0]));
+    for sub in [1, 2, 3, 5] {
+        result.push(("game_room", vec![101, 0, sub, 1, 0, 0, 0, 4, 0, 0, 0]));
+    }
     // A guarded one-byte-sub family needs an unknown subtype seed for the source
     // inventory; 101/0xff contains no understood lobby close.
     result.push(("gameplay.handle_in_world", vec![101, 0, 0xff, 0xff]));

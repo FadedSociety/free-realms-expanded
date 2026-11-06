@@ -1076,6 +1076,12 @@ pub struct ChessTable {
     engine: Option<(crate::chess_engine::Strength, u32)>,
 }
 
+impl std::fmt::Debug for ChessTable {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ChessTable").field("table_id", &self.table_id).finish_non_exhaustive()
+    }
+}
+
 impl ChessTable {
     /// A content-supplied skill (0 to 100) and near-equal window. `seed`
     /// starts the table's private random stream.
@@ -1145,10 +1151,9 @@ impl ChessTable {
         }
         validate_participant(white)?;
         validate_participant(black)?;
-        if white.player_id == black.player_id || white.instance_id == black.instance_id {
-            return Err(invalid(
-                "chess players and minigame instances must be distinct",
-            ));
+        // Each player's service numbers its own runs, so two seats can hold the same instance.
+        if white.player_id == black.player_id {
+            return Err(invalid("chess players must be distinct"));
         }
         Ok(ChessTable {
             table_id,
@@ -1187,6 +1192,29 @@ impl ChessTable {
 
     pub fn settled_count(&self) -> usize {
         self.settled.len()
+    }
+
+    pub fn is_settled(&self, player_id: u64) -> bool {
+        self.settled.contains(&player_id)
+    }
+
+    /// Every seat has settled or gone: nobody is owed anything more from this table.
+    pub fn all_settled(&self) -> bool {
+        self.unsettled().is_empty()
+    }
+
+    pub fn unsettled(&self) -> Vec<u64> {
+        let seats = self.players().into_iter().map(|seat| seat.player_id);
+        seats.filter(|player| !self.settled.contains(player)).collect()
+    }
+
+    pub fn seated(&self, player_id: u64) -> bool {
+        self.participant(player_id).is_some()
+    }
+
+    /// A seat whose run is over without a settlement: it left, or quit the game.
+    pub fn release(&mut self, player_id: u64) {
+        self.settled.insert(player_id);
     }
 
     fn participant(&self, player_id: u64) -> Option<ChessParticipant> {
@@ -1664,11 +1692,16 @@ impl ChessTable {
         })
     }
 
-    fn resign(&mut self, player_id: u64) -> io::Result<ChessOutcome> {
-        if self.phase != TablePhase::Playing
-            || self.result.is_some()
-            || self.participant(player_id).is_none()
-        {
+    pub fn resign(&mut self, player_id: u64) -> io::Result<ChessOutcome> {
+        if self.phase != TablePhase::Playing {
+            return Ok(ChessOutcome::default());
+        }
+        self.forfeit(player_id)
+    }
+
+    /// Gives up a seat, in play or still waiting for the other player: the other seat wins.
+    pub fn forfeit(&mut self, player_id: u64) -> io::Result<ChessOutcome> {
+        if self.result.is_some() || self.participant(player_id).is_none() {
             return Ok(ChessOutcome::default());
         }
         let winner = self
@@ -1966,6 +1999,16 @@ impl ChessTables {
             .ok_or_else(|| invalid("player is not seated at chess table"))?;
         let message = parse_payload_packet(participant.instance_id, packet)?;
         table.handle_text(player_id, &message)
+    }
+
+    /// Lend a table the World owns to this set for one message.
+    pub fn lend(&mut self, table: ChessTable) {
+        self.tables.insert(table.id(), table);
+    }
+
+    /// Take a table back out.
+    pub fn reclaim(&mut self, table_id: u64) -> Option<ChessTable> {
+        self.tables.remove(&table_id)
     }
 
     pub fn resign(&mut self, table_id: u64, player_id: u64) -> io::Result<ChessOutcome> {

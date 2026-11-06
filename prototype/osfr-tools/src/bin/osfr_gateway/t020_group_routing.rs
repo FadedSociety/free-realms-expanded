@@ -1233,3 +1233,58 @@ fn group_heal(server: &mut Server, picker: SessionKey, kill: (u64, u64)) {
         .unwrap();
     server.sessions.insert(picker, session);
 }
+
+/// Family 101 through the session: one player opens a game from the list, another takes the
+/// other seat, the host starts it, and a player who leaves the world gives the seat up.
+#[test]
+fn a_lobby_game_seats_two_and_frees_a_seat_when_a_player_leaves() {
+    const CHESS: u32 = 4;
+    let mut rig = rig("lobby");
+    let [host, guest, _] = &mut rig.sessions;
+    let world = &mut rig.world;
+    room_routing::open(host, world, CHESS);
+    room_routing::open(guest, world, CHESS);
+    assert_eq!(world.rooms.watching(GUIDS[0]), Some(CHESS));
+
+    // A real 101/5's start: two words, the lobby type, then one setting.
+    let mut create = vec![101, 0, 5];
+    for word in [1u32, 0, CHESS, 1, 11, 1] {
+        create.extend(word.to_le_bytes());
+    }
+    let created = room_routing::application(host, &create, world, 0).unwrap();
+    let to = |deliveries: &[Delivery], session: &Session| {
+        deliveries.iter().filter(|d| d.recipient == session.id).count()
+    };
+    assert!(to(&created, host) >= 2, "the host's seat and the list's row");
+    assert_eq!(to(&created, guest), 1, "the list's row");
+    let id = world.rooms.room_of(GUIDS[0]).unwrap().id;
+    let row = world.rooms.room(id).unwrap().row();
+    assert_eq!((row.options, row.players), (vec![(11, 1)], 1), "the list hides a row without them");
+
+    let mut join = vec![101, 0, 1];
+    join.extend(id.to_le_bytes());
+    join.extend(CHESS.to_le_bytes());
+    assert!(!room_routing::application(guest, &join, world, 0).unwrap().is_empty());
+    assert_eq!(world.rooms.room_of(GUIDS[1]).unwrap().id, id);
+
+    let mut start = vec![101, 0, 3];
+    start.extend(id.to_le_bytes());
+    start.extend(CHESS.to_le_bytes());
+    let started = room_routing::application(host, &start, world, 1_000).unwrap();
+    assert_eq!((to(&started, host), to(&started, guest)), (1, 1));
+
+    // Past START a seat goes by quitting the game or leaving the world, not by 101/2.
+    let mut leave = vec![101, 0, 2];
+    leave.extend(id.to_le_bytes());
+    leave.extend(CHESS.to_le_bytes());
+    assert!(room_routing::application(guest, &leave, world, 1_000).unwrap().is_empty());
+    assert_eq!(world.rooms.room_of(GUIDS[1]).unwrap().id, id);
+
+    world.leave_rooms(GUIDS[1]);
+    assert!(world.rooms.room_of(GUIDS[1]).is_none());
+    assert_eq!(world.rooms.watching(GUIDS[1]), None);
+
+    // Malformed or foreign packets do nothing.
+    assert_eq!(room_routing::application(host, &[101, 0, 1, 9], world, 0).unwrap().len(), 0);
+    assert!(room_routing::application(host, &[26, 0, 10, 0], world, 0).is_none());
+}

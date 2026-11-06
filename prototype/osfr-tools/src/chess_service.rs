@@ -134,6 +134,9 @@ pub struct ChessContent {
     /// `chess.json` carries every value; an omitted block is refused, never
     /// replaced with compiled tuning.
     pub scoring: ChessScoring,
+    /// The two-player row a lobby game runs on. Not a Games window row, so it is kept apart.
+    #[serde(default)]
+    pub hosted_row: Option<ChessRow>,
     pub rows: Vec<ChessRow>,
     /// L105 (R): the engine's thinking time per move, 50 to 1000 ms. The gateway waits for it.
     #[serde(default = "default_engine_movetime_ms")]
@@ -277,6 +280,11 @@ pub struct ChessService {
     current: Option<ChessRow>,
     started_ms: Option<u64>,
     ledger: ChessRewardLedger,
+    /// A lobby game's table id. That table is the World's; `lent` says it is here for one message.
+    hosted: Option<u64>,
+    lent: Option<u64>,
+    /// What this message said to the other seat, handed back with the table.
+    relay: Vec<chess::ChessMessage>,
     /// (R) Test/offline UTC day. Production leaves it `None` and follows the
     /// wall clock; the gateway never sets it.
     day: Option<u64>,
@@ -340,6 +348,9 @@ impl ChessService {
             current: None,
             started_ms: None,
             ledger: ChessRewardLedger::default(),
+            hosted: None,
+            lent: None,
+            relay: Vec::new(),
             day: None,
         };
         service.restore_ledger(saved)?;
@@ -411,6 +422,90 @@ impl ChessService {
         staged.started_ms = None;
         *self = staged;
         Ok(from_run(offered))
+    }
+
+    /// Start a lobby game's run, with `table_id` as its table. The lobby's countdown is the Go: the
+    /// offer (39/16) hides its window, since it would open behind the lobby's panels, and the start
+    /// follows at once. 39/17 is what closes the lobby (`009b9550`). `Ok` carries both and the run's
+    /// instance, which the table needs for this seat.
+    pub fn begin_hosted(
+        &mut self,
+        player_id: u64,
+        table_id: u64,
+        now_ms: u64,
+    ) -> Result<(ChessActivityOutcome, i32), EntryDenied> {
+        if player_id == 0 || self.tables.is_none() {
+            return Err(EntryDenied::Unavailable);
+        }
+        if self.is_active() {
+            return Err(EntryDenied::Busy);
+        }
+        let row = self.content.hosted_row.clone().ok_or(EntryDenied::Unknown)?;
+        let mut staged = self.clone();
+        let mut spec = run_spec(&row, &self.content.goals);
+        spec.flags[3] = 0; // `+615`: `009beb70` shows the window only when it is set.
+        let mut offered = staged.runs.offer(spec).map_err(|_| EntryDenied::Unavailable)?;
+        if !offered.accepted {
+            return Err(EntryDenied::Busy);
+        }
+        let instance = staged.runs.current_instance_id().ok_or(EntryDenied::Unavailable)?;
+        let started = staged.runs.start(instance).map_err(|_| EntryDenied::Unavailable)?;
+        offered.replies.extend(started.replies);
+        staged.runs.started(instance);
+        staged.current = Some(row);
+        staged.started_ms = Some(now_ms);
+        staged.hosted = Some(table_id);
+        *self = staged;
+        Ok((from_run(offered), instance))
+    }
+
+    /// A new two-seat table for the World to own.
+    pub fn open_hosted(
+        &mut self,
+        table_id: u64,
+        white: chess::ChessParticipant,
+        black: chess::ChessParticipant,
+    ) -> io::Result<chess::ChessTable> {
+        let row = self.content.hosted_row.as_ref().map(|row| row.row_id);
+        let row = row.ok_or_else(|| invalid("chess content has no hosted row"))?;
+        let tables = self.tables.as_mut().ok_or_else(|| invalid("chess tables are not seeded"))?;
+        tables.open_two_player(table_id, row, white, black)?;
+        tables.reclaim(table_id).ok_or_else(|| invalid("chess table vanished"))
+    }
+
+    /// A draw has no acknowledgement from the movie, so the seat that did not end it settles here,
+    /// with the World's table lent.
+    pub fn settle_hosted(
+        &mut self,
+        player_id: u64,
+        now_ms: u64,
+        rewards: &RewardState,
+    ) -> io::Result<ChessActivityOutcome> {
+        let mut out = ChessActivityOutcome::default();
+        if let Some(instance) = self.runs.current_instance_id() {
+            self.settle(instance, player_id, now_ms, rewards, &mut out)?;
+        }
+        Ok(out)
+    }
+
+    /// The lobby game this player's run belongs to.
+    pub fn hosted_table(&self) -> Option<u64> {
+        self.hosted
+    }
+
+    /// Lend the World's table for one message.
+    pub fn lend(&mut self, table: chess::ChessTable) {
+        if let Some(tables) = self.tables.as_mut() {
+            self.lent = Some(table.id());
+            tables.lend(table);
+        }
+    }
+
+    /// The lent table back, with what the other seat is owed.
+    pub fn reclaim(&mut self) -> Option<(chess::ChessTable, Vec<chess::ChessMessage>)> {
+        let id = self.lent.take()?;
+        let table = self.tables.as_mut()?.reclaim(id)?;
+        Some((table, std::mem::take(&mut self.relay)))
     }
 
     /// Route one client packet while a chess run exists. `None` means the
@@ -493,20 +588,24 @@ impl ChessService {
         if self.runs.state(instance) != Some(RunState::Playing) {
             return Ok(Some(ChessActivityOutcome::default()));
         }
+        let table_id = self.hosted.unwrap_or(instance as u64);
+        // A hosted table that is not here has closed: the movie's text has nothing to reach.
+        if self.hosted.is_some() && self.lent != self.hosted {
+            return Ok(Some(ChessActivityOutcome::default()));
+        }
         let table = self
             .tables
             .as_mut()
             .ok_or_else(|| invalid("chess tables are not seeded"))?
-            .handle_payload(instance as u64, player_id, packet)?;
+            .handle_payload(table_id, player_id, packet)?;
         let terminal = table.terminal.is_some();
+        let (mine, theirs) = (table.messages.into_iter())
+            .partition::<Vec<_>, _>(|message| message.player_id == player_id);
+        self.relay.extend(theirs);
         let mut out = ChessActivityOutcome {
             accepted: table.accepted,
             changed: table.changed,
-            replies: table
-                .messages
-                .into_iter()
-                .map(|message| message.packet)
-                .collect(),
+            replies: mine.into_iter().map(|message| message.packet).collect(),
             ..Default::default()
         };
         if terminal {
@@ -519,6 +618,10 @@ impl ChessService {
     }
 
     fn start_table(&mut self, instance: i32, player_id: u64, now_ms: u64) -> io::Result<()> {
+        if self.hosted.is_some() {
+            self.started_ms = Some(now_ms);
+            return Ok(());
+        }
         let row = self
             .current
             .as_ref()
@@ -558,10 +661,8 @@ impl ChessService {
         let Some(row) = self.current.as_ref() else {
             return Ok(());
         };
-        let table = self
-            .tables
-            .as_ref()
-            .and_then(|tables| tables.table(instance as u64));
+        let table_id = self.hosted.unwrap_or(instance as u64);
+        let table = self.tables.as_ref().and_then(|tables| tables.table(table_id));
         let result = table.and_then(|table| table.result());
         let won = result.and_then(|result| result.winner) == Some(player_id);
         let drew = result
@@ -592,7 +693,7 @@ impl ChessService {
             .as_mut()
             .ok_or_else(|| invalid("chess tables are not seeded"))?
             .settle_player(
-                instance as u64,
+                table_id,
                 player_id,
                 &mut self.runs,
                 0,
@@ -620,8 +721,11 @@ impl ChessService {
     }
 
     fn close_table(&mut self, instance: i32) {
-        if let Some(tables) = &mut self.tables {
-            tables.close(instance as u64);
+        // A hosted table stays the World's.
+        if self.hosted.take().is_none() {
+            if let Some(tables) = &mut self.tables {
+                tables.close(instance as u64);
+            }
         }
         self.current = None;
         self.started_ms = None;

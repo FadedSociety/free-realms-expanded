@@ -28,6 +28,7 @@ pub(super) fn telescope_menus(spot: &Option<Box<SpotGame>>) -> TableMenus {
         name: TELESCOPE_NAME.to_owned(),
         position,
         games: games.clone(),
+        lobby: None,
     };
     (telescopes.iter())
         .map(|telescope| (telescope.npc, menu(telescope.position)))

@@ -79,6 +79,8 @@ mod startup_source;
 mod t006_guilds;
 #[path = "osfr_gateway/tick_stats.rs"]
 mod tick_stats;
+#[path = "osfr_gateway/room_routing.rs"]
+mod room_routing;
 #[path = "osfr_gateway/world_event_routing.rs"]
 mod world_event_routing;
 use paths::{character_state_path, chat_settings_path, savestate_dir, social_path};
@@ -562,6 +564,10 @@ struct SharedWorld {
     security: Arc<Mutex<Security>>,
     /// T458: live world-event runs; changed only after a commit and by the 20 Hz tick.
     world_events: osfr_tools::world_events::WorldEvents,
+    /// The game lobby's rooms. Session-only: a restart ends every open game.
+    rooms: osfr_tools::game_room::Rooms,
+    /// Each running lobby game's table, by room id.
+    chess_tables: BTreeMap<u32, osfr_tools::chess::ChessTable>,
     /// T461: the boxes pressed from the item bar; session-only.
     boomboxes: osfr_tools::boombox::Boomboxes,
     /// T557: the placed cakes; session-only.
@@ -648,6 +654,8 @@ impl SharedWorld {
             client_areas: Default::default(),
             security: Arc::default(),
             world_events: Default::default(),
+            rooms: Default::default(),
+            chess_tables: BTreeMap::new(),
             boomboxes: Default::default(),
             cakes: Default::default(),
             portraits: None,
@@ -745,6 +753,9 @@ impl SharedWorld {
 
     fn leave_player(&mut self, session_id: SessionId) -> Vec<Delivery> {
         let mut deliveries = Vec::new();
+        if let Some(guid) = self.players.get(session_id).map(|player| player.character_guid) {
+            deliveries.extend(self.leave_rooms(guid));
+        }
         if let Some(player) = self.players.get(session_id) {
             self.public_looks.remove(&player.character_guid);
             if let Some(view) = self.rides.remove(&player.character_guid) {
@@ -1678,6 +1689,7 @@ impl Session {
         let mut staged_gateway = self.gateway.clone();
         let mut held =
             group_arena::Held::enter(&mut staged_gateway, membership, self.character_guid);
+        room_routing::lend(&mut staged_gateway, world);
         house_visits::admit(&mut staged_gateway, sessions, world, message);
         let mut outcome = match staged_gateway.handle_at(message, now_ms) {
             Ok(outcome) => outcome,
@@ -1697,6 +1709,7 @@ impl Session {
             }
         };
         held.leave(&mut staged_gateway, &outcome, combat);
+        let chess_table = staged_gateway.reclaim_chess_table();
         house_visits::settle(&mut staged_gateway);
         if let Some(trace) = &self.trace {
             for detail in &outcome.trace {
@@ -1708,6 +1721,7 @@ impl Session {
         let broadcast = outcome.broadcast.take();
         let admin_move = outcome.admin_move.take();
         let world_event = outcome.world_event.take();
+        let lobby = outcome.open_lobby.take();
         let boombox = outcome.boombox.take();
         let cake = outcome.shared_cake.take();
         let house_broadcast = outcome.house_broadcast.take();
@@ -1727,6 +1741,7 @@ impl Session {
         )?;
         if committed {
             held.publish(self, sessions, world, membership);
+            room_routing::publish(self, sessions, world, chess_table, now_ms);
             delivery::post_commit(self, sessions, world, broadcast, jump)?;
             if let Some(definition) = boombox {
                 boombox_routing::place(self, sessions, world, now_ms, definition);
@@ -1740,6 +1755,9 @@ impl Session {
             }
             if let Some(command) = world_event {
                 world_event_routing::apply(self, world, now_ms, command)?;
+            }
+            if let Some(lobby_type) = lobby {
+                room_routing::open(self, world, lobby_type);
             }
             moderation::run_staged(self, sessions, world, options, staged)?;
             gm_menu_routing::run(self, options, sessions, world, membership, now_ms)?;
@@ -2120,6 +2138,9 @@ impl Session {
         // T538: an event actor's guid is the bin's route (like a player guid in the radial
         // menu); a content NPC, player menu or NPC dialogue answer falls through.
         if let Some(deliveries) = world_event_routing::application(self, inner, world) {
+            return deliveries;
+        }
+        if let Some(deliveries) = room_routing::application(self, inner, world, now_ms) {
             return deliveries;
         }
         // T519: 156/2 is answered from the target's live presentation; 115 is checked and
@@ -3766,6 +3787,7 @@ impl Server {
             self.next_tick_ms = now_ms.saturating_add(50);
             self.tick_shared_fields(now_ms);
             group_arena::tick(self, now_ms);
+            room_routing::tick(self, now_ms);
             let unix_ms = osfr_tools::client_areas::unix_now_ms();
             client_area_routing::season_tick(&mut self.world, &mut self.sessions, unix_ms);
             client_area_routing::banner_tick(&mut self.world, &mut self.sessions, now_ms);

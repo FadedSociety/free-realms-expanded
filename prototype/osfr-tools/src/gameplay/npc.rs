@@ -754,6 +754,7 @@ impl Gameplay {
                         npc_interaction::NpcAction::TowerDefense { .. } => "tower_defense",
                         npc_interaction::NpcAction::Pirates { .. } => "pirates",
                         npc_interaction::NpcAction::BoardGame { .. } => "board_game",
+                        npc_interaction::NpcAction::Lobby { .. } => "lobby",
                         npc_interaction::NpcAction::Fish => "fish",
                         npc_interaction::NpcAction::Learn { .. } => "learn",
                     };
@@ -947,6 +948,12 @@ impl Gameplay {
                     consume_menu = true;
                     npc_event(select_event(runtime_guid, Some(key), option_id, "board_game"));
                     out = self.begin_board_game(game, character.guid)?;
+                    out.replies.insert(0, END_DIALOG_26_4.to_vec());
+                }
+                Ok(NpcSelection::Lobby(lobby_type)) => {
+                    consume_menu = true;
+                    npc_event(select_event(runtime_guid, Some(key), option_id, "lobby"));
+                    out.open_lobby = Some(lobby_type);
                     out.replies.insert(0, END_DIALOG_26_4.to_vec());
                 }
                 Ok(NpcSelection::TowerDefense(game)) => {

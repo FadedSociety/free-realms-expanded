@@ -148,6 +148,8 @@ pub struct GatewayOutcome {
     pub admin_move: Option<crate::gameplay::AdminMove>,
     /// T458: an admin `realm event start|stop`, run by the host after a commit, like `admin_move`.
     pub world_event: Option<crate::world_events::WorldEventCommand>,
+    /// A table's lobby option: the session opens this lobby's list after the commit.
+    pub open_lobby: Option<u32>,
     /// T461: a boombox press the host places once after the commit, like `admin_move`.
     pub boombox: Option<i32>,
     /// T557: a cake press or click the host answers from the shared registry after the commit.
@@ -513,6 +515,8 @@ fn application_handler(body: &[u8]) -> &'static str {
         // T007: the matchmaking list/stats/join, the empty in-progress list, and the
         // lobby close. Family 101 has a one-byte subtype, so 101/9 is matched on body[2].
         (Some(101), _) if body.get(2) == Some(&9) => "matchmaking",
+        // Join, leave, start and create run in the session's room routing.
+        (Some(101), _) if matches!(body.get(2), Some(1 | 2 | 3 | 5)) => "game_room",
         (Some(141), Some(1 | 3 | 13)) | (Some(41), Some(129)) => "matchmaking",
         (Some(15), Some(1)) => "social_chat",
         (Some(67), Some(2 | 3)) => "quick_chat",
@@ -1722,6 +1726,7 @@ impl Gateway {
                         outcome.broadcast = result.broadcast.or(outcome.broadcast.take());
                         outcome.admin_move = result.admin_move.or(outcome.admin_move.take());
                         outcome.world_event = result.world_event.or(outcome.world_event.take());
+                        outcome.open_lobby = result.open_lobby.or(outcome.open_lobby.take());
                         outcome.boombox = result.boombox.or(outcome.boombox.take());
                         outcome.shared_cake = result.shared_cake.or(outcome.shared_cake.take());
                         outcome.house_broadcast = crate::housing_service::HouseBroadcast::merge(
@@ -2011,8 +2016,11 @@ mod radial_routing {
         }
         // T007: family 101 has a one-byte subtype; 101/9 carries a u32 lobby type.
         assert_eq!(application_handler(&[101, 0, 9, 3, 0, 0, 0]), "matchmaking");
+        for sub in [1, 2, 3, 5] {
+            assert_eq!(application_handler(&[101, 0, sub, 0]), "game_room", "101/{sub}");
+        }
         assert_eq!(
-            application_handler(&[101, 0, 1, 0]),
+            application_handler(&[101, 0, 4, 0]),
             "gameplay.handle_in_world"
         );
         // 167 carries a service byte and a one-byte sub: 1/2 Play and 1/4 Refresh only.

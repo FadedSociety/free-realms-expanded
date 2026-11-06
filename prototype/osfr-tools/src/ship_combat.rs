@@ -209,6 +209,7 @@ impl Content {
             name: stand.name.clone(),
             position: stand.position,
             games: vec![(stand.arena, stand.label_id)],
+            lobby: None,
         };
         self.stands.iter().map(|stand| (stand.npc, menu(stand))).collect()
     }

@@ -249,6 +249,7 @@ impl TdContent {
                 name: table.name.clone(),
                 position: table.position,
                 games,
+                lobby: None,
             };
             if menus.insert(table.npc, menu).is_some() {
                 return Err(invalid("duplicate tower defense table"));

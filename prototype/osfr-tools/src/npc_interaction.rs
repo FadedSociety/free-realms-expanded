@@ -104,6 +104,10 @@ pub enum NpcAction {
         arena: u32,
     },
     /// (R) Play this board game. Offered by the world's game tables, `board_tables.json`.
+    /// Open this lobby's list of games.
+    Lobby {
+        lobby_type: u32,
+    },
     BoardGame {
         game: u32,
     },
@@ -205,6 +209,8 @@ pub struct TableMenu {
     pub position: [f32; 3],
     /// A game id and its name id per row.
     pub games: Vec<(u32, u32)>,
+    /// A lobby type and its row's name id, for a table that has a game list.
+    pub lobby: Option<(u32, u32)>,
 }
 
 /// The Tower Defense tables by NPC content key.
@@ -228,6 +234,8 @@ pub enum NpcSelection {
     Pirates(u32),
     /// The caller offers this game (`Gameplay::begin_board_game`).
     BoardGame(u32),
+    /// The caller opens this lobby's list.
+    Lobby(u32),
     /// The caller decides whether the job is taught (`Profiles::learn`).
     Learn(Trainer),
 }
@@ -720,6 +728,7 @@ impl NpcInteraction {
             NpcAction::TowerDefense { game } => Ok(NpcSelection::TowerDefense(game)),
             NpcAction::Pirates { arena } => Ok(NpcSelection::Pirates(arena)),
             NpcAction::BoardGame { game } => Ok(NpcSelection::BoardGame(game)),
+            NpcAction::Lobby { lobby_type } => Ok(NpcSelection::Lobby(lobby_type)),
             NpcAction::Learn { profile } => {
                 let trainer = self
                     .content
@@ -1133,6 +1142,7 @@ impl NpcInteraction {
             // (R) A table has nobody to talk to, as for Tower Defense's.
             options.retain(|(action, _)| !matches!(action, NpcAction::Talk));
             options.extend(table.games.iter().map(|&(game, name)| (NpcAction::BoardGame { game }, name)));
+            options.extend(table.lobby.map(|(lobby_type, name)| (NpcAction::Lobby { lobby_type }, name)));
         }
         for trainer in self
             .content

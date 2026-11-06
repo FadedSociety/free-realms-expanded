@@ -2,11 +2,60 @@
 //! the engine around one staged action, and the member-side steps of the arena tick.
 
 use super::Gateway;
+use crate::chess::{ChessMessage, ChessParticipant, ChessTable};
 use crate::encounter::{EncounterPhase, FieldParticipant, SharedArena};
 use crate::gameplay::Outcome;
 use std::io;
 
 impl Gateway {
+    /// A lobby game's offer for this player: the replies, and the run's instance if they took it.
+    pub fn begin_hosted_chess(&mut self, table_id: u64, now_ms: u64) -> io::Result<(Vec<Vec<u8>>, Option<i32>)> {
+        let guid = self.state.guid;
+        let Some(game) = self.gameplay.as_mut() else {
+            return Ok((Vec::new(), None));
+        };
+        let (out, instance) = game.begin_hosted_chess(guid, table_id, now_ms)?;
+        Ok((out.replies, instance))
+    }
+
+    pub fn can_host_chess(&self) -> bool {
+        self.gameplay.as_ref().is_some_and(|game| game.can_host_chess())
+    }
+
+    /// The other seat of a drawn lobby game, with the table lent: the replies.
+    pub fn settle_hosted_chess(&mut self, now_ms: u64) -> io::Result<Vec<Vec<u8>>> {
+        let guid = self.state.guid;
+        let Some(game) = self.gameplay.as_mut() else {
+            return Ok(Vec::new());
+        };
+        Ok(game.settle_hosted_chess(guid, now_ms)?.replies)
+    }
+
+    /// A new two-seat table for the World to own.
+    pub fn open_hosted_chess(
+        &mut self,
+        table_id: u64,
+        white: ChessParticipant,
+        black: ChessParticipant,
+    ) -> io::Result<ChessTable> {
+        let game = self.gameplay.as_mut().ok_or_else(|| io::Error::other("no gameplay"))?;
+        game.open_hosted_chess(table_id, white, black)
+    }
+
+    pub fn hosted_chess_table(&self) -> Option<u64> {
+        self.gameplay.as_ref()?.hosted_chess_table()
+    }
+
+    pub fn lend_chess_table(&mut self, table: ChessTable) {
+        if let Some(game) = self.gameplay.as_mut() {
+            game.lend_chess_table(table);
+        }
+    }
+
+    pub fn reclaim_chess_table(&mut self) -> Option<(ChessTable, Vec<ChessMessage>)> {
+        self.gameplay.as_mut()?.reclaim_chess_table()
+    }
+
     /// Copy this player's live battle run into a new shared arena.
     pub fn open_arena(&self) -> Option<SharedArena> {
         self.gameplay.as_ref()?.open_arena(self.state.guid)

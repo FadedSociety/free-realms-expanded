@@ -770,7 +770,7 @@ impl MinigameRuns {
         })
     }
 
-    fn start(&mut self, instance_id: i32) -> io::Result<RunOutcome> {
+    pub fn start(&mut self, instance_id: i32) -> io::Result<RunOutcome> {
         let Some(run) = self.current.as_ref() else {
             return Ok(RunOutcome::default());
         };

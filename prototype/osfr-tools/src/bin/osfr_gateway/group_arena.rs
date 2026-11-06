@@ -162,7 +162,7 @@ pub(super) fn tick(server: &mut Server, now_ms: u64) {
     }
 }
 
-fn key_of(server: &Server, guid: u64) -> Option<SessionKey> {
+pub(super) fn key_of(server: &Server, guid: u64) -> Option<SessionKey> {
     let id = server.world.active_sessions.get(&guid)?;
     server.world.session_keys.get(id).copied()
 }

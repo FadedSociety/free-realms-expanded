@@ -48,7 +48,7 @@ pub struct Room {
 }
 
 impl Room {
-    fn row(&self) -> LobbyGame {
+    pub fn row(&self) -> LobbyGame {
         let (host, first, last) = self.seats.first().map_or((0, "", ""), |seat| {
             (seat.guid, seat.first.as_str(), seat.last.as_str())
         });
@@ -61,11 +61,12 @@ impl Room {
                 ..HostName::default()
             },
             host,
+            players: self.seats.len() as u32,
             ..LobbyGame::default()
         }
     }
 
-    fn members(&self) -> impl Iterator<Item = u64> + '_ {
+    pub fn members(&self) -> impl Iterator<Item = u64> + '_ {
         self.seats.iter().map(|seat| seat.guid)
     }
 }
@@ -90,12 +91,7 @@ impl Rooms {
 
     /// 101/6 to one player, who then hears every change to that lobby.
     pub fn open_list(&mut self, lobby_type: u32, guid: u64) -> io::Result<Vec<Addressed>> {
-        let rows: Vec<_> = (self.rooms.values())
-            .filter(|room| room.lobby_type == lobby_type && room.phase == Phase::Open)
-            .map(Room::row)
-            .collect();
-        let kind = i32::try_from(lobby_type).map_err(|_| invalid("lobby type"))?;
-        let bytes = lobby_wire::show(&rows, kind)?;
+        let bytes = self.list(lobby_type)?;
         for watchers in self.watchers.values_mut() {
             watchers.remove(&guid);
         }
@@ -103,14 +99,44 @@ impl Rooms {
         Ok(vec![Addressed { to: guid, bytes }])
     }
 
-    /// 101/7 to a player leaving the list; a seat they hold goes with it.
+    /// 101/6: a lobby's open games.
+    fn list(&self, lobby_type: u32) -> io::Result<Vec<u8>> {
+        let rows: Vec<_> = (self.rooms.values())
+            .filter(|room| room.lobby_type == lobby_type && room.phase == Phase::Open)
+            .map(Room::row)
+            .collect();
+        let kind = i32::try_from(lobby_type).map_err(|_| invalid("lobby type"))?;
+        lobby_wire::show(&rows, kind)
+    }
+
+    /// 101/7 to a player leaving the list; a seat they hold goes with it, unless its game has
+    /// started.
     pub fn close_list(&mut self, guid: u64) -> io::Result<Vec<Addressed>> {
-        let mut out = self.leave(guid)?;
+        let mut out = if self.committed(guid) { Vec::new() } else { self.leave(guid)? };
         for watchers in self.watchers.values_mut() {
             watchers.remove(&guid);
         }
         out.push(Addressed { to: guid, bytes: lobby_wire::close() });
         Ok(out)
+    }
+
+    /// A seat past its START: only quitting the game, or going, gives it up.
+    pub fn committed(&self, guid: u64) -> bool {
+        self.room_of(guid).is_some_and(|room| room.phase != Phase::Open)
+    }
+
+    /// The lobby whose list this player has open.
+    pub fn watching(&self, guid: u64) -> Option<u32> {
+        (self.watchers.iter())
+            .find(|(_, watchers)| watchers.contains(&guid))
+            .map(|(lobby_type, _)| *lobby_type)
+    }
+
+    /// A player left the world: off every list.
+    pub fn forget(&mut self, guid: u64) {
+        for watchers in self.watchers.values_mut() {
+            watchers.remove(&guid);
+        }
     }
 
     /// A new game with `host` in its first seat. A player already seated, or a full server, gets
@@ -161,7 +187,17 @@ impl Rooms {
         let Some(room) = self.rooms.get_mut(&id) else {
             return Ok(Vec::new());
         };
+        // A running game belongs to its table now: the seat just goes.
+        if room.phase == Phase::Running {
+            room.seats.retain(|seat| seat.guid != guid);
+            if room.seats.is_empty() {
+                self.rooms.remove(&id);
+            }
+            return Ok(Vec::new());
+        }
         let lobby_type = room.lobby_type;
+        let counting = matches!(room.phase, Phase::Starting(_));
+        let staying: Vec<u64> = room.members().filter(|&member| member != guid).collect();
         let was_host = room.seats.first().is_some_and(|seat| seat.guid == guid);
         let mut out: Vec<_> = if was_host {
             let everyone: Vec<u64> = room.members().collect();
@@ -181,11 +217,15 @@ impl Rooms {
             if matches!(room.phase, Phase::Starting(_)) {
                 room.phase = Phase::Open;
             }
-            // A running game has no row on the list.
             if room.phase == Phase::Open {
                 let room = room.clone();
                 out.extend(self.row_update(&room)?);
             }
+        }
+        // The client locks its lobby for a countdown; only 101/6 resets it (`Lobby:Show`).
+        if counting {
+            let list = self.list(lobby_type)?;
+            out.extend(staying.into_iter().map(|to| Addressed { to, bytes: list.clone() }));
         }
         Ok(out)
     }
@@ -208,6 +248,12 @@ impl Rooms {
         let removed = self.tell_watchers(lobby_type, &lobby_wire::removed(id));
         out.extend(removed.into_iter().filter(|packet| !seated.contains(&packet.to)));
         Ok(out)
+    }
+
+    /// Who sits in a room whose countdown has ended.
+    pub fn seats_due(&self, now_ms: u64) -> Vec<u64> {
+        let due = |room: &&Room| matches!(room.phase, Phase::Starting(at) if at <= now_ms);
+        self.rooms.values().filter(due).flat_map(Room::members).collect()
     }
 
     /// Rooms whose countdown ended, now running. The caller opens each one's game.
@@ -340,6 +386,48 @@ mod tests {
         assert_eq!(rooms.due(6_000), [id]);
         let out = rooms.leave(GUEST).unwrap();
         assert!(to(&out, WATCHER).is_empty());
+    }
+
+    #[test]
+    fn a_running_game_keeps_its_room_until_the_last_seat_goes() {
+        let (mut rooms, id) = table();
+        rooms.join(id, seat(GUEST)).unwrap();
+        rooms.start(HOST, 1_000).unwrap();
+        assert_eq!(rooms.seats_due(6_000), [HOST, GUEST]);
+        rooms.due(6_000);
+        assert!(rooms.leave(HOST).unwrap().is_empty(), "the guest plays on");
+        assert!(rooms.room(id).is_some());
+        assert!(rooms.leave(GUEST).unwrap().is_empty());
+        assert!(rooms.room(id).is_none());
+    }
+
+    /// 101/6 is the only thing that frees a client locked by the countdown.
+    #[test]
+    fn a_broken_countdown_resets_the_seat_that_stays() {
+        let (mut rooms, id) = table();
+        rooms.join(id, seat(GUEST)).unwrap();
+        rooms.start(HOST, 1_000).unwrap();
+        assert!(rooms.committed(GUEST));
+        let out = rooms.leave(GUEST).unwrap();
+        assert!(to(&out, HOST).iter().any(|bytes| bytes.starts_with(&[101, 0, 6])));
+        assert!(!rooms.committed(HOST));
+
+        rooms.join(id, seat(GUEST)).unwrap();
+        rooms.start(HOST, 2_000).unwrap();
+        let out = rooms.leave(HOST).unwrap();
+        let heard = to(&out, GUEST);
+        assert_eq!(heard[0], lobby_wire::left(id, CHESS));
+        assert!(heard[1].starts_with(&[101, 0, 6]));
+    }
+
+    #[test]
+    fn closing_the_list_keeps_a_started_seat() {
+        let (mut rooms, id) = table();
+        rooms.join(id, seat(GUEST)).unwrap();
+        rooms.start(HOST, 1_000).unwrap();
+        let out = rooms.close_list(GUEST).unwrap();
+        assert_eq!(to(&out, GUEST), [lobby_wire::close()]);
+        assert_eq!(rooms.room_of(GUEST).unwrap().id, id);
     }
 
     #[test]
