@@ -136,6 +136,7 @@ impl Gameplay {
             }
             self.give_starter_piece(job, definition, reuse_owned, out)?;
         }
+        self.grant_first_car(job, out);
         Ok(())
     }
 

@@ -639,8 +639,9 @@ impl Catalogue {
     fn can_join(&self, a: &Activity, viewer: Viewer) -> bool {
         match a.kind {
             Kind::Battle => viewer.combat_job && viewer.level >= a.required_level,
-            // (R) Open to all for now: a car check needs cars, with refusal 407742.
-            Kind::Chess { .. } | Kind::Garage => true,
+            Kind::Chess { .. } => true,
+            // Each driving job comes with its first car.
+            Kind::Garage => viewer.jobs.contains(&48) || viewer.jobs.contains(&49),
             Kind::Soccer => viewer.level >= a.required_level,
             Kind::CardGame { .. } => self.card_refusal(a.id).is_none(),
             Kind::Recipe { recipe_id, job } => {

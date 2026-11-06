@@ -620,6 +620,11 @@ impl Inventory {
         self.content.definitions.contains_key(&definition_id)
     }
 
+    /// The item Class, which says what a vehicle part fits; `None` when it is not defined.
+    pub fn definition_class(&self, definition_id: i32) -> Option<i32> {
+        Some(self.content.definitions.get(&definition_id)?.class_id)
+    }
+
     /// L933: the equipment slot the catalogue puts this item in; `None` when it is not defined.
     pub fn definition_slot(&self, definition_id: i32) -> Option<i32> {
         Some(self.content.definitions.get(&definition_id)?.slot)

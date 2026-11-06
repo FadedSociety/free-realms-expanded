@@ -237,6 +237,13 @@ pub struct DerbyGateway {
     row_names: BTreeMap<i32, i32>,
 }
 
+impl DerbyGateway {
+    /// The derby car's definition, for the garage's derby tab.
+    pub fn garage_vehicle(&self) -> Vec<u8> {
+        self.content.vehicle.definition.clone()
+    }
+}
+
 /// L931: a match played in its arena scene, as a fishing hole (`gameplay/fishing_scene.rs`).
 #[derive(Clone, Debug)]
 struct ArenaVisit {

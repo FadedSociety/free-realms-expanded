@@ -87,6 +87,7 @@ impl Gateway {
             collections = current.progression_extras.unwrap_or_default().collections;
             self.apply_profile_state(&mut data, current.profiles.as_ref(), game)?;
             data.jobs.profiles.extend(game.staff_job_rows());
+            game.write_self_vehicles(&mut data);
         }
         crate::progression_extras::apply_collected_flags(&mut data.collections, &collections);
         Gameplay::write_self_quests(gameplay, &mut data)?;

@@ -69,6 +69,7 @@ pub mod kart_progress_native;
 pub mod kart_racing;
 pub mod kart_rewards;
 pub mod kart_rows;
+pub mod vehicle_parts;
 pub mod kart_service;
 pub mod kart_weapons;
 pub mod le;

@@ -59,6 +59,7 @@ impl Gameplay {
             out.replies.push(mounts.list_packet(self.inventory.state()));
         }
         self.resummon_pet(character, now_ms, out);
+        self.repair_first_cars(out);
     }
 
     /// W162: true while the rider sits on a ride (the emote rules refuse emotes then).

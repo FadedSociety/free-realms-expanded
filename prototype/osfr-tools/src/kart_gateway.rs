@@ -12,6 +12,7 @@ use crate::{
     kart_entry::{EntryGate, EntryOutcome, KartEntryHandler, RaceEntryContent, RaceEntryContext},
     kart_rows::KartRows,
     kart_service::KartServiceContent,
+    vehicle_parts::{Loadouts, Vehicles},
     le, zone_transition,
 };
 use serde::{Deserialize, Serialize};
@@ -122,6 +123,9 @@ pub struct KartGatewayState {
     /// relog does not reset it).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_paid_unix: Option<u64>,
+    /// The character's karts and derby cars, with what is fitted and which is chosen.
+    #[serde(default, skip_serializing_if = "crate::vehicle_parts::Loadouts::is_empty")]
+    pub loadouts: crate::vehicle_parts::Loadouts,
 }
 
 impl KartGatewayState {
@@ -139,12 +143,14 @@ impl KartGatewayState {
             active,
             race,
             last_paid_unix,
+            loadouts,
         } = self;
         version != after.version
             || content_sha256 != after.content_sha256
             || next_instance != after.next_instance
             || active != after.active
             || last_paid_unix != after.last_paid_unix
+            || loadouts != after.loadouts
             || match (race, &after.race) {
                 (Some(before), Some(after)) => !before.save_decision_eq(after),
                 (None, None) => false,
@@ -177,6 +183,8 @@ pub struct KartGateway {
     rows: Option<Arc<crate::kart_rows::KartRows>>,
     /// The row the next [`Self::begin`] runs, set by [`Self::choose_row`]; never saved.
     next_row: Option<u32>,
+    /// `None` when the content has no vehicle table: logins keep the template's list.
+    vehicles: Option<Arc<Vehicles>>,
 }
 
 fn invalid(message: impl ToString) -> io::Error {
@@ -268,6 +276,17 @@ impl KartGateway {
         })
     }
 
+    /// The vehicle table and this character's loadouts.
+    pub fn garage(&mut self) -> Option<(Arc<Vehicles>, &mut Loadouts)> {
+        Some((self.vehicles.clone()?, &mut self.state.loadouts))
+    }
+
+    /// The list and chosen ids the self packet carries.
+    pub fn login_vehicles(&self) -> Option<(Vec<u8>, [u32; 2])> {
+        let table = self.vehicles.as_ref()?;
+        Some((self.state.loadouts.encode(table), self.state.loadouts.active))
+    }
+
     pub fn load(directory: &Path, saved: Option<KartGatewayState>) -> io::Result<Option<Self>> {
         let path = directory.join("kart_entry.json");
         let metadata = match std::fs::symlink_metadata(&path) {
@@ -354,6 +373,7 @@ impl KartGateway {
             active: None,
             race: None,
             last_paid_unix: None,
+            loadouts: Loadouts::default(),
         });
         if state.version != 1
             || state.content_sha256 != hash
@@ -456,6 +476,7 @@ impl KartGateway {
             gates,
             rows,
             next_row: None,
+            vehicles: Vehicles::load(directory)?,
         };
         if result.state.active.is_some() {
             result.rebuild_entry()?;
