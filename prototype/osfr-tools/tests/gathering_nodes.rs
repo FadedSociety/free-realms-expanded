@@ -1865,6 +1865,54 @@ fn the_caves_window_swaps_the_ship() {
     assert!(inners(&free).iter().any(|p| p.starts_with(state)), "let go");
 }
 
+/// The fire button in play: the loaded guns fire, the same frame's repeat does not, the balls come
+/// down and the bars hear the guns come back.
+#[test]
+fn a_broadside_flies_and_splashes() {
+    let fixture = Fixture::new(PLOT);
+    let mut gateway = fixture.gateway_at(fixture.state(false, true), &fixture.node, 60.0);
+    tick(&mut gateway, 1_500);
+    play(&mut gateway, 1059, 2_000);
+    let loaded = [13_u16, 10].map(|op| send(&mut gateway, &op.to_le_bytes(), 2_100));
+    let go = press_go(&mut gateway, &loaded, 2_150);
+    let ship = (inners(&go).into_iter())
+        .find(|p| p.starts_with(&[94, 0, 9, 0]))
+        .expect("the ship");
+    let guid = u64::from_le_bytes(ship[4..12].try_into().unwrap());
+    let mut fire = vec![94, 0, 20, 0];
+    fire.extend([0; 16]);
+    fire.extend(5_u32.to_le_bytes());
+    let count = |out: &GatewayOutcome, sub: u8| {
+        inners(out).iter().filter(|p| p.starts_with(&[94, 0, sub, 0])).count()
+    };
+    assert_eq!(count(&send(&mut gateway, &fire, 2_200), 26), 0, "not in play yet");
+    send(&mut gateway, &[94, 0, 3, 0, 0x1a, 0, 0, 0], 2_200);
+    let playing: &[u8] = &[94, 0, 2, 0, 10, 0, 0, 0];
+    let mut now = 6_300;
+    let mut bars = 0;
+    loop {
+        let out = tick(&mut gateway, now);
+        bars += count(&out, 19);
+        if inners(&out).iter().any(|p| *p == playing) {
+            break;
+        }
+        now += 500;
+        assert!(now < 30_000, "Playing");
+    }
+    let content_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let content = osfr_tools::ship_combat::Content::load(&content_dir).unwrap().unwrap();
+    let dock = content.arenas[0].docks[0].bank;
+    send(&mut gateway, &ship_report(guid, dock), now + 100);
+    assert_eq!(bars + count(&tick(&mut gateway, now + 150), 19), 1, "the bars start full");
+    let cannons = content.opening_ship().cannons.len();
+    assert_eq!(count(&send(&mut gateway, &fire, now + 200), 26), cannons, "both broadsides");
+    assert_eq!(count(&send(&mut gateway, &fire, now + 216), 26), 0, "held down: still loading");
+    let flight = (content.gunnery.flight_seconds * 1000.0) as u64;
+    assert_eq!(count(&tick(&mut gateway, now + 200 + flight - 1), 27), 0, "in the air");
+    let down = tick(&mut gateway, now + 200 + flight);
+    assert_eq!(count(&down, 27), cannons, "in the water");
+}
+
 /// A forged position past the speed bound opens no window, so it cannot call the ship home.
 #[test]
 fn a_forged_report_opens_no_ship_selection() {

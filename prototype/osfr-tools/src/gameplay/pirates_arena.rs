@@ -271,6 +271,15 @@ impl Gameplay {
         let Some(arena) = self.pirates.as_mut() else {
             return Ok(Some(out));
         };
+        if let (Some(side), Some(content)) =
+            (ship_combat::fired_side(inner), self.ship_combat.as_deref())
+        {
+            if arena.game.playing_since().is_some() {
+                let volley = arena.plunder.fire(side, now_ms, &arena.ship, content);
+                out.replies.extend(volley);
+            }
+            return Ok(Some(out));
+        }
         // L966: the client's own ship report, while the clock runs.
         let report = ship_combat::ship_position(inner);
         let content = self.ship_combat.as_deref();
@@ -293,6 +302,9 @@ impl Gameplay {
             }
             let earned = (arena.plunder).sail(guid, at, now_ms, place, treasure, &ship);
             out.replies.extend(earned);
+            if let Some(motion) = ship_combat::ship_motion(inner) {
+                arena.plunder.steer(at, motion, treasure.max_speed);
+            }
             // Steering into the base's cave opens Ship Selection, once a visit; play goes on. Only
             // a position the speed bound accepted counts, so a forged report opens nothing, and a
             // ship that leaves for good (three radii) loses the window.
@@ -450,6 +462,16 @@ impl Gameplay {
             out.replies.extend(back);
             let guid = arena.return_to.guid;
             out.replies.extend(arena.plunder.release(guid, now_ms, &arena.ship));
+        }
+        // Balls still in the air at the whistle come down too: only DespawnProjectile ends one.
+        if matches!(arena.game.state(), ship_combat::PLAYING | ship_combat::GAME_OVER)
+            && let Some(content) = content
+        {
+            let splash = content.zone_config.get("ProjectileWaterImpactEffectId");
+            let splash = splash.copied().unwrap_or(0.0) as u32;
+            let guid = arena.return_to.guid;
+            let guns = arena.plunder.gunnery(guid, now_ms, &arena.ship, splash);
+            out.replies.extend(guns);
         }
         if arena.game.finished(now_ms) {
             let back = arena.return_to.clone();

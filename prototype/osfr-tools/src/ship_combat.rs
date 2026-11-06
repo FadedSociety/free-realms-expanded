@@ -10,7 +10,7 @@
 //! offset. The live per-zone values never shipped, so every value is content (R).
 use serde::Deserialize;
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, VecDeque},
     fs,
     io::{self, Read},
     path::Path,
@@ -43,6 +43,10 @@ pub const MARK_TREASURE_PICKUPS: u16 = 30;
 pub const RESET_PROXIED_SHIP: u16 = 11;
 pub const DESTROY_PROXIED_SHIP: u16 = 10;
 pub const SELECT_SHIP: u16 = 21;
+pub const UPDATE_SHIP_CANNONS: u16 = 19;
+pub const FIRE_AT_LOCATION: u16 = 20;
+pub const SPAWN_PROJECTILE: u16 = 26;
+pub const DESPAWN_PROJECTILE: u16 = 27;
 pub const ANNOUNCER_MESSAGE: u16 = 34;
 /// (R) How long a ship stays held at a whirlpool's exit (the loader's ExitFrozenTime).
 const WHIRLPOOL_HOLD_MS: u64 = 1_500;
@@ -129,6 +133,7 @@ pub struct Content {
     pub camera: BTreeMap<String, f64>,
     /// The treasure round's values (R).
     pub treasure: Treasure,
+    pub gunnery: Gunnery,
     /// The dock's book stands (`sg_signinbook_01`), the world's way in.
     #[serde(default)]
     pub stands: Vec<Stand>,
@@ -168,6 +173,7 @@ impl Content {
         ];
         ship.key.clone_from(&entry.key);
         ship.collision = format!("pirship_hum_{hull}_mainbody_bbe.cdt");
+        ship.cannons = self.gunnery.broadsides(entry);
         // The damage states' thresholds are absolute health: they scale with the hull.
         for state in &mut ship.damage_states {
             state.health = state.health * entry.health / self.ship.health.max(1);
@@ -257,6 +263,66 @@ pub struct FleetShip {
     pub turbo_speed: f64,
     /// The gears' MaxAngularSpeed (degrees a second).
     pub max_turn: f64,
+    /// (R) Where its guns sit, in metres from the ship's middle: to either side, up, and how far
+    /// along the hull each way the row runs.
+    pub gun_beam: f32,
+    pub gun_height: f32,
+    pub gun_row: f32,
+}
+
+/// The guns' shared values (R; the live `.Cannon.txt` files never shipped).
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct Gunnery {
+    /// ProjectileSpeed, along the water. The client's aim reads a shot's landing as the ship's
+    /// position plus twice (its speed and this, 00ca7480), and TargetMaxDistance's default is 70,
+    /// so 35 metres a second for two seconds.
+    pub speed: f32,
+    pub flight_seconds: f32,
+    /// How long a side takes to reload: one crew loads its guns in turn, so the bar fills.
+    pub reload_seconds: f32,
+    /// SpawnProjectile's model scale.
+    pub ball_scale: f32,
+}
+
+impl Gunnery {
+    /// A ship's guns (`entry.cannons`, half to a side), each side's row from bow to stern.
+    fn broadsides(&self, entry: &FleetShip) -> Vec<Cannon> {
+        let per_side = entry.cannons / 2;
+        let gun = |slot: u32, left: bool| {
+            let along = (f64::from(slot) + 0.5) / f64::from(per_side);
+            Cannon {
+                name: format!("Cannon{}", slot * 2 + u32::from(!left)),
+                left,
+                // Left is the client's +x (00cae5a0 mirrors a right gun's offset).
+                offset: [
+                    if left { entry.gun_beam } else { -entry.gun_beam },
+                    entry.gun_height,
+                    entry.gun_row * (1.0 - 2.0 * along as f32),
+                ],
+                bit: 1 << slot,
+                speed: self.speed,
+                reload_seconds: self.reload_seconds,
+            }
+        };
+        (0..per_side)
+            .flat_map(|slot| [gun(slot, true), gun(slot, false)])
+            .collect()
+    }
+}
+
+/// One gun (`ShipCombatCannonConfig`, loader 01069df0).
+#[derive(Clone, Debug, PartialEq)]
+pub struct Cannon {
+    /// SpawnProjectile names it, and the muzzle flash plays at it (`sub_CAEC40`).
+    pub name: String,
+    pub left: bool,
+    /// LocationOffset, in the ship's frame.
+    pub offset: [f32; 3],
+    /// Its bit in UpdateShipCannons' mask for its side.
+    pub bit: u32,
+    pub speed: f32,
+    pub reload_seconds: f32,
 }
 
 /// One flag: the masts' texture alias, its window icon (image set `icon_ui_pir_flag_*`) and its
@@ -282,6 +348,9 @@ pub struct Ship {
     /// Its key in the cave's list; the client finds the ship it is on by this (00a62280).
     #[serde(default)]
     pub key: String,
+    /// Its guns, from `Content::fleet_ship`.
+    #[serde(skip)]
+    pub cannons: Vec<Cannon>,
     /// `SHIP_FIELDS` by name; a missing key is 0.
     #[serde(default)]
     pub config: BTreeMap<String, f64>,
@@ -429,6 +498,7 @@ impl Content {
             && f64::from(t.respawn_seconds) <= MAX_SECONDS
             && (1.0..=1000.0).contains(&t.max_speed);
         let ship = &content.ship;
+        let g = &content.gunnery;
         let physics = |key: &str| ship.physics.get(key).copied().unwrap_or(0.0);
         let fastest = physics("TurboSpeed") * physics("SpeedFactor");
         let ship_ok = (ship.actors.iter().chain([&ship.collision])).all(|t| text_ok(t))
@@ -450,7 +520,15 @@ impl Content {
                     && f64::from(t.max_speed) >= f.turbo_speed
                     && text_ok(&f.key)
                     && text_ok(&f.hull)
+                    // Two sides, and each side's guns fit its 32-bit mask.
+                    && f.cannons % 2 == 0
+                    && (2..=64).contains(&f.cannons)
+                    && [f.gun_beam, f.gun_height, f.gun_row].iter().all(|v| v.is_finite())
+                    && f.gun_beam > 0.0
             })
+            && [g.speed, g.flight_seconds, g.reload_seconds, g.ball_scale]
+                .iter()
+                .all(|v| (0.01..=1000.0).contains(v))
             && (content.decals.iter()).all(|d| text_ok(&d.alias))
             && (content.fleet.is_empty()
                 || content.fleet.iter().any(|f| f.key == content.start_ship))
@@ -461,6 +539,18 @@ impl Content {
         // The hold counts chests: the client divides HoldCapacity by ShipHoldMinValue (00ca10b0,
         // 00ca07c0), so 0 would crash every client in the arena and another value would mismatch.
         let hold_unit = content.zone_config.get("ShipHoldMinValue") == Some(&1.0);
+        // The ball needs a model, and the client plays a splash only within this range of the
+        // ship (00a5f470, `sub_CA41A0`): at 0 no shot would ever splash.
+        let shots_show = [
+            "ProjectileMax",
+            "ProjectileModelId",
+            "ProjectileWaterImpactEffectId",
+            "ProjectileDespawnEffectRange",
+            "Gravity",
+            "WaterLevel",
+        ]
+        .iter()
+        .all(|key| content.zone_config.get(*key).is_some_and(|value| *value > 0.0));
         let timings = [
             f64::from(content.countdown_seconds),
             f64::from(content.report_timeout_seconds),
@@ -476,6 +566,7 @@ impl Content {
             || !treasure_ok
             || content.ship.hold_capacity < 1
             || !hold_unit
+            || !shots_show
             || content.colours.is_empty()
             || !(content.colours.iter()).all(|colour| COLOURS.contains(&colour.as_str()))
             || !timings.iter().all(|s| (0.0..=MAX_SECONDS).contains(s))
@@ -1000,6 +1091,99 @@ pub fn ship_position(packet: &[u8]) -> Option<(u64, [f32; 3])> {
         .then_some((guid, position))
 }
 
+/// The client's UpdateShipPhysics (16): where the bow points and how fast the ship moves (the third
+/// row and the vec4 after the position), or `None` for another packet or a non-finite value.
+pub fn ship_motion(packet: &[u8]) -> Option<([f32; 3], [f32; 3])> {
+    let body = packet
+        .strip_prefix(&FAMILY.to_le_bytes())?
+        .strip_prefix(&UPDATE_SHIP_PHYSICS.to_le_bytes())?;
+    if body.len() != SHIP_PHYSICS_BODY {
+        return None;
+    }
+    let vector = |at: usize| {
+        let word = |at: usize| Some(f32::from_le_bytes(body.get(at..at + 4)?.try_into().ok()?));
+        Some([word(at)?, word(at + 4)?, word(at + 8)?])
+    };
+    let forward = vector(8 + 1 + 8 + 32)?;
+    let velocity = vector(8 + 1 + 8 + 64)?;
+    (forward.iter().chain(&velocity))
+        .all(|v| v.is_finite())
+        .then_some((forward, velocity))
+}
+
+/// FireAtLocation (20): the side the client fires (`ShipCombatFrameUpdate` 00ca7480 sends it every
+/// frame the button is down: 1 left, 2 right, 5 both). Its location stays zero (00ca2dc0).
+pub fn fired_side(packet: &[u8]) -> Option<u32> {
+    let body = packet
+        .strip_prefix(&FAMILY.to_le_bytes())?
+        .strip_prefix(&FIRE_AT_LOCATION.to_le_bytes())?;
+    Some(u32::from_le_bytes(body.get(16..20)?.try_into().ok()?))
+}
+
+/// SpawnProjectile (26; reader `sub_A5A470`, handler 00a5f260): the model, its scale, the gun for
+/// the muzzle flash, then a sized blob (`sub_10880C0`): the id, 2 (a ship's shot), the ship's slot,
+/// the gravity, the velocity and the transform. The client flies it itself (`sub_1088070`: each
+/// frame the gravity slows the climb and the velocity moves the last row) until DespawnProjectile.
+fn spawn_projectile(
+    id: u32,
+    gun: &str,
+    (model, scale): (u32, f32),
+    at: [f32; 3],
+    velocity: [f32; 3],
+    gravity: f32,
+) -> Vec<u8> {
+    let mut blob = Vec::with_capacity(96);
+    for word in [id, 2, 0] {
+        blob.extend(word.to_le_bytes());
+    }
+    let [x, y, z] = at;
+    let [vx, vy, vz] = velocity;
+    let rows = [
+        gravity, vx, vy, vz, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, x, y, z,
+        1.0,
+    ];
+    for value in rows {
+        blob.extend(value.to_le_bytes());
+    }
+    let mut body = model.to_le_bytes().to_vec();
+    body.extend(scale.to_le_bytes());
+    string(&mut body, gun);
+    // 96 bytes: the cast is exact.
+    body.extend((blob.len() as u32).to_le_bytes());
+    body.extend(blob);
+    packet(SPAWN_PROJECTILE, &body)
+}
+
+/// DespawnProjectile (27; reader `sub_A5A540`, handler 00a5f470): the ball goes and `effect` plays
+/// at `at`, at scale 1 (over 1 the effect grows).
+fn despawn_projectile(id: u32, effect: u32, at: [f32; 3]) -> Vec<u8> {
+    let mut body = id.to_le_bytes().to_vec();
+    body.extend(effect.to_le_bytes());
+    for value in [at[0], at[1], at[2], 1.0, 1.0] {
+        body.extend(value.to_le_bytes());
+    }
+    packet(DESPAWN_PROJECTILE, &body)
+}
+
+/// UpdateShipCannons (19; handler 00a5ee90 keeps eight words at processor +0x348 for the client's
+/// own ship): the guns loaded on the right and left (the reload bars, `sub_C9ECF0`: this over half
+/// the ship's guns), two more counts, then the left and right masks (00ca7480 aims only those).
+fn ship_cannons(guid: u64, (left, right): (u32, u32)) -> Vec<u8> {
+    let mut body = guid.to_le_bytes().to_vec();
+    for word in [right.count_ones(), left.count_ones(), 0, 0, left, right, 0, 0] {
+        body.extend(word.to_le_bytes());
+    }
+    packet(UPDATE_SHIP_CANNONS, &body)
+}
+
+/// A ball in the air: it lands at `at` at `lands_ms`.
+#[derive(Clone, Debug, PartialEq)]
+struct Shot {
+    id: u32,
+    lands_ms: u64,
+    at: [f32; 3],
+}
+
 /// One player's treasure round: the arena's pickup points (each lying there, or taken until a
 /// time), the ship's last accepted report, the hold and the banked gold. The server owns it: the
 /// client only reports where its ship is.
@@ -1017,6 +1201,17 @@ pub struct Plunder {
     held_until: Option<u64>,
     /// The last report the speed bound let through: where the ship really is.
     position: Option<[f32; 3]>,
+    /// That report's bow, flat on the water and of length 1, and velocity.
+    motion: Option<([f32; 3], [f32; 3])>,
+    /// When each gun is loaded again, in the ship's order; a gun past the end is loaded.
+    reloads: Vec<u64>,
+    /// When each side's crew (right, left) has finished the guns it has been given.
+    crews: [u64; 2],
+    /// The balls in the air, soonest first: every flight lasts the same.
+    shots: VecDeque<Shot>,
+    next_shot: u32,
+    /// The left and right masks the client last heard.
+    told: Option<(u32, u32)>,
 }
 
 /// (R) Slack on the speed bound for a report's jitter (metres), once per anchor.
@@ -1048,6 +1243,12 @@ impl Plunder {
             unloaded_ms: None,
             held_until: None,
             position: None,
+            motion: None,
+            reloads: Vec::new(),
+            crews: [0; 2],
+            shots: VecDeque::new(),
+            next_shot: 1,
+            told: None,
         }
     }
 
@@ -1069,6 +1270,100 @@ impl Plunder {
         self.position = Some(home);
         self.held_until = Some(now_ms.saturating_add(WHIRLPOOL_HOLD_MS));
         self.hold = self.hold.min(u32::try_from(ship.hold_capacity).unwrap_or(0));
+        self.reloads.clear();
+        self.crews = [0; 2];
+        self.told = None;
+    }
+
+    /// Keeps the heading and speed of the report `sail` just took at `at`; one it turned down
+    /// aims nothing. The speed is held to `max_speed`, as the position was.
+    pub fn steer(&mut self, at: [f32; 3], motion: ([f32; 3], [f32; 3]), max_speed: f32) {
+        let ([x, _, z], [vx, _, vz]) = motion;
+        let length = x.hypot(z);
+        if self.position != Some(at) || length < 0.01 {
+            return;
+        }
+        let speed = vx.hypot(vz);
+        let slow = if speed > max_speed { max_speed / speed } else { 1.0 };
+        self.motion = Some(([x / length, 0.0, z / length], [vx * slow, 0.0, vz * slow]));
+    }
+
+    /// `side` fires (1 left, 2 right, 5 both): every loaded gun there sends a ball off to land on
+    /// the water `flight_seconds` on, and its side's crew takes it next, so a side reloads in
+    /// `reload_seconds` however long the button stays down. A held ship's guns stay quiet, and so
+    /// does any other side. The client empties its bars on every press (00ca7480), so a press that
+    /// leaves guns loaded makes `gunnery` tell it again.
+    pub fn fire(&mut self, side: u32, now_ms: u64, ship: &Ship, content: &Content) -> Vec<Vec<u8>> {
+        let (Some(at), Some(([fx, _, fz], velocity))) = (self.position, self.motion) else {
+            self.told = None;
+            return Vec::new();
+        };
+        if !matches!(side, 1 | 2 | 5) {
+            return Vec::new();
+        }
+        if self.held_until.is_some() {
+            self.told = None;
+            return Vec::new();
+        }
+        let zone = |key: &str| content.zone_config.get(key).copied().unwrap_or(0.0);
+        let gravity = zone("Gravity") as f32;
+        let water = zone("WaterLevel") as f32;
+        let model = (zone("ProjectileModelId") as u32, content.gunnery.ball_scale);
+        let flight = content.gunnery.flight_seconds;
+        let most = zone("ProjectileMax") as usize;
+        let per_side = (ship.cannons.len() / 2).max(1) as f32;
+        self.reloads.resize(ship.cannons.len(), 0);
+        let mut out = Vec::new();
+        for (gun, ready) in ship.cannons.iter().zip(&mut self.reloads) {
+            if *ready > now_ms || (gun.left && side == 2) || (!gun.left && side == 1) {
+                continue;
+            }
+            // The client's pool holds no more; the gun keeps its ball.
+            if self.shots.len() >= most {
+                self.told = None;
+                break;
+            }
+            let crew = &mut self.crews[usize::from(gun.left)];
+            let turn = (gun.reload_seconds * 1000.0 / per_side) as u64;
+            *crew = (*crew).max(now_ms).saturating_add(turn);
+            *ready = *crew;
+            // The ship's frame: the left is the bow turned a quarter (the rows `create_ship` writes).
+            let [ox, oy, oz] = gun.offset;
+            let from = [at[0] + fz * ox + fx * oz, at[1] + oy, at[2] - fx * ox + fz * oz];
+            let out_of_side = if gun.left { gun.speed } else { -gun.speed };
+            let vx = velocity[0] + fz * out_of_side;
+            let vz = velocity[2] - fx * out_of_side;
+            // Up just enough to meet the water as the flight ends.
+            let vy = (water - from[1]) / flight + gravity * flight / 2.0;
+            let id = self.next_shot;
+            self.next_shot = self.next_shot.wrapping_add(1).max(1);
+            out.push(spawn_projectile(id, &gun.name, model, from, [vx, vy, vz], gravity));
+            self.shots.push_back(Shot {
+                id,
+                lands_ms: now_ms.saturating_add((flight * 1000.0) as u64),
+                at: [from[0] + vx * flight, water, from[2] + vz * flight],
+            });
+        }
+        out
+    }
+
+    /// The balls that came down by `now_ms`, and the guns' state whenever it changed.
+    pub fn gunnery(&mut self, guid: u64, now_ms: u64, ship: &Ship, splash: u32) -> Vec<Vec<u8>> {
+        let mut out = Vec::new();
+        while let Some(shot) = self.shots.pop_front_if(|shot| shot.lands_ms <= now_ms) {
+            out.push(despawn_projectile(shot.id, splash, shot.at));
+        }
+        let (mut left, mut right) = (0, 0);
+        for (index, gun) in ship.cannons.iter().enumerate() {
+            if self.reloads.get(index).is_none_or(|ready| *ready <= now_ms) {
+                *(if gun.left { &mut left } else { &mut right }) |= gun.bit;
+            }
+        }
+        if self.told != Some((left, right)) {
+            self.told = Some((left, right));
+            out.push(ship_cannons(guid, (left, right)));
+        }
+        out
     }
 
     /// The whirlpool's hold ending: the state that lets the ship go, as Playing's did.
@@ -1375,7 +1670,24 @@ pub fn create_ship(guid: u64, slot: u32, position: [f32; 3], ship: &Ship, colour
     write_fields(&mut b, SHIP_FIELDS, &ship.config);
     b.push(0);
     zeros(&mut b, 4);
-    zeros(&mut b, 1); // the list at +67, empty (R)
+    b.extend(count(ship.cannons.len()));
+    for gun in &ship.cannons {
+        // Facing (1 left, 2 right), Type (2 `ship`), ReloadTime, RapidReloadTime, ProjectileSpeed.
+        b.extend(if gun.left { 1_u32 } else { 2 }.to_le_bytes());
+        b.extend(2_u32.to_le_bytes());
+        for value in [gun.reload_seconds, gun.reload_seconds, gun.speed] {
+            b.extend(value.to_le_bytes());
+        }
+        // LaunchAngle (0: straight out of the side), then the lob and auto-fire values (R).
+        zeros(&mut b, 8);
+        for value in [gun.offset[0], gun.offset[1], gun.offset[2], 0.0] {
+            b.extend(value.to_le_bytes());
+        }
+        // Damage (no ship to hit yet), then the gun's bit (00ca7480 tests it against the mask).
+        zeros(&mut b, 1);
+        b.extend(gun.bit.to_le_bytes());
+        string(&mut b, &gun.name);
+    }
     b.extend(count(ship.damage_states.len()));
     for state in &ship.damage_states {
         b.extend(state.health.to_le_bytes());
@@ -1702,6 +2014,134 @@ mod tests {
         assert_eq!(selected_ship(&[94, 0, 22, 0]), None, "another packet");
     }
 
+    /// Half a ship's guns to a side, the bits per side; the config carries them as `sub_A5BD50`
+    /// reads them.
+    #[test]
+    fn a_ship_carries_its_broadsides() {
+        let content = content();
+        let ship = content.fleet_ship("Eel").unwrap();
+        assert_eq!(ship.cannons.len(), 8);
+        let left: Vec<_> = ship.cannons.iter().filter(|gun| gun.left).collect();
+        assert_eq!(left.len(), 4);
+        assert_eq!(left.iter().map(|gun| gun.bit).sum::<u32>(), 0b1111);
+        assert!(left[0].offset[0] > 0.0 && ship.cannons[1].offset[0] < 0.0);
+        let bare = Ship { cannons: Vec::new(), ..ship.clone() };
+        let gun = 4 * 13 + 16 + 8;
+        let names: usize = ship.cannons.iter().map(|gun| 4 + gun.name.len()).sum();
+        let grown = create_ship(7, 0, [0.0; 3], &ship, "pir_red").len();
+        let plain = create_ship(7, 0, [0.0; 3], &bare, "pir_red").len();
+        assert_eq!(grown - plain, 8 * gun + names);
+    }
+
+    /// A gun fires once a reload; the side counts, the ball meets the water where it was sent, and
+    /// the guns come back one by one.
+    #[test]
+    fn guns_fire_once_a_reload_and_the_balls_come_down() {
+        let content = content();
+        let ship = content.fleet_ship("Eel").unwrap();
+        let treasure = &content.treasure;
+        let mut round = Plunder::new(0);
+        let at = [100.0, 53.6, 200.0];
+        assert!(round.fire(1, 0, &ship, &content).is_empty(), "no report yet");
+        round.position = Some(at);
+        round.steer(at, ([0.0, 0.0, 2.0], [0.0, 3.0, 5.0]), treasure.max_speed);
+        assert!(round.fire(3, 0, &ship, &content).is_empty(), "no such side");
+        let volley = round.fire(1, 0, &ship, &content);
+        assert_eq!(volley.len(), 4, "the left side alone");
+        assert!(round.fire(1, 100, &ship, &content).is_empty(), "still loading");
+        assert_eq!(round.fire(2, 100, &ship, &content).len(), 4, "the right side was loaded");
+        let shot = &volley[0];
+        assert_eq!(shot[..4], [94, 0, 26, 0]);
+        assert_eq!(shot[4..8], 1666_u32.to_le_bytes());
+        let name = u32::from_le_bytes(shot[12..16].try_into().unwrap()) as usize;
+        assert_eq!(&shot[16..16 + name], b"Cannon0");
+        let blob = &shot[16 + name..];
+        assert_eq!(blob[..4], 96_u32.to_le_bytes());
+        assert_eq!(blob.len(), 100);
+        let float = |at: usize| f32::from_le_bytes(blob[at..at + 4].try_into().unwrap());
+        assert_eq!(blob[4..8], 1_u32.to_le_bytes(), "the id");
+        assert_eq!(blob[8..12], 2_u32.to_le_bytes(), "a ship's shot");
+        assert!((float(16) - 9.81).abs() < 0.001, "gravity");
+        let speed = content.gunnery.speed;
+        assert!((float(20) - speed).abs() < 0.001, "out of the left, +x with the bow on +z");
+        assert!((float(28) - 5.0).abs() < 0.001, "the ship's way carries it");
+        let (height, climb, flight) = (float(88), float(24), content.gunnery.flight_seconds);
+        let landed = height + climb * flight - 9.81 * flight * flight / 2.0;
+        assert!((landed - 53.6).abs() < 0.01, "the water, at {landed}");
+        let splash = 15968;
+        let early = round.gunnery(7, 1_900, &ship, splash);
+        assert!(!early.iter().any(|p| p.starts_with(&[94, 0, 27, 0])), "still flying");
+        let told = (early.iter()).find(|p| p.starts_with(&[94, 0, 19, 0])).unwrap();
+        assert_eq!(told[4..12], 7_u64.to_le_bytes());
+        // 1.9 s of a 3 s reload: two of the left's four are back, the right's two (0.1 s behind).
+        assert_eq!(told[12..16], 2_u32.to_le_bytes(), "right");
+        assert_eq!(told[16..20], 2_u32.to_le_bytes(), "left");
+        assert_eq!(told[28..32], 0b0011_u32.to_le_bytes(), "left mask");
+        assert!(round.gunnery(7, 1_900, &ship, splash).is_empty(), "said once");
+        let down = round.gunnery(7, 2_000, &ship, splash);
+        let down: Vec<_> = down.iter().filter(|p| p.starts_with(&[94, 0, 27, 0])).collect();
+        assert_eq!(down.len(), 4, "the first volley");
+        assert_eq!(down[0][4..8], 1_u32.to_le_bytes());
+        assert_eq!(down[0][8..12], splash.to_le_bytes());
+        assert_eq!(down[0].len(), 4 + 8 + 16 + 4);
+        let y = f32::from_le_bytes(down[0][16..20].try_into().unwrap());
+        assert!((y - 53.6).abs() < 0.001);
+    }
+
+    /// Fire held down every frame reloads no faster than a tap: a side's guns per reload, and
+    /// never more balls in the air than the client's pool.
+    #[test]
+    fn holding_fire_does_not_beat_the_reload() {
+        let content = content();
+        let ship = content.fleet_ship("Juggernaut").unwrap();
+        let mut round = Plunder::new(0);
+        let at = [100.0, 53.6, 200.0];
+        round.position = Some(at);
+        round.steer(at, ([0.0, 0.0, 1.0], [0.0; 3]), 40.0);
+        let (mut fired, mut peak) = (0, 0);
+        for now in (0..30_000).step_by(16) {
+            fired += round.fire(5, now, &ship, &content).len();
+            peak = peak.max(round.shots.len());
+            round.gunnery(7, now, &ship, 15968);
+        }
+        // One volley of 24, then 24 a 3 s reload for 30 s; the pool's cap only ever lowers it.
+        assert!((200..=264).contains(&fired), "{fired} balls");
+        assert!(peak <= 32, "{peak} in the air");
+    }
+
+    /// The client empties its bars on any press, so a press the server refuses gets them back.
+    #[test]
+    fn a_refused_press_refills_the_bars() {
+        let content = content();
+        let ship = content.fleet_ship("Eel").unwrap();
+        let mut round = Plunder::new(0);
+        round.position = Some([1.0; 3]);
+        round.steer([1.0; 3], ([0.0, 0.0, 1.0], [0.0; 3]), 40.0);
+        assert_eq!(round.gunnery(7, 0, &ship, 1).len(), 1, "full bars");
+        round.held_until = Some(1_000);
+        assert!(round.fire(5, 10, &ship, &content).is_empty());
+        assert_eq!(round.gunnery(7, 20, &ship, 1).len(), 1, "told again");
+    }
+
+    /// A report the speed bound refused aims nothing, and a forged speed cannot throw a ball far.
+    #[test]
+    fn the_guns_trust_only_what_the_bound_let_through() {
+        let content = content();
+        let ship = content.fleet_ship("Eel").unwrap();
+        let mut round = Plunder::new(0);
+        round.steer([1.0; 3], ([0.0, 0.0, 1.0], [0.0; 3]), 40.0);
+        assert_eq!(round.motion, None, "no accepted report there");
+        round.position = Some([1.0; 3]);
+        round.steer([1.0; 3], ([0.0; 3], [0.0; 3]), 40.0);
+        assert_eq!(round.motion, None, "no bow to read");
+        round.steer([1.0; 3], ([0.0, 0.0, 1.0], [0.0, 900.0, 4000.0]), 40.0);
+        assert_eq!(round.motion, Some(([0.0, 0.0, 1.0], [0.0, 0.0, 40.0])));
+        assert_eq!(round.fire(5, 0, &ship, &content).len(), 8, "both sides");
+        round.held_until = Some(1);
+        round.reloads.clear();
+        assert!(round.fire(5, 0, &ship, &content).is_empty(), "a held ship holds fire");
+    }
+
     #[test]
     fn ship_reports_carry_the_last_row() {
         let out = report(7, [880.0, 52.0, 723.0]);
@@ -1709,6 +2149,14 @@ mod tests {
         assert_eq!(ship_position(&out), Some((7, [880.0, 52.0, 723.0])));
         assert_eq!(ship_position(&out[..116]), None);
         assert_eq!(ship_position(&report(7, [f32::NAN, 0.0, 0.0])), None);
+        assert_eq!(ship_motion(&out), Some(([0.0, 0.0, 1.0], [0.0; 3])));
+        assert_eq!(ship_motion(&out[..116]), None);
+        let mut fire = vec![94, 0, 20, 0];
+        fire.extend([0; 16]);
+        fire.extend(5_u32.to_le_bytes());
+        assert_eq!(fired_side(&fire), Some(5));
+        assert_eq!(fired_side(&fire[..20]), None);
+        assert_eq!(fired_side(&out), None);
         let marks = mark_treasure(&[[3.0, 50.0, 4.0]]);
         assert_eq!(marks[..8], [94, 0, 30, 0, 1, 0, 0, 0]);
         assert_eq!(marks[8..12], 3_f32.to_le_bytes());
@@ -1882,7 +2330,16 @@ mod tests {
         };
         assert!(loads(&|_| {}), "the shipped content");
         let long = "x".repeat(MAX_TEXT + 1);
-        let refused: [(&str, &dyn Fn(&mut serde_json::Value)); 15] = [
+        let refused: [(&str, &dyn Fn(&mut serde_json::Value)); 20] = [
+            ("no splash effect", &|c| {
+                c["zone_config"]["ProjectileWaterImpactEffectId"] = 0.into()
+            }),
+            ("guns on the wrong sides", &|c| c["fleet"][0]["gun_beam"] = (-1.0).into()),
+            ("shots that never splash", &|c| {
+                c["zone_config"]["ProjectileDespawnEffectRange"] = 0.into()
+            }),
+            ("an odd gun count", &|c| c["fleet"][0]["cannons"] = 7.into()),
+            ("a ball that never lands", &|c| c["gunnery"]["flight_seconds"] = 0.into()),
             ("a hold unit other than one chest", &|c| {
                 c["zone_config"]["ShipHoldMinValue"] = 0.into()
             }),

@@ -375,8 +375,10 @@
     "PickupEmptyTime": 3,
     "FlyingTreasureHeight": 1.2,
     "ProjectileMax": 32,
+    "ProjectileModelId": 1666,
     "ProjectileRadius": 1,
     "ProjectileLifetime": 4,
+    "ProjectileDespawnEffectRange": 300,
     "ShipHoldMinValue": 1,
     "ShipNameplateVisibleRange": 200,
     "ParkingAlignSpin": 1,
@@ -409,12 +411,13 @@
     "ShipChestFullEffectId": 16435,
     "ShipChestEmptyEffectId": 16434
   },
+  "gunnery": {"speed": 35.0, "flight_seconds": 2.0, "reload_seconds": 3.0, "ball_scale": 1.0},
   "start_ship": "Cutlass",
   "fleet": [
-    {"key": "Eel", "name_id": 417574, "size_id": 4087, "turning_id": 9001, "cannons": 8, "icon": 37125, "hull": "sml", "health": 70, "hold_capacity": 4, "max_speed": 26.0, "turbo_speed": 34.0, "max_turn": 90.0},
-    {"key": "Cutlass", "name_id": 417578, "size_id": 4088, "turning_id": 9315, "cannons": 12, "icon": 29287, "hull": "med", "health": 100, "hold_capacity": 5, "max_speed": 22.0, "turbo_speed": 30.0, "max_turn": 60.0},
-    {"key": "Revenge", "name_id": 417582, "size_id": 4088, "turning_id": 9315, "cannons": 16, "icon": 30792, "hull": "med2", "health": 120, "hold_capacity": 6, "max_speed": 20.0, "turbo_speed": 28.0, "max_turn": 60.0},
-    {"key": "Juggernaut", "name_id": 417586, "size_id": 4089, "turning_id": 8096, "cannons": 24, "icon": 29289, "hull": "lrg", "health": 150, "hold_capacity": 8, "max_speed": 17.0, "turbo_speed": 25.0, "max_turn": 40.0}
+    {"key": "Eel", "name_id": 417574, "size_id": 4087, "turning_id": 9001, "cannons": 8, "icon": 37125, "hull": "sml", "health": 70, "hold_capacity": 4, "max_speed": 26.0, "turbo_speed": 34.0, "max_turn": 90.0, "gun_beam": 2.5, "gun_height": 2.0, "gun_row": 3.0},
+    {"key": "Cutlass", "name_id": 417578, "size_id": 4088, "turning_id": 9315, "cannons": 12, "icon": 29287, "hull": "med", "health": 100, "hold_capacity": 5, "max_speed": 22.0, "turbo_speed": 30.0, "max_turn": 60.0, "gun_beam": 3.0, "gun_height": 2.0, "gun_row": 4.0},
+    {"key": "Revenge", "name_id": 417582, "size_id": 4088, "turning_id": 9315, "cannons": 16, "icon": 30792, "hull": "med2", "health": 120, "hold_capacity": 6, "max_speed": 20.0, "turbo_speed": 28.0, "max_turn": 60.0, "gun_beam": 3.5, "gun_height": 2.5, "gun_row": 5.0},
+    {"key": "Juggernaut", "name_id": 417586, "size_id": 4089, "turning_id": 8096, "cannons": 24, "icon": 29289, "hull": "lrg", "health": 150, "hold_capacity": 8, "max_speed": 17.0, "turbo_speed": 25.0, "max_turn": 40.0, "gun_beam": 4.5, "gun_height": 3.0, "gun_row": 7.0}
   ],
   "decals": [
     {"alias": "skullx01", "icon": 4859, "hud_icon": 6033},
