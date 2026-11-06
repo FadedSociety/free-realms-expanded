@@ -2,7 +2,7 @@
   "schema_version": 1,
   "source": "(R) Spawns from npc_spawns_extra.json; Stations.json gives each the games 20 and 21. Labels 103183 and 103185 read like the table's own lines.",
   "name": "Checkers & Chess",
-  "lobby": [4, 3211],
+  "lobbies": [[5, 3210], [4, 3211]],
   "games": [
     [20, 103183],
     [21, 103185]

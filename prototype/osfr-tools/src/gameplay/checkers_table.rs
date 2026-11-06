@@ -18,9 +18,9 @@ struct BoardTables {
     name: String,
     /// Game id and the menu row's label.
     games: Vec<(u32, u32)>,
-    /// Lobby type and the menu row's label.
+    /// Each lobby type and the menu row's label.
     #[serde(default)]
-    lobby: Option<(u32, u32)>,
+    lobbies: Vec<(u32, u32)>,
     tables: Vec<BoardTable>,
 }
 
@@ -48,7 +48,7 @@ pub(super) fn board_table_menus(content: &Path) -> io::Result<TableMenus> {
         name: file.name.clone(),
         position: table.position,
         games: file.games.clone(),
-        lobby: file.lobby,
+        lobbies: file.lobbies.clone(),
     };
     Ok(file.tables.iter().map(|table| (table.npc, menu(table))).collect())
 }

@@ -6,13 +6,14 @@
 //! A countdown that ends opens the game: each seat gets its own offer and run, and the World owns
 //! the one table between them. As for a shared arena, a seat's message borrows the table for its
 //! own transaction and it comes back after the commit. Rewards settle per player on their own
-//! gateway, since each client ends its own run. (R) Chess is the only hosted game so far, and a
-//! seat that quits or goes forfeits. A table closes once every seat has settled or gone, whatever
+//! gateway, since each client ends its own run. (R) A seat that quits or goes forfeits. A table closes once every seat has settled or gone, whatever
 //! the room's seats say: a late `FRServer_GameOver` still needs it.
 use super::*;
 use osfr_tools::{
-    chess::{ChessMessage, ChessParticipant, ChessTable},
+    checkers_lobby::HostedGame,
+    chess::{ChessMessage, ChessParticipant},
     game_room::{Addressed, Seat},
+    hosted_table::HostedTable,
     lobby_wire::{self, Request},
 };
 
@@ -96,9 +97,9 @@ pub(super) fn open(session: &mut Session, world: &mut SharedWorld, lobby_type: u
 
 /// Before a seat's message: its game's table, on loan to the staged gateway.
 pub(super) fn lend(gateway: &mut Gateway, world: &SharedWorld) {
-    let table = gateway.hosted_chess_table().and_then(|id| world.chess_tables.get(&(id as u32)));
+    let table = gateway.hosted_table().and_then(|id| world.tables.get(&(id as u32)));
     if let Some(table) = table.cloned() {
-        gateway.lend_chess_table(table);
+        gateway.lend_table(table);
     }
 }
 
@@ -108,16 +109,16 @@ pub(super) fn publish(
     me: &Session,
     sessions: &mut SessionMap,
     world: &mut SharedWorld,
-    returned: Option<(ChessTable, Vec<ChessMessage>)>,
+    returned: Option<(HostedTable, Vec<ChessMessage>)>,
     now_ms: u64,
 ) {
     let Some((mut table, mut relay)) = returned else {
         return;
     };
     let guid = me.character_guid;
-    if me.gateway.hosted_chess_table().is_none() {
+    if me.gateway.hosted_table().is_none() {
         match table.forfeit(guid) {
-            Ok(out) => relay.extend(out.messages.into_iter().filter(|m| m.player_id != guid)),
+            Ok(messages) => relay.extend(messages.into_iter().filter(|m| m.player_id != guid)),
             Err(error) => event(json!({"event": "lobby_refused", "reason": error.to_string()})),
         }
         table.release(guid);
@@ -130,9 +131,9 @@ pub(super) fn publish(
         }
     }
     settle_draw(&mut table, sessions, world, now_ms);
-    let id = table.id() as u32;
+    let id = table.id();
     if table.all_settled() {
-        world.chess_tables.remove(&id);
+        world.tables.remove(&id);
         world.rooms.close(id);
         return;
     }
@@ -141,27 +142,30 @@ pub(super) fn publish(
             event(json!({"event": "lobby_refused", "reason": error.to_string()}));
         }
     }
-    world.chess_tables.insert(id, table);
+    world.tables.insert(id, table);
 }
 
 /// A draw ends without the movie's `FRServer_GameOver`, so the seat that did not end it settles
 /// from here, on its own gateway. (R) It pays nothing, so there is no reward to commit.
 fn settle_draw(
-    table: &mut ChessTable,
+    table: &mut HostedTable,
     sessions: &mut SessionMap,
     world: &mut SharedWorld,
     now_ms: u64,
 ) {
-    if table.result().is_none_or(|result| result.winner.is_some()) {
+    let HostedTable::Chess(chess) = &*table else {
+        return;
+    };
+    if chess.result().is_none_or(|result| result.winner.is_some()) {
         return;
     }
-    for guid in table.unsettled() {
+    for guid in chess.unsettled() {
         let Some(seat) = encounter_invites::session_of(world, sessions, guid) else {
             continue;
         };
-        seat.gateway.lend_chess_table(table.clone());
+        seat.gateway.lend_table(table.clone());
         let settled = seat.gateway.settle_hosted_chess(now_ms);
-        if let Some((back, _)) = seat.gateway.reclaim_chess_table() {
+        if let Some((back, _)) = seat.gateway.reclaim_table() {
             *table = back;
         }
         let replies = settled.unwrap_or_else(|error| {
@@ -197,7 +201,7 @@ pub(super) fn tick(server: &mut Server, now_ms: u64) {
 
 fn ready(server: &Server, guid: u64) -> bool {
     let session = group_arena::key_of(server, guid).and_then(|key| server.sessions.get(&key));
-    session.is_some_and(|session| session.gateway.can_host_chess())
+    session.is_some_and(|session| session.gateway.can_host())
 }
 
 fn tell(server: &mut Server, packets: Vec<Addressed>) {
@@ -215,6 +219,7 @@ fn tell(server: &mut Server, packets: Vec<Addressed>) {
 fn open_game(server: &mut Server, id: u32, now_ms: u64) -> io::Result<()> {
     let room = server.world.rooms.room(id);
     let seats: Vec<u64> = room.map(|room| room.members().collect()).unwrap_or_default();
+    let lobby_type = room.map_or(0, |room| room.lobby_type);
     let mut taken = Vec::new();
     for guid in seats {
         let Some(key) = group_arena::key_of(server, guid) else {
@@ -223,7 +228,7 @@ fn open_game(server: &mut Server, id: u32, now_ms: u64) -> io::Result<()> {
         let Some(session) = server.sessions.get_mut(&key) else {
             continue;
         };
-        let (replies, instance) = session.gateway.begin_hosted_chess(u64::from(id), now_ms)?;
+        let (replies, instance) = session.gateway.begin_hosted(lobby_type, u64::from(id), now_ms)?;
         for reply in replies {
             if let Err(error) = session.queue_shared_message(&wrap_application(&reply)) {
                 event(json!({"event": "lobby_send_refused", "reason": error.to_string()}));
@@ -237,8 +242,13 @@ fn open_game(server: &mut Server, id: u32, now_ms: u64) -> io::Result<()> {
         return Err(io::Error::other("a lobby game needs both seats"));
     };
     let session = server.sessions.get_mut(host).ok_or_else(|| io::Error::other("host left"))?;
-    let table = session.gateway.open_hosted_chess(u64::from(id), *white, *black)?;
-    server.world.chess_tables.insert(id, table);
+    let table = if lobby_type == osfr_tools::hosted_table::CHECKERS_LOBBY {
+        let seat = |seat: &ChessParticipant| (seat.player_id, seat.instance_id);
+        HostedTable::Checkers(HostedGame::new(id, seat(white), seat(black)))
+    } else {
+        HostedTable::Chess(session.gateway.open_hosted_chess(u64::from(id), *white, *black)?)
+    };
+    server.world.tables.insert(id, table);
     Ok(())
 }
 
@@ -248,9 +258,9 @@ impl SharedWorld {
     pub(super) fn leave_rooms(&mut self, guid: u64) -> Vec<Delivery> {
         let mut told = Vec::new();
         let mut finished = Vec::new();
-        for (id, table) in self.chess_tables.iter_mut().filter(|(_, table)| table.seated(guid)) {
+        for (id, table) in self.tables.iter_mut().filter(|(_, table)| table.seated(guid)) {
             match table.forfeit(guid) {
-                Ok(out) => told.extend((out.messages.into_iter())
+                Ok(messages) => told.extend((messages.into_iter())
                     .filter(|message| message.player_id != guid)
                     .map(|message| Addressed { to: message.player_id, bytes: message.packet })),
                 Err(error) => event(json!({"event": "lobby_refused", "reason": error.to_string()})),
@@ -261,7 +271,7 @@ impl SharedWorld {
             }
         }
         for id in finished {
-            self.chess_tables.remove(&id);
+            self.tables.remove(&id);
             self.rooms.close(id);
         }
         match self.rooms.leave(guid) {

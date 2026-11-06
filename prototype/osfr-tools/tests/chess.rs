@@ -1182,6 +1182,14 @@ fn a_hosted_game_shares_one_table_between_two_services() {
     for sub in [16, 17] {
         assert!(started.replies.iter().any(|reply| reply.starts_with(&[39, 0, sub])), "39/{sub}");
     }
+    // `+615` stays on, or the client runs a micro game with no backdrop; `+621` hides the window.
+    let offer = started.replies.iter().find(|reply| reply.starts_with(&[39, 0, 16])).unwrap();
+    let tail = offer.len() - 12;
+    assert_eq!(offer[tail], 0, "+618");
+    assert_eq!(offer[tail + 3], 1, "+621");
+    let name = chess::PRELOAD_FILE.as_bytes();
+    let at = offer.windows(name.len()).position(|bytes| bytes == name).unwrap();
+    assert_eq!(offer[at - 9..at - 4], [1; 5], "+612 to +616");
     let (_, black_run) = black.begin_hosted(202, ROOM, 0).unwrap();
     assert_eq!(white_run, black_run, "each service counts its own runs");
     assert!(matches!(white.begin_hosted(101, ROOM, 0), Err(chess_service::EntryDenied::Busy)));

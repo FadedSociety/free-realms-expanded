@@ -249,7 +249,7 @@ impl TdContent {
                 name: table.name.clone(),
                 position: table.position,
                 games,
-                lobby: None,
+                lobbies: Vec::new(),
             };
             if menus.insert(table.npc, menu).is_some() {
                 return Err(invalid("duplicate tower defense table"));

@@ -22,6 +22,8 @@
 //! `VS_AI`, so the client waits for the server's moves instead of choosing them; a side with no
 //! legal move at its turn loses.
 use crate::{
+    checkers_lobby::{HOSTED_ROW, HostedGame},
+    chess::ChessMessage,
     minigame::{
         Activity, ActivityFinish, Goal, MinigameRuns, RunMode, RunOutcome, RunSpec, RunState,
     },
@@ -368,6 +370,11 @@ pub struct CheckersTable {
     won: Option<bool>,
     rng: Rng,
     started_ms: u64,
+    /// A lobby game's table id; the board is then the World's.
+    hosted: Option<u64>,
+    /// That board, on loan for one message, and what the other seat is owed.
+    lent: Option<HostedGame>,
+    relay: Vec<ChessMessage>,
 }
 
 struct Finish {
@@ -396,6 +403,9 @@ impl CheckersTable {
             won: None,
             rng,
             started_ms: 0,
+            hosted: None,
+            lent: None,
+            relay: Vec::new(),
         })
     }
 
@@ -408,13 +418,9 @@ impl CheckersTable {
         self.runs.current_instance_id().is_some()
     }
 
-    /// Offer the table (39/16); `None` while a run is already open.
-    pub fn begin(&mut self) -> io::Result<Option<TableOutcome>> {
-        if self.is_active() {
-            return Ok(None);
-        }
+    fn run_spec(game_id: i32) -> RunSpec {
         let mut spec = RunSpec::empty(
-            GAME_ID,
+            game_id,
             GAME_TYPE,
             RunMode::Flash {
                 movie: MOVIE.into(),
@@ -425,6 +431,58 @@ impl CheckersTable {
         spec.icon_id = ICON_ID;
         spec.preload_file = PRELOAD_FILE.into();
         spec.objectives = goals();
+        spec
+    }
+
+    /// Start a lobby game's run, as `ChessService::begin_hosted`: the countdown was the Go, so the
+    /// offer hides its window and the start follows at once. `None` while a run is open.
+    pub fn begin_hosted(
+        &mut self,
+        table_id: u64,
+        now_ms: u64,
+    ) -> io::Result<Option<(TableOutcome, i32)>> {
+        if self.is_active() {
+            return Ok(None);
+        }
+        let mut spec = Self::run_spec(HOSTED_ROW);
+        spec.hidden_offer = true;
+        let mut staged = self.clone();
+        let offered = staged.runs.offer(spec)?;
+        let Some(instance) = staged.runs.current_instance_id().filter(|_| offered.accepted) else {
+            return Ok(None);
+        };
+        let started = staged.runs.start(instance)?;
+        staged.runs.started(instance);
+        staged.started_ms = now_ms;
+        staged.hosted = Some(table_id);
+        *self = staged;
+        let mut out = TableOutcome::from_run(offered);
+        out.replies.extend(started.replies);
+        Ok(Some((out, instance)))
+    }
+
+    /// The lobby game this run belongs to.
+    pub fn hosted_table(&self) -> Option<u64> {
+        self.hosted
+    }
+
+    /// Lend the World's board for one message.
+    pub fn lend(&mut self, game: HostedGame) {
+        self.lent = Some(game);
+    }
+
+    /// The lent board back, with what the other seat is owed.
+    pub fn reclaim(&mut self) -> Option<(HostedGame, Vec<ChessMessage>)> {
+        let game = self.lent.take()?;
+        Some((game, std::mem::take(&mut self.relay)))
+    }
+
+    /// Offer the table (39/16); `None` while a run is already open.
+    pub fn begin(&mut self) -> io::Result<Option<TableOutcome>> {
+        if self.is_active() {
+            return Ok(None);
+        }
+        let spec = Self::run_spec(GAME_ID);
         let mut staged = self.clone();
         let offered = staged.runs.offer(spec)?;
         if !offered.accepted {
@@ -466,6 +524,7 @@ impl CheckersTable {
             }
             if staged.runs.current_instance_id().is_none() {
                 staged.board = None;
+                staged.hosted = None;
             }
             out
         } else {
@@ -488,9 +547,10 @@ impl CheckersTable {
         if self.runs.state(instance) != Some(RunState::Playing) {
             return Ok(out);
         }
-        let text = read_payload(instance, packet)?;
+        let game = if self.hosted.is_some() { HOSTED_ROW } else { GAME_ID };
+        let text = read_payload(instance, game, packet)?;
         let say = |out: &mut TableOutcome, text: &str| -> io::Result<()> {
-            out.replies.push(payload_packet(instance, text)?);
+            out.replies.push(payload_packet(instance, game, text)?);
             Ok(())
         };
         if text == "OnConnectMsg" {
@@ -498,6 +558,8 @@ impl CheckersTable {
         } else if text.starts_with("OnStartGameMsg") {
             say(&mut out, "OnStartGameMsg")?;
             say(&mut out, &message(BOARD, &[1]))?;
+        } else if self.hosted.is_some() {
+            return self.hosted_movie(instance, &text, now_ms, payer);
         } else if text == "FRServer_GameOver" {
             // The client's acknowledgement settles the decided game, as for chess.
             let Some(won) = self.won.take() else {
@@ -568,13 +630,55 @@ impl CheckersTable {
     }
 }
 
+impl CheckersTable {
+    /// One movie message of a lobby game. A board that is not here has closed: the movie's text has
+    /// nothing to reach.
+    fn hosted_movie(
+        &mut self,
+        instance: i32,
+        text: &str,
+        now_ms: u64,
+        payer: Option<(u64, &RewardState)>,
+    ) -> io::Result<TableOutcome> {
+        let mut out = TableOutcome::default();
+        let (Some((player, rewards)), Some(game)) = (payer, self.lent.as_mut()) else {
+            return Ok(out);
+        };
+        if text == "FRServer_GameOver" {
+            let Some(won) = game.won(player).filter(|_| !game.is_settled(player)) else {
+                return Ok(out);
+            };
+            game.release(player);
+            let elapsed = now_ms.saturating_sub(self.started_ms) / 1000;
+            let finish = Finish {
+                won,
+                elapsed_seconds: u32::try_from(elapsed).unwrap_or(u32::MAX),
+            };
+            let grant = win_grant(player);
+            let settlement = won.then_some((rewards, &grant));
+            return Ok(TableOutcome::from_run(self.runs.finish(instance, &finish, settlement)?));
+        }
+        let messages = match parse(text) {
+            Some(Request::Ready) => game.ready(player)?,
+            Some(Request::Move { start, path }) => game.play(player, start, &path)?,
+            _ => return Ok(out),
+        };
+        let (mine, theirs) = (messages.into_iter())
+            .partition::<Vec<_>, _>(|message| message.player_id == player);
+        self.relay.extend(theirs);
+        out.replies = mine.into_iter().map(|message| message.packet).collect();
+        out.accepted = true;
+        Ok(out)
+    }
+}
+
 /// 39/14: instance, the -1 group, the checkers game id, then the NUL-terminated text.
-fn payload_packet(instance: i32, text: &str) -> io::Result<Vec<u8>> {
+pub(crate) fn payload_packet(instance: i32, game: i32, text: &str) -> io::Result<Vec<u8>> {
     if text.len() > MAX_TEXT || text.contains('\0') {
         return Err(invalid("checkers payload text"));
     }
     let mut packet = vec![39, 0, 14];
-    for value in [instance, -1, GAME_ID] {
+    for value in [instance, -1, game] {
         packet.extend(value.to_le_bytes());
     }
     packet.extend(((text.len() + 1) as i32).to_le_bytes());
@@ -583,11 +687,11 @@ fn payload_packet(instance: i32, text: &str) -> io::Result<Vec<u8>> {
     Ok(packet)
 }
 
-fn read_payload(instance: i32, packet: &[u8]) -> io::Result<String> {
+fn read_payload(instance: i32, game: i32, packet: &[u8]) -> io::Result<String> {
     let at = |offset: usize| crate::le::i32(packet, offset);
     let length = at(15).and_then(|n| usize::try_from(n).ok()).unwrap_or(0);
     if at(3) != Some(instance)
-        || !matches!(at(11), Some(-1 | GAME_ID))
+        || at(11).is_none_or(|id| id != -1 && id != game)
         || length == 0
         || length > MAX_TEXT + 1
         || packet.len() != 19 + length
@@ -739,7 +843,7 @@ mod tests {
         let say = |table: &mut CheckersTable, text: &str| {
             texts(
                 &table
-                    .route(&payload_packet(instance, text).unwrap(), 1_100)
+                    .route(&payload_packet(instance, GAME_ID, text).unwrap(), 1_100)
                     .unwrap()
                     .unwrap(),
             )
@@ -761,7 +865,7 @@ mod tests {
         let (mut table, instance) = opened(5);
         let before = table.board.clone();
         let refused = table.route(
-            &payload_packet(instance, "OnMoveMsg\t21\t13").unwrap(),
+            &payload_packet(instance, GAME_ID, "OnMoveMsg\t21\t13").unwrap(),
             2_000,
         );
         let refused = refused.unwrap().unwrap();
@@ -770,7 +874,7 @@ mod tests {
         let answer = ["OnCheckersEventMsg	20	0", "OnCheckersEventMsg	1	0"];
         assert_eq!(texts(&refused), answer, "the turn comes back");
         let out = table.route(
-            &payload_packet(instance, "OnMoveMsg\t21\t17").unwrap(),
+            &payload_packet(instance, GAME_ID, "OnMoveMsg\t21\t17").unwrap(),
             2_100,
         );
         let said = texts(&out.unwrap().unwrap());
@@ -810,7 +914,7 @@ mod tests {
         });
         table.board = Some(board);
         let out = table.route(
-            &payload_packet(instance, "OnMoveMsg\t21\t14").unwrap(),
+            &payload_packet(instance, GAME_ID, "OnMoveMsg\t21\t14").unwrap(),
             3_000,
         );
         assert_eq!(
@@ -818,14 +922,14 @@ mod tests {
             "OnGameWonMsg"
         );
         let late = table.route(
-            &payload_packet(instance, "OnMoveMsg\t14\t10").unwrap(),
+            &payload_packet(instance, GAME_ID, "OnMoveMsg\t14\t10").unwrap(),
             3_100,
         );
         assert!(
             !late.unwrap().unwrap().changed,
             "no move after the game is decided"
         );
-        let over = payload_packet(instance, "FRServer_GameOver").unwrap();
+        let over = payload_packet(instance, GAME_ID, "FRServer_GameOver").unwrap();
         let settled = table.route(&over, 9_000).unwrap().unwrap();
         let result = (settled.replies.iter())
             .find(|p| p.starts_with(&[39, 0, 18]))
@@ -837,10 +941,11 @@ mod tests {
 
     #[test]
     fn a_cut_payload_is_refused_not_a_panic() {
-        let packet = payload_packet(7, "OnReadyMsg").unwrap();
-        assert_eq!(read_payload(7, &packet).unwrap(), "OnReadyMsg");
+        let packet = payload_packet(7, GAME_ID, "OnReadyMsg").unwrap();
+        assert_eq!(read_payload(7, GAME_ID, &packet).unwrap(), "OnReadyMsg");
+        assert!(read_payload(7, HOSTED_ROW, &packet).is_err(), "another game's message");
         for end in 0..packet.len() {
-            assert!(read_payload(7, &packet[..end]).is_err(), "cut at {end}");
+            assert!(read_payload(7, GAME_ID, &packet[..end]).is_err(), "cut at {end}");
         }
     }
 
@@ -899,7 +1004,7 @@ mod tests {
         for (won, coins) in [(true, WIN_COINS), (false, 0)] {
             let (mut table, instance) = opened(9);
             table.won = Some(won);
-            let over = payload_packet(instance, "FRServer_GameOver").unwrap();
+            let over = payload_packet(instance, GAME_ID, "FRServer_GameOver").unwrap();
             let out = table
                 .route_with(&over, 9_000, Some((player, &state)))
                 .unwrap()
@@ -910,5 +1015,102 @@ mod tests {
             assert_eq!(paid, coins, "won {won}");
             assert_eq!(out.reward_packets.is_empty(), !won);
         }
+    }
+
+    const ALPHA: u64 = 7;
+    const BETA: u64 = 8;
+
+    /// One seat of a lobby game: its table and run.
+    fn seat(seed: u64) -> (CheckersTable, i32) {
+        let mut table = CheckersTable::new(Rng::seeded(seed)).unwrap();
+        let (started, instance) = table.begin_hosted(5, 1_000).unwrap().unwrap();
+        for sub in [16, 17] {
+            assert!(started.replies.iter().any(|reply| reply.starts_with(&[39, 0, sub])), "39/{sub}");
+        }
+        assert!(table.begin_hosted(5, 1_000).unwrap().is_none(), "one run at a time");
+        (table, instance)
+    }
+
+    /// One message on a seat's table, the board lent and returned as the World does it.
+    fn say(
+        (table, instance): &mut (CheckersTable, i32),
+        game: &mut HostedGame,
+        player: u64,
+        text: &str,
+        rewards: &RewardState,
+    ) -> (TableOutcome, Vec<ChessMessage>) {
+        table.lend(game.clone());
+        let packet = payload_packet(*instance, HOSTED_ROW, text).unwrap();
+        let out = table.route_with(&packet, 9_000, Some((player, rewards))).unwrap().unwrap();
+        let (back, relay) = table.reclaim().unwrap();
+        *game = back;
+        (out, relay)
+    }
+
+    /// The last capture ends it for both: each seat's own `FRServer_GameOver` settles it once, the
+    /// winner paid and the loser not, and only then is the table done with.
+    #[test]
+    fn taking_the_last_piece_settles_both_seats_once() {
+        let state = rewards(ALPHA);
+        let (mut alpha, mut beta) = (seat(1), seat(2));
+        let mut game = HostedGame::new(5, (ALPHA, alpha.1), (BETA, beta.1));
+        say(&mut alpha, &mut game, ALPHA, "OnReadyMsg", &state);
+        say(&mut beta, &mut game, BETA, "OnReadyMsg", &state);
+        let mut board = Board { squares: [None; SQUARES] };
+        board.squares[21] = Some(Piece { owner: 0, king: false });
+        board.squares[17] = Some(Piece { owner: 1, king: false });
+        game.set_board(board);
+
+        let (moved, relay) = say(&mut alpha, &mut game, ALPHA, "OnMoveMsg\t21\t14", &state);
+        assert_eq!(texts(&moved).last().unwrap(), "OnGameWonMsg");
+        assert_eq!(relay.last().unwrap().text, "OnGameLostMsg");
+
+        let (won, _) = say(&mut alpha, &mut game, ALPHA, "FRServer_GameOver", &state);
+        assert_eq!(won.reward_state.map(|next| next.inventory.state().coins), Some(WIN_COINS));
+        assert!(!game.all_settled(), "the loser is still to finish");
+        let (lost, _) = say(&mut beta, &mut game, BETA, "FRServer_GameOver", &state);
+        assert!(lost.reward_state.is_none() && lost.changed, "a loss settles and pays nothing");
+        assert!(game.all_settled());
+    }
+
+    /// Two tables, one board: each hears its own side, a move reaches the other seat, a seat that
+    /// quits forfeits, and the winner's own `FRServer_GameOver` pays once.
+    #[test]
+    fn two_tables_share_one_board_and_a_quit_pays_the_other_seat_once() {
+        let state = rewards(ALPHA);
+        let (mut alpha, mut beta) = (seat(1), seat(2));
+        let mut game = HostedGame::new(5, (ALPHA, alpha.1), (BETA, beta.1));
+
+        let connected = say(&mut alpha, &mut game, ALPHA, "OnConnectMsg", &state).0;
+        assert_eq!(texts(&connected), ["OnServerReadyMsg"]);
+        let (ready, _) = say(&mut alpha, &mut game, ALPHA, "OnReadyMsg", &state);
+        assert_eq!(texts(&ready), ["OnCheckersEventMsg\t0\t0\t1", "OnCheckersEventMsg\t41"]);
+        let (ready, relay) = say(&mut beta, &mut game, BETA, "OnReadyMsg", &state);
+        assert_eq!(texts(&ready)[0], "OnCheckersEventMsg\t0\t1\t1", "the second seat is red");
+        assert_eq!(relay.len(), 1, "Alpha hears the first turn");
+
+        let (moved, relay) = say(&mut alpha, &mut game, ALPHA, "OnMoveMsg\t21\t17", &state);
+        assert!(moved.accepted);
+        assert!(!relay.is_empty() && relay.iter().all(|message| message.player_id == BETA));
+
+        // Beta quits: the run ends here, the World sees no hosted table left and forfeits the seat.
+        let mut quit = vec![39, 0, 6];
+        for value in [beta.1, -1, -1] {
+            quit.extend(value.to_le_bytes());
+        }
+        beta.0.lend(game.clone());
+        beta.0.route_with(&quit, 9_000, Some((BETA, &state))).unwrap().unwrap();
+        assert_eq!(beta.0.hosted_table(), None, "a quit run leaves its table");
+        game = beta.0.reclaim().unwrap().0;
+        let told = game.forfeit(BETA).unwrap();
+        game.release(BETA);
+        assert_eq!(told.iter().map(|m| m.player_id).collect::<Vec<_>>(), [ALPHA]);
+
+        let (over, _) = say(&mut alpha, &mut game, ALPHA, "FRServer_GameOver", &state);
+        let paid = over.reward_state.map(|next| next.inventory.state().coins);
+        assert_eq!(paid, Some(WIN_COINS));
+        assert!(game.all_settled());
+        let (again, _) = say(&mut alpha, &mut game, ALPHA, "FRServer_GameOver", &state);
+        assert!(again.reward_state.is_none(), "a second GameOver pays nothing");
     }
 }

@@ -3,23 +3,29 @@
 
 use super::Gateway;
 use crate::chess::{ChessMessage, ChessParticipant, ChessTable};
+use crate::hosted_table::HostedTable;
 use crate::encounter::{EncounterPhase, FieldParticipant, SharedArena};
 use crate::gameplay::Outcome;
 use std::io;
 
 impl Gateway {
     /// A lobby game's offer for this player: the replies, and the run's instance if they took it.
-    pub fn begin_hosted_chess(&mut self, table_id: u64, now_ms: u64) -> io::Result<(Vec<Vec<u8>>, Option<i32>)> {
+    pub fn begin_hosted(
+        &mut self,
+        lobby_type: u32,
+        table_id: u64,
+        now_ms: u64,
+    ) -> io::Result<(Vec<Vec<u8>>, Option<i32>)> {
         let guid = self.state.guid;
         let Some(game) = self.gameplay.as_mut() else {
             return Ok((Vec::new(), None));
         };
-        let (out, instance) = game.begin_hosted_chess(guid, table_id, now_ms)?;
+        let (out, instance) = game.begin_hosted(lobby_type, guid, table_id, now_ms)?;
         Ok((out.replies, instance))
     }
 
-    pub fn can_host_chess(&self) -> bool {
-        self.gameplay.as_ref().is_some_and(|game| game.can_host_chess())
+    pub fn can_host(&self) -> bool {
+        self.gameplay.as_ref().is_some_and(|game| game.can_host())
     }
 
     /// The other seat of a drawn lobby game, with the table lent: the replies.
@@ -42,18 +48,18 @@ impl Gateway {
         game.open_hosted_chess(table_id, white, black)
     }
 
-    pub fn hosted_chess_table(&self) -> Option<u64> {
-        self.gameplay.as_ref()?.hosted_chess_table()
+    pub fn hosted_table(&self) -> Option<u64> {
+        self.gameplay.as_ref()?.hosted_table()
     }
 
-    pub fn lend_chess_table(&mut self, table: ChessTable) {
+    pub fn lend_table(&mut self, table: HostedTable) {
         if let Some(game) = self.gameplay.as_mut() {
-            game.lend_chess_table(table);
+            game.lend_table(table);
         }
     }
 
-    pub fn reclaim_chess_table(&mut self) -> Option<(ChessTable, Vec<ChessMessage>)> {
-        self.gameplay.as_mut()?.reclaim_chess_table()
+    pub fn reclaim_table(&mut self) -> Option<(HostedTable, Vec<ChessMessage>)> {
+        self.gameplay.as_mut()?.reclaim_table()
     }
 
     /// Copy this player's live battle run into a new shared arena.

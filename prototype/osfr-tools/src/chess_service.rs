@@ -443,7 +443,7 @@ impl ChessService {
         let row = self.content.hosted_row.clone().ok_or(EntryDenied::Unknown)?;
         let mut staged = self.clone();
         let mut spec = run_spec(&row, &self.content.goals);
-        spec.flags[3] = 0; // `+615`: `009beb70` shows the window only when it is set.
+        spec.hidden_offer = true;
         let mut offered = staged.runs.offer(spec).map_err(|_| EntryDenied::Unavailable)?;
         if !offered.accepted {
             return Err(EntryDenied::Busy);

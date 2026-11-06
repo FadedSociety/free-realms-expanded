@@ -209,8 +209,8 @@ pub struct TableMenu {
     pub position: [f32; 3],
     /// A game id and its name id per row.
     pub games: Vec<(u32, u32)>,
-    /// A lobby type and its row's name id, for a table that has a game list.
-    pub lobby: Option<(u32, u32)>,
+    /// Each lobby type and its row's name id, for a table that has game lists.
+    pub lobbies: Vec<(u32, u32)>,
 }
 
 /// The Tower Defense tables by NPC content key.
@@ -1142,7 +1142,7 @@ impl NpcInteraction {
             // (R) A table has nobody to talk to, as for Tower Defense's.
             options.retain(|(action, _)| !matches!(action, NpcAction::Talk));
             options.extend(table.games.iter().map(|&(game, name)| (NpcAction::BoardGame { game }, name)));
-            options.extend(table.lobby.map(|(lobby_type, name)| (NpcAction::Lobby { lobby_type }, name)));
+            options.extend(table.lobbies.iter().map(|&(lobby_type, name)| (NpcAction::Lobby { lobby_type }, name)));
         }
         for trainer in self
             .content

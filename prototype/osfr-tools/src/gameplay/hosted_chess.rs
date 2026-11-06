@@ -1,17 +1,28 @@
-//! A lobby game of chess, as one player's `Gameplay` sees it: the offer, and the World's table lent
-//! around one message. The rules are `crate::chess`; `bin/osfr_gateway/room_routing.rs` owns the table.
+//! A lobby game, as one player's `Gameplay` sees it: the offer, and the World's table lent around
+//! one message. The rules are `crate::chess` and `crate::checkers_lobby`;
+//! `bin/osfr_gateway/room_routing.rs` owns the table.
 use super::*;
 use crate::chess::{ChessMessage, ChessParticipant, ChessTable};
+use crate::hosted_table::{CHECKERS_LOBBY, HostedTable};
 
 impl Gameplay {
     /// The lobby game's offer for this player; `None` when they cannot take it, with a line why.
-    pub(crate) fn begin_hosted_chess(
+    pub(crate) fn begin_hosted(
         &mut self,
+        lobby_type: u32,
         player_id: u64,
         table_id: u64,
         now_ms: u64,
     ) -> io::Result<(Outcome, Option<i32>)> {
         let mut out = Outcome::default();
+        if lobby_type == CHECKERS_LOBBY {
+            let Some((table, instance)) = self.checkers.begin_hosted(table_id, now_ms)? else {
+                return Ok((out, None));
+            };
+            out.changed = table.changed;
+            out.replies = table.replies;
+            return Ok((out, Some(instance)));
+        }
         let Some(chess) = self.chess.as_mut() else {
             return Ok((out, None));
         };
@@ -28,7 +39,7 @@ impl Gameplay {
     }
 
     /// Free to sit down when a countdown ends.
-    pub(crate) fn can_host_chess(&self) -> bool {
+    pub(crate) fn can_host(&self) -> bool {
         self.chess.is_some() && self.warp_blocker().is_none()
     }
 
@@ -57,17 +68,26 @@ impl Gameplay {
         chess.open_hosted(table_id, white, black)
     }
 
-    pub(crate) fn hosted_chess_table(&self) -> Option<u64> {
-        self.chess.as_ref()?.hosted_table()
+    pub(crate) fn hosted_table(&self) -> Option<u64> {
+        let chess = self.chess.as_ref().and_then(ChessService::hosted_table);
+        chess.or(self.checkers.hosted_table())
     }
 
-    pub(crate) fn lend_chess_table(&mut self, table: ChessTable) {
-        if let Some(chess) = self.chess.as_mut() {
-            chess.lend(table);
+    pub(crate) fn lend_table(&mut self, table: HostedTable) {
+        match table {
+            HostedTable::Chess(table) => {
+                if let Some(chess) = self.chess.as_mut() {
+                    chess.lend(table);
+                }
+            }
+            HostedTable::Checkers(game) => self.checkers.lend(game),
         }
     }
 
-    pub(crate) fn reclaim_chess_table(&mut self) -> Option<(ChessTable, Vec<ChessMessage>)> {
-        self.chess.as_mut()?.reclaim()
+    pub(crate) fn reclaim_table(&mut self) -> Option<(HostedTable, Vec<ChessMessage>)> {
+        let chess = self.chess.as_mut().and_then(ChessService::reclaim);
+        let chess = chess.map(|(table, relay)| (HostedTable::Chess(table), relay));
+        let checkers = self.checkers.reclaim();
+        chess.or(checkers.map(|(game, relay)| (HostedTable::Checkers(game), relay)))
     }
 }

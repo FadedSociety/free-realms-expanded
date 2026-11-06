@@ -140,6 +140,11 @@ pub struct RunSpec {
     pub flags: [u8; 5],
     pub preload_file: String,
     pub mode: RunMode,
+    /// `+621`: the offer draws no window, as a lobby's countdown stands for it. `flags[3]` is not
+    /// the way: the client copies it to the state's `+2311`, and without it the game is a micro
+    /// game, with no backdrop and no help button (`StartFlashMiniGameUi` `009bd650`).
+    #[serde(default)]
+    pub hidden_offer: bool,
 }
 
 impl RunSpec {
@@ -159,6 +164,7 @@ impl RunSpec {
             objectives: Vec::new(),
             flags: [1; 5],
             preload_file: String::new(),
+            hidden_offer: false,
             mode,
         }
     }
@@ -871,7 +877,7 @@ fn info_packet(instance_id: i32, spec: &RunSpec) -> io::Result<Vec<u8>> {
     bytes.extend(1_i32.to_le_bytes());
     bytes.push(1);
     bytes.extend(spec.game_id.to_le_bytes());
-    bytes.extend([0; 4]);
+    bytes.extend([0, 0, 0, u8::from(spec.hidden_offer)]);
     bytes.extend(0_i32.to_le_bytes());
     bytes.extend(0_i32.to_le_bytes());
     Ok(bytes)

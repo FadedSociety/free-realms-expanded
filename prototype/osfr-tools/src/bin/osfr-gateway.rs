@@ -567,7 +567,7 @@ struct SharedWorld {
     /// The game lobby's rooms. Session-only: a restart ends every open game.
     rooms: osfr_tools::game_room::Rooms,
     /// Each running lobby game's table, by room id.
-    chess_tables: BTreeMap<u32, osfr_tools::chess::ChessTable>,
+    tables: BTreeMap<u32, osfr_tools::hosted_table::HostedTable>,
     /// T461: the boxes pressed from the item bar; session-only.
     boomboxes: osfr_tools::boombox::Boomboxes,
     /// T557: the placed cakes; session-only.
@@ -655,7 +655,7 @@ impl SharedWorld {
             security: Arc::default(),
             world_events: Default::default(),
             rooms: Default::default(),
-            chess_tables: BTreeMap::new(),
+            tables: BTreeMap::new(),
             boomboxes: Default::default(),
             cakes: Default::default(),
             portraits: None,
@@ -1709,7 +1709,7 @@ impl Session {
             }
         };
         held.leave(&mut staged_gateway, &outcome, combat);
-        let chess_table = staged_gateway.reclaim_chess_table();
+        let chess_table = staged_gateway.reclaim_table();
         house_visits::settle(&mut staged_gateway);
         if let Some(trace) = &self.trace {
             for detail in &outcome.trace {

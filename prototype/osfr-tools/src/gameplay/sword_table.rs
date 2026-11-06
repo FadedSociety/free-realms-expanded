@@ -28,7 +28,7 @@ pub(super) fn dummy_menus(sword: &Option<Box<SwordGame>>) -> TableMenus {
         name: DUMMY_NAME.to_owned(),
         position,
         games: vec![(game, label)],
-        lobby: None,
+        lobbies: Vec::new(),
     };
     (dummies.iter())
         .map(|dummy| (dummy.npc, menu(dummy.position)))
