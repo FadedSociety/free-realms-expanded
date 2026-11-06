@@ -658,7 +658,7 @@ impl Catalogue {
                         Gather::Mining => {
                             viewer.crafts[CraftingJob::Miner as usize] >= a.required_level
                         }
-                        Gather::Harvesting => true,
+                        Gather::Harvesting | Gather::Artifact => true,
                     }
             }
             Kind::Kart

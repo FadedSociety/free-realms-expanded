@@ -85,7 +85,7 @@ use osfr_tools::{
     inventory::Inventory,
     item_bar::Effects,
     kart_gateway::KartGateway,
-    mail_sorting,
+    artifact_hunt, mail_sorting,
     mining::{self, Type8Engine},
     music_game,
     pets::PetContent,
@@ -286,6 +286,11 @@ impl Targets {
                 mail_sorting::CONTENT_FILE,
                 mail_sorting::GAME_ID,
                 mail_sorting::FIRST_INSTANCE_ID,
+            ),
+            (
+                artifact_hunt::CONTENT_FILE,
+                artifact_hunt::GAME_ID,
+                artifact_hunt::FIRST_INSTANCE_ID,
             ),
         ] {
             if !root.join(file).is_file() {

@@ -98,6 +98,10 @@ pub const MINING_PRELOAD_FILE: &str = "MiningAssets.txt";
 /// `.../Minigames/MatchThree/Mining/game_mining.swf`), launched through `26/12`.
 pub const MINING_LAUNCH_MOVIE: &str = "game_mining.gfx";
 
+fn default_difficulty() -> i32 {
+    1
+}
+
 fn default_preload_file() -> String {
     MINING_PRELOAD_FILE.to_string()
 }
@@ -254,6 +258,10 @@ struct Content {
     name_id: i32,
     description_id: i32,
     icon_id: i32,
+    /// Difficulty shown on the `39/16` offer (`MiniGameData.txt`). Defaults to the 1 every older
+    /// file has always sent.
+    #[serde(default = "default_difficulty")]
+    difficulty: i32,
     /// Preload asset-list name advertised in `39/16`. Defaults to the
     /// recovered mining list so existing `mining.json` files keep their bytes.
     #[serde(default = "default_preload_file")]
@@ -1041,7 +1049,14 @@ impl Type8Engine {
         let c = &self.content;
         let mut b = header(16, id, self.game_id);
         let job_type = osfr_tools::minigame::offer_job_type(c.profile_id);
-        for n in [c.name_id, c.icon_id, c.description_id, 1, job_type, 8] {
+        for n in [
+            c.name_id,
+            c.icon_id,
+            c.description_id,
+            c.difficulty,
+            job_type,
+            8,
+        ] {
             b.extend(n.to_le_bytes());
         }
         b.push(0);

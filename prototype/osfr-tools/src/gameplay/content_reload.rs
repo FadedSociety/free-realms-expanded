@@ -79,6 +79,7 @@ impl Gameplay {
                                 self.mining.as_ref(),
                                 self.harvesting.as_ref(),
                                 self.mail_sorting.as_ref(),
+                                self.artifact_hunt.as_ref(),
                             ],
                             self.fishing_spots.as_deref(),
                             self.music.as_ref(),

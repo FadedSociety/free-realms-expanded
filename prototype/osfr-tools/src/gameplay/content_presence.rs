@@ -193,6 +193,7 @@ pub(super) struct Dormant {
     pub mining: Option<Type8State>,
     pub harvesting: Option<Type8State>,
     pub mail_sorting: Option<Type8State>,
+    pub artifact_hunt: Option<Type8State>,
     pub housing: Option<HousingServiceState>,
 }
 
@@ -213,5 +214,6 @@ pub(super) fn restore_skipped(state: &mut GameplayState, dormant: &Dormant) {
     keep(&mut state.mining, &dormant.mining);
     keep(&mut state.harvesting, &dormant.harvesting);
     keep(&mut state.mail_sorting, &dormant.mail_sorting);
+    keep(&mut state.artifact_hunt, &dormant.artifact_hunt);
     keep(&mut state.housing, &dormant.housing);
 }

@@ -18,18 +18,20 @@ pub(super) enum Movie {
     Mining,
     Harvesting,
     Mail,
+    Artifact,
 }
 
 impl Movie {
     /// The order the five per-engine blocks were checked in. Only one movie
     /// runs at a time; a hand-made state with two keeps the earlier answer.
-    pub(super) const ALL: [Movie; 6] = [
+    pub(super) const ALL: [Movie; 7] = [
         Movie::Forging,
         Movie::Cooking,
         Movie::Smelting,
         Movie::Mining,
         Movie::Harvesting,
         Movie::Mail,
+        Movie::Artifact,
     ];
 
     /// The malformed 26/42 refusal, byte-identical to the five old blocks. Static
@@ -42,6 +44,7 @@ impl Movie {
             Movie::Mining => "invalid mining leave request",
             Movie::Harvesting => "invalid harvesting leave request",
             Movie::Mail => "invalid mail sorting leave request",
+            Movie::Artifact => "invalid artifact hunt leave request",
         }
     }
 
@@ -67,6 +70,9 @@ impl Movie {
             Movie::Mail => {
                 "Close the mail sorting game before changing jobs, equipment or interacting."
             }
+            Movie::Artifact => {
+                "Close the artifact hunt before changing jobs, equipment or interacting."
+            }
         }
     }
 
@@ -79,6 +85,7 @@ impl Movie {
             Movie::Mining => "Close the mining game before other opening actions.",
             Movie::Harvesting => "Close the harvesting game before other opening actions.",
             Movie::Mail => "Close the mail sorting game before other opening actions.",
+            Movie::Artifact => "Close the artifact hunt before other opening actions.",
         }
     }
 
@@ -89,6 +96,7 @@ impl Movie {
             Movie::Mining => Some(Gather::Mining),
             Movie::Harvesting => Some(Gather::Harvesting),
             Movie::Mail => Some(Gather::Mail),
+            Movie::Artifact => Some(Gather::Artifact),
             Movie::Forging | Movie::Cooking | Movie::Smelting => None,
         }
     }
@@ -102,6 +110,7 @@ impl Movie {
             Movie::Mining => Occupation::Mining,
             Movie::Harvesting => Occupation::Harvesting,
             Movie::Mail => Occupation::Mail,
+            Movie::Artifact => Occupation::Artifact,
         }
     }
 }
@@ -200,6 +209,11 @@ mod tests {
                     "Close the smelting game before changing jobs, equipment or interacting.",
                     "Close the smelting game before other opening actions.",
                     "invalid smelting leave request",
+                ),
+                Movie::Artifact => (
+                    "Close the artifact hunt before changing jobs, equipment or interacting.",
+                    "Close the artifact hunt before other opening actions.",
+                    "invalid artifact hunt leave request",
                 ),
                 Movie::Mining => (
                     "Close the mining game before changing jobs, equipment or interacting.",

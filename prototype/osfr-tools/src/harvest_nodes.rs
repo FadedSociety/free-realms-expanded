@@ -220,6 +220,7 @@ pub enum Gather {
     Mining,
     Harvesting,
     Mail,
+    Artifact,
 }
 
 impl Gather {
@@ -228,7 +229,14 @@ impl Gather {
             Self::Mining => MINER_PROFILE_ID,
             Self::Harvesting => CHEF_PROFILE_ID,
             Self::Mail => crate::mail_sorting::POSTMAN_PROFILE_ID,
+            Self::Artifact => crate::artifact_hunt::ADVENTURER_PROFILE_ID,
         }
+    }
+
+    /// Whether playing puts the player in the job. An arcade row does not: like chess, it runs in
+    /// whatever job the player is in.
+    pub fn switches_job(self) -> bool {
+        self != Self::Artifact
     }
 
     /// The job line every gather start shares (a node click, L100 a Games window row): the job
@@ -247,7 +255,7 @@ impl Gather {
     pub fn rank_floor(self, game: i32) -> u32 {
         match self {
             Self::Mining => crate::mining::rank_floor(game),
-            Self::Harvesting => 0,
+            Self::Harvesting | Self::Artifact => 0,
             Self::Mail => crate::mail_sorting::rank_floor(game),
         }
     }
@@ -258,6 +266,7 @@ impl Gather {
             Self::Mining => "mining",
             Self::Harvesting => "harvesting",
             Self::Mail => "mail sorting",
+            Self::Artifact => "artifact hunting",
         }
     }
 
@@ -267,6 +276,7 @@ impl Gather {
             Self::Mining => "Mining",
             Self::Harvesting => "Harvesting",
             Self::Mail => "Mail Sorting",
+            Self::Artifact => "Artifact Hunt",
         }
     }
 
@@ -276,6 +286,7 @@ impl Gather {
             Self::Mining => "Miner",
             Self::Harvesting => "Chef",
             Self::Mail => "Postman",
+            Self::Artifact => "Adventurer",
         }
     }
 }
@@ -806,7 +817,8 @@ fn add_sites(
                 composite_effect_id: Some(node_type.composite_effect_id),
                 ..NodePresentation::default()
             },
-            NodeSource::Gather(Gather::Mining | Gather::Mail) | NodeSource::Pickup => {
+            NodeSource::Gather(Gather::Mining | Gather::Mail | Gather::Artifact)
+            | NodeSource::Pickup => {
                 NodePresentation::default()
             }
         };

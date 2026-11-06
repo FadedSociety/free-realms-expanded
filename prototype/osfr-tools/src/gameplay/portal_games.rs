@@ -37,7 +37,7 @@ pub(super) fn games(
     kart: Option<&KartGateway>,
     derby: Option<&DerbyGateway>,
     recipes: &RecipeCatalog,
-    type8: [Option<&Type8Engine>; 3],
+    type8: [Option<&Type8Engine>; 4],
     fishing: Option<&FishingSpots>,
     music: Option<&MusicGame>,
     tower_defense: Option<&TowerDefense>,
@@ -69,7 +69,7 @@ pub(super) fn games(
             },
         )
     });
-    let gathers = [Gather::Mining, Gather::Harvesting, Gather::Mail]
+    let gathers = [Gather::Mining, Gather::Harvesting, Gather::Mail, Gather::Artifact]
         .into_iter()
         .zip(type8)
         .filter_map(|(gather, engine)| Some((gather, engine?)))
@@ -221,7 +221,9 @@ impl Gameplay {
                 }
                 self.commit_if_changed(|staged| {
                     let mut out = Outcome::default();
-                    staged.enter_activity_job(gather.job(), character.guid, &mut out)?;
+                    if gather.switches_job() {
+                        staged.enter_activity_job(gather.job(), character.guid, &mut out)?;
+                    }
                     staged.begin_gather(gather, Some(game), now_ms, &mut out)?;
                     Ok(out)
                 })

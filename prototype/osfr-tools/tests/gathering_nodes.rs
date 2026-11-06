@@ -23,7 +23,7 @@ use osfr_tools::{
         lifecycle::RECONSTRUCTED_CHEF_XP_PER_WIN,
     },
     inventory::InventoryItem,
-    mail_sorting,
+    artifact_hunt, mail_sorting,
     mining::{
         self, MINER_PROFILE_ID, MINING_GAME_ID, SIDE, Type8BoardSpec, Type8Goal, Type8Kind,
         Type8Output, Type8Phase, Type8Run, lifecycle::RECONSTRUCTED_MINER_XP_PER_WIN,
@@ -1446,6 +1446,51 @@ fn games_window_play_starts_the_rows_gather_game_away_from_every_node() {
         "{}",
         chat_text(&tin)
     );
+}
+
+/// Artifact Hunt, Games window row 413 (game 57): an arcade row, so Play neither asks for a job
+/// nor changes the one the player is in, and a finished hunt pays that job once and no item.
+#[test]
+fn games_window_play_hunts_artifacts_in_any_job() {
+    const POSTMAN: i32 = mail_sorting::POSTMAN_PROFILE_ID;
+    let hunt = Game {
+        node: "",
+        json_key: "artifact_hunt",
+        profile: artifact_hunt::ADVENTURER_PROFILE_ID,
+        goals: 4,
+        outputs: OUTPUTS,
+        region: None,
+    };
+    let fixture = Fixture::new(PLOT).with_activity_rates();
+    let mut spec = serde_json::to_value(board(4)).unwrap();
+    spec["outputs"] = json!([]);
+    let content = json!({
+        "schema_version": 1, "game_id": 57, "profile_id": artifact_hunt::ADVENTURER_PROFILE_ID,
+        "name_id": 35604, "description_id": 35605, "icon_id": 912,
+        "preload_file": "ArtifactAssets.txt", "launch_movie": "game_artifact.gfx", "spec": spec,
+    });
+    let path = fixture.directory.join(artifact_hunt::CONTENT_FILE);
+    fs::write(path, serde_json::to_vec(&content).unwrap()).unwrap();
+    let mut state = fixture.state(false, false);
+    let profiles = state.profiles.as_mut().unwrap();
+    profiles.unlocked.insert(POSTMAN);
+    profiles.active = POSTMAN;
+    let mut gateway = fixture.gateway_at(state, &fixture.node, 60.0);
+    tick(&mut gateway, 1_500);
+    let started = play(&mut gateway, 413, 2_000);
+    assert_eq!(started_game(&started), (57, 35604, 35605));
+    assert_eq!(gateway.gameplay().unwrap().active_profile(), Some(POSTMAN));
+    let id = active(&gateway, hunt).expect("the hunt is offered") as i32;
+    let (xp, items) = (
+        profile_xp(&gateway, POSTMAN),
+        gameplay_json(&gateway)["inventory"].clone(),
+    );
+    win(&mut gateway, hunt, id, 2_100);
+    let paid = artifact_hunt::RECONSTRUCTED_XP_PER_WIN;
+    assert_eq!(profile_xp(&gateway, POSTMAN), xp + u64::from(paid));
+    assert_eq!(gameplay_json(&gateway)["inventory"], items, "no item is paid");
+    send(&mut gateway, &payload(id, "OnNextLevelMsg"), 3_000);
+    assert_eq!(profile_xp(&gateway, POSTMAN), xp + u64::from(paid), "paid once");
 }
 
 /// L103: Mail Sorting runs on a third Type8 engine for the Postman. Play on the live Sanctuary

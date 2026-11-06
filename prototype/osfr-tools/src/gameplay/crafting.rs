@@ -39,7 +39,7 @@ impl Gameplay {
                 let result = self.smelting.as_mut().unwrap().cancel();
                 self.apply_craft(CraftingJob::Miner, result, character, out)?;
             }
-            Movie::Mining | Movie::Harvesting | Movie::Mail => {
+            Movie::Mining | Movie::Harvesting | Movie::Mail | Movie::Artifact => {
                 let gather = movie.gather().unwrap();
                 let result = self.type8_mut(gather).unwrap().cancel();
                 self.apply_type8(gather, result, out)?;
@@ -73,7 +73,7 @@ impl Gameplay {
                 let result = self.smelting.as_mut().unwrap().handle(inner)?;
                 self.apply_craft(CraftingJob::Miner, result, character, out)
             }
-            Movie::Mining | Movie::Harvesting | Movie::Mail => {
+            Movie::Mining | Movie::Harvesting | Movie::Mail | Movie::Artifact => {
                 let gather = movie.gather().unwrap();
                 let result = self.type8_mut(gather).unwrap().handle(inner)?;
                 self.apply_type8(gather, result, out)
@@ -186,6 +186,7 @@ impl Gameplay {
             Movie::Mining => self.tick_gather(Gather::Mining, now_ms, out)?,
             Movie::Harvesting => self.tick_gather(Gather::Harvesting, now_ms, out)?,
             Movie::Mail => self.tick_gather(Gather::Mail, now_ms, out)?,
+            Movie::Artifact => self.tick_gather(Gather::Artifact, now_ms, out)?,
             Movie::Cooking | Movie::Smelting => {}
         }
         Ok(())
@@ -656,6 +657,7 @@ impl Gameplay {
             Gather::Mining => self.mining.as_ref(),
             Gather::Harvesting => self.harvesting.as_ref(),
             Gather::Mail => self.mail_sorting.as_ref(),
+            Gather::Artifact => self.artifact_hunt.as_ref(),
         }
     }
 
@@ -664,6 +666,7 @@ impl Gameplay {
             Gather::Mining => self.mining.as_mut(),
             Gather::Harvesting => self.harvesting.as_mut(),
             Gather::Mail => self.mail_sorting.as_mut(),
+            Gather::Artifact => self.artifact_hunt.as_mut(),
         }
     }
 
@@ -700,13 +703,14 @@ impl Gameplay {
                         crate::harvesting::lifecycle::RECONSTRUCTED_CHEF_XP_PER_WIN,
                     ),
                 )?,
-                Gather::Mail => return Err(invalid("mail sorting pays no items")),
+                Gather::Mail | Gather::Artifact => return Err(invalid("this game pays no items")),
             };
             if self.profiles.as_ref().map(Profiles::active) != Some(gather.job()) {
                 return Err(invalid(match gather {
                     Gather::Mining => "mining completion is outside the accepted Miner job",
                     Gather::Harvesting => "harvesting completion is outside the accepted Chef job",
                     Gather::Mail => "mail sorting completion is outside the accepted Postman job",
+                    Gather::Artifact => "a hunt's completion is outside the Adventurer job",
                 }));
             }
             self.consume_materials(transaction.consumes, out)?;
@@ -738,7 +742,8 @@ impl Gameplay {
             // An item-less win, once, on the engine's own win. L103 (R): a sorted run pays Postman
             // XP. L934: Mining Practice has no outputs and pays nothing (the client calls it a
             // practice game with no rewards), but it is still a finished minigame.
-            if self.profiles.as_ref().map(Profiles::active) != Some(gather.job()) {
+            let job = self.profiles.as_ref().map(Profiles::active);
+            if gather.switches_job() && job != Some(gather.job()) {
                 return Err(invalid(format!(
                     "{} completion is outside the accepted {} job",
                     gather.noun(),
@@ -746,11 +751,16 @@ impl Gameplay {
                 )));
             }
             self.npc_minigame_win(&result.replies, out)?;
-            if gather == Gather::Mail {
-                let xp = self.activity_xp(
+            let xp = match gather {
+                Gather::Mail => self.activity_xp(
                     gather.job(),
                     crate::mail_sorting::RECONSTRUCTED_POSTMAN_XP_PER_WIN,
-                );
+                ),
+                // Flat: it pays whichever job the player is in, not a job's own rate.
+                Gather::Artifact => crate::artifact_hunt::RECONSTRUCTED_XP_PER_WIN,
+                Gather::Mining | Gather::Harvesting => 0,
+            };
+            if xp > 0 {
                 self.award_job_xp(xp, out)?;
             }
         } else {

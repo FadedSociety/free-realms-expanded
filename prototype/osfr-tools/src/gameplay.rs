@@ -46,6 +46,7 @@ pub use admin_move::{AdminMove, MoveTarget};
 mod card_launch;
 mod checkers_table;
 mod music_table;
+mod identity;
 mod kart_garage;
 mod pirates_arena;
 mod coin_authoring;
@@ -157,6 +158,9 @@ pub struct GameplayState {
     /// L103: Mail Sorting (Postman); absent unless `mail_sorting.json` is loaded.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub mail_sorting: Option<Type8State>,
+    /// Absent unless `artifact_hunt.json` is loaded.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub artifact_hunt: Option<Type8State>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub kart_entry: Option<crate::kart_gateway::KartGatewayState>,
     /// The derby completion ledger (see `DerbyGatewayState`); predecessor-only saves may also
@@ -222,6 +226,7 @@ pub struct Gameplay {
     mining: Option<Type8Engine>,
     harvesting: Option<Type8Engine>,
     mail_sorting: Option<Type8Engine>,
+    artifact_hunt: Option<Type8Engine>,
     forging_tick_ms: Option<u64>,
     /// L098 (R): the running craft came from its Games window row, so it completes anywhere.
     games_window_craft: bool,
@@ -683,6 +688,7 @@ impl Gameplay {
             .unwrap_or_default();
         let mut warp = piece_077::WarpRegistry::curated();
         let saved_derby = state.as_ref().and_then(|s| s.derby.clone());
+        let saved_hunt = state.as_ref().and_then(|s| s.artifact_hunt.clone());
         let saved_chess = state.as_ref().and_then(|s| s.chess);
         let saved_wheel_day = state.as_ref().and_then(|s| s.last_spin_day);
         let saved_sc_wallet = state.as_ref().and_then(|s| s.sc_wallet.clone());
@@ -1086,6 +1092,14 @@ impl Gameplay {
             dormant.mail_sorting = mail_sorting;
             None
         };
+        let file = crate::artifact_hunt::CONTENT_FILE;
+        let artifact_hunt = if presence.minigame(directory, "artifact_hunt", file, opening.is_some())
+        {
+            Some(crate::artifact_hunt::load(directory, saved_hunt)?)
+        } else {
+            dormant.artifact_hunt = saved_hunt;
+            None
+        };
         let type8 = |engine: &Option<Type8Engine>| engine.as_ref().is_some_and(Type8Engine::active);
         if [
             forging.as_ref().is_some_and(Forging::active),
@@ -1094,6 +1108,7 @@ impl Gameplay {
             type8(&mining),
             type8(&harvesting),
             type8(&mail_sorting),
+            type8(&artifact_hunt),
         ]
         .into_iter()
         .filter(|active| *active)
@@ -1156,7 +1171,8 @@ impl Gameplay {
         }
         let folders = [directory, bundled_npc_content.as_path()];
         let (kart, derby_ref) = (kart_entry.as_ref(), derby.as_ref());
-        let type8 = [mining.as_ref(), harvesting.as_ref(), mail_sorting.as_ref()];
+        let hunt = artifact_hunt.as_ref();
+        let type8 = [mining.as_ref(), harvesting.as_ref(), mail_sorting.as_ref(), hunt];
         let fishing_spots = crate::fishing_service::FishingSpots::load(directory)?.map(Arc::new);
         let fishing = fishing_spots.as_deref();
         let music = music_table::load_music(npc_content)?;
@@ -1274,6 +1290,7 @@ impl Gameplay {
             mining,
             harvesting,
             mail_sorting,
+            artifact_hunt,
             forging_tick_ms: None,
             games_window_craft: false,
             type8_tick_ms: None,
@@ -1480,6 +1497,7 @@ impl Gameplay {
             mining: self.mining.as_ref().map(|m| m.state().clone()),
             harvesting: self.harvesting.as_ref().map(|h| h.state().clone()),
             mail_sorting: self.mail_sorting.as_ref().map(|m| m.state().clone()),
+            artifact_hunt: self.artifact_hunt.as_ref().map(|m| m.state().clone()),
             kart_entry: self.kart_entry.as_ref().map(|k| k.state().clone()),
             derby: self
                 .derby
@@ -1842,6 +1860,7 @@ impl Gameplay {
             &mut self.mining,
             &mut self.harvesting,
             &mut self.mail_sorting,
+            &mut self.artifact_hunt,
         ]
         .into_iter()
         .flatten()
@@ -4764,36 +4783,6 @@ impl Gameplay {
             Some(player) => self.inventory.handle_with(inner, &player),
             None => self.inventory.handle(inner),
         }
-    }
-
-    pub fn apply_identity(&mut self, identity: &CharacterIdentity) -> io::Result<bool> {
-        self.remember_identity_look(identity);
-        self.set_character_name(identity.display_name());
-        if self.profiles.is_none() {
-            return Ok(false);
-        }
-        identity.validate()?;
-        self.gender = identity.gender;
-        let fingerprint = format!(
-            "{:x}",
-            Sha256::digest(serde_json::to_vec(identity).map_err(invalid)?)
-        );
-        if let Some(saved) = &self.identity_fingerprint {
-            if saved != &fingerprint {
-                return Err(invalid(
-                    "character identity differs from this progression save",
-                ));
-            }
-            return Ok(false);
-        }
-        for attachment in &identity.attachments {
-            self.inventory
-                .grant_with_tint(0, attachment.definition, 1, attachment.tint_id)?;
-            self.inventory
-                .equip_owned_definition(attachment.definition, 1)?;
-        }
-        self.identity_fingerprint = Some(fingerprint);
-        Ok(true)
     }
 
     pub fn initialization(&mut self, position: [f32; 3]) -> io::Result<Outcome> {

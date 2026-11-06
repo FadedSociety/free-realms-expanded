@@ -32,6 +32,8 @@ occupations!(
     Harvesting,
     // L103: a Mail Sorting run (Postman).
     Mail,
+    // An Artifact Hunt run (Adventurer).
+    Artifact,
     Chess,
     // L104: a checkers game against the server; (R) it closes the chess gates.
     Checkers,
@@ -97,6 +99,7 @@ impl Occupation {
             Mining => "mining",
             Harvesting => "harvesting",
             Mail => "mail sorting",
+            Artifact => "an artifact hunt",
             Chess => "a chess game",
             Checkers => "a checkers game",
             Music => "a Feeling the Beat! song",
@@ -119,7 +122,7 @@ impl Occupation {
         use Occupation::*;
         let (start, warp, ride, pets, location) = match self {
             // (R) A card run closes the same gates as chess (T765).
-            Forging | Smelting | Cooking | Mining | Harvesting | Mail | Chess | Checkers
+            Forging | Smelting | Cooking | Mining | Harvesting | Mail | Artifact | Chess | Checkers
             | Music | TowerDefense | CardGame | Fishing | Encounter => {
                 (true, true, true, true, false)
             }
@@ -160,6 +163,7 @@ impl Gameplay {
             Occupation::Mining => self.mining.as_ref().is_some_and(Type8Engine::active),
             Occupation::Harvesting => self.harvesting.as_ref().is_some_and(Type8Engine::active),
             Occupation::Mail => self.mail_sorting.as_ref().is_some_and(Type8Engine::active),
+            Occupation::Artifact => self.artifact_hunt.as_ref().is_some_and(Type8Engine::active),
             Occupation::Chess => self.chess.as_ref().is_some_and(ChessService::is_active),
             Occupation::Checkers => self.checkers.is_active(),
             Occupation::Music => {
@@ -233,6 +237,7 @@ mod tests {
                 Mining,
                 Harvesting,
                 Mail,
+                Artifact,
                 Chess,
                 Checkers,
                 Music,
@@ -259,6 +264,7 @@ mod tests {
                 Mining,
                 Harvesting,
                 Mail,
+                Artifact,
                 Chess,
                 Checkers,
                 Music,
@@ -284,6 +290,7 @@ mod tests {
                 Mining,
                 Harvesting,
                 Mail,
+                Artifact,
                 Chess,
                 Checkers,
                 Music,
@@ -309,6 +316,7 @@ mod tests {
                 Mining,
                 Harvesting,
                 Mail,
+                Artifact,
                 Chess,
                 Checkers,
                 Music,
@@ -337,6 +345,7 @@ mod tests {
                 Mining,
                 Harvesting,
                 Mail,
+                Artifact,
                 Chess,
                 Checkers,
                 Music,
