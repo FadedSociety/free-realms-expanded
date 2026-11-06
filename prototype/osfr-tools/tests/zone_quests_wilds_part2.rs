@@ -23,18 +23,15 @@ mod npc_quest_chain;
 mod placement;
 #[path = "support/quest_records.rs"]
 mod quest_records;
-#[path = "support/quest_target_sets.rs"]
-mod quest_target_sets;
 
 use npc_quest_chain::{
-    ADVENTURER, CHARACTER, Fixture, ZoneQuest, ZoneQuests, assert_no_offer,
-    assert_packet_changes_nothing, coins, content_dir, counts, objective_activated,
-    objective_complete, pending_turnin, quest_end_reply, quest_reply, quest_status, realm_level,
-    reference_content, saved, seed_active_profile, seed_quest, talk, zone_player_with_quests,
+    assert_no_offer, assert_packet_changes_nothing, coins, content_dir, counts,
+    objective_activated, objective_complete, pending_turnin, quest_end_reply, quest_reply,
+    quest_status, realm_level, saved, seed_active_profile, seed_quest, talk,
+    zone_player_with_quests, Fixture, ZoneQuest, ZoneQuests, ADVENTURER, CHARACTER,
 };
 use osfr_tools::{gameplay::Gameplay, quest_engine::QuestStatus, world::NpcVisibility};
 use quest_records::shipped_quest;
-use quest_target_sets::Targets;
 use std::collections::BTreeSet;
 
 const CHEF: i32 = 45;
@@ -304,8 +301,6 @@ fn the_other_wilds_rows_stay_off_with_a_blocker() {
     /// Quests that named an unresolved Coach Eddie slot until T898 pointed them at his drawn row
     /// (9000000053); they stay off because no objectives are wired.
     const NO_OBJECTIVES: [u32; 5] = [3_140_006, 3_140_010, 3_140_011, 3_140_023, 3_140_026];
-    /// Quests whose `finish_minigame` id has no server path that reports it.
-    const NO_MINIGAME: [(u32, u32); 1] = [(3_040_025, 527)];
     /// Quests behind a prerequisite that is itself disabled.
     const NO_PREREQUISITE: [u32; 2] = [3_160_008, 3_160_009];
     let root = content_dir();
@@ -314,7 +309,6 @@ fn the_other_wilds_rows_stay_off_with_a_blocker() {
         .into_iter()
         .filter_map(|npc| npc.content_key)
         .collect();
-    let targets = Targets::load(&root, &reference_content()).unwrap();
     let off = |id: u32| {
         let quest = shipped_quest(id);
         assert!(!quest.enabled, "quest {id} is enabled, not blocked");
@@ -327,13 +321,6 @@ fn the_other_wilds_rows_stay_off_with_a_blocker() {
         assert!(
             quest.objectives.is_empty(),
             "{id} grew objectives; re-check it"
-        );
-    }
-    for (id, game) in NO_MINIGAME {
-        off(id);
-        assert!(
-            !targets.minigames.contains(&game),
-            "{id}: minigame {game} has an emitter now"
         );
     }
     for id in NO_PREREQUISITE {

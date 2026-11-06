@@ -33,17 +33,17 @@ mod quest_records;
 mod quest_target_sets;
 
 use npc_quest_chain::{
-    ADVENTURER, CHARACTER, Fixture, ZoneQuest, ZoneQuests, accept, assert_no_offer,
-    assert_packet_changes_nothing, breadcrumb_start, character_at_for, coins, content_dir, counts,
-    finish_quest, objective_complete, offer, pending_offer, pending_turnin, quest_end_reply,
-    quest_reply, quest_status, read_json, realm_level, reference_content, release_end_screen,
-    saved, seed_active_profile, select_job, send, talk, zone_player,
+    accept, assert_no_offer, assert_packet_changes_nothing, breadcrumb_start, character_at_for,
+    coins, content_dir, counts, finish_quest, objective_complete, offer, pending_offer,
+    pending_turnin, quest_end_reply, quest_reply, quest_status, read_json, realm_level,
+    reference_content, release_end_screen, saved, seed_active_profile, select_job, send, talk,
+    zone_player, Fixture, ZoneQuest, ZoneQuests, ADVENTURER, CHARACTER,
 };
 use osfr_tools::{
     chat, gameplay::Gameplay, quest_engine::QuestStatus, quest_journal::BREADCRUMB_REFUSED,
     world::NpcVisibility,
 };
-use quest_records::{RawQuest, as_u32, read_quests};
+use quest_records::{as_u32, read_quests, RawQuest};
 use quest_target_sets::Targets;
 use std::collections::BTreeSet;
 use std::sync::OnceLock;
@@ -440,9 +440,6 @@ enum Blocker {
     Giver,
     /// A prerequisite is itself disabled, so the quest could never be offered.
     Prerequisite,
-    /// The spec's `finish_minigame` id has no server path that reports it
-    /// (`tests/support/quest_target_sets.rs` lists every emitter).
-    Minigame(u32),
     /// No player can make this job active: the profile has no content at all.
     NoProfile(u32),
     /// The record carries no gate for its intended job, so enabling it would offer the
@@ -452,22 +449,21 @@ enum Blocker {
     Unselectable(i32),
 }
 
-use Blocker::{Giver, Minigame, NoJobGate, NoProfile, Prerequisite, Unselectable};
+use Blocker::{Giver, NoJobGate, NoProfile, Prerequisite, Unselectable};
 
 /// The round-3 quests that stay disabled. Each row lists every blocker that still holds;
 /// the test fails when one lifts, so the next builder re-checks the others before wiring it
 /// (some are one content edit away, others need a mechanic the server lacks). T542 enabled
-/// Become a Postman (3130001), so the list is fourteen now; the test name keeps the T723
-/// count for the protected test list.
+/// Become a Postman (3130001). L1022's card games lifted 3040004 and 3040009, whose only blocker
+/// was their minigame, so the list is eleven now; the test name keeps the T723 count for the
+/// protected test list.
 #[test]
 fn the_other_fifteen_still_have_a_blocker() {
-    const OFF: [(u32, &[Blocker]); 13] = [
+    const OFF: [(u32, &[Blocker]); 11] = [
         (3_000_039, &[Giver, Prerequisite]),
         (3_020_031, &[Giver, Prerequisite]),
         (3_040_003, &[NoJobGate(120), Unselectable(120)]),
-        (3_040_004, &[Minigame(500)]),
-        (3_040_009, &[Minigame(504)]),
-        (3_040_011, &[Minigame(507), Unselectable(120)]),
+        (3_040_011, &[Unselectable(120)]),
         (3_050_018, &[Prerequisite]),
         (3_070_026, &[Giver]),
         (3_120_010, &[NoJobGate(121), NoProfile(121)]),
@@ -499,7 +495,6 @@ fn the_other_fifteen_still_have_a_blocker() {
                     .prerequisite_quest_ids
                     .iter()
                     .any(|p| quests.iter().any(|q| q.id == *p && !q.enabled)),
-                Minigame(game) => !targets.minigames.contains(&game),
                 NoProfile(profile) => !targets.profiles.contains(&profile),
                 NoJobGate(profile) => quest.job != Some(profile),
                 Unselectable(profile) => {

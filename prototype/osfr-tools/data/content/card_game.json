@@ -540,6 +540,51 @@
       ]
     }
   ],
+  "launch": {
+    "ticket_ttl_ms": 60000,
+    "port": 17782,
+    "lobby": {
+      "group_id": 1,
+      "lobby_type": 1,
+      "role": 1,
+      "collection": [
+        {"archetype_id": 100009946, "copies": 3},
+        {"archetype_id": 100009948, "copies": 3},
+        {"archetype_id": 100009951, "copies": 3},
+        {"archetype_id": 100009952, "copies": 3},
+        {"archetype_id": 100009955, "copies": 3},
+        {"archetype_id": 100009956, "copies": 3},
+        {"archetype_id": 100009957, "copies": 3},
+        {"archetype_id": 100009960, "copies": 3},
+        {"archetype_id": 100009961, "copies": 3},
+        {"archetype_id": 100009963, "copies": 3},
+        {"archetype_id": 100010026, "copies": 3},
+        {"archetype_id": 100010033, "copies": 3},
+        {"archetype_id": 100010042, "copies": 3},
+        {"archetype_id": 100009988, "copies": 3},
+        {"archetype_id": 100009995, "copies": 3}
+      ]
+    },
+    "duel": {
+      "game_types": [2, 3],
+      "min_seconds": 60,
+      "win_coins": 25
+    },
+    "source": [
+      {
+        "kind": "client",
+        "evidence": "tcg/FreeRealmsTCG.dll default card service port 17782 (host.svr ghost/gport); the 15 starter archetypes are in storage.dat and the client's default.cln collection (T825)."
+      },
+      {
+        "kind": "client",
+        "evidence": "duel.game_types: AccountCommand_RecordSinglePlayerGame (class 487, writer 10010300) names the game type: 3 Skirmish, 2 Scenario, 1 Tutorial (setter 1000ff10, game-screen setup 104ab920 / game-over handler 104ae280). The DLL plays those games itself (its own rules engine and AI), so a win is the client's report."
+      },
+      {
+        "kind": "reconstructed",
+        "evidence": "L935 (R): the lobby type and role, the 60 s pacing floor between a start record and a paying win, and the 25-coin purse are server choices, not recovered values; the Card Duelist activity_xp (466) is job_xp_curve.json's. A server-hosted NPC deck needs a rules engine this repo does not have, so a row here is credited by a Skirmish or Scenario win after launching it."
+      }
+    ]
+  },
   "type16_minigame_ids": [
     387, 388, 389, 390, 391, 392, 393, 394, 395, 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 418, 419, 420, 421, 422, 423, 424, 425, 426,
     499, 500, 501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511, 512, 513, 514, 515, 516, 517, 518, 519, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529, 530, 531, 532, 533, 534, 535, 536, 537, 661,

@@ -72,13 +72,13 @@ use osfr_tools::{
     world::NpcVisibility,
 };
 use quest_catalogue_fixture::{
-    Defect, FIXTURE_ABILITY, FIXTURE_BATTLE, FIXTURE_DEFECT, FIXTURE_ENEMY,
+    fixture, Defect, Scratch, FIXTURE_ABILITY, FIXTURE_BATTLE, FIXTURE_DEFECT, FIXTURE_ENEMY,
     FIXTURE_GATHER_RESOURCE, FIXTURE_ITEM, FIXTURE_MINIGAME, FIXTURE_NODE_TYPE, FIXTURE_PET_TRICK,
-    FIXTURE_QUEST, FIXTURE_RECIPE, FIXTURE_TARGET, FIXTURE_USE_ITEM, Scratch, fixture,
+    FIXTURE_QUEST, FIXTURE_RECIPE, FIXTURE_TARGET, FIXTURE_USE_ITEM,
 };
-use quest_records::{RawQuest, as_u32, read_quests, sorted_json_paths};
+use quest_records::{as_u32, read_quests, sorted_json_paths, RawQuest};
 use quest_target_sets::{MinigameFact, Targets};
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use std::{
     collections::{BTreeMap, BTreeSet},
     fs, io,
@@ -723,8 +723,9 @@ fn shipped_minigame_producers_are_pinned() {
         // L934: checkers 21, Copper Mining 91, Tin/Iron/Silver/Gold Mining 93/95/97/99, the
         // Harvesting regions 109/113/115/117/119, Mining Practice 375 and the six Mail Sorting
         // towns 376-381 credit at runtime; the table reads them from the loaded content.
+        // L935: the 16 Games-window card rows (category 11) credit their own MiniGameData id
+        // (499 lobby, 500-531 the named decks, 537 tutorial) on a Skirmish or Scenario win.
         vec![
-
             18, 20, 21, 28, 39, 40, 41, 42, 43, 44, 46, 66, 67, 77, 91, 93, 95, 97, 99, 109, 111,
             113, 115, 117, 119, 134, 135, 136, 137, 138, 139, 141, 142, 144, 146, 147, 148, 149,
             150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166,
@@ -733,8 +734,9 @@ fn shipped_minigame_producers_are_pinned() {
             251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 289, 290, 322, 323, 324, 325,
             326, 327, 328, 329, 330, 331, 332, 333, 350, 351, 352, 353, 354, 355, 356, 357, 358,
             359, 360, 361, 365, 366, 368, 375, 376, 377, 378, 379, 380, 381, 450, 451, 452, 453,
-            454, 455, 456, 457, 596, 597, 598, 599, 600, 601, 604, 607, 615, 616, 624, 627, 628,
-            629, 630, 631, 632, 633, 634, 1030, 1032, 1033, 1034,
+            454, 455, 456, 457, 499, 500, 503, 504, 507, 508, 511, 516, 519, 520, 523, 524, 527,
+            528, 531, 537, 596, 597, 598, 599, 600, 601, 604, 607, 615, 616, 624, 627, 628, 629,
+            630, 631, 632, 633, 634, 1030, 1032, 1033, 1034,
         ],
         "the finish_minigame producer set changed; update the producer table and this pin"
     );
@@ -827,6 +829,11 @@ fn shipped_minigame_producers_are_pinned() {
         assert!(!catalogue.targets.reports(kart, MinigameFact::Score));
         assert!(!catalogue.targets.reports(kart, MinigameFact::Placement));
     }
+    // L935: a card duel win reports only the server-measured time (the DLL's own score is not
+    // certified); the quest-only TYPE 16 ids with no Games row are not produced.
+    assert!(catalogue.targets.reports(507, MinigameFact::Elapsed));
+    assert!(!catalogue.targets.reports(507, MinigameFact::Score));
+    assert!(!catalogue.targets.minigames.contains(&668));
 }
 
 #[test]

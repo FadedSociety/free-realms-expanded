@@ -50,8 +50,13 @@ const VIEWER: Viewer = Viewer {
     combat_job: true,
 };
 
+/// The shipped card rows without their launch block (L935: the shipped file has one now; these
+/// tests add their own launch block to the rows, or pin the closed state without it).
 fn shipped() -> Value {
-    json::read(&PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/card_game.json"))
+    let mut content =
+        json::read(&PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/card_game.json"));
+    content.as_object_mut().unwrap().remove("launch");
+    content
 }
 
 /// The shipped card rows plus a launch block (the shipped file has none).
@@ -178,12 +183,8 @@ fn a_launch_block_admits_trading_card_rows_but_not_treasure_war() {
         catalogue.admit(TREASURE_WAR_ROW, VIEWER, false),
         Err(Refusal::TreasureWarClosed)
     );
-    // The shipped file has no launch block: every card row stays closed.
-    let closed = Arc::new(
-        Content::load_optional(&PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content"))
-            .unwrap()
-            .unwrap(),
-    );
+    // Without a launch block every card row stays closed.
+    let closed = Arc::new(load(&shipped(), "closed").unwrap());
     assert!(closed.launch().is_none());
     let catalogue = Catalogue::assemble(None, None, None, Some(&closed)).unwrap();
     assert_eq!(
@@ -982,7 +983,9 @@ fn a_login_without_a_card_launch_block_sends_no_session_ticket() {
     if !private_fixture_available() {
         return;
     }
-    let no_card_file = Fixture::new();
+    // L935: the runtime content ships a card file now, so "no card file" is a copy without it.
+    let no_card_file = card_fixture(&shipped());
+    fs::remove_file(no_card_file.content.join("card_game.json")).unwrap();
     let shipped_card_file = card_fixture(&shipped());
     for (fixture, name) in [
         (&no_card_file, "no card file"),

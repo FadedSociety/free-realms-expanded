@@ -326,6 +326,23 @@ fn the_lobby_bodies_match_the_client_readers() {
     );
 }
 
+/// "Play a Game" joins group 2: a group in the root, of the type the lobby screen gives its
+/// buttons to, and the client joins and shows it as it did the root.
+#[test]
+fn the_casual_lobby_sits_in_the_root_as_a_group_with_buttons() {
+    let root = osfr_tools::card_game::Lobby {
+        group_id: 1,
+        lobby_type: 1,
+        role: 1,
+        collection: Vec::new(),
+    };
+    let [groups, join, display] = card_service::casual_lobby(7, &root, "Tester");
+    // Containing group 1, group 2, type 2, no deck, tournament round 0, sub-state 0.
+    assert_eq!(groups[groups.len() - 6..], [0x01, 0x02, 0x02, 0x01, 0x00, 0x00]);
+    assert!(join.starts_with(&[&headers(&[0x2C, 0x05], 4)[..], &[0x07, 0x02, 0x01]].concat()));
+    assert_eq!(display, [&headers(&[0x23, 0x12], 1)[..], &[0x07, 0x02]].concat());
+}
+
 /// T825: the collection sync bodies, spelled out in the client readers' order (account 7; the
 /// starter: archetype 900001 twice, archetype 5 once). Compact ids: 83 = `23 05`, 84 = `24 05`,
 /// 85 = `25 05`, 86 = `26 05`, `InstanceID` 350 = `2E 15`; 900001 = `41 BA DB`. Each instance

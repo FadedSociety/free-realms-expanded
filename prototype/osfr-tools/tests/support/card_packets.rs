@@ -95,6 +95,27 @@ pub fn ping(spoof: i32) -> Vec<u8> {
     [int(112), int(1), int(spoof)].concat()
 }
 
+/// L935: the client's 487 `AccountCommand_RecordSinglePlayerGame` (writer `10010300`): two header
+/// pairs (the leaf and the `AccountCommand` base, reader `10010230` / `10009530`), the account id,
+/// then phase, game type, result, the game screen's counter, the start time and the name.
+pub fn single_player_record(
+    account: i32,
+    (phase, game_type, result): (i32, i32, i32),
+    started: i32,
+) -> Vec<u8> {
+    [
+        [int(487), int(1), int(487), int(1)].concat(),
+        int(account),
+        int(phase),
+        int(game_type),
+        int(result),
+        int(12),
+        int(started),
+        text("Skirmish"),
+    ]
+    .concat()
+}
+
 /// One client frame: `htonl(length)`, then the routing words when routed, then the body
 /// (`101921e0`; the 414 is sent unrouted).
 pub fn frame(routing: Option<[u32; 3]>, body: &[u8]) -> Vec<u8> {

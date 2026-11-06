@@ -10,9 +10,9 @@
 use osfr_tools::{
     gameplay::GameplayState,
     gateway::Gateway,
-    startup_selfdata::{QuestRecords, parse_self_with_quest_bindings},
+    startup_selfdata::{parse_self_with_quest_bindings, QuestRecords},
 };
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use std::{
     fs,
     path::{Path, PathBuf},
@@ -92,7 +92,8 @@ fn login(gateway: &mut Gateway) -> Vec<Vec<u8>> {
     put_string(&mut bytes, manifest["client_version"].as_str().unwrap());
     put_string(&mut bytes, "");
     let replies = gateway.handle(&bytes).unwrap().replies;
-    assert_eq!(replies.len(), 8);
+    // The startup stream, and with gameplay the card window's session ticket after it.
+    assert!(matches!(replies.len(), 8 | 9));
     replies
 }
 

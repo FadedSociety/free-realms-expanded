@@ -6,8 +6,12 @@
 //! written; after login the client's ping (112) is echoed. T813: a login pushes the launch
 //! block's lobby (94 -> 92 -> 291), which opens the lobby screen. T825: then the starter
 //! collection sync (83, and per client Update 84, 85, 86); the client's status (137) is echoed and
-//! its own Join requests (92) are logged, not answered. Other commands are logged, not answered
-//! yet. Off unless the card content's launch block names a port.
+//! its own Join requests (92) are logged, and one for the casual group is answered with it. L935: the single-player records of the
+//! card window (487; it plays Tutorials, Scenarios and Skirmishes itself) are queued by their
+//! connection's character and settled by `Server::poll_card` in that character's session
+//! (`Gameplay::card_single_player`): a paying win credits the launched row and pays the duel
+//! purse. Other commands are logged, not answered yet. Off unless the card content's launch
+//! block names a port.
 //!
 //! T782: every step prints one JSON event line (`events`, drained by `Server::poll_card`):
 //! `card_connected`, `card_gateway_request` (a 414 answered), `card_login` (a 411: `ok`, the
@@ -15,8 +19,10 @@
 //! `lengths`), `card_lobby` (T813: the lobby pushed, once per connection: ids only),
 //! `card_join_request` (T825: the group and role a client Join asks for), `card_sync` (T825: the
 //! collection synced, or already cached by the client), `card_ping`
-//! (T808: a ping echoed), `card_command_unhandled` and `card_closed` with its reason. A ticket or
-//! session id is never in an event.
+//! (T808: a ping echoed), `card_single_player` (L935: phase, game type and result of a record),
+//! `card_duel_settled` (L935: a win paid, with the row and the server-measured seconds),
+//! `card_command_unhandled` and `card_closed` with its reason. A ticket or session id is never in
+//! an event.
 use super::*;
 use osfr_tools::card_service;
 use serde_json::Value;
@@ -28,6 +34,11 @@ const MAX_CONNECTIONS: usize = 16;
 const MAX_PER_ADDRESS: usize = 4;
 /// (R) A connection that has not logged in this long after opening is closed.
 const LOGIN_DEADLINE_MS: u64 = 30_000;
+/// (R) A logged-in window pings every 10 s: this long silent, its PC is gone. Without it a dead
+/// connection holds one of the slots above until the realm restarts.
+const IDLE_DEADLINE_MS: u64 = 120_000;
+/// (R) A game sends two records, and each costs a staged session, so one poll takes this many.
+const MAX_RECORDS_PER_POLL: usize = 8;
 /// (R) Unhandled commands, and answered 414/411/ping requests, logged per connection (each count
 /// apart), so a chatty client cannot fill the log.
 const LOGGED_PER_KIND: u32 = 16;
@@ -39,6 +50,9 @@ pub(super) struct CardListener {
     connections: Vec<Connection>,
     /// The event lines of the polls since the last drain.
     events: Vec<Value>,
+    /// L935: the single-player records of logged-in connections since the last drain, with the
+    /// character each connection logged in as (`Server::poll_card` settles them).
+    records: Vec<(u64, card_service::SinglePlayerRecord)>,
     /// T813: the lobby a login enters, from the launch block (none: the login stops there).
     lobby: Option<osfr_tools::card_game::Lobby>,
 }
@@ -59,6 +73,10 @@ struct Connection {
     inbox: Vec<u8>,
     opened_ms: u64,
     character: Option<u64>,
+    /// When the client last sent anything.
+    heard_ms: u64,
+    /// The 411's name, for the lobbies joined later.
+    name: String,
     sync: SyncStep,
     unhandled: u32,
     answered: Answered,
@@ -73,6 +91,7 @@ struct Answered {
     logins: u32,
     pings: u32,
     join_requests: u32,
+    single_player: u32,
 }
 
 impl Answered {
@@ -82,6 +101,7 @@ impl Answered {
             AnsweredKind::Login => &mut self.logins,
             AnsweredKind::Ping => &mut self.pings,
             AnsweredKind::JoinRequest => &mut self.join_requests,
+            AnsweredKind::SinglePlayer => &mut self.single_player,
         }
     }
 }
@@ -92,6 +112,7 @@ enum AnsweredKind {
     Login,
     Ping,
     JoinRequest,
+    SinglePlayer,
 }
 
 /// The card service settings the content asks for: the launch block's port and lobby, read from
@@ -146,6 +167,7 @@ impl CardListener {
             port: local.port(),
             connections: Vec::new(),
             events: Vec::new(),
+            records: Vec::new(),
             lobby: None,
         })
     }
@@ -177,6 +199,8 @@ impl CardListener {
                     inbox: Vec::new(),
                     opened_ms: now_ms,
                     character: None,
+                    heard_ms: 0,
+                    name: String::new(),
                     sync: SyncStep::Off,
                     unhandled: 0,
                     answered: Answered::default(),
@@ -186,9 +210,10 @@ impl CardListener {
             }
         }
         let (host, port) = (self.host.clone(), self.port);
-        let (events, lobby) = (&mut self.events, self.lobby.as_ref());
+        let (events, records, lobby) = (&mut self.events, &mut self.records, self.lobby.as_ref());
         self.connections.retain_mut(|c| {
-            let Some(reason) = c.serve(&host, port, now_ms, lobby, &mut redeem, events) else {
+            let Some(reason) = c.serve(&host, port, now_ms, lobby, &mut redeem, events, records)
+            else {
                 return true;
             };
             events.push(json!({
@@ -209,9 +234,13 @@ impl Connection {
         lobby: Option<&osfr_tools::card_game::Lobby>,
         redeem: &mut impl FnMut(&str, &str) -> Result<u64, &'static str>,
         events: &mut Vec<Value>,
+        records: &mut Vec<(u64, card_service::SinglePlayerRecord)>,
     ) -> Option<&'static str> {
         if self.character.is_none() && now_ms.saturating_sub(self.opened_ms) > LOGIN_DEADLINE_MS {
             return Some("deadline");
+        }
+        if now_ms.saturating_sub(self.heard_ms.max(self.opened_ms)) > IDLE_DEADLINE_MS {
+            return Some("idle");
         }
         // At most 64 KiB per poll, so the inbox stays near one frame (`client_frame` refuses
         // longer ones).
@@ -219,7 +248,10 @@ impl Connection {
         for _ in 0..16 {
             match self.stream.read(&mut chunk) {
                 Ok(0) => return Some("eof"),
-                Ok(n) => self.inbox.extend_from_slice(&chunk[..n]),
+                Ok(n) => {
+                    self.heard_ms = now_ms;
+                    self.inbox.extend_from_slice(&chunk[..n]);
+                }
                 Err(error) if error.kind() == ErrorKind::WouldBlock => break,
                 Err(_) => return Some("read_failed"),
             }
@@ -234,7 +266,7 @@ impl Connection {
                 Ok(None) => return None,
                 Err(_) => return Some("bad_frame"),
             };
-            match self.lobby_command(&body, lobby, events) {
+            match self.lobby_command(&body, lobby, events, records) {
                 Some(Ok(reply)) if reply.is_empty() || self.stream.write_all(&reply).is_ok() => {
                     continue;
                 }
@@ -253,6 +285,7 @@ impl Connection {
                 });
                 login = Some((redeemed, l.version, lengths));
                 name = l.character_name.clone();
+                self.name.clone_from(&name);
                 redeemed.ok()
             });
             match reply {
@@ -338,19 +371,29 @@ impl Connection {
     /// - 503 avatar picture: answered by silence (`card_service::UPLOAD_AVATAR_IMAGE`).
     /// - 87 Update: the next sync step (StartInstances, SendInstances, Complete); 86 Complete
     ///   from the client: its cached collection matched the Start, nothing to send.
+    /// - L935 487 single-player record (a Tutorial, Scenario or Skirmish the DLL plays itself):
+    ///   queued for `Server::poll_card` to settle in the character's session; no answer. A record
+    ///   for another account is dropped, an unreadable one is logged as unhandled.
     fn lobby_command(
         &mut self,
         body: &[u8],
         lobby: Option<&osfr_tools::card_game::Lobby>,
         events: &mut Vec<Value>,
+        records: &mut Vec<(u64, card_service::SinglePlayerRecord)>,
     ) -> Option<io::Result<Vec<u8>>> {
-        let account = card_service::account_id(self.character?);
+        let character = self.character?;
+        let account = card_service::account_id(character);
         let cards = lobby.map_or(&[][..], |lobby| &lobby.collection[..]);
         let reply = match card_service::class_id(body).ok()? {
             card_service::CHANGE_STATUS => card_service::change_status(account, body),
-            card_service::JOIN => card_service::join_request(body).map(|_| {
+            card_service::JOIN => card_service::join_request(body).and_then(|(group, _)| {
                 self.log_answer(body, None, "", 0, events);
-                Vec::new()
+                if let Some(root) = lobby.filter(|_| group == card_service::CASUAL_GROUP) {
+                    for frame in card_service::casual_lobby(account, root, &self.name) {
+                        self.stream.write_all(&card_service::server_frame(&frame))?;
+                    }
+                }
+                Ok(Vec::new())
             }),
             card_service::SYNC_UPDATE => {
                 let (next, step) = match self.sync {
@@ -374,6 +417,16 @@ impl Connection {
             card_service::SYNC_COMPLETE if self.sync == SyncStep::Started => {
                 self.sync = SyncStep::Done;
                 self.synced("cached", cards, events);
+                Ok(Vec::new())
+            }
+            card_service::RECORD_SINGLE_PLAYER_GAME => {
+                // A record this decoder cannot read stays an unhandled command (logged), never a
+                // closed window: the layout has no native sample yet.
+                let record = card_service::SinglePlayerRecord::decode(body).ok()?;
+                self.log_answer(body, None, "", 0, events);
+                if record.account == account && records.len() < MAX_RECORDS_PER_POLL {
+                    records.push((character, record));
+                }
                 Ok(Vec::new())
             }
             // The client's own Complete after the sync, and its avatar picture: no reply.
@@ -421,6 +474,7 @@ impl Connection {
             (Ok(card_service::SEND_SESSION_ID), Some(_)) => AnsweredKind::Login,
             (Ok(card_service::PING), _) => AnsweredKind::Ping,
             (Ok(card_service::JOIN), _) => AnsweredKind::JoinRequest,
+            (Ok(card_service::RECORD_SINGLE_PLAYER_GAME), _) => AnsweredKind::SinglePlayer,
             _ => return,
         };
         let answered = self.answered.count(kind);
@@ -451,6 +505,15 @@ impl Connection {
                 };
                 json!({"event":"card_join_request","peer":peer,"group":group,"role":role})
             }
+            AnsweredKind::SinglePlayer => {
+                let Ok(record) = card_service::SinglePlayerRecord::decode(body) else {
+                    return;
+                };
+                json!({
+                    "event":"card_single_player","peer":peer,"character":self.character,
+                    "phase":record.phase,"type":record.game_type,"result":record.result
+                })
+            }
         };
         events.push(event);
     }
@@ -468,7 +531,73 @@ impl Server {
         for event in card.events.drain(..) {
             println!("{event}");
         }
+        let records: Vec<_> = card.records.drain(..).collect();
         self.card = Some(card);
+        for (character, record) in records {
+            self.settle_card_record(character, &record, now_ms);
+        }
+    }
+
+    /// L935: settle one single-player record in the character's session, in the order of every
+    /// other server-initiated payout: stage the change on a copy, save it, adopt it, then queue
+    /// the replies. The copy is adopted whenever the save is not needed, because a start record
+    /// only moves the session's tracker. A record for a character with no session is dropped.
+    fn settle_card_record(
+        &mut self,
+        character: u64,
+        record: &card_service::SinglePlayerRecord,
+        now_ms: u64,
+    ) {
+        let Some(session) = self
+            .sessions
+            .values_mut()
+            .find(|session| session.character_guid == character)
+        else {
+            return;
+        };
+        let mut staged = session.gateway.clone();
+        let settled = match staged
+            .gameplay_mut()
+            .map(|game| game.card_single_player(character, record, now_ms))
+        {
+            Some(Ok(settled)) => settled,
+            Some(Err(error)) => {
+                println!(
+                    "{}",
+                    json!({"event":"card_duel_refused","character":character,"reason":error.to_string()})
+                );
+                return;
+            }
+            None => return,
+        };
+        if settled.as_ref().is_some_and(|(_, out)| out.changed)
+            && save(&session.state_path, &staged.snapshot()).is_err()
+        {
+            println!(
+                "{}",
+                json!({"event":"card_duel_save_failed","character":character})
+            );
+            return;
+        }
+        session.gateway = staged;
+        let Some((win, out)) = settled else {
+            return;
+        };
+        for reply in out.replies {
+            if session
+                .queue_shared_message(&wrap_application(&reply))
+                .is_err()
+            {
+                break;
+            }
+        }
+        println!(
+            "{}",
+            json!({
+                "event":"card_duel_settled","character":character,"minigame":win.minigame_id,
+                "seconds":win.elapsed_seconds,"coins":win.coins
+            })
+        );
     }
 
     /// The live session that minted a card login's launch ticket redeems it. T805: the retail
@@ -505,8 +634,8 @@ mod card_packets;
 pub(super) mod tests {
     use super::super::tests::test_support;
     use super::card_packets::{
-        ROUTING, frame, gateway_request, headers, int, ping, read_results, session_login, text,
-        ticket_in,
+        ROUTING, frame, gateway_request, headers, int, ping, read_results, session_login,
+        single_player_record, text, ticket_in,
     };
     use super::*;
     use std::time::Duration;
@@ -827,7 +956,8 @@ pub(super) mod tests {
     /// T825: login -> lobby -> collection sync over the real socket. After the lobby comes the
     /// Start; each client Update gets the next step (StartInstances, SendInstances, Complete),
     /// byte-equal to the codec, then one `card_sync`. The client's status (137) comes back for
-    /// its own account; its Join request (92) gets no answer, only a `card_join_request` event.
+    /// its own account; its Join of the root (92) gets no answer, only a `card_join_request` event,
+    /// and its Join of the casual group gets that group.
     #[test]
     fn a_card_login_syncs_the_starter_collection() {
         if !test_support::bin_test_target("card") {
@@ -928,6 +1058,24 @@ pub(super) mod tests {
             (&requests[0]["group"], &requests[0]["role"]),
             (&json!(1), &json!(1))
         );
+        // "Play a Game": a Join of group 2 is answered with the group, the Join and the screen.
+        let mut casual = headers(&[0x2C, 0x05], 4);
+        for value in [
+            int(account),
+            int(card_service::CASUAL_GROUP),
+            int(1),
+            text(""),
+            int(0),
+            text(""),
+            int(1),
+            int(0),
+        ] {
+            casual.extend(value);
+        }
+        player.write_all(&frame(Some(ROUTING), &casual)).unwrap();
+        let bodies: Vec<_> = (0..3).map(|_| answer(&mut card, &mut player, 3)).collect();
+        assert!(bodies[0].ends_with(&[1, 2, 2, 1, 0, 0]), "{:?}", bodies[0]);
+        assert!(!waiting(&player));
         assert!(
             !card
                 .events
@@ -1111,10 +1259,15 @@ pub(super) mod tests {
             return;
         }
         let scratch = test_support::Scratch::new("t770-card-login");
-        let options = test_support::options(scratch.state());
+        let mut options = test_support::options(scratch.state());
         if !test_support::fixtures_present(&options) {
             return;
         }
+        // L935: the shipped content opens the card service, so this case runs on a vendor copy
+        // that has no card file.
+        let content = test_support::vendor_content(&scratch);
+        assert!(!content.join("card_game.json").exists());
+        options.content = Some(content);
         let mut server = Server::new(options).unwrap();
         for character in ["5041", "", "not-a-guid"] {
             assert_eq!(
@@ -1387,5 +1540,150 @@ pub(super) mod tests {
             "the login has its own budget"
         );
         assert_eq!(closed(&card), ["login_refused"]);
+    }
+    /// L935: a logged-in card window's single-player records are logged and queued for their
+    /// session; another account's record is dropped, and an unreadable one is an unhandled command,
+    /// never a closed window (the layout has no native sample yet).
+    #[test]
+    fn single_player_records_are_queued_for_the_session() {
+        if !test_support::bin_test_target("card") {
+            return;
+        }
+        let mut card = listener();
+        let guid = 5041_u64;
+        let mut window = client(&card);
+        assert!(log_in(&mut card, &mut window, "", "271828182845", Ok(guid)).0);
+        let account = card_service::account_id(guid);
+        let started = 1_793_000_000;
+        let mut send = |body: &[u8]| window.write_all(&frame(Some(ROUTING), body)).unwrap();
+        send(&single_player_record(account, (1, 3, 0), started));
+        send(&single_player_record(account, (2, 3, 1), started));
+        send(&single_player_record(account + 1, (2, 3, 1), started + 1));
+        send(&single_player_record(account, (2, 3, 1), started)[..7]);
+        for _ in 0..40 {
+            card.poll(3, refuse);
+            std::thread::sleep(Duration::from_millis(5));
+        }
+        let record = |phase, result| {
+            (
+                guid,
+                card_service::SinglePlayerRecord {
+                    account,
+                    phase,
+                    game_type: 3,
+                    result,
+                    started,
+                },
+            )
+        };
+        assert_eq!(card.records, [record(1, 0), record(2, 1)]);
+        assert_eq!(
+            count(&card, "card_single_player"),
+            3,
+            "the foreign one is logged, not kept"
+        );
+        assert_eq!(
+            count(&card, "card_command_unhandled"),
+            1,
+            "the truncated record"
+        );
+        assert!(closed(&card).is_empty(), "the window stays open");
+    }
+
+    /// L935: the whole path. A player presses Play on a card row and opens the card window; the
+    /// window's start and end records (a Skirmish win 70 s apart on the server's clock) cross the
+    /// socket and `Server::poll_card`, and the session that launched it is paid and saved once.
+    #[test]
+    fn a_card_window_win_pays_the_session_that_launched_it() {
+        if !test_support::bin_test_target("card") {
+            return;
+        }
+        let scratch = test_support::Scratch::new("l935-card-duel");
+        let mut options = test_support::options(scratch.state());
+        if !test_support::fixtures_present(&options) {
+            return;
+        }
+        let content = test_support::vendor_content(&scratch);
+        let shipped = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
+        let mut cards: Value =
+            serde_json::from_slice(&fs::read(shipped.join("card_game.json")).unwrap()).unwrap();
+        // The shipped launch block (with its duel purse) minus its port: the test binds its own.
+        cards["launch"]["port"] = json!(0);
+        fs::write(content.join("card_game.json"), cards.to_string()).unwrap();
+        options.content = Some(content);
+        let mut server = Server::new(options).unwrap();
+        let options = &server.options;
+        let mut scene = test_support::Scene::new(options, 935);
+        scene.send(options, &[13, 0], 1_000).unwrap();
+        scene.send(options, &[10, 0], 1_001).unwrap();
+        scene.exchange(options, &test_support::portal_play(490), 1_100);
+        let mut ask = vec![39, 0, 37];
+        for value in [osfr_tools::card_game::FIRST_INSTANCE_ID, -1, -1] {
+            ask.extend(value.to_le_bytes());
+        }
+        let ticket = ticket_in(&scene.exchange(options, &ask, 1_200));
+        let key = SessionKey {
+            peer: scene.session.peer,
+            connection_id: scene.session.request.id,
+        };
+        server.sessions.insert(key, scene.session);
+        server.card = Some(listener());
+
+        let mut window = client(server.card.as_ref().unwrap());
+        window
+            .write_all(&frame(
+                Some(ROUTING),
+                &session_login("", &ticket.to_string()),
+            ))
+            .unwrap();
+        let (success, _, account, _) =
+            read_results(&answer_with(|| server.poll_card(2_000), &mut window));
+        assert!(success, "the minting session's ticket logs in");
+
+        let coins = |server: &Server| {
+            server.sessions[&key]
+                .gateway
+                .gameplay()
+                .unwrap()
+                .state()
+                .inventory
+                .coins
+        };
+        let before = coins(&server);
+        let started = 1_793_000_000;
+        let mut report = |server: &mut Server, record: Vec<u8>, now: u64| {
+            window.write_all(&frame(Some(ROUTING), &record)).unwrap();
+            for _ in 0..40 {
+                server.poll_card(now);
+                std::thread::sleep(Duration::from_millis(5));
+            }
+        };
+        report(
+            &mut server,
+            single_player_record(account, (1, 3, 0), started),
+            10_000,
+        );
+        assert_eq!(coins(&server), before, "a start record pays nothing");
+        report(
+            &mut server,
+            single_player_record(account, (2, 3, 1), started),
+            80_000,
+        );
+        assert_eq!(coins(&server), before + 25, "the shipped duel purse");
+        // The client repeating its end record is not paid again.
+        report(
+            &mut server,
+            single_player_record(account, (2, 3, 1), started),
+            90_000,
+        );
+        assert_eq!(coins(&server), before + 25);
+        // The save on disk carries the purse.
+        let saved: Value =
+            serde_json::from_slice(&fs::read(&server.sessions[&key].state_path).unwrap()).unwrap();
+        assert_eq!(
+            saved["gameplay"]["inventory"]["coins"],
+            json!(before + 25),
+            "the settled win was saved"
+        );
     }
 }

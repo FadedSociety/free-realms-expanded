@@ -32,10 +32,15 @@
 //! * The row's MiniGameData link (`minigame_id`) stays in data; no wire field is known to hold it.
 //! * T545: `type16_minigame_ids` lists every client `MiniGameData.txt` TYPE 16 row. The admin
 //!   `realm duel` credit refuses every other id, so a kart, derby or Treasure War row cannot
-//!   stand in for a card duel while the card service has no result path.
+//!   stand in for a card duel.
+//! * L935: the card window plays Tutorials, Scenarios and Skirmishes itself (its own rules engine
+//!   and AI) and reports them (`AccountCommand_RecordSinglePlayerGame`, class 487); `Launches::record`
+//!   turns a bounded win into a [`Win`] for the row the run was launched from (spec:
+//!   lab/autopilot/opus/minigame-notes/L935-tcg-protocol.md). Server-hosted matches and NPC decks
+//!   would need a rules engine this repo does not have.
 
 use crate::activity_portal::{Activity, Kind};
-use crate::card_service::LaunchTickets;
+use crate::card_service::{LaunchTickets, SinglePlayerRecord};
 use crate::minigame::{MinigameRuns, RunMode, RunOutcome, RunSpec, RunState, card_start_packet};
 use crate::startup_messages;
 use serde::Deserialize;
@@ -135,7 +140,41 @@ pub struct Launch {
     /// lobby..." after its login.
     #[serde(default)]
     pub lobby: Option<Lobby>,
+    /// L935: what a single-player win reported by the card window pays; without it a launch
+    /// block opens the window but no game result counts.
+    #[serde(default)]
+    pub duel: Option<Duel>,
     pub source: Vec<Source>,
+}
+
+/// L935: how a Skirmish or Scenario win reported by the card window pays (R values, bounded in
+/// `validate`). The DLL plays those games itself and reports the result, so the server bounds
+/// what it accepts instead of replaying it (spec: L935-tcg-protocol.md).
+#[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct Duel {
+    /// `AccountCommand_RecordSinglePlayerGame` game types that pay: 3 Skirmish, 2 Scenario (the
+    /// scripted Tutorial, type 1, stays out).
+    pub game_types: Vec<i32>,
+    /// A win reported less than this many server seconds after its start record pays nothing.
+    pub min_seconds: u32,
+    /// Coins one qualifying win pays; the Card Duelist's `activity_xp` rides on top.
+    pub win_coins: u32,
+}
+
+/// The Card Duelist job profile (`job_xp_curve.json`, 466 `activity_xp` per duel).
+pub const CARD_DUELIST_PROFILE: i32 = 120;
+
+/// L935: a win the card window reported that passed every server bound.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Win {
+    /// The MiniGameData row the run was launched from.
+    pub minigame_id: u32,
+    /// The client's game start time: unique per game, it keys the payout.
+    pub started: i32,
+    /// Server seconds from the start record to the end record.
+    pub elapsed_seconds: u32,
+    pub coins: u32,
 }
 
 /// T813: the one lobby group the card service defines for a logged-in card window (R: the
@@ -190,7 +229,8 @@ pub const PRELOAD_FILE: &str = "TradingCardAssets.txt";
 pub const FIRST_INSTANCE_ID: i32 = 61_000_001;
 /// The client's results Close (`CommandPacketClosedMinigameEndScreen`, constructor `008a2eb0`):
 /// the same 26/42 a shared run retires on after a win or loss. (R) that a terminal card run's
-/// results window sends this one; the card results path does not exist yet.
+/// results window sends this one; the card window's results are the DLL's own (`Launches::record`
+/// settles them), so no run reaches Won or Lost today.
 const RESULTS_CLOSE: [u8; 4] = [26, 0, 42, 0];
 
 /// T765: one session's card launches: the type-16 run lifecycle and the one-time tickets its
@@ -200,6 +240,15 @@ pub struct Launches {
     runs: MinigameRuns,
     tickets: LaunchTickets,
     preload_file: String,
+    duel: Option<Duel>,
+    /// L935: the live run's (instance, MiniGameData id), set when its row is played.
+    entered: Option<(i32, i32)>,
+    /// L935: the single-player game in progress: the client's start time and the server clock
+    /// (ms) when its start record arrived.
+    playing: Option<(i32, u64)>,
+    /// L935: the newest game start accepted; a start record must be newer, so a replayed record
+    /// of an earlier game pays nothing.
+    last_started: Option<i32>,
 }
 
 impl Launches {
@@ -208,7 +257,50 @@ impl Launches {
             runs: MinigameRuns::new(FIRST_INSTANCE_ID)?,
             tickets: LaunchTickets::new(launch.ticket_ttl_ms),
             preload_file: launch.preload_file.clone(),
+            duel: launch.duel.clone(),
+            entered: None,
+            playing: None,
+            last_started: None,
         })
+    }
+
+    /// L935: take the card window's single-player record for the live run. A start record
+    /// remembers the game; an end record that names it settles it exactly once, and only a win
+    /// of a paying game type, `min_seconds` of server time after the start, comes back as a
+    /// [`Win`]. A record with no live run, no duel settings, an older start or no matching start
+    /// changes nothing and pays nothing.
+    pub fn record(&mut self, record: &SinglePlayerRecord, now_ms: u64) -> Option<Win> {
+        let (instance, minigame_id) = self.entered?;
+        if self.runs.current_instance_id() != Some(instance) {
+            self.entered = None;
+            self.playing = None;
+            return None;
+        }
+        let duel = self.duel.as_ref()?;
+        match record.phase {
+            SinglePlayerRecord::STARTED => {
+                if self.last_started.is_none_or(|last| record.started > last) {
+                    self.last_started = Some(record.started);
+                    self.playing = Some((record.started, now_ms));
+                }
+                None
+            }
+            SinglePlayerRecord::ENDED => {
+                let (started, at_ms) = self.playing.take_if(|(s, _)| *s == record.started)?;
+                let elapsed_seconds =
+                    u32::try_from(now_ms.saturating_sub(at_ms) / 1_000).unwrap_or(u32::MAX);
+                (record.result == SinglePlayerRecord::WON
+                    && duel.game_types.contains(&record.game_type)
+                    && elapsed_seconds >= duel.min_seconds)
+                    .then_some(Win {
+                        minigame_id: u32::try_from(minigame_id).ok()?,
+                        started,
+                        elapsed_seconds,
+                        coins: duel.win_coins,
+                    })
+            }
+            _ => None,
+        }
     }
 
     pub fn is_active(&self) -> bool {
@@ -243,7 +335,12 @@ impl Launches {
             .map_err(|_| invalid("card mini-game id is out of range"))?;
         let mut spec = RunSpec::empty(game_id, CARD_GAME_TYPE, RunMode::CardClient);
         spec.preload_file.clone_from(&self.preload_file);
-        self.runs.offer(spec)
+        let offered = self.runs.offer(spec)?;
+        if offered.accepted {
+            self.entered = self.runs.current_instance_id().map(|run| (run, game_id));
+            self.playing = None;
+        }
+        Ok(offered)
     }
 
     /// The run's lifecycle packets (39/5 start, 39/6 leave, 39/7 ack). A 39/37, while the run is
@@ -393,6 +490,26 @@ impl Content {
         {
             return Err(invalid("card launch asset list is 1 to 64 ASCII bytes"));
         }
+        // L935 (R) bounds: the DLL has three single-player game types (1 to 3), each named once; a
+        // win must take a moment (an hour at most) and pay a small purse.
+        if self
+            .launch
+            .as_ref()
+            .and_then(|launch| launch.duel.as_ref())
+            .is_some_and(|duel| {
+                duel.game_types.is_empty()
+                    || duel.game_types.len() > 3
+                    || duel.game_types.iter().any(|kind| !(1..=3).contains(kind))
+                    || duel.game_types.iter().collect::<BTreeSet<_>>().len()
+                        != duel.game_types.len()
+                    || !(1..=3_600).contains(&duel.min_seconds)
+                    || duel.win_coins > 10_000
+            })
+        {
+            return Err(invalid(
+                "card duel needs distinct game types 1 to 3, 1 to 3600 seconds and at most 10000 coins",
+            ));
+        }
         // (R) bounds: only the client's root group 1 until a second group is decoded (`10371960`
         // joins group 1 itself), a known role, a small type.
         if self
@@ -521,6 +638,127 @@ mod tests {
         }))
         .unwrap();
         Launches::new(&launch).unwrap()
+    }
+
+    fn dueling() -> Launches {
+        let launch: Launch = serde_json::from_value(serde_json::json!({
+            "ticket_ttl_ms": 120_000,
+            "duel": {"game_types": [2, 3], "min_seconds": 60, "win_coins": 25},
+            "source": [{"kind": "reconstructed", "evidence": "L935 test"}]
+        }))
+        .unwrap();
+        Launches::new(&launch).unwrap()
+    }
+
+    fn record(phase: i32, game_type: i32, result: i32, started: i32) -> SinglePlayerRecord {
+        SinglePlayerRecord {
+            account: 1,
+            phase,
+            game_type,
+            result,
+            started,
+        }
+    }
+
+    /// The instance the row's 39/16 offer names.
+    fn enter(launches: &mut Launches, row: u32) -> i32 {
+        let cards = Content::load(&crate::content::bundled_content().join(CONTENT_FILE)).unwrap();
+        let offer = launches.begin(cards.row(row).unwrap()).unwrap();
+        i32::from_le_bytes(offer.replies[0][3..7].try_into().unwrap())
+    }
+
+    const START: i32 = SinglePlayerRecord::STARTED;
+    const END: i32 = SinglePlayerRecord::ENDED;
+    const WIN: i32 = SinglePlayerRecord::WON;
+
+    /// L935: a Skirmish or Scenario win pays the launched row once, and only after the pacing floor
+    /// measured on the server's clock between the start record and the end record.
+    #[test]
+    fn a_win_after_the_floor_credits_the_launched_row_once() {
+        let mut launches = dueling();
+        enter(&mut launches, 490);
+        assert_eq!(launches.record(&record(START, 3, 0, 1_000), 5_000), None);
+        let win = launches
+            .record(&record(END, 3, WIN, 1_000), 65_000)
+            .unwrap();
+        assert_eq!(
+            win,
+            Win {
+                minigame_id: 500,
+                started: 1_000,
+                elapsed_seconds: 60,
+                coins: 25
+            }
+        );
+        // The same end record again, and a replay of the same start, pay nothing.
+        assert_eq!(launches.record(&record(END, 3, WIN, 1_000), 130_000), None);
+        assert_eq!(launches.record(&record(START, 3, 0, 1_000), 131_000), None);
+        assert_eq!(launches.record(&record(END, 3, WIN, 1_000), 200_000), None);
+        // An older start is ignored; a newer game (the scenario, type 2) pays again.
+        assert_eq!(launches.record(&record(START, 2, 0, 999), 201_000), None);
+        assert_eq!(launches.record(&record(END, 2, WIN, 999), 300_000), None);
+        assert_eq!(launches.record(&record(START, 2, 0, 2_000), 301_000), None);
+        assert!(
+            launches
+                .record(&record(END, 2, WIN, 2_000), 362_000)
+                .is_some()
+        );
+    }
+
+    #[test]
+    fn a_result_that_misses_a_bound_pays_nothing() {
+        let mut launches = dueling();
+        // No run yet: nothing is tracked.
+        assert_eq!(launches.record(&record(START, 3, 0, 1_000), 0), None);
+        enter(&mut launches, 490);
+        assert_eq!(
+            launches.record(&record(END, 3, WIN, 1_000), 90_000),
+            None,
+            "no start record"
+        );
+
+        let mut play = |kind: i32, result: i32, started: i32, seconds: u64| {
+            let at = 1_000_000 * started.unsigned_abs() as u64;
+            launches.record(&record(START, kind, 0, started), at);
+            launches.record(&record(END, kind, result, started), at + seconds * 1_000)
+        };
+        assert_eq!(play(3, WIN, 1, 59), None, "under the floor");
+        assert_eq!(play(3, 2, 2, 600), None, "a loss");
+        assert_eq!(play(3, 0, 3, 600), None, "an unfinished result");
+        assert_eq!(play(1, WIN, 4, 600), None, "the scripted Tutorial");
+        assert_eq!(play(9, WIN, 5, 600), None, "a type the DLL does not have");
+        assert!(
+            play(3, WIN, 6, 60).is_some(),
+            "the control: a Skirmish win at the floor"
+        );
+
+        // An end that names another game neither pays nor consumes the pending game.
+        launches.record(&record(START, 3, 0, 7), 20_000_000);
+        assert_eq!(launches.record(&record(END, 3, WIN, 8), 90_000_000), None);
+        assert!(
+            launches
+                .record(&record(END, 3, WIN, 7), 90_000_001)
+                .is_some()
+        );
+    }
+
+    #[test]
+    fn a_closed_run_or_missing_duel_settings_pay_nothing() {
+        let mut launches = dueling();
+        let instance = enter(&mut launches, 491);
+        launches.record(&record(START, 3, 0, 1_000), 0);
+        launches.route(&client(6, instance), 1, 1_000).unwrap();
+        assert_eq!(
+            launches.record(&record(END, 3, WIN, 1_000), 100_000),
+            None,
+            "the card window was left"
+        );
+
+        // A launch block with no `duel` settings opens the window but pays no game.
+        let mut plain = self::launches();
+        enter(&mut plain, 491);
+        plain.record(&record(START, 3, 0, 1_000), 0);
+        assert_eq!(plain.record(&record(END, 3, WIN, 1_000), 100_000), None);
     }
 
     /// T782 review: a card run that reached Won/Lost owns the client's results Close (26/42) and

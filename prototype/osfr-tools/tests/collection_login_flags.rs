@@ -7,7 +7,7 @@
 #[path = "common/gateway_reference.rs"]
 mod gateway_reference;
 
-use gateway_reference::{Reference, initial_state};
+use gateway_reference::{initial_state, Reference};
 use osfr_tools::{
     gameplay::GameplayState,
     gateway::Gateway,
@@ -15,7 +15,7 @@ use osfr_tools::{
     startup_selfdata::{self as selfdata, CollectionKeyedRow, CollectionRecord, RewardBundle},
     startup_snapshot::StartupSnapshot,
 };
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::{
     fs,
@@ -98,7 +98,8 @@ fn login(version: &str) -> Vec<u8> {
 /// Log in and return the self-data message (startup index 7).
 fn self_packet(gateway: &mut Gateway, version: &str) -> Vec<u8> {
     let replies = gateway.handle(&login(version)).unwrap().replies;
-    assert_eq!(replies.len(), 8);
+    // The startup stream, and with gameplay the card window's session ticket after it.
+    assert!(matches!(replies.len(), 8 | 9));
     replies[7].clone()
 }
 
@@ -148,12 +149,10 @@ fn diff(left: &[u8], right: &[u8]) -> Vec<usize> {
 fn fresh_character_sends_every_collection_with_no_entry_collected() {
     let reference = reference();
     let template = template(&reference);
-    assert!(
-        template
-            .collections
-            .iter()
-            .all(|record| { record.keyed_rows.iter().all(|row| row.payload[28] == 1) })
-    );
+    assert!(template
+        .collections
+        .iter()
+        .all(|record| { record.keyed_rows.iter().all(|row| row.payload[28] == 1) }));
     let mut cleared = template.collections.clone();
     for row in cleared.iter_mut().flat_map(|record| &mut record.keyed_rows) {
         row.payload[28] = 0;

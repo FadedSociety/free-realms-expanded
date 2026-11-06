@@ -12,8 +12,11 @@ use osfr_tools::{
     chat,
     gameplay::{Gameplay, Outcome},
 };
-use std::path::PathBuf;
+use std::{fs, path::PathBuf};
 
+#[path = "common/content_copy.rs"]
+#[allow(dead_code)] // this suite only links and overlays; the helper also has `copy_tree`
+mod content_copy;
 #[path = "common/field_battle_fixture.rs"]
 mod field_battle_fixture;
 use field_battle_fixture::{battles, decode_list};
@@ -312,8 +315,8 @@ fn world_entry_lists_the_card_game_rows() {
             TRADING_CARD
         };
         assert_eq!(row.category, category, "card row {id} category");
-        // B4: PLAY! is Play's own gate, greyed while the shipped card game has no launch block.
-        assert!(!row.can_join, "card row {id}: closed, so greyed");
+        // B4: PLAY! is Play's own gate: the duels are open, Treasure War is not.
+        assert_eq!(row.can_join, id != 1078, "card row {id}");
     }
     // The field battle keeps its own (hidden) row beside them.
     assert_eq!(
@@ -342,10 +345,38 @@ fn only_chat(outcome: &osfr_tools::gateway::GatewayOutcome) -> String {
     field_battle_fixture::chat_text(outcome)
 }
 
+/// L935: the production-shaped fixture with the shipped card rows but no launch block. The shipped
+/// file opens the card service since L935; this suite pins the closed answer, so the file is
+/// overlaid in a private content copy.
+fn closed_card_fixture() -> field_battle_fixture::Fixture {
+    let mut fixture = field_battle_fixture::Fixture::new();
+    let root = fixture.root.join("content");
+    fs::create_dir_all(&root).unwrap();
+    let mut cards: serde_json::Value = serde_json::from_slice(
+        &fs::read(field_battle_fixture::content_dir().join("card_game.json")).unwrap(),
+    )
+    .unwrap();
+    cards.as_object_mut().unwrap().remove("launch");
+    fs::write(
+        root.join("card_game.json"),
+        serde_json::to_vec(&cards).unwrap(),
+    )
+    .unwrap();
+    for entry in fs::read_dir(&fixture.content).unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_file() {
+            content_copy::hard_link_or_copy(&entry.path(), &root.join(entry.file_name()));
+        }
+    }
+    content_copy::copy_missing(&field_battle_fixture::content_dir(), &root);
+    fixture.content = root;
+    fixture
+}
+
 #[test]
 fn playing_a_card_row_says_unavailable_and_changes_nothing() {
     use field_battle_fixture::{portal_play, send};
-    let fixture = field_battle_fixture::Fixture::new();
+    let fixture = closed_card_fixture();
     let mut gateway = player(&fixture, 5_041);
     let before = gateway.snapshot();
     let before_json = serde_json::to_vec(&before.gameplay).unwrap();

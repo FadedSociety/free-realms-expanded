@@ -369,8 +369,71 @@ pub const SYNC_UPDATE: i32 = 87;
 /// class exists, so the server answers by silence. The image is not kept until other players
 /// can fetch it (`AccountCommand_RequestAvatarImages` -> `SendAvatarImage`).
 pub const UPLOAD_AVATAR_IMAGE: i32 = 503;
+/// L935: `AccountCommand_RecordSinglePlayerGame` (initializer `100103d0`, reader `10010230`,
+/// writer `10010300`). The card window sends one when a Tutorial, Scenario or Skirmish starts
+/// (`104ab920`) and one when it ends (`104ae280`); the DLL plays those games itself, so this is the
+/// only wire they leave. Spec: lab/autopilot/opus/minigame-notes/L935-tcg-protocol.md.
+pub const RECORD_SINGLE_PLAYER_GAME: i32 = 487;
+/// (R) The reader's pairs: it reads its own header, then the `AccountCommand` base (`10009530`)
+/// reads one more and the account id. No native sample exists, so a third pair (the Lobby family
+/// has three) is accepted too, whichever consumes the frame exactly.
+const RECORD_HEADER_PAIRS: [usize; 2] = [2, 3];
+/// (R) Longest `name` string accepted; it is never used, only skipped.
+const RECORD_MAX_NAME: usize = 256;
 /// (R) The one delivery a starter sync makes; nothing compares it (`101db550`).
 const DELIVERY: i32 = 1;
+
+/// L935: one single-player record, fields in the writer's order (`10010300`). Every value is the
+/// client's word (the DLL plays the game); `name` is dropped.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct SinglePlayerRecord {
+    pub account: i32,
+    /// 1 the game started, 2 it ended (setter `1000fef0`).
+    pub phase: i32,
+    /// 3 Skirmish, 1 Tutorial, 2 a campaign Scenario (setter `1000ff10`).
+    pub game_type: i32,
+    /// At the end 1 when the local player won, else 2 (`1000ff30`); 0 at the start.
+    pub result: i32,
+    /// The client's game start time (`1000ff70`), the same value in both records of one game.
+    pub started: i32,
+}
+
+impl SinglePlayerRecord {
+    pub const STARTED: i32 = 1;
+    pub const ENDED: i32 = 2;
+    pub const WON: i32 = 1;
+
+    pub fn decode(body: &[u8]) -> io::Result<Self> {
+        RECORD_HEADER_PAIRS
+            .iter()
+            .find_map(|pairs| Self::decode_with(body, *pairs).ok())
+            .ok_or_else(|| invalid("card single-player record is malformed"))
+    }
+
+    fn decode_with(body: &[u8], pairs: usize) -> io::Result<Self> {
+        let mut reader = Reader::new(body);
+        for _ in 0..pairs {
+            if reader.int()? != RECORD_SINGLE_PLAYER_GAME {
+                return Err(invalid("card record has the wrong class id"));
+            }
+            reader.int()?;
+        }
+        let account = reader.int()?;
+        let (phase, game_type, result) = (reader.int()?, reader.int()?, reader.int()?);
+        reader.int()?; // the game screen's counter (unresolved)
+        let started = reader.int()?;
+        if reader.string()?.len() > RECORD_MAX_NAME || !reader.finished() {
+            return Err(invalid("card record name or tail is invalid"));
+        }
+        Ok(Self {
+            account,
+            phase,
+            game_type,
+            result,
+            started,
+        })
+    }
+}
 
 /// T813: the bodies that take a logged-in card window from "Entering main lobby..." to the
 /// lobby screen, in order. The screen dereferences its group without a null check
@@ -391,18 +454,35 @@ const DELIVERY: i32 = 1;
 /// - 291 v1 (`1015e5f0`, execute `1015e400`): the group id; event 70 opens the lobby screen for it
 ///   (`10372d70` -> `1037e5a0`).
 pub fn lobby_entry(account: i32, lobby: &crate::card_game::Lobby, name: &str) -> [Vec<u8>; 3] {
+    group_entry(account, [0, lobby.group_id, lobby.lobby_type], lobby.role, name)
+}
+
+/// The group "Play a Game" joins (`WALobbyChooser`; (R) the first group under the root).
+pub const CASUAL_GROUP: i32 = 2;
+/// Its type: the lobby screen gives only 2 and 9-19 their Practice and Two-Player buttons
+/// (`104a69a0`), and 1 is the root's.
+const CASUAL_TYPE: i32 = 2;
+
+/// The answer to a Join of [`CASUAL_GROUP`]: the same three bodies, for a group in the root.
+pub fn casual_lobby(account: i32, root: &crate::card_game::Lobby, name: &str) -> [Vec<u8>; 3] {
+    group_entry(account, [root.group_id, CASUAL_GROUP, CASUAL_TYPE], root.role, name)
+}
+
+/// Defines a group, joins it and shows it; `place` is its containing group, id and type.
+fn group_entry(account: i32, place: [i32; 3], role: i32, name: &str) -> [Vec<u8>; 3] {
+    let [container, group_id, lobby_type] = place;
     let level = |id, version| sync_command(id, version, [account]);
     let mut groups = level(ADD_GROUPS, 1);
     // One group: class 103 v3, five absent property sets, five empty role lists.
     let lobby_object = [1, 103, 3, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0];
     // Containing group, group, type, no deck, tournament round, sub-state.
-    let ids = [0, lobby.group_id, lobby.lobby_type, 1, 0, 0];
+    let ids = [container, group_id, lobby_type, 1, 0, 0];
     for value in lobby_object.into_iter().chain(ids) {
         put_int(&mut groups, value);
     }
     let mut join = level(JOIN, 4);
-    put_int(&mut join, lobby.group_id);
-    put_int(&mut join, lobby.role);
+    put_int(&mut join, group_id);
+    put_int(&mut join, role);
     put_string(&mut join, "");
     put_int(&mut join, 0);
     put_string(&mut join, name);
@@ -411,7 +491,7 @@ pub fn lobby_entry(account: i32, lobby: &crate::card_game::Lobby, name: &str) ->
         put_int(&mut join, value);
     }
     let mut display = level(CHANGE_LOBBY_DISPLAY, 1);
-    put_int(&mut display, lobby.group_id);
+    put_int(&mut display, group_id);
     [groups, join, display]
 }
 
@@ -707,6 +787,64 @@ fn invalid(message: &'static str) -> io::Error {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// The client's 487 in the writer's order (`10010300`): `pairs` header pairs, the account id,
+    /// then phase, type, result, counter, start time and the name.
+    fn record_bytes(pairs: usize, fields: [i32; 6], name: &str) -> Vec<u8> {
+        let mut body = Vec::new();
+        for _ in 0..pairs {
+            put_int(&mut body, RECORD_SINGLE_PLAYER_GAME);
+            put_int(&mut body, 1);
+        }
+        for value in fields {
+            put_int(&mut body, value);
+        }
+        put_string(&mut body, name);
+        body
+    }
+
+    /// L935: both header layouts the decoder accepts give the same record, and the name is dropped.
+    #[test]
+    fn a_single_player_record_decodes_with_two_or_three_header_pairs() {
+        let fields = [4_099, SinglePlayerRecord::ENDED, 3, 1, 12, 1_793_000_000];
+        let expected = SinglePlayerRecord {
+            account: 4_099,
+            phase: 2,
+            game_type: 3,
+            result: 1,
+            started: 1_793_000_000,
+        };
+        for pairs in [2, 3] {
+            let body = record_bytes(pairs, fields, "Skirmish");
+            assert_eq!(class_id(&body).unwrap(), RECORD_SINGLE_PLAYER_GAME);
+            assert_eq!(SinglePlayerRecord::decode(&body).unwrap(), expected);
+        }
+    }
+
+    #[test]
+    fn a_malformed_single_player_record_is_refused() {
+        let fields = [1, 1, 3, 0, 0, 1_793_000_000];
+        let good = record_bytes(2, fields, "");
+        assert!(SinglePlayerRecord::decode(&good).is_ok());
+        // Truncated at every length, trailing bytes, one header pair, four pairs, the wrong class.
+        for length in 0..good.len() {
+            assert!(
+                SinglePlayerRecord::decode(&good[..length]).is_err(),
+                "{length}"
+            );
+        }
+        assert!(SinglePlayerRecord::decode(&[good.clone(), vec![0]].concat()).is_err());
+        assert!(SinglePlayerRecord::decode(&record_bytes(1, fields, "")).is_err());
+        assert!(SinglePlayerRecord::decode(&record_bytes(4, fields, "")).is_err());
+        let mut wrong = good;
+        wrong[0] = 0x10 | (SEND_SESSION_ID as u8 & 0xF);
+        assert!(SinglePlayerRecord::decode(&wrong).is_err());
+        // A name longer than the cap is refused whole.
+        let long = "x".repeat(RECORD_MAX_NAME + 1);
+        assert!(SinglePlayerRecord::decode(&record_bytes(2, fields, &long)).is_err());
+        let longest = "x".repeat(RECORD_MAX_NAME);
+        assert!(SinglePlayerRecord::decode(&record_bytes(2, fields, &longest)).is_ok());
+    }
 
     #[test]
     fn a_broken_random_source_is_refused_after_four_draws() {

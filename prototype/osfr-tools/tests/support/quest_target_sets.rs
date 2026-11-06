@@ -78,7 +78,7 @@
 
 use super::quest_records::as_u32;
 use osfr_tools::{
-    activity_portal, checkers, chess_service,
+    activity_portal, card_game, checkers, chess_service,
     derby_gateway::DerbyGateway,
     harvest_nodes::GatheringNodes,
     harvesting,
@@ -242,6 +242,21 @@ impl Targets {
         if let Some(content) = ship_combat::Content::load(root)? {
             for arena in &content.arenas {
                 targets.producer(arena.minigame_id, [MinigameFact::Score, MinigameFact::Placement]);
+            }
+        }
+        // L935: with a launch block that has duel settings, a Games-window card row (category 11)
+        // credits its own MiniGameData id when the card window reports a Skirmish or Scenario win
+        // (`Gameplay::card_single_player`); the only fact is the server-measured time. The quest-only
+        // TYPE 16 ids with no Games row (`type16_minigame_ids`) have no entry and stay unproduced.
+        if let Some(cards) = card_game::Content::load_optional(root)?
+            && cards.launch().is_some_and(|launch| launch.duel.is_some())
+        {
+            for row in cards
+                .rows()
+                .iter()
+                .filter(|row| row.category == card_game::TRADING_CARD_CATEGORY)
+            {
+                targets.producer(row.minigame_id, [MinigameFact::Elapsed]);
             }
         }
         // `FishingSpots::load` owns the file; a paid catch credits the spot's

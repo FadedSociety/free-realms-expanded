@@ -531,9 +531,37 @@ fn card_rows_match_the_client_reader() {
     assert_eq!(tutorials, 14);
 }
 
+/// L935: the shipped card rows without their launch block, the state this suite's refusal order
+/// was written against (the shipped file opens the service since L935).
+fn closed_cards() -> Arc<card_game::Content> {
+    let mut shipped: serde_json::Value = serde_json::from_slice(
+        &fs::read(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/card_game.json"))
+            .unwrap(),
+    )
+    .unwrap();
+    shipped.as_object_mut().unwrap().remove("launch");
+    let dir = Dir::new();
+    let path = dir.0.join("card_game.json");
+    fs::write(&path, serde_json::to_vec(&shipped).unwrap()).unwrap();
+    Arc::new(card_game::Content::load(&path).unwrap())
+}
+
+/// L935: with the shipped launch block the deck rows and the tutorial open, Treasure War stays shut.
+#[test]
+fn shipped_card_rows_open_except_treasure_war() {
+    let catalogue = Catalogue::assemble(None, None, None, Some(&cards())).unwrap();
+    for id in [7, 490, 505, 1049] {
+        assert!(catalogue.admit(id, FIGHTER, false).is_ok(), "row {id}");
+    }
+    assert_eq!(
+        catalogue.admit(1078, FIGHTER, false),
+        Err(Refusal::TreasureWarClosed)
+    );
+}
+
 #[test]
 fn card_rows_are_refused_in_order_unknown_busy_closed() {
-    let cards = cards();
+    let cards = closed_cards();
     let catalogue = Catalogue::assemble(None, None, None, Some(&cards))
         .unwrap()
         .append([chess_row(20).into()])
