@@ -290,7 +290,9 @@ fn the_shipped_harvesting_file_offers_each_plot_game_with_the_recovered_produce(
         for (slot, goal) in row["goals"].as_array().unwrap().iter().enumerate() {
             assert_eq!(goal["value"], json!(recovered.goals[slot].value), "{game}");
             assert_eq!(goal["icon_id"], json!(recovered.goals[slot].icon_id));
-            assert_eq!(goal["quota"], base["goals"][slot]["quota"], "{game}");
+            // Each farm asks its own bundles of its two named crops (the Goals panel).
+            let (quota, per_reward) = (goal["quota"].as_u64(), goal["per_reward"].as_u64());
+            assert_eq!(quota.unwrap() % per_reward.unwrap(), 0, "{game}");
             assert_eq!(goal["per_reward"], base["goals"][slot]["per_reward"]);
         }
         for (slot, output) in row["outputs"].as_array().unwrap().iter().enumerate() {

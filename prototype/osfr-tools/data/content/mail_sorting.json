@@ -14,16 +14,16 @@
       "description_id": 35611,
       "icon_id": 911,
       "selectable": [
-        401,
+        406,
         403,
         405,
-        408
+        407
       ],
       "tiles": [
         {
-          "value": 401,
+          "value": 406,
           "category": 400,
-          "icon_id": 1
+          "icon_id": 6
         },
         {
           "value": 403,
@@ -36,38 +36,38 @@
           "icon_id": 5
         },
         {
-          "value": 408,
+          "value": 407,
           "category": 400,
-          "icon_id": 8
+          "icon_id": 7
         }
       ],
       "goals": [
         {
           "index": 0,
-          "value": 401,
-          "quota": 15,
-          "per_reward": 5,
+          "value": 406,
+          "quota": 20,
+          "per_reward": 1,
           "icon_id": 0
         },
         {
           "index": 1,
           "value": 403,
-          "quota": 15,
-          "per_reward": 5,
+          "quota": 20,
+          "per_reward": 1,
           "icon_id": 0
         },
         {
           "index": 2,
           "value": 405,
-          "quota": 15,
-          "per_reward": 5,
+          "quota": 20,
+          "per_reward": 1,
           "icon_id": 0
         },
         {
           "index": 3,
-          "value": 408,
-          "quota": 15,
-          "per_reward": 5,
+          "value": 407,
+          "quota": 20,
+          "per_reward": 1,
           "icon_id": 0
         }
       ],
@@ -86,6 +86,38 @@
         0, 0, 0, 4, 4, 4, 1, 1, 4, 4, 4, 0, 0,
         0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+      ],
+      "objectives": [
+        {
+          "name_id": 36987,
+          "category": 1,
+          "counts": "levels",
+          "target": 1
+        },
+        {
+          "name_id": 92864,
+          "category": 2,
+          "counts": "score",
+          "target": 65000
+        },
+        {
+          "name_id": 92861,
+          "category": 4,
+          "counts": "chain",
+          "target": 12
+        },
+        {
+          "name_id": 92915,
+          "category": 4,
+          "counts": "levels",
+          "target": 1
+        },
+        {
+          "name_id": 92916,
+          "category": 5,
+          "counts": "locked",
+          "target": 4
+        }
       ]
     },
     {
@@ -94,26 +126,26 @@
       "description_id": 35611,
       "icon_id": 911,
       "selectable": [
-        402,
-        403,
         404,
+        402,
+        408,
         407
       ],
       "tiles": [
+        {
+          "value": 404,
+          "category": 400,
+          "icon_id": 4
+        },
         {
           "value": 402,
           "category": 400,
           "icon_id": 2
         },
         {
-          "value": 403,
+          "value": 408,
           "category": 400,
-          "icon_id": 3
-        },
-        {
-          "value": 404,
-          "category": 400,
-          "icon_id": 4
+          "icon_id": 8
         },
         {
           "value": 407,
@@ -124,30 +156,30 @@
       "goals": [
         {
           "index": 0,
-          "value": 402,
-          "quota": 15,
-          "per_reward": 5,
+          "value": 404,
+          "quota": 20,
+          "per_reward": 1,
           "icon_id": 0
         },
         {
           "index": 1,
-          "value": 403,
-          "quota": 15,
-          "per_reward": 5,
+          "value": 402,
+          "quota": 20,
+          "per_reward": 1,
           "icon_id": 0
         },
         {
           "index": 2,
-          "value": 404,
-          "quota": 15,
-          "per_reward": 5,
+          "value": 408,
+          "quota": 20,
+          "per_reward": 1,
           "icon_id": 0
         },
         {
           "index": 3,
           "value": 407,
-          "quota": 15,
-          "per_reward": 5,
+          "quota": 20,
+          "per_reward": 1,
           "icon_id": 0
         }
       ],
@@ -166,6 +198,32 @@
         0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 4, 4, 4, 4, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+      ],
+      "objectives": [
+        {
+          "name_id": 36987,
+          "category": 1,
+          "counts": "levels",
+          "target": 1
+        },
+        {
+          "name_id": 92861,
+          "category": 4,
+          "counts": "chain",
+          "target": 12
+        },
+        {
+          "name_id": 92915,
+          "category": 4,
+          "counts": "levels",
+          "target": 1
+        },
+        {
+          "name_id": 92916,
+          "category": 5,
+          "counts": "locked",
+          "target": 4
+        }
       ]
     },
     {
@@ -205,33 +263,65 @@
         {
           "index": 0,
           "value": 403,
-          "quota": 15,
-          "per_reward": 5,
+          "quota": 20,
+          "per_reward": 1,
           "icon_id": 0
         },
         {
           "index": 1,
           "value": 404,
-          "quota": 15,
-          "per_reward": 5,
+          "quota": 20,
+          "per_reward": 1,
           "icon_id": 0
         },
         {
           "index": 2,
           "value": 406,
-          "quota": 15,
-          "per_reward": 5,
+          "quota": 20,
+          "per_reward": 1,
           "icon_id": 0
         },
         {
           "index": 3,
           "value": 408,
-          "quota": 15,
-          "per_reward": 5,
+          "quota": 20,
+          "per_reward": 1,
           "icon_id": 0
         }
       ],
-      "outputs": []
+      "outputs": [],
+      "objectives": [
+        {
+          "name_id": 36987,
+          "category": 1,
+          "counts": "levels",
+          "target": 1
+        },
+        {
+          "name_id": 92864,
+          "category": 2,
+          "counts": "score",
+          "target": 65000
+        },
+        {
+          "name_id": 92861,
+          "category": 4,
+          "counts": "chain",
+          "target": 12
+        },
+        {
+          "name_id": 92915,
+          "category": 4,
+          "counts": "levels",
+          "target": 1
+        },
+        {
+          "name_id": 92916,
+          "category": 5,
+          "counts": "locked",
+          "target": 4
+        }
+      ]
     },
     {
       "game_id": 380,
@@ -239,60 +329,60 @@
       "description_id": 35611,
       "icon_id": 911,
       "selectable": [
-        404,
         405,
-        407,
-        408
+        404,
+        408,
+        407
       ],
       "tiles": [
-        {
-          "value": 404,
-          "category": 400,
-          "icon_id": 4
-        },
         {
           "value": 405,
           "category": 400,
           "icon_id": 5
         },
         {
-          "value": 407,
+          "value": 404,
           "category": 400,
-          "icon_id": 7
+          "icon_id": 4
         },
         {
           "value": 408,
           "category": 400,
           "icon_id": 8
+        },
+        {
+          "value": 407,
+          "category": 400,
+          "icon_id": 7
         }
       ],
       "goals": [
         {
           "index": 0,
-          "value": 404,
-          "quota": 15,
-          "per_reward": 5,
+          "value": 405,
+          "quota": 20,
+          "per_reward": 1,
           "icon_id": 0
         },
         {
           "index": 1,
-          "value": 405,
-          "quota": 15,
-          "per_reward": 5,
+          "value": 404,
+          "quota": 20,
+          "per_reward": 1,
           "icon_id": 0
         },
         {
           "index": 2,
-          "value": 407,
-          "quota": 15,
-          "per_reward": 5,
+          "value": 408,
+          "quota": 20,
+          "per_reward": 1,
           "icon_id": 0
         },
         {
           "index": 3,
-          "value": 408,
-          "quota": 15,
-          "per_reward": 5,
+          "value": 407,
+          "quota": 20,
+          "per_reward": 1,
           "icon_id": 0
         }
       ],
@@ -311,6 +401,32 @@
         0, 0, 1, 1, 1, 4, 4, 4, 4, 1, 1, 1, 0,
         0, 0, 4, 4, 4, 0, 0, 0, 0, 4, 4, 4, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+      ],
+      "objectives": [
+        {
+          "name_id": 36987,
+          "category": 1,
+          "counts": "levels",
+          "target": 1
+        },
+        {
+          "name_id": 92864,
+          "category": 2,
+          "counts": "score",
+          "target": 65000
+        },
+        {
+          "name_id": 92915,
+          "category": 4,
+          "counts": "levels",
+          "target": 1
+        },
+        {
+          "name_id": 92916,
+          "category": 5,
+          "counts": "locked",
+          "target": 4
+        }
       ]
     },
     {
@@ -319,60 +435,60 @@
       "description_id": 35611,
       "icon_id": 911,
       "selectable": [
-        401,
-        402,
-        404,
-        406
+        408,
+        403,
+        405,
+        407
       ],
       "tiles": [
         {
-          "value": 401,
+          "value": 408,
           "category": 400,
-          "icon_id": 1
+          "icon_id": 8
         },
         {
-          "value": 402,
+          "value": 403,
           "category": 400,
-          "icon_id": 2
+          "icon_id": 3
         },
         {
-          "value": 404,
+          "value": 405,
           "category": 400,
-          "icon_id": 4
+          "icon_id": 5
         },
         {
-          "value": 406,
+          "value": 407,
           "category": 400,
-          "icon_id": 6
+          "icon_id": 7
         }
       ],
       "goals": [
         {
           "index": 0,
-          "value": 401,
-          "quota": 15,
-          "per_reward": 5,
+          "value": 408,
+          "quota": 20,
+          "per_reward": 1,
           "icon_id": 0
         },
         {
           "index": 1,
-          "value": 402,
-          "quota": 15,
-          "per_reward": 5,
+          "value": 403,
+          "quota": 20,
+          "per_reward": 1,
           "icon_id": 0
         },
         {
           "index": 2,
-          "value": 404,
-          "quota": 15,
-          "per_reward": 5,
+          "value": 405,
+          "quota": 20,
+          "per_reward": 1,
           "icon_id": 0
         },
         {
           "index": 3,
-          "value": 406,
-          "quota": 15,
-          "per_reward": 5,
+          "value": 407,
+          "quota": 20,
+          "per_reward": 1,
           "icon_id": 0
         }
       ],
@@ -391,6 +507,38 @@
         0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,
         0, 0, 0, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+      ],
+      "objectives": [
+        {
+          "name_id": 36987,
+          "category": 1,
+          "counts": "levels",
+          "target": 1
+        },
+        {
+          "name_id": 92913,
+          "category": 2,
+          "counts": "score",
+          "target": 70000
+        },
+        {
+          "name_id": 92914,
+          "category": 4,
+          "counts": "chain",
+          "target": 15
+        },
+        {
+          "name_id": 92915,
+          "category": 4,
+          "counts": "levels",
+          "target": 1
+        },
+        {
+          "name_id": 92916,
+          "category": 5,
+          "counts": "locked",
+          "target": 4
+        }
       ]
     }
   ],
@@ -413,13 +561,18 @@
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     ],
     "selectable": [
+      404,
       401,
       402,
-      405,
       406
     ],
     "collectable": [],
     "tiles": [
+      {
+        "value": 404,
+        "category": 400,
+        "icon_id": 4
+      },
       {
         "value": 401,
         "category": 400,
@@ -431,11 +584,6 @@
         "icon_id": 2
       },
       {
-        "value": 405,
-        "category": 400,
-        "icon_id": 5
-      },
-      {
         "value": 406,
         "category": 400,
         "icon_id": 6
@@ -444,30 +592,30 @@
     "goals": [
       {
         "index": 0,
-        "value": 401,
-        "quota": 15,
-        "per_reward": 5,
+        "value": 404,
+        "quota": 20,
+        "per_reward": 1,
         "icon_id": 0
       },
       {
         "index": 1,
-        "value": 402,
-        "quota": 15,
-        "per_reward": 5,
+        "value": 401,
+        "quota": 20,
+        "per_reward": 1,
         "icon_id": 0
       },
       {
         "index": 2,
-        "value": 405,
-        "quota": 15,
-        "per_reward": 5,
+        "value": 402,
+        "quota": 20,
+        "per_reward": 1,
         "icon_id": 0
       },
       {
         "index": 3,
         "value": 406,
-        "quota": 15,
-        "per_reward": 5,
+        "quota": 20,
+        "per_reward": 1,
         "icon_id": 0
       }
     ],
@@ -481,5 +629,37 @@
     "meter_id": 0,
     "reconstructed_rules": true,
     "rule_notice": "Recovered: game_mailsorting.gfx is the type-8 match-three movie of game_mining.gfx (identical server network, level, spawn, progression and bin classes; ConfigServer GAME_ID 12), the eight mail items are the client CodeStringMappings mailValue401..408 (Global.Text 40975, 117132-117135, 40979, 117137, 73630), the tutorial (Global.Text 19323) asks four items per level filled by chains of three or more, the six towns are client MiniGameData 376-381 with their name ids and description 35611, the preload list MailsortingAssets.txt and the movie from the client packs. Reconstructed (server tables never shipped): the four items per town, the farming board's shape, duration, quotas and spawn percentages, and the payout (no item; Postman XP per sorted run)."
-  }
+  },
+  "objectives": [
+    {
+      "name_id": 36987,
+      "category": 1,
+      "counts": "levels",
+      "target": 1
+    },
+    {
+      "name_id": 92913,
+      "category": 2,
+      "counts": "score",
+      "target": 70000
+    },
+    {
+      "name_id": 92914,
+      "category": 4,
+      "counts": "chain",
+      "target": 15
+    },
+    {
+      "name_id": 92915,
+      "category": 4,
+      "counts": "levels",
+      "target": 1
+    },
+    {
+      "name_id": 92916,
+      "category": 5,
+      "counts": "locked",
+      "target": 4
+    }
+  ]
 }

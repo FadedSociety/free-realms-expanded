@@ -304,6 +304,7 @@ fn harvested_bundles_grant_once_from_a_serialized_completion_state() {
         chains: 4,
         reshuffles: 0,
         end_sent: false,
+        best_chain: 0,
     };
     let state = Type8State {
         version: 1,

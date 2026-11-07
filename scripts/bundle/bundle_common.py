@@ -580,7 +580,7 @@ def _check_board(
         not selectable or len(selectable) > 16
         or any(not _is_u16(value) or not 400 <= value < 500 for value in selectable)
         or len(collectable) > 16
-        or any(not _is_u16(value) or not 600 <= value < 700 for value in collectable)
+        or any(not _is_u16(value) or not 600 <= value < 800 for value in collectable)
     ):
         raise ValueError(f"content/{name} has invalid tile kinds")
     # `Type8Kind` deserialization requires all three fields with these widths;

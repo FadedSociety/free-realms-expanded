@@ -356,5 +356,37 @@
     "meter_id": 0,
     "reconstructed_rules": true,
     "rule_notice": "Recovered: game_artifact.gfx is the type-8 match-three movie of game_mining.gfx, and its text asks four kinds of artifact per level. Seen on a retail level 1: its four artifacts, quota 15, difficulty 2. Levels 2 to 5 are the wiki's rounds; round II lists five artifacts, so the Goblet is left out (R). Reconstructed: quotas and times past level 1, Mail Sorting's board tuning and the XP."
-  }
+  },
+  "objectives": [
+    {
+      "name_id": 36987,
+      "category": 1,
+      "counts": "levels",
+      "target": 1
+    },
+    {
+      "name_id": 92937,
+      "category": 2,
+      "counts": "score",
+      "target": 83000
+    },
+    {
+      "name_id": 92914,
+      "category": 4,
+      "counts": "chain",
+      "target": 15
+    },
+    {
+      "name_id": 92915,
+      "category": 4,
+      "counts": "levels",
+      "target": 5
+    },
+    {
+      "name_id": 92940,
+      "category": 5,
+      "counts": "locked",
+      "target": 15
+    }
+  ]
 }

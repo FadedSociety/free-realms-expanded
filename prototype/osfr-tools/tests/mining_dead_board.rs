@@ -188,6 +188,7 @@ fn dead_state(board: Vec<u16>, tile_queue: Vec<u16>) -> Type8State {
             chains: 6,
             reshuffles: 0,
             end_sent: false,
+            best_chain: 0,
         }),
     }
 }

@@ -620,7 +620,7 @@ fn mining_chain(run: &Type8Run) -> Vec<(usize, usize)> {
     let width = SIDE;
     for y in 0..SIDE {
         for x in 0..SIDE {
-            if !matches!(run.board[y * width + x], 601 | 602) {
+            if !matches!(run.board[y * width + x], 600..800) {
                 continue;
             }
             for below in (y + 1)..SIDE {
@@ -676,7 +676,7 @@ fn finish_shipped_mining(gateway: &mut Gateway, id: i32, base_ms: u64) {
         let foot = |x: usize| (0..SIDE - 1).find(|y| run.board[(y + 1) * SIDE + x] == 100);
         let falling = (0..SIDE).find_map(|x| {
             let y = foot(x)?;
-            matches!(run.board[y * SIDE + x], 601 | 602).then_some((x, y))
+            matches!(run.board[y * SIDE + x], 600..800).then_some((x, y))
         });
         if let Some((x, y)) = falling {
             send(
@@ -731,11 +731,8 @@ fn shipped_mining_board_pays_ore_and_xp_once_through_the_node() {
 
     send(&mut gateway, &payload(id, "OnNextLevelMsg"), 5_000);
     assert_eq!(mining_run(&gateway).phase, Type8Phase::Won);
-    assert_eq!(
-        count(&gateway, 2739),
-        12,
-        "six 601 drops plus six 602 drops"
-    );
+    // Six 601 drops and six 602 drops, and a tile that falls past a met quota still pays.
+    assert!(count(&gateway, 2739) >= 12);
     assert_eq!(xp(&gateway, MINING), 25, "(R) Miner XP per win");
     let paid = gateway.snapshot();
 
@@ -2521,11 +2518,12 @@ fn a_campaign_without_plot_games_refuses_the_plot_and_keeps_the_mushrooms() {
 
 /// L934: the Games window ore rows (row, MiniGameData game, the ore it pays, the Miner rank it
 /// asks), and every ore the Miner's bars smelt.
-const ORE_ROWS: [(u32, i32, i32); 4] = [
-    (401, 93, 2740),
-    (402, 95, 2741),
-    (577, 97, 2742),
-    (578, 99, 2743),
+/// Row, game, ore, and the ore its first goal asks (the client's "Collect N ... ore!").
+const ORE_ROWS: [(u32, i32, i32, u32); 4] = [
+    (401, 93, 2740, 10),
+    (402, 95, 2741, 10),
+    (577, 97, 2742, 8),
+    (578, 99, 2743, 6),
 ];
 const ORES: [i32; 5] = [2739, 2740, 2741, 2742, 2743];
 
@@ -2558,7 +2556,7 @@ fn games_window_ore_rows_pay_their_own_ore_at_their_miner_rank() {
         profiles.experience.insert(MINER_PROFILE_ID, xp);
         state
     };
-    for (row, game, paid) in ORE_ROWS {
+    for (row, game, paid, asked) in ORE_ROWS {
         let mut novice = fixture.gateway_at(miner(0), &fixture.node, 60.0);
         let before = novice.snapshot();
         let refused = play(&mut novice, row, 2_000);
@@ -2583,9 +2581,9 @@ fn games_window_ore_rows_pay_their_own_ore_at_their_miner_rank() {
         send(&mut gateway, &payload(id, "OnNextLevelMsg"), 5_000);
         assert_eq!(mining_run(&gateway).phase, Type8Phase::Won, "row {row}");
         for ore in ORES {
-            // Twelve at the quotas; a tile that falls past a met quota still pays.
+            // A tile that falls past a met quota still pays.
             let held = count(&gateway, ore);
-            let right = if ore == paid { held >= 12 } else { held == 0 };
+            let right = if ore == paid { held >= asked } else { held == 0 };
             assert!(right, "row {row}: ore {ore} holds {held}");
         }
         let paid_state = gateway.snapshot();

@@ -45,21 +45,21 @@
         {
           "index": 0,
           "value": 401,
-          "quota": 15,
+          "quota": 0,
           "per_reward": 5,
           "icon_id": 706
         },
         {
           "index": 1,
           "value": 410,
-          "quota": 15,
+          "quota": 0,
           "per_reward": 5,
           "icon_id": 710
         },
         {
           "index": 2,
           "value": 415,
-          "quota": 15,
+          "quota": 25,
           "per_reward": 5,
           "icon_id": 667
         },
@@ -107,6 +107,42 @@
         0, 4, 4, 4, 1, 1, 1, 1, 1, 1, 4, 4, 4,
         0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+      ],
+      "objectives": [
+        {
+          "name_id": 92942,
+          "category": 1,
+          "counts": {
+            "bin": 3
+          },
+          "target": 3
+        },
+        {
+          "name_id": 92943,
+          "category": 2,
+          "counts": {
+            "bin": 2
+          },
+          "target": 5
+        },
+        {
+          "name_id": 92861,
+          "category": 4,
+          "counts": "chain",
+          "target": 12
+        },
+        {
+          "name_id": 92873,
+          "category": 4,
+          "counts": "score",
+          "target": 80000
+        },
+        {
+          "name_id": 92946,
+          "category": 5,
+          "counts": "locked",
+          "target": 20
+        }
       ]
     },
     {
@@ -146,14 +182,14 @@
         {
           "index": 0,
           "value": 410,
-          "quota": 15,
+          "quota": 0,
           "per_reward": 5,
           "icon_id": 710
         },
         {
           "index": 1,
           "value": 414,
-          "quota": 15,
+          "quota": 25,
           "per_reward": 5,
           "icon_id": 705
         },
@@ -167,7 +203,7 @@
         {
           "index": 3,
           "value": 401,
-          "quota": 15,
+          "quota": 0,
           "per_reward": 5,
           "icon_id": 706
         }
@@ -208,6 +244,42 @@
         0, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4,
         0, 1, 1, 1, 1, 4, 4, 4, 4, 0, 0, 0, 0,
         0, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0
+      ],
+      "objectives": [
+        {
+          "name_id": 92952,
+          "category": 1,
+          "counts": {
+            "bin": 2
+          },
+          "target": 3
+        },
+        {
+          "name_id": 92953,
+          "category": 2,
+          "counts": {
+            "bin": 1
+          },
+          "target": 5
+        },
+        {
+          "name_id": 92861,
+          "category": 4,
+          "counts": "chain",
+          "target": 12
+        },
+        {
+          "name_id": 92873,
+          "category": 4,
+          "counts": "score",
+          "target": 80000
+        },
+        {
+          "name_id": 92946,
+          "category": 5,
+          "counts": "locked",
+          "target": 20
+        }
       ]
     },
     {
@@ -254,21 +326,21 @@
         {
           "index": 1,
           "value": 413,
-          "quota": 15,
+          "quota": 0,
           "per_reward": 5,
           "icon_id": 713
         },
         {
           "index": 2,
           "value": 412,
-          "quota": 15,
+          "quota": 25,
           "per_reward": 5,
           "icon_id": 714
         },
         {
           "index": 3,
           "value": 403,
-          "quota": 15,
+          "quota": 0,
           "per_reward": 5,
           "icon_id": 712
         }
@@ -309,6 +381,42 @@
         0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0,
         0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0,
         0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 0, 0, 0
+      ],
+      "objectives": [
+        {
+          "name_id": 92957,
+          "category": 1,
+          "counts": {
+            "bin": 0
+          },
+          "target": 3
+        },
+        {
+          "name_id": 92958,
+          "category": 2,
+          "counts": {
+            "bin": 2
+          },
+          "target": 5
+        },
+        {
+          "name_id": 92861,
+          "category": 4,
+          "counts": "chain",
+          "target": 12
+        },
+        {
+          "name_id": 92873,
+          "category": 4,
+          "counts": "score",
+          "target": 80000
+        },
+        {
+          "name_id": 92946,
+          "category": 5,
+          "counts": "locked",
+          "target": 20
+        }
       ]
     },
     {
@@ -355,21 +463,21 @@
         {
           "index": 1,
           "value": 406,
-          "quota": 15,
+          "quota": 25,
           "per_reward": 5,
           "icon_id": 716
         },
         {
           "index": 2,
           "value": 410,
-          "quota": 15,
+          "quota": 0,
           "per_reward": 5,
           "icon_id": 710
         },
         {
           "index": 3,
           "value": 401,
-          "quota": 15,
+          "quota": 0,
           "per_reward": 5,
           "icon_id": 706
         }
@@ -410,6 +518,42 @@
         0, 0, 0, 4, 1, 1, 1, 1, 1, 1, 4, 0, 0,
         0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+      ],
+      "objectives": [
+        {
+          "name_id": 92962,
+          "category": 1,
+          "counts": {
+            "bin": 0
+          },
+          "target": 3
+        },
+        {
+          "name_id": 92963,
+          "category": 2,
+          "counts": {
+            "bin": 1
+          },
+          "target": 5
+        },
+        {
+          "name_id": 92861,
+          "category": 4,
+          "counts": "chain",
+          "target": 12
+        },
+        {
+          "name_id": 92873,
+          "category": 4,
+          "counts": "score",
+          "target": 80000
+        },
+        {
+          "name_id": 92946,
+          "category": 5,
+          "counts": "locked",
+          "target": 20
+        }
       ]
     },
     {
@@ -449,21 +593,21 @@
         {
           "index": 0,
           "value": 403,
-          "quota": 15,
+          "quota": 0,
           "per_reward": 5,
           "icon_id": 712
         },
         {
           "index": 1,
           "value": 409,
-          "quota": 15,
+          "quota": 25,
           "per_reward": 5,
           "icon_id": 703
         },
         {
           "index": 2,
           "value": 413,
-          "quota": 15,
+          "quota": 0,
           "per_reward": 5,
           "icon_id": 713
         },
@@ -511,6 +655,42 @@
         0, 0, 0, 4, 1, 1, 1, 1, 1, 1, 4, 0, 0,
         0, 0, 0, 0, 4, 1, 1, 1, 1, 4, 0, 0, 0,
         0, 0, 0, 0, 0, 4, 4, 4, 4, 0, 0, 0, 0
+      ],
+      "objectives": [
+        {
+          "name_id": 92967,
+          "category": 1,
+          "counts": {
+            "bin": 3
+          },
+          "target": 3
+        },
+        {
+          "name_id": 92968,
+          "category": 2,
+          "counts": {
+            "bin": 1
+          },
+          "target": 5
+        },
+        {
+          "name_id": 92861,
+          "category": 4,
+          "counts": "chain",
+          "target": 12
+        },
+        {
+          "name_id": 92873,
+          "category": 4,
+          "counts": "score",
+          "target": 80000
+        },
+        {
+          "name_id": 92946,
+          "category": 5,
+          "counts": "locked",
+          "target": 20
+        }
       ]
     }
   ],
@@ -572,21 +752,21 @@
       {
         "index": 1,
         "value": 413,
-        "quota": 15,
+        "quota": 0,
         "per_reward": 5,
         "icon_id": 713
       },
       {
         "index": 2,
         "value": 416,
-        "quota": 15,
+        "quota": 25,
         "per_reward": 5,
         "icon_id": 717
       },
       {
         "index": 3,
         "value": 403,
-        "quota": 15,
+        "quota": 0,
         "per_reward": 5,
         "icon_id": 712
       }
@@ -622,5 +802,41 @@
     "meter_id": 0,
     "reconstructed_rules": true,
     "rule_notice": "Recovered: type-8 family 39 envelope and payload names, caret-delimited MatchThree*Data.txt schema, chain/minimum-3 rule, tile and score constants from GameData.as, per-region produce sets from locale 94149..94154, the farmingValue401..416 code strings and SelectableTile1..16 frames that name and draw every basket, bundle item definitions 2875..2890 from the pinned ClientItemDefinitions.json, the farming preload list FarmingAssets.txt and the game_farming.gfx movie from the client packs, and the staggered/stepped board drawn by the pinned wiki screenshot (diamond_shape). Every farm's board is read from its retail picture on the wiki's game page (row 0 and column 0 stay empty because the original fall loops never visit index 0). Reconstructed (server tables never shipped): duration, per-goal quotas, tiles-per-bundle cadence, spawn percentages, and bundles granted per goal."
-  }
+  },
+  "objectives": [
+    {
+      "name_id": 92947,
+      "category": 1,
+      "counts": {
+        "bin": 0
+      },
+      "target": 3
+    },
+    {
+      "name_id": 92948,
+      "category": 2,
+      "counts": {
+        "bin": 2
+      },
+      "target": 5
+    },
+    {
+      "name_id": 92861,
+      "category": 4,
+      "counts": "chain",
+      "target": 12
+    },
+    {
+      "name_id": 92873,
+      "category": 4,
+      "counts": "score",
+      "target": 80000
+    },
+    {
+      "name_id": 92946,
+      "category": 5,
+      "counts": "locked",
+      "target": 20
+    }
+  ]
 }

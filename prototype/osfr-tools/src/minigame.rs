@@ -86,7 +86,7 @@ pub struct Goal {
 }
 
 impl Goal {
-    fn encode(&self, out: &mut Vec<u8>) {
+    pub fn encode(&self, out: &mut Vec<u8>) {
         for value in [self.id, self.name_id, self.description_id] {
             out.extend(value.to_le_bytes());
         }
@@ -885,7 +885,7 @@ fn info_packet(instance_id: i32, spec: &RunSpec) -> io::Result<Vec<u8>> {
 
 /// 47/1 (dispatch `00a91bf0`, reader `00a8d1f0`, row `00cb81e0`): the goal's row in the in-game
 /// Goals panel, `BaseClient.ObjectiveHelper`. The panel opens once it holds a row (`ObjectiveWindow`).
-fn goal_row_packet(goal: &Goal) -> Vec<u8> {
+pub fn goal_row_packet(goal: &Goal) -> Vec<u8> {
     let mut bytes = FAMILY_UI.to_le_bytes().to_vec();
     bytes.push(1);
     for value in [goal.id, 0, goal.name_id] {
@@ -900,7 +900,7 @@ fn goal_row_packet(goal: &Goal) -> Vec<u8> {
 
 /// 45/1 ObjectiveActivatePacket (reader `009b56d0`, apply `009ad510`): the goal the offer listed
 /// under this id takes its total and turns InProgress.
-fn goal_activate_packet(goal: &Goal) -> Vec<u8> {
+pub fn goal_activate_packet(goal: &Goal) -> Vec<u8> {
     let mut bytes = FAMILY_OBJECTIVE.to_le_bytes().to_vec();
     bytes.push(1);
     bytes.extend(goal.id.to_le_bytes());

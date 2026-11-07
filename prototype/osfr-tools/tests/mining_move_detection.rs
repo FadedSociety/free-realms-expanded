@@ -141,6 +141,7 @@ fn synthetic_state(board: Vec<u16>, idle: Vec<bool>, reshuffles: u32) -> Type8St
             chains: 1,
             reshuffles,
             end_sent: false,
+            best_chain: 0,
         }),
     }
 }

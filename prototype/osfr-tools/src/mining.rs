@@ -79,6 +79,8 @@ pub const TILE_DROPZONE: u16 = 100;
 pub const TILE_WILDCARD: u16 = 200;
 pub const TILE_SELECTABLE_START: u16 = 400;
 pub const TILE_COLLECTABLE_START: u16 = 600;
+/// Ores are the 600 block and gems the 700 block (`TILE_BONUS`); both fall and are collected.
+const TILE_COLLECTABLE_END: u16 = 800;
 pub const TILE_BLOCKER: u16 = 800;
 /// ORIGINAL: `GameData.TILE_POWERUP`; `900..=949` is the collected range, at
 /// `GameData.TILE_POWERUP_PRESSME` (950) the four clickable originals begin
@@ -218,6 +220,9 @@ pub struct Type8Run {
     pub chains: u32,
     pub reshuffles: u32,
     pub end_sent: bool,
+    /// The longest chain so far, for the Goals panel.
+    #[serde(default)]
+    pub best_chain: u32,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
@@ -289,10 +294,39 @@ struct Content {
     /// The levels after the first, in order. Empty for a one-level game.
     #[serde(default)]
     levels: Vec<LevelVariant>,
+    /// The Goals panel. Empty, no panel.
+    #[serde(default)]
+    objectives: Vec<Objective>,
     /// This content's level, from 1; `next_level` counts it, the file never sets it.
     #[serde(skip, default = "first_level")]
     level: u32,
     spec: Type8BoardSpec,
+}
+
+/// What moves a row of the Goals panel. The engine owns every fact.
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+enum Counts {
+    /// Whole bundles in a bin, by goal index.
+    Bin(usize),
+    Score,
+    /// The longest chain of the run.
+    Chain,
+    /// Levels cleared.
+    Levels,
+    /// ponytail: locked tiles are not in the engine, so this row stays at nothing until they are.
+    Locked,
+}
+
+/// One row of the Goals panel, under the client's own text.
+#[derive(Clone, Copy, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct Objective {
+    name_id: u32,
+    /// `ObjectiveCategoryPrefix*`: 1 Primary, 2 Secondary, 4 Bonus, 5 Elite.
+    category: u32,
+    counts: Counts,
+    target: u32,
 }
 
 /// What a later level replaces. The board and every other setting stay the first level's.
@@ -316,6 +350,12 @@ struct GameVariant {
     /// This game's own board, on the file's grid.
     #[serde(default)]
     shape: Option<Vec<i32>>,
+    /// This game's own Goals panel.
+    #[serde(default)]
+    objectives: Vec<Objective>,
+    /// This game's own ore and gem, where it has them.
+    #[serde(default)]
+    collectable: Vec<u16>,
     name_id: i32,
     description_id: i32,
     icon_id: i32,
@@ -336,6 +376,10 @@ impl Content {
         content.icon_id = game.icon_id;
         if let Some(shape) = game.shape {
             content.spec.shape = shape;
+        }
+        content.objectives = game.objectives;
+        if !game.collectable.is_empty() {
+            content.spec.collectable = game.collectable;
         }
         content.spec.selectable = game.selectable;
         content.spec.tiles = game.tiles;
@@ -375,6 +419,11 @@ impl Content {
     /// Every later level is a valid board. Its goal count is the first level's, so a run saved
     /// on any level still validates against the file's own spec.
     fn validate_levels(&self) -> io::Result<()> {
+        // A new level empties the bins, so a bin's goal would complete on every level.
+        let bin = |row: &Objective| matches!(row.counts, Counts::Bin(_));
+        if !self.levels.is_empty() && self.objectives.iter().any(bin) {
+            return Err(invalid("a game with levels cannot have a bin goal"));
+        }
         let mut at = self.clone();
         while let Some(level) = at.next_level() {
             if level.spec.goals.len() != self.spec.goals.len() {
@@ -684,6 +733,7 @@ impl Type8Engine {
             chains: 0,
             reshuffles: 0,
             end_sent: false,
+            best_chain: 0,
         };
         self.state.next_instance_id = next;
         self.state.active = Some(run);
@@ -786,6 +836,13 @@ impl Type8Engine {
     }
 
     pub fn handle(&mut self, inner: &[u8]) -> io::Result<Type8Outcome> {
+        let before = self.panel_facts();
+        let mut out = self.handle_message(inner)?;
+        self.report_goals(&before, &mut out);
+        Ok(out)
+    }
+
+    fn handle_message(&mut self, inner: &[u8]) -> io::Result<Type8Outcome> {
         if inner.len() < 2 || inner[..2] != TYPE8_GAME_FAMILY.to_le_bytes() {
             return Ok(Type8Outcome::default());
         }
@@ -856,6 +913,11 @@ impl Type8Engine {
         let mut advanced = None;
         if sub == 5 {
             if run.phase == Type8Phase::Offered {
+                // (R) Ahead of 39/17, as `MinigameRuns::start`: the HUD opens on the rows it finds.
+                for goal in &self.panel_goals() {
+                    out.replies.push(osfr_tools::minigame::goal_row_packet(goal));
+                    out.replies.push(osfr_tools::minigame::goal_activate_packet(goal));
+                }
                 out.replies.push(header(17, id, self.game_id));
                 out.replies.push(launch_packet(&self.content.launch_movie));
                 run.phase = Type8Phase::Launched;
@@ -950,6 +1012,7 @@ impl Type8Engine {
                         for &(x, y) in &chain {
                             run.board[y * width + x] = TILE_EMPTY;
                         }
+                        run.best_chain = run.best_chain.max(chain.len() as u32);
                         run.chains = run
                             .chains
                             .checked_add(1)
@@ -1172,6 +1235,63 @@ impl Type8Engine {
         Ok(out)
     }
 
+    /// The Goals panel's rows, numbered from 1.
+    fn panel_goals(&self) -> Vec<osfr_tools::minigame::Goal> {
+        let goal = |(index, row): (usize, &Objective)| osfr_tools::minigame::Goal {
+            id: index as u32 + 1,
+            name_id: row.name_id,
+            description_id: row.name_id,
+            category: row.category,
+            bonus: row.category == 4,
+            stars: 0,
+            coins: 0,
+            total: if matches!(row.counts, Counts::Bin(_)) { row.target } else { 0 },
+            failure_condition: false,
+            members_only: false,
+        };
+        self.content.objectives.iter().enumerate().map(goal).collect()
+    }
+
+    /// Where each Goals panel row stands; empty without a run.
+    fn panel_facts(&self) -> Vec<u32> {
+        let Some(run) = self.state.active.as_ref() else {
+            return Vec::new();
+        };
+        let cleared = u32::from(matches!(run.phase, Type8Phase::LevelComplete | Type8Phase::Won));
+        let goals = &self.content.spec.goals;
+        let fact = |row: &Objective| match row.counts {
+            Counts::Bin(index) => match (goals.get(index), run.collected.get(index)) {
+                (Some(goal), Some(count)) => count / goal.per_reward.max(1),
+                _ => 0,
+            },
+            Counts::Score => run.score,
+            Counts::Chain => run.best_chain,
+            Counts::Levels => self.content.level - 1 + cleared,
+            Counts::Locked => 0,
+        };
+        self.content.objectives.iter().map(fact).collect()
+    }
+
+    /// The panel's updates for what one message moved: a bin's new count, and a goal just met.
+    fn report_goals(&self, before: &[u32], out: &mut Type8Outcome) {
+        let after = self.panel_facts();
+        if before.is_empty() || after.len() != before.len() {
+            return;
+        }
+        for (index, row) in self.content.objectives.iter().enumerate() {
+            let (was, now, id) = (before[index], after[index], index as u32 + 1);
+            if now == was {
+                continue;
+            }
+            if matches!(row.counts, Counts::Bin(_)) {
+                out.replies.extend(osfr_tools::minigame::goal_progress_packets(id, now.min(row.target)));
+            }
+            if was < row.target && now >= row.target {
+                out.replies.extend(osfr_tools::minigame::goal_done_packets(id));
+            }
+        }
+    }
+
     fn info_packet(&self, id: i32) -> Vec<u8> {
         let c = &self.content;
         let mut b = header(16, id, self.game_id);
@@ -1188,7 +1308,11 @@ impl Type8Engine {
         }
         b.push(0);
         b.extend([0; 207]); // Three empty 69-byte RewardBundleBase records.
-        b.extend(0_i32.to_le_bytes());
+        let goals = self.panel_goals();
+        b.extend((goals.len() as i32).to_le_bytes());
+        for goal in &goals {
+            goal.encode(&mut b);
+        }
         b.extend([1; 5]);
         let s = self.content.preload_file.as_bytes();
         b.extend((s.len() as i32).to_le_bytes());
@@ -1404,7 +1528,7 @@ fn validate_spec(spec: &Type8BoardSpec) -> io::Result<()> {
         || spec
             .collectable
             .iter()
-            .any(|v| !(TILE_COLLECTABLE_START..TILE_COLLECTABLE_START + 100).contains(v))
+            .any(|v| !(TILE_COLLECTABLE_START..TILE_COLLECTABLE_END).contains(v))
     {
         return Err(invalid("invalid mining tile kinds"));
     }
@@ -1531,7 +1655,7 @@ fn valid_value(v: u16) -> bool {
         || v == TILE_DROPZONE
         || v == TILE_WILDCARD
         || (TILE_SELECTABLE_START..TILE_SELECTABLE_START + 100).contains(&v)
-        || (TILE_COLLECTABLE_START..TILE_COLLECTABLE_START + 100).contains(&v)
+        || (TILE_COLLECTABLE_START..TILE_COLLECTABLE_END).contains(&v)
         || v == TILE_BLOCKER
         || (900..=953).contains(&v)
 }
@@ -2700,6 +2824,7 @@ mod shape_tests {
             chains: 0,
             reshuffles: 0,
             end_sent: false,
+            best_chain: 0,
         }
     }
 
@@ -2750,6 +2875,53 @@ mod shape_tests {
         assert!(broken(|shape| shape[9 * GRID + 5] = 0), "a column with no dropzone");
         assert!(broken(|shape| shape[5] = 1), "a tile on row 0, which the fall loops skip");
         assert!(broken(|shape| shape[12 * GRID + 5] = 4), "a dropzone under nothing");
+    }
+
+    /// A bin's count and a goal met reach the panel once; a row with no bin only completes.
+    #[test]
+    fn the_goals_panel_follows_the_run() {
+        let directory = std::env::temp_dir().join(format!("type8-goals-{}", std::process::id()));
+        fs::create_dir_all(&directory).unwrap();
+        let path = write_content(&directory, 18).unwrap();
+        let file = path.file_name().unwrap().to_str().unwrap().to_owned();
+        let engine = Type8Engine::load(&directory, &file, 18, FIRST_MINING_INSTANCE, None);
+        fs::remove_dir_all(&directory).unwrap();
+        let mut engine = engine.unwrap();
+        Arc::make_mut(&mut engine.content).objectives = vec![
+            Objective { name_id: 1, category: 1, counts: Counts::Bin(0), target: 2 },
+            Objective { name_id: 2, category: 4, counts: Counts::Chain, target: 5 },
+            Objective { name_id: 3, category: 5, counts: Counts::Locked, target: 4 },
+        ];
+        engine.begin(engine.profile_id()).unwrap();
+        assert_eq!(engine.panel_goals().iter().map(|goal| goal.total).collect::<Vec<_>>(), [2, 0, 0]);
+
+        let per_reward = engine.content.spec.goals[0].per_reward;
+        let before = engine.panel_facts();
+        let run = engine.state.active.as_mut().unwrap();
+        run.collected[0] = per_reward;
+        run.best_chain = 4;
+        let mut out = Type8Outcome::default();
+        engine.report_goals(&before, &mut out);
+        assert_eq!(out.replies, osfr_tools::minigame::goal_progress_packets(1, 1), "one bundle of two");
+
+        let before = engine.panel_facts();
+        let run = engine.state.active.as_mut().unwrap();
+        run.collected[0] = per_reward * 3;
+        run.best_chain = 6;
+        let mut out = Type8Outcome::default();
+        engine.report_goals(&before, &mut out);
+        let mut met = osfr_tools::minigame::goal_progress_packets(1, 2).to_vec();
+        met.extend(osfr_tools::minigame::goal_done_packets(1));
+        met.extend(osfr_tools::minigame::goal_done_packets(2));
+        assert_eq!(out.replies, met, "capped at the target, and both goals met");
+
+        let before = engine.panel_facts();
+        let mut out = Type8Outcome::default();
+        engine.report_goals(&before, &mut out);
+        assert!(out.replies.is_empty(), "nothing moved");
+
+        engine.state.active = None;
+        assert!(engine.handle(&[39, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]).is_ok(), "no run, no panic");
     }
 
     /// A board size change must not stop a character with a run in progress from loading.

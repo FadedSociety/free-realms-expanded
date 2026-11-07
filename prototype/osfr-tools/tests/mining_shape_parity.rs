@@ -232,6 +232,7 @@ fn short_queue_state(seed: u32, queue_len: usize) -> Type8State {
             chains: 6,
             reshuffles: 0,
             end_sent: false,
+            best_chain: 0,
         }),
     }
 }

@@ -10,15 +10,15 @@
           "icon_id": 909,
           "index": 0,
           "per_reward": 1,
-          "quota": 6,
-          "value": 601
+          "quota": 12,
+          "value": 613
         },
         {
           "icon_id": 909,
           "index": 1,
-          "per_reward": 2,
-          "quota": 6,
-          "value": 602
+          "per_reward": 1,
+          "quota": 0,
+          "value": 704
         }
       ],
       "icon_id": 909,
@@ -27,57 +27,85 @@
         {
           "cluster_quantity": 1,
           "definition_id": 2739,
-          "value": 601
+          "value": 613
         },
         {
-          "cluster_quantity": 2,
-          "definition_id": 2739,
-          "value": 602
+          "cluster_quantity": 1,
+          "definition_id": 2752,
+          "value": 704
         }
       ],
       "selectable": [
-        401,
-        402,
-        403,
         404,
+        402,
         405
       ],
       "tiles": [
         {
+          "value": 404,
           "category": 400,
-          "icon_id": 1,
-          "value": 401
+          "icon_id": 4
         },
         {
+          "value": 402,
           "category": 400,
-          "icon_id": 2,
-          "value": 402
+          "icon_id": 2
         },
         {
+          "value": 405,
           "category": 400,
-          "icon_id": 3,
-          "value": 403
+          "icon_id": 5
         },
         {
-          "category": 400,
-          "icon_id": 4,
-          "value": 404
-        },
-        {
-          "category": 400,
-          "icon_id": 5,
-          "value": 405
-        },
-        {
+          "value": 613,
           "category": 600,
-          "icon_id": 909,
-          "value": 601
+          "icon_id": 909
         },
         {
-          "category": 600,
-          "icon_id": 909,
-          "value": 602
+          "value": 704,
+          "category": 700,
+          "icon_id": 909
         }
+      ],
+      "objectives": [
+        {
+          "name_id": 102511,
+          "category": 1,
+          "counts": {
+            "bin": 0
+          },
+          "target": 12
+        },
+        {
+          "name_id": 92848,
+          "category": 2,
+          "counts": "score",
+          "target": 78000
+        },
+        {
+          "name_id": 92845,
+          "category": 4,
+          "counts": "chain",
+          "target": 18
+        },
+        {
+          "name_id": 92847,
+          "category": 4,
+          "counts": {
+            "bin": 1
+          },
+          "target": 8
+        },
+        {
+          "name_id": 92846,
+          "category": 5,
+          "counts": "score",
+          "target": 96000
+        }
+      ],
+      "collectable": [
+        613,
+        704
       ]
     },
     {
@@ -88,15 +116,15 @@
           "icon_id": 909,
           "index": 0,
           "per_reward": 1,
-          "quota": 6,
-          "value": 601
+          "quota": 10,
+          "value": 604
         },
         {
           "icon_id": 909,
           "index": 1,
-          "per_reward": 2,
-          "quota": 6,
-          "value": 602
+          "per_reward": 1,
+          "quota": 0,
+          "value": 701
         }
       ],
       "icon_id": 909,
@@ -105,57 +133,45 @@
         {
           "cluster_quantity": 1,
           "definition_id": 2740,
-          "value": 601
+          "value": 604
         },
         {
-          "cluster_quantity": 2,
-          "definition_id": 2740,
-          "value": 602
+          "cluster_quantity": 1,
+          "definition_id": 2750,
+          "value": 701
         }
       ],
       "selectable": [
-        401,
         402,
-        403,
-        404,
-        405
+        405,
+        403
       ],
       "source": "MiniGameData 93 Tin Mining (difficulty 2). Output 2740 is the Tin Ore the Tin Bar recipe consumes (recipes.json miner.tin_bar). Board, quotas and cluster sizes are the copper board's (R).",
       "tiles": [
         {
+          "value": 402,
           "category": 400,
-          "icon_id": 1,
-          "value": 401
+          "icon_id": 2
         },
         {
+          "value": 405,
           "category": 400,
-          "icon_id": 2,
-          "value": 402
+          "icon_id": 5
         },
         {
+          "value": 403,
           "category": 400,
-          "icon_id": 3,
-          "value": 403
+          "icon_id": 3
         },
         {
-          "category": 400,
-          "icon_id": 4,
-          "value": 404
-        },
-        {
-          "category": 400,
-          "icon_id": 5,
-          "value": 405
-        },
-        {
+          "value": 604,
           "category": 600,
-          "icon_id": 909,
-          "value": 601
+          "icon_id": 909
         },
         {
-          "category": 600,
-          "icon_id": 909,
-          "value": 602
+          "value": 701,
+          "category": 700,
+          "icon_id": 909
         }
       ],
       "shape": [
@@ -172,6 +188,46 @@
         0, 0, 1, 1, 1, 4, 4, 4, 4, 1, 1, 1, 0,
         0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0,
         0, 0, 4, 4, 4, 0, 0, 0, 0, 4, 4, 4, 0
+      ],
+      "objectives": [
+        {
+          "name_id": 102512,
+          "category": 1,
+          "counts": {
+            "bin": 0
+          },
+          "target": 10
+        },
+        {
+          "name_id": 92852,
+          "category": 2,
+          "counts": "score",
+          "target": 72000
+        },
+        {
+          "name_id": 92853,
+          "category": 4,
+          "counts": "chain",
+          "target": 16
+        },
+        {
+          "name_id": 92854,
+          "category": 4,
+          "counts": {
+            "bin": 1
+          },
+          "target": 9
+        },
+        {
+          "name_id": 92855,
+          "category": 5,
+          "counts": "score",
+          "target": 94000
+        }
+      ],
+      "collectable": [
+        604,
+        701
       ]
     },
     {
@@ -182,15 +238,15 @@
           "icon_id": 909,
           "index": 0,
           "per_reward": 1,
-          "quota": 6,
+          "quota": 10,
           "value": 601
         },
         {
           "icon_id": 909,
           "index": 1,
-          "per_reward": 2,
-          "quota": 6,
-          "value": 602
+          "per_reward": 1,
+          "quota": 0,
+          "value": 700
         }
       ],
       "icon_id": 909,
@@ -202,54 +258,42 @@
           "value": 601
         },
         {
-          "cluster_quantity": 2,
-          "definition_id": 2741,
-          "value": 602
+          "cluster_quantity": 1,
+          "definition_id": 2751,
+          "value": 700
         }
       ],
       "selectable": [
-        401,
-        402,
-        403,
         404,
-        405
+        405,
+        403
       ],
       "source": "MiniGameData 95 Iron Mining (difficulty 3). Output 2741 is the Iron Ore the Iron Bar recipe consumes (recipes.json miner.iron_bar). Board, quotas and cluster sizes are the copper board's (R).",
       "tiles": [
         {
+          "value": 404,
           "category": 400,
-          "icon_id": 1,
-          "value": 401
+          "icon_id": 4
         },
         {
+          "value": 405,
           "category": 400,
-          "icon_id": 2,
-          "value": 402
+          "icon_id": 5
         },
         {
+          "value": 403,
           "category": 400,
-          "icon_id": 3,
-          "value": 403
+          "icon_id": 3
         },
         {
-          "category": 400,
-          "icon_id": 4,
-          "value": 404
-        },
-        {
-          "category": 400,
-          "icon_id": 5,
-          "value": 405
-        },
-        {
+          "value": 601,
           "category": 600,
-          "icon_id": 909,
-          "value": 601
+          "icon_id": 909
         },
         {
-          "category": 600,
-          "icon_id": 909,
-          "value": 602
+          "value": 700,
+          "category": 700,
+          "icon_id": 909
         }
       ],
       "shape": [
@@ -266,6 +310,46 @@
         0, 0, 0, 4, 1, 1, 1, 1, 1, 1, 4, 0, 0,
         0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+      ],
+      "objectives": [
+        {
+          "name_id": 92868,
+          "category": 1,
+          "counts": {
+            "bin": 0
+          },
+          "target": 10
+        },
+        {
+          "name_id": 92864,
+          "category": 2,
+          "counts": "score",
+          "target": 65000
+        },
+        {
+          "name_id": 92861,
+          "category": 4,
+          "counts": "chain",
+          "target": 12
+        },
+        {
+          "name_id": 92866,
+          "category": 4,
+          "counts": {
+            "bin": 1
+          },
+          "target": 7
+        },
+        {
+          "name_id": 92867,
+          "category": 5,
+          "counts": "score",
+          "target": 84000
+        }
+      ],
+      "collectable": [
+        601,
+        700
       ]
     },
     {
@@ -276,15 +360,15 @@
           "icon_id": 909,
           "index": 0,
           "per_reward": 1,
-          "quota": 6,
-          "value": 601
+          "quota": 8,
+          "value": 607
         },
         {
           "icon_id": 909,
           "index": 1,
-          "per_reward": 2,
-          "quota": 6,
-          "value": 602
+          "per_reward": 1,
+          "quota": 0,
+          "value": 702
         }
       ],
       "icon_id": 909,
@@ -293,57 +377,45 @@
         {
           "cluster_quantity": 1,
           "definition_id": 2742,
-          "value": 601
+          "value": 607
         },
         {
-          "cluster_quantity": 2,
-          "definition_id": 2742,
-          "value": 602
+          "cluster_quantity": 1,
+          "definition_id": 2748,
+          "value": 702
         }
       ],
       "selectable": [
-        401,
-        402,
-        403,
         404,
+        402,
         405
       ],
       "source": "MiniGameData 97 Silver Mining (difficulty 4). Output 2742 is the Silver Ore the Silver Bar recipe consumes (recipes.json miner.silver_bar). Board, quotas and cluster sizes are the copper board's (R).",
       "tiles": [
         {
+          "value": 404,
           "category": 400,
-          "icon_id": 1,
-          "value": 401
+          "icon_id": 4
         },
         {
+          "value": 402,
           "category": 400,
-          "icon_id": 2,
-          "value": 402
+          "icon_id": 2
         },
         {
+          "value": 405,
           "category": 400,
-          "icon_id": 3,
-          "value": 403
+          "icon_id": 5
         },
         {
-          "category": 400,
-          "icon_id": 4,
-          "value": 404
-        },
-        {
-          "category": 400,
-          "icon_id": 5,
-          "value": 405
-        },
-        {
+          "value": 607,
           "category": 600,
-          "icon_id": 909,
-          "value": 601
+          "icon_id": 909
         },
         {
-          "category": 600,
-          "icon_id": 909,
-          "value": 602
+          "value": 702,
+          "category": 700,
+          "icon_id": 909
         }
       ],
       "shape": [
@@ -360,6 +432,46 @@
         0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4
+      ],
+      "objectives": [
+        {
+          "name_id": 102514,
+          "category": 1,
+          "counts": {
+            "bin": 0
+          },
+          "target": 8
+        },
+        {
+          "name_id": 92873,
+          "category": 2,
+          "counts": "score",
+          "target": 80000
+        },
+        {
+          "name_id": 92861,
+          "category": 4,
+          "counts": "chain",
+          "target": 12
+        },
+        {
+          "name_id": 92875,
+          "category": 4,
+          "counts": {
+            "bin": 1
+          },
+          "target": 10
+        },
+        {
+          "name_id": 92876,
+          "category": 5,
+          "counts": "score",
+          "target": 120000
+        }
+      ],
+      "collectable": [
+        607,
+        702
       ]
     },
     {
@@ -371,14 +483,14 @@
           "index": 0,
           "per_reward": 1,
           "quota": 6,
-          "value": 601
+          "value": 610
         },
         {
           "icon_id": 909,
           "index": 1,
-          "per_reward": 2,
-          "quota": 6,
-          "value": 602
+          "per_reward": 1,
+          "quota": 0,
+          "value": 703
         }
       ],
       "icon_id": 909,
@@ -387,57 +499,45 @@
         {
           "cluster_quantity": 1,
           "definition_id": 2743,
-          "value": 601
+          "value": 610
         },
         {
-          "cluster_quantity": 2,
-          "definition_id": 2743,
-          "value": 602
+          "cluster_quantity": 1,
+          "definition_id": 2747,
+          "value": 703
         }
       ],
       "selectable": [
         401,
-        402,
         403,
-        404,
-        405
+        404
       ],
       "source": "MiniGameData 99 Gold Mining (difficulty 5). Output 2743 is the Gold Ore the Gold Bar recipe consumes (recipes.json miner.gold_bar). Board, quotas and cluster sizes are the copper board's (R).",
       "tiles": [
         {
+          "value": 401,
           "category": 400,
-          "icon_id": 1,
-          "value": 401
+          "icon_id": 1
         },
         {
+          "value": 403,
           "category": 400,
-          "icon_id": 2,
-          "value": 402
+          "icon_id": 3
         },
         {
+          "value": 404,
           "category": 400,
-          "icon_id": 3,
-          "value": 403
+          "icon_id": 4
         },
         {
-          "category": 400,
-          "icon_id": 4,
-          "value": 404
-        },
-        {
-          "category": 400,
-          "icon_id": 5,
-          "value": 405
-        },
-        {
+          "value": 610,
           "category": 600,
-          "icon_id": 909,
-          "value": 601
+          "icon_id": 909
         },
         {
-          "category": 600,
-          "icon_id": 909,
-          "value": 602
+          "value": 703,
+          "category": 700,
+          "icon_id": 909
         }
       ],
       "shape": [
@@ -454,6 +554,46 @@
         0, 1, 1, 1, 1, 4, 0, 0, 4, 1, 1, 1, 1,
         0, 1, 1, 4, 4, 0, 0, 0, 0, 4, 4, 1, 1,
         0, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 4, 4
+      ],
+      "objectives": [
+        {
+          "name_id": 102515,
+          "category": 1,
+          "counts": {
+            "bin": 0
+          },
+          "target": 6
+        },
+        {
+          "name_id": 92881,
+          "category": 2,
+          "counts": "score",
+          "target": 50000
+        },
+        {
+          "name_id": 92861,
+          "category": 4,
+          "counts": "chain",
+          "target": 12
+        },
+        {
+          "name_id": 92884,
+          "category": 4,
+          "counts": {
+            "bin": 1
+          },
+          "target": 6
+        },
+        {
+          "name_id": 92848,
+          "category": 5,
+          "counts": "score",
+          "target": 78000
+        }
+      ],
+      "collectable": [
+        610,
+        703
       ]
     },
     {
@@ -537,7 +677,7 @@
       601,
       602
     ],
-    "collectable_percent": 40,
+    "collectable_percent": 25,
     "duration_seconds": 180,
     "goals": [
       {

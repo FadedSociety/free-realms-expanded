@@ -132,6 +132,7 @@ fn state_with(
             chains: 0,
             reshuffles: 0,
             end_sent: false,
+            best_chain: 0,
         }),
     }
 }

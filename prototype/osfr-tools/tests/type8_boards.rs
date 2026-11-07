@@ -53,10 +53,12 @@ fn each_ore_row_pays_the_ore_its_bar_smelts() {
         let ore = smelts[&smelting];
         let spec = engine.spec_for(Some(game)).expect("the ore row is offered");
         assert!(!spec.outputs.is_empty(), "game {game} pays nothing");
+        // The first bin is the row's ore; the second its gem.
+        assert_eq!(spec.outputs[0].definition_id, ore, "game {game} pays another ore");
         for output in &spec.outputs {
-            assert_eq!(output.definition_id, ore, "game {game} pays another ore");
+            let item = output.definition_id;
+            assert!(inventory.has_definition(item), "game {game}: item {item} has no definition");
         }
-        assert!(inventory.has_definition(ore), "ore {ore} has no definition");
     }
     // Five distinct ores, one per row.
     let distinct: std::collections::BTreeSet<_> =

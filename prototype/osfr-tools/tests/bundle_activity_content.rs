@@ -84,17 +84,17 @@ const FROZEN_SHA256: &[(&str, &str)] = &[
         "mining.json",
         // L100: Copper Mining (game 91) added on the copper board.
         // L934: Tin, Iron, Silver and Gold Mining (93-99) and Mining Practice (375).
-        "6e0aa53c479815199bf384948d580002b99ad11d0bb97e3d99bd88a7497b757b",
+        "ef16f36f7f282c420985c60483e377158ace8dcafbe88d91642221cf151376d8",
     ),
     (
         "harvesting.json",
         // L934: Chugaroot Farm (113) and Thorny Tillage (119).
-        "bc37cf689d23d349d34c5ccdc7884f89e8feb906f9c1f244af83bb84ec42f8f0",
+        "7f51a097801c65a9a6f86c902861fbd0de74bc2629df835cce426c4df7e60b6f",
     ),
     (
         // L103: the six Mail Sorting boards.
         "mail_sorting.json",
-        "8084e6dfca1b58f87e0a92ee519184869f1cb93c152b9f879cbf146e2c920c2e",
+        "45622fca85f6710c34ee96151f8aac24c25c53c83849d06f486b776bda1c515d",
     ),
 ];
 

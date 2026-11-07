@@ -360,7 +360,7 @@ fn the_other_ten_stay_off_until_their_blocker_lifts() {
         (3_090_023, None),
         (3_090_032, None),
         (3_100_025, None),
-        (3_100_027, Some(2_747)),
+        (3_100_027, None),
     ];
     let targets = Targets::load(&content_dir(), &reference_content()).unwrap();
     for (quest, gather) in OFF {

@@ -1177,7 +1177,8 @@ pub fn validate_content(content: &HarvestContent) -> Result<(), HarvestError> {
                     ))
                 })?;
                 let goal = &spec.goals[slot];
-                if goal.value != value || goal.quota == 0 || goal.per_reward == 0 {
+                // A quota of 0 is a bonus basket: it counts, and the level does not wait for it.
+                if goal.value != value || goal.per_reward == 0 {
                     return Err(HarvestError::Content(format!(
                         "goal {slot} must use the recovered produce value {value} \
                          (farmingValue{value}); the 600 block has no recovered name"
