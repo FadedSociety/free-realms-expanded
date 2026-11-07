@@ -38,6 +38,27 @@ impl HostedTable {
         }
     }
 
+    /// The seat the game is waiting on, while it has no result.
+    pub fn waiting_on(&self) -> Option<u64> {
+        match self {
+            Self::Chess(table) => table.waiting_on(),
+            Self::Checkers(game) => game.waiting_on(),
+        }
+    }
+
+    /// The seat it waits on took too long: it loses, and both seats hear. Each client's own
+    /// `FRServer_GameOver` settles it; one that has gone is released when its session ends.
+    pub fn time_out(&mut self) -> io::Result<Vec<ChessMessage>> {
+        let Some(guid) = self.waiting_on() else {
+            return Ok(Vec::new());
+        };
+        let mut messages = self.forfeit(guid)?;
+        if let Self::Checkers(game) = self {
+            messages.extend(game.timed_out(guid)?);
+        }
+        Ok(messages)
+    }
+
     pub fn release(&mut self, guid: u64) {
         match self {
             Self::Chess(table) => table.release(guid),

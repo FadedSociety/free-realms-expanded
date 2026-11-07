@@ -95,9 +95,12 @@ impl HostedGame {
         self.ready[seat] = true;
         out.push(self.to(seat, &checkers::message(INIT, &[seat as u8, RED]))?);
         if let Some(winner) = self.winner {
-            // The seat that gave up has gone, and may be in another game by now.
+            // A seat that gave up by leaving is done, and may be in another game by now; one
+            // the idle limit gave up on is still here, loading.
             if winner == seat {
                 out.push(self.to(seat, "OnGameWonMsg")?);
+            } else if !self.done[seat] {
+                out.push(self.to(seat, "OnGameLostMsg")?);
             }
         } else if self.ready == [true; 2] {
             self.both(&mut out, &checkers::message(TURN_START, &[0]))?;
@@ -150,6 +153,20 @@ impl HostedGame {
             out.push(self.to(1 - seat, "OnGameWonMsg")?);
         }
         Ok(out)
+    }
+
+    /// The seat the game is waiting on: one still sitting down, or the one to move.
+    pub fn waiting_on(&self) -> Option<u64> {
+        if self.winner.is_some() {
+            return None;
+        }
+        let seat = self.ready.iter().position(|ready| !ready).unwrap_or(self.turn);
+        Some(self.seats[seat].0)
+    }
+
+    /// What the seat that gave up hears, when the game gave up on it.
+    pub fn timed_out(&self, player: u64) -> io::Result<Vec<ChessMessage>> {
+        self.seat(player).map_or(Ok(Vec::new()), |seat| Ok(vec![self.to(seat, "OnGameLostMsg")?]))
     }
 
     /// Whether this player won, once the game has a result.
@@ -236,6 +253,29 @@ mod tests {
         let out = game.ready(BETA).unwrap();
         assert_eq!(texts(&out, BETA)[1], "OnGameWonMsg");
         assert!(texts(&out, ALPHA).is_empty(), "the seat that left hears nothing");
+    }
+
+    #[test]
+    fn the_game_waits_on_whoever_has_to_act() {
+        let mut game = HostedGame::new(5, (ALPHA, 1), (BETA, 2));
+        assert_eq!(game.waiting_on(), Some(ALPHA), "nobody has sat down");
+        game.ready(ALPHA).unwrap();
+        assert_eq!(game.waiting_on(), Some(BETA));
+        game.ready(BETA).unwrap();
+        assert_eq!(game.waiting_on(), Some(ALPHA));
+        game.play(ALPHA, 21, &[17]).unwrap();
+        assert_eq!(game.waiting_on(), Some(BETA));
+        game.forfeit(BETA).unwrap();
+        assert_eq!(game.waiting_on(), None);
+        assert_eq!(texts(&game.timed_out(BETA).unwrap(), BETA), ["OnGameLostMsg"]);
+    }
+
+    #[test]
+    fn a_seat_timed_out_while_loading_hears_it_lost_when_it_sits_down() {
+        let mut game = HostedGame::new(5, (ALPHA, 1), (BETA, 2));
+        game.ready(ALPHA).unwrap();
+        game.forfeit(BETA).unwrap();
+        assert_eq!(texts(&game.ready(BETA).unwrap(), BETA)[1], "OnGameLostMsg");
     }
 
     #[test]

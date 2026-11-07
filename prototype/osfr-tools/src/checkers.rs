@@ -968,8 +968,11 @@ mod tests {
     /// An empty bag with 0 coins, as `Inventory::load` reads it (the chess tests' fixture).
     fn rewards(player: u64) -> RewardState {
         use sha2::{Digest, Sha256};
-        let directory =
-            std::env::temp_dir().join(format!("osfr-checkers-pay-{}", std::process::id()));
+        // Tests run side by side, so each call has its own folder.
+        static NEXT: std::sync::atomic::AtomicU32 = std::sync::atomic::AtomicU32::new(0);
+        let call = NEXT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        let directory = std::env::temp_dir()
+            .join(format!("osfr-checkers-pay-{}-{call}", std::process::id()));
         std::fs::create_dir_all(&directory).unwrap();
         let zero = 0_i32.to_le_bytes();
         let span = |kind: &str, offset: usize, profile_id: i32| {

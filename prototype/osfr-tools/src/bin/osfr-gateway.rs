@@ -568,6 +568,8 @@ struct SharedWorld {
     rooms: osfr_tools::game_room::Rooms,
     /// Each running lobby game's table, by room id.
     tables: BTreeMap<u32, osfr_tools::hosted_table::HostedTable>,
+    /// When each running game last moved, for the idle limit.
+    table_moved: BTreeMap<u32, u64>,
     /// T461: the boxes pressed from the item bar; session-only.
     boomboxes: osfr_tools::boombox::Boomboxes,
     /// T557: the placed cakes; session-only.
@@ -656,6 +658,7 @@ impl SharedWorld {
             world_events: Default::default(),
             rooms: Default::default(),
             tables: BTreeMap::new(),
+            table_moved: BTreeMap::new(),
             boomboxes: Default::default(),
             cakes: Default::default(),
             portraits: None,

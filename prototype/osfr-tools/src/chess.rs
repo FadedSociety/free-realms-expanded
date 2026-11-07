@@ -1194,6 +1194,17 @@ impl ChessTable {
         self.settled.len()
     }
 
+    /// The seat the game is waiting on: one still sitting down, or the side to move.
+    pub fn waiting_on(&self) -> Option<u64> {
+        if self.result.is_some() {
+            return None;
+        }
+        let players = self.players();
+        let sitting = players.iter().find(|seat| !self.ready.contains(&seat.player_id));
+        let seat = sitting.copied().or_else(|| self.participant_for_side(self.position().side_to_move()));
+        seat.map(|seat| seat.player_id)
+    }
+
     pub fn is_settled(&self, player_id: u64) -> bool {
         self.settled.contains(&player_id)
     }
@@ -1458,6 +1469,23 @@ impl ChessTable {
                 Ok(out)
             }
             "OnStartGameMsg" if fields.len() == 2 && fields[1] == "0" => {
+                if let Some(result) = self.result.filter(|_| !self.game_over.contains(&player_id)) {
+                    // The game ended while this movie loaded, and it lost the message.
+                    if self.connected.contains(&player_id) && self.ready.insert(player_id) {
+                        let mut out = ChessOutcome {
+                            accepted: true,
+                            changed: true,
+                            ..Default::default()
+                        };
+                        let message = if result.winner == Some(player_id) {
+                            "OnGameWonMsg"
+                        } else {
+                            "OnGameLostMsg"
+                        };
+                        self.emit(&mut out, player_id, message.into())?;
+                        return Ok(out);
+                    }
+                }
                 if self.phase != TablePhase::Waiting || !self.connected.contains(&player_id) {
                     return Ok(ChessOutcome::default());
                 }

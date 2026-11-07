@@ -19,6 +19,9 @@ use osfr_tools::{
 
 /// (R) Chess and checkers seat two, and they are the only lobby games so far.
 const SEATS: usize = 2;
+/// (R) A seat this long without a move loses: neither movie has a clock, and the other player
+/// would otherwise wait for ever, then pay the idle seat by quitting.
+const IDLE_LIMIT_MS: u64 = 5 * 60 * 1000;
 
 fn deliveries(world: &SharedWorld, packets: Vec<Addressed>) -> Vec<Delivery> {
     let deliver = |packet: Addressed| {
@@ -123,6 +126,9 @@ pub(super) fn publish(
         }
         table.release(guid);
     }
+    if !relay.is_empty() {
+        world.table_moved.insert(table.id(), now_ms);
+    }
     for message in relay {
         if let Some(seat) = encounter_invites::session_of(world, sessions, message.player_id) {
             if let Err(error) = seat.queue_shared_message(&wrap_application(&message.packet)) {
@@ -134,6 +140,7 @@ pub(super) fn publish(
     let id = table.id();
     if table.all_settled() {
         world.tables.remove(&id);
+        world.table_moved.remove(&id);
         world.rooms.close(id);
         return;
     }
@@ -191,12 +198,33 @@ pub(super) fn tick(server: &mut Server, now_ms: u64) {
             }
         }
     }
+    time_out_idle(server, now_ms);
     for id in server.world.rooms.due(now_ms) {
         if let Err(error) = open_game(server, id, now_ms) {
             event(json!({"event": "lobby_game_failed", "room": id, "reason": error.to_string()}));
             server.world.rooms.close(id);
         }
     }
+}
+
+/// Games nobody has moved in for too long: the seat they wait on loses.
+fn time_out_idle(server: &mut Server, now_ms: u64) {
+    let world = &mut server.world;
+    let idle = |(_, moved): (&u32, &u64)| now_ms.saturating_sub(*moved) >= IDLE_LIMIT_MS;
+    let due: Vec<u32> = world.table_moved.iter().filter(|row| idle(*row)).map(|(id, _)| *id).collect();
+    let mut told = Vec::new();
+    for id in due {
+        world.table_moved.remove(&id);
+        let Some(table) = world.tables.get_mut(&id) else {
+            continue;
+        };
+        match table.time_out() {
+            Ok(messages) => told.extend(messages),
+            Err(error) => event(json!({"event": "lobby_refused", "reason": error.to_string()})),
+        }
+    }
+    let packets = told.into_iter().map(|message| Addressed { to: message.player_id, bytes: message.packet });
+    tell(server, packets.collect());
 }
 
 fn ready(server: &Server, guid: u64) -> bool {
@@ -249,6 +277,7 @@ fn open_game(server: &mut Server, id: u32, now_ms: u64) -> io::Result<()> {
         HostedTable::Chess(session.gateway.open_hosted_chess(u64::from(id), *white, *black)?)
     };
     server.world.tables.insert(id, table);
+    server.world.table_moved.insert(id, now_ms);
     Ok(())
 }
 
@@ -272,6 +301,7 @@ impl SharedWorld {
         }
         for id in finished {
             self.tables.remove(&id);
+            self.table_moved.remove(&id);
             self.rooms.close(id);
         }
         match self.rooms.leave(guid) {
