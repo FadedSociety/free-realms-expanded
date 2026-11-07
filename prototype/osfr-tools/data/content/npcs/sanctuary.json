@@ -1370,14 +1370,30 @@
       "presence": "listed",
       "title_or_role": [],
       "roles": [
-        "ambient"
+        "ambient",
+        "quest_giver"
       ],
       "enemy_kind": null,
       "location_evidence": [
         "Sanctuary"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3951459,
+          "title": "The Toadal Truth",
+          "title_string_id": 37430,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Toadal Truth (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_toadal_truth_d4101d)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3951459
+      ],
       "quests_given_text": [],
       "quests_accepted": [],
       "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
@@ -46634,14 +46650,30 @@
         "Palace usher at the Town Hall"
       ],
       "roles": [
-        "ambient"
+        "ambient",
+        "quest_giver"
       ],
       "enemy_kind": null,
       "location_evidence": [
         "Town Hall, outside the Royal Palace (405061045, 124193672)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3951154,
+          "title": "Bundles of Balloons",
+          "title_string_id": 428077,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Bundles of Balloons (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bundles_of_balloons_8cb1e1)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3951154
+      ],
       "quests_given_text": [
         "Bundles of Balloons (Birthday Bash daily, 788383721); gives palace badges (462215610); named by Sam Potts's quest So Over Archery (Card Duelist); target of Merry Vale errands (425819014)"
       ],
@@ -47756,8 +47788,36 @@
       "location_evidence": [
         "On a hilltop near the Sanctuary warpstone (wiki); a video distance marker also names him"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3951174,
+          "title": "Cloudy Days",
+          "title_string_id": 430168,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cloudy Days (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cloudy_days_e7ba57)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3951175,
+          "title": "Coin Clean-Up",
+          "title_string_id": 430164,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Coin Clean-Up (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_coin_clean_up_8f77be)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3951174,
+        3951175
+      ],
       "quests_given_text": [
         "Cloudy Days (daily); Coin Clean-Up (repeatable; client title 1725128647; video offer e4XXSnnive0/00196)"
       ],
@@ -48213,9 +48273,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3557 spawnNpcWithGuid(33326); src/Resources/Npcs.json Id=33326"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": 0.945779966
+      "heading": 0.945779966,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000524,

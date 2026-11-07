@@ -1107,10 +1107,23 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3951129,
+          "title": "Bears on the Loose!",
+          "title_string_id": 116258,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Bears on the Loose! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bears_on_the_loose_a75c7e)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3010023
+        3010023,
+        3951129
       ],
       "quests_given_text": [
         "Archer: Animal Investigation (the player goes to him; \"Speak with Mr. Miles at the Durango Zoo\", 479926652); Archer: Prevention First (he asks for food bundles, \"Mr. Miles wants you to gather some food for the animals to eat. Once you turn in the bundles to Mr. Miles, return to Bowman Bilter.\", 572827109); Bears on the Loose! (client title 4241189458; \"Assist Mr. Miles in wrangling up the loose bears.\", 1808830298; thanks \"Thanks a bunch! I'm glad those bears didn't get into any trouble!\", 3394952785, 4223572578). See #Town and area quests."
@@ -1625,11 +1638,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:64; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1274 (ModelId=784, ModelFileName=human_m_farmhand_02.agr, NameId=100788)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.738696,
       "model_id": 784,
-      "model_file_name": "human_m_farmhand_02.agr"
+      "model_file_name": "human_m_farmhand_02.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000260,

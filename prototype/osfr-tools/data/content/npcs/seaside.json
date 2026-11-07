@@ -35246,8 +35246,36 @@
       "location_evidence": [
         "North end of the beach near the Tide Pools (439260072, 2249897152); video quest panels (AW041GUrkus/00158)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3951316,
+          "title": "Lost Turtle",
+          "title_string_id": 94588,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Lost Turtle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lost_turtle_405065)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3951427,
+          "title": "Starfish Picking",
+          "title_string_id": 101154,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Starfish Picking (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_starfish_picking_c2b1d3)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3951316,
+        3951427
+      ],
       "quests_given_text": [
         "Lost Turtle (title 3550976283; \"Oh no! I've lost my pet turtle!\" video AW041GUrkus/00158); Starfish Picking (title 1626187908; offer shows \"You receive 15 coins\", AW041GUrkus/00220); Combo Challenge (title 2096369689; a frame after completion shows \"You receive 1 Wild T-Shirt\", AW041GUrkus/00346, 00348); Pool of Seashells (title 46229354, bucket minigame 1544766839). Scouting errand for Aziwug (3802378602)"
       ],
@@ -35707,11 +35735,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:711; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1953 (ModelId=241, ModelFileName=fairychild_f_pigtailsdress.adr, NameId=21316)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.800473,
       "model_id": 241,
-      "model_file_name": "fairychild_f_pigtailsdress.adr"
+      "model_file_name": "fairychild_f_pigtailsdress.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000618,

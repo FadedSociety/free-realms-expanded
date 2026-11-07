@@ -4121,6 +4121,1105 @@
       "description_string_id": 38787,
       "intro_text_string_id": 38787,
       "enabled": true
+    },
+    {
+      "id": 3951126,
+      "title_string_id": 16462,
+      "giver_npc_id": 9500000096,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 16467,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the barrels of sasparilla - (0/4) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_barrels_of_fun_d26dda)."
+            }
+          ],
+          "node_type": "quest-barrels-of-sasparilla",
+          "quantity": 4
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 16484,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Bubaba (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_barrels_of_fun_d26dda)."
+            }
+          ],
+          "npc_id": 9500000096
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 75,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Barrels of Fun (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_barrels_of_fun_d26dda)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Barrels of Fun (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_barrels_of_fun_d26dda)."
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3951129,
+      "title_string_id": 116258,
+      "giver_npc_id": 9000000156,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 116269,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the loose bears - (0/5) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bears_on_the_loose_a75c7e)."
+            }
+          ],
+          "node_type": "quest-loose-bears",
+          "quantity": 5
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 77846,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Mr. Miles (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bears_on_the_loose_a75c7e)."
+            }
+          ],
+          "npc_id": 9000000156
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 61,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Bears on the Loose! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bears_on_the_loose_a75c7e)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Bears on the Loose! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bears_on_the_loose_a75c7e)."
+        }
+      ],
+      "description_string_id": 116259,
+      "intro_text_string_id": 116257,
+      "enabled": true
+    },
+    {
+      "id": 3951154,
+      "title_string_id": 428077,
+      "giver_npc_id": 9500000520,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 428660,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect a blue balloon (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bundles_of_balloons_8cb1e1)."
+            }
+          ],
+          "node_type": "quest-blue-balloon",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 428662,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect a green balloon (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bundles_of_balloons_8cb1e1)."
+            }
+          ],
+          "node_type": "quest-green-balloon",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 3,
+          "text_string_id": 428664,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect an orange balloon (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bundles_of_balloons_8cb1e1)."
+            }
+          ],
+          "node_type": "quest-orange-balloon",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 428666,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Quills (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bundles_of_balloons_8cb1e1)."
+            }
+          ],
+          "npc_id": 9500000520
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Bundles of Balloons (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bundles_of_balloons_8cb1e1)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Bundles of Balloons (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bundles_of_balloons_8cb1e1)."
+        }
+      ],
+      "description_string_id": 428078,
+      "intro_text_string_id": 428076,
+      "enabled": true
+    },
+    {
+      "id": 3951159,
+      "title_string_id": 72032,
+      "giver_npc_id": 9500000178,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 72403,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect the butterflies - 0/8 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bye_bye_butterfly_665d94)."
+            }
+          ],
+          "node_type": "quest-butterflies",
+          "quantity": 8
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 72412,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Miffit (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bye_bye_butterfly_665d94)."
+            }
+          ],
+          "npc_id": 9500000178
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Bye Bye, Butterfly (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bye_bye_butterfly_665d94)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Bye Bye, Butterfly (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bye_bye_butterfly_665d94)."
+        }
+      ],
+      "description_string_id": 72033,
+      "intro_text_string_id": 72031,
+      "enabled": true
+    },
+    {
+      "id": 3951174,
+      "title_string_id": 430168,
+      "giver_npc_id": 9500000523,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 430215,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Gather coins from Cloud World (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cloudy_days_e7ba57)."
+            }
+          ],
+          "node_type": "quest-coins",
+          "quantity": 1
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cloudy Days (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cloudy_days_e7ba57)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Cloudy Days (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cloudy_days_e7ba57)."
+        }
+      ],
+      "description_string_id": 430169,
+      "intro_text_string_id": 430167,
+      "enabled": true
+    },
+    {
+      "id": 3951175,
+      "title_string_id": 430164,
+      "giver_npc_id": 9500000523,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 430174,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect coins from the Cloud World. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_coin_clean_up_8f77be)."
+            }
+          ],
+          "node_type": "quest-coins",
+          "quantity": 1
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Coin Clean-Up (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_coin_clean_up_8f77be)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Coin Clean-Up (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_coin_clean_up_8f77be)."
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3951271,
+      "title_string_id": 72430,
+      "giver_npc_id": 9500000946,
+      "prerequisite_quest_ids": [
+        3951451
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 72432,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Grandpa Snarfs (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_grandpa_snarfs_is_losted_4ba6cb)."
+            }
+          ],
+          "npc_id": 9500001760
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Grandpa Snarfs is Losted (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_grandpa_snarfs_is_losted_4ba6cb)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Grandpa Snarfs is Losted (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_grandpa_snarfs_is_losted_4ba6cb)."
+        }
+      ],
+      "description_string_id": 72431,
+      "intro_text_string_id": 72444,
+      "enabled": true
+    },
+    {
+      "id": 3951276,
+      "title_string_id": 37602,
+      "giver_npc_id": 9000000308,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 37604,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect fishing grubs. - 0/6 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_grubby_hands_242608)."
+            }
+          ],
+          "node_type": "quest-fishing-grubs",
+          "quantity": 6
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 38003,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Dooba (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_grubby_hands_242608)."
+            }
+          ],
+          "npc_id": 9000000308
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Grubby Hands (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_grubby_hands_242608)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Grubby Hands (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_grubby_hands_242608)."
+        }
+      ],
+      "description_string_id": 38002,
+      "intro_text_string_id": 38002,
+      "enabled": true
+    },
+    {
+      "id": 3951302,
+      "title_string_id": 38095,
+      "giver_npc_id": 9000000308,
+      "prerequisite_quest_ids": [
+        3951276
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 38105,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Glimmer (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_keep_it_down_3bc80b)."
+            }
+          ],
+          "npc_id": 9500000138
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Keep it Down! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_keep_it_down_3bc80b)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Keep it Down! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_keep_it_down_3bc80b)."
+        }
+      ],
+      "description_string_id": 38183,
+      "intro_text_string_id": 38183,
+      "enabled": true
+    },
+    {
+      "id": 3951316,
+      "title_string_id": 94588,
+      "giver_npc_id": 9500000617,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 94590,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Rainchaser's pet turtle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lost_turtle_405065)."
+            }
+          ],
+          "node_type": "quest-rainchaser-s-pet-turtle",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 94592,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Rainchaser (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lost_turtle_405065)."
+            }
+          ],
+          "npc_id": 9500000617
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Lost Turtle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lost_turtle_405065)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Lost Turtle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lost_turtle_405065)."
+        }
+      ],
+      "description_string_id": 94596,
+      "intro_text_string_id": 94594,
+      "enabled": true
+    },
+    {
+      "id": 3951317,
+      "title_string_id": 90819,
+      "giver_npc_id": 9500000047,
+      "prerequisite_quest_ids": [
+        3950234
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 90828,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Gather poison toad secretions - (0/5) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_make_sure_to_wash_up_ae87ea)."
+            }
+          ],
+          "node_type": "quest-poison-toad-secretions",
+          "quantity": 5
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 90832,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Milford in Blackspore (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_make_sure_to_wash_up_ae87ea)."
+            }
+          ],
+          "npc_id": 9500000047
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Make Sure to Wash Up... (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_make_sure_to_wash_up_ae87ea)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Make Sure to Wash Up... (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_make_sure_to_wash_up_ae87ea)."
+        }
+      ],
+      "description_string_id": 90827,
+      "intro_text_string_id": 90818,
+      "enabled": true
+    },
+    {
+      "id": 3951322,
+      "title_string_id": 91524,
+      "giver_npc_id": 9500000651,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 116551,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the missing books - (0/6) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_missing_books_f69d3b)."
+            }
+          ],
+          "node_type": "quest-missing-books",
+          "quantity": 6
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 94085,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Arestol in Shrouded Glade (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_missing_books_f69d3b)."
+            }
+          ],
+          "npc_id": 9500000651
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Missing Books (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_missing_books_f69d3b)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Missing Books (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_missing_books_f69d3b)."
+        }
+      ],
+      "description_string_id": 91525,
+      "enabled": true
+    },
+    {
+      "id": 3951362,
+      "title_string_id": 37984,
+      "giver_npc_id": 9500000280,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 37987,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect the baby chicks - (0/6) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_picking_up_chicks_e4a523)."
+            }
+          ],
+          "node_type": "quest-baby-chicks",
+          "quantity": 6
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 37989,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Tamara at Farnum Farmstead (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_picking_up_chicks_e4a523)."
+            }
+          ],
+          "npc_id": 9500000280
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Picking Up Chicks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_picking_up_chicks_e4a523)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Picking Up Chicks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_picking_up_chicks_e4a523)."
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3951364,
+      "title_string_id": 19820,
+      "giver_npc_id": 9500000366,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 19827,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Get treats (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pookie_s_treats_9e5277)."
+            }
+          ],
+          "node_type": "quest-treats",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 19829,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Sunni in Lakeshore (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pookie_s_treats_9e5277)."
+            }
+          ],
+          "npc_id": 9500000366
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pookie's Treats (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pookie_s_treats_9e5277)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Pookie's Treats (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pookie_s_treats_9e5277)."
+        }
+      ],
+      "description_string_id": 19821,
+      "intro_text_string_id": 24938,
+      "enabled": true
+    },
+    {
+      "id": 3951407,
+      "title_string_id": 72066,
+      "giver_npc_id": 9500000111,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 73642,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pluck nearby daisies - 0/6 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_she_loves_me_not_2581d5)."
+            }
+          ],
+          "node_type": "quest-nearby-daisies",
+          "quantity": 6
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 73644,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Corflugg (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_she_loves_me_not_2581d5)."
+            }
+          ],
+          "npc_id": 9500000111
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 60,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "She Loves Me... Not (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_she_loves_me_not_2581d5)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "She Loves Me... Not (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_she_loves_me_not_2581d5)."
+        }
+      ],
+      "description_string_id": 72067,
+      "enabled": true
+    },
+    {
+      "id": 3951427,
+      "title_string_id": 101154,
+      "giver_npc_id": 9500000617,
+      "prerequisite_quest_ids": [
+        3951316
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 391172,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on the Starfish Bucket (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_starfish_picking_c2b1d3)."
+            }
+          ],
+          "npc_id": 9500001969
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 94592,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Rainchaser (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_starfish_picking_c2b1d3)."
+            }
+          ],
+          "npc_id": 9500000617
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Starfish Picking (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_starfish_picking_c2b1d3)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Starfish Picking (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_starfish_picking_c2b1d3)."
+        }
+      ],
+      "description_string_id": 101168,
+      "intro_text_string_id": 101166,
+      "enabled": true
+    },
+    {
+      "id": 3951451,
+      "title_string_id": 72418,
+      "giver_npc_id": 9500000946,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 72420,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the pies - 0/6 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_only_thing_better_than_cake_cddf92)."
+            }
+          ],
+          "node_type": "quest-pies",
+          "quantity": 6
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 72422,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Snarf (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_only_thing_better_than_cake_cddf92)."
+            }
+          ],
+          "npc_id": 9500000946
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Only Thing Better Than Cake (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_only_thing_better_than_cake_cddf92)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "The Only Thing Better Than Cake (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_only_thing_better_than_cake_cddf92)."
+        }
+      ],
+      "description_string_id": 72419,
+      "intro_text_string_id": 72424,
+      "enabled": true
+    },
+    {
+      "id": 3951459,
+      "title_string_id": 37430,
+      "giver_npc_id": 9500000438,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 37448,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find giant toads (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_toadal_truth_d4101d)."
+            }
+          ],
+          "node_type": "quest-giant-toads",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 37450,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Anura in Sanctuary (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_toadal_truth_d4101d)."
+            }
+          ],
+          "npc_id": 9500000438
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 61,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Toadal Truth (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_toadal_truth_d4101d)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "The Toadal Truth (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_toadal_truth_d4101d)."
+        }
+      ],
+      "description_string_id": 37431,
+      "intro_text_string_id": 37429,
+      "enabled": true
+    },
+    {
+      "id": 3951491,
+      "title_string_id": 72070,
+      "giver_npc_id": 9500000111,
+      "prerequisite_quest_ids": [
+        3951407
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 73650,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Andante (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_words_of_wooing_a61c15)."
+            }
+          ],
+          "npc_id": 9500000085
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 73644,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Corflugg (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_words_of_wooing_a61c15)."
+            }
+          ],
+          "npc_id": 9500000111
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Words of Wooing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_words_of_wooing_a61c15)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Words of Wooing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_words_of_wooing_a61c15)."
+        }
+      ],
+      "description_string_id": 72071,
+      "intro_text_string_id": 72069,
+      "enabled": true
+    },
+    {
+      "id": 3951494,
+      "title_string_id": 38440,
+      "giver_npc_id": 9500000138,
+      "prerequisite_quest_ids": [
+        3951302
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 38446,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Whisperwing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_x_marks_the_where_is_everyone_4a4e74)."
+            }
+          ],
+          "npc_id": 9500000232
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 38452,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Dayflower (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_x_marks_the_where_is_everyone_4a4e74)."
+            }
+          ],
+          "npc_id": 9500000119
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 38455,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Purra (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_x_marks_the_where_is_everyone_4a4e74)."
+            }
+          ],
+          "npc_id": 9500000200
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 38457,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Glimmer (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_x_marks_the_where_is_everyone_4a4e74)."
+            }
+          ],
+          "npc_id": 9500000138
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "X Marks the... Where is Everyone (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_x_marks_the_where_is_everyone_4a4e74)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "X Marks the... Where is Everyone (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_x_marks_the_where_is_everyone_4a4e74)."
+        }
+      ],
+      "enabled": true
     }
   ]
 }

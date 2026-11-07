@@ -22138,8 +22138,23 @@
       "location_evidence": [
         "The swamp: \"dances in the swamp\" (3731835062); video nameplate beside Oberyn near a stone wall, Cracked Claw Caverns marker 139 m"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3951317,
+          "title": "Make Sure to Wash Up...",
+          "title_string_id": 90819,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Make Sure to Wash Up... (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_make_sure_to_wash_up_ae87ea)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3951317
+      ],
       "quests_given_text": [
         "Search for Milford (1641429655) then ingredient series: bogwart samples (2851729882), strangleroot samples (1985959659), Grave Blossoms (3532615967), poisonous purple toads (4198837565); \"Return to Milford in Blackspore\" (3383934881)"
       ],

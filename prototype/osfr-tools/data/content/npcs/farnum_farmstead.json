@@ -3024,7 +3024,11 @@
         "\"In Farnum Farmstead\" (222952832, 2591550472, 3306571276, 3396905925). Tables are on the western side near Hartley (2164323471). Not seen in video."
       ],
       "quests_given": [],
-      "quest_ids_given": [3170007, 3170008, 3170009],
+      "quest_ids_given": [
+        3170007,
+        3170008,
+        3170009
+      ],
       "quests_given_text": [
         "Three tiers: Easy Garden Defense (\"Complete each of the Easy Garden Defense games for Houston in Farnum Farmstead.\" 3396905925), Medium Garden Defense (Dwarf Towers, 887635954, 1173981347, 2226494857), Hard Garden Defense (\"Now that you've gotten some experience, Houston has challenged you to defeat all of the Hard Garden Defense games!\" 3886165947; \"You have to beat ALL of the Hard Garden Defense games before I'm coughing up a reward!\" 3671700864; \"I might even have a spiffy reward\" 219303859). Hand-back \"Return to Houston\" (818875018)."
       ],
@@ -4958,7 +4962,9 @@
         "The client gives no place. Wiki only: Farnum's Farm. One weak source for the place."
       ],
       "quests_given": [],
-      "quest_ids_given": [3170013],
+      "quest_ids_given": [
+        3170013
+      ],
       "quests_given_text": [
         "Garden Defense (title ucdt 912671793 / ugdt 3987963014 by wording; the \"basic\" game is Crop Dusting, 3802931860, 1975270100; \"Return to Papa Salt\" 2034842409)."
       ],
@@ -8450,8 +8456,23 @@
       "location_evidence": [
         "Farm yard near Mae: green marker 11 m with Mae at 14 m (3caQP-As968/00542, /00544)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3951362,
+          "title": "Picking Up Chicks",
+          "title_string_id": 37984,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Picking Up Chicks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_picking_up_chicks_e4a523)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3951362
+      ],
       "quests_given_text": [
         "An untitled harvesting quest: \"Help Tamara by harvesting.\" (214303431), \"Return to Tamara at Farnum Farmstead\" (932572323), \"Return to Tamara\" (2747406420). Rucks's challenge confirms it: \"I heard that you helped Tamara collect ingredients for dinner...\" (2169546441). Title and rewards unknown; mentioned in Adventurer gaps."
       ],

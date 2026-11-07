@@ -14220,8 +14220,23 @@
       "location_evidence": [
         "Lakeshore (\"Return to Sunni in Lakeshore\", 1110836504)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3951364,
+          "title": "Pookie's Treats",
+          "title_string_id": 19820,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pookie's Treats (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pookie_s_treats_9e5277)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3951364
+      ],
       "quests_given_text": [
         "\"Pookie's Treats\" (client title 2591785185; ugdt 4104694526): get dog treats from Finnie in NPCs - Sanctuary (762518195, 1160392013) and give one to Pookie from Mister Nooklings (4292520723). By wording."
       ],
@@ -14527,10 +14542,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob%3ASunni"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 312,
-      "model_file_name": "human_m_freestyle_03.agr"
+      "model_file_name": "human_m_freestyle_03.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000223,

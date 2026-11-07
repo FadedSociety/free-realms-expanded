@@ -39205,9 +39205,36 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part A. The Roadhouse and the Tavern Cellar (Northern Wilds), row 38; source cell: [client]"
             }
           ]
+        },
+        {
+          "quest_id": 3951451,
+          "title": "The Only Thing Better Than Cake",
+          "title_string_id": 72418,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Only Thing Better Than Cake (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_only_thing_better_than_cake_cddf92)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3951271,
+          "title": "Grandpa Snarfs is Losted",
+          "title_string_id": 72430,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Grandpa Snarfs is Losted (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_grandpa_snarfs_is_losted_4ba6cb)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3951451,
+        3951271
+      ],
       "quests_given_text": [
         "Grandpa Snarfs is Losted (client title 2052652915; \"Find Grandpa Snarfs. Snarf suggested looking for him in Wugachug.\", 2610503665; \"Search Wugachug for Grandpa Snarfs\", 3818182166). A pie errand: a Snowhill baker sent a cake instead of pies, so the player hunts pies at the Roadhouse (2548799522, 919179831, 1801378532; thanks \"Lot of pies! Snarf is happy!\", 3803683848). Pie quest title not found. \"Grandpa Snarfs\" is also a name entry (ucdt 2368200922)."
       ],
@@ -39513,11 +39540,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2074; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3331 (ModelId=166, ModelFileName=troll_peasant_01.adr, NameId=72022)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.754206,
       "model_id": 166,
-      "model_file_name": "troll_peasant_01.adr"
+      "model_file_name": "troll_peasant_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000947,

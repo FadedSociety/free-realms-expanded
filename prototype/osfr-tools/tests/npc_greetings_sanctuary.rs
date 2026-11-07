@@ -242,7 +242,7 @@ const LATER_GREETINGS: [(u64, u32); 4] = [
 /// A legacy-data Sanctuary trainer, merchant and non-quest greeter in the edited set.
 const TRAINER: u64 = 9000000097; // General Glowlight
 const MERCHANT: u64 = 9500000515; // Pucca De'Flor
-const GREETER: u64 = 9500000438; // Anura, ambient
+const GREETER: u64 = 9500000522; // Ridwan Lacsher, ambient (Anura now gives The Toadal Truth, a wiki pick-up quest)
 /// An untouched legacy-data Sanctuary row with no recovered greeting.
 const BLANK: u64 = 9500000443; // Barin Battlerock
 

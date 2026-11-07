@@ -5995,7 +5995,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:419; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1653 (ModelId=168, ModelFileName=troll_shaman.adr, NameId=72452)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500001760
     },
     {
       "spawn_guid": 100000001664,
@@ -10525,7 +10526,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:712; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1954 (ModelId=521, ModelFileName=sh_bucket_01.adr, NameId=116178)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500001969
     },
     {
       "spawn_guid": 100000001955,

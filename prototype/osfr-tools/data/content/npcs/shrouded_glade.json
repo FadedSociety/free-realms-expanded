@@ -1787,8 +1787,23 @@
       "location_evidence": [
         "At the Druid Academy (\"Return the missing books to Arestol at the Druid Academy.\" 2898765982). Video: nameplate beside Suni Sorrowsmile, Misty Mountain marker 92 m (T1Gie2A5nEE/00024)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3951322,
+          "title": "Missing Books",
+          "title_string_id": 91524,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Missing Books (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_missing_books_f69d3b)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3951322
+      ],
       "quests_given_text": [
         "Missing library books (\"Several books have gone missing from the Druid Academy's library recently. Arestol would like for you to search Shrouded Glade and find them.\" 684372761; \"Return to Arestol in Shrouded Glade\" 1864515453); buried tomes on Misty Mountain (\"Arestol will reward you if you can find some buried tomes up on Misty Mountain\" 794019279; book on Fastvi Frostflutter from \"the highest peak of Misty Mountain\", 1308263417); the Warrior's Tome (\"Return the Warrior's Tome to Arestol in Shrouded Glade.\" 2620663095; he sends the player on to Iris Shiversting above Snowhill, 1930645234) in Warrior: Finding Facts About Fastvi (matched by wording on that page, W15); holds the notes on ice magic that Suni and Keldon want (808705770, 4120808893). Darkthorne research for Chapter 1: Shrouded History (E6): \"If my memory serves, Arestol is still the historian in Shrouded Glade. He may be able to shed some light on the situation.\" (2742813247); the Academy reply 3802352425 is by an unnamed speaker, probably him [inferred]."
       ],
@@ -2248,11 +2263,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:215; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1448 (ModelId=468, ModelFileName=fairy_druid_m.adr, NameId=45364)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.206384,
       "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr"
+      "model_file_name": "fairy_druid_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000652,
