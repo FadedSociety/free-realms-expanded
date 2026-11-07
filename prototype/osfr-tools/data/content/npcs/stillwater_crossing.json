@@ -8831,19 +8831,19 @@
         ],
         "model_id": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob:Melanie"
+            "kind": "client",
+            "evidence": "(R) The client model named after this NPC (human_f_melanie.agr); the row drew humanchild_f_skirtandtunic.adr, a generic or another NPC's model. Checked in lab/tools/model-view and against the NPC's wiki picture."
           }
         ],
         "model_file_name": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob:Melanie"
+            "kind": "client",
+            "evidence": "(R) The client model named after this NPC (human_f_melanie.agr); the row drew humanchild_f_skirtandtunic.adr, a generic or another NPC's model. Checked in lab/tools/model-view and against the NPC's wiki picture."
           }
         ]
       },
-      "model_id": 7,
-      "model_file_name": "humanchild_f_skirtandtunic.adr"
+      "model_id": 3894,
+      "model_file_name": "human_f_melanie.agr"
     },
     {
       "npc_id": 9000000157,
@@ -10807,14 +10807,14 @@
         ],
         "model_id": [
           {
-            "kind": "legacy-data",
-            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1711; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2968 (ModelId=1589, ModelFileName=human_m_capn_sigmundr.agr, NameId=388950)."
+            "kind": "client",
+            "evidence": "(R) The client model named after this NPC (fairy_m_reed_stillwater.agr); the row drew human_m_capn_sigmundr.agr, a generic or another NPC's model. Checked in lab/tools/model-view and against the NPC's wiki picture."
           }
         ],
         "model_file_name": [
           {
-            "kind": "legacy-data",
-            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1711; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2968 (ModelId=1589, ModelFileName=human_m_capn_sigmundr.agr, NameId=388950)."
+            "kind": "client",
+            "evidence": "(R) The client model named after this NPC (fairy_m_reed_stillwater.agr); the row drew human_m_capn_sigmundr.agr, a generic or another NPC's model. Checked in lab/tools/model-view and against the NPC's wiki picture."
           }
         ],
         "greeting_string_id": [
@@ -10829,8 +10829,8 @@
         ]
       },
       "heading": 2.828683,
-      "model_id": 1589,
-      "model_file_name": "human_m_capn_sigmundr.agr",
+      "model_id": 1594,
+      "model_file_name": "fairy_m_reed_stillwater.agr",
       "greeting_string_id": 408272
     },
     {
@@ -13445,19 +13445,19 @@
         ],
         "model_id": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) stand-in body: the most common model of drawn dog male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AVince"
+            "kind": "client",
+            "evidence": "(R) The client model named after this NPC (dog_large_vince.agr); the row drew dog_large_shortears.adr, a generic or another NPC's model. Checked in lab/tools/model-view and against the NPC's wiki picture."
           }
         ],
         "model_file_name": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) stand-in body: the most common model of drawn dog male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AVince"
+            "kind": "client",
+            "evidence": "(R) The client model named after this NPC (dog_large_vince.agr); the row drew dog_large_shortears.adr, a generic or another NPC's model. Checked in lab/tools/model-view and against the NPC's wiki picture."
           }
         ]
       },
-      "model_id": 171,
-      "model_file_name": "dog_large_shortears.adr"
+      "model_id": 1045,
+      "model_file_name": "dog_large_vince.agr"
     },
     {
       "npc_id": 9000000235,

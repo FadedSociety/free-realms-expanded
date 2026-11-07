@@ -6997,14 +6997,14 @@
         ],
         "model_id": [
           {
-            "kind": "legacy-data",
-            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1655; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2912 (ModelId=431, ModelFileName=human_f_samantha.agr, NameId=103722)."
+            "kind": "client",
+            "evidence": "(R) The client model named after this NPC (fairy_f_merigold.agr); the row drew human_f_samantha.agr, a generic or another NPC's model. Checked in lab/tools/model-view and against the NPC's wiki picture."
           }
         ],
         "model_file_name": [
           {
-            "kind": "legacy-data",
-            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1655; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2912 (ModelId=431, ModelFileName=human_f_samantha.agr, NameId=103722)."
+            "kind": "client",
+            "evidence": "(R) The client model named after this NPC (fairy_f_merigold.agr); the row drew human_f_samantha.agr, a generic or another NPC's model. Checked in lab/tools/model-view and against the NPC's wiki picture."
           }
         ],
         "greeting_string_id": [
@@ -7025,8 +7025,8 @@
         ]
       },
       "heading": -1.199926,
-      "model_id": 431,
-      "model_file_name": "human_f_samantha.agr",
+      "model_id": 958,
+      "model_file_name": "fairy_f_merigold.agr",
       "greeting_string_id": 80,
       "explainer_topics": [
         {

@@ -17228,20 +17228,20 @@
         ],
         "model_id": [
           {
-            "kind": "legacy-data",
-            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:340; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1573 (ModelId=4582, ModelFileName=human_m_merchant_wizard_caucasian.agr, NameId=45561)."
+            "kind": "client",
+            "evidence": "(R) The client model named after this NPC (human_m_manager_landon.agr); the row drew human_m_merchant_wizard_caucasian.agr, a generic or another NPC's model. Checked in lab/tools/model-view and against the NPC's wiki picture."
           }
         ],
         "model_file_name": [
           {
-            "kind": "legacy-data",
-            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:340; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1573 (ModelId=4582, ModelFileName=human_m_merchant_wizard_caucasian.agr, NameId=45561)."
+            "kind": "client",
+            "evidence": "(R) The client model named after this NPC (human_m_manager_landon.agr); the row drew human_m_merchant_wizard_caucasian.agr, a generic or another NPC's model. Checked in lab/tools/model-view and against the NPC's wiki picture."
           }
         ]
       },
       "heading": -2.574916,
-      "model_id": 4582,
-      "model_file_name": "human_m_merchant_wizard_caucasian.agr"
+      "model_id": 1457,
+      "model_file_name": "human_m_manager_landon.agr"
     },
     {
       "npc_id": 9500000038,
@@ -41596,8 +41596,8 @@
       "capture_match": null,
       "position_reason": null,
       "heading": 0.0,
-      "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr",
+      "model_id": 425,
+      "model_file_name": "fairy_m_bullseye.agr",
       "source": [
         {
           "kind": "wiki",
@@ -41835,14 +41835,14 @@
         ],
         "model_id": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) stand-in body: most common model of drawn pixie male NPCs"
+            "kind": "client",
+            "evidence": "(R) The client model named after this NPC (fairy_m_bullseye.agr); the row drew fairy_druid_m.adr, a generic or another NPC's model. Checked in lab/tools/model-view and against the NPC's wiki picture."
           }
         ],
         "model_file_name": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) stand-in body: most common model of drawn pixie male NPCs"
+            "kind": "client",
+            "evidence": "(R) The client model named after this NPC (fairy_m_bullseye.agr); the row drew fairy_druid_m.adr, a generic or another NPC's model. Checked in lab/tools/model-view and against the NPC's wiki picture."
           }
         ]
       }

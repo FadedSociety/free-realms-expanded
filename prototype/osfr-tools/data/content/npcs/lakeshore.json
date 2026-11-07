@@ -3690,19 +3690,19 @@
         ],
         "model_id": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AErnest_McScuttle"
+            "kind": "client",
+            "evidence": "(R) The client model named after this NPC (fairy_m_ernest_mcscuttle.agr); the row drew fairy_druid_m.adr, a generic or another NPC's model. Checked in lab/tools/model-view and against the NPC's wiki picture."
           }
         ],
         "model_file_name": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AErnest_McScuttle"
+            "kind": "client",
+            "evidence": "(R) The client model named after this NPC (fairy_m_ernest_mcscuttle.agr); the row drew fairy_druid_m.adr, a generic or another NPC's model. Checked in lab/tools/model-view and against the NPC's wiki picture."
           }
         ]
       },
-      "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr"
+      "model_id": 1586,
+      "model_file_name": "fairy_m_ernest_mcscuttle.agr"
     },
     {
       "npc_id": 9500000344,
