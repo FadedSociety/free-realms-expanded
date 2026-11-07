@@ -5220,6 +5220,51 @@
         }
       ],
       "enabled": true
+    },
+    {
+      "id": 3951547,
+      "title_string_id": 140311,
+      "giver_npc_id": 9000000227,
+      "prerequisite_quest_ids": [
+        3000060
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 140339,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Caitlyn (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_grave_danger_71a369)."
+            }
+          ],
+          "npc_id": 9000000038
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 6,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Brawler: Grave Danger (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_grave_danger_71a369)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Brawler: Grave Danger (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_grave_danger_71a369)."
+        }
+      ],
+      "job": 43,
+      "description_string_id": 140312,
+      "intro_text_string_id": 140310,
+      "enabled": true
     }
   ]
 }

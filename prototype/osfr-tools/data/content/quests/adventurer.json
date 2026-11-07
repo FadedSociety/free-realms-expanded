@@ -3052,7 +3052,56 @@
       "prerequisite_quest_ids": [
         3000034
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 90807,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Ask about Darkthorne (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_forgotten_princess_66a775)."
+            }
+          ],
+          "npc_id": 9000000067
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 90798,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Ask Nomi -- Quills was needed, instead of Nomi for me (Malarcio) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_forgotten_princess_66a775)."
+            }
+          ],
+          "npc_id": 9500000509
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 90807,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Ask Sir Whittington (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_forgotten_princess_66a775)."
+            }
+          ],
+          "npc_id": 9000000205
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 90636,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Geoffrey in the Royal Palace (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_forgotten_princess_66a775)."
+            }
+          ],
+          "npc_id": 9000000330
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -3102,7 +3151,9 @@
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "description_string_id": 90794,
+      "intro_text_string_id": 90786
     },
     {
       "id": 3000036,
@@ -3111,7 +3162,33 @@
       "prerequisite_quest_ids": [
         3000035
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 90824,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the merchant caravan (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_find_the_caravan_56e4b2)."
+            }
+          ],
+          "node_type": "quest-merchant-caravan",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 90830,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Vittorio (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_find_the_caravan_56e4b2)."
+            }
+          ],
+          "npc_id": 9000000232
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -3168,7 +3245,7 @@
       "description_string_id": 90815,
       "intro_text_string_id": 90813,
       "end_text_string_id": 90816,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000037,
@@ -3177,7 +3254,56 @@
       "prerequisite_quest_ids": [
         3000036
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 36445,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Sergeant Cargug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_weapon_shipment_9e92ce)."
+            }
+          ],
+          "npc_id": 9500000209
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 90843,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Bring Cargug's message and gift to Mumpalot in Wugachug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_weapon_shipment_9e92ce)."
+            }
+          ],
+          "npc_id": 9500000988
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 90845,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Sergeant Cargug in Briarwood (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_weapon_shipment_9e92ce)."
+            }
+          ],
+          "npc_id": 9500000209
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 90847,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Vittorio at the broken down caravan in Briarwood (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_weapon_shipment_9e92ce)."
+            }
+          ],
+          "npc_id": 9000000232
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -3234,7 +3360,7 @@
       "description_string_id": 90836,
       "intro_text_string_id": 90834,
       "end_text_string_id": 90837,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000038,
@@ -3243,7 +3369,57 @@
       "prerequisite_quest_ids": [
         3000037
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 90856,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Quartermaster Bargangle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_armor_shipment_c10f94)."
+            }
+          ],
+          "npc_id": 9500000201
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 90858,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Test the armor (on PS3, Defeat the Practice Dummy with your combat abilities.) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_armor_shipment_c10f94)."
+            }
+          ],
+          "minigame_id": 79,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 93747,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Quartermaster Bargangle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_armor_shipment_c10f94)."
+            }
+          ],
+          "npc_id": 9500000201
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 90847,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Vittorio at the broken down caravan in Briarwood (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_armor_shipment_c10f94)."
+            }
+          ],
+          "npc_id": 9000000232
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -3300,7 +3476,7 @@
       "description_string_id": 90851,
       "intro_text_string_id": 90849,
       "end_text_string_id": 90852,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000039,
@@ -3309,7 +3485,20 @@
       "prerequisite_quest_ids": [
         3000038
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 90869,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Lieutenant Snibug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_small_wooden_box_6bf6ae)."
+            }
+          ],
+          "npc_id": 9500000163
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -3366,7 +3555,7 @@
       "description_string_id": 90862,
       "intro_text_string_id": 90860,
       "end_text_string_id": 90863,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000040,

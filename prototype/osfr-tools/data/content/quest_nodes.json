@@ -677,6 +677,30 @@
         "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
       },
       "name_id": 19820
+    },
+    {
+      "key": "quest-merchant-caravan",
+      "name": "Merchant Caravan",
+      "model_id": 1050,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 90814
     }
   ],
   "pools": [
@@ -1089,6 +1113,21 @@
       "key": "quest-treats",
       "zone_definition_id": 1,
       "node_type": "quest-treats",
+      "max_active_nodes": 3,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-merchant-caravan",
+      "zone_definition_id": 1,
+      "node_type": "quest-merchant-caravan",
       "max_active_nodes": 3,
       "respawn_seconds": 30,
       "source_tag": "reconstructed",
@@ -3830,6 +3869,54 @@
         -740.68,
         9.09,
         956.16
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 250,
+      "pool_key": "quest-merchant-caravan",
+      "zone_definition_id": 1,
+      "position": [
+        -1408.9,
+        -27.631,
+        357.17
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 251,
+      "pool_key": "quest-merchant-caravan",
+      "zone_definition_id": 1,
+      "position": [
+        -1412.6,
+        -27.631,
+        362.71
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 252,
+      "pool_key": "quest-merchant-caravan",
+      "zone_definition_id": 1,
+      "position": [
+        -1419.14,
+        -27.631,
+        361.41
       ],
       "heading": 0.0,
       "source_tag": "reconstructed",

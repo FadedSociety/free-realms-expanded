@@ -47,8 +47,13 @@ const GATES: [(u32, u64, i32); 4] = [
     (NINJA_5, CHLOE, NINJA),
 ];
 /// A gate's follow-up the same giver offers once the gate is paid (T669: Growing Up and
-/// Finding a Buyer list their gate as the prerequisite).
-const FOLLOW_UPS: [(u32, u32); 2] = [(MINER_20, 3_100_024), (BRAWLER_5, 3_030_024)];
+/// Finding a Buyer list their gate as the prerequisite; Silverray's Blacksmith 3020025 follows
+/// Reach Level 20 the same way).
+const FOLLOW_UPS: [(u32, u32); 3] = [
+    (MINER_20, 3_100_024),
+    (BRAWLER_5, 3_030_024),
+    (BLACKSMITH_20, 3_020_025),
+];
 /// Both givers' rows are in `blackspore_swamp.json`; Petra's drawn body is her
 /// `npc_spawns_extra.json` spawn, whose runtime guid is her content key.
 const MAP: ZoneQuests = ZoneQuests {

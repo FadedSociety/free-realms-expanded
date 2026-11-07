@@ -26234,7 +26234,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1712; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2969 (ModelId=493, ModelFileName=human_f_aida.agr, NameId=100175)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500002016
     },
     {
       "spawn_guid": 100000002971,

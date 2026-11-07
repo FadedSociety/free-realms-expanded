@@ -455,12 +455,12 @@ use Blocker::{Giver, NoJobGate, NoProfile, Prerequisite, Unselectable};
 /// the test fails when one lifts, so the next builder re-checks the others before wiring it
 /// (some are one content edit away, others need a mechanic the server lacks). T542 enabled
 /// Become a Postman (3130001). L1022's card games lifted 3040004 and 3040009, whose only blocker
-/// was their minigame, so the list is eleven now; the test name keeps the T723 count for the
-/// protected test list.
+/// was their minigame, so the list is eleven now; the Chapter 1 wiring lifted 3000039 (Vittorio
+/// drawn, its prerequisite live), so ten; the test name keeps the T723 count for the protected
+/// test list.
 #[test]
 fn the_other_fifteen_still_have_a_blocker() {
-    const OFF: [(u32, &[Blocker]); 11] = [
-        (3_000_039, &[Giver, Prerequisite]),
+    const OFF: [(u32, &[Blocker]); 10] = [
         (3_020_031, &[Giver, Prerequisite]),
         (3_040_003, &[NoJobGate(120), Unselectable(120)]),
         (3_040_011, &[Unselectable(120)]),

@@ -1757,8 +1757,33 @@
       "prerequisite_quest_ids": [
         3020024
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 100165,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Anata Caliburn (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_forging_rumors_57dde9)."
+            }
+          ],
+          "npc_id": 9500002016
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 90,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Blacksmith: Forging Rumors (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_forging_rumors_57dde9)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1793,7 +1818,9 @@
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "description_string_id": 95108,
+      "intro_text_string_id": 95143
     },
     {
       "id": 3020026,

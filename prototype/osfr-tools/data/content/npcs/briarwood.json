@@ -17676,10 +17676,17 @@
             "kind": "client",
             "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 353,
-      "model_file_name": "fairy_darkthorne_f.adr"
+      "model_file_name": "fairy_darkthorne_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000118,
@@ -56677,11 +56684,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1532; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2789 (ModelId=338, ModelFileName=chugawug_m_sergeantcargug.adr, NameId=73506)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.905958,
       "model_id": 338,
-      "model_file_name": "chugawug_m_sergeantcargug.adr"
+      "model_file_name": "chugawug_m_sergeantcargug.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000202,
@@ -70570,8 +70584,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "model_id": 840,
+      "model_file_name": "human_m_vittorio.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000230,

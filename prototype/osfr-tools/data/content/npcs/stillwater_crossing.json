@@ -12042,10 +12042,23 @@
               "evidence": "title_string_id corrected from raw locale hash 4206471822 to Global.Text id 94247 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3951547,
+          "title": "Brawler: Grave Danger",
+          "title_string_id": 140311,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Brawler: Grave Danger (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_grave_danger_71a369)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3000022
+        3000022,
+        3951547
       ],
       "quests_given_text": [
         "Introduce Yourself (wiki gives her as the starter; sends the player to Francis Panic). Follow-up quests exist but their titles are not found: \"Valerie was looking for you while you were learning about racing. Francis thinks she has more quests for you\" (2585187751); \"I think Valerie is still looking for you. Have you talked to her yet?\" (2505291937); \"Hey, Valerie was looking for you. I think she has a few more quests!\" (4277860925). Receives a flier in the charity-derby errand (\"Give a flier to Valerie\", 485992453)."
@@ -12492,11 +12505,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1689; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2946 (ModelId=963, ModelFileName=human_f_valerie.agr, NameId=116458)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.169452,
       "model_id": 963,
-      "model_file_name": "human_f_valerie.agr"
+      "model_file_name": "human_f_valerie.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000229,
