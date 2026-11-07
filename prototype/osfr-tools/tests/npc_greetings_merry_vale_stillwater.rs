@@ -534,7 +534,9 @@ fn changed_rows_are(
 /// slice's change, pinned by its own suite, not this suite's spill.
 fn is_greeting_only_change_between(old: &Value, new: &Value) -> bool {
     changed_rows_are(old, new, true, |old, new| {
-        without_fields(old, &["greeting_string_id"]) == without_fields(new, &["greeting_string_id"])
+        // L1047: `quest_wire.py` notes a quest NPC with no client greeting in `greeting_reason`.
+        let fields = ["greeting_string_id", "greeting_reason"];
+        without_fields(old, &fields) == without_fields(new, &fields)
     })
 }
 
@@ -556,7 +558,7 @@ fn is_quest_binding_and_greeting_change_between(old: &Value, new: &Value) -> boo
         let fields: Vec<&str> = QUEST_BINDING_FIELDS
             .iter()
             .copied()
-            .chain(["greeting_string_id", "model_id", "model_file_name", "name_string_id", "field_sources"])
+            .chain(["greeting_string_id", "greeting_reason", "model_id", "model_file_name", "name_string_id", "field_sources"])
             .collect();
         without_fields(old, &fields) == without_fields(new, &fields)
     })
@@ -992,7 +994,6 @@ fn the_existing_greetings_and_other_regions_are_unchanged() {
         let (Some(old), Some(new)) = (old, new) else {
             panic!("{path} changed: the change under test is not readable JSON");
         };
-        let working_tree = base == ChangeBase::WorkingTree;
         // A greeting-only edit is allowed in both bases: each foreign region's
         // own greeting suite pins its bindings, so a committed binding slice
         // (T894) must not trip this guard once the integrator commits it.
@@ -1000,7 +1001,9 @@ fn the_existing_greetings_and_other_regions_are_unchanged() {
             is_quest_binding_change_between(path, &old, &new)
                 || is_greeting_only_change_between(&old, &new)
                 || is_npc_body_change_between(&old, &new)
-                || (working_tree && is_quest_binding_and_greeting_change_between(&old, &new)),
+                // L1047: a quest giver drawn, bound and noted in one wiring pass, committed
+                // or not (Vittorio: body and greeting note together).
+                || is_quest_binding_and_greeting_change_between(&old, &new),
             "{path} changed: this slice owns only merry_vale.json and stillwater_crossing.json"
         );
     }
