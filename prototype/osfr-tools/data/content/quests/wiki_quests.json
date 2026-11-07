@@ -5265,6 +5265,116 @@
       "description_string_id": 140312,
       "intro_text_string_id": 140310,
       "enabled": true
+    },
+    {
+      "id": 3951668,
+      "title_string_id": 428200,
+      "giver_npc_id": 9000000070,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 428218,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tell Diggy what food the pirates want for the party (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_farewell_feast_18bee1)."
+            }
+          ],
+          "npc_id": 9000000070
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 428242,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give the sample to Jolly Roger (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_farewell_feast_18bee1)."
+            }
+          ],
+          "npc_id": 9500000591
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 101092,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Diggy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_farewell_feast_18bee1)."
+            }
+          ],
+          "npc_id": 9000000070
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Farewell Feast (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_farewell_feast_18bee1)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Farewell Feast (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_farewell_feast_18bee1)."
+        }
+      ],
+      "description_string_id": 428201,
+      "intro_text_string_id": 428199,
+      "enabled": true
+    },
+    {
+      "id": 3951724,
+      "title_string_id": 100277,
+      "giver_npc_id": 9000000070,
+      "prerequisite_quest_ids": [
+        3950175
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 100290,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Seaspray (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hasty_food_delivery_56503a)."
+            }
+          ],
+          "npc_id": 9500000623
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Hasty Food Delivery (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hasty_food_delivery_56503a)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Hasty Food Delivery (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hasty_food_delivery_56503a)."
+        }
+      ],
+      "description_string_id": 100297,
+      "intro_text_string_id": 100297,
+      "enabled": true
     }
   ]
 }

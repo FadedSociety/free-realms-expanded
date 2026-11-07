@@ -279,16 +279,17 @@ impl Shipped {
                 let giver = self.records[&quest].giver_npc_id;
                 givers.entry(giver).or_default().push(quest);
             }
-            let start = character_at_for(CHARACTER, 0, [0.0; 3]);
-            let mut game = fixture.game(Some(state));
-            game.set_world_dir(Some(live.clone())).unwrap();
-            let mut client = Client::new(game, start);
             for (giver, targets) in givers {
                 let Some((at, actor)) = self.giver(CHARACTER, giver) else {
                     pass.unplaced.extend(targets);
                     continue;
                 };
-                client.at = at;
+                // A fresh client per giver: one walking every giver accepts every offer and,
+                // with enough root quests, reaches the active-quest limit (`quest_engine.rs`
+                // `active_limit`), so the last givers offered nothing (the giver-pinned quest batch).
+                let mut game = fixture.game(Some(state.clone()));
+                game.set_world_dir(Some(live.clone())).unwrap();
+                let mut client = Client::new(game, at);
                 let offers = client.walk(actor, None);
                 pass.walks.push(Walk {
                     giver,

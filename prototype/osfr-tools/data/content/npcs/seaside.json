@@ -12280,8 +12280,36 @@
       "location_evidence": [
         "The cafe (1556595973); video nameplate in three frames (wI2eLQKFFHg/00210)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3951668,
+          "title": "Farewell Feast",
+          "title_string_id": 428200,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Farewell Feast (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_farewell_feast_18bee1)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3951724,
+          "title": "Hasty Food Delivery",
+          "title_string_id": 100277,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Hasty Food Delivery (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hasty_food_delivery_56503a)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3951668,
+        3951724
+      ],
       "quests_given_text": [
         "Farewell Feast (title 3030398973, a feast for Jolly Roger's retiring pirate crew, 2493573445); Hasty Food Delivery (title 1798567334, a dish for Seaspray); Bucket O'Fish (title 211779048, repeatable; \"Collect buckets of fish from the Seaside beach\", 740224499); Helping the Local Chef (title 2980787396, repeatable); appears in Touring Seaside, Forcing the Food (title 1601016891), Craving Something Tasty (title 811105456), Hungry Hungry Troll (title 254473930), Cakey Clue (title 2930939421) and the event quest Birthday Cake Bake-off (title 2440607895; client: help cook Crispy Choychoy Delight, 2224135702). Clams from the Cray Caves (853566351, 614981641, 947918158; title not found). Diggy's Shopping List (title 1746864794): harvest Rainleaf, Gummyfruit and Spiralmint from Queensfields and Farnum's Farm (185453723) [inferred]. See Chef"
       ],
