@@ -323,6 +323,7 @@ pub struct Gameplay {
     last_npc_dialogue: Option<(u32, u64, u64, Vec<u8>)>,
     /// Quest offered as a dialog choice: (runtime guid, content key, quest id).
     pending_quest_choice: Option<(u64, u64, u32)>,
+    direct_quests: bool,
     /// T543: this session's open quest conversation, if a Talk started one. Never saved:
     /// a reconnect restarts the step's conversation at its first line.
     quest_conversation: Option<crate::quest_dialogue::OpenConversation>,
@@ -1205,6 +1206,7 @@ impl Gameplay {
             npc_interaction,
             last_npc_dialogue: None,
             pending_quest_choice: None,
+            direct_quests: false,
             quest_conversation: None,
             pending_choice_packets: Vec::new(),
             npc_coin_shop,

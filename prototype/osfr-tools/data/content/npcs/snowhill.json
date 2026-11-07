@@ -849,13 +849,19 @@
       "title_or_role": [
         "Pixie."
       ],
-      "roles": ["quest_giver"],
+      "roles": [
+        "quest_giver"
+      ],
       "enemy_kind": null,
       "location_evidence": [
         "\"Next to Easy Penguin Defense mini-game\" (wiki). The client says the Penguin Defense games are \"just outside the town hall\" (63326794)."
       ],
       "quests_given": [],
-      "quest_ids_given": [3170001, 3170002, 3170003],
+      "quest_ids_given": [
+        3170001,
+        3170002,
+        3170003
+      ],
       "quests_given_text": [],
       "quests_accepted": [],
       "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
@@ -8398,8 +8404,23 @@
       "location_evidence": [
         "\"Cinn in Snowhill\" (client 4139692188). Turnips taken by yetis in Snowy Canyon (client 190207954). [video: green marker 39 m, near Fladnag, CW9hNMMNV8w/00000]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950045,
+          "title": "Better Late Than Never",
+          "title_string_id": 46285,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Better Late Than Never (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_better_late_than_never_5e51b1)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950045
+      ],
       "quests_given_text": [
         "The turnip retrieval quest in Snowy Canyon (client 636790647); \"Cinn's Request\" (title 647807268, NOT LIVE in one variant 320834269)."
       ],
@@ -8765,9 +8786,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3941 spawnNpcWithGuid(33732); src/Resources/Npcs.json Id=33732"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -1.915841
+      "heading": -1.915841,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000738,
@@ -8800,8 +8828,23 @@
       "location_evidence": [
         "Snowhill (wiki); [video: green marker beside a frozen lake, QRbWTjaVopE/00020]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950286,
+          "title": "Noisy Neighbors",
+          "title_string_id": 36810,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Noisy Neighbors (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_noisy_neighbors_3847ce)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950286
+      ],
       "quests_given_text": [
         "Starts the complaint to Flynn (\"Clara wants you to tell Flynn to turn down the volume\", client 377442065)."
       ],
@@ -9247,9 +9290,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3957 spawnNpcWithGuid(33762); src/Resources/Npcs.json Id=33762"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -2.28326987
+      "heading": -2.28326987,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000739,
@@ -15170,8 +15220,23 @@
       "location_evidence": [
         "At the Snowhill stage: \"Return to Flynn at the Snowhill stage\" (client 3354962909). [video: green marker 30 m away, WHFQFeeB7aI/00010]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950285,
+          "title": "Noise Permit",
+          "title_string_id": 36830,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Noise Permit (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_noise_permit_4b200b)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950285
+      ],
       "quests_given_text": [
         "Wiki lists a \"Noise Permit\" questline on the Snowhill page; the client has the exact title Noise Permit (511573328)."
       ],
@@ -15631,11 +15696,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2311; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3568 (ModelId=49, ModelFileName=fairy_m_02.adr, NameId=5453)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.870462,
       "model_id": 49,
-      "model_file_name": "fairy_m_02.adr"
+      "model_file_name": "fairy_m_02.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000748,
@@ -23141,11 +23213,24 @@
               "evidence": "title_string_id corrected from raw locale hash 3013218619 to Global.Text id 387259 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3950260,
+          "title": "Lucca's New Creation",
+          "title_string_id": 46128,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Lucca's New Creation (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lucca_s_new_creation_4c583b)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3050027,
-        3050028
+        3050028,
+        3950260
       ],
       "quests_given_text": [
         "Chef: Double Dog Dare, Chef: Reach Level 15 (wiki calls it \"Chef: Achieve Level 15\"), sends to Glerga (Chef: Glerga). Reviews the food in Chef: The Food Reviewer. Town quests Lucca's New Creation and Helping the Local Chef (wiki; the latter repeatable). Appears in Snowhill Secret Society."
@@ -23626,9 +23711,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3853 spawnNpcWithGuid(33634); src/Resources/Npcs.json Id=33634"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -0.266582996
+      "heading": -0.266582996,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000140,
@@ -33662,11 +33754,24 @@
               "evidence": "title_string_id corrected from raw locale hash 3799595359 to Global.Text id 436550 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3950463,
+          "title": "Where is Wellington",
+          "title_string_id": 37551,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Where is Wellington (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_where_is_wellington_a126b4)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3040049,
-        3040050
+        3040050,
+        3950463
       ],
       "quests_given_text": [
         "Card Duelist: A Guide to The Baron, Card Duelist: Master Explorer (inferred; see Card Duelist page)."
@@ -34123,9 +34228,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3945 spawnNpcWithGuid(33736); src/Resources/Npcs.json Id=33736"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -1.94461002
+      "heading": -1.94461002,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000201,
@@ -36863,11 +36975,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2310; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3567 (ModelId=42, ModelFileName=fairy_f_02.adr, NameId=5452)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.665482,
       "model_id": 42,
-      "model_file_name": "fairy_f_02.adr"
+      "model_file_name": "fairy_f_02.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000771,
@@ -39940,15 +40059,31 @@
         "Vendor: \"Lvl 20 Clothing and Tools\" (wiki, per the Miner page)."
       ],
       "roles": [
-        "vendor",
-        "trainer"
+        "quest_giver",
+        "trainer",
+        "vendor"
       ],
       "enemy_kind": null,
       "location_evidence": [
         "Singing Crystal Mines. [video: marker seen in the mine, wstXCsranVg/00030, /00070]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950020,
+          "title": "A Profitable Package",
+          "title_string_id": 103365,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Profitable Package (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_profitable_package_03a6b7)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950020
+      ],
       "quests_given_text": [],
       "quests_accepted": [],
       "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
@@ -40418,11 +40553,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2346; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3604 (ModelId=382, ModelFileName=dwarf_miner_m.adr, NameId=6342)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.010311,
       "model_id": 382,
-      "model_file_name": "dwarf_miner_m.adr"
+      "model_file_name": "dwarf_miner_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000215,
@@ -43062,10 +43204,23 @@
               "evidence": "title_string_id corrected from raw locale hash 3824034041 to Global.Text id 410109 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3950114,
+          "title": "Day 9: Snowhill Soccer",
+          "title_string_id": 441110,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Day 9: Snowhill Soccer (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_day_9_snowhill_soccer_a49743)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3070042
+        3070042,
+        3950114
       ],
       "quests_given_text": [
         "The 12 daily quests (12 Days quests)."
@@ -43506,10 +43661,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob:Trina_Turtledove"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 7,
-      "model_file_name": "humanchild_f_skirtandtunic.adr"
+      "model_file_name": "humanchild_f_skirtandtunic.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000220,
@@ -44848,8 +45010,23 @@
       "location_evidence": [
         "At the Snowhill warpstone: \"southeast\"/\"northeast of Perry\" (client 738475127), \"south of Tevin\" (3222136947). [video: marker 11-12 m from the warpstone, v1bVCKWiSvw/00000, gEi7O6pbnQQ/00000]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950350,
+          "title": "Sanctuary Warp Tests",
+          "title_string_id": 385680,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Sanctuary Warp Tests (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sanctuary_warp_tests_6d4c57)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950350
+      ],
       "quests_given_text": [
         "The follow-up side of Snowhill Warp Tests (Kellin starts it in Sanctuary)."
       ],

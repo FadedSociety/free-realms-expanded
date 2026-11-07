@@ -548,6 +548,11 @@ impl Gameplay {
             // End the NPC dialog so the client leaves dialog camera and restores
             // the HUD (native run 200411 stayed in dialog view after accepting).
             out.replies.push(END_DIALOG_26_4.to_vec());
+            // Accept hides the quest window but leaves the HUD down until this; a decline
+            // restores it itself.
+            if accepted && self.direct_quests {
+                out.replies.push(DISMISS_QUEST_26_29.to_vec());
+            }
             return Ok(Some(out));
         }
         Ok(None)
@@ -620,6 +625,34 @@ impl Gameplay {
                 )?;
             }
             out.replies.push(END_DIALOG_26_4.to_vec());
+            // The line goes straight on (`-zp-94_-ImE` 223-224); with nothing more to offer,
+            // the HUD comes back.
+            if !self.direct_quests {
+                return Ok(Some(out));
+            }
+            let next = self.npc_quests.as_ref().and_then(|engine| {
+                let giver = engine.turnin_npc_id(quest_id)?;
+                let interaction = self.npc_interaction.as_ref()?;
+                Some((giver, interaction.offerable_quest_for_talk(giver, engine)?))
+            });
+            if let Some((giver, next)) = next.filter(|_| completed) {
+                if let Some(engine) = self.npc_quests.as_mut() {
+                    let result = engine.offer(next, giver);
+                    self.append_npc_quest_outcome(result, &mut out)?;
+                }
+                let actor = self
+                    .last_npc_dialogue
+                    .as_ref()
+                    .filter(|last| last.2 == giver)
+                    .map_or(giver, |last| last.1);
+                for packet in &mut out.replies {
+                    if packet.starts_with(&[49, 0, 1, 0]) {
+                        patch_npc_actor(packet, actor);
+                    }
+                }
+            } else {
+                out.replies.push(DISMISS_QUEST_26_29.to_vec());
+            }
             return Ok(Some(out));
         }
         Ok(None)
@@ -1348,6 +1381,26 @@ impl Gameplay {
         Ok(out)
     }
 
+    /// `load` for a live session: the gateway's way in.
+    pub fn load_session(
+        directory: &std::path::Path,
+        state: Option<GameplayState>,
+    ) -> io::Result<Self> {
+        let mut game = Self::load(directory, state)?;
+        game.open_quests_directly();
+        Ok(game)
+    }
+
+    /// A click opens straight on the quest window; only the gateway turns this on.
+    /// ponytail: about 60 older test files walk the dialogue-row flow through `Gameplay::load`.
+    /// Move them to the direct flow, then delete `direct_quests` and the row path it guards.
+    pub fn open_quests_directly(&mut self) {
+        self.direct_quests = true;
+        if let Some(engine) = &mut self.npc_quests {
+            engine.drop_open_offer();
+        }
+    }
+
     /// The Talk arm of one 26/10 choice. Quest events and the named turn-in run before
     /// the dialogue packet; this only reads the menu, after those events, so no guard is
     /// held across a service call or a save.
@@ -1360,6 +1413,11 @@ impl Gameplay {
         zone_id: u32,
         out: &mut Outcome,
     ) -> io::Result<()> {
+        if self.direct_quests
+            && let Some(engine) = &mut self.npc_quests
+        {
+            engine.drop_open_offer();
+        }
         let pending_before = self
             .npc_quests
             .as_ref()
@@ -1417,7 +1475,18 @@ impl Gameplay {
             .iter()
             .any(|packet| packet.starts_with(&[49, 0, 13, 0]));
         self.pending_choice_packets.clear();
+        // Clicking an NPC opens straight on its quest window, which draws its own speech bubble
+        // (`XzhxhHmpXfs` 0-2 s: Uncle Irving's marker, then his card). Only an NPC with other
+        // topics to offer keeps the dialogue, with the quest as one of its rows.
+        let lone = self.direct_quests && context.explainer_topics.is_empty();
         let offer_outcome = if already_offering {
+            "offer"
+        } else if turning_in && lone {
+            for packet in &mut out.replies {
+                if packet.starts_with(&[49, 0, 13, 0]) {
+                    patch_npc_actor(packet, runtime_guid);
+                }
+            }
             "offer"
         } else if turning_in {
             // Same shape as the offer: the 49/13 end screen opens from a
@@ -1450,11 +1519,24 @@ impl Gameplay {
             // open NPC dialog, and the server's 26/4 EndDialog after the
             // reply restores camera and HUD. The quest is therefore a
             // dialog choice; choosing it (26/6) sends the 49/1 offer.
-            if let Some(quest_id) = quest_id {
-                self.pending_quest_choice = Some((runtime_guid, key, quest_id));
-                "quest_choice"
-            } else {
-                "dialogue"
+            match quest_id {
+                Some(quest_id) if lone => {
+                    if let Some(engine) = self.npc_quests.as_mut() {
+                        let result = engine.offer(quest_id, key);
+                        self.append_npc_quest_outcome(result, out)?;
+                    }
+                    for packet in &mut out.replies {
+                        if packet.starts_with(&[49, 0, 1, 0]) {
+                            patch_npc_actor(packet, runtime_guid);
+                        }
+                    }
+                    "offer"
+                }
+                Some(quest_id) => {
+                    self.pending_quest_choice = Some((runtime_guid, key, quest_id));
+                    "quest_choice"
+                }
+                None => "dialogue",
             }
         };
         let quest_choice = match (offer_outcome, self.pending_quest_choice) {
@@ -1629,6 +1711,9 @@ fn shop_open_event(guid: u64, content_key: u64, item_count: usize) -> serde_json
 ///   (`00984960`). A quest Talk event names the content NPC key, which differs from
 ///   the runtime actor for an extra-spawn NPC bound through a `content_key`; the
 ///   held screen is patched here when 26/6 releases it.
+/// Gives the HUD back after the quest window (`00a99220`, `ScriptsBase.lua:15700`).
+const DISMISS_QUEST_26_29: [u8; 4] = [26, 0, 29, 0];
+
 pub(super) fn patch_npc_actor(packet: &mut [u8], npc_guid: u64) {
     let guid = npc_guid.to_le_bytes();
     if packet.starts_with(&[26, 0, 3, 0]) && packet.len() >= 20 {

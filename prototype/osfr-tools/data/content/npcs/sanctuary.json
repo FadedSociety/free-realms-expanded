@@ -2837,8 +2837,23 @@
       "location_evidence": [
         "South of Queensfields, \"outside of Sanctuary\" (1240837255, 165801004)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950066,
+          "title": "Broken Axle",
+          "title_string_id": 10128,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Broken Axle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_broken_axle_52fa12)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950066
+      ],
       "quests_given_text": [
         "Sells adventurer gear to the Silas Emptyhook errand (2752285660) (Adventurer)"
       ],
@@ -3126,9 +3141,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3377 spawnNpcWithGuid(33086); src/Resources/Npcs.json Id=33086"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -1.99139
+      "heading": -1.99139,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000443,
@@ -4493,9 +4515,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3398 spawnNpcWithGuid(33107); src/Resources/Npcs.json Id=33107"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -0.488419997
+      "heading": -0.488419997,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000447,
@@ -4528,8 +4557,23 @@
       "location_evidence": [
         "Memorial Caverns"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950036,
+          "title": "Bad Apples",
+          "title_string_id": 75688,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Bad Apples (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bad_apples_b6f099)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950036
+      ],
       "quests_given_text": [
         "Honey test in the Forgotten Caves (472649836, 1979376524) (Forgotten Caves)"
       ],
@@ -4907,11 +4951,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1190; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2447 (ModelId=178, ModelFileName=changeling_f.adr, NameId=7653)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.06906,
       "model_id": 178,
-      "model_file_name": "changeling_f.adr"
+      "model_file_name": "changeling_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000448,
@@ -14745,8 +14796,23 @@
       "location_evidence": [
         "Sanctuary, Pixiewood strip (1855534750, 527600271)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950273,
+          "title": "Mum's the Word",
+          "title_string_id": 415358,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Mum's the Word (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_mum_s_the_word_53d00e)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950273
+      ],
       "quests_given_text": [
         "Mum's the Word (Super Spooktacular, wiki); wagon help (2002339232)"
       ],
@@ -15122,9 +15188,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3640 spawnNpcWithGuid(33416); src/Resources/Npcs.json Id=33416"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -1.81506396
+      "heading": -1.81506396,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000467,
@@ -24052,8 +24125,23 @@
       "location_evidence": [
         "Sanctuary (313579823)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950413,
+          "title": "The Memorial Caverns",
+          "title_string_id": 75611,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Memorial Caverns (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_memorial_caverns_890bf8)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950413
+      ],
       "quests_given_text": [
         "Free tours of Honey Fields, Shimmering Pond, Jacque's Cafe, Saffron's Exotic Pets, Town Hall (313579823); audience for Pet Trainer: Adoption Audition (3395438212) (Pet Trainer)"
       ],
@@ -24341,9 +24429,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3623 spawnNpcWithGuid(33399); src/Resources/Npcs.json Id=33399"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -1.52144003
+      "heading": -1.52144003,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000484,
@@ -28810,8 +28905,23 @@
       "location_evidence": [
         "Pixiewood Hills"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950425,
+          "title": "The Search for Snorg",
+          "title_string_id": 46203,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Search for Snorg (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_search_for_snorg_4152bb)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950425
+      ],
       "quests_given_text": [
         "Oops!"
       ],
@@ -29177,9 +29287,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3578 spawnNpcWithGuid(33348); src/Resources/Npcs.json Id=33348"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": 1.99407995
+      "heading": 1.99407995,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000491,
@@ -35110,8 +35227,23 @@
       "location_evidence": [
         "Sanctuary warpstone (video caption \"Sanctuary Warpstone\", LKEWRMmbVeQ/00000)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950378,
+          "title": "Snowhill Warp Tests",
+          "title_string_id": 385690,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Snowhill Warp Tests (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snowhill_warp_tests_6b5cc5)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950378
+      ],
       "quests_given_text": [
         "Snowhill Warp Tests (wiki, with client title 2115957631); Sanctuary Warp Tests (client title 2119021258, arrival side: \"find his brother Kellin Warpwatcher\", 2642927607)"
       ],
@@ -38142,7 +38274,11 @@
         "Bixie Defense tables, Sanctuary (128604021)"
       ],
       "quests_given": [],
-      "quest_ids_given": [3170010, 3170011, 3170012],
+      "quest_ids_given": [
+        3170010,
+        3170011,
+        3170012
+      ],
       "quests_given_text": [
         "Medium and Hard Bixie Defense challenge quests (128604021, 1077251242; titles unknown)"
       ],
@@ -42158,14 +42294,30 @@
       "presence": "listed",
       "title_or_role": [],
       "roles": [
-        "ambient"
+        "ambient",
+        "quest_giver"
       ],
       "enemy_kind": null,
       "location_evidence": [
         "Sanctuary"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950314,
+          "title": "Pirri's Sketches",
+          "title_string_id": 46259,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pirri's Sketches (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pirri_s_sketches_5fc94f)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950314
+      ],
       "quests_given_text": [],
       "quests_accepted": [],
       "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
@@ -42469,11 +42621,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1172; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2429 (ModelId=398, ModelFileName=fairy_sanctuary_m_01.adr, NameId=10176)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.074912,
       "model_id": 398,
-      "model_file_name": "fairy_sanctuary_m_01.adr"
+      "model_file_name": "fairy_sanctuary_m_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000170,
@@ -45868,11 +46027,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1122; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2379 (ModelId=344, ModelFileName=fairy_royalguard_f.adr, NameId=79031)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.00854,
       "model_id": 344,
-      "model_file_name": "fairy_royalguard_f.adr"
+      "model_file_name": "fairy_royalguard_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000519,
@@ -49493,8 +49659,55 @@
       "location_evidence": [
         "Royal Palace (1243191462)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3000053,
+          "title": "How to Clean",
+          "title_string_id": 391255,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part F. Non-essential quests listed inside the Chapter 1 sequence, row F3; name 'How to Clean'; title id cell ucdt 3363226496 / ugdt 1121688177"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part F. Non-essential quests listed inside the Chapter 1 sequence, row F3; name 'How to Clean'; title id cell ucdt 3363226496 / ugdt 1121688177"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3000053 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3000053
+      ],
       "quests_given_text": [
         "How to Clean (shared with Ladyslipper; get the book from Tilda Timidleaf in Shrouded Glade, 4071971276) (Adventurer)"
       ],
@@ -49876,10 +50089,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ARoxana"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 7,
-      "model_file_name": "humanchild_f_skirtandtunic.adr"
+      "model_file_name": "humanchild_f_skirtandtunic.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000527,
@@ -53066,14 +53286,56 @@
       "presence": "listed",
       "title_or_role": [],
       "roles": [
-        "ambient"
+        "ambient",
+        "quest_giver"
       ],
       "enemy_kind": null,
       "location_evidence": [
         "Near Sanctuary; wiki says a mansion east of the warpstone"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950360,
+          "title": "Seafoam's Sweet Tooth",
+          "title_string_id": 15105,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Seafoam's Sweet Tooth (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seafoam_s_sweet_tooth_ce53e0)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3950358,
+          "title": "Seafoam is Picky",
+          "title_string_id": 15107,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Seafoam is Picky (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seafoam_is_picky_928a8b)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3950359,
+          "title": "Seafoam's Last Idea",
+          "title_string_id": 15109,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Seafoam's Last Idea (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seafoam_s_last_idea_7cd073)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950360,
+        3950358,
+        3950359
+      ],
       "quests_given_text": [],
       "quests_accepted": [],
       "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
@@ -53377,11 +53639,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2290; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3547 (ModelId=30, ModelFileName=fairy_m_old_01.adr, NameId=10096)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.806046,
       "model_id": 30,
-      "model_file_name": "fairy_m_old_01.adr"
+      "model_file_name": "fairy_m_old_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000532,
@@ -59474,8 +59743,23 @@
       "location_evidence": [
         "Pixiewood Hills"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950200,
+          "title": "Going Batty",
+          "title_string_id": 415295,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Going Batty (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_going_batty_245eb0)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950200
+      ],
       "quests_given_text": [
         "Going Batty"
       ],
@@ -59857,10 +60141,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob%3AVladimir"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 312,
-      "model_file_name": "human_m_freestyle_03.agr"
+      "model_file_name": "human_m_freestyle_03.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000543,

@@ -7,7 +7,11 @@
       "title_string_id": 104106,
       "giver_npc_id": 9000000177,
       "prerequisite_quest_ids": [],
-      "prerequisite_any_quest_ids": [3000020, 3000021, 3000022],
+      "prerequisite_any_quest_ids": [
+        3000020,
+        3000021,
+        3000022
+      ],
       "objectives": [
         {
           "kind": "talk_to_npc",

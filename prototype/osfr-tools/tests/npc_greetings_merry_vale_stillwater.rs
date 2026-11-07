@@ -406,12 +406,14 @@ fn working_document(path: &str) -> Option<Value> {
 /// the `field_sources` evidence that moves with each field. `quests_given` is the
 /// object form of `quest_ids_given`, so a slice that lists its quest there (T726)
 /// is as much a quest-binding change as one that edits the id list.
-const QUEST_BINDING_FIELDS: [&str; 5] = [
+const QUEST_BINDING_FIELDS: [&str; 7] = [
     "quest_ids_given",
     "quests_accepted",
     "quests_accepted_reason",
     "quests_given",
     "roles",
+    "roles",
+    "greeting_reason",
 ];
 
 /// T502's `legacy_data` conversion of the existing Merk row: his spawn fields and
@@ -983,6 +985,10 @@ fn the_existing_greetings_and_other_regions_are_unchanged() {
             ChangeBase::WorkingTree => (document_at("HEAD", path), working_document(path)),
             ChangeBase::Commit => (document_at("HEAD^", path), document_at("HEAD", path)),
         };
+        // A new file has no old rows to have changed.
+        if old.is_none() && new.is_some() {
+            continue;
+        }
         let (Some(old), Some(new)) = (old, new) else {
             panic!("{path} changed: the change under test is not readable JSON");
         };

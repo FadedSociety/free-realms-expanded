@@ -1,0 +1,3583 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3950020,
+      "title_string_id": 103365,
+      "giver_npc_id": 9000000487,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 46302,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver the package to General Glowlight (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_profitable_package_03a6b7)."
+            }
+          ],
+          "npc_id": 9000000097
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Profitable Package (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_profitable_package_03a6b7)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "A Profitable Package (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_profitable_package_03a6b7)."
+        }
+      ],
+      "description_string_id": 46303,
+      "intro_text_string_id": 46301,
+      "enabled": true
+    },
+    {
+      "id": 3950023,
+      "title_string_id": 36581,
+      "giver_npc_id": 9500001436,
+      "prerequisite_quest_ids": [
+        3950277
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 36583,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver the full bag of ore to Therin (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_small_errand_25f785)."
+            }
+          ],
+          "npc_id": 9000000217
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 61,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Small Errand (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_small_errand_25f785)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "A Small Errand (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_small_errand_25f785)."
+        }
+      ],
+      "description_string_id": 36582,
+      "intro_text_string_id": 36580,
+      "enabled": true
+    },
+    {
+      "id": 3950036,
+      "title_string_id": 75688,
+      "giver_npc_id": 9500000447,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 75698,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Commander Kiggle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bad_apples_b6f099)."
+            }
+          ],
+          "npc_id": 9500000465
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Bad Apples (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bad_apples_b6f099)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Bad Apples (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bad_apples_b6f099)."
+        }
+      ],
+      "description_string_id": 75689,
+      "intro_text_string_id": 75687,
+      "enabled": true
+    },
+    {
+      "id": 3950041,
+      "title_string_id": 101741,
+      "giver_npc_id": 9500000553,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 101743,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Cole in Seaside (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_beach_ball_wear_2cfc10)."
+            }
+          ],
+          "npc_id": 9500000567
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 101745,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Bacala (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_beach_ball_wear_2cfc10)."
+            }
+          ],
+          "npc_id": 9500000553
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beach Ball Wear (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_beach_ball_wear_2cfc10)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Beach Ball Wear (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_beach_ball_wear_2cfc10)."
+        }
+      ],
+      "description_string_id": 101747,
+      "intro_text_string_id": 101747,
+      "enabled": true
+    },
+    {
+      "id": 3950045,
+      "title_string_id": 46285,
+      "giver_npc_id": 9500000737,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 46298,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Mort Scuttlestone (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_better_late_than_never_5e51b1)."
+            }
+          ],
+          "npc_id": 9500000706
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Better Late Than Never (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_better_late_than_never_5e51b1)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Better Late Than Never (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_better_late_than_never_5e51b1)."
+        }
+      ],
+      "description_string_id": 46286,
+      "intro_text_string_id": 46284,
+      "enabled": true
+    },
+    {
+      "id": 3950066,
+      "title_string_id": 10128,
+      "giver_npc_id": 9500000442,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 14868,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Crofti in Sanctuary (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_broken_axle_52fa12)."
+            }
+          ],
+          "npc_id": 9500000466
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Broken Axle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_broken_axle_52fa12)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Broken Axle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_broken_axle_52fa12)."
+        }
+      ],
+      "description_string_id": 24841,
+      "intro_text_string_id": 24841,
+      "enabled": true
+    },
+    {
+      "id": 3950068,
+      "title_string_id": 16890,
+      "giver_npc_id": 9500000905,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 37476,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Hans (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brother_s_keeper_ff368a)."
+            }
+          ],
+          "npc_id": 9500000907
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Brother's Keeper (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brother_s_keeper_ff368a)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Brother's Keeper (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brother_s_keeper_ff368a)."
+        }
+      ],
+      "description_string_id": 103060,
+      "intro_text_string_id": 24800,
+      "enabled": true
+    },
+    {
+      "id": 3950083,
+      "title_string_id": 36592,
+      "giver_npc_id": 9500001385,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 36594,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Banter south of Queensfields (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_career_change_90e1e8)."
+            }
+          ],
+          "npc_id": 9500000442
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 36596,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Silas Emptyhook (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_career_change_90e1e8)."
+            }
+          ],
+          "npc_id": 9500001385
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Career Change (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_career_change_90e1e8)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Career Change (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_career_change_90e1e8)."
+        }
+      ],
+      "description_string_id": 36593,
+      "enabled": true
+    },
+    {
+      "id": 3950084,
+      "title_string_id": 46954,
+      "giver_npc_id": 9500000231,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 45669,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Private Shumple (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cargug_cargug_let_me_in_33fdce)."
+            }
+          ],
+          "npc_id": 9500000198
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 46973,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Sergeant Cargug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cargug_cargug_let_me_in_33fdce)."
+            }
+          ],
+          "npc_id": 9500000209
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 46975,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Chief Bilgragum (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cargug_cargug_let_me_in_33fdce)."
+            }
+          ],
+          "npc_id": 9500000102
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 46977,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Lieutenant Snibug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cargug_cargug_let_me_in_33fdce)."
+            }
+          ],
+          "npc_id": 9500000163
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 46979,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Whigguma (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cargug_cargug_let_me_in_33fdce)."
+            }
+          ],
+          "npc_id": 9500000231
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cargug, Cargug, Let Me In! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cargug_cargug_let_me_in_33fdce)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Cargug, Cargug, Let Me In! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cargug_cargug_let_me_in_33fdce)."
+        }
+      ],
+      "description_string_id": 46955,
+      "intro_text_string_id": 46953,
+      "enabled": true
+    },
+    {
+      "id": 3950114,
+      "title_string_id": 441110,
+      "giver_npc_id": 9000000492,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 441183,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win a Snowhill Soccer minigame. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_day_9_snowhill_soccer_a49743)."
+            }
+          ],
+          "minigame_id": 43,
+          "count": 1
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Day 9: Snowhill Soccer (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_day_9_snowhill_soccer_a49743)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Day 9: Snowhill Soccer (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_day_9_snowhill_soccer_a49743)."
+        }
+      ],
+      "description_string_id": 441111,
+      "intro_text_string_id": 441109,
+      "enabled": true
+    },
+    {
+      "id": 3950125,
+      "title_string_id": 92318,
+      "giver_npc_id": 9500000703,
+      "prerequisite_quest_ids": [
+        3950141
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 72705,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Visit Glerga at the Robgoblin Camp (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_doctor_s_note_27c820)."
+            }
+          ],
+          "npc_id": 9000000332
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 92333,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Visit Doctor Gordon in Sanctuary (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_doctor_s_note_27c820)."
+            }
+          ],
+          "npc_id": 9000000073
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 91563,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Tilda in Shrouded Glade (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_doctor_s_note_27c820)."
+            }
+          ],
+          "npc_id": 9500000718
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 388893,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tell Milla she's excused from school. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_doctor_s_note_27c820)."
+            }
+          ],
+          "npc_id": 9500000703
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Doctor's Note (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_doctor_s_note_27c820)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Doctor's Note (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_doctor_s_note_27c820)."
+        }
+      ],
+      "description_string_id": 92317,
+      "intro_text_string_id": 92317,
+      "enabled": true
+    },
+    {
+      "id": 3950131,
+      "title_string_id": 92356,
+      "giver_npc_id": 9500000711,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 92367,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Bella (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_druid_dress_code_de6f6b)."
+            }
+          ],
+          "npc_id": 9500000446
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 92369,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Rena in Shrouded Glade (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_druid_dress_code_de6f6b)."
+            }
+          ],
+          "npc_id": 9500000711
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Druid Dress Code (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_druid_dress_code_de6f6b)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Druid Dress Code (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_druid_dress_code_de6f6b)."
+        }
+      ],
+      "description_string_id": 92357,
+      "intro_text_string_id": 92355,
+      "enabled": true
+    },
+    {
+      "id": 3950141,
+      "title_string_id": 92272,
+      "giver_npc_id": 9500000703,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 92278,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tell Tilda Milla is sick (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_excuses_excuses_db900c)."
+            }
+          ],
+          "npc_id": 9500000718
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 92316,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Milla (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_excuses_excuses_db900c)."
+            }
+          ],
+          "npc_id": 9500000703
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 6,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Excuses, Excuses! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_excuses_excuses_db900c)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Excuses, Excuses! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_excuses_excuses_db900c)."
+        }
+      ],
+      "description_string_id": 92273,
+      "intro_text_string_id": 92271,
+      "enabled": true
+    },
+    {
+      "id": 3950161,
+      "title_string_id": 71552,
+      "giver_npc_id": 9500000293,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 71557,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver Carson's assessment to Ambrose Worcester. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_finishing_the_job_25652a)."
+            }
+          ],
+          "npc_id": 9000000005
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Finishing the Job (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_finishing_the_job_25652a)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Finishing the Job (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_finishing_the_job_25652a)."
+        }
+      ],
+      "description_string_id": 71553,
+      "intro_text_string_id": 71551,
+      "enabled": true
+    },
+    {
+      "id": 3950162,
+      "title_string_id": 92592,
+      "giver_npc_id": 9500000694,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 92656,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find a friend for Karmen (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_first_day_jitters_6e6631)."
+            }
+          ],
+          "npc_id": 9500000693
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 93033,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Karmen (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_first_day_jitters_6e6631)."
+            }
+          ],
+          "npc_id": 9500000694
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "First Day Jitters (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_first_day_jitters_6e6631)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "First Day Jitters (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_first_day_jitters_6e6631)."
+        }
+      ],
+      "description_string_id": 92593,
+      "enabled": true
+    },
+    {
+      "id": 3950164,
+      "title_string_id": 94562,
+      "giver_npc_id": 9500000622,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 94564,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Banani (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fisher_poem_d52b65)."
+            }
+          ],
+          "npc_id": 9500000554
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 94566,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Sanford (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fisher_poem_d52b65)."
+            }
+          ],
+          "npc_id": 9500000622
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Fisher Poem (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fisher_poem_d52b65)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Fisher Poem (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fisher_poem_d52b65)."
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3950173,
+      "title_string_id": 70920,
+      "giver_npc_id": 9500001004,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 70928,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Fizzi (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fond_memories_61f382)."
+            }
+          ],
+          "npc_id": 9500000518
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 70930,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Virtalot in Wugachug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fond_memories_61f382)."
+            }
+          ],
+          "npc_id": 9500001004
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 90,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Fond Memories (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fond_memories_61f382)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Fond Memories (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fond_memories_61f382)."
+        }
+      ],
+      "description_string_id": 70936,
+      "intro_text_string_id": 70936,
+      "enabled": true
+    },
+    {
+      "id": 3950175,
+      "title_string_id": 101540,
+      "giver_npc_id": 9500000548,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 101433,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Diggy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_forcing_the_food_e723e0)."
+            }
+          ],
+          "npc_id": 9000000070
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Forcing the Food (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_forcing_the_food_e723e0)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Forcing the Food (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_forcing_the_food_e723e0)."
+        }
+      ],
+      "description_string_id": 101544,
+      "intro_text_string_id": 101544,
+      "enabled": true
+    },
+    {
+      "id": 3950183,
+      "title_string_id": 100231,
+      "giver_npc_id": 9500000581,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 100237,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to The Great Koodini (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fortune_find_1184ce)."
+            }
+          ],
+          "npc_id": 9500000634
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Fortune Find (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fortune_find_1184ce)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Fortune Find (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fortune_find_1184ce)."
+        }
+      ],
+      "description_string_id": 100230,
+      "intro_text_string_id": 100230,
+      "enabled": true
+    },
+    {
+      "id": 3950199,
+      "title_string_id": 20550,
+      "giver_npc_id": 9500000291,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 15861,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Glerga (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_glugmort_s_palate_20863e)."
+            }
+          ],
+          "npc_id": 9000000332
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 20563,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Glugmort at the Greenwood Camp (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_glugmort_s_palate_20863e)."
+            }
+          ],
+          "npc_id": 9000000334
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Glugmort's Palate (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_glugmort_s_palate_20863e)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Glugmort's Palate (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_glugmort_s_palate_20863e)."
+        }
+      ],
+      "description_string_id": 20551,
+      "intro_text_string_id": 24816,
+      "enabled": true,
+      "end_text_string_id": 20565
+    },
+    {
+      "id": 3950200,
+      "title_string_id": 415295,
+      "giver_npc_id": 9500000542,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 415605,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find a bat (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_going_batty_245eb0)."
+            }
+          ],
+          "npc_id": 9500001077
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 415610,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Vladimir in Sanctuary (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_going_batty_245eb0)."
+            }
+          ],
+          "npc_id": 9500000542
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Going Batty (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_going_batty_245eb0)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Going Batty (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_going_batty_245eb0)."
+        }
+      ],
+      "description_string_id": 415296,
+      "intro_text_string_id": 415294,
+      "enabled": true
+    },
+    {
+      "id": 3950210,
+      "title_string_id": 103039,
+      "giver_npc_id": 9500000637,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 103041,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Take the picture to Enve LeStamp (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_half_a_dozen_8a85e1)."
+            }
+          ],
+          "npc_id": 9000000080
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Half a Dozen (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_half_a_dozen_8a85e1)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Half a Dozen (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_half_a_dozen_8a85e1)."
+        }
+      ],
+      "description_string_id": 103043,
+      "intro_text_string_id": 103043,
+      "enabled": true
+    },
+    {
+      "id": 3950216,
+      "title_string_id": 101251,
+      "giver_npc_id": 9500000627,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 101253,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Heddy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_heading_for_safety_e05398)."
+            }
+          ],
+          "npc_id": 9500000588
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 101255,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Tince Hammerdudley in Seaside (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_heading_for_safety_e05398)."
+            }
+          ],
+          "npc_id": 9500000636
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 101257,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Heddy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_heading_for_safety_e05398)."
+            }
+          ],
+          "npc_id": 9500000588
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 101259,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Aziwug in Seaside (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_heading_for_safety_e05398)."
+            }
+          ],
+          "npc_id": 9500000552
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Heading for Safety (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_heading_for_safety_e05398)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Heading for Safety (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_heading_for_safety_e05398)."
+        }
+      ],
+      "description_string_id": 101261,
+      "intro_text_string_id": 101261,
+      "enabled": true
+    },
+    {
+      "id": 3950218,
+      "title_string_id": 4422,
+      "giver_npc_id": 9500000129,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 5474,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Drixi (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hide_n_seek_c2b0be)."
+            }
+          ],
+          "npc_id": 9500000124
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 5475,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Banx (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hide_n_seek_c2b0be)."
+            }
+          ],
+          "npc_id": 9500000090
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 5476,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Xander (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hide_n_seek_c2b0be)."
+            }
+          ],
+          "npc_id": 9500000238
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 5477,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Morgan (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hide_n_seek_c2b0be)."
+            }
+          ],
+          "npc_id": 9500000182
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 5479,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Farmer Brambleback (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hide_n_seek_c2b0be)."
+            }
+          ],
+          "npc_id": 9500000129
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 28,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Hide 'n Seek (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hide_n_seek_c2b0be)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Hide 'n Seek (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hide_n_seek_c2b0be)."
+        }
+      ],
+      "description_string_id": 115942,
+      "intro_text_string_id": 24794,
+      "enabled": true
+    },
+    {
+      "id": 3950229,
+      "title_string_id": 101431,
+      "giver_npc_id": 9500000646,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 101433,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Diggy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hungry_hungry_troll_75a30e)."
+            }
+          ],
+          "npc_id": 9000000070
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 101435,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Zwargug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hungry_hungry_troll_75a30e)."
+            }
+          ],
+          "npc_id": 9500000646
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Hungry Hungry Troll (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hungry_hungry_troll_75a30e)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Hungry Hungry Troll (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hungry_hungry_troll_75a30e)."
+        }
+      ],
+      "description_string_id": 101437,
+      "intro_text_string_id": 101437,
+      "enabled": true
+    },
+    {
+      "id": 3950231,
+      "title_string_id": 36616,
+      "giver_npc_id": 9500000169,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 36620,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Lyrral Pathfinder (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_i_m_new_at_this_a2f9f5)."
+            }
+          ],
+          "npc_id": 9500000168
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 61,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "I'm New at This (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_i_m_new_at_this_a2f9f5)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "I'm New at This (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_i_m_new_at_this_a2f9f5)."
+        }
+      ],
+      "description_string_id": 36617,
+      "intro_text_string_id": 36615,
+      "enabled": true
+    },
+    {
+      "id": 3950233,
+      "title_string_id": 92429,
+      "giver_npc_id": 9500000698,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 92437,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Visit Lucca in Snowhill (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_icky_brown_bag_lunch_b1c390)."
+            }
+          ],
+          "npc_id": 9000000133
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 92439,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Leek in Shrouded Glade (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_icky_brown_bag_lunch_b1c390)."
+            }
+          ],
+          "npc_id": 9500000698
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Icky Brown Bag Lunch (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_icky_brown_bag_lunch_b1c390)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Icky Brown Bag Lunch (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_icky_brown_bag_lunch_b1c390)."
+        }
+      ],
+      "description_string_id": 92430,
+      "intro_text_string_id": 92428,
+      "enabled": true
+    },
+    {
+      "id": 3950234,
+      "title_string_id": 90731,
+      "giver_npc_id": 9000000315,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 90746,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Milford (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_idle_hands_f69899)."
+            }
+          ],
+          "npc_id": 9500000047
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Idle Hands (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_idle_hands_f69899)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Idle Hands (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_idle_hands_f69899)."
+        }
+      ],
+      "description_string_id": 90730,
+      "intro_text_string_id": 90730,
+      "enabled": true
+    },
+    {
+      "id": 3950239,
+      "title_string_id": 70977,
+      "giver_npc_id": 9500001004,
+      "prerequisite_quest_ids": [
+        3950173
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 70979,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Wugawump (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_job_reference_363640)."
+            }
+          ],
+          "npc_id": 9000000191
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 70981,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Virtalot in Wugachug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_job_reference_363640)."
+            }
+          ],
+          "npc_id": 9500001004
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Job Reference (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_job_reference_363640)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Job Reference (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_job_reference_363640)."
+        }
+      ],
+      "description_string_id": 70983,
+      "intro_text_string_id": 70983,
+      "enabled": true
+    },
+    {
+      "id": 3950247,
+      "title_string_id": 76057,
+      "giver_npc_id": 9500000351,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 76071,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Len Tyril (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lakeshore_reports_910543)."
+            }
+          ],
+          "npc_id": 9500000352
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 76077,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Tyn Redwing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lakeshore_reports_910543)."
+            }
+          ],
+          "npc_id": 9500000367
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 76079,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Mort McFly (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lakeshore_reports_910543)."
+            }
+          ],
+          "npc_id": 9500000359
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 76082,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Lan Spryleaf (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lakeshore_reports_910543)."
+            }
+          ],
+          "npc_id": 9500000351
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Lakeshore Reports (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lakeshore_reports_910543)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Lakeshore Reports (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lakeshore_reports_910543)."
+        }
+      ],
+      "description_string_id": 76058,
+      "intro_text_string_id": 76056,
+      "enabled": true
+    },
+    {
+      "id": 3950260,
+      "title_string_id": 46128,
+      "giver_npc_id": 9000000133,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 46140,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Tatounbor (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lucca_s_new_creation_4c583b)."
+            }
+          ],
+          "npc_id": 9500001000
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Lucca's New Creation (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lucca_s_new_creation_4c583b)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Lucca's New Creation (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lucca_s_new_creation_4c583b)."
+        }
+      ],
+      "description_string_id": 46129,
+      "intro_text_string_id": 46130,
+      "enabled": true
+    },
+    {
+      "id": 3950264,
+      "title_string_id": 429030,
+      "giver_npc_id": 9500000294,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 429047,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Counselor Kaela (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_meet_and_greet_aa36f4)."
+            }
+          ],
+          "npc_id": 9500000301
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 429049,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Counselor Tyra (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_meet_and_greet_aa36f4)."
+            }
+          ],
+          "npc_id": 9500000302
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 429051,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Counselor Jake (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_meet_and_greet_aa36f4)."
+            }
+          ],
+          "npc_id": 9500000299
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 429053,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Counselor Edmond (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_meet_and_greet_aa36f4)."
+            }
+          ],
+          "npc_id": 9500000297
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Meet and Greet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_meet_and_greet_aa36f4)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Meet and Greet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_meet_and_greet_aa36f4)."
+        }
+      ],
+      "description_string_id": 429031,
+      "intro_text_string_id": 429029,
+      "enabled": true
+    },
+    {
+      "id": 3950273,
+      "title_string_id": 415358,
+      "giver_npc_id": 9500000466,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 415629,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Doctor Gordon (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_mum_s_the_word_53d00e)."
+            }
+          ],
+          "npc_id": 9000000073
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 415626,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Crofti (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_mum_s_the_word_53d00e)."
+            }
+          ],
+          "npc_id": 9500000466
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Mum's the Word (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_mum_s_the_word_53d00e)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Mum's the Word (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_mum_s_the_word_53d00e)."
+        }
+      ],
+      "description_string_id": 415359,
+      "intro_text_string_id": 415360,
+      "enabled": true
+    },
+    {
+      "id": 3950277,
+      "title_string_id": 36507,
+      "giver_npc_id": 9500001436,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 36509,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Mister Nooklings and get a large bag of holding (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_need_bigger_bags_1ded73)."
+            }
+          ],
+          "npc_id": 9500000358
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 36511,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Throck Shallowshale and talk to him (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_need_bigger_bags_1ded73)."
+            }
+          ],
+          "npc_id": 9500001436
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 61,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Need Bigger Bags (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_need_bigger_bags_1ded73)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Need Bigger Bags (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_need_bigger_bags_1ded73)."
+        }
+      ],
+      "description_string_id": 36508,
+      "enabled": true
+    },
+    {
+      "id": 3950285,
+      "title_string_id": 36830,
+      "giver_npc_id": 9500000747,
+      "prerequisite_quest_ids": [
+        3950286
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 36834,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the permit (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_noise_permit_4b200b)."
+            }
+          ],
+          "npc_id": 9500001314
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 36735,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Flynn at the Snowhill stage (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_noise_permit_4b200b)."
+            }
+          ],
+          "npc_id": 9500000747
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 26,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Noise Permit (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_noise_permit_4b200b)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Noise Permit (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_noise_permit_4b200b)."
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3950286,
+      "title_string_id": 36810,
+      "giver_npc_id": 9500000738,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 36816,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Flynn (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_noisy_neighbors_3847ce)."
+            }
+          ],
+          "npc_id": 9500000747
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 9,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Noisy Neighbors (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_noisy_neighbors_3847ce)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Noisy Neighbors (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_noisy_neighbors_3847ce)."
+        }
+      ],
+      "description_string_id": 36811,
+      "intro_text_string_id": 36809,
+      "enabled": true
+    },
+    {
+      "id": 3950314,
+      "title_string_id": 46259,
+      "giver_npc_id": 9500000512,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 46268,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Inni Ki (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pirri_s_sketches_5fc94f)."
+            }
+          ],
+          "npc_id": 9500000589
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pirri's Sketches (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pirri_s_sketches_5fc94f)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Pirri's Sketches (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pirri_s_sketches_5fc94f)."
+        }
+      ],
+      "description_string_id": 46260,
+      "intro_text_string_id": 46258,
+      "enabled": true
+    },
+    {
+      "id": 3950324,
+      "title_string_id": 116469,
+      "giver_npc_id": 9500000786,
+      "prerequisite_quest_ids": [
+        3000020
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 116889,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Laurin (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_power_problems_b1b613)."
+            }
+          ],
+          "npc_id": 9500000914
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 116895,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Dane Blueshift (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_power_problems_b1b613)."
+            }
+          ],
+          "npc_id": 9500000891
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 116903,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Crash Davis (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_power_problems_b1b613)."
+            }
+          ],
+          "npc_id": 9000000289
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 116909,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Francis in Stillwater Crossing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_power_problems_b1b613)."
+            }
+          ],
+          "npc_id": 9500000786
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 7,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Power Problems (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_power_problems_b1b613)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Power Problems (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_power_problems_b1b613)."
+        }
+      ],
+      "description_string_id": 116470,
+      "intro_text_string_id": 116468,
+      "enabled": true
+    },
+    {
+      "id": 3950333,
+      "title_string_id": 429096,
+      "giver_npc_id": 9500000318,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 429111,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Counselor Cammy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rags_to_riches_4e4683)."
+            }
+          ],
+          "npc_id": 9500000296
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 429113,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Counselor Jenny (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rags_to_riches_4e4683)."
+            }
+          ],
+          "npc_id": 9500000300
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 429115,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Counselor Wes (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rags_to_riches_4e4683)."
+            }
+          ],
+          "npc_id": 9500000303
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 429117,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Counselor Jacen (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rags_to_riches_4e4683)."
+            }
+          ],
+          "npc_id": 9500000298
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 429119,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Robbie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rags_to_riches_4e4683)."
+            }
+          ],
+          "npc_id": 9500000318
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Rags to Riches (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rags_to_riches_4e4683)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Rags to Riches (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rags_to_riches_4e4683)."
+        }
+      ],
+      "description_string_id": 429097,
+      "intro_text_string_id": 429095,
+      "enabled": true
+    },
+    {
+      "id": 3950348,
+      "title_string_id": 389592,
+      "giver_npc_id": 9500000659,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 389619,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Vidor Stormshroud (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sad_penguin_cdde61)."
+            }
+          ],
+          "npc_id": 9000000231
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 389627,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Brin Galeglow (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sad_penguin_cdde61)."
+            }
+          ],
+          "npc_id": 9000000031
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 438275,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Headmaster Merk (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sad_penguin_cdde61)."
+            }
+          ],
+          "npc_id": 9500000690
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 389634,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Cella Cedarnook (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sad_penguin_cdde61)."
+            }
+          ],
+          "npc_id": 9500000659
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 12,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Sad Penguin! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sad_penguin_cdde61)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Sad Penguin! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sad_penguin_cdde61)."
+        }
+      ],
+      "description_string_id": 389591,
+      "intro_text_string_id": 389591,
+      "enabled": true
+    },
+    {
+      "id": 3950350,
+      "title_string_id": 385680,
+      "giver_npc_id": 9500000778,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 385688,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Kellin (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sanctuary_warp_tests_6d4c57)."
+            }
+          ],
+          "npc_id": 9500000502
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 6,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Sanctuary Warp Tests (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sanctuary_warp_tests_6d4c57)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Sanctuary Warp Tests (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sanctuary_warp_tests_6d4c57)."
+        }
+      ],
+      "description_string_id": 385681,
+      "intro_text_string_id": 385679,
+      "enabled": true
+    },
+    {
+      "id": 3950358,
+      "title_string_id": 15107,
+      "giver_npc_id": 9500000531,
+      "prerequisite_quest_ids": [
+        3950360
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 15861,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Glerga (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seafoam_is_picky_928a8b)."
+            }
+          ],
+          "npc_id": 9000000332
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 15834,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Seafoam near Sanctuary (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seafoam_is_picky_928a8b)."
+            }
+          ],
+          "npc_id": 9500000531
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 61,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Seafoam is Picky (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seafoam_is_picky_928a8b)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Seafoam is Picky (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seafoam_is_picky_928a8b)."
+        }
+      ],
+      "description_string_id": 15108,
+      "enabled": true
+    },
+    {
+      "id": 3950359,
+      "title_string_id": 15109,
+      "giver_npc_id": 9500000531,
+      "prerequisite_quest_ids": [
+        3950358
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 15926,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Oggy in Wugachug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seafoam_s_last_idea_7cd073)."
+            }
+          ],
+          "npc_id": 9500000993
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 15834,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Seafoam near Sanctuary (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seafoam_s_last_idea_7cd073)."
+            }
+          ],
+          "npc_id": 9500000531
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 61,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Seafoam's Last Idea (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seafoam_s_last_idea_7cd073)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Seafoam's Last Idea (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seafoam_s_last_idea_7cd073)."
+        }
+      ],
+      "description_string_id": 15110,
+      "intro_text_string_id": 24876,
+      "enabled": true
+    },
+    {
+      "id": 3950360,
+      "title_string_id": 15105,
+      "giver_npc_id": 9500000531,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 15832,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Bordon Cloo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seafoam_s_sweet_tooth_ce53e0)."
+            }
+          ],
+          "npc_id": 9000000028
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 15834,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Seafoam near Sanctuary (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seafoam_s_sweet_tooth_ce53e0)."
+            }
+          ],
+          "npc_id": 9500000531
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 6,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Seafoam's Sweet Tooth (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seafoam_s_sweet_tooth_ce53e0)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Seafoam's Sweet Tooth (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seafoam_s_sweet_tooth_ce53e0)."
+        }
+      ],
+      "description_string_id": 15268,
+      "intro_text_string_id": 24874,
+      "enabled": true
+    },
+    {
+      "id": 3950370,
+      "title_string_id": 94547,
+      "giver_npc_id": 9500000621,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 94549,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Snowi (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sister_feud_0d33b2)."
+            }
+          ],
+          "npc_id": 9500000770
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 61,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Sister Feud (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sister_feud_0d33b2)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Sister Feud (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sister_feud_0d33b2)."
+        }
+      ],
+      "description_string_id": 94551,
+      "intro_text_string_id": 94551,
+      "enabled": true
+    },
+    {
+      "id": 3950378,
+      "title_string_id": 385690,
+      "giver_npc_id": 9500000502,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 385696,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Vaelen (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snowhill_warp_tests_6b5cc5)."
+            }
+          ],
+          "npc_id": 9500000778
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 6,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Snowhill Warp Tests (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snowhill_warp_tests_6b5cc5)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Snowhill Warp Tests (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snowhill_warp_tests_6b5cc5)."
+        }
+      ],
+      "description_string_id": 385691,
+      "enabled": true
+    },
+    {
+      "id": 3950387,
+      "title_string_id": 16111,
+      "giver_npc_id": 9500000142,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 16127,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Spinnerette (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_spinnerette_8c6d38)."
+            }
+          ],
+          "npc_id": 9500000218
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 16138,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Gorg (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_spinnerette_8c6d38)."
+            }
+          ],
+          "npc_id": 9500000142
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Spinnerette (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_spinnerette_8c6d38)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Spinnerette (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_spinnerette_8c6d38)."
+        }
+      ],
+      "description_string_id": 16121,
+      "intro_text_string_id": 24895,
+      "enabled": true
+    },
+    {
+      "id": 3950388,
+      "title_string_id": 46729,
+      "giver_npc_id": 9500001002,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 46771,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Sal (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_spread_the_good_cheer_19c4b8)."
+            }
+          ],
+          "npc_id": 9500000996
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 46773,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Happalot (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_spread_the_good_cheer_19c4b8)."
+            }
+          ],
+          "npc_id": 9500000984
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 46775,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Delilah (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_spread_the_good_cheer_19c4b8)."
+            }
+          ],
+          "npc_id": 9500000973
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 46777,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Chuggoom (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_spread_the_good_cheer_19c4b8)."
+            }
+          ],
+          "npc_id": 9500000970
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 46779,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Twingnbor (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_spread_the_good_cheer_19c4b8)."
+            }
+          ],
+          "npc_id": 9500001002
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Spread the Good Cheer (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_spread_the_good_cheer_19c4b8)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Spread the Good Cheer (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_spread_the_good_cheer_19c4b8)."
+        }
+      ],
+      "description_string_id": 46728,
+      "intro_text_string_id": 46728,
+      "enabled": true
+    },
+    {
+      "id": 3950395,
+      "title_string_id": 41403,
+      "giver_npc_id": 9500000314,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 41410,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Grab a pie from Wugachug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sweet_incentive_4731a2)."
+            }
+          ],
+          "npc_id": 9500001317
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 41412,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Zek (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sweet_incentive_4731a2)."
+            }
+          ],
+          "npc_id": 9500000324
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 41414,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Matron Murgla (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sweet_incentive_4731a2)."
+            }
+          ],
+          "npc_id": 9500000314
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 75,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Sweet Incentive (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sweet_incentive_4731a2)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Sweet Incentive (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sweet_incentive_4731a2)."
+        }
+      ],
+      "description_string_id": 41404,
+      "intro_text_string_id": 41402,
+      "enabled": true
+    },
+    {
+      "id": 3950399,
+      "title_string_id": 429545,
+      "giver_npc_id": 9500000314,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 429549,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find \"Bob\" (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_that_robgoblin_s_story_c9b34a)."
+            }
+          ],
+          "npc_id": 9500000318
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 41414,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Matron Murgla (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_that_robgoblin_s_story_c9b34a)."
+            }
+          ],
+          "npc_id": 9500000314
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "That Robgoblin's Story (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_that_robgoblin_s_story_c9b34a)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "That Robgoblin's Story (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_that_robgoblin_s_story_c9b34a)."
+        }
+      ],
+      "description_string_id": 429546,
+      "intro_text_string_id": 429544,
+      "enabled": true
+    },
+    {
+      "id": 3950401,
+      "title_string_id": 38824,
+      "giver_npc_id": 9500000102,
+      "prerequisite_quest_ids": [
+        3950468
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 16750,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Sperry (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_cure_for_the_common_lazy_435c1a)."
+            }
+          ],
+          "npc_id": 9500000217
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 45268,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Bring the vegetables to Chugilda (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_cure_for_the_common_lazy_435c1a)."
+            }
+          ],
+          "npc_id": 9500000104
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 38833,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver the meal to Gigafrug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_cure_for_the_common_lazy_435c1a)."
+            }
+          ],
+          "npc_id": 9500000137
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 75,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Cure for the Common Lazy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_cure_for_the_common_lazy_435c1a)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "The Cure for the Common Lazy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_cure_for_the_common_lazy_435c1a)."
+        }
+      ],
+      "description_string_id": 38823,
+      "intro_text_string_id": 38823,
+      "enabled": true
+    },
+    {
+      "id": 3950413,
+      "title_string_id": 75611,
+      "giver_npc_id": 9500000483,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 75616,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Tori (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_memorial_caverns_890bf8)."
+            }
+          ],
+          "npc_id": 9500000541
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 8,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Memorial Caverns (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_memorial_caverns_890bf8)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "The Memorial Caverns (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_memorial_caverns_890bf8)."
+        }
+      ],
+      "description_string_id": 75610,
+      "intro_text_string_id": 75610,
+      "enabled": true
+    },
+    {
+      "id": 3950414,
+      "title_string_id": 16253,
+      "giver_npc_id": 9500000177,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 16258,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Malarkilanihani (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_mighty_mekaletaliki_09504b)."
+            }
+          ],
+          "npc_id": 9500000171
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Mighty Mekaletaliki! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_mighty_mekaletaliki_09504b)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "The Mighty Mekaletaliki! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_mighty_mekaletaliki_09504b)."
+        }
+      ],
+      "description_string_id": 16257,
+      "enabled": true
+    },
+    {
+      "id": 3950425,
+      "title_string_id": 46203,
+      "giver_npc_id": 9500000490,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 46218,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Snorg (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_search_for_snorg_4152bb)."
+            }
+          ],
+          "npc_id": 9000000470
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Search for Snorg (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_search_for_snorg_4152bb)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "The Search for Snorg (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_search_for_snorg_4152bb)."
+        }
+      ],
+      "description_string_id": 46204,
+      "intro_text_string_id": 46202,
+      "enabled": true
+    },
+    {
+      "id": 3950431,
+      "title_string_id": 384769,
+      "giver_npc_id": 9500000016,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 384776,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Play the Silver Mining minigame - (0/5) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_there_s_silver_in_those_hills_8ab960)."
+            }
+          ],
+          "minigame_id": 97,
+          "count": 5
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 94071,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Dalton (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_there_s_silver_in_those_hills_8ab960)."
+            }
+          ],
+          "npc_id": 9500000016
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "There's Silver in Those Hills (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_there_s_silver_in_those_hills_8ab960)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "There's Silver in Those Hills (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_there_s_silver_in_those_hills_8ab960)."
+        }
+      ],
+      "job": 14,
+      "description_string_id": 384770,
+      "enabled": true
+    },
+    {
+      "id": 3950436,
+      "title_string_id": 16071,
+      "giver_npc_id": 9500000118,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 16189,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tag Ted (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_1_898a88)."
+            }
+          ],
+          "npc_id": 9500001423
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 16195,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tag Roberto (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_1_898a88)."
+            }
+          ],
+          "npc_id": 9500001352
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 16187,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tag Ruberto (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_1_898a88)."
+            }
+          ],
+          "npc_id": 9500001361
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 16191,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tag Ribberto (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_1_898a88)."
+            }
+          ],
+          "npc_id": 9500001347
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 23452,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Darrel (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_1_898a88)."
+            }
+          ],
+          "npc_id": 9500000118
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Toad Tag - Round 1 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_1_898a88)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Toad Tag - Round 1 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_1_898a88)."
+        }
+      ],
+      "description_string_id": 115948,
+      "intro_text_string_id": 24795,
+      "enabled": true
+    },
+    {
+      "id": 3950437,
+      "title_string_id": 16176,
+      "giver_npc_id": 9500000118,
+      "prerequisite_quest_ids": [
+        3950436
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 16187,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tag Ruberto (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_2_c99a76)."
+            }
+          ],
+          "npc_id": 9500001361
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 16189,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tag Ted (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_2_c99a76)."
+            }
+          ],
+          "npc_id": 9500001423
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 16191,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tag Ribberto (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_2_c99a76)."
+            }
+          ],
+          "npc_id": 9500001347
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 16189,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tag Ted (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_2_c99a76)."
+            }
+          ],
+          "npc_id": 9500001423
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 16195,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tag Roberto (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_2_c99a76)."
+            }
+          ],
+          "npc_id": 9500001352
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 6,
+          "text_string_id": 16187,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tag Ruberto (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_2_c99a76)."
+            }
+          ],
+          "npc_id": 9500001361
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 7,
+          "text_string_id": 23452,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Darrel (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_2_c99a76)."
+            }
+          ],
+          "npc_id": 9500000118
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Toad Tag - Round 2 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_2_c99a76)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Toad Tag - Round 2 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_2_c99a76)."
+        }
+      ],
+      "description_string_id": 115948,
+      "intro_text_string_id": 24796,
+      "enabled": true
+    },
+    {
+      "id": 3950438,
+      "title_string_id": 17211,
+      "giver_npc_id": 9500000118,
+      "prerequisite_quest_ids": [
+        3950437
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 16196,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tag Roberto (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_3_df414f)."
+            }
+          ],
+          "npc_id": 9500001352
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 16188,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tag Ruberto (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_3_df414f)."
+            }
+          ],
+          "npc_id": 9500001361
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 16193,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tag Ted (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_3_df414f)."
+            }
+          ],
+          "npc_id": 9500001423
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 16196,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tag Roberto (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_3_df414f)."
+            }
+          ],
+          "npc_id": 9500001352
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 16192,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tag Ribberto (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_3_df414f)."
+            }
+          ],
+          "npc_id": 9500001347
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 6,
+          "text_string_id": 16193,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tag Ted (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_3_df414f)."
+            }
+          ],
+          "npc_id": 9500001423
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 7,
+          "text_string_id": 16188,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tag Ruberto (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_3_df414f)."
+            }
+          ],
+          "npc_id": 9500001361
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 8,
+          "text_string_id": 16193,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tag Ted (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_3_df414f)."
+            }
+          ],
+          "npc_id": 9500001423
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 9,
+          "text_string_id": 16192,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tag Ribberto (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_3_df414f)."
+            }
+          ],
+          "npc_id": 9500001347
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 10,
+          "text_string_id": 23452,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Darrel (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_3_df414f)."
+            }
+          ],
+          "npc_id": 9500000118
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Toad Tag - Round 3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_3_df414f)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Toad Tag - Round 3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_3_df414f)."
+        }
+      ],
+      "description_string_id": 115948,
+      "enabled": true
+    },
+    {
+      "id": 3950443,
+      "title_string_id": 91581,
+      "giver_npc_id": 9500000719,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 91597,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver the flower to Phyll (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_tran_s_plant_716f0e)."
+            }
+          ],
+          "npc_id": 9500000709
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 6,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tran's Plant (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_tran_s_plant_716f0e)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Tran's Plant (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_tran_s_plant_716f0e)."
+        }
+      ],
+      "description_string_id": 91582,
+      "intro_text_string_id": 91580,
+      "enabled": true
+    },
+    {
+      "id": 3950455,
+      "title_string_id": 38841,
+      "giver_npc_id": 9500000137,
+      "prerequisite_quest_ids": [
+        3950401
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 38848,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Dooba (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_washing_it_down_fb8db4)."
+            }
+          ],
+          "npc_id": 9000000308
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 39037,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Gigafrug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_washing_it_down_fb8db4)."
+            }
+          ],
+          "npc_id": 9500000137
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Washing it Down (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_washing_it_down_fb8db4)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Washing it Down (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_washing_it_down_fb8db4)."
+        }
+      ],
+      "description_string_id": 38840,
+      "intro_text_string_id": 38840,
+      "enabled": true
+    },
+    {
+      "id": 3950463,
+      "title_string_id": 37551,
+      "giver_npc_id": 9000000195,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 37553,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Sir Wellington (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_where_is_wellington_a126b4)."
+            }
+          ],
+          "npc_id": 9500000211
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 37555,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Senari in Snowhill (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_where_is_wellington_a126b4)."
+            }
+          ],
+          "npc_id": 9000000195
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Where is Wellington (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_where_is_wellington_a126b4)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Where is Wellington (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_where_is_wellington_a126b4)."
+        }
+      ],
+      "description_string_id": 37550,
+      "intro_text_string_id": 37550,
+      "enabled": true
+    },
+    {
+      "id": 3950468,
+      "title_string_id": 38784,
+      "giver_npc_id": 9500000137,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 38778,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Chief Bilgragum (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_working_overtime_c2a8c6)."
+            }
+          ],
+          "npc_id": 9500000102
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Working Overtime (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_working_overtime_c2a8c6)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Working Overtime (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_working_overtime_c2a8c6)."
+        }
+      ],
+      "description_string_id": 38783,
+      "intro_text_string_id": 38783,
+      "enabled": true
+    }
+  ]
+}

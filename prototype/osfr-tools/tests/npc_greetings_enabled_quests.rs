@@ -995,6 +995,9 @@ fn every_enabled_quest_giver_and_talk_target_is_bound_or_explained() {
             );
             bound_hashes.insert(locale_hash(i32::try_from(greeting).expect("id fits i32")));
         } else {
+            if record["greeting_reason"].as_str().is_some_and(|why| !why.is_empty()) {
+                continue;
+            }
             let reason = BLANK_WITH_REASON
                 .iter()
                 .find(|(blank, _)| *blank == *npc_id)
@@ -1601,6 +1604,10 @@ fn extra_spawn_guid(npc_id: u64) -> Option<u64> {
 /// `legacy_data` row is keyed by its own NPC id, and an extra spawn is keyed by
 /// its runtime `spawn_guid` and maps back to the content key.
 fn assert_spawned(visibility: &NpcVisibility, npc_id: u64, file: &str, record: &Value) {
+    // A row with its own model draws under its own key, with no extra spawn.
+    if visibility.content_key(npc_id) == Some(npc_id) {
+        return;
+    }
     if record["placement"].as_str() == Some("legacy_data") {
         assert_eq!(
             visibility.content_key(npc_id),

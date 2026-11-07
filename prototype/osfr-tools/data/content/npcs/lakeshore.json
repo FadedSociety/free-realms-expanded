@@ -6833,8 +6833,23 @@
       "location_evidence": [
         "Lakeshore. [video: green marker 70 m from the Lakeshore Warpstone, huZ4Hl_YSIc/00000; 19 distance-marker frames, 0IaICGnTWWQ/00024; nameplates, bLxqx_aCizY/00034]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950247,
+          "title": "Lakeshore Reports",
+          "title_string_id": 76057,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Lakeshore Reports (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lakeshore_reports_910543)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950247
+      ],
       "quests_given_text": [
         "Receives the theft reports in the Thieves About! chain (\"Report your findings to Lan Spryleaf\", 1788379616; \"Return to Lan Spryleaf with all the precious things!\", 2713453771; \"Deliver the news to Lan Spryleaf back in Lakeshore\", 3017351224). Cut quest \"NOT LIVE - Spryleaf's Morphin Munchies\" (2636870032)."
       ],
@@ -7200,9 +7215,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3764 spawnNpcWithGuid(33542); src/Resources/Npcs.json Id=33542"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": 1.78634404
+      "heading": 1.78634404,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000352,
@@ -7526,9 +7548,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3691 spawnNpcWithGuid(33469); src/Resources/Npcs.json Id=33469"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -2.22600006
+      "heading": -2.22600006,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000353,
@@ -10437,9 +10466,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3778 spawnNpcWithGuid(33556); src/Resources/Npcs.json Id=33556"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -0.352139988
+      "heading": -0.352139988,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000359,
@@ -10763,9 +10799,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3793 spawnNpcWithGuid(33571); src/Resources/Npcs.json Id=33571"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -1.64757836
+      "heading": -1.64757836,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000360,
@@ -15909,9 +15952,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3800 spawnNpcWithGuid(33578); src/Resources/Npcs.json Id=33578"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -0.702262902
+      "heading": -0.702262902,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000233,

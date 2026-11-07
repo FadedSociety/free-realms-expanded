@@ -198,7 +198,7 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
         .filter(|path| path.extension().and_then(|ext| ext.to_str()) == Some("json"))
         .collect();
     npc_files.sort();
-    assert_eq!(npc_files.len(), 17);
+    assert_eq!(npc_files.len(), 18);
 
     let mut canonical_ids = HashSet::new();
     let mut resolved_reference_ids = HashSet::new();
@@ -383,7 +383,7 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
     // T498 added quests/zone_wilds.json (four records); T500 added quests/zone_sanctuary.json (three);
     // T501 added quests/zone_merry_vale.json (five); T502 added zone_wugachug_briarwood.json (five).
     // tower_defense.json holds the table chains, board_games.json the game table quests.
-    assert_eq!(quest_files.len(), 25);
+    assert_eq!(quest_files.len(), 26);
     let mut quest_records = Vec::new();
     let mut quest_ids_by_giver = BTreeMap::<u64, Vec<u32>>::new();
     let mut resolved_giver_occurrences = 0usize;
@@ -523,7 +523,7 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
     // to npcs/sanctuary.json (1,203); T501 appended Shannon and Sugaboo to npcs/merry_vale.json (1,205);
     // T739 appended four clickable quest props (1,209); L096 the two Wildwood turnstile actors.
     // L925: twelve wiki quest givers. L932: the two Snowhill soccer gates.
-    assert_eq!(content_npcs.len(), 1225);
+    assert_eq!(content_npcs.len(), 1234);
     let expected_npc_count = loader_npcs.len();
     write_json(
         &scratch.join("npcs.json"),
@@ -534,12 +534,12 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
     assert_eq!(db.zones.len(), 17);
     assert_eq!(db.npcs.len(), expected_npc_count);
     assert_eq!(db.jobs.len(), 17);
-    assert_eq!(db.quests.len(), 706); // T498: four Wilds zone quests; T500: three Sanctuary ones; T501: five Merry Vale ones; T502: five Wugachug/Briarwood ones; T503: A Booming Problem; T539: three collect quests; T542: eight Become-a records
+    assert_eq!(db.quests.len(), 768); // T498: four Wilds zone quests; T500: three Sanctuary ones; T501: five Merry Vale ones; T502: five Wugachug/Briarwood ones; T503: A Booming Problem; T539: three collect quests; T542: eight Become-a records
     assert_eq!(resolved_reference_ids.len(), 295);
     assert_eq!(unresolved_ids.len(), 170);
     assert_eq!(
         resolved_giver_occurrences + unresolved_giver_occurrences,
-        706
+        768
     );
     println!(
         "NPC refs: {} resolved, {} unresolved; quest giver occurrences: {} resolved, {} unresolved; positions: {} known, {} unknown",

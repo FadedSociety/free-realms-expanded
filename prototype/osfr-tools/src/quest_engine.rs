@@ -1956,6 +1956,15 @@ impl QuestEngine {
         }
     }
 
+    /// Forgets an offer the player walked away from: Escape closes the window with no reply,
+    /// and a window does not outlive its session, yet an open offer refuses every other.
+    pub fn drop_open_offer(&mut self) {
+        if let Some(open) = self.state.pending_offer.take() {
+            self.state.quests.remove(&open);
+            self.bump();
+        }
+    }
+
     /// Offer only after server-side prerequisites, level/job, membership and limit checks (R).
     pub fn offer(&mut self, quest_id: u32, giver_npc_id: u64) -> QuestOutcome {
         if let Some(denial) = self.offer_denial(quest_id, giver_npc_id) {

@@ -1122,7 +1122,7 @@ impl Gateway {
         directory: &Path,
         state: Option<GameplayState>,
     ) -> io::Result<()> {
-        let mut gameplay = Gameplay::load(directory, state)?;
+        let mut gameplay = Gameplay::load_session(directory, state)?;
         if let Some(return_location) = gameplay.abandon_battle_for_reconnect() {
             if self.state.guid != return_location.guid {
                 return Err(invalid("battle reconnect character ownership differs"));

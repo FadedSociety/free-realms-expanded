@@ -25,8 +25,8 @@ mod pet_inventory;
 mod pet_wire;
 
 use npc_quest_chain::{
-    ADVENTURER, CHARACTER, Fixture, QUEST_CHOICE, accept, character_at_for, content_dir,
-    content_position, counts, dialogue_choice, finish_quest, gateway_send, gateway_talk,
+    ADVENTURER, CHARACTER, Fixture, accept, character_at_for, content_dir,
+    content_position, counts, finish_quest, gateway_send, gateway_talk,
     has_family, offer, pending_turnin, quest_reply, quest_status, read_json, release_end_screen,
     saved, send, talk,
 };
@@ -384,22 +384,15 @@ fn blocked_pet_credits_nothing() {
     assert_eq!(saved(&game), before, "a blocked pet changes nothing");
 }
 
-/// Open and accept the quest through the real gateway path: the 26/8 click, the 26/10 Talk row,
-/// the 26/6 offer choice and the 49/2 accept. The gateway stages and commits the accepted state.
+/// Open and accept the quest through the real gateway path: the 26/8 click, the 26/10 Talk row
+/// that opens straight on the offer, and the 49/2 accept. The gateway stages and commits it.
 fn accept_through_gateway(gateway: &mut Gateway, now: u64) {
-    let dialogue = gateway_talk(gateway, GIVER, now);
-    assert!(
-        dialogue
-            .iter()
-            .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
-        "Talk opens the 26/3 dialogue"
-    );
-    let offered = gateway_send(gateway, &dialogue_choice(QUEST_CHOICE), now + 2);
+    let offered = gateway_talk(gateway, GIVER, now);
     assert!(
         offered
             .iter()
             .any(|packet| packet.starts_with(&[49, 0, 1, 0])),
-        "the 26/6 choice offers the Pet Trainer record"
+        "the Talk offers the Pet Trainer record"
     );
     let accepted = gateway_send(gateway, &quest_reply(QUEST, true), now + 4);
     assert!(

@@ -4329,10 +4329,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ABanx"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr"
+      "model_file_name": "fairy_druid_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000091,
@@ -9811,8 +9818,23 @@
       "location_evidence": [
         "\"In Nettleseed\" (client 1137301342, 1840694640)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950401,
+          "title": "The Cure for the Common Lazy",
+          "title_string_id": 38824,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Cure for the Common Lazy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_cure_for_the_common_lazy_435c1a)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950401
+      ],
       "quests_given_text": [
         "Harvest vegetables for Chugilda (client 2400421441); receives Gigafrug's break request (4130417784); explains why travellers are kept out (Moldy Shamblers)."
       ],
@@ -10118,11 +10140,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1548; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2805 (ModelId=338, ModelFileName=chugawug_m_sergeantcargug.adr, NameId=38672)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.418795,
       "model_id": 338,
-      "model_file_name": "chugawug_m_sergeantcargug.adr"
+      "model_file_name": "chugawug_m_sergeantcargug.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000103,
@@ -11047,11 +11076,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1546; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2803 (ModelId=222, ModelFileName=chugawug_f_02.adr, NameId=16602)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -3.128156,
       "model_id": 222,
-      "model_file_name": "chugawug_f_02.adr"
+      "model_file_name": "chugawug_f_02.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000105,
@@ -17599,9 +17635,49 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Farms and the Bayou, row 89; source cell: [client][video][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3950436,
+          "title": "Toad Tag - Round 1",
+          "title_string_id": 16071,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Toad Tag - Round 1 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_1_898a88)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3950437,
+          "title": "Toad Tag - Round 2",
+          "title_string_id": 16176,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Toad Tag - Round 2 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_2_c99a76)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3950438,
+          "title": "Toad Tag - Round 3",
+          "title_string_id": 17211,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Toad Tag - Round 3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_3_df414f)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3950436,
+        3950437,
+        3950438
+      ],
       "quests_given_text": [
         "Toad Tag minigame; not a Blackspore resident per the client",
         "Toad Tag, three rounds (client 3811044157, 664925730, 1492087305). His frog Ted (ucdt 3562080740) is named on the wiki."
@@ -18290,11 +18366,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1382; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2639 (ModelId=221, ModelFileName=chugawug_m_02.adr, NameId=10298)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.947594,
       "model_id": 221,
-      "model_file_name": "chugawug_m_02.adr"
+      "model_file_name": "chugawug_m_02.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000119,
@@ -22640,11 +22723,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1467; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2724 (ModelId=11, ModelFileName=fairychild_f_sleevesandshorts.adr, NameId=3987)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.257794,
       "model_id": 11,
-      "model_file_name": "fairychild_f_sleevesandshorts.adr"
+      "model_file_name": "fairychild_f_sleevesandshorts.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000125,
@@ -24787,14 +24877,30 @@
         "Farmer."
       ],
       "roles": [
-        "ambient"
+        "ambient",
+        "quest_giver"
       ],
       "enemy_kind": null,
       "location_evidence": [
         "\"At his farm near the center of Briarwood\" (client 2315913197). [video: green arrow at night on a farm, W5NLGqGVa0E/00050]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950218,
+          "title": "Hide 'n Seek",
+          "title_string_id": 4422,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Hide 'n Seek (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hide_n_seek_c2b0be)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950218
+      ],
       "quests_given_text": [
         "Harvest stainberry and moonbean from his garden (client 1189475938, 1245273815); scouting near his farm for lumber (433808430). His children are the target of Hide 'n Seek (client 293022622)."
       ],
@@ -25178,11 +25284,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1377; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2634 (ModelId=32, ModelFileName=fairy_m_farmer_01.adr, NameId=3530)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.962794,
       "model_id": 32,
-      "model_file_name": "fairy_m_farmer_01.adr"
+      "model_file_name": "fairy_m_farmer_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000130,
@@ -27134,7 +27247,11 @@
         "Bristlewood (wiki)."
       ],
       "quests_given": [],
-      "quest_ids_given": [3170004, 3170005, 3170006],
+      "quest_ids_given": [
+        3170004,
+        3170005,
+        3170006
+      ],
       "quests_given_text": [
         "The three Briarwood Defense games: \"Complete each Easy/Medium/Hard Briarwood Defense game for General Spattonug in Briarwood\" (client 2344760986, 2877740620, 1635910719; titles 2707697741, 831642615, 2270528556)."
       ],
@@ -27908,8 +28025,36 @@
       "location_evidence": [
         "Not placed."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950468,
+          "title": "Working Overtime",
+          "title_string_id": 38784,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Working Overtime (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_working_overtime_c2a8c6)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3950455,
+          "title": "Washing it Down",
+          "title_string_id": 38841,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Washing it Down (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_washing_it_down_fb8db4)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950468,
+        3950455
+      ],
       "quests_given_text": [
         "Break request chain: vegetables from Sperry, a meal from Chugilda, then a mug of sasparilla (client 1137301342, 2230278072, 2625944266, 113475310); the sasparilla seller is not named in those lines. Titles not found."
       ],
@@ -28215,11 +28360,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1594; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2851 (ModelId=65, ModelFileName=chugawug_m_greenwood_soldier.adr, NameId=38772)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.757374,
       "model_id": 65,
-      "model_file_name": "chugawug_m_greenwood_soldier.adr"
+      "model_file_name": "chugawug_m_greenwood_soldier.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000138,
@@ -29670,8 +29822,23 @@
       "location_evidence": [
         "\"The Chugawug Camp in Briarwood\" (client 898770951); \"his camp in northern Bristlewood\" (1603468285). Wiki: a camp south of the Bristlewood warpstone (see Conflicts)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950387,
+          "title": "Spinnerette",
+          "title_string_id": 16111,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Spinnerette (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_spinnerette_8c6d38)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950387
+      ],
       "quests_given_text": [
         "Wiki lists Cut the Vines, Spinnerette, Stopping an Infiltration, Take the Fight to Them and Urgent Missive; see #Town and area quests for each. A sack beside him starts the Urgent Missive minigame (client 1778588367). Sends Warrior trainees there in the older Morninglory errand (client 241976108)."
       ],
@@ -30055,11 +30222,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1535; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2792 (ModelId=65, ModelFileName=chugawug_m_greenwood_soldier.adr, NameId=16109)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.143672,
       "model_id": 65,
-      "model_file_name": "chugawug_m_greenwood_soldier.adr"
+      "model_file_name": "chugawug_m_greenwood_soldier.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000143,
@@ -39549,11 +39723,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:104; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1324 (ModelId=65, ModelFileName=chugawug_m_greenwood_soldier.adr, NameId=17913)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.495925,
       "model_id": 65,
-      "model_file_name": "chugawug_m_greenwood_soldier.adr"
+      "model_file_name": "chugawug_m_greenwood_soldier.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000377,
@@ -41821,11 +42002,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1323; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2580 (ModelId=573, ModelFileName=fairy_f_freestyle_11.agr, NameId=384174)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.496265,
       "model_id": 573,
-      "model_file_name": "fairy_f_freestyle_11.agr"
+      "model_file_name": "fairy_f_freestyle_11.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000169,
@@ -41858,8 +42046,23 @@
       "location_evidence": [
         "Not placed."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950231,
+          "title": "I'm New at This",
+          "title_string_id": 36616,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "I'm New at This (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_i_m_new_at_this_a2f9f5)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950231
+      ],
       "quests_given_text": [
         "\"Mabel wants you to find her partner, Lyrral\" (client 2237257670)."
       ],
@@ -42165,11 +42368,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1296; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2553 (ModelId=366, ModelFileName=fairy_f_freestyle_03.agr, NameId=36600)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.093167,
       "model_id": 366,
-      "model_file_name": "fairy_f_freestyle_03.agr"
+      "model_file_name": "fairy_f_freestyle_03.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000170,
@@ -42932,10 +43142,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn stone head male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob%3AMalarkilanihani"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 39,
-      "model_file_name": "tikihead_m_ozymandias.adr"
+      "model_file_name": "tikihead_m_ozymandias.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000172,
@@ -44960,8 +45177,23 @@
       "location_evidence": [
         "Not placed."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950414,
+          "title": "The Mighty Mekaletaliki!",
+          "title_string_id": 16253,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Mighty Mekaletaliki! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_mighty_mekaletaliki_09504b)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950414
+      ],
       "quests_given_text": [
         "The Mighty Mekaletaliki! (client 1936807939, 903178007)."
       ],
@@ -45269,11 +45501,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1390; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2647 (ModelId=39, ModelFileName=tikihead_m_ozymandias.adr, NameId=16245)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.100429,
       "model_id": 39,
-      "model_file_name": "tikihead_m_ozymandias.adr"
+      "model_file_name": "tikihead_m_ozymandias.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000178,
@@ -47568,10 +47807,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AMorgan"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr"
+      "model_file_name": "fairy_druid_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000183,
@@ -55047,11 +55293,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1544; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2801 (ModelId=64, ModelFileName=chugawug_f_greenwood_soldier.adr, NameId=3515)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.551106,
       "model_id": 64,
-      "model_file_name": "chugawug_f_greenwood_soldier.adr"
+      "model_file_name": "chugawug_f_greenwood_soldier.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000199,
@@ -59984,11 +60237,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1542; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2799 (ModelId=338, ModelFileName=chugawug_m_sergeantcargug.adr, NameId=10297)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.542041,
       "model_id": 338,
-      "model_file_name": "chugawug_m_sergeantcargug.adr"
+      "model_file_name": "chugawug_m_sergeantcargug.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000210,
@@ -60897,11 +61157,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1471; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2728 (ModelId=510, ModelFileName=human_m_sirwellington.agr, NameId=17867)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.695711,
       "model_id": 510,
-      "model_file_name": "human_m_sirwellington.agr"
+      "model_file_name": "human_m_sirwellington.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000212,
@@ -63971,11 +64238,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1565; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2822 (ModelId=30, ModelFileName=fairy_m_old_01.adr, NameId=4032)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.15943,
       "model_id": 30,
-      "model_file_name": "fairy_m_old_01.adr"
+      "model_file_name": "fairy_m_old_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000218,
@@ -64387,11 +64661,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1457; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2714 (ModelId=53, ModelFileName=blackwidowqueen.adr, NameId=16111)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 3.007997,
       "model_id": 53,
-      "model_file_name": "blackwidowqueen.adr"
+      "model_file_name": "blackwidowqueen.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000219,
@@ -70628,8 +70909,23 @@
       "location_evidence": [
         "At the gate (client 2942987325). [video: marker 34 m in a purple mushroom forest, CR7BfAesNLM/00000]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950084,
+          "title": "Cargug, Cargug, Let Me In!",
+          "title_string_id": 46954,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cargug, Cargug, Let Me In! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cargug_cargug_let_me_in_33fdce)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950084
+      ],
       "quests_given_text": [
         "Safety First (Moldy Shamblers)."
       ],
@@ -71017,11 +71313,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1541; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2798 (ModelId=250, ModelFileName=chugawug_farmer_f.adr, NameId=46920)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.028126,
       "model_id": 250,
-      "model_file_name": "chugawug_farmer_f.adr"
+      "model_file_name": "chugawug_farmer_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000232,
@@ -73716,10 +74019,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AXander"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr"
+      "model_file_name": "fairy_druid_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000239,

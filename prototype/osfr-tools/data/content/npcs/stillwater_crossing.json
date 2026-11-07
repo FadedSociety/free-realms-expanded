@@ -2747,8 +2747,23 @@
       "location_evidence": [
         "\"Standing next to his kart, around the corner to the north east\" (3439454587: \"Have you met Francis yet?\"). Not seen in video."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950324,
+          "title": "Power Problems",
+          "title_string_id": 116469,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Power Problems (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_power_problems_b1b613)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950324
+      ],
       "quests_given_text": [
         "Introduce Yourself (target); Power Problems (he asks for a power crystal; sponsor Laurin at Thunder Falls Speedway; thanks the player in 1739923908). Receives a flier (\"Give a flier to Francis Panic\", 2704291466)."
       ],

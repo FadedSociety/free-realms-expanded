@@ -7271,7 +7271,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:498; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1736 (ModelId=3848, ModelFileName=batmount_m_basic.adr, NameId=2241)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500001077
     },
     {
       "spawn_guid": 100000001738,
@@ -17298,7 +17299,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1168; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2425 (ModelId=269, ModelFileName=sg_pies.adr, NameId=37143)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500001317
     },
     {
       "spawn_guid": 100000002427,
@@ -21177,7 +21179,8 @@
         }
       ],
       "position_w": null,
-      "texture_alias": "poisonous"
+      "texture_alias": "poisonous",
+      "content_key": 9500001361
     },
     {
       "spawn_guid": 100000002641,
@@ -21204,7 +21207,8 @@
         }
       ],
       "position_w": null,
-      "texture_alias": "brown"
+      "texture_alias": "brown",
+      "content_key": 9500001423
     },
     {
       "spawn_guid": 100000002642,
@@ -21231,7 +21235,8 @@
         }
       ],
       "position_w": null,
-      "texture_alias": "purple"
+      "texture_alias": "purple",
+      "content_key": 9500001352
     },
     {
       "spawn_guid": 100000002643,
@@ -21258,7 +21263,8 @@
         }
       ],
       "position_w": null,
-      "texture_alias": "purple"
+      "texture_alias": "purple",
+      "content_key": 9500001347
     },
     {
       "spawn_guid": 100000002645,
@@ -27835,7 +27841,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1812; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3069 (ModelId=32, ModelFileName=fairy_m_farmer_01.adr, NameId=36463)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500001385
     },
     {
       "spawn_guid": 100000003070,
@@ -45768,7 +45775,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2836; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4170 (ModelId=382, ModelFileName=dwarf_miner_m.adr, NameId=36453)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500001436
     },
     {
       "spawn_guid": 100000004173,
@@ -76558,7 +76566,8 @@
           "evidence": "(R) T550: Sanctuary-main places this 2014 client prop here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied). Decoration only: the row binds no interaction or ability."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500001314
     },
     {
       "spawn_guid": 100000033695,

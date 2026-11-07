@@ -377,9 +377,10 @@ fn t550_rows_are_harvest_plants_and_static_props() {
             "{name}: spawn guid collides with a regional actor"
         );
         assert_eq!(row["legacy_npc_id"], Value::Null, "{name}");
+        // A row a quest names binds the record the quest wiring gave it, above the T501 ids.
         assert!(
-            row.get("content_key").is_none(),
-            "{name}: a T550 row binds no content key"
+            row["content_key"].as_u64().is_none_or(|key| key > 9_500_001_023),
+            "{name}: a T550 row binds no content key of its own"
         );
         let id = lua_spawn_id(row).unwrap_or_else(|| panic!("{name}: no reference spawn id"));
         assert_eq!(
@@ -607,7 +608,7 @@ fn assert_rows_are_drawn_from_their_own_position(imported: &[&Value]) {
         );
         let scale = row["scale"].as_f64().unwrap_or(1.0) as f32;
         assert!((npc.scale - scale).abs() <= f32::EPSILON, "{guid}: scale");
-        assert_eq!(visibility.content_key(guid), None, "{guid}: content key");
+        assert_eq!(visibility.content_key(guid), row["content_key"].as_u64(), "{guid}: content key");
     }
 }
 

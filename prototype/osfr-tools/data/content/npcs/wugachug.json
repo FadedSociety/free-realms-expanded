@@ -1974,11 +1974,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:399; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1632 (ModelId=221, ModelFileName=chugawug_m_02.adr, NameId=41446)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.136242,
       "model_id": 221,
-      "model_file_name": "chugawug_m_02.adr"
+      "model_file_name": "chugawug_m_02.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000971,
@@ -3935,11 +3942,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:400; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1633 (ModelId=889, ModelFileName=human_f_sanctuary.adr, NameId=41445)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.792642,
       "model_id": 889,
-      "model_file_name": "human_f_sanctuary.adr"
+      "model_file_name": "human_f_sanctuary.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000974,
@@ -8487,11 +8501,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:404; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1637 (ModelId=222, ModelFileName=chugawug_f_02.adr, NameId=41447)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.342913,
       "model_id": 222,
-      "model_file_name": "chugawug_f_02.adr"
+      "model_file_name": "chugawug_f_02.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000985,
@@ -11938,11 +11959,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:424; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1658 (ModelId=221, ModelFileName=chugawug_m_02.adr, NameId=15923)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.339386,
       "model_id": 221,
-      "model_file_name": "chugawug_m_02.adr"
+      "model_file_name": "chugawug_m_02.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000172,
@@ -14077,11 +14105,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2962; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4296 (ModelId=780, ModelFileName=human_sanctuary_m.adr, NameId=41443)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.971749,
       "model_id": 780,
-      "model_file_name": "human_sanctuary_m.adr"
+      "model_file_name": "human_sanctuary_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000997,
@@ -15130,11 +15165,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:427; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1661 (ModelId=14, ModelFileName=chugawug_m_01.adr, NameId=41237)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.439649,
       "model_id": 14,
-      "model_file_name": "chugawug_m_01.adr"
+      "model_file_name": "chugawug_m_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000198,
@@ -17146,11 +17188,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:387; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1620 (ModelId=221, ModelFileName=chugawug_m_02.adr, NameId=41269)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -3.012073,
       "model_id": 221,
-      "model_file_name": "chugawug_m_02.adr"
+      "model_file_name": "chugawug_m_02.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500001001,
@@ -17527,8 +17576,23 @@
       "location_evidence": [
         "Not stated by the client; the sasparilla table is \"behind Twingnbor\" (2543985805, 2986302085). [video: nameplate on three frames, 35 m beside the cooking table and Wootmoot (FMJhD6JeqqA/00020), 88 m (lO-Y93qFcgA/00014)]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950388,
+          "title": "Spread the Good Cheer",
+          "title_string_id": 46729,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Spread the Good Cheer (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_spread_the_good_cheer_19c4b8)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950388
+      ],
       "quests_given_text": [
         "Kart Driver: Endorsement Deal (Shooblemoot sends the player: \"Find Twingnbor in Wugachug. He will give you the specifics\" 1589182333; \"Talk to Twingnbor in Wugachug about a possible sponsorship deal.\" 1814784711; \"Return to Twingnbor\" 2415598343). The party-hosting jobs: \"Pick up the jugs of sasparilla behind Twingnbor and bring them to Sal, Delilah, Happalot, and Chuggoom in Wugachug.\" (1099236009); \"Pick up some mugs of sasparilla from the table behind Twingnbor ...\" (2543985805); \"Return to Twingnbor and tell him that the party is a success.\" (2888060771); also \"Twingnbor is running low on sasparilla. Do him a favor and let Sasparilla Brewmaster Wugawump know.\" (840324519)."
       ],
@@ -17912,11 +17976,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:395; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1628 (ModelId=221, ModelFileName=chugawug_m_02.adr, NameId=41242)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.123216,
       "model_id": 221,
-      "model_file_name": "chugawug_m_02.adr"
+      "model_file_name": "chugawug_m_02.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500001003,
@@ -18373,8 +18444,36 @@
       "location_evidence": [
         "Not stated. [video: green-marker nameplate read as \"Virtalot Checkers & Chess\" 18 m and 54 m away, probably two labels overlapping, low confidence, OHuwchqU5V0/00236, l-KJnbZShSk/00006]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950173,
+          "title": "Fond Memories",
+          "title_string_id": 70920,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Fond Memories (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fond_memories_61f382)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3950239,
+          "title": "Job Reference",
+          "title_string_id": 70977,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Job Reference (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_job_reference_363640)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950173,
+        3950239
+      ],
       "quests_given_text": [
         "The Virtalot chain, by text: find Fizzi in Sanctuary (3988705639, 1442441969) and Bellis for a gift (1114276239, 26406172); Fizzi's old spear comes back (3395098225, 4246815316 \"This is my old spear!\"); Virtalot asks for a word with the Brewmaster (1923542011, 937653419); \"Speak to the Brewmaster in Wugachug about getting Virtalot a job as a guard.\" (1552442656); good news back to Virtalot (3830686113, 3550824883, 3299983649, 3463342382). Titles not found."
       ],
@@ -18752,11 +18851,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:428; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1662 (ModelId=222, ModelFileName=chugawug_f_02.adr, NameId=41252)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.873708,
       "model_id": 222,
-      "model_file_name": "chugawug_f_02.adr"
+      "model_file_name": "chugawug_f_02.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500001005,

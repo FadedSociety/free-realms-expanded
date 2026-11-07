@@ -4640,11 +4640,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:195; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1428 (ModelId=456, ModelFileName=fairy_druid_f.adr, NameId=45410)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 3.053635,
       "model_id": 456,
-      "model_file_name": "fairy_druid_f.adr"
+      "model_file_name": "fairy_druid_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000656,
@@ -6129,9 +6136,23 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part C. Warpstone greeters, Pet Park and townsfolk, row 81; source cell: [client] [video]"
             }
           ]
+        },
+        {
+          "quest_id": 3950348,
+          "title": "Sad Penguin!",
+          "title_string_id": 389592,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Sad Penguin! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sad_penguin_cdde61)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3950348
+      ],
       "quests_given_text": [
         "Lost Penguin: \"Cella Cedarnook has found a penguin so cuddly and cute that he must be someone's pet. She wants you to ask around Shrouded Glade to see if he belongs to anyone.\" (2220160998); gummyfruit gumbo errands (\"Cella would like you to make some Gummyfruit Gumbo and feed it to the little penguin in Shrouded Glade.\" 2434767681; ingredients 3518098074, 2993737548); \"Cella Cedarnook wants you to take Aedon to Snowhill\" (4024511923). Penguin Aedon (ucdt 498347338): escort to the top of Misty Mountain (16034566); Valinda in Snowhill takes penguins (NPCs - Snowhill, 553022046)."
       ],
@@ -6509,11 +6530,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:149; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1376 (ModelId=456, ModelFileName=fairy_druid_f.adr, NameId=45339)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.167739,
       "model_id": 456,
-      "model_file_name": "fairy_druid_f.adr"
+      "model_file_name": "fairy_druid_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000045,
@@ -21495,11 +21523,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/Lxzxrus-Free-Realms-Server/src/Scripts/Zone/FabledRealms.lua:2325 spawn definition 3841; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=3841 (NameId=45386, ModelId=3952, ModelFileName=fairy_druid_m_factionleader.adr)"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.705207,
       "model_id": 3952,
-      "model_file_name": "fairy_druid_m_factionleader.adr"
+      "model_file_name": "fairy_druid_m_factionleader.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000691,
@@ -22823,11 +22858,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:180; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1412 (ModelId=456, ModelFileName=fairy_druid_f.adr, NameId=45417)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.154025,
       "model_id": 456,
-      "model_file_name": "fairy_druid_f.adr"
+      "model_file_name": "fairy_druid_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000694,
@@ -22860,8 +22902,23 @@
       "location_evidence": [
         "Shrouded Glade. Video: nameplate by the Postboxes with Halister and Sera Bella (bgHR3By3b9g/00340, /00348)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950162,
+          "title": "First Day Jitters",
+          "title_string_id": 92592,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "First Day Jitters (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_first_day_jitters_6e6631)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950162
+      ],
       "quests_given_text": [
         "A friend for Karmen (\"Find a friend for Karmen in Shrouded Glade.\" 2543765823; \"Return to Karmen\" 3995330280; \"I am sure one of the girls around Shrouded Glade would make a good friend. Can you please look around?\" 573016090)."
       ],
@@ -23311,11 +23368,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:209; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1442 (ModelId=456, ModelFileName=fairy_druid_f.adr, NameId=45457)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.144174,
       "model_id": 456,
-      "model_file_name": "fairy_druid_f.adr"
+      "model_file_name": "fairy_druid_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000695,
@@ -24386,8 +24450,23 @@
       "location_evidence": [
         "Shrouded Glade (\"Return to Leek in Shrouded Glade\" 1749639822). No video."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950233,
+          "title": "Icky Brown Bag Lunch",
+          "title_string_id": 92429,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Icky Brown Bag Lunch (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_icky_brown_bag_lunch_b1c390)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950233
+      ],
       "quests_given_text": [
         "Sandwich run: fetch a sandwich from Lucca De'Flor in Snowhill (3085622630, 2872091535) and \"Deliver the delicious sandwich to Leek Thistleore in Shrouded Glade.\" (4152176717). Lucca's reply: 160507592."
       ],
@@ -24693,10 +24772,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ALeek_Thistleore"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr"
+      "model_file_name": "fairy_druid_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000699,
@@ -26320,8 +26406,36 @@
       "location_evidence": [
         "Hiding in the bushes of the town (wiki only)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950141,
+          "title": "Excuses, Excuses!",
+          "title_string_id": 92272,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Excuses, Excuses! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_excuses_excuses_db900c)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3950125,
+          "title": "Doctor's Note",
+          "title_string_id": 92318,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Doctor's Note (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_doctor_s_note_27c820)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950141,
+        3950125
+      ],
       "quests_given_text": [
         "Excuses, Excuses! (title ucdt 462225231 / ugdt 240633419; \"Milla wants to play hooky from school so she can see Bruce perform in Snowhill. She has asked you to tell her teacher, Tilda that she is too sick to come to school.\" 2010669692, which the wiki quotes word for word)."
       ],
@@ -26703,10 +26817,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob:Milla"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 456,
-      "model_file_name": "fairy_druid_f.adr"
+      "model_file_name": "fairy_druid_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000704,
@@ -27960,11 +28081,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:170; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1401 (ModelId=468, ModelFileName=fairy_druid_m.adr, NameId=45419)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 3.09219,
       "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr"
+      "model_file_name": "fairy_druid_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000707,
@@ -29155,11 +29283,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:190; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1423 (ModelId=468, ModelFileName=fairy_druid_m.adr, NameId=45358)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.563345,
       "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr"
+      "model_file_name": "fairy_druid_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000173,
@@ -30133,8 +30268,23 @@
       "location_evidence": [
         "\"The grassy area near Rena Mistmender\" is where ducks gather (3646096917). No video."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950131,
+          "title": "Druid Dress Code",
+          "title_string_id": 92356,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Druid Dress Code (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_druid_dress_code_de6f6b)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950131
+      ],
       "quests_given_text": [
         "Rena's spare robe: \"Rena has let her laundry pile up and now she doesn't have a clean robe to wear to school. She has asked you to get a spare robe from her sister Bella outside of Sanctuary.\" (1377936496; \"Take the spare robe back to Rena Mistmender in Shrouded Glade.\" 1613739524; \"Return to Rena in Shrouded Glade\" 1014119290)."
       ],
@@ -30440,11 +30590,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:172; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1403 (ModelId=571, ModelFileName=fairy_f_freestyle_09.agr, NameId=45420)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.991415,
       "model_id": 571,
-      "model_file_name": "fairy_f_freestyle_09.agr"
+      "model_file_name": "fairy_f_freestyle_09.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000712,
@@ -33397,11 +33554,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:210; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1443 (ModelId=456, ModelFileName=fairy_druid_f.adr, NameId=45360)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.575268,
       "model_id": 456,
-      "model_file_name": "fairy_druid_f.adr"
+      "model_file_name": "fairy_druid_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000719,
@@ -33434,8 +33598,23 @@
       "location_evidence": [
         "Not stated."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950443,
+          "title": "Tran's Plant",
+          "title_string_id": 91581,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tran's Plant (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_tran_s_plant_716f0e)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950443
+      ],
       "quests_given_text": [
         "The flower delivery (title not found)."
       ],
@@ -33741,11 +33920,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:122; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1344 (ModelId=468, ModelFileName=fairy_druid_m.adr, NameId=45362)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.641698,
       "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr"
+      "model_file_name": "fairy_druid_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000720,
@@ -35908,11 +36094,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:133; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1356 (ModelId=468, ModelFileName=fairy_druid_m.adr, NameId=78662)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.772754,
       "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr"
+      "model_file_name": "fairy_druid_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000723,

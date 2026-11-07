@@ -1294,7 +1294,9 @@ fn interaction_list_packet(
     let mut packet = vec![NPC_FAMILY as u8, 0, INTERACTION_LIST as u8, 0];
     // (R) The region's reconstructed NPC key is used until the live actor GUID is supplied.
     packet.extend(npc.npc_id.to_le_bytes());
-    packet.push(0);
+    // A lone action needs no wheel: with this byte set the client selects it at once
+    // (`00a38570`, the popup's +0x18), as the original does (`-zp-94_-ImE` 388.00-388.50).
+    packet.push(u8::from(options.len() == 1));
     packet.extend((options.len() as i32).to_le_bytes());
     for option in options {
         // Native menu record as used by opening_world::menu: seven dwords per choice.

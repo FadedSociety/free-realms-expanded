@@ -3855,9 +3855,23 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part B. The Greenwood Camp (chugawug archer camp) and the merchants around it, row 61; source cell: [client][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3950199,
+          "title": "Glugmort's Palate",
+          "title_string_id": 20550,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Glugmort's Palate (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_glugmort_s_palate_20863e)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3950199
+      ],
       "quests_given_text": [
         "Boring Burnetta (title 4087542426; matched by wording to 2595534078, 3960786902, 4015276437: convince her to cook something new); the daily cooking contest (\"Every day, the camp archers compete ... The victorious archer is rewarded with some of Burnetta's Crispy Choychoy Delight\", 1073363634; \"Cook Up Some Crispy Choychoy Delight and Feed One Greenwood Archer of Your Choice\", 3485791053); A Fancy Meal for Glugmort (title 3033698600; she needs eggs from Danger Peaks for Glugmort, 3960176192, 889224962, 3474404536); the worm-soup test ends with Glugmort (Glugmort's Palate). Taste-tester stop for Darkthorne's cook search (4206732159, 3609159894; the quest title may be \"Interviewing the Tasters\" 1058217131, unproven). She also hands out Burnetta's Curious Creation; the recipe is sold by Bordon Cloo (829103903) and Mae Farnum (30334094, 2373329029)."
       ],
@@ -4717,8 +4731,23 @@
       "location_evidence": [
         "Not stated. [video: green marker beside Robbie's marker in a green-tent camp, tracker \"The Great Scavenger Hunt\", IYzJU-RjbPE/00002, /00076, /00126; no zone label]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950161,
+          "title": "Finishing the Job",
+          "title_string_id": 71552,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Finishing the Job (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_finishing_the_job_25652a)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950161
+      ],
       "quests_given_text": [
         "A baby-duck gathering: \"Help figure out the weight and size of the baby ducks by gathering them for Carson!\" (120126494, 194489493, 3318203020; a speaker with \"duck bites\", 2137523745). Title not found. His scouting report: \"Have you ever been to Ambrose's dig site? He hired me to scout Greenwood Forest for ruins, but I haven't found any. Can you deliver my report to him?\" (3978479547, 3652662105). Title not found. Ambrose's reply: \"Carson is more concerned about animals than artifacts. Oh well, I suppose I should pay you for the report.\" (526810817)."
       ],
@@ -5096,11 +5125,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2983; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4317 (ModelId=496, ModelFileName=human_m_treasurehunter.agr, NameId=70355)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.079786,
       "model_id": 496,
-      "model_file_name": "human_m_treasurehunter.agr"
+      "model_file_name": "human_m_treasurehunter.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000294,
@@ -5145,8 +5181,23 @@
       "location_evidence": [
         "Camp Chatty: \"Welcome to Camp Chatty! ...\" (166769791), \"Did you already meet my camp counselors yet? They're somewhere around Camp Chatty.\" (1543405257), \"camp leader Chatty\" (3465226063). [video: Chatty's quest panel and dialog for the first quest \"Battles\" at a level 1 Adventurer's housing plot, not at the camp, yJ2KHN9I7EI/00014, /00018, /00244]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950264,
+          "title": "Meet and Greet",
+          "title_string_id": 429030,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Meet and Greet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_meet_and_greet_aa36f4)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950264
+      ],
       "quests_given_text": [
         "Meet and Greet (wiki; client text 166769791, 785744442); the turn-in for Confronting Bigfoot (\"Return to Chatty\", 73896818; video L27vxozHOls/00280). The wiki also lists Chatty under The Great Treeble Race (mentioned), Confronting Bigfoot and Bigfooted Friend. His own wiki \"Quests\" list is Meet and Greet only. He announces the lake race: \"We all want to get in shape to support our camp leader, Chatty, in his totem grabbing attempt\" (3231929936)."
       ],
@@ -5618,11 +5669,18 @@
             "kind": "legacy-data",
             "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3264; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4630 (ModelId=277, ModelFileName=chatdy.adr, NameId=5102985)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.355156,
       "model_id": 277,
-      "model_file_name": "chatdy.adr"
+      "model_file_name": "chatdy.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000295,
@@ -6380,11 +6438,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3247; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4613 (ModelId=3008, ModelFileName=fairy_f_freestyle_Cammy.agr, NameId=429025)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.698379,
       "model_id": 3008,
-      "model_file_name": "fairy_f_freestyle_Cammy.agr"
+      "model_file_name": "fairy_f_freestyle_Cammy.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000297,
@@ -7852,11 +7917,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3266; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4632 (ModelId=3022, ModelFileName=human_m_freestyle_Jake.agr, NameId=428935)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.416368,
       "model_id": 3022,
-      "model_file_name": "human_m_freestyle_Jake.agr"
+      "model_file_name": "human_m_freestyle_Jake.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000300,
@@ -8371,11 +8443,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3254; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4620 (ModelId=3015, ModelFileName=human_f_freestyle_Jenny.agr, NameId=429026)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.43659,
       "model_id": 3015,
-      "model_file_name": "human_f_freestyle_Jenny.agr"
+      "model_file_name": "human_f_freestyle_Jenny.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000301,
@@ -9340,11 +9419,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3260; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4626 (ModelId=3020, ModelFileName=human_f_freestyle_Tyra.agr, NameId=428932)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.053144,
       "model_id": 3020,
-      "model_file_name": "human_f_freestyle_Tyra.agr"
+      "model_file_name": "human_f_freestyle_Tyra.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000303,
@@ -9859,11 +9945,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3246; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4612 (ModelId=3009, ModelFileName=fairy_m_freestyle_Wes.agr, NameId=429027)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.771419,
       "model_id": 3009,
-      "model_file_name": "fairy_m_freestyle_Wes.agr"
+      "model_file_name": "fairy_m_freestyle_Wes.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000304,
@@ -17177,9 +17270,36 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part C. The forest, the dig site and the wildlife camp, row 84; source cell: [client]"
             }
           ]
+        },
+        {
+          "quest_id": 3950395,
+          "title": "Sweet Incentive",
+          "title_string_id": 41403,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Sweet Incentive (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sweet_incentive_4731a2)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3950399,
+          "title": "That Robgoblin's Story",
+          "title_string_id": 429545,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "That Robgoblin's Story (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_that_robgoblin_s_story_c9b34a)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3950395,
+        3950399
+      ],
       "quests_given_text": [
         "Zek's Pie (client title 208675392, ugdt 3337847922): \"That rascal Zek ran away again! Zek loves pie. If you get a pie from Wugachug, maybe he'll come out from hiding.\" (151308257); \"Grab a pie from Wugachug and use it to lure Zek out of hiding near Murgla's camp.\" (383205145); thanks \"So you found Zek. He is in for an earful when he gets back! Take this for helping.\" (3218604499). Another NPC's text sends the player to her (631385009, 1088337639). The Wilds page's \"Zek goes missing\" row refers to the same quest."
       ],
@@ -17485,11 +17605,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2986; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4320 (ModelId=187, ModelFileName=robgoblin_f_cook.adr, NameId=41293)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.419373,
       "model_id": 187,
-      "model_file_name": "robgoblin_f_cook.adr"
+      "model_file_name": "robgoblin_f_cook.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000405,
@@ -20100,9 +20227,23 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part A. The Summer Camp: Camp Chatty and Camp Robbie, row 44; source cell: [client][video][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3950333,
+          "title": "Rags to Riches",
+          "title_string_id": 429096,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Rags to Riches (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rags_to_riches_4e4683)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3950333
+      ],
       "quests_given_text": [
         "Rags to Riches (wiki; client title 40276724; Robbie: \"Yeah, welcome to my camp... if you hang out here, you can go from rags, to being rich!\" 2093705484); Certified Treasure Hunter (wiki; client title 2090142817; \"win either a scavenger hunt or dig up some artifacts\", 3882605396, 645926711); Bigfooted Friend (wiki; client title 1628471361; \"Now that you're officially part of Robbie's camp, he asks that you help their misunderstood friend, Bigfoot\", 3849973998). Hand-in for Unearthing Treasures (\"show Robbie your findings\", 2812940865). The daily junk pile in his tent is Rob Robbie daily (see the quest table)."
       ],
@@ -20574,11 +20715,18 @@
             "kind": "legacy-data",
             "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3257; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4623 (ModelId=1027, ModelFileName=robgoblin_m_bobgoblin.adr, NameId=429024)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.024974,
       "model_id": 1027,
-      "model_file_name": "robgoblin_m_bobgoblin.adr"
+      "model_file_name": "robgoblin_m_bobgoblin.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000319,
@@ -24218,11 +24366,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2783; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4117 (ModelId=4, ModelFileName=robgoblin_m_basic.adr, NameId=41295)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.757832,
       "model_id": 4,
-      "model_file_name": "robgoblin_m_basic.adr"
+      "model_file_name": "robgoblin_m_basic.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     }
   ]
 }

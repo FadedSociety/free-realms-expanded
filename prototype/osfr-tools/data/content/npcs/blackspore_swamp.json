@@ -7588,8 +7588,23 @@
       "location_evidence": [
         "Quagmire Quarry (3985749908)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950431,
+          "title": "There's Silver in Those Hills",
+          "title_string_id": 384769,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "There's Silver in Those Hills (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_there_s_silver_in_those_hills_8ab960)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950431
+      ],
       "quests_given_text": [
         "The Mining Operation (Donovan sends the player here: 2173197478, 3706288412); Free for the Taking (inferred: \"Gather abandoned tools around the Quagmire Quarry\", 2813311574, 2141129067); The Eye of Necrosis (inferred: speaker wants to send the gem to Donovan, 3438722063, 1983003654); Breaking a Few Eggs (inferred: 2217731672); \"Dalton needs some assistance in mining the surrounding hills for Silver\" (474375314); \"Deliver Dalton's earnings\" (29029614). A Medic contract line names him (3373569827: \"spider infestation ... Grave Elemental\"), which supports Medic Contract: Cheap Clients"
       ],
@@ -7895,11 +7910,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:273; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1506 (ModelId=744, ModelFileName=human_blackspore_miner_m.adr, NameId=45554)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.69225,
       "model_id": 744,
-      "model_file_name": "human_blackspore_miner_m.adr"
+      "model_file_name": "human_blackspore_miner_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000017,
@@ -9964,10 +9986,23 @@
               "evidence": "title_string_id corrected from raw locale hash 105665276 to Global.Text id 90957 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3950234,
+          "title": "Idle Hands",
+          "title_string_id": 90731,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Idle Hands (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_idle_hands_f69899)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3000049
+        3000049,
+        3950234
       ],
       "quests_given_text": [
         "Chapter 1: One Last Favor (receives Darkthorne's plant, 323977348); Chapter 1: Haunted by the Past (rescue from Grave Elementals); Chapter 1: The Alchemy of Betrayal (Adventurer E19 to E21); Idle Hands (find the pupil Milford, 3731835062); The Master's Components (components back to him, 892935789, 2144127256); wiki mentions Make Sure to Wash up..., Pulling Weeds, Follow Your Nose and Grave Blossoms as the ingredient quests"
@@ -10486,11 +10521,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:306; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1539 (ModelId=666, ModelFileName=changeling_eggertthemad_m.adr, NameId=45298)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.431529,
       "model_id": 666,
-      "model_file_name": "changeling_eggertthemad_m.adr"
+      "model_file_name": "changeling_eggertthemad_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000022,
@@ -22547,11 +22589,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:328; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1561 (ModelId=664, ModelFileName=human_m_milford.agr, NameId=45293)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.268049,
       "model_id": 664,
-      "model_file_name": "human_m_milford.agr"
+      "model_file_name": "human_m_milford.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000048,

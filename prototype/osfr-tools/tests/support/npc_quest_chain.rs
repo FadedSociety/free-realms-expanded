@@ -772,15 +772,24 @@ pub fn offer(
     quest_id: u32,
     now: u64,
 ) -> Outcome {
-    let dialogue = talk(game, character, target, now);
-    assert!(
-        dialogue
-            .replies
-            .iter()
-            .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
-        "Talk must open the 26/3 dialogue"
-    );
-    let offered = send(game, character, &dialogue_choice(QUEST_CHOICE), now + 2);
+    let talked = talk(game, character, target, now);
+    // The gateway's sessions open straight on the quest window.
+    let direct = talked
+        .replies
+        .iter()
+        .any(|packet| packet.starts_with(&[49, 0, 1, 0]));
+    let offered = if direct {
+        talked
+    } else {
+        assert!(
+            talked
+                .replies
+                .iter()
+                .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
+            "Talk must open the 26/3 dialogue"
+        );
+        send(game, character, &dialogue_choice(QUEST_CHOICE), now + 2)
+    };
     let offers: Vec<&Vec<u8>> = offered
         .replies
         .iter()

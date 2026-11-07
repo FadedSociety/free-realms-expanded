@@ -4225,10 +4225,49 @@
     {
       "id": 3000053,
       "title_string_id": 391255,
-      "giver_npc_id": 9000000443,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "giver_npc_id": 9500000526,
+      "prerequisite_quest_ids": [
+        3000033
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 391260,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Tilda (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_how_to_clean_98dc41)."
+            }
+          ],
+          "npc_id": 9500000718
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 391262,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Roxana in the Royal Palace (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_how_to_clean_98dc41)."
+            }
+          ],
+          "npc_id": 9500000526
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 12,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "How to Clean (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_how_to_clean_98dc41)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -4270,7 +4309,7 @@
       "description_string_id": 391256,
       "intro_text_string_id": 391254,
       "end_text_string_id": 391257,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000054,

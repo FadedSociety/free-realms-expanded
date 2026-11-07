@@ -796,8 +796,23 @@
       "location_evidence": [
         "Seaside beach; video nameplate in 14 frames (for example HCN8MzLIzhg/00016), next to Kendall and Enaine"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950175,
+          "title": "Forcing the Food",
+          "title_string_id": 101540,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Forcing the Food (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_forcing_the_food_e723e0)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950175
+      ],
       "quests_given_text": [
         "\"Alonzo in Seaside wants you to go into the Cray Caves and help clean up\" (1652534197, 1876476591; title not found); basket of veggies for Diggy (3334227141, 3967331627), probably Forcing the Food [inferred]. The Cray's own opinion of him is in 1771167615. Dungeon page Cray Caves"
       ],
@@ -1247,11 +1262,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:546; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1786 (ModelId=369, ModelFileName=human_m_evan_01.agr, NameId=45574)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.397585,
       "model_id": 369,
-      "model_file_name": "human_m_evan_01.agr"
+      "model_file_name": "human_m_evan_01.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000549,
@@ -3054,11 +3076,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:580; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1820 (ModelId=776, ModelFileName=chugawug_m_aziwug.adr, NameId=101247)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.311245,
       "model_id": 776,
-      "model_file_name": "chugawug_m_aziwug.adr"
+      "model_file_name": "chugawug_m_aziwug.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000553,
@@ -3091,8 +3120,23 @@
       "location_evidence": [
         "Luxurious homes, east side of Seaside (3939893660)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950041,
+          "title": "Beach Ball Wear",
+          "title_string_id": 101741,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beach Ball Wear (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_beach_ball_wear_2cfc10)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950041
+      ],
       "quests_given_text": [
         "Needs help picking an outfit for the Beach Ball: asks Cole about the dress code (1269476848, 878988793), then chooses between outfits (3933009666, 3700954517). Beach Ball Wear (client title string \"Beach Ball Wear?\" 2696642412) [inferred]"
       ],
@@ -3542,11 +3586,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:747; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1990 (ModelId=790, ModelFileName=fairy_f_bacala_01.agr, NameId=45582)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.145687,
       "model_id": 790,
-      "model_file_name": "fairy_f_bacala_01.agr"
+      "model_file_name": "fairy_f_bacala_01.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000554,
@@ -4040,11 +4091,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:632; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1874 (ModelId=757, ModelFileName=fairy_f_jambe.agr, NameId=45549)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.059968,
       "model_id": 757,
-      "model_file_name": "fairy_f_jambe.agr"
+      "model_file_name": "fairy_f_jambe.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000555,
@@ -9807,11 +9865,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:510; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1748 (ModelId=761, ModelFileName=fairy_m_cole.agr, NameId=93337)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.974671,
       "model_id": 761,
-      "model_file_name": "fairy_m_cole.agr"
+      "model_file_name": "fairy_m_cole.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000568,
@@ -12666,11 +12731,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2931; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4265 (ModelId=773, ModelFileName=human_m_diggy.agr, NameId=21302)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.08811,
       "model_id": 773,
-      "model_file_name": "human_m_diggy.agr"
+      "model_file_name": "human_m_diggy.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000072,
@@ -17436,8 +17508,23 @@
       "location_evidence": [
         "Seaside; video nameplate once (1gt4j8_A5Hc/00024)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950183,
+          "title": "Fortune Find",
+          "title_string_id": 100231,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Fortune Find (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fortune_find_1184ce)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950183
+      ],
       "quests_given_text": [
         "Errand: \"go visit the Great Koodini\" (3568476844, 2713695036; title not found)"
       ],
@@ -17887,11 +17974,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:545; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1785 (ModelId=659, ModelFileName=fairy_m_freestyle_10.agr, NameId=45799)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.210464,
       "model_id": 659,
-      "model_file_name": "fairy_m_freestyle_10.agr"
+      "model_file_name": "fairy_m_freestyle_10.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000080,
@@ -21376,11 +21470,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:683; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1925 (ModelId=203, ModelFileName=human_m_hooligan_brawler_01.agr, NameId=45826)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -3.01833,
       "model_id": 203,
-      "model_file_name": "human_m_hooligan_brawler_01.agr"
+      "model_file_name": "human_m_hooligan_brawler_01.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000589,
@@ -21803,11 +21904,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:559; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1799 (ModelId=401, ModelFileName=fairy_seaside_f_01.adr, NameId=46263)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.999279,
       "model_id": 401,
-      "model_file_name": "fairy_seaside_f_01.adr"
+      "model_file_name": "fairy_seaside_f_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000112,
@@ -36816,8 +36924,23 @@
       "location_evidence": [
         "\"Near the docks\" (1538797401); music stand beside her (1406063917)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950370,
+          "title": "Sister Feud",
+          "title_string_id": 94547,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Sister Feud (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sister_feud_0d33b2)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950370
+      ],
       "quests_given_text": [
         "Talent show recruiting: Electra Dozen and Flurrie Flo (above); Music Conducting minigame (title 626088874, \"Take your shot ... clicking on the Music Stand next to Sandi\", 3231682468); letter to Snowi in Snowhill (929955078); returning a cancelled booking from Wugachug (983365281). Titles not found"
       ],
@@ -37277,11 +37400,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:573; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1813 (ModelId=401, ModelFileName=fairy_seaside_f_01.adr, NameId=21298)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.482495,
       "model_id": 401,
-      "model_file_name": "fairy_seaside_f_01.adr"
+      "model_file_name": "fairy_seaside_f_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000622,
@@ -37314,8 +37444,23 @@
       "location_evidence": [
         "\"Below the boardwalk\" (1084202134)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950164,
+          "title": "Fisher Poem",
+          "title_string_id": 94562,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Fisher Poem (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fisher_poem_d52b65)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950164
+      ],
       "quests_given_text": [
         "Wants a smoothie from Banani in return for a poem (1407532748, 3406893279); title not found"
       ],
@@ -37765,11 +37910,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:720; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1962 (ModelId=414, ModelFileName=fairy_seaside_m_01_lod0.adr, NameId=21306)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.473089,
       "model_id": 414,
-      "model_file_name": "fairy_seaside_m_01_lod0.adr"
+      "model_file_name": "fairy_seaside_m_01_lod0.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000623,
@@ -39738,8 +39890,23 @@
       "location_evidence": [
         "Near the Ocean Treasures Cafe (wiki)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950216,
+          "title": "Heading for Safety",
+          "title_string_id": 101251,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Heading for Safety (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_heading_for_safety_e05398)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950216
+      ],
       "quests_given_text": [
         "Wants a helmet from Heddy Heathcliff for Aziwug (566825305, 3493387114); wants her socks back from Meika and Swatch Dozen (222936347, 2867719161)"
       ],
@@ -43708,11 +43875,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:528; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1766 (ModelId=779, ModelFileName=human_m_great_koodini.agr, NameId=21311)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.892321,
       "model_id": 779,
-      "model_file_name": "human_m_great_koodini.agr"
+      "model_file_name": "human_m_great_koodini.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000635,
@@ -44540,11 +44714,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:551; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1791 (ModelId=382, ModelFileName=dwarf_miner_m.adr, NameId=45591)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.802975,
       "model_id": 382,
-      "model_file_name": "dwarf_miner_m.adr"
+      "model_file_name": "dwarf_miner_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000637,
@@ -44577,8 +44758,23 @@
       "location_evidence": [
         "Near the Seaside Information Center (wiki Half a Dozen); video next to Hank Highjump (PvUWhApOxWQ/00116)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950210,
+          "title": "Half a Dozen",
+          "title_string_id": 103039,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Half a Dozen (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_half_a_dozen_8a85e1)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950210
+      ],
       "quests_given_text": [
         "Half a Dozen (title 592038755; take a picture to the post office, 15 coins); Merry Vale ambassador target (3536021443)"
       ],
@@ -45028,11 +45224,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:513; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1751 (ModelId=401, ModelFileName=fairy_seaside_f_01.adr, NameId=45584)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.394999,
       "model_id": 401,
-      "model_file_name": "fairy_seaside_f_01.adr"
+      "model_file_name": "fairy_seaside_f_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000638,
@@ -48531,8 +48734,23 @@
       "location_evidence": [
         "Seaside (2241945310); video nameplate in six frames (NrSXtovtEYw/00084)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950229,
+          "title": "Hungry Hungry Troll",
+          "title_string_id": 101431,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Hungry Hungry Troll (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hungry_hungry_troll_75a30e)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950229
+      ],
       "quests_given_text": [
         "Hungry Hungry Troll (title 254473930) [inferred]: \"Get Zwargug in Seaside some food from Diggy!\" (2515519025); the wiki lists the quest in Diggy's appearances"
       ],
@@ -48982,11 +49200,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:687; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1929 (ModelId=167, ModelFileName=troll_peasant_02.adr, NameId=45568)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.778629,
       "model_id": 167,
-      "model_file_name": "troll_peasant_02.adr"
+      "model_file_name": "troll_peasant_02.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000001989,

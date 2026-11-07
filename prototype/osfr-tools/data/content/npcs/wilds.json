@@ -13117,11 +13117,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1782; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3039 (ModelId=831, ModelFileName=human_m_dane_blueshift.agr, NameId=100868)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.580945,
       "model_id": 831,
-      "model_file_name": "human_m_dane_blueshift.agr"
+      "model_file_name": "human_m_dane_blueshift.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000892,
@@ -19619,8 +19626,23 @@
       "location_evidence": [
         "\"By the road\" in the wilds west of Sanctuary (\"Find Greta's brother in the wilds west of Sanctuary\", 1031593123; Hans says \"She's by the road?\", 2276171514)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950068,
+          "title": "Brother's Keeper",
+          "title_string_id": 16890,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Brother's Keeper (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brother_s_keeper_ff368a)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950068
+      ],
       "quests_given_text": [
         "The lost-brother errand: \"Greta has asked you to help find him\" (2854132386, 3557521127); news line \"helped Greta find her wandering brother Hans\" (1145594427). Title not found."
       ],
@@ -19926,11 +19948,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2286; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3543 (ModelId=7, ModelFileName=humanchild_f_skirtandtunic.adr, NameId=37011)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.404453,
       "model_id": 7,
-      "model_file_name": "humanchild_f_skirtandtunic.adr"
+      "model_file_name": "humanchild_f_skirtandtunic.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000335,
@@ -25858,11 +25887,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1808; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3065 (ModelId=569, ModelFileName=fairy_f_freestyle_07.agr, NameId=116521)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.317294,
       "model_id": 569,
-      "model_file_name": "fairy_f_freestyle_07.agr"
+      "model_file_name": "fairy_f_freestyle_07.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000915,
