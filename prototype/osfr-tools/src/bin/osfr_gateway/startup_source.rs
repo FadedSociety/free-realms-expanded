@@ -27,8 +27,5 @@ pub(crate) fn load_gameplay(
     content: &Path,
     saved: Option<GameplayState>,
 ) -> io::Result<Gateway> {
-    match options.reference_dir() {
-        Some(reference) => Gateway::load_gameplay(reference, character, content, saved),
-        None => Gateway::load_gameplay_from_content(character, content, saved),
-    }
+    Gateway::load_live(options.reference_dir(), character, content, saved)
 }

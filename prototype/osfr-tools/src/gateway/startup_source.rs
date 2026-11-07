@@ -127,6 +127,20 @@ impl Gateway {
         Self::load_with_gameplay(Source::Content(content), state, content, saved)
     }
 
+    /// `load_gameplay` for a live player: a click opens straight on the quest window. The flag
+    /// goes on before `load_internal`, as a `Gateway` is too large to move around in a debug build.
+    pub fn load_live(
+        reference: Option<&Path>,
+        state: CharacterState,
+        content: &Path,
+        saved: Option<GameplayState>,
+    ) -> io::Result<Self> {
+        match reference {
+            Some(reference) => Self::build_gameplay(reference, state, content, saved, true),
+            None => Self::build_gameplay(Source::Content(content), state, content, saved, true),
+        }
+    }
+
     /// Gameplay from `content`, startup from `source`: the one body of both gameplay loads.
     pub(super) fn load_with_gameplay<'a>(
         source: impl Into<Source<'a>>,
@@ -134,8 +148,21 @@ impl Gateway {
         content: &Path,
         saved: Option<GameplayState>,
     ) -> io::Result<Self> {
+        Self::build_gameplay(source, state, content, saved, false)
+    }
+
+    fn build_gameplay<'a>(
+        source: impl Into<Source<'a>>,
+        state: CharacterState,
+        content: &Path,
+        saved: Option<GameplayState>,
+        live: bool,
+    ) -> io::Result<Self> {
         let mut gameplay = Gameplay::load(content, saved)?;
         gameplay.bind_npc_quest_catalogue(content, state.guid)?;
+        if live {
+            gameplay.open_quests_directly();
+        }
         let offsets = load_profile_rank_offsets(content)?;
         Self::load_internal(source, state, Some(gameplay), None, offsets)
     }

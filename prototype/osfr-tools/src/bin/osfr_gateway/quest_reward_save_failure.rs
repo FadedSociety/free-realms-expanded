@@ -377,8 +377,7 @@ fn gameplay(scene: &Scene) -> GameplayState {
         .expect("the session has gameplay state")
 }
 
-/// Offer and accept one synthetic quest through the real 26/8 -> 26/10 -> 26/6 -> 49/2
-/// interaction path.
+/// Offer and accept one synthetic quest through the real 26/8 -> 26/10 -> 49/2 interaction path.
 fn accept_quest(scene: &mut Scene, options: &Options, quest_id: u32, now: &mut u64) {
     *now += 10;
     let menu = scene.exchange(options, &interact(GIVER), *now);
@@ -387,13 +386,7 @@ fn accept_quest(scene: &mut Scene, options: &Options, quest_id: u32, now: &mut u
         "the giver did not return its 26/9 menu: {menu:?}"
     );
     *now += 10;
-    let dialogue = scene.exchange(options, &select(GIVER, TALK_OPTION), *now);
-    assert!(
-        has_family(&dialogue, 26, 3),
-        "Talk did not open the 26/3 dialogue: {dialogue:?}"
-    );
-    *now += 10;
-    let offered = scene.exchange(options, &dialogue_choice(QUEST_CHOICE), *now);
+    let offered = scene.exchange(options, &select(GIVER, TALK_OPTION), *now);
     assert!(
         has_quest_packet(&offered, 1, quest_id),
         "quest {quest_id} was not offered: {offered:?}"
@@ -410,8 +403,7 @@ fn accept_quest(scene: &mut Scene, options: &Options, quest_id: u32, now: &mut u
     );
 }
 
-/// Complete the quest's only Talk objective at the giver and release the held 49/13 end screen
-/// with the client's 26/6 row.
+/// Complete the quest's only Talk objective at the giver, which opens the 49/13 end screen.
 fn complete_quest(scene: &mut Scene, options: &Options, quest_id: u32, now: &mut u64) {
     *now += 10;
     let menu = scene.exchange(options, &interact(GIVER), *now);
@@ -420,15 +412,9 @@ fn complete_quest(scene: &mut Scene, options: &Options, quest_id: u32, now: &mut
         "the giver did not return its 26/9 menu: {menu:?}"
     );
     *now += 10;
-    let dialogue = scene.exchange(options, &select(GIVER, TALK_OPTION), *now);
-    assert!(
-        has_family(&dialogue, 26, 3),
-        "the turn-in Talk did not open the 26/3 dialogue: {dialogue:?}"
-    );
+    let released = scene.exchange(options, &select(GIVER, TALK_OPTION), *now);
     let state = gameplay(scene);
     assert_eq!(pending_turnin(&state), Some(quest_id));
-    *now += 10;
-    let released = scene.exchange(options, &dialogue_choice(QUEST_CHOICE), *now);
     let end = released
         .iter()
         .find(|packet| {

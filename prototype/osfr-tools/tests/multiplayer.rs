@@ -1941,8 +1941,7 @@ fn a_shared_field_kill_pays_both_and_credits_the_killer_once() {
     // A accepts the synthetic defeat quest through the ordinary NPC menu.
     let menu = app(&mut first, &mut server, &npc_interact(T335_GIVER));
     let choice = menu_choice(&menu, T335_GIVER, TALK_LABEL);
-    app(&mut first, &mut server, &npc_select(T335_GIVER, choice));
-    let offer = app(&mut first, &mut server, &dialogue_choice(QUEST_CHOICE));
+    let offer = app(&mut first, &mut server, &npc_select(T335_GIVER, choice));
     assert!(
         offer
             .iter()
@@ -2188,8 +2187,8 @@ fn group_result_code(messages: &[Vec<u8>], sub: u16) -> Option<u32> {
 fn accept_quest(client: &mut Client, server: &mut Server) -> Vec<Vec<u8>> {
     let mut replies = app(client, server, &npc_interact(T335_GIVER));
     let choice = menu_choice(&replies, T335_GIVER, TALK_LABEL);
-    replies.extend(app(client, server, &npc_select(T335_GIVER, choice)));
-    let offer = app(client, server, &dialogue_choice(QUEST_CHOICE));
+    let offer = app(client, server, &npc_select(T335_GIVER, choice));
+    replies.extend(offer.iter().cloned());
     assert!(
         offer
             .iter()
@@ -2211,8 +2210,7 @@ fn accept_quest(client: &mut Client, server: &mut Server) -> Vec<Vec<u8>> {
 fn turn_in_quest(client: &mut Client, server: &mut Server) -> Vec<Vec<u8>> {
     let mut replies = app(client, server, &npc_interact(T335_GIVER));
     let choice = menu_choice(&replies, T335_GIVER, TALK_LABEL);
-    replies.extend(app(client, server, &npc_select(T335_GIVER, choice)));
-    let end = app(client, server, &dialogue_choice(QUEST_CHOICE));
+    let end = app(client, server, &npc_select(T335_GIVER, choice));
     assert!(
         end.iter()
             .any(|message| family_body(message, 49, 13).is_some()),
