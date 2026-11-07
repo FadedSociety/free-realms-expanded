@@ -1358,13 +1358,13 @@ fn node_content_is_bounded_and_unique() {
     // (T503, `quest_nodes.json`), 21 T539 quest pickups (5 hammers, 5 chisels, 3 rocks,
     // 8 homework pages), 166 placed collection nodes (T524, the 34 pool maxima) and the
     // 8 Snowhill copper veins T547 places from the 17 recovered rows and the 13 T553 farm
-    // plots (every recovered plot is active), and 148 spots for the 25 quest pick-ups (with the Chapter 1 caravan)
+    // plots (every recovered plot is active), and 162 spots for the 26 quest pick-ups (with the Chapter 1 caravan)
     // (`quest_wire.py`: up to count + 2 each, on a ring round the giver).
-    assert_eq!(actors.len(), 379);
+    assert_eq!(actors.len(), 393);
     let mut ids: Vec<_> = actors.iter().map(|a| a.guid).collect();
     ids.sort();
     ids.dedup();
-    assert_eq!(ids.len(), 379);
+    assert_eq!(ids.len(), 393);
     assert!(
         actors
             .iter()

@@ -701,6 +701,30 @@
         "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
       },
       "name_id": 90814
+    },
+    {
+      "key": "quest-butterflies-2",
+      "name": "Butterflies",
+      "model_id": 342,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 18952
     }
   ],
   "pools": [
@@ -1129,6 +1153,21 @@
       "zone_definition_id": 1,
       "node_type": "quest-merchant-caravan",
       "max_active_nodes": 3,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-butterflies-2",
+      "zone_definition_id": 1,
+      "node_type": "quest-butterflies-2",
+      "max_active_nodes": 14,
       "respawn_seconds": 30,
       "source_tag": "reconstructed",
       "source_tags": {
@@ -3917,6 +3956,230 @@
         -1419.14,
         -27.631,
         361.41
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 253,
+      "pool_key": "quest-butterflies-2",
+      "zone_definition_id": 1,
+      "position": [
+        -1115.96,
+        -9.551,
+        311.17
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 254,
+      "pool_key": "quest-butterflies-2",
+      "zone_definition_id": 1,
+      "position": [
+        -1121.96,
+        -9.551,
+        317.17
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 255,
+      "pool_key": "quest-butterflies-2",
+      "zone_definition_id": 1,
+      "position": [
+        -1127.5,
+        -9.551,
+        313.47
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 256,
+      "pool_key": "quest-butterflies-2",
+      "zone_definition_id": 1,
+      "position": [
+        -1126.2,
+        -9.551,
+        306.93
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 257,
+      "pool_key": "quest-butterflies-2",
+      "zone_definition_id": 1,
+      "position": [
+        -1119.66,
+        -9.551,
+        305.63
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 258,
+      "pool_key": "quest-butterflies-2",
+      "zone_definition_id": 1,
+      "position": [
+        -1109.96,
+        -9.551,
+        311.17
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 259,
+      "pool_key": "quest-butterflies-2",
+      "zone_definition_id": 1,
+      "position": [
+        -1121.96,
+        -9.551,
+        323.17
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 260,
+      "pool_key": "quest-butterflies-2",
+      "zone_definition_id": 1,
+      "position": [
+        -1130.44,
+        -9.551,
+        319.66
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 261,
+      "pool_key": "quest-butterflies-2",
+      "zone_definition_id": 1,
+      "position": [
+        -1133.96,
+        -9.551,
+        311.17
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 262,
+      "pool_key": "quest-butterflies-2",
+      "zone_definition_id": 1,
+      "position": [
+        -1126.55,
+        -9.551,
+        300.08
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 263,
+      "pool_key": "quest-butterflies-2",
+      "zone_definition_id": 1,
+      "position": [
+        -1117.36,
+        -9.551,
+        300.08
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 264,
+      "pool_key": "quest-butterflies-2",
+      "zone_definition_id": 1,
+      "position": [
+        -1108.1,
+        -9.551,
+        316.91
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 265,
+      "pool_key": "quest-butterflies-2",
+      "zone_definition_id": 1,
+      "position": [
+        -1111.35,
+        -9.551,
+        321.78
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 266,
+      "pool_key": "quest-butterflies-2",
+      "zone_definition_id": 1,
+      "position": [
+        -1116.22,
+        -9.551,
+        325.03
       ],
       "heading": 0.0,
       "source_tag": "reconstructed",

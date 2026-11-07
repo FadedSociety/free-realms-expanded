@@ -6599,8 +6599,23 @@
       "location_evidence": [
         "The town's Cooking Table (video QBr1g_qkZMY/00000, /00030, /00094; l7dWE7ImZ8w/00126)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3951987,
+          "title": "Popularly Healthy",
+          "title_string_id": 428826,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Popularly Healthy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_popularly_healthy_1cc042)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3951987
+      ],
       "quests_given_text": [
         "Gumbo, Choychoy and gathering requests (736487779; 647277422 \"overwhelmed with orders\"; 2037818938; 817411980; 2009413847; title entries \"Gummyfruit Gumbo\" ucdt 1322860907 and \"Crispy Choychoy Delight\" ucdt 1373537820); a mystery-meat stock (\"Chef Safrie in Shrouded Glade might have some\", 1543421549). See the row on Chef (\"no complete quest mapping\")."
       ],
@@ -6988,11 +7003,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:157; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1384 (ModelId=456, ModelFileName=fairy_druid_f.adr, NameId=428592)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.518974,
       "model_id": 456,
-      "model_file_name": "fairy_druid_f.adr"
+      "model_file_name": "fairy_druid_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000660,

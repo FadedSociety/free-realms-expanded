@@ -821,9 +821,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3949 spawnNpcWithGuid(33740); src/Resources/Npcs.json Id=33740"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": 2.67620994
+      "heading": 2.67620994,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000726,
@@ -6545,10 +6552,23 @@
               "evidence": "The Gifting Tree (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_gifting_tree_b608e7)."
             }
           ]
+        },
+        {
+          "quest_id": 3951995,
+          "title": "Present Problems",
+          "title_string_id": 420268,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Present Problems (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_present_problems_47802d)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3951040
+        3951040,
+        3951995
       ],
       "quests_given_text": [
         "The Gifting Tree (repeatable once a day), Present Problems, Holiday Cheer, Silversnow's Sapling, Guarding the Gifting Tree, The Perfect Disguise, Robgoblin Robbery Ring, Snowmen Disassembly, An Unexpected Gift, Bye-Bye Supplies!."
@@ -12147,8 +12167,23 @@
       "location_evidence": [
         "\"Her house on Snowdrip Lane\" (client 3653979331)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3951809,
+          "title": "Curious Gift Baskets",
+          "title_string_id": 421001,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Curious Gift Baskets (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_curious_gift_baskets_3cdd14)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3951809
+      ],
       "quests_given_text": [
         "Curious Gift Baskets (wiki, Snow Days repeatable; client 1275934548). Towel errand for Murphy (client 87765181)."
       ],
@@ -12514,9 +12549,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3867 spawnNpcWithGuid(33648); src/Resources/Npcs.json Id=33648"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -0.0269199998
+      "heading": -0.0269199998,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000076,
@@ -48722,8 +48764,15 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: most common model of drawn pixie male NPCs"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500001022,

@@ -32399,11 +32399,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2098; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3355 (ModelId=32, ModelFileName=fairy_m_farmer_01.adr, NameId=18720)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.616869,
       "model_id": 32,
-      "model_file_name": "fairy_m_farmer_01.adr"
+      "model_file_name": "fairy_m_farmer_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000929,

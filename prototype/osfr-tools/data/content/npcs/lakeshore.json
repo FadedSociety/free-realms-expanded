@@ -16501,8 +16501,23 @@
       "location_evidence": [
         "Southwest of Lakeshore, in a cubby in the mountains."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3951759,
+          "title": "Beautiful Butterflies",
+          "title_string_id": 20190,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beautiful Butterflies (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_beautiful_butterflies_1a0f0a)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3951759
+      ],
       "quests_given_text": [],
       "quests_accepted": [],
       "quests_accepted_reason": null,
@@ -16783,8 +16798,15 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: most common model of drawn pixie female NPCs"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     }
   ]
 }

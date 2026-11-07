@@ -5375,6 +5375,346 @@
       "description_string_id": 100297,
       "intro_text_string_id": 100297,
       "enabled": true
+    },
+    {
+      "id": 3951759,
+      "title_string_id": 20190,
+      "giver_npc_id": 9600000004,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 20200,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Get some nectar from Peacepetal (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_beautiful_butterflies_1a0f0a)."
+            }
+          ],
+          "npc_id": 9500000928
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 20202,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Ginger (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_beautiful_butterflies_1a0f0a)."
+            }
+          ],
+          "npc_id": 9600000004
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beautiful Butterflies (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_beautiful_butterflies_1a0f0a)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Beautiful Butterflies (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_beautiful_butterflies_1a0f0a)."
+        }
+      ],
+      "description_string_id": 20191,
+      "intro_text_string_id": 24944,
+      "enabled": true,
+      "end_text_string_id": 9730
+    },
+    {
+      "id": 3951785,
+      "title_string_id": 37090,
+      "giver_npc_id": 9600000005,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 37092,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect butterflies - (0/12) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_butterfly_fluttered_by_dc3cad)."
+            }
+          ],
+          "node_type": "quest-butterflies-2",
+          "quantity": 12
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 37094,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Britta Autumnkiss (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_butterfly_fluttered_by_dc3cad)."
+            }
+          ],
+          "npc_id": 9600000005
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 38,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Butterfly Fluttered By (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_butterfly_fluttered_by_dc3cad)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Butterfly Fluttered By (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_butterfly_fluttered_by_dc3cad)."
+        }
+      ],
+      "description_string_id": 37089,
+      "intro_text_string_id": 37089,
+      "enabled": true
+    },
+    {
+      "id": 3951809,
+      "title_string_id": 421001,
+      "giver_npc_id": 9500000743,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "text_string_id": 414305,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cook Burnetta's Curious Creation - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_curious_gift_baskets_3cdd14)."
+            }
+          ],
+          "recipe_id": 38,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 420301,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Downey (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_curious_gift_baskets_3cdd14)."
+            }
+          ],
+          "npc_id": 9500000743
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Curious Gift Baskets (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_curious_gift_baskets_3cdd14)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Curious Gift Baskets (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_curious_gift_baskets_3cdd14)."
+        }
+      ],
+      "description_string_id": 421002,
+      "enabled": true
+    },
+    {
+      "id": 3951987,
+      "title_string_id": 428826,
+      "giver_npc_id": 9000000045,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "text_string_id": 414459,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cook some Gummyfruit Gumbo - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_popularly_healthy_1cc042)."
+            }
+          ],
+          "recipe_id": 35,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 428629,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Chef Safrie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_popularly_healthy_1cc042)."
+            }
+          ],
+          "npc_id": 9000000045
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Popularly Healthy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_popularly_healthy_1cc042)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Popularly Healthy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_popularly_healthy_1cc042)."
+        }
+      ],
+      "description_string_id": 428827,
+      "enabled": true
+    },
+    {
+      "id": 3951995,
+      "title_string_id": 420268,
+      "giver_npc_id": 9500000733,
+      "prerequisite_quest_ids": [
+        3951040
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 420301,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Downey (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_present_problems_47802d)."
+            }
+          ],
+          "npc_id": 9500000743
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 420303,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Milus Featherfeet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_present_problems_47802d)."
+            }
+          ],
+          "npc_id": 9600000007
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 91368,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Annabelle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_present_problems_47802d)."
+            }
+          ],
+          "npc_id": 9500000725
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 419846,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Candi Ivy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_present_problems_47802d)."
+            }
+          ],
+          "npc_id": 9500000733
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Present Problems (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_present_problems_47802d)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Present Problems (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_present_problems_47802d)."
+        }
+      ],
+      "description_string_id": 420269,
+      "intro_text_string_id": 420267,
+      "enabled": true
+    },
+    {
+      "id": 3952076,
+      "title_string_id": 78698,
+      "giver_npc_id": 9600000011,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 78703,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Donovan Shadeweaver (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_road_to_mire_s_edge_42d5e9)."
+            }
+          ],
+          "npc_id": 9500000019
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Road to Mire's Edge (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_road_to_mire_s_edge_42d5e9)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "The Road to Mire's Edge (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_road_to_mire_s_edge_42d5e9)."
+        }
+      ],
+      "description_string_id": 78699,
+      "intro_text_string_id": 78697,
+      "enabled": true
     }
   ]
 }

@@ -1757,10 +1757,61 @@
       "title_string_id": 77764,
       "giver_npc_id": 9000000203,
       "prerequisite_quest_ids": [
+        3100020,
         3100021
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "text_string_id": 77974,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Smelt Silver Bars - 0/10 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_smelting_secrets_297157)."
+            }
+          ],
+          "recipe_id": 7,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 77976,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Take Ramberry her Silver Bars (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_smelting_secrets_297157)."
+            }
+          ],
+          "npc_id": 9500000059
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 77754,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Silverray at Quagmire Quarry (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_smelting_secrets_297157)."
+            }
+          ],
+          "npc_id": 9000000203
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Miner: Smelting Secrets (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_smelting_secrets_297157)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1802,7 +1853,7 @@
       "description_string_id": 77765,
       "intro_text_string_id": 77763,
       "end_text_string_id": 77766,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3100023,

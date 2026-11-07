@@ -9071,11 +9071,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:317; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1550 (ModelId=640, ModelFileName=human_donovanshadeweaver_m.adr, NameId=45296)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.706222,
       "model_id": 640,
-      "model_file_name": "human_donovanshadeweaver_m.adr"
+      "model_file_name": "human_donovanshadeweaver_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000020,
@@ -28466,11 +28473,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:276; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1509 (ModelId=42, ModelFileName=fairy_f_02.adr, NameId=77757)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 3.063703,
       "model_id": 42,
-      "model_file_name": "fairy_f_02.adr"
+      "model_file_name": "fairy_f_02.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000060,
@@ -41878,8 +41892,23 @@
       "location_evidence": [
         "Blackspore Swamp, Blackspore Swamp"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3952076,
+          "title": "The Road to Mire's Edge",
+          "title_string_id": 78698,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Road to Mire's Edge (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_road_to_mire_s_edge_42d5e9)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3952076
+      ],
       "quests_given_text": [],
       "quests_accepted": [],
       "quests_accepted_reason": null,
@@ -42160,8 +42189,15 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: most common model of drawn human female NPCs"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     }
   ]
 }
