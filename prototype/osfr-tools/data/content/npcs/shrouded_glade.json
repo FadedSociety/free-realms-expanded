@@ -22593,8 +22593,23 @@
       "location_evidence": [
         "Shrouded Glade (the well, \"Get some water from the well in Shrouded Glade and convince Khord to drink it.\" 2998723480). No video."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950698,
+          "title": "A Friend in Need",
+          "title_string_id": 92596,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Friend in Need (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_friend_in_need_75573c)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950698
+      ],
       "quests_given_text": [
         "Kari's task (\"Complete Kari's task in order to earn her friendship.\" 4288868936; \"Return to Kari and let her know that the prank was a 'toadal' success!\" 3914861464; \"Any friend of Karmen's must share her love for pink druid robes.\" 3204174855). Khord drinks the water and becomes a frog (3132272185)."
       ],
@@ -24105,11 +24120,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:184; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1416 (ModelId=468, ModelFileName=fairy_druid_m.adr, NameId=45436)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.088161,
       "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr"
+      "model_file_name": "fairy_druid_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000697,

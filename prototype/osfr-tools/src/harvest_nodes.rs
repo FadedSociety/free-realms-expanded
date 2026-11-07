@@ -126,6 +126,11 @@ impl HarvestNodesContent {
 pub struct HarvestNodeType {
     pub key: String,
     pub name: String,
+    /// The client's line for this type's name. A quest pick-up with one is drawn named and
+    /// upright, the way a click on it reached the server natively (run 111732Z: a player
+    /// clicked the barrel and picked up the present); one without stays as captured.
+    #[serde(default)]
+    pub name_id: Option<i32>,
     pub model_id: u32,
     /// AddNpc `scale`: the model scale this type is drawn at (every pre-T547 type is 1.0, the
     /// captured template's value).
@@ -326,6 +331,8 @@ pub struct NodePresentation {
     /// X-prompt radius is the AddNpc float `unknown_float_51`, not this field, and server
     /// admission uses [`Site::range`].
     pub interact_range: Option<u32>,
+    /// AddNpc `name_string_id` from the type's `name_id`.
+    pub name_id: Option<i32>,
     /// AddNpc `sub_text_name_string_id` (after the three animation ids): the rare-node
     /// subtitle.
     pub sub_text_name_id: Option<i32>,
@@ -823,6 +830,7 @@ fn add_sites(
             }
         };
         presentation.scale = Some(node_type.scale);
+        presentation.name_id = node_type.name_id;
         presentation.texture_alias = texture_alias;
         presentation
             .notifications
@@ -926,6 +934,10 @@ fn node_spawn(node: &NodeActor, interactable: bool) -> NpcSpawn {
         spawn.terrain_object_id = terrain;
     }
     spawn.is_interactable = u8::from(interactable);
+    if let Some(name) = node.presentation.name_id {
+        spawn.name_string_id = name;
+        spawn.rotation = [0.0, 0.0, 0.0, 1.0];
+    }
     spawn
 }
 

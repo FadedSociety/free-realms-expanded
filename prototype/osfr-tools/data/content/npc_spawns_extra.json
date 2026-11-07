@@ -16981,7 +16981,8 @@
         }
       ],
       "position_w": null,
-      "texture_alias": "02"
+      "texture_alias": "02",
+      "content_key": 9500001515
     },
     {
       "spawn_guid": 100000002405,
@@ -36808,7 +36809,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2325; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3582 (ModelId=572, ModelFileName=fairy_f_freestyle_10.agr, NameId=92479)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500001591
     },
     {
       "spawn_guid": 100000003583,

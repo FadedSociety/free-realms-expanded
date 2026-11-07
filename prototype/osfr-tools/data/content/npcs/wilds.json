@@ -48621,8 +48621,23 @@
       "location_evidence": [
         "Near the greenhouse (3978079914)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950706,
+          "title": "A Pretty Necklace",
+          "title_string_id": 38301,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Pretty Necklace (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_pretty_necklace_0cd8b2)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950706
+      ],
       "quests_given_text": [
         "\"Zinnea needs you to get her sparkling flowers to make necklaces. The flowers grow around the Pixie Nursery.\" (331882309, 4075335134). Suspect in Flax's fish case (2063005555)."
       ],
@@ -48928,11 +48943,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2132; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3389 (ModelId=377, ModelFileName=fairy_farmer_f.adr, NameId=38031)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.052359,
       "model_id": 377,
-      "model_file_name": "fairy_farmer_f.adr"
+      "model_file_name": "fairy_farmer_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500001007,

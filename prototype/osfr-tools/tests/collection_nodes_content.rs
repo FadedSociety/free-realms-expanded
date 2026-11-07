@@ -332,11 +332,17 @@ fn the_gathering_loader_reads_collection_nodes() {
     let nodes = GatheringNodes::load(&dir.0)
         .unwrap()
         .expect("the quest node file");
+    // A wiki pick-up type adds only its client name line (`name_id`).
     assert!(
-        nodes
-            .actors()
-            .all(|actor| actor.presentation == template_presentation()),
+        nodes.actors().all(|actor| NodePresentation {
+            name_id: None,
+            ..actor.presentation.clone()
+        } == template_presentation()),
         "quest actors must keep the captured AddNpc template fields"
+    );
+    assert!(
+        nodes.actors().any(|actor| actor.presentation.name_id.is_some()),
+        "the wiki pick-ups are drawn named"
     );
     let dir = TempDir::new();
     fs::copy(

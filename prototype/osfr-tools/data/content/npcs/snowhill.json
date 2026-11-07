@@ -6533,8 +6533,23 @@
       "location_evidence": [
         "Near the Gifting Tree during Snow Days (wiki); \"Meet Candi Ivy in Snowhill\" (client 53857791). [video: dialog headers, 2fhn8kePbKQ/00468, /00492, /00498, /00504]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3951040,
+          "title": "The Gifting Tree",
+          "title_string_id": 419835,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Gifting Tree (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_gifting_tree_b608e7)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3951040
+      ],
       "quests_given_text": [
         "The Gifting Tree (repeatable once a day), Present Problems, Holiday Cheer, Silversnow's Sapling, Guarding the Gifting Tree, The Perfect Disguise, Robgoblin Robbery Ring, Snowmen Disassembly, An Unexpected Gift, Bye-Bye Supplies!."
       ],
@@ -6994,11 +7009,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4248; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=32813 (ModelId=45, ModelFileName=human_f_santa.adr, NameId=419832)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.856337,
       "model_id": 45,
-      "model_file_name": "human_f_santa.adr"
+      "model_file_name": "human_f_santa.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000734,

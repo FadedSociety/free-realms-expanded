@@ -1128,15 +1128,30 @@
       ],
       "roles": [
         "quest_giver",
-        "vendor",
-        "trainer"
+        "trainer",
+        "vendor"
       ],
       "enemy_kind": null,
       "location_evidence": [
         "\"Bluerose can be found in Lakeshore\" (752251102). The Lakeshore cooking table is \"near Bluerose\" (164117812, 1812826004)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3951093,
+          "title": "Worms!",
+          "title_string_id": 21986,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Worms! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_worms_884e9e)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3951093
+      ],
       "quests_given_text": [
         "Fisherman: Bluerose's Best Bait (target). Worm collection quest \"Worms\" (client title 3339631064; 455261714: \"Talk to Bluerose and obtain the quest, 'Worms'\"). Shiny-lure fetch, silver and onyx (2223724148; cut title \"NOT LIVE - Lakeshore Lures\", 3994521347). Debtor in Brawler: I Want My Money! (4044833138)."
       ],
@@ -1428,9 +1443,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3701 spawnNpcWithGuid(33479); src/Resources/Npcs.json Id=33479"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -3.14122605
+      "heading": -3.14122605,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000035,

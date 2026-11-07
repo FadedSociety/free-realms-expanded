@@ -3710,6 +3710,417 @@
       "description_string_id": 91542,
       "intro_text_string_id": 91540,
       "enabled": true
+    },
+    {
+      "id": 3950698,
+      "title_string_id": 92596,
+      "giver_npc_id": 9500000693,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 92664,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Grab some well water (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_friend_in_need_75573c)."
+            }
+          ],
+          "node_type": "quest-well-water",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 92666,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give Khord the water (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_friend_in_need_75573c)."
+            }
+          ],
+          "npc_id": 9500000696
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 92668,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Kari (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_friend_in_need_75573c)."
+            }
+          ],
+          "npc_id": 9500000693
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 6,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Friend in Need (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_friend_in_need_75573c)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "A Friend in Need (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_friend_in_need_75573c)."
+        }
+      ],
+      "description_string_id": 92597,
+      "intro_text_string_id": 92595,
+      "enabled": true
+    },
+    {
+      "id": 3950706,
+      "title_string_id": 38301,
+      "giver_npc_id": 9500000965,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 38307,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect sparkling flowers - 0/12 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_pretty_necklace_0cd8b2)."
+            }
+          ],
+          "node_type": "quest-sparkling-flowers",
+          "quantity": 12
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 38309,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Zinnea (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_pretty_necklace_0cd8b2)."
+            }
+          ],
+          "npc_id": 9500000965
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Pretty Necklace (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_pretty_necklace_0cd8b2)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "A Pretty Necklace (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_pretty_necklace_0cd8b2)."
+        }
+      ],
+      "description_string_id": 38302,
+      "intro_text_string_id": 38300,
+      "enabled": true,
+      "end_text_string_id": 2141
+    },
+    {
+      "id": 3950836,
+      "title_string_id": 92484,
+      "giver_npc_id": 9500001591,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 92493,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find buckets of fish - (0/8) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fishy_fish_thefts_a3d94c)."
+            }
+          ],
+          "node_type": "quest-buckets-of-fish",
+          "quantity": 8
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 92507,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Frani Frostflinger (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fishy_fish_thefts_a3d94c)."
+            }
+          ],
+          "npc_id": 9500001591
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Fishy Fish Thefts (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fishy_fish_thefts_a3d94c)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Fishy Fish Thefts (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fishy_fish_thefts_a3d94c)."
+        }
+      ],
+      "description_string_id": 92485,
+      "intro_text_string_id": 92483,
+      "enabled": true
+    },
+    {
+      "id": 3950850,
+      "title_string_id": 37070,
+      "giver_npc_id": 9500001515,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 37072,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Obtain honey in Sanctuary (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_forgotten_food_c114be)."
+            }
+          ],
+          "node_type": "quest-honey",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 37074,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Obtain sweet bread from Lucca De'Flor in Snowhill. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_forgotten_food_c114be)."
+            }
+          ],
+          "npc_id": 9000000133
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 37076,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Bryan (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_forgotten_food_c114be)."
+            }
+          ],
+          "npc_id": 9500001515
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 61,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Forgotten Food (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_forgotten_food_c114be)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Forgotten Food (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_forgotten_food_c114be)."
+        }
+      ],
+      "description_string_id": 103105,
+      "enabled": true
+    },
+    {
+      "id": 3950877,
+      "title_string_id": 15258,
+      "giver_npc_id": 9500000447,
+      "prerequisite_quest_ids": [
+        3950036
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 18267,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect corrupted bixie honey - 0/7 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_happy_on_the_inside_068718)."
+            }
+          ],
+          "node_type": "quest-corrupted-bixie-honey",
+          "quantity": 7
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 18202,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Belladonna in the Memorial Caverns (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_happy_on_the_inside_068718)."
+            }
+          ],
+          "npc_id": 9500000447
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Happy on the Inside (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_happy_on_the_inside_068718)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Happy on the Inside (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_happy_on_the_inside_068718)."
+        }
+      ],
+      "description_string_id": 15259,
+      "intro_text_string_id": 24857,
+      "enabled": true
+    },
+    {
+      "id": 3951040,
+      "title_string_id": 419835,
+      "giver_npc_id": 9500000733,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 419863,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect your present! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_gifting_tree_b608e7)."
+            }
+          ],
+          "node_type": "quest-present",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 419846,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Candi Ivy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_gifting_tree_b608e7)."
+            }
+          ],
+          "npc_id": 9500000733
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Gifting Tree (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_gifting_tree_b608e7)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "The Gifting Tree (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_gifting_tree_b608e7)."
+        }
+      ],
+      "description_string_id": 419836,
+      "intro_text_string_id": 419834,
+      "enabled": true
+    },
+    {
+      "id": 3951093,
+      "title_string_id": 21986,
+      "giver_npc_id": 9000000027,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 21988,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect worms - (0/10) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_worms_884e9e)."
+            }
+          ],
+          "node_type": "quest-worms",
+          "quantity": 10
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 22025,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Bluerose (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_worms_884e9e)."
+            }
+          ],
+          "npc_id": 9000000027
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Worms! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_worms_884e9e)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Worms! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_worms_884e9e)."
+        }
+      ],
+      "description_string_id": 38787,
+      "intro_text_string_id": 38787,
+      "enabled": true
     }
   ]
 }

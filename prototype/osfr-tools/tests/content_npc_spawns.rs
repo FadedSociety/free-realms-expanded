@@ -315,7 +315,7 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // `legacy_data` clickable quest props (1,209, all Legacy spawns); L096 the two Wildwood
     // turnstile actors (1,211, live_capture); L925 twelve fanbyte-wiki quest givers (1,223, poi_anchor);
     // L932 the two Snowhill soccer gates (1,225, client_object).
-    assert_eq!(regional_legacy + regional_reconstructed, 1234);
+    assert_eq!(regional_legacy + regional_reconstructed, 1236);
     assert!(
         regional_legacy >= 582,
         "regional NPCs dropped to {regional_legacy}"

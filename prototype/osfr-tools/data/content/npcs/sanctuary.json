@@ -4569,10 +4569,23 @@
               "evidence": "Bad Apples (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bad_apples_b6f099)."
             }
           ]
+        },
+        {
+          "quest_id": 3950877,
+          "title": "Happy on the Inside",
+          "title_string_id": 15258,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Happy on the Inside (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_happy_on_the_inside_068718)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3950036
+        3950036,
+        3950877
       ],
       "quests_given_text": [
         "Honey test in the Forgotten Caves (472649836, 1979376524) (Forgotten Caves)"
