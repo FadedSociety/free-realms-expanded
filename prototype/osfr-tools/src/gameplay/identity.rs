@@ -10,6 +10,11 @@ impl Gameplay {
         }
         identity.validate()?;
         self.gender = identity.gender;
+        self.creation_clothes = identity
+            .attachments
+            .iter()
+            .map(|attachment| (attachment.definition, attachment.tint_id))
+            .collect();
         let fingerprint = format!(
             "{:x}",
             Sha256::digest(serde_json::to_vec(identity).map_err(invalid)?)

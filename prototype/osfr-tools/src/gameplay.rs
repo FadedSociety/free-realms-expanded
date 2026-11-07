@@ -219,6 +219,9 @@ pub struct Gameplay {
     identity_fingerprint: Option<String>,
     /// Character gender (1 boy, 2 girl) from `apply_identity`; 0 until then (gender not checked).
     gender: i32,
+    /// The identity's creation clothes (definition, tint) from `apply_identity`: the Adventurer's
+    /// outfit, which `profiles.json` has no starter kit for.
+    creation_clothes: Vec<(i32, i32)>,
     opening: Option<OpeningEngine>,
     encounter: Option<EncounterEngine>,
     world: Option<OpeningWorld>,
@@ -1247,6 +1250,7 @@ impl Gameplay {
             profiles,
             identity_fingerprint,
             gender: 0,
+            creation_clothes: Vec::new(),
             opening,
             encounter,
             world,

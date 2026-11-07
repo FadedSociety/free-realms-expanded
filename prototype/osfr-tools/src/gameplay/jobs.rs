@@ -120,6 +120,21 @@ impl Gameplay {
         out: &mut Outcome,
     ) -> io::Result<()> {
         let items = self.profiles.as_ref().unwrap().starter_items(job).to_vec();
+        // The Adventurer has no kit: it wears the creation clothes `apply_identity` put on it once.
+        // A save whose Adventurer lost them (an older save, clothes taken off) could never switch
+        // back: the client's `ProcessProfileSwap` (`00bfb620`) needs Chest and Legs on every job.
+        if items.is_empty() && job == crate::artifact_hunt::ADVENTURER_PROFILE_ID {
+            for (definition, tint) in self.creation_clothes.clone() {
+                if !self.inventory.state().items.iter().any(|item| item.definition_id == definition) {
+                    out.replies
+                        .extend(self.inventory.grant_with_tint(0, definition, 1, tint)?.replies);
+                }
+                let equipped = self.inventory.equip_owned_definition(definition, job)?;
+                out.changed |= equipped.changed;
+                out.replies.extend(equipped.replies);
+            }
+            return Ok(());
+        }
         for definition in items {
             // The inherited Chef defaults include the same hat that
             // this local story awards at Cooking101 turn-in. Defer only
@@ -211,15 +226,11 @@ impl Gameplay {
         }
     }
 
-    /// (R) A job never stays bare: when a job with a completely empty outfit
+    /// (R) A job never stays bare: when a job without the Chest and Legs the client needs
     /// becomes active, it gets its starter outfit (The owner, 2026-10-15). Fixes
     /// saves whose job was unlocked by a path that granted no clothes.
     pub(super) fn ensure_outfit(&mut self, job: i32, out: &mut Outcome) -> io::Result<()> {
-        if self
-            .inventory
-            .profile_attachments(job)?
-            .starts_with(&0i32.to_le_bytes())
-        {
+        if !self.inventory.has_required_profile_slots(job) {
             self.give_starter_outfit(job, true, out)?;
         }
         let has_weapon = self
