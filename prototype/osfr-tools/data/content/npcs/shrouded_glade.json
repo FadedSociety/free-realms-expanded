@@ -2605,7 +2605,7 @@
       "reference_ids": [],
       "name": "Baily Leafcutter",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 90246,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -5077,7 +5077,7 @@
       "reference_ids": [],
       "name": "Captain Sunspark",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 437145,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -11681,8 +11681,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 1566,
+      "model_file_name": "bear_m_druid.adr"
     },
     {
       "npc_id": 9500000670,
@@ -11690,7 +11704,7 @@
       "reference_ids": [],
       "name": "Druid of the Branch",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 721,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -12172,8 +12186,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 3939,
+      "model_file_name": "fairy_f_druid_branch.agr"
     },
     {
       "npc_id": 9500000671,
@@ -12181,7 +12209,7 @@
       "reference_ids": [],
       "name": "Druid of the Viper",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 720,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -12663,8 +12691,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 3938,
+      "model_file_name": "fairy_f_druid_viper.agr"
     },
     {
       "npc_id": 9500000672,
@@ -17498,7 +17540,7 @@
       "reference_ids": [],
       "name": "General Drahk",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 437153,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -18834,7 +18876,7 @@
       "reference_ids": [],
       "name": "Golmie Greasebeard",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 437261,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -19273,7 +19315,7 @@
       "reference_ids": [],
       "name": "Gus Geargrinder",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 437262,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -24790,7 +24832,7 @@
       "reference_ids": [],
       "name": "Little J",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 5449,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -29834,7 +29876,7 @@
       "reference_ids": [],
       "name": "Queen Valerian",
       "name_reason": null,
-      "name_string_id": 2085012813,
+      "name_string_id": 130547,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -32251,7 +32293,7 @@
       "reference_ids": [],
       "name": "Tald Daybreaker",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 45374,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -32734,7 +32776,7 @@
       "reference_ids": [],
       "name": "The Rose that Knows",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 140646,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -33093,8 +33135,23 @@
       "location_evidence": [
         "The Academy. Video: nameplate by the Postboxes, 14 to 15 m, near a wooden footbridge (bgHR3By3b9g/00274, /00320, /00324)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950687,
+          "title": "Late Library Books",
+          "title_string_id": 91541,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Late Library Books (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_late_library_books_b1c7da)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950687
+      ],
       "quests_given_text": [
         "Truant Druids (a minigame: \"Tilda needs help rounding up some truant students. Interact with the attendance sheet next to her to begin.\" 3972585747; \"Send the truant druids back to class.\" 423915354; \"Thank you for finding the truant students. I think today's lesson will be to write on the blackboard, 'I will not skip class' at least 300 times.\" 784081024); Overdue books (\"Tilda has asked you to do a bit of traveling and get some of her overdue books back from Rourke Ironfist in Lakeshore, Murphy in Snowhill, and Anura in Sanctuary.\" 1613887895; \"Return the overdue books to Tilda Timidleaf at the Druid Academy in Shrouded Glade.\" 2539558607); the \"How to Clean\" book for the Royal Palace maids (264599173, 4071971276; row F3 of Adventurer); receives Milla's excuse in Excuses, Excuses! (below)."
       ],

@@ -4110,7 +4110,7 @@
       "reference_ids": [],
       "name": "Bandy Randi",
       "name_reason": null,
-      "name_string_id": 4152399943,
+      "name_string_id": 90233,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -4695,7 +4695,7 @@
       "reference_ids": [],
       "name": "Baron von Darkcheat",
       "name_reason": null,
-      "name_string_id": 2087525998,
+      "name_string_id": 294,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -5095,8 +5095,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 3883,
+      "model_file_name": "dwarf_darkcheat.adr"
     },
     {
       "npc_id": 9500000557,
@@ -9027,7 +9041,7 @@
       "reference_ids": [],
       "name": "Chip Numbwing",
       "name_reason": null,
-      "name_string_id": 3410365534,
+      "name_string_id": 408638,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -19462,7 +19476,7 @@
       "reference_ids": [],
       "name": "Foreman Moser",
       "name_reason": null,
-      "name_string_id": 3702093883,
+      "name_string_id": 429896,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -31675,7 +31689,7 @@
       "reference_ids": [],
       "name": "Munchi Elwood",
       "name_reason": null,
-      "name_string_id": 2741891973,
+      "name_string_id": 90229,
       "name_string_ids": [
         {
           "table": "unspecified",

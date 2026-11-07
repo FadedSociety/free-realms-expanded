@@ -2174,7 +2174,7 @@
       "reference_ids": [],
       "name": "Blackspore Pet Adoption Center",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 93695,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": "Blackspore Swamp",
@@ -3416,7 +3416,7 @@
       "reference_ids": [],
       "name": "Burke",
       "name_reason": null,
-      "name_string_id": 3565222911,
+      "name_string_id": 45295,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -3815,7 +3815,7 @@
       "reference_ids": [],
       "name": "Cakeling",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 6215,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": "Blackspore Swamp",
@@ -12053,7 +12053,7 @@
       "reference_ids": [],
       "name": "Finn",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 15904,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": null,
@@ -17663,7 +17663,7 @@
       "reference_ids": [],
       "name": "Lord William IV",
       "name_reason": null,
-      "name_string_id": 1032980989,
+      "name_string_id": 416046,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -18062,7 +18062,7 @@
       "reference_ids": [],
       "name": "Lost Explorer",
       "name_reason": null,
-      "name_string_id": 3037496321,
+      "name_string_id": 139363,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -19401,7 +19401,7 @@
       "reference_ids": [],
       "name": "Mac",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 15368,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": "Blackspore Swamp",
@@ -26405,7 +26405,7 @@
       ],
       "name": "Petra",
       "name_reason": null,
-      "name_string_id": 565519828,
+      "name_string_id": 72450,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -27178,7 +27178,7 @@
       "reference_ids": [],
       "name": "Pumpkin Prince",
       "name_reason": null,
-      "name_string_id": 942570469,
+      "name_string_id": 416102,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -29927,7 +29927,7 @@
       ],
       "name": "Sal Monella",
       "name_reason": null,
-      "name_string_id": 3178725636,
+      "name_string_id": 45300,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -40752,8 +40752,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 1438,
+      "model_file_name": "human_m_waldo_sidewinder.agr"
     },
     {
       "npc_id": 9500000081,

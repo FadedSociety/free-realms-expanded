@@ -4811,7 +4811,7 @@
       "reference_ids": [],
       "name": "Bodkin",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 382852,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -9861,8 +9861,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 1319,
+      "model_file_name": "human_m_claudio_demarco.agr"
     },
     {
       "npc_id": 9000000053,
@@ -10656,7 +10670,7 @@
       "reference_ids": [],
       "name": "Collin",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 38372,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -14362,7 +14376,7 @@
       "reference_ids": [],
       "name": "Elder Mugwort",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 16811,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -18109,7 +18123,7 @@
       "reference_ids": [],
       "name": "Ginger Gold",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 66866,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -27017,7 +27031,7 @@
       "reference_ids": [],
       "name": "Mac",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 15368,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -38707,8 +38721,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 1306,
+      "model_file_name": "fairy_m_sir_horace.agr"
     },
     {
       "npc_id": 9500000945,
@@ -46151,7 +46179,7 @@
       "reference_ids": [],
       "name": "Wanderwings",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 47394,
       "name_string_ids": [
         {
           "table": "ucdt",

@@ -898,7 +898,7 @@ fn therin_is_drawable_and_the_quest_content_resolves() {
     let therin_npc = row(&snowhill["records"].as_array().unwrap(), THERIN);
     assert_eq!(therin_npc["placement"], json!("poi_anchor"));
     assert_eq!(therin_npc["name"], json!("Therin"));
-    assert_eq!(therin_npc["name_string_id"], json!(943_830_538));
+    assert_eq!(therin_npc["name_string_id"], json!(185));
     assert_eq!(therin_npc["position"], therin_row["position"]);
 
     // The production per-session visibility batch draws the one shared actor for two

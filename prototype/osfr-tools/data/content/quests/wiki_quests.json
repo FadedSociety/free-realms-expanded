@@ -3578,6 +3578,138 @@
       "description_string_id": 38783,
       "intro_text_string_id": 38783,
       "enabled": true
+    },
+    {
+      "id": 3950498,
+      "title_string_id": 415267,
+      "giver_npc_id": 9500000515,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 415407,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Get caramel from Halloween Harry (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_apples_ee35c8)."
+            }
+          ],
+          "npc_id": 9500000493
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 415412,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Pucca De'Flor (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_apples_ee35c8)."
+            }
+          ],
+          "npc_id": 9500000515
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Apples! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_apples_ee35c8)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Apples! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_apples_ee35c8)."
+        }
+      ],
+      "description_string_id": 415268,
+      "intro_text_string_id": 415266,
+      "enabled": true
+    },
+    {
+      "id": 3950687,
+      "title_string_id": 91541,
+      "giver_npc_id": 9500000718,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 91557,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Get a book from Rourke in Lakeshore (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_late_library_books_b1c7da)."
+            }
+          ],
+          "npc_id": 9000000185
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 91559,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Get a book from Murphy in Snowhill (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_late_library_books_b1c7da)."
+            }
+          ],
+          "npc_id": 9000000158
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 91561,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Get a book from Anura in Sanctuary (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_late_library_books_b1c7da)."
+            }
+          ],
+          "npc_id": 9500000438
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 91563,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Tilda in Shrouded Glade (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_late_library_books_b1c7da)."
+            }
+          ],
+          "npc_id": 9500000718
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Late Library Books (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_late_library_books_b1c7da)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Late Library Books (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_late_library_books_b1c7da)."
+        }
+      ],
+      "description_string_id": 91542,
+      "intro_text_string_id": 91540,
+      "enabled": true
     }
   ]
 }

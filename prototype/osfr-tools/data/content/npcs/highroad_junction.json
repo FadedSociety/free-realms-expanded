@@ -9,7 +9,7 @@
       "reference_ids": [],
       "name": "Alena Goldenheart",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 611,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -3090,8 +3090,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 4470,
+      "model_file_name": "chugawug_m_bugawug_01.adr"
     },
     {
       "npc_id": 9500000330,
@@ -3099,7 +3113,7 @@
       "reference_ids": [],
       "name": "Chatty",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 20060,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -3583,8 +3597,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 3381,
+      "model_file_name": "human_m_mannequin_chatty.agr"
     },
     {
       "npc_id": 9500000331,
@@ -8481,7 +8509,7 @@
       "reference_ids": [],
       "name": "Raven",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 5159,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -8907,7 +8935,7 @@
       "reference_ids": [],
       "name": "Sammy \"The Shark\"",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 436624,
       "name_string_ids": [
         {
           "table": "ucdt",

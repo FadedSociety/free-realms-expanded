@@ -357,7 +357,7 @@
       "reference_ids": [],
       "name": "Gram Tracker",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 47238,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -692,7 +692,7 @@
       "reference_ids": [],
       "name": "Monno Monogram",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 47239,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -3589,7 +3589,7 @@
       "reference_ids": [],
       "name": "Zoo Keeper",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 441391,
       "name_string_ids": [
         {
           "table": "ucdt",

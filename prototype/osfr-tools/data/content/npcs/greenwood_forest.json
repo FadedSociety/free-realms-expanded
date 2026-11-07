@@ -645,7 +645,7 @@
       "reference_ids": [],
       "name": "Archer on Patrol",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 78684,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -5688,7 +5688,7 @@
       "reference_ids": [],
       "name": "Counselor Amira",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 441915,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -15380,8 +15380,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 3927,
+      "model_file_name": "human_m_jason_maskface.agr"
     },
     {
       "npc_id": 9500000312,

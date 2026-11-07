@@ -1708,7 +1708,7 @@
       "reference_ids": [],
       "name": "Archmage Petulia",
       "name_reason": null,
-      "name_string_id": 27110847,
+      "name_string_id": 16244,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -2811,7 +2811,7 @@
       "reference_ids": [],
       "name": "Banter",
       "name_reason": null,
-      "name_string_id": 2933649269,
+      "name_string_id": 7581,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -3574,7 +3574,7 @@
       "reference_ids": [],
       "name": "Barton",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 10095,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": "Sanctuary",
@@ -3887,7 +3887,7 @@
       "reference_ids": [],
       "name": "Baxi Sparkletoes",
       "name_reason": null,
-      "name_string_id": 1809254345,
+      "name_string_id": 382902,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -4212,7 +4212,7 @@
       "reference_ids": [],
       "name": "Bella",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 37189,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": "Sanctuary",
@@ -4970,7 +4970,7 @@
       "reference_ids": [],
       "name": "Bellis",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 70739,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": "Sanctuary",
@@ -5606,7 +5606,7 @@
       ],
       "name": "Beth Callahan",
       "name_reason": null,
-      "name_string_id": 199591402,
+      "name_string_id": 388395,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -6351,7 +6351,7 @@
       "reference_ids": [],
       "name": "Bezzle",
       "name_reason": null,
-      "name_string_id": 2736457341,
+      "name_string_id": 441072,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -7093,7 +7093,7 @@
       "reference_ids": [],
       "name": "Bixie Queen",
       "name_reason": null,
-      "name_string_id": 1039808409,
+      "name_string_id": 16234,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -7578,8 +7578,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 211,
+      "model_file_name": "bixie_f_mage.adr"
     },
     {
       "npc_id": 9500000453,
@@ -8875,7 +8889,7 @@
       "reference_ids": [],
       "name": "Brent",
       "name_reason": null,
-      "name_string_id": 3903743459,
+      "name_string_id": 116863,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -9285,7 +9299,7 @@
       "reference_ids": [],
       "name": "Bruce",
       "name_reason": null,
-      "name_string_id": 255196100,
+      "name_string_id": 201,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -9702,7 +9716,7 @@
       "reference_ids": [],
       "name": "Brunhilda",
       "name_reason": null,
-      "name_string_id": 3267602478,
+      "name_string_id": 415531,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -10092,8 +10106,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 1709,
+      "model_file_name": "human_f_costume_brunhilda.agr"
     },
     {
       "npc_id": 9500000457,
@@ -10447,7 +10475,7 @@
       "reference_ids": [],
       "name": "Cadie",
       "name_reason": null,
-      "name_string_id": 535976468,
+      "name_string_id": 10094,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -10855,7 +10883,7 @@
       "reference_ids": [],
       "name": "Cakeling",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 6215,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": "Sanctuary",
@@ -11683,7 +11711,7 @@
       "reference_ids": [],
       "name": "Camellia",
       "name_reason": null,
-      "name_string_id": 2124725291,
+      "name_string_id": 428364,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -13775,7 +13803,7 @@
       "reference_ids": [],
       "name": "Coin Farmer Dang Dang",
       "name_reason": null,
-      "name_string_id": 851166952,
+      "name_string_id": 429145,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -14770,7 +14798,7 @@
       "reference_ids": [],
       "name": "Crofti",
       "name_reason": null,
-      "name_string_id": 2634051898,
+      "name_string_id": 10175,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -17322,8 +17350,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 531,
+      "model_file_name": "human_f_domo.agr"
     },
     {
       "npc_id": 9500000470,
@@ -17826,7 +17868,7 @@
       "reference_ids": [],
       "name": "Dusti Rodez",
       "name_reason": null,
-      "name_string_id": 1937066573,
+      "name_string_id": 427443,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -19468,7 +19510,7 @@
       "reference_ids": [],
       "name": "Farmer Wug",
       "name_reason": null,
-      "name_string_id": 3974213124,
+      "name_string_id": 434638,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -20159,7 +20201,7 @@
       ],
       "name": "Felipe",
       "name_reason": null,
-      "name_string_id": 3221065707,
+      "name_string_id": 21276,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -21609,7 +21651,7 @@
       "reference_ids": [],
       "name": "Finklestein",
       "name_reason": null,
-      "name_string_id": 195202075,
+      "name_string_id": 415613,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -23687,7 +23729,7 @@
       "reference_ids": [],
       "name": "Florina",
       "name_reason": null,
-      "name_string_id": 1160566912,
+      "name_string_id": 45951,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -24100,7 +24142,7 @@
       "reference_ids": [],
       "name": "Flurti",
       "name_reason": null,
-      "name_string_id": 1501861154,
+      "name_string_id": 10088,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -25484,7 +25526,7 @@
       ],
       "name": "Geoffrey",
       "name_reason": null,
-      "name_string_id": 509620257,
+      "name_string_id": 70318,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -26743,7 +26785,7 @@
       "reference_ids": [],
       "name": "Ghost Hunter",
       "name_reason": null,
-      "name_string_id": 3947454227,
+      "name_string_id": 416777,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -27225,7 +27267,7 @@
       "reference_ids": [],
       "name": "Glitter",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 7609,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": "Sanctuary",
@@ -28398,7 +28440,7 @@
       "reference_ids": [],
       "name": "Guard Banee",
       "name_reason": null,
-      "name_string_id": 2582427649,
+      "name_string_id": 10079,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -28880,7 +28922,7 @@
       "reference_ids": [],
       "name": "Guard Snapdragon",
       "name_reason": null,
-      "name_string_id": 95767746,
+      "name_string_id": 10100,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -29728,7 +29770,7 @@
       "reference_ids": [],
       "name": "Gulsh",
       "name_reason": null,
-      "name_string_id": 1827985187,
+      "name_string_id": 10087,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -31072,7 +31114,7 @@
       "reference_ids": [],
       "name": "Helga Humbleloaf",
       "name_reason": null,
-      "name_string_id": 3741237114,
+      "name_string_id": 23792,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -32160,7 +32202,7 @@
       "reference_ids": [],
       "name": "Ikee",
       "name_reason": null,
-      "name_string_id": 1439015993,
+      "name_string_id": 14699,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -33414,7 +33456,7 @@
       "reference_ids": [],
       "name": "Jestin",
       "name_reason": null,
-      "name_string_id": 4005173527,
+      "name_string_id": 7606,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -35202,7 +35244,7 @@
       "reference_ids": [],
       "name": "Kellin Warpwatcher",
       "name_reason": null,
-      "name_string_id": 3786212204,
+      "name_string_id": 384749,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -36745,7 +36787,7 @@
       ],
       "name": "Lavarius Sparksizzle",
       "name_reason": null,
-      "name_string_id": 3247296594,
+      "name_string_id": 79014,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -37923,7 +37965,7 @@
       "reference_ids": [],
       "name": "Morninglory",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 16826,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": "Sanctuary",
@@ -38248,7 +38290,7 @@
       "reference_ids": [],
       "name": "Napoleon",
       "name_reason": null,
-      "name_string_id": 627137493,
+      "name_string_id": 391444,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -41146,7 +41188,7 @@
       "reference_ids": [],
       "name": "Orchid",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 14700,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": "Sanctuary",
@@ -41461,7 +41503,7 @@
       ],
       "name": "Osgood",
       "name_reason": null,
-      "name_string_id": 2145856305,
+      "name_string_id": 45555,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -43631,7 +43673,7 @@
       "reference_ids": [],
       "name": "Posey",
       "name_reason": null,
-      "name_string_id": 67301554,
+      "name_string_id": 10089,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -43953,7 +43995,7 @@
       "reference_ids": [],
       "name": "Preston Daly",
       "name_reason": null,
-      "name_string_id": 3630297844,
+      "name_string_id": 422709,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -44381,8 +44423,23 @@
       "location_evidence": [
         "Pixiewood Hills"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3950498,
+          "title": "Apples!",
+          "title_string_id": 415267,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Apples! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_apples_ee35c8)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3950498
+      ],
       "quests_given_text": [
         "Apples! (Super Spooktacular, wiki)"
       ],
@@ -44783,7 +44840,7 @@
       "reference_ids": [],
       "name": "Pumpkin Prince",
       "name_reason": null,
-      "name_string_id": 942570469,
+      "name_string_id": 416102,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -46046,7 +46103,7 @@
       "reference_ids": [],
       "name": "Queen Valerian",
       "name_reason": null,
-      "name_string_id": 2085012813,
+      "name_string_id": 130547,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -47661,7 +47718,7 @@
       "reference_ids": [],
       "name": "Rio Cloudjumps",
       "name_reason": null,
-      "name_string_id": 3832631746,
+      "name_string_id": 430047,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -48495,7 +48552,7 @@
       ],
       "name": "Roscoe",
       "name_reason": null,
-      "name_string_id": 3331365642,
+      "name_string_id": 78660,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -49226,7 +49283,7 @@
       "reference_ids": [],
       "name": "Rose",
       "name_reason": null,
-      "name_string_id": 277954173,
+      "name_string_id": 10073,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -50107,7 +50164,7 @@
       "reference_ids": [],
       "name": "Ruby",
       "name_reason": null,
-      "name_string_id": 507642611,
+      "name_string_id": 15413,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -52678,7 +52735,7 @@
       ],
       "name": "Sandbur",
       "name_reason": null,
-      "name_string_id": 2247542797,
+      "name_string_id": 10090,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -53658,7 +53715,7 @@
       "reference_ids": [],
       "name": "Sergeant Larkspur",
       "name_reason": null,
-      "name_string_id": 2094170236,
+      "name_string_id": 441907,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -55636,7 +55693,7 @@
       "reference_ids": [],
       "name": "Skelly",
       "name_reason": null,
-      "name_string_id": 788164024,
+      "name_string_id": 415500,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -56038,7 +56095,7 @@
       "reference_ids": [],
       "name": "Speedy",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 7608,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": "Sanctuary",
@@ -58676,8 +58733,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 4750,
+      "model_file_name": "fairy_m_the_scrutinizer.agr"
     },
     {
       "npc_id": 9500000540,

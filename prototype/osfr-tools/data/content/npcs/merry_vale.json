@@ -2276,7 +2276,7 @@
       "reference_ids": [],
       "name": "Brennion",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 47182,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -3083,8 +3083,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 22,
+      "model_file_name": "cakenstein.adr"
     },
     {
       "npc_id": 9500000374,
@@ -6611,7 +6625,7 @@
       "reference_ids": [],
       "name": "Duana",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 385854,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -11522,7 +11536,7 @@
       "reference_ids": [],
       "name": "Izzy Fast",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 427564,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -12430,7 +12444,7 @@
       "reference_ids": [],
       "name": "Jecca Ruchcups",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 427320,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -21818,7 +21832,7 @@
       "reference_ids": [],
       "name": "Necronomicus",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 440729,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -28005,7 +28019,7 @@
       "reference_ids": [],
       "name": "Sous-Chef Elden",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 41261,
       "name_string_ids": [
         {
           "table": "ucdt",

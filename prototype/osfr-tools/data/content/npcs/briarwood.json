@@ -3154,8 +3154,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 423,
+      "model_file_name": "human_m_archnos.agr"
     },
     {
       "npc_id": 9500000088,
@@ -3163,7 +3177,7 @@
       "reference_ids": [],
       "name": "Azure",
       "name_reason": null,
-      "name_string_id": 747079180,
+      "name_string_id": 6455,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -7258,7 +7272,7 @@
       "reference_ids": [],
       "name": "Buttercup Webbywand",
       "name_reason": null,
-      "name_string_id": 1421102691,
+      "name_string_id": 390551,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -12345,8 +12359,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 4028,
+      "model_file_name": "human_m_clancy_blackheart.agr"
     },
     {
       "npc_id": 9500000107,
@@ -13003,7 +13031,7 @@
       "reference_ids": [],
       "name": "Commander Kluggenkrush",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 10293,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -16801,7 +16829,7 @@
       ],
       "name": "Darkthorne",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 91522,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -17579,8 +17607,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 353,
+      "model_file_name": "fairy_darkthorne_f.adr"
     },
     {
       "npc_id": 9500000118,
@@ -24109,7 +24151,7 @@
       "reference_ids": [],
       "name": "Fabio \"Fancy Feet\"",
       "name_reason": null,
-      "name_string_id": 3015444983,
+      "name_string_id": 401691,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -25728,7 +25770,7 @@
       "reference_ids": [],
       "name": "Figwit Figgletons",
       "name_reason": null,
-      "name_string_id": 2951444911,
+      "name_string_id": 90124,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -29139,7 +29181,7 @@
       "reference_ids": [],
       "name": "Glowlum",
       "name_reason": null,
-      "name_string_id": 149788154,
+      "name_string_id": 73535,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -29468,7 +29510,7 @@
       "reference_ids": [],
       "name": "Glumleaf",
       "name_reason": null,
-      "name_string_id": 3618924518,
+      "name_string_id": 73531,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -30241,7 +30283,7 @@
       "reference_ids": [],
       "name": "Guard Reli",
       "name_reason": null,
-      "name_string_id": 3498264269,
+      "name_string_id": 116888,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -31075,7 +31117,7 @@
       ],
       "name": "Gunther",
       "name_reason": null,
-      "name_string_id": 3082272307,
+      "name_string_id": 409300,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -34264,7 +34306,7 @@
       "reference_ids": [],
       "name": "Joey the Lost",
       "name_reason": null,
-      "name_string_id": 2300336944,
+      "name_string_id": 18071,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -41269,7 +41311,7 @@
       "reference_ids": [],
       "name": "Lumfall",
       "name_reason": null,
-      "name_string_id": 2357015509,
+      "name_string_id": 73550,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -47137,8 +47179,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 825,
+      "model_file_name": "human_f_mirana_vega.agr"
     },
     {
       "npc_id": 9500000181,
@@ -47146,7 +47202,7 @@
       "reference_ids": [],
       "name": "Miss Artie",
       "name_reason": null,
-      "name_string_id": 821848638,
+      "name_string_id": 10294,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -48166,7 +48222,7 @@
       "reference_ids": [],
       "name": "Necrolaceous",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 4580,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -48900,7 +48956,7 @@
       "reference_ids": [],
       "name": "Noctelun",
       "name_reason": null,
-      "name_string_id": 821614722,
+      "name_string_id": 73536,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -49229,7 +49285,7 @@
       "reference_ids": [],
       "name": "Nogg the Cruel",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 4093,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -57251,7 +57307,7 @@
       "reference_ids": [],
       "name": "Raven Fluxspin",
       "name_reason": null,
-      "name_string_id": 46607674,
+      "name_string_id": 19332,
       "name_string_ids": [
         {
           "table": "unspecified",
@@ -67823,7 +67879,7 @@
       "reference_ids": [],
       "name": "Tiny Tina",
       "name_reason": null,
-      "name_string_id": 523845954,
+      "name_string_id": 100781,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -68882,7 +68938,7 @@
       "reference_ids": [],
       "name": "Treeleaf Hedge",
       "name_reason": null,
-      "name_string_id": 492694666,
+      "name_string_id": 5739,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -69630,7 +69686,7 @@
       ],
       "name": "Vittorio",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 10296,
       "name_string_ids": [
         {
           "table": "ucdt",

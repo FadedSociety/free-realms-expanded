@@ -690,7 +690,7 @@
       "reference_ids": [],
       "name": "Assistant Bogse",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 440419,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -7108,7 +7108,7 @@
       "reference_ids": [],
       "name": "Feathered Drake Elder",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 439171,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -10418,7 +10418,7 @@
       "reference_ids": [],
       "name": "Harley",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 1755,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -12277,8 +12277,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 4206,
+      "model_file_name": "dwarf_m_ironteeth.adr"
     },
     {
       "npc_id": 9500000826,
@@ -19700,7 +19714,7 @@
       "reference_ids": [],
       "name": "Peaceful Sandscale",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 440145,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -21328,7 +21342,7 @@
       "reference_ids": [],
       "name": "Quetzalcoatl",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 439215,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -22270,7 +22284,7 @@
       "reference_ids": [],
       "name": "Razzle",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 413068,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -30936,8 +30950,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 4132,
+      "model_file_name": "dwarf_f_factionleader_hammer.adr"
     },
     {
       "npc_id": 9500000860,

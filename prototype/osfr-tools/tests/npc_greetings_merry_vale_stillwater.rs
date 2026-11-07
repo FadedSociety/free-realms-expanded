@@ -542,7 +542,7 @@ fn is_greeting_only_change_between(old: &Value, new: &Value) -> bool {
 /// actor) so the world draws them touches every region; the drawing suites pin the values.
 fn is_npc_body_change_between(old: &Value, new: &Value) -> bool {
     changed_rows_are(old, new, false, |old, new| {
-        let fields = ["model_id", "model_file_name", "name_string_id", "position"];
+        let fields = ["model_id", "model_file_name", "name_string_id", "position", "field_sources"];
         without_fields(old, &fields) == without_fields(new, &fields)
     })
 }
@@ -556,7 +556,7 @@ fn is_quest_binding_and_greeting_change_between(old: &Value, new: &Value) -> boo
         let fields: Vec<&str> = QUEST_BINDING_FIELDS
             .iter()
             .copied()
-            .chain(["greeting_string_id"])
+            .chain(["greeting_string_id", "model_id", "model_file_name", "name_string_id", "field_sources"])
             .collect();
         without_fields(old, &fields) == without_fields(new, &fields)
     })

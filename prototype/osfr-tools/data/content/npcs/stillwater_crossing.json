@@ -436,8 +436,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 1595,
+      "model_file_name": "human_f_anna_mudskipper.agr"
     },
     {
       "npc_id": 9000000038,
@@ -5038,7 +5052,7 @@
       ],
       "name": "Guppie",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 409079,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -9698,7 +9712,7 @@
       "reference_ids": [],
       "name": "Pumpkin Prince",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 416102,
       "name_string_ids": [
         {
           "table": "ucdt",

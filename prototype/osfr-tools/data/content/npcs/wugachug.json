@@ -1633,8 +1633,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 4039,
+      "model_file_name": "chugawug_m_grimyfoot.adr"
     },
     {
       "npc_id": 9500000970,
@@ -15877,7 +15891,7 @@
       "reference_ids": [],
       "name": "Sparkolot",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 382930,
       "name_string_ids": [
         {
           "table": "ucdt",

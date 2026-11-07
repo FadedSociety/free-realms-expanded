@@ -304,7 +304,7 @@ fn geoffrey_is_drawable_and_offers_the_missing_sisters() {
     let npc = geoffrey_npc();
     assert_eq!(npc["placement"], json!("unanchored"));
     assert_eq!(npc["name"], json!("Geoffrey"));
-    assert_eq!(npc["name_string_id"], json!(NPC_ROW_NAME_ID));
+    assert_eq!(npc["name_string_id"], json!(70_318));
     assert_eq!(npc["zone_id"], json!(10));
 
     // The client's text table resolves the spawn's name id; the NPC row's ucdt

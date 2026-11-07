@@ -1311,7 +1311,7 @@
       ],
       "name": "Carlos Brazenfist",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 20671,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -4482,7 +4482,7 @@
       "reference_ids": [],
       "name": "Kibler",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 20466,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -5244,7 +5244,7 @@
       "reference_ids": [],
       "name": "Mac",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 15368,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -6027,7 +6027,7 @@
       "reference_ids": [],
       "name": "Mongo",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 20482,
       "name_string_ids": [
         {
           "table": "ucdt",

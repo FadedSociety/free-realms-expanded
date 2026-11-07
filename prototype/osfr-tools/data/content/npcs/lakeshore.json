@@ -776,7 +776,7 @@
       "reference_ids": [],
       "name": "Big Mike",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 103818,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -1104,7 +1104,7 @@
       ],
       "name": "Bluerose",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 19676,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -2163,7 +2163,7 @@
       ],
       "name": "Chaz Strongarm",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 117044,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -2580,7 +2580,7 @@
       "reference_ids": [],
       "name": "Clark",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 409940,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -2913,7 +2913,7 @@
       "reference_ids": [],
       "name": "Dori Tendersole",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 36468,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -4864,7 +4864,7 @@
       ],
       "name": "Kazuo the Dragon",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 415195,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -6804,7 +6804,7 @@
       "reference_ids": [],
       "name": "Lan Spryleaf",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 76029,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -7232,7 +7232,7 @@
       "reference_ids": [],
       "name": "Len Tyril",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 76038,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -8803,7 +8803,7 @@
       ],
       "name": "Merri De'Flor",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 19671,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -10059,7 +10059,7 @@
       "reference_ids": [],
       "name": "Mister Nooklings",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 19682,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -10483,7 +10483,7 @@
       "reference_ids": [],
       "name": "Mort McFly",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 76040,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -10816,7 +10816,7 @@
       "reference_ids": [],
       "name": "Natali",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 388323,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -12343,7 +12343,7 @@
       ],
       "name": "Rourke Ironfist",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 22805,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -13023,9 +13023,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3756 spawnNpcWithGuid(33534); src/Resources/Npcs.json Id=33534"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -0.0979499985
+      "heading": -0.0979499985,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000364,
@@ -13475,7 +13482,7 @@
       ],
       "name": "Selvi Slowreel",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 37339,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -15636,7 +15643,7 @@
       "reference_ids": [],
       "name": "Tyn Redwing",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 76041,
       "name_string_ids": [
         {
           "table": "ucdt",
