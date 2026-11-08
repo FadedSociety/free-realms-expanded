@@ -514,6 +514,45 @@ fn an_npc_offers_its_deck_only_to_a_player_whose_quest_wants_it() {
     assert!(!labels.contains(&other), "Poe's other decks stay hidden: {labels:?}");
 }
 
+/// A dig site's row waits for the quest's game step, and picking it starts that site's own board.
+#[test]
+fn a_dig_sites_row_shows_at_the_game_step_and_starts_its_board() {
+    const CONFRONTING_AMBROSE: u32 = 3_040_035;
+    const AMBROSE: u64 = 9_000_000_005;
+    const SITE: u64 = 9_500_002_001;
+    const DIG: i32 = 681;
+    const DIG_NAME: u32 = 413_706;
+    let fixture = duel_fixture(&[]);
+    fixture.patch_quest("card_duelist.json", CONFRONTING_AMBROSE, |record| {
+        record["enabled"] = Value::Bool(true);
+        record["prerequisite_quest_ids"] = serde_json::json!([]);
+    });
+    let mut game = card_duelist_as(&fixture, CHARACTER);
+    let there = |npc| {
+        let position = card_duelist::content_position("greenwood_forest.json", npc);
+        card_duelist::character_at_for(CHARACTER, 0, position)
+    };
+    let (esther, ambrose, site) = (at(ESTHER), there(AMBROSE), there(SITE));
+    offer(&mut game, &esther, ESTHER, CONFRONTING_AMBROSE, 2_000);
+    accept(&mut game, &esther, CONFRONTING_AMBROSE, 2_010);
+
+    let early = send(&mut game, &site, &npc_interact(SITE), 2_020);
+    assert!(!menu_labels(&early).contains(&DIG_NAME), "the quest is not at the game step");
+
+    card_duelist::talk_step(&mut game, &ambrose, AMBROSE, 2_100, "Speak to Ambrose");
+    card_duelist::talk_step(&mut game, &site, SITE, 2_200, "Click on the dig site");
+    let menu = send(&mut game, &site, &npc_interact(SITE), 2_300);
+    assert!(menu_labels(&menu).contains(&DIG_NAME), "the row shows at the game step");
+
+    let choice = card_duelist::menu_option(&menu, DIG_NAME);
+    let picked = send(&mut game, &site, &card_duelist::npc_select(SITE, choice), 2_310);
+    assert!(game.state().artifact_hunt.and_then(|hunt| hunt.active).is_some(), "the run survived the menu");
+    assert!(
+        picked.replies.iter().any(|p| p.windows(4).any(|w| w == DIG.to_le_bytes())),
+        "the offer names the site's own game"
+    );
+}
+
 #[test]
 fn every_npc_deck_names_a_card_row_and_stays_out_of_the_games_window() {
     let content = osfr_tools::card_game::Content::load(

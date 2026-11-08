@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "source": "(R) Which prop opens which dig. The games are the client's MiniGameData 681-683 (TYPE 8, Artifact Hunt's icon 912); the props are placed beside the people whose quests name them.",
+  "sites": [
+    {
+      "npc_id": 9500002001,
+      "game_id": 681,
+      "name_id": 413706
+    },
+    {
+      "npc_id": 9500002002,
+      "game_id": 682,
+      "name_id": 413707
+    },
+    {
+      "npc_id": 9500002003,
+      "game_id": 683,
+      "name_id": 413708
+    }
+  ]
+}

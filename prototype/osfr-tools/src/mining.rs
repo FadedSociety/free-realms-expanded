@@ -359,6 +359,9 @@ struct GameVariant {
     name_id: i32,
     description_id: i32,
     icon_id: i32,
+    /// This game's own difficulty, where the client gives it one.
+    #[serde(default)]
+    difficulty: Option<i32>,
     selectable: Vec<u16>,
     tiles: Vec<Type8Kind>,
     goals: Vec<Type8Goal>,
@@ -370,10 +373,13 @@ impl Content {
     fn variant(&self, game: GameVariant) -> io::Result<Self> {
         let mut content = self.clone();
         content.games.clear();
+        // A variant is one board: a dig site is not the home hunt's five levels.
+        content.levels.clear();
         content.game_id = game.game_id;
         content.name_id = game.name_id;
         content.description_id = game.description_id;
         content.icon_id = game.icon_id;
+        content.difficulty = game.difficulty.unwrap_or(content.difficulty);
         if let Some(shape) = game.shape {
             content.spec.shape = shape;
         }
@@ -2945,5 +2951,20 @@ mod shape_tests {
         let engine = Type8Engine::load(&directory, &file, 18, FIRST_MINING_INSTANCE, Some(saved));
         fs::remove_dir_all(&directory).unwrap();
         assert!(!engine.unwrap().active());
+    }
+}
+
+#[cfg(test)]
+mod variant_levels {
+    use super::*;
+
+    /// The home hunt has further levels; a dig site's game, a variant of the same file, is one board.
+    #[test]
+    fn a_variant_is_one_board_even_in_a_file_with_levels() {
+        let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/artifact_hunt.json");
+        let content: Content = serde_json::from_slice(&std::fs::read(path).unwrap()).unwrap();
+        assert!(content.next_level().is_some(), "the home game has levels");
+        let dig = content.variant(content.games[0].clone()).unwrap();
+        assert!(dig.next_level().is_none(), "a variant ends on its own board");
     }
 }

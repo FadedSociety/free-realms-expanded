@@ -97,6 +97,10 @@ pub enum NpcAction {
     CardDuel {
         activity: u32,
     },
+    /// (R) Dig here: a dig site's own Artifact Hunt board (`dig_sites.json`).
+    DigSite {
+        game: u32,
+    },
     /// (R) Go fishing (W160). Offered only by NPCs named in `fishing_spots.json`.
     Fish,
     /// (R) Play this Tower Defense game. Offered only by its tables, `tower_defense.json` `tables`.
@@ -231,6 +235,7 @@ pub enum NpcSelection {
     /// The caller decides whether this row may start (`Gameplay::begin_soccer_gate`).
     Soccer(u32),
     CardDuel(u32),
+    DigSite(u32),
     /// The caller decides whether the trip may start (`FishingService::enter`).
     Fish,
     /// The caller offers this game (`Gameplay::begin_tower_defense`).
@@ -387,6 +392,7 @@ struct NpcContent {
     /// The rows a gate lists: game id, name id.
     soccer_rows: Vec<(u32, u32)>,
     card_duels: std::collections::HashMap<u64, Vec<(u32, u32, u32)>>,
+    dig_sites: std::collections::HashMap<u64, (u32, u32)>,
     tower_defense_tables: TableMenus,
     /// The dock's book stands; each row is an arena and its label.
     pirates_stands: TableMenus,
@@ -518,6 +524,7 @@ impl NpcInteraction {
                 soccer_gates: BTreeSet::new(),
                 soccer_rows: Vec::new(),
                 card_duels: std::collections::HashMap::new(),
+                dig_sites: std::collections::HashMap::new(),
                 tower_defense_tables: BTreeMap::new(),
                 pirates_stands: BTreeMap::new(),
                 board_tables: BTreeMap::new(),
@@ -574,6 +581,18 @@ impl NpcInteraction {
             .filter(|npc| !self.content.npcs.contains_key(npc))
             .collect();
         Arc::make_mut(&mut self.content).card_duels = duels.into_iter().collect();
+        unknown
+    }
+
+    /// (R) Each dig site as (NPC, game, name line); returns the NPCs the content does not know.
+    pub fn set_dig_sites(&mut self, sites: Vec<(u64, u32, u32)>) -> Vec<u64> {
+        let unknown = sites
+            .iter()
+            .map(|site| site.0)
+            .filter(|npc| !self.content.npcs.contains_key(npc))
+            .collect();
+        Arc::make_mut(&mut self.content).dig_sites =
+            sites.into_iter().map(|(npc, game, name)| (npc, (game, name))).collect();
         unknown
     }
 
@@ -743,6 +762,7 @@ impl NpcInteraction {
             NpcAction::Derby => Ok(NpcSelection::Derby),
             NpcAction::Soccer { game } => Ok(NpcSelection::Soccer(game)),
             NpcAction::CardDuel { activity } => Ok(NpcSelection::CardDuel(activity)),
+            NpcAction::DigSite { game } => Ok(NpcSelection::DigSite(game)),
             NpcAction::Fish => Ok(NpcSelection::Fish),
             NpcAction::TowerDefense { game } => Ok(NpcSelection::TowerDefense(game)),
             NpcAction::Pirates { arena } => Ok(NpcSelection::Pirates(arena)),
@@ -1147,6 +1167,12 @@ impl NpcInteraction {
         if let (Some(decks), Some(engine)) = (self.content.card_duels.get(&npc.npc_id), quests) {
             let wanted = decks.iter().filter(|deck| engine.wants_minigame(deck.2));
             options.extend(wanted.map(|&(activity, name, _)| (NpcAction::CardDuel { activity }, name)));
+        }
+        // (R) Likewise a dig: its row shows once the quest has reached the game step.
+        if let (Some(&(game, name)), Some(engine)) = (self.content.dig_sites.get(&npc.npc_id), quests) {
+            if engine.wants_minigame(game) {
+                options.push((NpcAction::DigSite { game }, name));
+            }
         }
         if self.content.fish_gates.contains(&npc.npc_id) {
             options.push((NpcAction::Fish, self.content.fish_string_id));

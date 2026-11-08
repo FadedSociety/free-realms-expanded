@@ -151,6 +151,24 @@ impl Gameplay {
     /// game, `None` the engine's own. The engine starts first; only then is the shared clock
     /// stamped and the outcome applied. A failed begin therefore leaves no clock or engine
     /// state behind.
+    /// (R) A dig site's board, picked from its own menu: an Artifact Hunt run under the site's
+    /// MiniGameData id, in whatever job the player is in. Refused while busy with something else.
+    pub(super) fn begin_dig_site(
+        &mut self,
+        game: u32,
+        guid: u64,
+        now_ms: u64,
+    ) -> io::Result<Outcome> {
+        let mut out = Outcome::default();
+        if self.warp_blocker().is_some() {
+            out.replies.push(chat::system(&crate::activity_portal::Refusal::Busy.message()));
+            return Ok(out);
+        }
+        let game = i32::try_from(game).map_err(|_| invalid("dig site game id out of range"))?;
+        self.begin_gather_in_job(Gather::Artifact, Some(game), guid, now_ms, &mut out)?;
+        Ok(out)
+    }
+
     /// A gather run in its job. The offer goes out before the job change: a start screen that
     /// arrives during a job change waits 2 s (`009beb70`, `TickMiniGameManager`), and once an
     /// offer has been declined in the session that late screen never draws, stranding the player

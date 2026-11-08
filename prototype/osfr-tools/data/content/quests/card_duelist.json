@@ -3401,8 +3401,60 @@
       "id": 3040035,
       "title_string_id": 413787,
       "giver_npc_id": 9000000082,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3952472
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 413905,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Ambrose (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_confronting_ambrose_43e151)."
+            }
+          ],
+          "npc_id": 9000000005
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 413907,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on Ambrose's Dig Site (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_confronting_ambrose_43e151)."
+            }
+          ],
+          "npc_id": 9500002001
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 3,
+          "text_string_id": 413909,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the 'Ambrose's Dig' minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_confronting_ambrose_43e151)."
+            }
+          ],
+          "minigame_id": 681,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 413912,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Esther (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_confronting_ambrose_43e151)."
+            }
+          ],
+          "npc_id": 9000000082
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -3455,7 +3507,8 @@
       "description_string_id": 413788,
       "intro_text_string_id": 413786,
       "end_text_string_id": 413789,
-      "enabled": false
+      "enabled": true,
+      "job": 120
     },
     {
       "id": 3040036,
@@ -3551,9 +3604,49 @@
     {
       "id": 3040037,
       "title_string_id": 413791,
-      "giver_npc_id": 9000000005,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9000000082,
+      "prerequisite_quest_ids": [
+        3040035
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 413915,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat Esther's deck (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_something_precious_6336c7)."
+            }
+          ],
+          "minigame_id": 668,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 413879,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Esther (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_something_precious_6336c7)."
+            }
+          ],
+          "npc_id": 9000000082
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 413919,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Edwin Goldstory (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_something_precious_6336c7)."
+            }
+          ],
+          "npc_id": 9500000125
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -3606,15 +3699,55 @@
       "description_string_id": 413792,
       "intro_text_string_id": 413790,
       "end_text_string_id": 413793,
-      "enabled": false
+      "enabled": true,
+      "job": 120
     },
     {
       "id": 3040038,
       "title_string_id": 413795,
-      "giver_npc_id": 9000000005,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "giver_npc_id": 9500000125,
+      "prerequisite_quest_ids": [
+        3040037
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 90268,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Ramirez (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_scattered_artifacts_45f9a6)."
+            }
+          ],
+          "npc_id": 9500000060
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 413923,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Tyrone Shadowshard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_scattered_artifacts_45f9a6)."
+            }
+          ],
+          "npc_id": 9000000224
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 7,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Card Duelist: Scattered Artifacts (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_scattered_artifacts_45f9a6)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3647,12 +3780,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 2026-11-08: Edwin Goldstory gives it: the client description opens with him, and the wiki says to speak to him."
         }
       ],
       "description_string_id": 413796,
       "intro_text_string_id": 413794,
       "end_text_string_id": 413797,
-      "enabled": false
+      "enabled": true,
+      "job": 120
     },
     {
       "id": 3040039,
@@ -3711,9 +3849,61 @@
     {
       "id": 3040040,
       "title_string_id": 413811,
-      "giver_npc_id": 9000000519,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9500000211,
+      "prerequisite_quest_ids": [
+        3040041
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 413949,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat Sir Wellington's Celebration Deck (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cardie_partay_ed015a)."
+            }
+          ],
+          "minigame_id": 699,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 413871,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Sir Wellington (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cardie_partay_ed015a)."
+            }
+          ],
+          "npc_id": 9500000211
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 413923,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Tyrone Shadowshard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cardie_partay_ed015a)."
+            }
+          ],
+          "npc_id": 9000000224
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 22608,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Sir Wellington (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cardie_partay_ed015a)."
+            }
+          ],
+          "npc_id": 9500000211
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -3770,14 +3960,67 @@
       "description_string_id": 413812,
       "intro_text_string_id": 413810,
       "end_text_string_id": 413813,
-      "enabled": false
+      "enabled": true,
+      "job": 120
     },
     {
       "id": 3040041,
       "title_string_id": 413807,
-      "giver_npc_id": 9000000224,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9500000125,
+      "prerequisite_quest_ids": [
+        3952640
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 413943,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click the dig site (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_final_dig_2fa06d)."
+            }
+          ],
+          "npc_id": 9500002003
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 413945,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the 'Wellington's Dig' minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_final_dig_2fa06d)."
+            }
+          ],
+          "minigame_id": 683,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 413941,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Edwin Goldstory (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_final_dig_2fa06d)."
+            }
+          ],
+          "npc_id": 9500000125
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 413871,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Sir Wellington (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_final_dig_2fa06d)."
+            }
+          ],
+          "npc_id": 9500000211
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -3829,12 +4072,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 2026-11-08: Edwin Goldstory gives it: the client description opens with him, and the wiki says to speak to him."
         }
       ],
       "description_string_id": 413808,
       "intro_text_string_id": 413806,
       "end_text_string_id": 413809,
-      "enabled": false
+      "enabled": true,
+      "job": 120
     },
     {
       "id": 3040042,

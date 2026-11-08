@@ -1142,6 +1142,17 @@ impl Gameplay {
             for npc in interaction.set_card_duels(cards.map_or_else(Vec::new, |c| c.npc_decks())) {
                 npc_event(serde_json::json!({"event": "card_duel_unknown_npc", "content_key": npc}));
             }
+            let sites = crate::artifact_hunt::load_dig_sites(npc_content)?;
+            // A site whose game the hunt does not offer could start nothing: it gets no row.
+            let offered = |game: u32| {
+                let hunt = artifact_hunt.as_ref();
+                i32::try_from(game).is_ok_and(|g| hunt.is_some_and(|h| h.spec_for(Some(g)).is_some()))
+            };
+            let sites = sites.iter().filter(|s| offered(s.game_id));
+            let sites = sites.map(|s| (s.npc_id, s.game_id, s.name_id)).collect();
+            for npc in interaction.set_dig_sites(sites) {
+                npc_event(serde_json::json!({"event": "dig_site_unknown_npc", "content_key": npc}));
+            }
         }
         let folders = [directory, bundled_npc_content.as_path()];
         let (kart, derby_ref) = (kart_entry.as_ref(), derby.as_ref());

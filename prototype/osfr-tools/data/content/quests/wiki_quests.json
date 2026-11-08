@@ -6189,6 +6189,176 @@
       "job": 120,
       "description_string_id": 400814,
       "enabled": true
+    },
+    {
+      "id": 3952640,
+      "title_string_id": 413803,
+      "giver_npc_id": 9000000224,
+      "prerequisite_quest_ids": [
+        3952686
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 413937,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on Tyrone's dig site (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_access_granted_8182a8)."
+            }
+          ],
+          "npc_id": 9500002002
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 413939,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the 'Tyrone's Dig' minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_access_granted_8182a8)."
+            }
+          ],
+          "minigame_id": 682,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 413941,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Edwin Goldstory (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_access_granted_8182a8)."
+            }
+          ],
+          "npc_id": 9500000125
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 50,
+          "items": [],
+          "job_xp": {
+            "120": 100
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Access Granted (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_access_granted_8182a8)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Access Granted (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_access_granted_8182a8)."
+        }
+      ],
+      "job": 120,
+      "description_string_id": 413827,
+      "intro_text_string_id": 413802,
+      "enabled": true
+    },
+    {
+      "id": 3952686,
+      "title_string_id": 413799,
+      "giver_npc_id": 9000000224,
+      "prerequisite_quest_ids": [
+        3040038
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 413927,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat Tyrone's first round (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_four_round_challenge_00ca2e)."
+            }
+          ],
+          "minigame_id": 387,
+          "count": 1
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 413929,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat Tyrone's second round (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_four_round_challenge_00ca2e)."
+            }
+          ],
+          "minigame_id": 388,
+          "count": 1
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 3,
+          "text_string_id": 413931,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat Tyrone's third round (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_four_round_challenge_00ca2e)."
+            }
+          ],
+          "minigame_id": 389,
+          "count": 1
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 4,
+          "text_string_id": 413932,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat Tyrone's fourth round (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_four_round_challenge_00ca2e)."
+            }
+          ],
+          "minigame_id": 390,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 413934,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Tyrone (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_four_round_challenge_00ca2e)."
+            }
+          ],
+          "npc_id": 9000000224
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 50,
+          "items": [],
+          "job_xp": {
+            "120": 100
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Card Duelist: Four Round Challenge (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_four_round_challenge_00ca2e)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Card Duelist: Four Round Challenge (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_four_round_challenge_00ca2e)."
+        }
+      ],
+      "job": 120,
+      "description_string_id": 413826,
+      "enabled": true
     }
   ]
 }

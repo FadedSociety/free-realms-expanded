@@ -554,7 +554,8 @@ fn is_npc_body_change_between(old: &Value, new: &Value) -> bool {
 /// allowed on its own above, and the owning quest and greeting suites pin the
 /// values; only the combination used to fail.
 fn is_quest_binding_and_greeting_change_between(old: &Value, new: &Value) -> bool {
-    changed_rows_are(old, new, false, |old, new| {
+    // Appended rows are new props (the dig sites); the existing rows are what this guards.
+    changed_rows_are(old, new, true, |old, new| {
         let fields: Vec<&str> = QUEST_BINDING_FIELDS
             .iter()
             .copied()

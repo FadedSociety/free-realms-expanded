@@ -22860,8 +22860,96 @@
       "location_evidence": [
         "Dig site in Briarwood. [video: stands right of Sir Wellington by barrels and a campfire, EJYVXogAhhE/00058]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3040038,
+          "title": "Card Duelist: Scattered Artifacts",
+          "title_string_id": 413795,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 37; name 'Card Duelist: Scattered Artifacts'; title id cell 3197400606 ucdt; 506654877 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3040038 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "client",
+              "evidence": "title_string_id corrected from raw locale hash 3197400606 to Global.Text id 413795 (content_check text_raw_hash, 2026-10-15)"
+            }
+          ]
+        },
+        {
+          "quest_id": 3040041,
+          "title": "Card Duelist: Final Dig",
+          "title_string_id": 413807,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 40; name 'Card Duelist: Final Dig'; title id cell 691480628 ucdt; 3532800124 ugdt"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 40; name 'Card Duelist: Final Dig'; title id cell 691480628 ucdt; 3532800124 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3040041 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "client",
+              "evidence": "title_string_id corrected from raw locale hash 691480628 to Global.Text id 413807 (content_check text_raw_hash, 2026-10-15)"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3040038,
+        3040041
+      ],
       "quests_given_text": [
         "Dig up artifacts, including at Sir Wellington's site (client 2151669046, 2181304264); speak to Ramirez and Tyrone Shadowshard (1382500642). Titles not found."
       ],
@@ -23239,11 +23327,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1469; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2726 (ModelId=1577, ModelFileName=dwarf_m_edwingoldstory.adr, NameId=407095)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.518034,
       "model_id": 1577,
-      "model_file_name": "dwarf_m_edwingoldstory.adr"
+      "model_file_name": "dwarf_m_edwingoldstory.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000126,
@@ -23816,6 +23911,46 @@
               "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
             }
           ]
+        },
+        {
+          "quest_id": 3040037,
+          "title": "Card Duelist: Something Precious",
+          "title_string_id": 413791,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 36; name 'Card Duelist: Something Precious'; title id cell 2215047685 ucdt; 2137481815 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3040037 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
@@ -23823,7 +23958,8 @@
         3040033,
         3040035,
         3040031,
-        3040030
+        3040030,
+        3040037
       ],
       "quests_given_text": [
         "Card Duelist: Quick Game of Cards (inferred), Card Duelist: Esther's Special Card, Card Duelist: Confronting Ambrose (Ambrose Worcester is in Greenwood Forest)."
@@ -61071,10 +61207,55 @@
               "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
             }
           ]
+        },
+        {
+          "quest_id": 3040040,
+          "title": "Cardie Partay",
+          "title_string_id": 413811,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 39; name 'Card Duelist: Cardie Partay'; title id cell 3538702431 ucdt; 322170228 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3040040 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3040036
+        3040036,
+        3040040
       ],
       "quests_given_text": [
         "Shattered Past card duels (client 1006820340, 732423513); see Card Duelist."
@@ -76106,6 +76287,317 @@
           }
         ]
       }
+    },
+    {
+      "npc_id": 9500002003,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Wellington's Dig Site",
+      "name_reason": null,
+      "name_string_id": 20530,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 20530
+        }
+      ],
+      "name_string_id_reason": null,
+      "zone": "Briarwood",
+      "zone_id": 2,
+      "zone_reason": null,
+      "region_pages": [
+        "Briarwood"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "Quest prop: the dig site the Card Duelist quests send you to (MiniGameData 683)"
+      ],
+      "roles": [
+        "ambient"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)"
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [
+        "None. The row is the clickable prop for this dig."
+      ],
+      "quests_accepted": [],
+      "quests_accepted_reason": "(R) This row is a clickable quest prop, not a quest giver or hand-in.",
+      "vendor_stock": null,
+      "vendor_stock_reason": "(R) No vendor stock is recorded for this prop.",
+      "services": [],
+      "services_reason": "(R) No distinct service is recorded for this prop.",
+      "position": [
+        -797.3745,
+        -64.77139,
+        2290.513
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "placement": "unanchored",
+      "placement_source": "reconstructed_unanchored_default",
+      "placement_confidence": "low",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video).",
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "zone": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "presence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "roles": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "position": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1471; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2728 (ModelId=510, ModelFileName=human_m_sirwellington.agr, NameId=17867)."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) 4 m from NPC 9500000211, the person whose quests name this dig site."
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "placement": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "heading": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 683), placed beside the person the quest sends you to. Sir Wellington and Edwin Goldstory stand at the dig site in Briarwood (their records and video)."
+          }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
+        ]
+      },
+      "heading": 0.0,
+      "model_id": 310,
+      "model_file_name": "sg_archaeologist_tool_node_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     }
   ]
 }

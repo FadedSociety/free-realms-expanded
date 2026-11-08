@@ -340,7 +340,7 @@ const APPENDED_BY_OTHER_SLICES: [u64; 1] = [9000001989];
 /// Row counts: this slice edits rows, it never adds or removes one. T379
 /// appended one binding-only row to seaside.json.
 // L925: twelve wiki quest givers appended (Emily Mistmire stands in briarwood.json: 181 -> 182)
-const ROW_COUNTS: [(&str, usize); 2] = [(SEASIDE, 109), (BRIARWOOD, 182)];
+const ROW_COUNTS: [(&str, usize); 2] = [(SEASIDE, 109), (BRIARWOOD, 183)];
 
 /// Alonzo: a drawable Seaside quest giver left blank because the guide only carries
 /// third-person narration about him. A blank row must not inherit another row's body.

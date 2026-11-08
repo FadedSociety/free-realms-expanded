@@ -39,86 +39,6 @@
       ],
       "quests_given": [
         {
-          "quest_id": 3040037,
-          "title": "Card Duelist: Something Precious",
-          "title_string_id": 413791,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 36; name 'Card Duelist: Something Precious'; title id cell 2215047685 ucdt; 2137481815 ugdt"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3040037 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 2215047685 to Global.Text id 413791 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
-          "quest_id": 3040038,
-          "title": "Card Duelist: Scattered Artifacts",
-          "title_string_id": 413795,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 37; name 'Card Duelist: Scattered Artifacts'; title id cell 3197400606 ucdt; 506654877 ugdt"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3040038 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 3197400606 to Global.Text id 413795 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
           "quest_id": null,
           "title": "Friendly Competition",
           "title_string_id": null,
@@ -167,10 +87,7 @@
           ]
         }
       ],
-      "quest_ids_given": [
-        3040037,
-        3040038
-      ],
+      "quest_ids_given": [],
       "quests_given_text": [
         "The wiki Greenwood Forest page lists three Ambrose quests: Friendly Competition (client title 1709971177), Turning the Tables (4135591801), Digging for Glory (3896383253). Description by wording: \"Ambrose needs some help if he's going to be able to compete with his arch rival Sir Wellington. Deliver this package to Sir Wellington and get his reaction.\" (3103689650, 2523437218) goes with the package errand; the other two have no description match. Card Duelist: Card Duelist: Confronting Ambrose (Esther sends the player, 208379763, 1796047545), Card Duelist: Something Precious (inferred). Level 20 Card Duelist is needed for his duel (client 2427999653, per Card Duelist). Pays Carson's report (526810817)."
       ],
@@ -24412,6 +24329,317 @@
       "heading": 0.757832,
       "model_id": 4,
       "model_file_name": "robgoblin_m_basic.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
+    },
+    {
+      "npc_id": 9500002001,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Ambrose's Dig Site",
+      "name_reason": null,
+      "name_string_id": 70351,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 70351
+        }
+      ],
+      "name_string_id_reason": null,
+      "zone": "Greenwood Forest",
+      "zone_id": 6,
+      "zone_reason": null,
+      "region_pages": [
+        "Greenwood Forest"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "Quest prop: the dig site the Card Duelist quests send you to (MiniGameData 681)"
+      ],
+      "roles": [
+        "ambient"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)"
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [
+        "None. The row is the clickable prop for this dig."
+      ],
+      "quests_accepted": [],
+      "quests_accepted_reason": "(R) This row is a clickable quest prop, not a quest giver or hand-in.",
+      "vendor_stock": null,
+      "vendor_stock_reason": "(R) No vendor stock is recorded for this prop.",
+      "services": [],
+      "services_reason": "(R) No distinct service is recorded for this prop.",
+      "position": [
+        -1759.041,
+        -33.59748,
+        -773.5538
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "placement": "unanchored",
+      "placement_source": "reconstructed_unanchored_default",
+      "placement_confidence": "low",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record).",
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "zone": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "presence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "roles": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "position": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2237; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3494 (ModelId=438, ModelFileName=human_m_andrew.agr, NameId=70339)."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) 4 m from NPC 9000000005, the person whose quests name this dig site."
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "placement": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "heading": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Quest prop for a Card Duelist dig (MiniGameData 681), placed beside the person the quest sends you to. Ambrose's Dig Site is north of the Greenwood archer camp (client lines on Ambrose Worcester's record)."
+          }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
+        ]
+      },
+      "heading": 0.0,
+      "model_id": 310,
+      "model_file_name": "sg_archaeologist_tool_node_01.adr",
       "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     }
   ]
