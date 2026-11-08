@@ -75,9 +75,10 @@ const CONSUMERS: [(&str, &[&str], usize, usize, usize); 4] = [
     (
         "recipes.json",
         &["definition_id", "recipe_item_definition_id"],
-        151,
+        // 39 reconstructed recipes (2026-11-07) add their outputs and scrolls.
+        190,
         39,
-        151,
+        190,
     ),
     (
         "collection_catalogue.json",

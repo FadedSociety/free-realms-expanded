@@ -5715,6 +5715,223 @@
       "description_string_id": 78699,
       "intro_text_string_id": 78697,
       "enabled": true
+    },
+    {
+      "id": 3952082,
+      "title_string_id": 432195,
+      "giver_npc_id": 9000000136,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 432200,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Gassy Water - 0/5 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_dark_future_4c3d3e)."
+            }
+          ],
+          "node_type": "quest-gassy-water",
+          "quantity": 5
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 432202,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Madam Zelda (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_dark_future_4c3d3e)."
+            }
+          ],
+          "npc_id": 9000000136
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Dark Future (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_dark_future_4c3d3e)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "A Dark Future (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_dark_future_4c3d3e)."
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3952343,
+      "title_string_id": 421070,
+      "giver_npc_id": 9500000725,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 421080,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Pretty Presents - 0/4 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pretty_presents_0a1c33)."
+            }
+          ],
+          "node_type": "quest-pretty-presents",
+          "quantity": 4
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 421082,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Annabelle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pretty_presents_0a1c33)."
+            }
+          ],
+          "npc_id": 9500000725
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pretty Presents (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pretty_presents_0a1c33)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Pretty Presents (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pretty_presents_0a1c33)."
+        }
+      ],
+      "description_string_id": 421071,
+      "intro_text_string_id": 421069,
+      "enabled": true
+    },
+    {
+      "id": 3952371,
+      "title_string_id": 100217,
+      "giver_npc_id": 9000000079,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 100222,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the treasure chests - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seaside_treasure_hunting_790700)."
+            }
+          ],
+          "node_type": "quest-treasure-chests",
+          "quantity": 3
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 100224,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Enaine in Seaside (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seaside_treasure_hunting_790700)."
+            }
+          ],
+          "npc_id": 9000000079
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Seaside Treasure Hunting (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seaside_treasure_hunting_790700)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Seaside Treasure Hunting (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seaside_treasure_hunting_790700)."
+        }
+      ],
+      "description_string_id": 100216,
+      "intro_text_string_id": 100216,
+      "enabled": true
+    },
+    {
+      "id": 3952407,
+      "title_string_id": 71596,
+      "giver_npc_id": 9500000310,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 71603,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the Golden Bear (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_golden_bear_of_greenwood_4a95d2)."
+            }
+          ],
+          "node_type": "quest-golden-bear",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 71605,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Isabella (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_golden_bear_of_greenwood_4a95d2)."
+            }
+          ],
+          "npc_id": 9500000310
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Golden Bear of Greenwood (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_golden_bear_of_greenwood_4a95d2)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "The Golden Bear of Greenwood (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_golden_bear_of_greenwood_4a95d2)."
+        }
+      ],
+      "description_string_id": 71597,
+      "enabled": true
     }
   ]
 }

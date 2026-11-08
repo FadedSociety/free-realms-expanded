@@ -20168,6 +20168,18 @@
               "evidence": "title_string_id corrected from raw locale hash 3334173901 to Global.Text id 5100630 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3952082,
+          "title": "A Dark Future",
+          "title_string_id": 432195,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Dark Future (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_dark_future_4c3d3e)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
@@ -20177,7 +20189,8 @@
         3040056,
         3040057,
         3040058,
-        3040063
+        3040063,
+        3952082
       ],
       "quests_given_text": [
         "Card Duelist: Zelda's Warning; Card Duelist: Heart of Darkness; Card Duelist: Slow and Steady; Card Duelist: Stinky Feet; Card Duelist: Meet the Boss; Card Duelist: The Realmkeepers Are Missing!; Card Duelist: Return from the Rumbledome (Card Duelist); A Dark Future; Being Prepared (Team Vampire); Being Prepared (Team Werewolf) (see Part F)",
@@ -21011,11 +21024,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:233; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1466 (ModelId=567, ModelFileName=human_f_gypsy.agr, NameId=432157)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.318799,
       "model_id": 567,
-      "model_file_name": "human_f_gypsy.agr"
+      "model_file_name": "human_f_gypsy.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000044,

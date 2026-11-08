@@ -72,7 +72,13 @@ fn player(fixture: &Fixture, guid: u64, active: i32, done: &[(u32, &[u32])]) -> 
 }
 
 fn blacksmith(fixture: &Fixture, guid: u64) -> Gameplay {
-    player(fixture, guid, BLACKSMITH, &[(CURIOUS_CANCELATION, &[1, 1])])
+    // Bat Fighter follows Warrior Weapon again (the cudgel recipe is back).
+    player(
+        fixture,
+        guid,
+        BLACKSMITH,
+        &[(CURIOUS_CANCELATION, &[1, 1]), (WARRIOR_WEAPON, &[1, 1, 1])],
+    )
 }
 
 fn warrior(fixture: &Fixture, guid: u64) -> Gameplay {
@@ -380,26 +386,24 @@ fn the_talk_targets_are_drawn_by_the_production_spawn_list() {
     }
 }
 
-/// Warrior Weapon is the forge step before Bat Fighter. It stays off until the recipe book holds
-/// the Valiant Guardian Cudgel (the recipe has no payload, `recipes_unresolved.json`
-/// `blacksmith.valiant_guardian_cudgel`), because an accepted quest could never be finished.
-/// While it is off, Bat Fighter follows Curious Cancelation. When this fails, a recipe landed:
-/// re-check 3020006 and put it back in front of 3020007.
+/// Warrior Weapon is the forge step before Bat Fighter. It waited for the recipe book to hold the
+/// Valiant Guardian Cudgel; the recipe was reconstructed (2026-11-07, `recipes.json`, same family
+/// as the Stalwart Protector Hammer), so the quest is on again and back in front of Bat Fighter.
 #[test]
 fn warrior_weapon_stays_off_until_the_cudgel_can_be_forged() {
-    assert!(!shipped_quest(WARRIOR_WEAPON).enabled);
     let book = read_json(&content_dir().join("recipes.json"));
     assert!(
-        !book["records"]
+        book["records"]
             .as_array()
             .unwrap()
             .iter()
             .any(|row| row["name"] == "Valiant Guardian Cudgel"),
-        "the recipe book now holds the cudgel: re-check quest 3020006"
+        "the recipe book holds the cudgel"
     );
+    assert!(shipped_quest(WARRIOR_WEAPON).enabled);
     assert_eq!(
         shipped_quest(BAT_FIGHTER).prerequisite_quest_ids,
-        [CURIOUS_CANCELATION]
+        [WARRIOR_WEAPON]
     );
 }
 

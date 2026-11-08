@@ -454,8 +454,23 @@
       "location_evidence": [
         "Snowhill (client 4152861503, 312751976)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3952343,
+          "title": "Pretty Presents",
+          "title_string_id": 421070,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pretty Presents (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pretty_presents_0a1c33)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3952343
+      ],
       "quests_given_text": [
         "Ninja: The Masterless Ninja (Michi sends the player to her, client 2468190736); Pretty Presents (wiki, Snow Days repeatable; client 585626544)."
       ],
@@ -11720,11 +11735,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2029; src/Resources/Npcs.json Id=3286 (ModelId=574, ModelFileName=fairy_m_blacksmith_01.agr, NameId=77270)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.869727,
       "model_id": 574,
-      "model_file_name": "fairy_m_blacksmith_01.agr"
+      "model_file_name": "fairy_m_blacksmith_01.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000742,

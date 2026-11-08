@@ -415,7 +415,45 @@
       "prerequisite_quest_ids": [
         3020005
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "recipe_id": 201,
+          "quantity": 1,
+          "text_string_id": 91134,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Blacksmith: Warrior Weapon (lab/references/quest-table-20261102/quests.merged.json)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000033,
+          "text_string_id": 91236,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Blacksmith: Warrior Weapon (lab/references/quest-table-20261102/quests.merged.json)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9000000033,
+          "text_string_id": 91238,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Blacksmith: Warrior Weapon (lab/references/quest-table-20261102/quests.merged.json)."
+            }
+          ]
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -467,12 +505,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Enabled once the Valiant Guardian Cudgel recipe was reconstructed (2026-11-07); back in front of Bat Fighter, as zone_quests_snowhill_round2 asked."
         }
       ],
       "description_string_id": 90792,
       "intro_text_string_id": 90790,
       "end_text_string_id": 90793,
-      "enabled": false
+      "enabled": true,
+      "job": 16
     },
     {
       "id": 3020007,
@@ -480,7 +523,7 @@
       "title_string_id": 91268,
       "giver_npc_id": 9000000033,
       "prerequisite_quest_ids": [
-        3020005
+        3020006
       ],
       "objectives": [
         {
@@ -662,9 +705,36 @@
       "title_string_id": 91392,
       "giver_npc_id": 9000000069,
       "prerequisite_quest_ids": [
+        3020007,
         3020008
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 91496,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect the Recipe Pages! - 0/10 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_impressing_the_axemaker_10e96c)."
+            }
+          ],
+          "node_type": "quest-recipe-pages",
+          "quantity": 10
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 91498,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Derp (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_impressing_the_axemaker_10e96c)."
+            }
+          ],
+          "npc_id": 9000000069
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -721,7 +791,8 @@
       "description_string_id": 91393,
       "intro_text_string_id": 91391,
       "end_text_string_id": 91394,
-      "enabled": false
+      "enabled": true,
+      "job": 16
     },
     {
       "id": 3020010,
@@ -730,7 +801,45 @@
       "prerequisite_quest_ids": [
         3020009
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "text_string_id": 91686,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Forge Rowdy Rumbler Hammers - 0/2 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_dull_challenge_500db6)."
+            }
+          ],
+          "recipe_id": 16,
+          "quantity": 2
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 91688,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give the Rowdy Rumbler Hammers to Derp (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_dull_challenge_500db6)."
+            }
+          ],
+          "npc_id": 9000000069
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 93786,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Derp (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_dull_challenge_500db6)."
+            }
+          ],
+          "npc_id": 9000000069
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -787,7 +896,8 @@
       "description_string_id": 91672,
       "intro_text_string_id": 91670,
       "end_text_string_id": 91673,
-      "enabled": false
+      "enabled": true,
+      "job": 16
     },
     {
       "id": 3020011,
@@ -796,7 +906,33 @@
       "prerequisite_quest_ids": [
         3020010
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 93826,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Score 12,000 on the Practice Dummy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_hammer_quality_f26e44)."
+            }
+          ],
+          "minigame_id": 79,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 93933,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Derp (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_hammer_quality_f26e44)."
+            }
+          ],
+          "npc_id": 9000000069
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -853,15 +989,56 @@
       "description_string_id": 93814,
       "intro_text_string_id": 93812,
       "end_text_string_id": 93815,
-      "enabled": false
+      "enabled": true,
+      "job": 16
     },
     {
       "id": 3020012,
       "title_string_id": 387555,
       "giver_npc_id": 9000000069,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3020011
+      ],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "text_string_id": 387626,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Blacksmith: Level 10 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_reach_level_10_c03c3b)."
+            }
+          ],
+          "profile_id": 16,
+          "level": 10
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 77261,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Derp Axemaker (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_reach_level_10_c03c3b)."
+            }
+          ],
+          "npc_id": 9000000069
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 6,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Blacksmith: Reach Level 10 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_reach_level_10_c03c3b)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -903,7 +1080,8 @@
       "description_string_id": 387556,
       "intro_text_string_id": 387554,
       "end_text_string_id": 387557,
-      "enabled": false
+      "enabled": true,
+      "job": 16
     },
     {
       "id": 3020013,
@@ -912,7 +1090,45 @@
       "prerequisite_quest_ids": [
         3020012
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "text_string_id": 94374,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Forge Field Support Scalpels - 0/2 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_supply_delivery_211817)."
+            }
+          ],
+          "recipe_id": 177,
+          "quantity": 2
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 94376,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver the Field Support Scalpels to Supply Master Leo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_supply_delivery_211817)."
+            }
+          ],
+          "npc_id": 9000000479
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 94408,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Supply Master Leo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_supply_delivery_211817)."
+            }
+          ],
+          "npc_id": 9000000479
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -969,7 +1185,8 @@
       "description_string_id": 94368,
       "intro_text_string_id": 94366,
       "end_text_string_id": 94369,
-      "enabled": false
+      "enabled": true,
+      "job": 16
     },
     {
       "id": 3020014,

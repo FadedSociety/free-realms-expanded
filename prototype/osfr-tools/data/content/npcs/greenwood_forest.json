@@ -14500,9 +14500,23 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part C. The forest, the dig site and the wildlife camp, row 86; source cell: [client][video][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3952407,
+          "title": "The Golden Bear of Greenwood",
+          "title_string_id": 71596,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Golden Bear of Greenwood (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_golden_bear_of_greenwood_4a95d2)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3952407
+      ],
       "quests_given_text": [
         "Greenwood Toads (client title 187833044, ugdt 3370751021): \"Find the places in Greenwood where toads live, and we'll reward you!\" (1638384594, 635119819, 1559291360). The Golden Bear of Greenwood (client title 620234978, ugdt 598876220; the wiki says Isabella hosts it): \"Find the Golden Bear of Greenwood Forest.\" (4079581822), the bear \"only wanders the forest at nighttime\" (695989523, 2212038982), \"We could really use information about the whereabouts of any golden bears\" (449245327). She also moves the player on: \"she might be able to put you to work\" (1653812357)."
       ],
@@ -14962,11 +14976,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2984; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4318 (ModelId=181, ModelFileName=human_f_explorer_caucasian01.agr, NameId=70354)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.299362,
       "model_id": 181,
-      "model_file_name": "human_f_explorer_caucasian01.agr"
+      "model_file_name": "human_f_explorer_caucasian01.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000311,

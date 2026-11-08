@@ -595,7 +595,7 @@ fn every_cooking_catalog_recipe_uses_exact_transaction_once() {
         assert_eq!(game.state().completed, 1, "{key}");
         tested += 1;
     }
-    assert_eq!(tested, 26);
+    assert_eq!(tested, 29);
 }
 
 #[test]

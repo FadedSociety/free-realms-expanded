@@ -1649,7 +1649,8 @@ fn the_record_and_both_npcs_resolve() {
         let record = row(&document["records"].as_array().unwrap(), id);
         assert_eq!(
             record["enabled"],
-            json!(id == u64::from(RUSH_ORDER)),
+            // Warrior Weapon (3020006) is on again since the cudgel recipe was reconstructed.
+            json!(id == u64::from(RUSH_ORDER) || id == 3_020_006),
             "quest {id} enabled state"
         );
     }

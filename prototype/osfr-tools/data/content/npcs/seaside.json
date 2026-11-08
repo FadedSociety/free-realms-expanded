@@ -16752,8 +16752,8 @@
       ],
       "roles": [
         "quest_giver",
-        "vendor",
-        "trainer"
+        "trainer",
+        "vendor"
       ],
       "enemy_kind": null,
       "location_evidence": [
@@ -16903,12 +16903,25 @@
               "evidence": "title_string_id corrected from raw locale hash 1960073937 to Global.Text id 130193 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3952371,
+          "title": "Seaside Treasure Hunting",
+          "title_string_id": 100217,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Seaside Treasure Hunting (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seaside_treasure_hunting_790700)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3130016,
         3130018,
-        3130019
+        3130019,
+        3952371
       ],
       "quests_given_text": [
         "Seashells from Froggle Rock (212346597, 1576059110); hidden treasure chests on the beach (2651435169, 1474017691); a seashell necklace is the Merry Vale contest prize (4065856982). Titles not found"
@@ -17513,11 +17526,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:547; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1787 (ModelId=401, ModelFileName=fairy_seaside_f_01.adr, NameId=21305)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.952515,
       "model_id": 401,
-      "model_file_name": "fairy_seaside_f_01.adr"
+      "model_file_name": "fairy_seaside_f_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000581,

@@ -12,7 +12,23 @@ fn item_definition_ids() -> HashSet<i32> {
     let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("../../../lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json");
     let raw = fs::read_to_string(path).expect("pinned item definitions should be available in lab");
-    recipes::ids_from_item_definitions_json(&raw).unwrap()
+    let mut ids = recipes::ids_from_item_definitions_json(&raw).unwrap();
+    ids.extend(supplement_ids());
+    ids
+}
+
+/// The runtime also loads the supplement: reconstructed items the original table lacks.
+fn supplement_ids() -> Vec<i32> {
+    let supplement: serde_json::Value = serde_json::from_slice(
+        &fs::read(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/release/item-table-supplement.json")).unwrap(),
+    )
+    .unwrap();
+    supplement["rows"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|row| row[0].as_i64().unwrap() as i32)
+        .collect()
 }
 
 fn shipped() -> RecipeCatalog {
@@ -109,7 +125,8 @@ fn shipped_recipes_load_and_all_item_references_exist() {
         &ids,
     )
     .unwrap();
-    assert_eq!(catalog.records.len(), 52);
+    // 52 shipped plus 39 reconstructed (lab recipe_reconstruct.py and item_reconstruct.py, 2026-11-07).
+    assert_eq!(catalog.records.len(), 91);
 
     for recipe in &catalog.records {
         assert!(ids.contains(&recipe.output.definition_id));
@@ -129,7 +146,7 @@ fn shipped_recipes_load_and_all_item_references_exist() {
         &ids,
     )
     .unwrap();
-    assert_eq!(unresolved.records.len(), 62);
+    assert_eq!(unresolved.records.len(), 23);
     assert!(
         unresolved
             .records
@@ -143,7 +160,7 @@ fn shipped_recipes_load_and_all_item_references_exist() {
             .iter()
             .filter(|row| row.job == CraftingJob::Chef)
             .count(),
-        18
+        15
     );
     assert_eq!(
         unresolved
@@ -151,7 +168,7 @@ fn shipped_recipes_load_and_all_item_references_exist() {
             .iter()
             .filter(|row| row.job == CraftingJob::Blacksmith)
             .count(),
-        44
+        8
     );
     assert_eq!(
         unresolved
@@ -169,6 +186,7 @@ fn every_loaded_recipe_item_exists_in_runtime_item_catalogue() {
         .join("../../../lab/reports/round70-native-20261016T061000Z/content");
     let mut ids = definition_ids(&content.join("inventory.json"));
     ids.extend(definition_ids(&content.join("item-catalogue.json")));
+    ids.extend(supplement_ids());
     assert!(
         ids.len() >= 58_000,
         "runtime item catalogue unexpectedly small: {}",
@@ -180,7 +198,8 @@ fn every_loaded_recipe_item_exists_in_runtime_item_catalogue() {
         &ids,
     )
     .expect("every loaded recipe item must have a runtime definition");
-    assert_eq!(catalog.records.len(), 52);
+    // 52 shipped plus 39 reconstructed (lab recipe_reconstruct.py and item_reconstruct.py, 2026-11-07).
+    assert_eq!(catalog.records.len(), 91);
 }
 
 #[test]
@@ -259,8 +278,8 @@ fn unresolved_candidate_ids_do_not_silently_shadow_loaded_rows() {
 #[test]
 fn lookups_cover_job_rank_and_output() {
     let catalog = shipped();
-    assert_eq!(catalog.by_job(CraftingJob::Chef).count(), 26);
-    assert_eq!(catalog.by_job(CraftingJob::Blacksmith).count(), 21);
+    assert_eq!(catalog.by_job(CraftingJob::Chef).count(), 29);
+    assert_eq!(catalog.by_job(CraftingJob::Blacksmith).count(), 57);
     assert_eq!(catalog.by_job(CraftingJob::Miner).count(), 5);
     assert_eq!(catalog.by_output(21785).next().unwrap().name, "Copper Bar");
     assert_eq!(

@@ -996,5 +996,6 @@ fn shipped_recipes_join_their_live_crafting_rows() {
                 .any(|row| matches!(row.category, 12 | 14 | 21) && u64::from(row.content_id) == *id)
         })
         .count();
-    assert_eq!(joined, 51);
+    // The reconstructed recipes (2026-11-07) join live crafting rows too.
+    assert_eq!(joined, 87);
 }
