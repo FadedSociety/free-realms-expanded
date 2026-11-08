@@ -1645,10 +1645,17 @@
             "kind": "client",
             "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 4039,
-      "model_file_name": "chugawug_m_grimyfoot.adr"
+      "model_file_name": "chugawug_m_grimyfoot.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000970,
@@ -12030,54 +12037,6 @@
       ],
       "quests_given": [
         {
-          "quest_id": 3040021,
-          "title": "Card Duelist: Parcel Recovery",
-          "title_string_id": 104253,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "wiki",
-              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1d - Wugachug, row 20; name 'Card Duelist: Parcel Recovery'; title id cell 2178142502 ucdt; 939009919 ugdt; bare title 3327370383 ucdt"
-            },
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1d - Wugachug, row 20; name 'Card Duelist: Parcel Recovery'; title id cell 2178142502 ucdt; 939009919 ugdt; bare title 3327370383 ucdt"
-            },
-            {
-              "kind": "video",
-              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1d - Wugachug, row 20; name 'Card Duelist: Parcel Recovery'; title id cell 2178142502 ucdt; 939009919 ugdt; bare title 3327370383 ucdt"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3040021 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 2178142502 to Global.Text id 104253 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
           "quest_id": 3130020,
           "title": "Postman: Jug Clean Up",
           "title_string_id": 130203,
@@ -12287,7 +12246,6 @@
         }
       ],
       "quest_ids_given": [
-        3040021,
         3130020,
         3130021,
         3130022,
@@ -14634,10 +14592,59 @@
               "evidence": "title_string_id corrected from raw locale hash 723945475 to Global.Text id 104230 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3040021,
+          "title": "Card Duelist: Parcel Recovery",
+          "title_string_id": 104253,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1d - Wugachug, row 20; name 'Card Duelist: Parcel Recovery'; title id cell 2178142502 ucdt; 939009919 ugdt; bare title 3327370383 ucdt"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1d - Wugachug, row 20; name 'Card Duelist: Parcel Recovery'; title id cell 2178142502 ucdt; 939009919 ugdt; bare title 3327370383 ucdt"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1d - Wugachug, row 20; name 'Card Duelist: Parcel Recovery'; title id cell 2178142502 ucdt; 939009919 ugdt; bare title 3327370383 ucdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3040021 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3040020
+        3040020,
+        3040021
       ],
       "quests_given_text": [
         "The Brewery errand chain: \"A Sasparilla Brewmaster never rests! I need you to speak with Brockoom ... Farmer Murglot ... Guard Thoomlug\" (3759436651; objective 1685817269); bixie trouble (\"wants you to deal with the bixies\", 3598316925; \"Hurry to Brewmaster Wugawump and tell him about the bixies in Sweetwater Climb!\", 2694227573); party scouting (\"scout out some party locations\", 1392384911, 3411949842; thanks 1425009787); sasparilla bills to Runalug (2048485603, 3134368944); a job for Virtalot (4219676670, 1637372591); the party-tent monsters (2070279671, by wording); the thugawug raid letter to Glugmort (\"Deliver Sasparilla Brewmaster Wugawump's letter to Glugmort at the Greenwood Camp.\", 2970237973). Job quests: Card Duelist: Squash the Shuffler (wiki giver) and Card Duelist: Parcel Recovery (wiki lists him; the video shows Runalug first). Sends the reward: \"go tell Brockoom to let you have some of the private stock!\" (307692584)."
@@ -15886,11 +15893,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:423; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1657 (ModelId=649, ModelFileName=human_m_tcg_shifty_the_shuffler.agr, NameId=74095)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.560934,
       "model_id": 649,
-      "model_file_name": "human_m_tcg_shifty_the_shuffler.agr"
+      "model_file_name": "human_m_tcg_shifty_the_shuffler.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000998,

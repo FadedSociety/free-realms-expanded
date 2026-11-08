@@ -2227,11 +2227,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2322; src/Resources/Npcs.json Id=3579 (ModelId=3883, ModelFileName=dwarf_darkcheat.adr, NameId=294)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.996206,
       "model_id": 3883,
-      "model_file_name": "dwarf_darkcheat.adr"
+      "model_file_name": "dwarf_darkcheat.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000727,
@@ -18483,11 +18490,18 @@
             "kind": "reconstructed",
             "evidence": "(R) Body model 644 fairy_m_tcg_rick_garfield.agr follows Sanctuary Npcs.json Id=33633. Client Models.txt also has 444 human_m_tcg_rick_garfield.agr (line 445), which FreeRealms-Legacy uses only for the unnamed NPCs 1226/1230/1841; nothing in the client names Garrison's body."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.00549800034,
       "model_id": 644,
-      "model_file_name": "fairy_m_tcg_rick_garfield.agr"
+      "model_file_name": "fairy_m_tcg_rick_garfield.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000098,
@@ -20915,8 +20929,96 @@
       "location_evidence": [
         "\"Walking around the center of town\" (client 2878919189, 3193655758)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3040046,
+          "title": "Suspicious Sneak",
+          "title_string_id": 436542,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 45; name 'Card Duelist: Suspicious Sneak'; title id cell 1687158850 ucdt; 1315765836 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3040046 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
+        },
+        {
+          "quest_id": 3040047,
+          "title": "To Catch a Sneak",
+          "title_string_id": 2571,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 46; name 'Card Duelist: To Catch a Sneak'; title id cell 1857224941 ucdt; 171585002 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3040047 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3040046,
+        3040047
+      ],
       "quests_given_text": [
         "Defend-Snowhill-from-wolves medal quest (client 2369415669, 2430170184; completion \"dubbed Protector of Snowhill\" 1997264351); Ice Troll Scout follow-up to Howling Hills (client 4058148193); toppled snowmen (3659103661). Titles uncertain: candidates Snowhill Protector (1209734640)."
       ],
@@ -21204,9 +21306,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3887 spawnNpcWithGuid(33669); src/Resources/Npcs.json Id=33669"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": 0.13566596
+      "heading": 0.13566596,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000754,
@@ -25444,9 +25553,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3946 spawnNpcWithGuid(33737); src/Resources/Npcs.json Id=33737"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -1.1774953
+      "heading": -1.1774953,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000151,
@@ -26577,11 +26693,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2324; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3581 (ModelId=30, ModelFileName=fairy_m_old_01.adr, NameId=3066)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.924096,
       "model_id": 30,
-      "model_file_name": "fairy_m_old_01.adr"
+      "model_file_name": "fairy_m_old_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000757,
@@ -30762,9 +30885,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4038 spawnNpcWithGuid(33879); src/Resources/Npcs.json Id=33879"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -0.108579995
+      "heading": -0.108579995,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000762,
@@ -33754,50 +33884,6 @@
       ],
       "quests_given": [
         {
-          "quest_id": 3040049,
-          "title": "Card Duelist: A Guide to The Baron",
-          "title_string_id": 2572,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 48; name 'Card Duelist: A Guide to The Baron'; title id cell 2991450430 ucdt; 3944985595 ugdt"
-            },
-            {
-              "kind": "wiki",
-              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 48; name 'Card Duelist: A Guide to The Baron'; title id cell 2991450430 ucdt; 3944985595 ugdt"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3040049 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 2991450430 to Global.Text id 2572 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
           "quest_id": 3040050,
           "title": "Card Duelist: Master Explorer",
           "title_string_id": 436550,
@@ -33852,12 +33938,56 @@
               "evidence": "Where is Wellington (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_where_is_wellington_a126b4)."
             }
           ]
+        },
+        {
+          "quest_id": 3040051,
+          "title": "Confronting The Baron",
+          "title_string_id": 2573,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 50; name 'Card Duelist: Confronting The Baron'; title id cell 2491569756 ucdt; 3058350398 ugdt"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 50; name 'Card Duelist: Confronting The Baron'; title id cell 2491569756 ucdt; 3058350398 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3040051 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3040049,
         3040050,
-        3950463
+        3950463,
+        3040051
       ],
       "quests_given_text": [
         "Card Duelist: A Guide to The Baron, Card Duelist: Master Explorer (inferred; see Card Duelist page)."
@@ -48188,8 +48318,96 @@
       "location_evidence": [
         "Scarlet stands behind a bush at the Snowhill Town Hall"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3040048,
+          "title": "Finder of Secrets",
+          "title_string_id": 436546,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 47; name 'Card Duelist: Finder of Secrets'; title id cell 3461045341 ucdt; 1211139414 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3040048 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
+        },
+        {
+          "quest_id": 3040049,
+          "title": "A Guide to The Baron",
+          "title_string_id": 2572,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 48; name 'Card Duelist: A Guide to The Baron'; title id cell 2991450430 ucdt; 3944985595 ugdt"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 48; name 'Card Duelist: A Guide to The Baron'; title id cell 2991450430 ucdt; 3944985595 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3040049 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3040048,
+        3040049
+      ],
       "quests_given_text": [],
       "quests_accepted": [],
       "quests_accepted_reason": null,
@@ -48470,8 +48688,15 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: most common model of drawn pixie female NPCs"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9600000007,

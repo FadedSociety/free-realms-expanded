@@ -290,7 +290,7 @@ fn the_wrong_job_and_a_missing_prerequisite_change_nothing() {
 /// lacks (see `notes/Autopilot/T672.md`). A row that gains objectives has to be re-checked.
 #[test]
 fn the_other_merry_vale_rows_stay_off() {
-    for id in [3_040_026, 3_130_012, 3_130_013, 3_130_015] {
+    for id in [3_130_012, 3_130_013, 3_130_015] {
         let quest = shipped_quest(id);
         assert!(!quest.enabled, "quest {id} is enabled, not blocked");
         assert!(

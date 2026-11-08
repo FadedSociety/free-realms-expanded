@@ -179,7 +179,8 @@
     "self_sha256": "f4b8b4caeaf0beb52e5d36cee96fefdf5a6249dd70abf68bc999bc57a5f1bec3",
     "source_json_sha256": "e471ab7fd98532328fada3e759bdcb073f2baf626a4650f7334a540718358777",
     "wire": "Supplied ClientPcData profile serialization; complete bytes match uniquely. Activation38/21 corroborated pinned Legacy.",
-    "job_kits": "L953 (owner 2026-11-03: every job gets its outfit now): every job's starter_items are the default items of that job in the FreeRealms-Legacy server project (src/Resources/Profiles.json DefaultItems; AGPL-3.0, credited in NOTICE). Each id is in the client item table at MinProfileRank 1 in a class the job wears, and every kit covers Chest and Legs, which the client's profile swap needs. Postman and Wizard list a boys' and a girls' piece for the same slot (GenderUsage 1/2); the grant skips the other gender's piece. Adventurer (1) and Card Duelist (120) have no defaults there. The Fisherman keeps its L933 kit with the starter rod."
+    "job_kits": "L953 (owner 2026-11-03: every job gets its outfit now): every job's starter_items are the default items of that job in the FreeRealms-Legacy server project (src/Resources/Profiles.json DefaultItems; AGPL-3.0, credited in NOTICE). Each id is in the client item table at MinProfileRank 1 in a class the job wears, and every kit covers Chest and Legs, which the client's profile swap needs. Postman and Wizard list a boys' and a girls' piece for the same slot (GenderUsage 1/2); the grant skips the other gender's piece. Adventurer (1) has no defaults there. The Fisherman keeps its L933 kit with the starter rod.",
+    "card_duelist_kit": "(R) 2026-11-08: Card Duelist (120) has no defaults in FreeRealms-Legacy, so its kit is built from the client's own item table at MinProfileRank 1, all Class 1 (which the job's allowed_classes lists): Card Shark Trilby 2609, Card Duelist T-Shirt 2703, Small Stitched Pants 392 (the bootcut model of Duelist Pants 51613, whose Class 0 the job does not allow), Dress Shoes 420, Duelist Utility Belt 3994. The client's profile swap needs Chest and Legs."
   },
   "schema_version": 1,
   "starter_items": {
@@ -281,6 +282,13 @@
       62169,
       61609,
       62473
+    ],
+    "120": [
+      2609,
+      2703,
+      392,
+      420,
+      3994
     ],
     "137": [
       68430,

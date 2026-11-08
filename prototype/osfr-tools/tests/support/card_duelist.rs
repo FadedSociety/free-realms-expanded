@@ -42,14 +42,18 @@ pub fn at_for(guid: u64, npc: u64) -> CharacterState {
     character_at_for(guid, 0, content_position(file, npc))
 }
 
-/// The shared fixture: a private copy of the shipped content with the two Card Duelist quests
-/// switched on or off. Callers that need more content (an item-catalogue row) extend it.
+/// The shared fixture: a private copy of the shipped content with only the listed Card Duelist
+/// quests switched on, the rest of the line off so these tests see just the quests they name.
+/// Callers that need more content (an item-catalogue row) extend it.
 pub fn fixture_with(enabled: &[u32]) -> Fixture {
     let fixture = Fixture::new();
     fixture.overlay_content(&content_dir());
     // As `quest_item_reward`: the opening inventory lacks the farming rewards.
     let _ = fs::remove_file(fixture.path().join("harvesting.json"));
-    for quest in [POES_BEST_DECK, ESTHER_THE_BRAINS] {
+    let line = fs::read(content_dir().join("quests/card_duelist.json")).unwrap();
+    let line: Value = serde_json::from_slice(&line).unwrap();
+    for record in line["records"].as_array().unwrap() {
+        let quest = record["id"].as_u64().unwrap() as u32;
         fixture.patch_quest("card_duelist.json", quest, |record| {
             record["enabled"] = Value::Bool(enabled.contains(&quest));
         });
@@ -64,8 +68,8 @@ pub fn learn_card_duelist(game: &mut Gameplay, who: &CharacterState, now: u64) -
     send(game, who, &npc_select(SAM, choice), now + 1)
 }
 
-/// Seed profile 120 active in `game`'s save. Card Duelist cannot be selected through 26/13 yet
-/// (it has no starter outfit), so the save is seeded active, as `seed_active_profile` documents.
+/// Seed profile 120 active in `game`'s save. The fixture's opening profiles predate the job's
+/// starter outfit, so the save is seeded active, as `seed_active_profile` documents.
 pub fn activate_card_duelist(fixture: &Fixture, game: &Gameplay, guid: u64) -> Gameplay {
     let mut state = game.state();
     seed_active_profile(&mut state, CARD_DUELIST, &[]);

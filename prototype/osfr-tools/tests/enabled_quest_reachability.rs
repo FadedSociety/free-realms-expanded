@@ -723,20 +723,31 @@ fn shipped_minigame_producers_are_pinned() {
         // L934: checkers 21, Copper Mining 91, Tin/Iron/Silver/Gold Mining 93/95/97/99, the
         // Harvesting regions 109/113/115/117/119, Mining Practice 375 and the six Mail Sorting
         // towns 376-381 credit at runtime; the table reads them from the loaded content.
+        // The card decks NPCs offer (card_game.json npc_decks) credit theirs too.
         // L935: the 16 Games-window card rows (category 11) credit their own MiniGameData id
         // (499 lobby, 500-531 the named decks, 537 tutorial) on a Skirmish or Scenario win.
         vec![
-            18, 20, 21, 28, 39, 40, 41, 42, 43, 44, 46, 57, 66, 67, 77, 79, 91, 93, 95, 97, 99, 109, 111,
-            113, 115, 117, 119, 134, 135, 136, 137, 138, 139, 141, 142, 144, 146, 147, 148, 149,
-            150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166,
-            167, 169, 170, 171, 173, 174, 175, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187,
-            188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 201, 202, 203, 204, 250,
-            251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 289, 290, 322, 323, 324, 325,
-            326, 327, 328, 329, 330, 331, 332, 333, 350, 351, 352, 353, 354, 355, 356, 357, 358,
-            359, 360, 361, 365, 366, 368, 375, 376, 377, 378, 379, 380, 381, 450, 451, 452, 453,
-            454, 455, 456, 457, 499, 500, 503, 504, 507, 508, 511, 516, 519, 520, 523, 524, 527,
-            528, 531, 537, 596, 597, 598, 599, 600, 601, 604, 607, 615, 616, 624, 627, 628, 629,
-            630, 631, 632, 633, 634, 1030, 1032, 1033, 1034, 1040, 1042, 1044,
+            18, 20, 21, 28, 39, 40, 41, 42, 43, 44, 46, 57, 66, 67,
+            77, 79, 91, 93, 95, 97, 99, 109, 111, 113, 115, 117, 119, 134,
+            135, 136, 137, 138, 139, 141, 142, 144, 146, 147, 148, 149, 150, 151,
+            152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165,
+            166, 167, 169, 170, 171, 173, 174, 175, 178, 179, 180, 181, 182, 183,
+            184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197,
+            198, 199, 201, 202, 203, 204, 250, 251, 252, 253, 254, 255, 256, 257,
+            258, 259, 260, 261, 289, 290, 322, 323, 324, 325, 326, 327, 328, 329,
+            330, 331, 332, 333, 350, 351, 352, 353, 354, 355, 356, 357, 358, 359,
+            360, 361, 365, 366, 368, 375, 376, 377, 378, 379, 380, 381, 387, 388,
+            389, 390, 391, 392, 393, 394, 395, 396, 397, 398, 399, 400, 401, 402,
+            403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416,
+            417, 418, 419, 420, 421, 422, 423, 424, 425, 426, 450, 451, 452, 453,
+            454, 455, 456, 457, 499, 500, 501, 502, 503, 504, 505, 506, 507, 508,
+            509, 510, 511, 512, 513, 514, 515, 516, 517, 518, 519, 520, 521, 522,
+            523, 524, 525, 526, 527, 528, 529, 530, 531, 532, 533, 534, 535, 536,
+            537, 596, 597, 598, 599, 600, 601, 604, 607, 615, 616, 624, 627, 628,
+            629, 630, 631, 632, 633, 634, 661, 666, 667, 668, 669, 684, 685, 686,
+            687, 688, 689, 690, 691, 692, 693, 694, 695, 696, 697, 698, 699, 710,
+            711, 1030, 1032, 1033, 1034, 1036, 1040, 1042, 1044, 1083, 1084, 1085, 1086, 1087,
+            1088, 1089, 1090, 1091, 1092, 1093, 1094, 1095, 1096, 1097, 1098,
         ],
         "the finish_minigame producer set changed; update the producer table and this pin"
     );
@@ -830,10 +841,12 @@ fn shipped_minigame_producers_are_pinned() {
         assert!(!catalogue.targets.reports(kart, MinigameFact::Placement));
     }
     // L935: a card duel win reports only the server-measured time (the DLL's own score is not
-    // certified); the quest-only TYPE 16 ids with no Games row are not produced.
+    // certified); a deck with no Games row counts once its NPC offers it, so only decks with
+    // neither stay unproduced.
     assert!(catalogue.targets.reports(507, MinigameFact::Elapsed));
     assert!(!catalogue.targets.reports(507, MinigameFact::Score));
-    assert!(!catalogue.targets.minigames.contains(&668));
+    assert!(catalogue.targets.reports(668, MinigameFact::Elapsed));
+    assert!(!catalogue.targets.reports(700, MinigameFact::Elapsed));
 }
 
 #[test]

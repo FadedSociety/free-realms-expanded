@@ -2042,6 +2042,18 @@ impl QuestEngine {
         self.definitions.get(&quest_id).map(|d| d.turnin_npc_id)
     }
 
+    /// Whether an active quest's open step is to finish this minigame.
+    pub fn wants_minigame(&self, minigame_id: u32) -> bool {
+        let active = self.state.quests.iter().filter(|(_, p)| matches!(p.status, QuestStatus::Active));
+        active.into_iter().any(|(id, _)| {
+            self.current_objectives(*id).iter().any(|objective| match objective.kind {
+                ObjectiveKind::FinishMinigame { minigame_id: game }
+                | ObjectiveKind::MinigameResult { minigame_id: game, .. } => game == minigame_id,
+                _ => false,
+            })
+        })
+    }
+
     pub fn is_enabled(&self, quest_id: u32) -> bool {
         !self.disabled.contains(&quest_id)
             && self

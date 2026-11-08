@@ -10188,8 +10188,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Resources/Models.txt: robgoblin_m_freddieslowhands.adr is named for this NPC; checked with lab/tools/model-view (2026-11-08)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Resources/Models.txt: robgoblin_m_freddieslowhands.adr is named for this NPC; checked with lab/tools/model-view (2026-11-08)."
+          }
         ]
-      }
+      },
+      "model_id": 4033,
+      "model_file_name": "robgoblin_m_freddieslowhands.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000388,

@@ -12400,10 +12400,17 @@
             "kind": "client",
             "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 4028,
-      "model_file_name": "human_m_clancy_blackheart.agr"
+      "model_file_name": "human_m_clancy_blackheart.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000107,
@@ -21379,90 +21386,6 @@
       ],
       "quests_given": [
         {
-          "quest_id": 3040030,
-          "title": null,
-          "title_string_id": 407029,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 29; name \"Card Duelist: Dominic's New Card\"; title id cell 2336257939 ucdt; 824616479 ugdt; bare title 2932515784 ucdt"
-            },
-            {
-              "kind": "wiki",
-              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 29; name \"Card Duelist: Dominic's New Card\"; title id cell 2336257939 ucdt; 824616479 ugdt; bare title 2932515784 ucdt"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3040030 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 2336257939 to Global.Text id 407029 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
-          "quest_id": 3040031,
-          "title": "Card Duelist: Break Time",
-          "title_string_id": 413775,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 30; name 'Card Duelist: Break Time'; title id cell 727420106 ucdt; 1537956290 ugdt"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3040031 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 727420106 to Global.Text id 413775 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
           "quest_id": 3040034,
           "title": "Card Duelist: Esther, the Brains",
           "title_string_id": 407019,
@@ -21509,12 +21432,36 @@
               "evidence": "(R) T505: moved from Esther to Dominic. Locale 407020 ('Dominic of Briarwood wants you to meet Esther') and intro 407018 (Dominic speaking) name Dominic as the giver of original quest 1875; Esther speaks the end text 407021 and takes the turn-in."
             }
           ]
+        },
+        {
+          "quest_id": 3952471,
+          "title": "Card Duelist: Gifted Cards",
+          "title_string_id": 413779,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Card Duelist: Gifted Cards (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_gifted_cards_4ce1d1)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3952472,
+          "title": "Card Duelist: Keeping Quiet",
+          "title_string_id": 413783,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Card Duelist: Keeping Quiet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_keeping_quiet_9a6c27)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3040030,
-        3040031,
-        3040034
+        3040034,
+        3952471,
+        3952472
       ],
       "quests_given_text": [
         "Card Duelist: A Card Dueling Rumor (Poe Tatters sends the player here), Card Duelist: Dominic's New Card, Card Duelist: Break Time, Card Duelist: Esther, the Brains."
@@ -21907,11 +21854,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1474; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2731 (ModelId=1569, ModelFileName=human_m_dominique_the_brawn.agr, NameId=407094)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.718936,
       "model_id": 1569,
-      "model_file_name": "human_m_dominique_the_brawn.agr"
+      "model_file_name": "human_m_dominique_the_brawn.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000308,
@@ -23778,12 +23732,98 @@
               "evidence": "title_string_id corrected from raw locale hash 3019848983 to Global.Text id 413787 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3040031,
+          "title": "Card Duelist: Break Time",
+          "title_string_id": 413775,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 30; name 'Card Duelist: Break Time'; title id cell 727420106 ucdt; 1537956290 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3040031 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
+        },
+        {
+          "quest_id": 3040030,
+          "title": "Card Duelist: Dominic's New Card",
+          "title_string_id": 407029,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 29; name \"Card Duelist: Dominic's New Card\"; title id cell 2336257939 ucdt; 824616479 ugdt; bare title 2932515784 ucdt"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 29; name \"Card Duelist: Dominic's New Card\"; title id cell 2336257939 ucdt; 824616479 ugdt; bare title 2932515784 ucdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3040030 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3040032,
         3040033,
-        3040035
+        3040035,
+        3040031,
+        3040030
       ],
       "quests_given_text": [
         "Card Duelist: Quick Game of Cards (inferred), Card Duelist: Esther's Special Card, Card Duelist: Confronting Ambrose (Ambrose Worcester is in Greenwood Forest)."
@@ -24236,11 +24276,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1470; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2727 (ModelId=1568, ModelFileName=human_f_estherthebrain.adr, NameId=407093)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 3.121559,
       "model_id": 1568,
-      "model_file_name": "human_f_estherthebrain.adr"
+      "model_file_name": "human_f_estherthebrain.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000127,
@@ -60984,8 +61031,51 @@
       "location_evidence": [
         "\"Outside the Vale of the Ancients in Bristlewood\" (client 584342201, 771600541 \"beyond the hedge maze\"). [video: dialog beside a campfire with Edwin Goldstory, EJYVXogAhhE/00058; nameplate, zone label Briarwood, s3EnTnoA_d4/00006]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3040036,
+          "title": "Alleged Thievery",
+          "title_string_id": 413771,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 35; name 'Card Duelist: Alleged Thievery'; title id cell 1245727084 ucdt; 2678188332 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3040036 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3040036
+      ],
       "quests_given_text": [
         "Shattered Past card duels (client 1006820340, 732423513); see Card Duelist."
       ],

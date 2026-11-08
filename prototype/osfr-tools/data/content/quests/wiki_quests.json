@@ -5932,6 +5932,263 @@
       ],
       "description_string_id": 71597,
       "enabled": true
+    },
+    {
+      "id": 3952471,
+      "title_string_id": 413779,
+      "giver_npc_id": 9000000074,
+      "prerequisite_quest_ids": [
+        3040031
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 413889,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat Dominic's first deck (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_gifted_cards_4ce1d1)."
+            }
+          ],
+          "minigame_id": 684,
+          "count": 1
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 413893,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat Dominic's second deck (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_gifted_cards_4ce1d1)."
+            }
+          ],
+          "minigame_id": 685,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 407041,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Dominic (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_gifted_cards_4ce1d1)."
+            }
+          ],
+          "npc_id": 9000000074
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 50,
+          "items": [],
+          "job_xp": {
+            "120": 100
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Card Duelist: Gifted Cards (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_gifted_cards_4ce1d1)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Card Duelist: Gifted Cards (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_gifted_cards_4ce1d1)."
+        }
+      ],
+      "job": 120,
+      "description_string_id": 413780,
+      "intro_text_string_id": 413778,
+      "enabled": true
+    },
+    {
+      "id": 3952472,
+      "title_string_id": 413783,
+      "giver_npc_id": 9000000074,
+      "prerequisite_quest_ids": [
+        3952471
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 413897,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat Dominic's third deck (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_keeping_quiet_9a6c27)."
+            }
+          ],
+          "minigame_id": 686,
+          "count": 1
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 413899,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat Dominic's fourth deck (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_keeping_quiet_9a6c27)."
+            }
+          ],
+          "minigame_id": 687,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 407041,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Dominic (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_keeping_quiet_9a6c27)."
+            }
+          ],
+          "npc_id": 9000000074
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 413879,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Esther (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_keeping_quiet_9a6c27)."
+            }
+          ],
+          "npc_id": 9000000082
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 50,
+          "items": [],
+          "job_xp": {
+            "120": 100
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Card Duelist: Keeping Quiet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_keeping_quiet_9a6c27)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Card Duelist: Keeping Quiet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_keeping_quiet_9a6c27)."
+        }
+      ],
+      "job": 120,
+      "description_string_id": 413782,
+      "intro_text_string_id": 413782,
+      "enabled": true
+    },
+    {
+      "id": 3952500,
+      "title_string_id": 416492,
+      "giver_npc_id": 9500000525,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 416498,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Play and beat Rose's Bixie deck (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_deck_of_buzzing_076b3b)."
+            }
+          ],
+          "minigame_id": 711,
+          "count": 1
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deck of Buzzing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_deck_of_buzzing_076b3b)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Deck of Buzzing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_deck_of_buzzing_076b3b)."
+        }
+      ],
+      "job": 120,
+      "description_string_id": 416493,
+      "intro_text_string_id": 416491,
+      "enabled": true
+    },
+    {
+      "id": 3952619,
+      "title_string_id": 400813,
+      "giver_npc_id": 9500000586,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 400852,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat Grekel's secret deck (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_matching_wits_fe2285)."
+            }
+          ],
+          "minigame_id": 661,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 400856,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Grekel (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_matching_wits_fe2285)."
+            }
+          ],
+          "npc_id": 9500000586
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Matching Wits (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_matching_wits_fe2285)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Matching Wits (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_matching_wits_fe2285)."
+        }
+      ],
+      "job": 120,
+      "description_string_id": 400814,
+      "enabled": true
     }
   ]
 }

@@ -12289,10 +12289,17 @@
             "kind": "client",
             "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 4206,
-      "model_file_name": "dwarf_m_ironteeth.adr"
+      "model_file_name": "dwarf_m_ironteeth.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000826,
@@ -13762,8 +13769,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Resources/Models.txt: robgoblin_m_junkmaster.adr, the junk-themed robgoblin; the wiki's Robgoblins list names Jort; checked with lab/tools/model-view (2026-11-08)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Resources/Models.txt: robgoblin_m_junkmaster.adr, the junk-themed robgoblin; the wiki's Robgoblins list names Jort; checked with lab/tools/model-view (2026-11-08)."
+          }
         ]
-      }
+      },
+      "model_id": 4202,
+      "model_file_name": "robgoblin_m_junkmaster.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000827,
@@ -17390,8 +17418,8 @@
         "Runs the \"Monster Mesa Travel Company\" (658083063) and holds Magetech. A wanted-style line reads \"Wanted KO'd or alive for overcharging for tours of Sunstone Valley\" (219244888; matched to him by wording)."
       ],
       "roles": [
-        "quest_giver",
-        "enemy"
+        "enemy",
+        "quest_giver"
       ],
       "enemy_kind": "Runs the \"Monster Mesa Travel Company\" (658083063) and holds Magetech. A wanted-style line reads \"Wanted KO'd or alive for overcharging for tours of Sunstone Valley\" (219244888; matched to him by wording).",
       "location_evidence": [
@@ -17985,8 +18013,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Resources/Models.txt: manguana_m_base.adr, the lizard folk's plain body, from the surname; no client model or wiki picture names Milo (2026-11-08)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Resources/Models.txt: manguana_m_base.adr, the lizard folk's plain body, from the surname; no client model or wiki picture names Milo (2026-11-08)."
+          }
         ]
-      }
+      },
+      "model_id": 1528,
+      "model_file_name": "manguana_m_base.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000836,
@@ -22275,8 +22324,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Resources/Models.txt: cactusgiant_m_cactusjack.adr, the named cactus giant in the client's block of Card Duelist villains (4027-4043), for the cactus-named Quizzical Yucca (2026-11-08)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Resources/Models.txt: cactusgiant_m_cactusjack.adr, the named cactus giant in the client's block of Card Duelist villains (4027-4043), for the cactus-named Quizzical Yucca (2026-11-08)."
+          }
         ]
-      }
+      },
+      "model_id": 4043,
+      "model_file_name": "cactusgiant_m_cactusjack.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000845,
@@ -25707,11 +25777,18 @@
             "kind": "legacy-data",
             "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3365; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4798 (ModelId=4219, ModelFileName=dwarf_m_rumblekingdon.adr, NameId=442192)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.656586,
       "model_id": 4219,
-      "model_file_name": "dwarf_m_rumblekingdon.adr"
+      "model_file_name": "dwarf_m_rumblekingdon.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000849,

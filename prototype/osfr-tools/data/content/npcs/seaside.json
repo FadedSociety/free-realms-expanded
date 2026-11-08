@@ -5107,10 +5107,17 @@
             "kind": "client",
             "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 3883,
-      "model_file_name": "dwarf_darkcheat.adr"
+      "model_file_name": "dwarf_darkcheat.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000557,
@@ -11911,11 +11918,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:701; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1943 (ModelId=772, ModelFileName=human_m_delvin.agr, NameId=45818)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.845486,
       "model_id": 772,
-      "model_file_name": "human_m_delvin.agr"
+      "model_file_name": "human_m_delvin.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000573,
@@ -20366,8 +20380,23 @@
       "location_evidence": [
         "Card table at the Ocean Treasures Cafe (3735715913)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3952619,
+          "title": "Matching Wits",
+          "title_string_id": 400813,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Matching Wits (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_matching_wits_fe2285)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3952619
+      ],
       "quests_given_text": [
         "Player's Club: Grekel's Challenge (title 3978546624 / 2511676086); summer \"secret deck\" duel for a roman candle or summer reward (1618656001, 3183506692). See Card Duelist"
       ],
@@ -22720,11 +22749,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:595; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1836 (ModelId=641, ModelFileName=fairy_f_tcg_jammie_swiftsong.agr, NameId=74098)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.685854,
       "model_id": 641,
-      "model_file_name": "fairy_f_tcg_jammie_swiftsong.agr"
+      "model_file_name": "fairy_f_tcg_jammie_swiftsong.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000590,
@@ -29978,11 +30014,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:759; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2002 (ModelId=763, ModelFileName=fairy_m_monty_dozen.agr, NameId=45781)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.689403,
       "model_id": 763,
-      "model_file_name": "fairy_m_monty_dozen.agr"
+      "model_file_name": "fairy_m_monty_dozen.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000605,

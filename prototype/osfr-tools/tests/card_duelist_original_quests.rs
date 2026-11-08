@@ -63,25 +63,15 @@ fn offered_reward(game: &mut Gameplay, who: &CharacterState, giver: u64, quest: 
 
 #[test]
 fn shipped_card_duelist_bindings_load_and_stay_disabled() {
-    let mut engine = engine(&content_dir(), &[("card_duelist", 20)]);
+    let engine = engine(&content_dir(), &[("card_duelist", 20)]);
     assert_eq!(engine.giver_npc_id(POES_BEST_DECK), Some(POE));
     assert_eq!(engine.turnin_npc_id(POES_BEST_DECK), Some(POE));
     assert_eq!(engine.giver_npc_id(ESTHER_THE_BRAINS), Some(DOMINIC));
     assert_eq!(engine.turnin_npc_id(ESTHER_THE_BRAINS), Some(ESTHER));
 
-    // Disabled: every NPC refuses both quests and nothing changes.
-    let before = engine.state().clone();
+    // Live since the line opened (2026-11-08), behind the job-120 gate.
     for quest in [POES_BEST_DECK, ESTHER_THE_BRAINS] {
-        assert!(!engine.is_enabled(quest), "{quest} stays disabled");
-        for npc in [POE, DOMINIC, ESTHER] {
-            let refused = engine.offer(quest, npc);
-            assert!(
-                refused.denial.is_some() && !refused.changed,
-                "{quest} at {npc}"
-            );
-            assert!(refused.outbound.is_empty());
-            assert_eq!(engine.state(), &before);
-        }
+        assert!(engine.is_enabled(quest), "{quest} ships live");
     }
 
     // Through the real menu a Card Duelist is offered nothing by the three NPCs.

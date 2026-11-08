@@ -1136,6 +1136,13 @@ impl Gameplay {
                 );
             }
         }
+        // (R) Each deck's own NPC offers it (`card_game.json` `npc_decks`).
+        if let Some(interaction) = &mut npc_interaction {
+            let cards = crate::card_game::Content::load_optional(npc_content)?;
+            for npc in interaction.set_card_duels(cards.map_or_else(Vec::new, |c| c.npc_decks())) {
+                npc_event(serde_json::json!({"event": "card_duel_unknown_npc", "content_key": npc}));
+            }
+        }
         let folders = [directory, bundled_npc_content.as_path()];
         let (kart, derby_ref) = (kart_entry.as_ref(), derby.as_ref());
         let hunt = artifact_hunt.as_ref();

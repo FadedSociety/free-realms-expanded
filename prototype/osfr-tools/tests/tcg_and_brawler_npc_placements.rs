@@ -263,11 +263,18 @@ fn eligibility() -> CharacterEligibility {
     }
 }
 
+const CARD_DUELIST_STILL_OFF: [u32; 14] = [
+    3_040_010, 3_040_029, 3_040_032, 3_040_033, 3_040_035, 3_040_037, 3_040_038, 3_040_039,
+    3_040_040, 3_040_041, 3_040_044, 3_040_045, 3_040_053, 3_040_063,
+];
+
 #[test]
 fn card_duelist_and_brawler_quests_stay_disabled() {
     let quests = quest_records::read_quests(&content_dir());
-    // All 63 Card Duelist quests and the Brawler line's disabled records (3030014 is Tevin's).
-    let disabled: Vec<u32> = (3_040_001..=3_040_063)
+    // The Card Duelist quests still waiting on a mechanic (the rest went live behind the job-120
+    // gate, 2026-11-08) and the Brawler line's disabled records (3030014 is Tevin's).
+    let disabled: Vec<u32> = CARD_DUELIST_STILL_OFF
+        .into_iter()
         .chain(3_030_010..=3_030_014)
         .collect();
     for id in &disabled {
@@ -282,7 +289,8 @@ fn card_duelist_and_brawler_quests_stay_disabled() {
         assert!(!engine.is_enabled(id), "{id} is offered");
     }
 
-    // Sam Potts is the Card Duelist trainer; with every quest disabled, Talk offers none.
+    // Sam Potts is the Card Duelist trainer; his quests are gated on job 120, so Talk offers
+    // this non-duelist none.
     let fixture = Fixture::new();
     let mut game = fixture.game(None);
     let sam = character_at_for(CHARACTER, 0, content_position("sanctuary.json", SAM));
@@ -331,8 +339,8 @@ fn original_ids_are_recorded() {
         &["original quest 1875", "15573", "407045", "15574", "407047"],
     );
 
-    // The link is provenance only: both records stay disabled.
+    // Both records went live with the rest of the line (2026-11-08), and keep the link.
     for id in [3_040_011_u64, 3_040_034] {
-        assert_eq!(record(id)["enabled"].as_bool(), Some(false), "{id}");
+        assert_eq!(record(id)["enabled"].as_bool(), Some(true), "{id}");
     }
 }

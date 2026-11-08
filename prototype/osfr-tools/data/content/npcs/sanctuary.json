@@ -10493,10 +10493,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob:Buzz"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr"
+      "model_file_name": "fairy_druid_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000458,
@@ -28941,9 +28948,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3676 spawnNpcWithGuid(33453); src/Resources/Npcs.json Id=33453"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -0.894525974
+      "heading": -0.894525974,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000490,
@@ -42742,50 +42756,6 @@
       ],
       "quests_given": [
         {
-          "quest_id": 3040002,
-          "title": "Card Duelist: Enter the Champion",
-          "title_string_id": 103263,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "wiki",
-              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 1; name 'Card Duelist: Enter the Champion'; title id cell 3701715584 ucdt; 4266284614 ugdt"
-            },
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 1; name 'Card Duelist: Enter the Champion'; title id cell 3701715584 ucdt; 4266284614 ugdt"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3040002 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 3701715584 to Global.Text id 103263 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
           "quest_id": 3040003,
           "title": "Card Duelist: Sam I Am",
           "title_string_id": 103500,
@@ -43051,7 +43021,6 @@
         }
       ],
       "quest_ids_given": [
-        3040002,
         3040003,
         3040008,
         3040009,
@@ -43690,11 +43659,18 @@
             "kind": "client",
             "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 648 = human_m_tcg_poe_tatters.agr (line 649); the client's model table maps this id to this body."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -3.09744,
       "model_id": 648,
-      "model_file_name": "human_m_tcg_poe_tatters.agr"
+      "model_file_name": "human_m_tcg_poe_tatters.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000513,
@@ -44014,9 +43990,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3569 spawnNpcWithGuid(33339); src/Resources/Npcs.json Id=33339"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -1.88986005
+      "heading": -1.88986005,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000514,
@@ -49388,8 +49371,23 @@
       "location_evidence": [
         "Pixiewood (1986323457)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3952500,
+          "title": "Deck of Buzzing",
+          "title_string_id": 416492,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deck of Buzzing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_deck_of_buzzing_076b3b)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3952500
+      ],
       "quests_given_text": [
         "Deck of Buzzing (Super Spooktacular, wiki); pet-trick audience (1828683964)"
       ],
@@ -49761,9 +49759,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3664 spawnNpcWithGuid(33440); src/Resources/Npcs.json Id=33440"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": 1.85735
+      "heading": 1.85735,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000526,
@@ -51654,13 +51659,58 @@
               "evidence": "title_string_id corrected from raw locale hash 1444771264 to Global.Text id 103556 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3040002,
+          "title": "Card Duelist: Enter the Champion",
+          "title_string_id": 103263,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 1; name 'Card Duelist: Enter the Champion'; title id cell 3701715584 ucdt; 4266284614 ugdt"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 1; name 'Card Duelist: Enter the Champion'; title id cell 3701715584 ucdt; 4266284614 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3040002 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3040004,
         3040005,
         3040006,
-        3040007
+        3040007,
+        3040002
       ],
       "quests_given_text": [
         "Card Duelist: Practice Makes Perfect (bare title 1645470343); Card Duelist: 52 Card Pick-Up; Card Duelist: So Over Archery; Card Duelist: Cardie 4 Life (Card Duelist); target of Card Duelist: Sam I Am"
@@ -52301,11 +52351,18 @@
             "kind": "client",
             "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 646 = human_f_tcg_sam_potts.agr (line 647); the client's model table maps this id to this body."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.08519005,
       "model_id": 646,
-      "model_file_name": "human_f_tcg_sam_potts.agr"
+      "model_file_name": "human_f_tcg_sam_potts.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000530,

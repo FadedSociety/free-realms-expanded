@@ -60,6 +60,7 @@ pub const TRADING_CARD_CATEGORY: u32 = 11;
 pub const TREASURE_WAR_CATEGORY: u32 = 26;
 const MAX_FILE: u64 = 1 << 20;
 const MAX_ROWS: usize = 32;
+const MAX_HIDDEN_ROWS: usize = 200;
 const MAX_IMAGE_NAME: usize = 64;
 /// T545: bound on the client's TYPE 16 id list (the client table has 124 such rows).
 const MAX_TYPE16_IDS: usize = 1024;
@@ -92,6 +93,14 @@ pub struct Row {
     pub source: Vec<Source>,
 }
 
+/// (R) The decks one NPC duels with: Sam Potts opened her deck's offer from her own Talk (the
+/// sheet's `iud_NyVa_2o_3884.00`), and each row names its NPC.
+#[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
+pub struct NpcDecks {
+    pub npc_id: u64,
+    pub activities: Vec<u32>,
+}
+
 /// One evidence entry (`legacy-data`, `client` or `reconstructed`), the shape `content_check.py` counts.
 #[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
@@ -107,6 +116,12 @@ pub struct Content {
     #[serde(rename = "source")]
     _source: String,
     rows: Vec<Row>,
+    /// (R) Decks with no Games-window row (108 of the 124 card rows): only their NPC offers them.
+    #[serde(default)]
+    hidden_rows: Vec<Row>,
+    /// (R) Which NPC offers which deck.
+    #[serde(default)]
+    npc_decks: Vec<NpcDecks>,
     /// T765: present once a card service runs; until then every card row stays refused.
     #[serde(default)]
     launch: Option<Launch>,
@@ -426,6 +441,11 @@ impl Content {
         if self.rows.is_empty() || self.rows.len() > MAX_ROWS {
             return Err(invalid("card game content needs 1 to 32 rows"));
         }
+        if self.hidden_rows.len() > MAX_HIDDEN_ROWS
+            || self.npc_decks.iter().flat_map(|npc| &npc.activities).any(|id| self.row(*id).is_none())
+        {
+            return Err(invalid("card game NPC decks name a row the content lacks"));
+        }
         if self.type16_minigame_ids.len() > MAX_TYPE16_IDS
             || self
                 .type16_minigame_ids
@@ -450,7 +470,15 @@ impl Content {
             }
         }
         let mut ids = BTreeSet::new();
-        for row in &self.rows {
+        // Only the Trading Card Game launches from an NPC's menu, and only a joinable row.
+        if self
+            .hidden_rows
+            .iter()
+            .any(|row| row.category != TRADING_CARD_CATEGORY || !row.can_player_join)
+        {
+            return Err(invalid("card game hidden rows are joinable category 11 rows"));
+        }
+        for row in self.rows.iter().chain(&self.hidden_rows) {
             if row.id == 0 || !ids.insert(row.id) {
                 return Err(invalid("card game ids must be unique and nonzero"));
             }
@@ -565,7 +593,7 @@ impl Content {
 
     /// The row behind activity `id`.
     pub fn row(&self, id: u32) -> Option<&Row> {
-        self.rows.iter().find(|row| row.id == id)
+        self.rows.iter().chain(&self.hidden_rows).find(|row| row.id == id)
     }
 
     /// T545: whether `minigame_id` is a client TYPE 16 row, the only kind a card duel
@@ -576,6 +604,24 @@ impl Content {
 
     /// The catalogue rows (ids, names, image, difficulty); the rest of each wire row is read
     /// back from `rows()` by `Catalogue::list_packet`.
+    /// The hidden decks an NPC offers: they credit their MiniGameData id like a Games-window row.
+    pub fn offered_hidden_rows(&self) -> impl Iterator<Item = &Row> {
+        let offered: std::collections::BTreeSet<u32> =
+            self.npc_decks.iter().flat_map(|npc| npc.activities.iter().copied()).collect();
+        self.hidden_rows.iter().filter(move |row| offered.contains(&row.id))
+    }
+
+    /// (R) NPC -> its decks as (activity id, deck name line, MiniGameData id), for the NPC menu rows.
+    pub fn npc_decks(&self) -> Vec<(u64, Vec<(u32, u32, u32)>)> {
+        self.npc_decks
+            .iter()
+            .map(|npc| {
+                let rows = npc.activities.iter().filter_map(|id| self.row(*id));
+                (npc.npc_id, rows.map(|row| (row.id, row.name_id, row.minigame_id)).collect())
+            })
+            .collect()
+    }
+
     pub fn portal_rows(&self) -> Vec<Activity> {
         self.rows
             .iter()

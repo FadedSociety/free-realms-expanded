@@ -23,6 +23,18 @@ impl Gameplay {
         Ok(())
     }
 
+    /// (R) An NPC's deck, picked from its menu: the same run as a Games-window row, refused
+    /// while the player is busy with something else.
+    pub(super) fn begin_npc_card_duel(&mut self, activity: u32) -> io::Result<Outcome> {
+        let mut out = Outcome::default();
+        if self.warp_blocker().is_some() {
+            out.replies.push(chat::system(&crate::activity_portal::Refusal::Busy.message()));
+            return Ok(out);
+        }
+        self.begin_card_game(activity, &mut out)?;
+        Ok(out)
+    }
+
     /// The lifecycle packets of the card run (live, or just ended for its 39/7 ack); `None`
     /// leaves the packet to later owners.
     pub(super) fn handle_card_game(

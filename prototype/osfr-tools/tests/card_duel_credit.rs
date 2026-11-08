@@ -11,7 +11,7 @@
 //! and `668^16` (Poe's Trick Deck, Poe's Tournament Deck, Esther's Friendly Deck), while `18^8`
 //! (kart), `39^11` (derby) and `727^23` (Treasure War) are not card duels. The chain itself is
 //! T505's: 3040011 targets 507 at Poe; 3040034 starts at Dominic, meets Esther at 9000000082 and
-//! targets 668. Shipped content keeps both quests disabled.
+//! targets 668. Both quests ship live behind the job-120 gate since 2026-11-08.
 
 #[path = "support/card_duelist.rs"]
 mod card_duelist;
@@ -21,9 +21,9 @@ mod item_catalogue;
 use card_duelist::{
     ADVENTURER, CARD_DUELIST, CHARACTER, DOMINIC, ESTHER, ESTHER_THE_BRAINS, Fixture, POE,
     POES_BEST_DECK, accept, at, at_for, card_duelist_as, coins, content_dir, counts,
-    end_screen_reward, finish_quest, fixture_with, objective_complete, offer, pending_turnin,
-    profile_xp, quest_end_reply, quest_status, release_end_screen, said, seed_active_profile, send,
-    talk,
+    end_screen_reward, finish_quest, fixture_with, npc_interact, objective_complete, offer,
+    pending_turnin, profile_xp, quest_end_reply, quest_status, release_end_screen, said,
+    seed_active_profile, send, talk,
 };
 use osfr_tools::{
     account_store::AccountRole,
@@ -422,9 +422,9 @@ fn shipped_content_is_unchanged_by_the_command() {
             .find(|record| record["id"] == quest)
             .unwrap_or_else(|| panic!("quest {quest} is in the shipped file"));
         assert_eq!(
-            record["enabled"],
-            Value::Bool(false),
-            "quest {quest} must stay disabled"
+            (&record["enabled"], &record["job"]),
+            (&Value::Bool(true), &Value::from(CARD_DUELIST)),
+            "quest {quest} ships live, for Card Duelists only"
         );
     }
 
@@ -471,4 +471,68 @@ fn shipped_content_is_unchanged_by_the_command() {
         cards_before,
         "the command wrote to the shipped whitelist"
     );
+}
+
+/// (R) A deck with no Games-window row is offered by its own NPC, and only while the player's
+/// quest asks for that duel (Sam offered hers on Practice Makes Perfect).
+/// The 26/9 rows' label ids: i32 count at 13, then seven dwords per row, label at +8.
+fn menu_labels(outcome: &Outcome) -> Vec<u32> {
+    let Some(menu) = outcome.replies.iter().find(|p| p.starts_with(&[26, 0, 9, 0])) else {
+        return Vec::new();
+    };
+    let count = i32::from_le_bytes(menu[13..17].try_into().unwrap()) as usize;
+    (0..count)
+        .map(|row| 17 + row * 28 + 8)
+        .map(|at| u32::from_le_bytes(menu[at..at + 4].try_into().unwrap()))
+        .collect()
+}
+
+/// A deck's row shows on its NPC only while the player's own quest asks for that duel.
+#[test]
+fn an_npc_offers_its_deck_only_to_a_player_whose_quest_wants_it() {
+    let content: Value =
+        serde_json::from_slice(&fs::read(content_dir().join("card_game.json")).unwrap()).unwrap();
+    let rows = content["rows"].as_array().unwrap().iter();
+    let rows = rows.chain(content["hidden_rows"].as_array().unwrap());
+    let label = |game: u32| {
+        let row = rows.clone().find(|row| row["minigame_id"] == u64::from(game));
+        row.expect("the deck has a row")["name_id"].as_u64().unwrap() as u32
+    };
+    let (wanted, other) = (label(POES_TOURNAMENT_DECK), label(POES_TRICK_DECK));
+    let fixture = duel_fixture(&[POES_BEST_DECK]);
+    let mut game = card_duelist_as(&fixture, CHARACTER);
+    let poe = at(POE);
+    let now = 2_000;
+
+    let before = send(&mut game, &poe, &npc_interact(POE), now);
+    assert!(!menu_labels(&before).contains(&wanted), "no quest, no deck row");
+
+    offer(&mut game, &poe, POE, POES_BEST_DECK, now + 10);
+    accept(&mut game, &poe, POES_BEST_DECK, now + 20);
+    let labels = menu_labels(&send(&mut game, &poe, &npc_interact(POE), now + 30));
+    assert!(labels.contains(&wanted), "the quest's own deck shows: {labels:?}");
+    assert!(!labels.contains(&other), "Poe's other decks stay hidden: {labels:?}");
+}
+
+#[test]
+fn every_npc_deck_names_a_card_row_and_stays_out_of_the_games_window() {
+    let content = osfr_tools::card_game::Content::load(
+        &std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/card_game.json"),
+    )
+    .unwrap();
+    let published: Vec<u32> = content.rows().iter().map(|row| row.id).collect();
+    let decks = content.npc_decks();
+    assert!(decks.len() >= 20, "NPCs offering decks: {}", decks.len());
+    for (_, rows) in &decks {
+        for &(activity, name, game) in rows {
+            let row = content.row(activity).expect("the deck's row");
+            assert_eq!((row.name_id, row.minigame_id), (name, game));
+            assert!(content.is_duel_row(game), "{game} is a card duel row");
+        }
+    }
+    assert!(
+        content.offered_hidden_rows().all(|row| !published.contains(&row.id)),
+        "a hidden deck is not a Games-window row"
+    );
+    assert_eq!(content.portal_rows().len(), published.len());
 }

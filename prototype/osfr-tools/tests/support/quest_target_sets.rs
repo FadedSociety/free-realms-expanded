@@ -260,7 +260,7 @@ impl Targets {
         // L935: with a launch block that has duel settings, a Games-window card row (category 11)
         // credits its own MiniGameData id when the card window reports a Skirmish or Scenario win
         // (`Gameplay::card_single_player`); the only fact is the server-measured time. The quest-only
-        // TYPE 16 ids with no Games row (`type16_minigame_ids`) have no entry and stay unproduced.
+        // TYPE 16 ids with no Games row and no NPC offering them have no entry and stay unproduced.
         if let Some(cards) = card_game::Content::load_optional(root)?
             && cards.launch().is_some_and(|launch| launch.duel.is_some())
         {
@@ -269,6 +269,9 @@ impl Targets {
                 .iter()
                 .filter(|row| row.category == card_game::TRADING_CARD_CATEGORY)
             {
+                targets.producer(row.minigame_id, [MinigameFact::Elapsed]);
+            }
+            for row in cards.offered_hidden_rows() {
                 targets.producer(row.minigame_id, [MinigameFact::Elapsed]);
             }
         }

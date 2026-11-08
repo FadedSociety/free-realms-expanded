@@ -149,6 +149,37 @@ fn a_skirmish_win_credits_the_launched_row_and_pays_the_purse() {
     assert_eq!(profile_xp(&game, CARD_DUELIST), xp_after);
 }
 
+/// A deck picked from its NPC's menu is the same run as a Games-window row: the launch survives
+/// the selection, its window gets a ticket, and its win credits the quest.
+#[test]
+fn a_deck_picked_from_its_npc_launches_and_credits_the_quest() {
+    let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/card_game.json");
+    let content: serde_json::Value = serde_json::from_slice(&fs::read(path).unwrap()).unwrap();
+    let row = content["rows"].as_array().unwrap().iter().find(|row| row["minigame_id"] == 507);
+    let label = row.expect("Poe's Tournament Deck has a row")["name_id"].as_u64().unwrap() as u32;
+    let fixture = fixture_with(&[POES_BEST_DECK]);
+    let mut game = card_duelist_as(&fixture, CHARACTER);
+    let poe = at(POE);
+    offer(&mut game, &poe, POE, POES_BEST_DECK, 2_000);
+    accept(&mut game, &poe, POES_BEST_DECK, 2_010);
+
+    let menu = card_duelist::interact(&mut game, &poe, POE, 3_000);
+    let choice = card_duelist::menu_option(&menu, label);
+    let picked = send(&mut game, &poe, &card_duelist::npc_select(POE, choice), 3_010);
+    let instance = instance_of(&picked);
+    let ticket = send(&mut game, &poe, &client(37, instance), 3_100);
+    assert!(
+        ticket.replies.iter().any(|p| p.starts_with(&[39, 0, 0x28])),
+        "the run survived the menu: its 39/37 gets a ticket"
+    );
+
+    start(&mut game, SKIRMISH, 1_793_000_000, 10_000);
+    let (win, _) = finish(&mut game, SKIRMISH, WIN, 1_793_000_000, 10_000 + FLOOR_MS + 5_000)
+        .expect("a win after the floor settles");
+    assert_eq!(win.minigame_id, 507);
+    assert_eq!(counts(&game, POES_BEST_DECK), [1], "MiniGameData 507 was credited");
+}
+
 #[test]
 fn a_scenario_win_credits_the_row_it_was_launched_from() {
     let (_fixture, mut game) = launched(POES_TRICK_ROW);

@@ -548,25 +548,73 @@
       "lobby_type": 1,
       "role": 1,
       "collection": [
-        {"archetype_id": 100009946, "copies": 3},
-        {"archetype_id": 100009948, "copies": 3},
-        {"archetype_id": 100009951, "copies": 3},
-        {"archetype_id": 100009952, "copies": 3},
-        {"archetype_id": 100009955, "copies": 3},
-        {"archetype_id": 100009956, "copies": 3},
-        {"archetype_id": 100009957, "copies": 3},
-        {"archetype_id": 100009960, "copies": 3},
-        {"archetype_id": 100009961, "copies": 3},
-        {"archetype_id": 100009963, "copies": 3},
-        {"archetype_id": 100010026, "copies": 3},
-        {"archetype_id": 100010033, "copies": 3},
-        {"archetype_id": 100010042, "copies": 3},
-        {"archetype_id": 100009988, "copies": 3},
-        {"archetype_id": 100009995, "copies": 3}
+        {
+          "archetype_id": 100009946,
+          "copies": 3
+        },
+        {
+          "archetype_id": 100009948,
+          "copies": 3
+        },
+        {
+          "archetype_id": 100009951,
+          "copies": 3
+        },
+        {
+          "archetype_id": 100009952,
+          "copies": 3
+        },
+        {
+          "archetype_id": 100009955,
+          "copies": 3
+        },
+        {
+          "archetype_id": 100009956,
+          "copies": 3
+        },
+        {
+          "archetype_id": 100009957,
+          "copies": 3
+        },
+        {
+          "archetype_id": 100009960,
+          "copies": 3
+        },
+        {
+          "archetype_id": 100009961,
+          "copies": 3
+        },
+        {
+          "archetype_id": 100009963,
+          "copies": 3
+        },
+        {
+          "archetype_id": 100010026,
+          "copies": 3
+        },
+        {
+          "archetype_id": 100010033,
+          "copies": 3
+        },
+        {
+          "archetype_id": 100010042,
+          "copies": 3
+        },
+        {
+          "archetype_id": 100009988,
+          "copies": 3
+        },
+        {
+          "archetype_id": 100009995,
+          "copies": 3
+        }
       ]
     },
     "duel": {
-      "game_types": [2, 3],
+      "game_types": [
+        2,
+        3
+      ],
       "min_seconds": 60,
       "win_coins": 25
     },
@@ -586,13 +634,2796 @@
     ]
   },
   "type16_minigame_ids": [
-    387, 388, 389, 390, 391, 392, 393, 394, 395, 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 418, 419, 420, 421, 422, 423, 424, 425, 426,
-    499, 500, 501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511, 512, 513, 514, 515, 516, 517, 518, 519, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529, 530, 531, 532, 533, 534, 535, 536, 537, 661,
-    666, 667, 668, 669, 684, 685, 686, 687, 688, 689, 690, 691, 692, 693, 694, 695, 696, 697, 698, 699, 700, 701, 702, 703, 710, 711, 1036, 1083, 1084, 1085, 1086, 1087, 1088, 1089, 1090, 1091, 1092, 1093, 1094, 1095,
-    1096, 1097, 1098, 9997
+    387,
+    388,
+    389,
+    390,
+    391,
+    392,
+    393,
+    394,
+    395,
+    396,
+    397,
+    398,
+    399,
+    400,
+    401,
+    402,
+    403,
+    404,
+    405,
+    406,
+    407,
+    408,
+    409,
+    410,
+    411,
+    412,
+    413,
+    414,
+    415,
+    416,
+    417,
+    418,
+    419,
+    420,
+    421,
+    422,
+    423,
+    424,
+    425,
+    426,
+    499,
+    500,
+    501,
+    502,
+    503,
+    504,
+    505,
+    506,
+    507,
+    508,
+    509,
+    510,
+    511,
+    512,
+    513,
+    514,
+    515,
+    516,
+    517,
+    518,
+    519,
+    520,
+    521,
+    522,
+    523,
+    524,
+    525,
+    526,
+    527,
+    528,
+    529,
+    530,
+    531,
+    532,
+    533,
+    534,
+    535,
+    536,
+    537,
+    661,
+    666,
+    667,
+    668,
+    669,
+    684,
+    685,
+    686,
+    687,
+    688,
+    689,
+    690,
+    691,
+    692,
+    693,
+    694,
+    695,
+    696,
+    697,
+    698,
+    699,
+    700,
+    701,
+    702,
+    703,
+    710,
+    711,
+    1036,
+    1083,
+    1084,
+    1085,
+    1086,
+    1087,
+    1088,
+    1089,
+    1090,
+    1091,
+    1092,
+    1093,
+    1094,
+    1095,
+    1096,
+    1097,
+    1098,
+    9997
   ],
   "type16_source": {
     "kind": "client",
     "evidence": "Resources/MiniGameData.txt (lab/working/OSFR.Client/OSFR Client, sha256 8ce3cc61a2ad324912465e8d1785d246ccd680a01712e256fddf702ce856c252): header #ID^TYPE^..., every row whose TYPE column is 16, 124 ids. TYPE 16 rows include 504, 507 and 668; 18 is TYPE 8, 39 TYPE 11 and 727 TYPE 23. Which rows a quest credits is quest data, not this list."
-  }
+  },
+  "hidden_rows": [
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20387,
+      "minigame_id": 387,
+      "display_name_id": 8906,
+      "display_description_id": 8930,
+      "name_id": 8906,
+      "description_id": 8930,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20388,
+      "minigame_id": 388,
+      "display_name_id": 8907,
+      "display_description_id": 8931,
+      "name_id": 8907,
+      "description_id": 8931,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20389,
+      "minigame_id": 389,
+      "display_name_id": 8908,
+      "display_description_id": 8932,
+      "name_id": 8908,
+      "description_id": 8932,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20390,
+      "minigame_id": 390,
+      "display_name_id": 8909,
+      "display_description_id": 8933,
+      "name_id": 8909,
+      "description_id": 8933,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20391,
+      "minigame_id": 391,
+      "display_name_id": 8910,
+      "display_description_id": 8934,
+      "name_id": 8910,
+      "description_id": 8934,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20392,
+      "minigame_id": 392,
+      "display_name_id": 8911,
+      "display_description_id": 8935,
+      "name_id": 8911,
+      "description_id": 8935,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20393,
+      "minigame_id": 393,
+      "display_name_id": 8912,
+      "display_description_id": 8936,
+      "name_id": 8912,
+      "description_id": 8936,
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20394,
+      "minigame_id": 394,
+      "display_name_id": 8913,
+      "display_description_id": 8937,
+      "name_id": 8913,
+      "description_id": 8937,
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20395,
+      "minigame_id": 395,
+      "display_name_id": 8914,
+      "display_description_id": 8938,
+      "name_id": 8914,
+      "description_id": 8938,
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20396,
+      "minigame_id": 396,
+      "display_name_id": 8915,
+      "display_description_id": 8939,
+      "name_id": 8915,
+      "description_id": 8939,
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20397,
+      "minigame_id": 397,
+      "display_name_id": 8916,
+      "display_description_id": 8940,
+      "name_id": 8916,
+      "description_id": 8940,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20398,
+      "minigame_id": 398,
+      "display_name_id": 8917,
+      "display_description_id": 8941,
+      "name_id": 8917,
+      "description_id": 8941,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20399,
+      "minigame_id": 399,
+      "display_name_id": 8918,
+      "display_description_id": 8942,
+      "name_id": 8918,
+      "description_id": 8942,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20400,
+      "minigame_id": 400,
+      "display_name_id": 8919,
+      "display_description_id": 8943,
+      "name_id": 8919,
+      "description_id": 8943,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20401,
+      "minigame_id": 401,
+      "display_name_id": 8920,
+      "display_description_id": 8944,
+      "name_id": 8920,
+      "description_id": 8944,
+      "difficulty": 4,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20402,
+      "minigame_id": 402,
+      "display_name_id": 8921,
+      "display_description_id": 8945,
+      "name_id": 8921,
+      "description_id": 8945,
+      "difficulty": 4,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20403,
+      "minigame_id": 403,
+      "display_name_id": 8922,
+      "display_description_id": 8946,
+      "name_id": 8922,
+      "description_id": 8946,
+      "difficulty": 4,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20404,
+      "minigame_id": 404,
+      "display_name_id": 8923,
+      "display_description_id": 8947,
+      "name_id": 8923,
+      "description_id": 8947,
+      "difficulty": 4,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20405,
+      "minigame_id": 405,
+      "display_name_id": 8924,
+      "display_description_id": 8948,
+      "name_id": 8924,
+      "description_id": 8948,
+      "difficulty": 5,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20406,
+      "minigame_id": 406,
+      "display_name_id": 8925,
+      "display_description_id": 8949,
+      "name_id": 8925,
+      "description_id": 8949,
+      "difficulty": 5,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20407,
+      "minigame_id": 407,
+      "display_name_id": 8926,
+      "display_description_id": 8950,
+      "name_id": 8926,
+      "description_id": 8950,
+      "difficulty": 5,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20408,
+      "minigame_id": 408,
+      "display_name_id": 8927,
+      "display_description_id": 8951,
+      "name_id": 8927,
+      "description_id": 8951,
+      "difficulty": 5,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20409,
+      "minigame_id": 409,
+      "display_name_id": 8928,
+      "display_description_id": 8952,
+      "name_id": 8928,
+      "description_id": 8952,
+      "difficulty": 5,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20410,
+      "minigame_id": 410,
+      "display_name_id": 8929,
+      "display_description_id": 8953,
+      "name_id": 8929,
+      "description_id": 8953,
+      "difficulty": 5,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20411,
+      "minigame_id": 411,
+      "display_name_id": 13340,
+      "display_description_id": 13341,
+      "name_id": 13340,
+      "description_id": 13341,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20412,
+      "minigame_id": 412,
+      "display_name_id": 13343,
+      "display_description_id": 13344,
+      "name_id": 13343,
+      "description_id": 13344,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20413,
+      "minigame_id": 413,
+      "display_name_id": 13346,
+      "display_description_id": 13347,
+      "name_id": 13346,
+      "description_id": 13347,
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20414,
+      "minigame_id": 414,
+      "display_name_id": 13349,
+      "display_description_id": 13350,
+      "name_id": 13349,
+      "description_id": 13350,
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20415,
+      "minigame_id": 415,
+      "display_name_id": 13352,
+      "display_description_id": 13353,
+      "name_id": 13352,
+      "description_id": 13353,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20416,
+      "minigame_id": 416,
+      "display_name_id": 13355,
+      "display_description_id": 13356,
+      "name_id": 13355,
+      "description_id": 13356,
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20417,
+      "minigame_id": 417,
+      "display_name_id": 13358,
+      "display_description_id": 13359,
+      "name_id": 13358,
+      "description_id": 13359,
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20418,
+      "minigame_id": 418,
+      "display_name_id": 13361,
+      "display_description_id": 13362,
+      "name_id": 13361,
+      "description_id": 13362,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20419,
+      "minigame_id": 419,
+      "display_name_id": 13364,
+      "display_description_id": 13365,
+      "name_id": 13364,
+      "description_id": 13365,
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20420,
+      "minigame_id": 420,
+      "display_name_id": 13367,
+      "display_description_id": 13368,
+      "name_id": 13367,
+      "description_id": 13368,
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20421,
+      "minigame_id": 421,
+      "display_name_id": 13370,
+      "display_description_id": 13371,
+      "name_id": 13370,
+      "description_id": 13371,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20422,
+      "minigame_id": 422,
+      "display_name_id": 13373,
+      "display_description_id": 13374,
+      "name_id": 13373,
+      "description_id": 13374,
+      "difficulty": 4,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20423,
+      "minigame_id": 423,
+      "display_name_id": 13376,
+      "display_description_id": 13377,
+      "name_id": 13376,
+      "description_id": 13377,
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20424,
+      "minigame_id": 424,
+      "display_name_id": 13379,
+      "display_description_id": 13380,
+      "name_id": 13379,
+      "description_id": 13380,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20425,
+      "minigame_id": 425,
+      "display_name_id": 13382,
+      "display_description_id": 13383,
+      "name_id": 13382,
+      "description_id": 13383,
+      "difficulty": 4,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20426,
+      "minigame_id": 426,
+      "display_name_id": 13385,
+      "display_description_id": 13386,
+      "name_id": 13385,
+      "description_id": 13386,
+      "difficulty": 5,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20501,
+      "minigame_id": 501,
+      "display_name_id": 92721,
+      "display_description_id": 92753,
+      "name_id": 92721,
+      "description_id": 92753,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20502,
+      "minigame_id": 502,
+      "display_name_id": 92722,
+      "display_description_id": 92754,
+      "name_id": 92722,
+      "description_id": 92754,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20505,
+      "minigame_id": 505,
+      "display_name_id": 92725,
+      "display_description_id": 92757,
+      "name_id": 92725,
+      "description_id": 92757,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20506,
+      "minigame_id": 506,
+      "display_name_id": 92726,
+      "display_description_id": 92758,
+      "name_id": 92726,
+      "description_id": 92758,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20509,
+      "minigame_id": 509,
+      "display_name_id": 92729,
+      "display_description_id": 92761,
+      "name_id": 92729,
+      "description_id": 92761,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20510,
+      "minigame_id": 510,
+      "display_name_id": 92730,
+      "display_description_id": 92762,
+      "name_id": 92730,
+      "description_id": 92762,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20512,
+      "minigame_id": 512,
+      "display_name_id": 92732,
+      "display_description_id": 92764,
+      "name_id": 92732,
+      "description_id": 92764,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20513,
+      "minigame_id": 513,
+      "display_name_id": 92733,
+      "display_description_id": 92765,
+      "name_id": 92733,
+      "description_id": 92765,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20514,
+      "minigame_id": 514,
+      "display_name_id": 92734,
+      "display_description_id": 92766,
+      "name_id": 92734,
+      "description_id": 92766,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20515,
+      "minigame_id": 515,
+      "display_name_id": 92735,
+      "display_description_id": 92767,
+      "name_id": 92735,
+      "description_id": 92767,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20517,
+      "minigame_id": 517,
+      "display_name_id": 92737,
+      "display_description_id": 92769,
+      "name_id": 92737,
+      "description_id": 92769,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20518,
+      "minigame_id": 518,
+      "display_name_id": 92738,
+      "display_description_id": 92770,
+      "name_id": 92738,
+      "description_id": 92770,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20521,
+      "minigame_id": 521,
+      "display_name_id": 92741,
+      "display_description_id": 92773,
+      "name_id": 92741,
+      "description_id": 92773,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20522,
+      "minigame_id": 522,
+      "display_name_id": 92742,
+      "display_description_id": 92774,
+      "name_id": 92742,
+      "description_id": 92774,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20525,
+      "minigame_id": 525,
+      "display_name_id": 92745,
+      "display_description_id": 92777,
+      "name_id": 92745,
+      "description_id": 92777,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20526,
+      "minigame_id": 526,
+      "display_name_id": 92746,
+      "display_description_id": 92778,
+      "name_id": 92746,
+      "description_id": 92778,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20529,
+      "minigame_id": 529,
+      "display_name_id": 92749,
+      "display_description_id": 92781,
+      "name_id": 92749,
+      "description_id": 92781,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20530,
+      "minigame_id": 530,
+      "display_name_id": 92750,
+      "display_description_id": 92782,
+      "name_id": 92750,
+      "description_id": 92782,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20532,
+      "minigame_id": 532,
+      "display_name_id": 92823,
+      "display_description_id": 92818,
+      "name_id": 92823,
+      "description_id": 92818,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20533,
+      "minigame_id": 533,
+      "display_name_id": 92824,
+      "display_description_id": 92819,
+      "name_id": 92824,
+      "description_id": 92819,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20534,
+      "minigame_id": 534,
+      "display_name_id": 92825,
+      "display_description_id": 92820,
+      "name_id": 92825,
+      "description_id": 92820,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20535,
+      "minigame_id": 535,
+      "display_name_id": 92826,
+      "display_description_id": 92821,
+      "name_id": 92826,
+      "description_id": 92821,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20536,
+      "minigame_id": 536,
+      "display_name_id": 92827,
+      "display_description_id": 92822,
+      "name_id": 92827,
+      "description_id": 92822,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20661,
+      "minigame_id": 661,
+      "display_name_id": 400872,
+      "display_description_id": 400873,
+      "name_id": 400872,
+      "description_id": 400873,
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20666,
+      "minigame_id": 666,
+      "display_name_id": 407121,
+      "display_description_id": 407117,
+      "name_id": 407121,
+      "description_id": 407117,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20667,
+      "minigame_id": 667,
+      "display_name_id": 407122,
+      "display_description_id": 407118,
+      "name_id": 407122,
+      "description_id": 407118,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20668,
+      "minigame_id": 668,
+      "display_name_id": 407123,
+      "display_description_id": 407119,
+      "name_id": 407123,
+      "description_id": 407119,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20669,
+      "minigame_id": 669,
+      "display_name_id": 407124,
+      "display_description_id": 407120,
+      "name_id": 407124,
+      "description_id": 407120,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20684,
+      "minigame_id": 684,
+      "display_name_id": 413997,
+      "display_description_id": 415647,
+      "name_id": 413997,
+      "description_id": 415647,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20685,
+      "minigame_id": 685,
+      "display_name_id": 413998,
+      "display_description_id": 415648,
+      "name_id": 413998,
+      "description_id": 415648,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20686,
+      "minigame_id": 686,
+      "display_name_id": 413999,
+      "display_description_id": 415649,
+      "name_id": 413999,
+      "description_id": 415649,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20687,
+      "minigame_id": 687,
+      "display_name_id": 414000,
+      "display_description_id": 415650,
+      "name_id": 414000,
+      "description_id": 415650,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20688,
+      "minigame_id": 688,
+      "display_name_id": 414001,
+      "display_description_id": 415651,
+      "name_id": 414001,
+      "description_id": 415651,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20689,
+      "minigame_id": 689,
+      "display_name_id": 414002,
+      "display_description_id": 415652,
+      "name_id": 414002,
+      "description_id": 415652,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20690,
+      "minigame_id": 690,
+      "display_name_id": 414003,
+      "display_description_id": 415653,
+      "name_id": 414003,
+      "description_id": 415653,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20691,
+      "minigame_id": 691,
+      "display_name_id": 414004,
+      "display_description_id": 415654,
+      "name_id": 414004,
+      "description_id": 415654,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20692,
+      "minigame_id": 692,
+      "display_name_id": 414005,
+      "display_description_id": 415655,
+      "name_id": 414005,
+      "description_id": 415655,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20693,
+      "minigame_id": 693,
+      "display_name_id": 414006,
+      "display_description_id": 415656,
+      "name_id": 414006,
+      "description_id": 415656,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20694,
+      "minigame_id": 694,
+      "display_name_id": 414007,
+      "display_description_id": 415657,
+      "name_id": 414007,
+      "description_id": 415657,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20695,
+      "minigame_id": 695,
+      "display_name_id": 414008,
+      "display_description_id": 415658,
+      "name_id": 414008,
+      "description_id": 415658,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20696,
+      "minigame_id": 696,
+      "display_name_id": 414009,
+      "display_description_id": 415659,
+      "name_id": 414009,
+      "description_id": 415659,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20697,
+      "minigame_id": 697,
+      "display_name_id": 414010,
+      "display_description_id": 415660,
+      "name_id": 414010,
+      "description_id": 415660,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20698,
+      "minigame_id": 698,
+      "display_name_id": 414011,
+      "display_description_id": 415661,
+      "name_id": 414011,
+      "description_id": 415661,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20699,
+      "minigame_id": 699,
+      "display_name_id": 414012,
+      "display_description_id": 415662,
+      "name_id": 414012,
+      "description_id": 415662,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20710,
+      "minigame_id": 710,
+      "display_name_id": 416478,
+      "display_description_id": 416634,
+      "name_id": 416478,
+      "description_id": 416634,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 20711,
+      "minigame_id": 711,
+      "display_name_id": 416492,
+      "display_description_id": 416636,
+      "name_id": 416492,
+      "description_id": 416636,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 21036,
+      "minigame_id": 1036,
+      "display_name_id": 426641,
+      "display_description_id": 426642,
+      "name_id": 426641,
+      "description_id": 426642,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 21083,
+      "minigame_id": 1083,
+      "display_name_id": 442160,
+      "display_description_id": 442176,
+      "name_id": 442160,
+      "description_id": 442176,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 21084,
+      "minigame_id": 1084,
+      "display_name_id": 442161,
+      "display_description_id": 442177,
+      "name_id": 442161,
+      "description_id": 442177,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 21085,
+      "minigame_id": 1085,
+      "display_name_id": 442162,
+      "display_description_id": 442178,
+      "name_id": 442162,
+      "description_id": 442178,
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 21086,
+      "minigame_id": 1086,
+      "display_name_id": 442163,
+      "display_description_id": 442179,
+      "name_id": 442163,
+      "description_id": 442179,
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 21087,
+      "minigame_id": 1087,
+      "display_name_id": 442164,
+      "display_description_id": 442180,
+      "name_id": 442164,
+      "description_id": 442180,
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 21088,
+      "minigame_id": 1088,
+      "display_name_id": 442165,
+      "display_description_id": 442181,
+      "name_id": 442165,
+      "description_id": 442181,
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 21089,
+      "minigame_id": 1089,
+      "display_name_id": 442166,
+      "display_description_id": 442182,
+      "name_id": 442166,
+      "description_id": 442182,
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 21090,
+      "minigame_id": 1090,
+      "display_name_id": 442167,
+      "display_description_id": 442183,
+      "name_id": 442167,
+      "description_id": 442183,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 21091,
+      "minigame_id": 1091,
+      "display_name_id": 442168,
+      "display_description_id": 442184,
+      "name_id": 442168,
+      "description_id": 442184,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 21092,
+      "minigame_id": 1092,
+      "display_name_id": 442169,
+      "display_description_id": 442185,
+      "name_id": 442169,
+      "description_id": 442185,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 21093,
+      "minigame_id": 1093,
+      "display_name_id": 442170,
+      "display_description_id": 442186,
+      "name_id": 442170,
+      "description_id": 442186,
+      "difficulty": 4,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 21094,
+      "minigame_id": 1094,
+      "display_name_id": 442171,
+      "display_description_id": 442187,
+      "name_id": 442171,
+      "description_id": 442187,
+      "difficulty": 4,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 21095,
+      "minigame_id": 1095,
+      "display_name_id": 442172,
+      "display_description_id": 442188,
+      "name_id": 442172,
+      "description_id": 442188,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 21096,
+      "minigame_id": 1096,
+      "display_name_id": 442173,
+      "display_description_id": 442189,
+      "name_id": 442173,
+      "description_id": 442189,
+      "difficulty": 5,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 21097,
+      "minigame_id": 1097,
+      "display_name_id": 442174,
+      "display_description_id": 442190,
+      "name_id": 442174,
+      "description_id": 442190,
+      "difficulty": 5,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    },
+    {
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "id": 21098,
+      "minigame_id": 1098,
+      "display_name_id": 442175,
+      "display_description_id": 442191,
+      "name_id": 442175,
+      "description_id": 442191,
+      "difficulty": 5,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Reconstructed 2026-11-08: the client's MiniGameData TYPE 16 row (name, description, difficulty); no Games-window row exists for it, so only its NPC offers it. Service fields follow the lobby row."
+        }
+      ]
+    }
+  ],
+  "npc_decks": [
+    {
+      "npc_id": 9000000020,
+      "activities": [
+        20407,
+        20408,
+        20409,
+        20410,
+        20423,
+        20424,
+        20425,
+        20426
+      ]
+    },
+    {
+      "npc_id": 9000000035,
+      "activities": [
+        492,
+        500,
+        20509,
+        20510
+      ]
+    },
+    {
+      "npc_id": 9000000074,
+      "activities": [
+        20666,
+        20667,
+        20684,
+        20685,
+        20686,
+        20687
+      ]
+    },
+    {
+      "npc_id": 9000000082,
+      "activities": [
+        20668,
+        20669,
+        20688,
+        20689,
+        20690,
+        20691
+      ]
+    },
+    {
+      "npc_id": 9000000094,
+      "activities": [
+        20512,
+        20513,
+        20514,
+        20515
+      ]
+    },
+    {
+      "npc_id": 9000000109,
+      "activities": [
+        21095,
+        21096,
+        21097,
+        21098
+      ]
+    },
+    {
+      "npc_id": 9000000112,
+      "activities": [
+        495,
+        503,
+        20521,
+        20522
+      ]
+    },
+    {
+      "npc_id": 9000000141,
+      "activities": [
+        497,
+        505,
+        20529,
+        20530
+      ]
+    },
+    {
+      "npc_id": 9000000143,
+      "activities": [
+        20391,
+        20392,
+        20393,
+        20394
+      ]
+    },
+    {
+      "npc_id": 9000000170,
+      "activities": [
+        491,
+        499,
+        20505,
+        20506
+      ]
+    },
+    {
+      "npc_id": 9000000176,
+      "activities": [
+        21091,
+        21092,
+        21093,
+        21094
+      ]
+    },
+    {
+      "npc_id": 9000000187,
+      "activities": [
+        490,
+        498,
+        20501,
+        20502
+      ]
+    },
+    {
+      "npc_id": 9000000195,
+      "activities": [
+        20403,
+        20404,
+        20405,
+        20406
+      ]
+    },
+    {
+      "npc_id": 9000000198,
+      "activities": [
+        494,
+        502,
+        20517,
+        20518
+      ]
+    },
+    {
+      "npc_id": 9000000224,
+      "activities": [
+        20387,
+        20388,
+        20389,
+        20390,
+        20692,
+        20693,
+        20694,
+        20695
+      ]
+    },
+    {
+      "npc_id": 9000000347,
+      "activities": [
+        20534
+      ]
+    },
+    {
+      "npc_id": 9000000370,
+      "activities": [
+        21087,
+        21088,
+        21089,
+        21090
+      ]
+    },
+    {
+      "npc_id": 9000000408,
+      "activities": [
+        21083,
+        21084,
+        21085,
+        21086
+      ]
+    },
+    {
+      "npc_id": 9500000106,
+      "activities": [
+        20411,
+        20412,
+        20413,
+        20414
+      ]
+    },
+    {
+      "npc_id": 9500000211,
+      "activities": [
+        20696,
+        20697,
+        20698,
+        20699
+      ]
+    },
+    {
+      "npc_id": 9500000276,
+      "activities": [
+        20532
+      ]
+    },
+    {
+      "npc_id": 9500000387,
+      "activities": [
+        20415,
+        20416,
+        20417,
+        20418
+      ]
+    },
+    {
+      "npc_id": 9500000467,
+      "activities": [
+        20710
+      ]
+    },
+    {
+      "npc_id": 9500000500,
+      "activities": [
+        20533
+      ]
+    },
+    {
+      "npc_id": 9500000525,
+      "activities": [
+        20711
+      ]
+    },
+    {
+      "npc_id": 9500000556,
+      "activities": [
+        20407,
+        20408,
+        20409,
+        20410,
+        20423,
+        20424,
+        20425,
+        20426
+      ]
+    },
+    {
+      "npc_id": 9500000586,
+      "activities": [
+        20535,
+        20661
+      ]
+    },
+    {
+      "npc_id": 9500000592,
+      "activities": [
+        21036
+      ]
+    },
+    {
+      "npc_id": 9500000753,
+      "activities": [
+        20395,
+        20396,
+        20397,
+        20398
+      ]
+    },
+    {
+      "npc_id": 9500000869,
+      "activities": [
+        496,
+        504,
+        20525,
+        20526
+      ]
+    },
+    {
+      "npc_id": 9500000969,
+      "activities": [
+        20419,
+        20420,
+        20421,
+        20422
+      ]
+    },
+    {
+      "npc_id": 9500000982,
+      "activities": [
+        20536
+      ]
+    },
+    {
+      "npc_id": 9600000001,
+      "activities": [
+        20399,
+        20400,
+        20401,
+        20402
+      ]
+    }
+  ]
 }

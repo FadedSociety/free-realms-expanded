@@ -1060,8 +1060,8 @@ fn the_release_overlay_is_publishable() {
     let jobs: std::collections::BTreeSet<i64> = kits.keys().map(|k| k.parse().unwrap()).collect();
     assert_eq!(
         jobs,
-        [2, 4, 11, 12, 14, 16, 32, 35, 43, 45, 48, 49, 52, 137].into(),
-        "a kit per job with Legacy defaults (Adventurer and Card Duelist have none)"
+        [2, 4, 11, 12, 14, 16, 32, 35, 43, 45, 48, 49, 52, 120, 137].into(),
+        "a kit per job with Legacy defaults, and Card Duelist's own (the Adventurer has none)"
     );
     assert!(profiles["provenance"].get("starter_definitions").is_none());
 

@@ -445,25 +445,22 @@ enum Blocker {
     /// The record carries no gate for its intended job, so enabling it would offer the
     /// quest to every player while that job is also not selectable.
     NoJobGate(i32),
-    /// The job can be unlocked but the 26/13 switch is refused (no starter outfit).
-    Unselectable(i32),
 }
 
-use Blocker::{Giver, NoJobGate, NoProfile, Prerequisite, Unselectable};
+use Blocker::{Giver, NoJobGate, NoProfile, Prerequisite};
 
 /// The round-3 quests that stay disabled. Each row lists every blocker that still holds;
 /// the test fails when one lifts, so the next builder re-checks the others before wiring it
 /// (some are one content edit away, others need a mechanic the server lacks). T542 enabled
 /// Become a Postman (3130001). L1022's card games lifted 3040004 and 3040009, whose only blocker
 /// was their minigame, so the list is eleven now; the Chapter 1 wiring lifted 3000039 (Vittorio
-/// drawn, its prerequisite live), so ten; the test name keeps the T723 count for the protected
+/// drawn, its prerequisite live), so ten; job 120's starter outfit lifted 3040003 and 3040011 (the
+/// Card Duelist line, 2026-11-08), so eight; the test name keeps the T723 count for the protected
 /// test list.
 #[test]
 fn the_other_fifteen_still_have_a_blocker() {
-    const OFF: [(u32, &[Blocker]); 10] = [
+    const OFF: [(u32, &[Blocker]); 8] = [
         (3_020_031, &[Giver, Prerequisite]),
-        (3_040_003, &[NoJobGate(120), Unselectable(120)]),
-        (3_040_011, &[Unselectable(120)]),
         (3_050_018, &[Prerequisite]),
         (3_070_026, &[Giver]),
         (3_120_010, &[NoJobGate(121), NoProfile(121)]),
@@ -481,7 +478,6 @@ fn the_other_fifteen_still_have_a_blocker() {
         .collect();
     let targets = Targets::load(&root, &reference_content()).unwrap();
     let quests = read_quests(&root);
-    let profile_fixture = Fixture::new();
     for (id, blockers) in OFF {
         let quest = quests
             .iter()
@@ -497,22 +493,6 @@ fn the_other_fifteen_still_have_a_blocker() {
                     .any(|p| quests.iter().any(|q| q.id == *p && !q.enabled)),
                 NoProfile(profile) => !targets.profiles.contains(&profile),
                 NoJobGate(profile) => quest.job != Some(profile),
-                Unselectable(profile) => {
-                    let mut state = profile_fixture.game(None).state();
-                    seed_active_profile(&mut state, ADVENTURER, &[]);
-                    state.profiles.as_mut().unwrap().unlocked.insert(profile);
-                    let mut game = profile_fixture.game(Some(state));
-                    let at = character_at_for(CHARACTER, 0, [0.0; 3]);
-                    let before = saved(&game);
-                    let refused = send(&mut game, &at, &select_job(profile), 1_000);
-                    assert!(!refused.changed, "quest {id}: job {profile} switched");
-                    assert_eq!(
-                        saved(&game),
-                        before,
-                        "quest {id}: the refused switch changed the save"
-                    );
-                    game.state().profiles.unwrap().active != profile
-                }
             };
             assert!(
                 held,
@@ -520,4 +500,23 @@ fn the_other_fifteen_still_have_a_blocker() {
             );
         }
     }
+}
+
+/// Job 120's starter outfit (`profiles.json` `card_duelist_kit`) is what lets the 26/13 switch go
+/// through: the client's profile swap needs a Chest and Legs piece on every job.
+#[test]
+fn the_card_duelist_job_can_be_selected() {
+    const CARD_DUELIST: i32 = 120;
+    let fixture = Fixture::new();
+    // The fixture's opening copy predates the job kits: this test is about the shipped one.
+    let shipped = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("data/release/profiles.json");
+    std::fs::copy(shipped, fixture.path().join("profiles.json")).unwrap();
+    let mut state = fixture.game(None).state();
+    seed_active_profile(&mut state, ADVENTURER, &[]);
+    state.profiles.as_mut().unwrap().unlocked.insert(CARD_DUELIST);
+    let mut game = fixture.game(Some(state));
+    let at = character_at_for(CHARACTER, 0, [0.0; 3]);
+    let switched = send(&mut game, &at, &select_job(CARD_DUELIST), 1_000);
+    assert!(switched.changed, "job 120 switches");
+    assert_eq!(game.state().profiles.unwrap().active, CARD_DUELIST);
 }
