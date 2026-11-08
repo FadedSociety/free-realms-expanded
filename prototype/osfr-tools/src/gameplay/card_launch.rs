@@ -4,7 +4,7 @@
 //! launch ticket (39/37) and gets it in 39/0x28, which enables the Start button; the click
 //! (39/5) is answered with 39/17 (T795: the client's order). Leaving the card window (39/6, then
 //! its 39/7 ack) ends the run, and the generic 26/42 Close sent just before is not the run's
-//! (T782). Session-only: nothing here marks a save. L935: the card window plays its games itself
+//! (T782). The run and ticket are session-only; only a win's rewards mark a save. L935: the card window plays its games itself
 //! and reports them (`card_single_player`): a bounded win credits the launched row and pays the
 //! duel purse, once.
 use super::*;
@@ -92,7 +92,22 @@ impl Gameplay {
         };
         self.credit_minigame(win.minigame_id, result, &mut out)?;
         self.pay_card_win(character, &win, &mut out)?;
+        // The record names no deck, so only the launched scenario can be that deck's fight.
+        if record.game_type == crate::card_service::SinglePlayerRecord::SCENARIO {
+            self.pay_deck_prize(win.minigame_id, &mut out);
+        }
         Ok(Some((win, out)))
+    }
+
+    /// (R) A deck's cards, the first time this character beats it. The open card window keeps
+    /// the collection it synced at login, so the cards appear at the next one.
+    fn pay_deck_prize(&mut self, deck: u32, out: &mut Outcome) {
+        let prize = self.activities.cards().and_then(|cards| cards.deck_prize(deck));
+        if prize.is_some_and(|prize| self.earned_cards.pay_prize(deck, prize)) {
+            out.replies.push(chat::system(
+                "You won new cards! They join your collection the next time you open the card game.",
+            ));
+        }
     }
 
     /// The duel purse: `win.coins` and the Card Duelist's `activity_xp`, the XP only while that
@@ -161,5 +176,10 @@ impl Gameplay {
     /// The client scenario of the card row in play, for the card login's challenge.
     pub fn card_scenario(&self) -> Option<i32> {
         self.card_launches.as_ref()?.scenario()
+    }
+
+    /// The cards this character has earned, for the card login's collection sync.
+    pub fn earned_cards(&self) -> Vec<crate::card_game::StarterCard> {
+        self.earned_cards.rows()
     }
 }

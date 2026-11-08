@@ -402,6 +402,8 @@ impl SinglePlayerRecord {
     pub const STARTED: i32 = 1;
     pub const ENDED: i32 = 2;
     pub const WON: i32 = 1;
+    /// The game type of a scripted fight: 1 Tutorial, 2 Scenario, 3 Skirmish (`104ab920`).
+    pub const SCENARIO: i32 = 2;
 
     pub fn decode(body: &[u8]) -> io::Result<Self> {
         RECORD_HEADER_PAIRS
@@ -581,7 +583,7 @@ pub fn join_request(body: &[u8]) -> io::Result<(i32, i32)> {
 /// three class headers (family level `101d7090`/`101d70d0`) and no account level. The cards are
 /// owned as `InstanceID`s (class 350 v1, one header, reader `101476a0`): archetype, series 0 and
 /// instance numbers 0.. per archetype, as the client's own `default.cln` numbers them, so the
-/// same starter always has the same ids and nothing needs saving. The LobbyCommand level is the
+/// same cards always have the same ids and only the earned counts are saved. The LobbyCommand level is the
 /// same shape (reader `10156340`, writer `10156390`): its one value is the account.
 fn sync_command(id: i32, version: i32, values: impl IntoIterator<Item = i32>) -> Vec<u8> {
     let mut body = Vec::new();
@@ -596,7 +598,7 @@ fn instances(cards: &[crate::card_game::StarterCard]) -> i32 {
     cards.iter().map(|card| card.copies).sum()
 }
 
-/// The collection's ModID: a stable hash of the starter list, positive and never 0. The client
+/// The collection's ModID: a stable hash of the synced list, positive and never 0. The client
 /// caches a synced collection with it (`1006f1c0`) and skips the next sync when it matches.
 pub fn collection_mod_id(cards: &[crate::card_game::StarterCard]) -> i32 {
     let hash = cards.iter().fold(0, |acc, card| {

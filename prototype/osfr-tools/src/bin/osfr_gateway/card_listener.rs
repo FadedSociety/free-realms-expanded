@@ -29,8 +29,9 @@ use serde_json::Value;
 use std::io::{ErrorKind, Read, Write};
 use std::net::{IpAddr, SocketAddr, TcpStream};
 
-/// What a card login's ticket names: its character and that row's client scenario, or a refusal.
-type Redeemed = Result<(u64, Option<i32>), &'static str>;
+/// What a card login's ticket names: its character, that row's client scenario and the cards the
+/// character has earned; or a refusal.
+type Redeemed = Result<(u64, Option<i32>, Vec<osfr_tools::card_game::StarterCard>), &'static str>;
 
 /// (R) The gateway's own player ceilings: a stranger cannot hold more sockets than players.
 const MAX_CONNECTIONS: usize = 16;
@@ -81,6 +82,8 @@ struct Connection {
     /// The 411's name, for the lobbies joined later.
     name: String,
     sync: SyncStep,
+    /// The collection this login synced: the starter set plus what the character has earned.
+    cards: Vec<osfr_tools::card_game::StarterCard>,
     unhandled: u32,
     answered: Answered,
 }
@@ -205,6 +208,7 @@ impl CardListener {
                     heard_ms: 0,
                     name: String::new(),
                     sync: SyncStep::Off,
+                    cards: Vec::new(),
                     unhandled: 0,
                     answered: Answered::default(),
                 });
@@ -277,12 +281,15 @@ impl Connection {
                 Some(Err(_)) => return Some("bad_message"),
                 None => {}
             }
-            let (mut login, mut name, mut scenario) = (None, String::new(), None);
+            let (mut login, mut name, mut scenario, mut earned) =
+                (None, String::new(), None, Vec::new());
             let logged_in = self.character.is_some();
             let reply = card_service::reply(&body, host, port, logged_in, |l| {
                 let redeemed = redeem(&l.ticket, &l.character_id);
-                scenario = redeemed.ok().and_then(|(_, scenario)| scenario);
-                let redeemed = redeemed.map(|(character, _)| character);
+                let redeemed = redeemed.map(|(character, for_row, cards)| {
+                    (scenario, earned) = (for_row, cards);
+                    character
+                });
                 // T805: the 411's shape for its event: lengths only, never a value.
                 let lengths = json!({
                     "session_id":l.session_id.len(),"character_name":l.character_name.len(),
@@ -312,6 +319,10 @@ impl Connection {
                         Some(Ok(character)) if self.character.is_none() => {
                             self.character = Some(character);
                             if let Some(lobby) = lobby {
+                                self.cards = osfr_tools::card_game::collection_with(
+                                    &lobby.collection,
+                                    &earned,
+                                );
                                 if !self.enter_lobby(character, scenario, lobby, &name, events) {
                                     return Some("write_failed");
                                 }
@@ -358,8 +369,8 @@ impl Connection {
             bodies.push(card_service::online_decks(&lobby.collection));
         }
         // T825: the collection sync starts right after the lobby.
-        if !lobby.collection.is_empty() {
-            bodies.push(card_service::sync_start(account, &lobby.collection));
+        if !self.cards.is_empty() {
+            bodies.push(card_service::sync_start(account, &self.cards));
             self.sync = SyncStep::Started;
         }
         for body in bodies {
@@ -403,7 +414,6 @@ impl Connection {
     ) -> Option<io::Result<Vec<u8>>> {
         let character = self.character?;
         let account = card_service::account_id(character);
-        let cards = lobby.map_or(&[][..], |lobby| &lobby.collection[..]);
         let reply = match card_service::class_id(body).ok()? {
             card_service::CHANGE_STATUS => card_service::change_status(account, body),
             card_service::JOIN => card_service::join_request(body).and_then(|(group, _)| {
@@ -418,25 +428,25 @@ impl Connection {
             card_service::SYNC_UPDATE => {
                 let (next, step) = match self.sync {
                     SyncStep::Started => (
-                        card_service::sync_start_instances(account, cards),
+                        card_service::sync_start_instances(account, &self.cards),
                         SyncStep::InstancesStarted,
                     ),
                     SyncStep::InstancesStarted => (
-                        card_service::sync_send_instances(cards),
+                        card_service::sync_send_instances(&self.cards),
                         SyncStep::InstancesSent,
                     ),
                     SyncStep::InstancesSent => (card_service::sync_complete(), SyncStep::Done),
                     SyncStep::Off | SyncStep::Done => return Some(Ok(Vec::new())),
                 };
                 if step == SyncStep::Done {
-                    self.synced("sent", cards, events);
+                    self.synced("sent", events);
                 }
                 self.sync = step;
                 Ok(next)
             }
             card_service::SYNC_COMPLETE if self.sync == SyncStep::Started => {
                 self.sync = SyncStep::Done;
-                self.synced("cached", cards, events);
+                self.synced("cached", events);
                 Ok(Vec::new())
             }
             card_service::RECORD_SINGLE_PLAYER_GAME => {
@@ -464,15 +474,14 @@ impl Connection {
 
     /// One `card_sync` event per connection: the collection sent, or already cached.
     fn synced(
-        &mut self,
+        &self,
         how: &str,
-        cards: &[osfr_tools::card_game::StarterCard],
         events: &mut Vec<Value>,
     ) {
         events.push(json!({
             "event":"card_sync","peer":self.peer.to_string(),"character":self.character,
-            "collection":how,"archetypes":cards.len(),
-            "instances":cards.iter().map(|card| card.copies).sum::<i32>()
+            "collection":how,"archetypes":self.cards.len(),
+            "instances":self.cards.iter().map(|card| card.copies).sum::<i32>()
         }));
     }
 
@@ -638,7 +647,7 @@ impl Server {
                 continue;
             };
             if let Some(redeemed) = game.redeem_card_ticket(ticket, character, now_ms) {
-                return redeemed.map(|guid| (guid, game.card_scenario()));
+                return redeemed.map(|guid| (guid, game.card_scenario(), game.earned_cards()));
             }
         }
         Err(card_service::UNKNOWN_TICKET)
@@ -757,7 +766,7 @@ pub(super) mod tests {
         ticket: &str,
         accept: Result<u64, &'static str>,
     ) -> (bool, i32, i32, Vec<(String, String)>) {
-        log_in_to(card, client, character_id, ticket, accept.map(|guid| (guid, None)))
+        log_in_to(card, client, character_id, ticket, accept.map(|guid| (guid, None, Vec::new())))
     }
 
     /// [`log_in`] for a redeem that also names the row's client scenario.
@@ -776,7 +785,7 @@ pub(super) mod tests {
         for _ in 0..200 {
             card.poll(2, |t, c| {
                 seen.push((t.to_owned(), c.to_owned()));
-                accept
+                accept.clone()
             });
             if !seen.is_empty() {
                 body = Some(answer(card, client, 2));
@@ -981,13 +990,17 @@ pub(super) mod tests {
             "source": [{"kind":"reconstructed","evidence":"deck login test"}]
         }));
         let guid = 5041u64;
+        let earned = osfr_tools::card_game::StarterCard { archetype_id: 7, copies: 1 };
         let mut player = client(&card);
-        assert!(log_in_to(&mut card, &mut player, "", "78", Ok((guid, Some(6)))).0);
+        assert!(log_in_to(&mut card, &mut player, "", "78", Ok((guid, Some(6), vec![earned.clone()]))).0);
         let pushed: Vec<_> = (0..5).map(|_| answer(&mut card, &mut player, 3)).collect();
         let classes: Vec<_> = pushed.iter().map(|b| card_service::class_id(b).unwrap()).collect();
         assert_eq!(classes, [94, 486, 92, 363, 83], "the deck, then the collection sync; no 291");
         let account = card_service::account_id(guid);
         assert_eq!(pushed[1], card_service::initiate_challenge(account, 6));
+        let starter = osfr_tools::card_game::StarterCard { archetype_id: 100_009_946, copies: 3 };
+        assert_eq!(pushed[3], card_service::online_decks(std::slice::from_ref(&starter)), "the starter only");
+        assert_eq!(pushed[4], card_service::sync_start(account, &[starter, earned]), "earned cards sync");
         assert!(card.events.iter().any(|e| e["event"] == "card_lobby" && e["scenario"] == 6));
     }
 

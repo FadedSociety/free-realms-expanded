@@ -197,6 +197,9 @@ pub struct GameplayState {
     /// byte-identical.
     #[serde(default, skip_serializing_if = "BTreeSet::is_empty")]
     pub upgraded_rides: BTreeSet<i32>,
+    /// Cards earned beyond the starter set; absent when empty so older saves stay byte-identical.
+    #[serde(default, skip_serializing_if = "crate::card_game::EarnedCards::is_empty")]
+    pub earned_cards: crate::card_game::EarnedCards,
     /// T560: the UTC day index of the last paid daily-wheel spin; absent until one is paid.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_spin_day: Option<u64>,
@@ -288,6 +291,7 @@ pub struct Gameplay {
     character_name: String,
     /// T765: the session's Trading Card Game launches (type-16 runs and one-time tickets).
     card_launches: Option<crate::card_game::Launches>,
+    earned_cards: crate::card_game::EarnedCards,
     /// T560: the daily wheel (`gameplay/daily_wheel.rs`); only its day stamp is saved.
     daily_wheel: crate::daily_wheel::DailyWheel,
     /// Last answered 167/1/4 refresh: a 4-byte request returns up to ~6.7 KB,
@@ -653,6 +657,7 @@ impl Gameplay {
             .as_ref()
             .map(|s| s.upgraded_rides.clone())
             .unwrap_or_default();
+        let earned_cards = state.as_ref().map(|s| s.earned_cards.clone()).unwrap_or_default();
         let mut warp = piece_077::WarpRegistry::curated();
         let saved_derby = state.as_ref().and_then(|s| s.derby.clone());
         let saved_hunt = state.as_ref().and_then(|s| s.artifact_hunt.clone());
@@ -1309,6 +1314,7 @@ impl Gameplay {
             garage: None,
             character_name: String::new(),
             card_launches,
+            earned_cards,
             daily_wheel,
             portal_refreshed_ms: None,
             portal_listed: None,
@@ -1509,6 +1515,7 @@ impl Gameplay {
                 mounts.saved_upgrades(self.inventory.state())
             }),
             last_spin_day: self.daily_wheel.last_spin_day(),
+            earned_cards: self.earned_cards.clone(),
         };
         content_presence::restore_skipped(&mut state, &self.dormant);
         state

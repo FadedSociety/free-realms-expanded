@@ -44,9 +44,9 @@ use crate::activity_portal::{Activity, Kind};
 use crate::card_service::{LaunchTickets, SinglePlayerRecord};
 use crate::minigame::{MinigameRuns, RunMode, RunOutcome, RunSpec, RunState, card_start_packet};
 use crate::startup_messages;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::{
-    collections::BTreeSet,
+    collections::{BTreeMap, BTreeSet},
     fs,
     io::{self, Read},
     path::Path,
@@ -185,6 +185,13 @@ pub struct Launch {
     /// block opens the window but no game result counts.
     #[serde(default)]
     pub duel: Option<Duel>,
+    /// (R) What each deck pays the first time a character beats it: "you will win 3 cards from
+    /// that player", once per deck (wiki). Which cards is not recorded anywhere; see
+    /// `prizes_source`.
+    #[serde(default)]
+    pub prizes: Vec<DeckPrize>,
+    #[serde(default)]
+    pub prizes_source: Vec<Source>,
     pub source: Vec<Source>,
 }
 
@@ -201,6 +208,74 @@ pub struct Duel {
     pub min_seconds: u32,
     /// Coins one qualifying win pays; the Card Duelist's `activity_xp` rides on top.
     pub win_coins: u32,
+}
+
+/// One deck's first-win prize: card archetypes, one copy each.
+#[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct DeckPrize {
+    pub minigame_id: u32,
+    pub cards: Vec<i32>,
+}
+
+/// The most copies of one card a sync carries for a character (the client's own `default.cln`
+/// holds up to 100).
+const MAX_EARNED_COPIES: i32 = 100;
+
+/// The cards a character has earned beyond the starter set, and the decks that already paid.
+/// Saved; the card window learns them from the collection sync at its next login.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct EarnedCards {
+    #[serde(default)]
+    pub copies: BTreeMap<i32, i32>,
+    #[serde(default)]
+    pub beaten: BTreeSet<u32>,
+}
+
+impl EarnedCards {
+    pub fn is_empty(&self) -> bool {
+        self.copies.is_empty() && self.beaten.is_empty()
+    }
+
+    /// Adds one copy of each card.
+    pub fn add(&mut self, cards: &[i32]) {
+        for card in cards {
+            *self.copies.entry(*card).or_default() += 1;
+        }
+    }
+
+    /// Pays `prize` the first time `deck` is beaten; true when it paid.
+    pub fn pay_prize(&mut self, deck: u32, prize: &[i32]) -> bool {
+        let first = self.beaten.insert(deck);
+        if first {
+            self.add(prize);
+        }
+        first
+    }
+
+    /// One row per card, each count bounded: the save is a file, and a sync sends every copy.
+    pub fn rows(&self) -> Vec<StarterCard> {
+        self.copies
+            .iter()
+            .map(|(&archetype_id, &copies)| StarterCard {
+                archetype_id,
+                copies: copies.clamp(1, MAX_EARNED_COPIES),
+            })
+            .collect()
+    }
+}
+
+/// `starter` with `earned` folded in, one row per archetype in `starter`'s order.
+pub fn collection_with(starter: &[StarterCard], earned: &[StarterCard]) -> Vec<StarterCard> {
+    let mut all = starter.to_vec();
+    for card in earned {
+        match all.iter_mut().find(|row| row.archetype_id == card.archetype_id) {
+            Some(row) => row.copies += card.copies,
+            None => all.push(card.clone()),
+        }
+    }
+    all
 }
 
 /// The Card Duelist job profile (`job_xp_curve.json`, 466 `activity_xp` per duel).
@@ -233,7 +308,7 @@ pub struct Lobby {
     /// The player's role in it: 1 general, 2 player, 3 observer, 4 moderator, 5 staff (the
     /// `Lobby` writer's role lists, `101558e0`); 0 is the client's invalid role.
     pub role: i32,
-    /// T825: the starter collection the card service syncs after the lobby (empty: no sync). R:
+    /// T825: the starter collection the card service syncs after the lobby. R:
     /// the client data holds no starter deck list (the skirmish's "Digital Starter" decks,
     /// `104ab920`, are not in `tcg/data/decks`), so the ids are chosen from the client's own card
     /// data: archetypes of `tcg/data/archetypes/storage.dat` that its `default.cln` collection
@@ -572,6 +647,22 @@ impl Content {
                 "card duel needs distinct game types 1 to 3, 1 to 3600 seconds and at most 10000 coins",
             ));
         }
+        let (prizes, sourced) = self.launch.as_ref().map_or((&[][..], true), |launch| {
+            (&launch.prizes[..], launch.prizes.is_empty() || !launch.prizes_source.is_empty())
+        });
+        let is_row = |id| self.rows.iter().chain(&self.hidden_rows).any(|row| row.minigame_id == id);
+        if !sourced
+            || prizes.iter().any(|p| {
+                !(1..=3).contains(&p.cards.len())
+                    || p.cards.iter().any(|c| *c <= 0)
+                    || !is_row(p.minigame_id)
+            })
+            || prizes.iter().map(|p| p.minigame_id).collect::<BTreeSet<_>>().len() != prizes.len()
+        {
+            return Err(invalid(
+                "card prizes need a source, 1 to 3 real cards, a real row and one prize per deck",
+            ));
+        }
         // (R) bounds: only the client's root group 1 until a second group is decoded (`10371960`
         // joins group 1 itself), a known role, a small type.
         if self
@@ -623,6 +714,12 @@ impl Content {
     /// T765: the launch settings, when Trading Card Game rows may start.
     pub fn launch(&self) -> Option<&Launch> {
         self.launch.as_ref()
+    }
+
+    /// The cards deck `minigame_id` pays the first time it is beaten.
+    pub fn deck_prize(&self, minigame_id: u32) -> Option<&[i32]> {
+        let launch = self.launch.as_ref()?;
+        Some(&launch.prizes.iter().find(|prize| prize.minigame_id == minigame_id)?.cards)
     }
 
     /// The row behind activity `id`.
@@ -709,6 +806,33 @@ mod tests {
             packet.extend(value.to_le_bytes());
         }
         packet
+    }
+
+    /// A deck pays once, and earned copies stack on the starter's.
+    #[test]
+    fn a_deck_pays_its_prize_once_and_its_cards_join_the_collection() {
+        let mut earned = EarnedCards::default();
+        assert!(earned.pay_prize(504, &[7, 8, 8]));
+        assert!(!earned.pay_prize(504, &[7, 8, 8]), "once per deck");
+        let starter = [StarterCard { archetype_id: 8, copies: 3 }];
+        assert_eq!(
+            collection_with(&starter, &earned.rows()),
+            [
+                StarterCard { archetype_id: 8, copies: 5 },
+                StarterCard { archetype_id: 7, copies: 1 }
+            ]
+        );
+    }
+
+    /// Every deck row with a client scenario has a prize (the tutorial has no opponent).
+    #[test]
+    fn every_scenario_deck_has_a_prize() {
+        let cards = Content::load(&crate::content::bundled_content().join(CONTENT_FILE)).unwrap();
+        let rows = cards.rows.iter().chain(&cards.hidden_rows);
+        for row in rows.filter(|row| scenario_of(row.minigame_id as i32).is_some() && row.minigame_id != 537) {
+            let prize = cards.deck_prize(row.minigame_id).expect("a prize");
+            assert_eq!(prize.len(), 3, "row {}", row.minigame_id);
+        }
     }
 
     /// The client has 1..=121, each one row; the owners' intros pin the blocks.

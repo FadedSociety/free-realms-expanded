@@ -197,6 +197,26 @@ fn a_scenario_win_credits_the_row_it_was_launched_from() {
     );
 }
 
+/// A scenario win pays its deck's cards once, and they survive a save; a Skirmish pays none,
+/// because its record names no deck.
+#[test]
+fn a_deck_prize_pays_once_for_its_scenario_and_never_for_a_skirmish() {
+    let (_fixture, mut game) = launched(POES_TOURNAMENT_ROW);
+    start(&mut game, SKIRMISH, 1_793_000_001, 1_000_000);
+    assert!(finish(&mut game, SKIRMISH, WIN, 1_793_000_001, 1_600_000).is_some());
+    assert!(game.earned_cards().is_empty(), "a skirmish is not the deck's fight");
+    start(&mut game, SCENARIO, 1_793_000_002, 2_000_000);
+    assert!(finish(&mut game, SCENARIO, WIN, 1_793_000_002, 2_600_000).is_some());
+    let prize = game.earned_cards();
+    assert_eq!(prize.len(), 3);
+    let saved = serde_json::to_string(&game.state()).unwrap();
+    let back: osfr_tools::gameplay::GameplayState = serde_json::from_str(&saved).unwrap();
+    assert_eq!(back.earned_cards.beaten.len(), 1, "the prize is in the save");
+    start(&mut game, SCENARIO, 1_793_000_003, 3_000_000);
+    assert!(finish(&mut game, SCENARIO, WIN, 1_793_000_003, 3_600_000).is_some());
+    assert_eq!(game.earned_cards(), prize, "once per deck");
+}
+
 #[test]
 fn losses_early_wins_and_tutorials_change_nothing() {
     let (_fixture, mut game) = launched(POES_TOURNAMENT_ROW);
