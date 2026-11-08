@@ -165,7 +165,10 @@ fn sam_offers_become_a_card_duelist_through_the_real_menu() {
         } else {
             vec![TALK_LABEL]
         };
-        assert_eq!(labels(&menu), expected, "{npc}: only Sam teaches the job");
+        // Masters also sell card packs (`card_game.json` `packs.sales`); this pins the job row.
+        const PACK_ROWS: [u32; 6] = [150_025, 4_992, 4_993, 4_994, 4_995, 4_996];
+        let shown: Vec<_> = labels(&menu).into_iter().filter(|label| !PACK_ROWS.contains(label)).collect();
+        assert_eq!(shown, expected, "{npc}: only Sam teaches the job");
         // All 63 Card Duelist quests stay disabled: Talk offers nothing.
         assert_no_offer(&mut game, &at, npc, &mut now, "Card Duelist NPC");
     }

@@ -97,6 +97,11 @@ pub enum NpcAction {
     CardDuel {
         activity: u32,
     },
+    /// (R) Buy a booster or starter deck (`card_game.json` `packs.sales`).
+    BuyCardPack {
+        item_id: i32,
+        coins: u32,
+    },
     /// (R) Dig here: a dig site's own Artifact Hunt board (`dig_sites.json`).
     DigSite {
         game: u32,
@@ -235,6 +240,10 @@ pub enum NpcSelection {
     /// The caller decides whether this row may start (`Gameplay::begin_soccer_gate`).
     Soccer(u32),
     CardDuel(u32),
+    BuyCardPack {
+        item_id: i32,
+        coins: u32,
+    },
     DigSite(u32),
     /// The caller decides whether the trip may start (`FishingService::enter`).
     Fish,
@@ -392,6 +401,7 @@ struct NpcContent {
     /// The rows a gate lists: game id, name id.
     soccer_rows: Vec<(u32, u32)>,
     card_duels: std::collections::HashMap<u64, Vec<(u32, u32, u32)>>,
+    card_packs: std::collections::HashMap<u64, Vec<(i32, u32, u32)>>,
     dig_sites: std::collections::HashMap<u64, (u32, u32)>,
     tower_defense_tables: TableMenus,
     /// The dock's book stands; each row is an arena and its label.
@@ -524,6 +534,7 @@ impl NpcInteraction {
                 soccer_gates: BTreeSet::new(),
                 soccer_rows: Vec::new(),
                 card_duels: std::collections::HashMap::new(),
+                card_packs: std::collections::HashMap::new(),
                 dig_sites: std::collections::HashMap::new(),
                 tower_defense_tables: BTreeMap::new(),
                 pirates_stands: BTreeMap::new(),
@@ -581,6 +592,17 @@ impl NpcInteraction {
             .filter(|npc| !self.content.npcs.contains_key(npc))
             .collect();
         Arc::make_mut(&mut self.content).card_duels = duels.into_iter().collect();
+        unknown
+    }
+
+    /// (R) The card packs each NPC sells; returns the NPCs the content does not know.
+    pub fn set_card_packs(&mut self, packs: Vec<(u64, Vec<(i32, u32, u32)>)>) -> Vec<u64> {
+        let unknown = packs
+            .iter()
+            .map(|(npc, _)| *npc)
+            .filter(|npc| !self.content.npcs.contains_key(npc))
+            .collect();
+        Arc::make_mut(&mut self.content).card_packs = packs.into_iter().collect();
         unknown
     }
 
@@ -762,6 +784,9 @@ impl NpcInteraction {
             NpcAction::Derby => Ok(NpcSelection::Derby),
             NpcAction::Soccer { game } => Ok(NpcSelection::Soccer(game)),
             NpcAction::CardDuel { activity } => Ok(NpcSelection::CardDuel(activity)),
+            NpcAction::BuyCardPack { item_id, coins } => {
+                Ok(NpcSelection::BuyCardPack { item_id, coins })
+            }
             NpcAction::DigSite { game } => Ok(NpcSelection::DigSite(game)),
             NpcAction::Fish => Ok(NpcSelection::Fish),
             NpcAction::TowerDefense { game } => Ok(NpcSelection::TowerDefense(game)),
@@ -1167,6 +1192,11 @@ impl NpcInteraction {
         if let (Some(decks), Some(engine)) = (self.content.card_duels.get(&npc.npc_id), quests) {
             let wanted = decks.iter().filter(|deck| engine.wants_minigame(deck.2));
             options.extend(wanted.map(|&(activity, name, _)| (NpcAction::CardDuel { activity }, name)));
+        }
+        if let Some(packs) = self.content.card_packs.get(&npc.npc_id) {
+            options.extend(
+                packs.iter().map(|&(item_id, name, coins)| (NpcAction::BuyCardPack { item_id, coins }, name)),
+            );
         }
         // (R) Likewise a dig: its row shows once the quest has reached the game step.
         if let (Some(&(game, name)), Some(engine)) = (self.content.dig_sites.get(&npc.npc_id), quests) {

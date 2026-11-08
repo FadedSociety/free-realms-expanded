@@ -514,6 +514,36 @@ fn an_npc_offers_its_deck_only_to_a_player_whose_quest_wants_it() {
     assert!(!labels.contains(&other), "Poe's other decks stay hidden: {labels:?}");
 }
 
+/// A pack on an NPC's menu is refused without its coins; bought, the coins go and its cards are kept.
+#[test]
+fn a_pack_on_an_npc_menu_takes_its_coins_and_joins_the_collection() {
+    const MACHINE_STARTER_NAME: u32 = 4_994;
+    const PRICE: u32 = 600;
+    let fixture = duel_fixture(&[]);
+    let mut game = card_duelist_as(&fixture, CHARACTER);
+    let poe = at(POE);
+    let menu = send(&mut game, &poe, &npc_interact(POE), 2_000);
+    let row = card_duelist::menu_option(&menu, MACHINE_STARTER_NAME);
+    assert!(coins(&game) < PRICE, "the fixture starts short of a deck");
+    let held = coins(&game);
+    let refused = send(&mut game, &poe, &card_duelist::npc_select(POE, row), 2_010);
+    assert!(!refused.changed, "a refusal is not saved");
+    assert!(said(&refused, "You need 600 coins"), "the player is told why");
+    assert_eq!(coins(&game), held, "no coins, no deck");
+    assert!(game.earned_cards().is_empty());
+
+    admin(&mut game);
+    send(&mut game, &poe, &chat::local_request("realm coins 1000"), 2_020);
+    let topped = coins(&game);
+    let menu = send(&mut game, &poe, &npc_interact(POE), 2_030);
+    let row = card_duelist::menu_option(&menu, MACHINE_STARTER_NAME);
+    let bought = send(&mut game, &poe, &card_duelist::npc_select(POE, row), 2_040);
+    assert!(bought.changed, "the purchase is saved");
+    assert_eq!(coins(&game), topped - PRICE);
+    let copies: u32 = game.earned_cards().iter().map(|card| card.copies as u32).sum();
+    assert_eq!(copies, 40, "a starter deck is 40 cards");
+}
+
 /// A dig site's row waits for the quest's game step, and picking it starts that site's own board.
 #[test]
 fn a_dig_sites_row_shows_at_the_game_step_and_starts_its_board() {

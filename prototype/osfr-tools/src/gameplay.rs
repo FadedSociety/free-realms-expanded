@@ -1144,8 +1144,12 @@ impl Gameplay {
         // (R) Each deck's own NPC offers it (`card_game.json` `npc_decks`).
         if let Some(interaction) = &mut npc_interaction {
             let cards = crate::card_game::Content::load_optional(npc_content)?;
+            let packs = cards.as_ref().map_or_else(Vec::new, |c| c.pack_sales());
             for npc in interaction.set_card_duels(cards.map_or_else(Vec::new, |c| c.npc_decks())) {
                 npc_event(serde_json::json!({"event": "card_duel_unknown_npc", "content_key": npc}));
+            }
+            for npc in interaction.set_card_packs(packs) {
+                npc_event(serde_json::json!({"event": "card_pack_unknown_npc", "content_key": npc}));
             }
             let sites = crate::artifact_hunt::load_dig_sites(npc_content)?;
             // A site whose game the hunt does not offer could start nothing: it gets no row.

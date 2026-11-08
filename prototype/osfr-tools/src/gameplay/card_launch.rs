@@ -99,6 +99,33 @@ impl Gameplay {
         Ok(Some((win, out)))
     }
 
+    /// (R) A booster or starter deck bought from an NPC's menu: the coins go and its cards join
+    /// the collection, seen at the next card login.
+    pub(super) fn buy_card_pack(&mut self, item_id: i32, coins: u32) -> io::Result<Outcome> {
+        let mut out = Outcome::default();
+        let clock = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH);
+        let seed = clock.map_or(1, |now| now.as_nanos() as u64) | 1;
+        let cards = self.activities.cards().and_then(|cards| cards.launch()?.packs.as_ref()?.open(item_id, seed));
+        let Some(cards) = cards else {
+            return Ok(out);
+        };
+        if !self.earned_cards.has_room_for(&cards) {
+            out.replies.push(chat::system("Your card collection has no room for those."));
+            return Ok(out);
+        }
+        let Ok(paid) = self.inventory.spend_coins(coins) else {
+            out.replies.push(chat::system(&format!("You need {coins} coins for that.")));
+            return Ok(out);
+        };
+        self.earned_cards.add(&cards);
+        out.replies.extend(paid.replies);
+        out.replies.push(chat::system(
+            "Your new cards join your collection the next time you open the card game.",
+        ));
+        out.changed = true;
+        Ok(out)
+    }
+
     /// (R) A deck's cards, the first time this character beats it. The open card window keeps
     /// the collection it synced at login, so the cards appear at the next one.
     fn pay_deck_prize(&mut self, deck: u32, out: &mut Outcome) {

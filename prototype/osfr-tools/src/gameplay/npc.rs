@@ -785,6 +785,7 @@ impl Gameplay {
                         npc_interaction::NpcAction::Derby => "derby",
                         npc_interaction::NpcAction::Soccer { .. } => "soccer",
                         npc_interaction::NpcAction::CardDuel { .. } => "card_duel",
+                        npc_interaction::NpcAction::BuyCardPack { .. } => "card_pack",
                         npc_interaction::NpcAction::DigSite { .. } => "dig_site",
                         npc_interaction::NpcAction::TowerDefense { .. } => "tower_defense",
                         npc_interaction::NpcAction::Pirates { .. } => "pirates",
@@ -969,6 +970,12 @@ impl Gameplay {
                     npc_event(select_event(runtime_guid, Some(key), option_id, "card_duel"));
                     // Session-only, so `changed` stays false: staged, the run would be thrown away.
                     out = self.begin_npc_card_duel(activity)?;
+                    out.replies.insert(0, END_DIALOG_26_4.to_vec());
+                }
+                Ok(NpcSelection::BuyCardPack { item_id, coins }) => {
+                    consume_menu = true;
+                    npc_event(select_event(runtime_guid, Some(key), option_id, "card_pack"));
+                    out = self.commit_if_changed(|staged| staged.buy_card_pack(item_id, coins))?;
                     out.replies.insert(0, END_DIALOG_26_4.to_vec());
                 }
                 Ok(NpcSelection::DigSite(game)) => {

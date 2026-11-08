@@ -192,7 +192,94 @@ pub struct Launch {
     pub prizes: Vec<DeckPrize>,
     #[serde(default)]
     pub prizes_source: Vec<Source>,
+    /// (R) What a bought pack opens into.
+    #[serde(default)]
+    pub packs: Option<CardPacks>,
     pub source: Vec<Source>,
+}
+
+/// (R) Booster packs and starter decks, bought from an NPC's menu and opened on purchase. The
+/// client's merchant window keeps its Buy button off for these items.
+#[derive(Debug, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct CardPacks {
+    pub boosters: Vec<BoosterPack>,
+    pub pools: BTreeMap<String, RarityPool>,
+    pub starter_decks: Vec<DeckPack>,
+    pub sales: Vec<PackSale>,
+    pub source: Vec<Source>,
+}
+
+/// One menu row: `npc_id` sells `item_id` for `coins`, labelled with the item's own name.
+#[derive(Debug, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct PackSale {
+    pub npc_id: u64,
+    pub item_id: i32,
+    pub name_id: u32,
+    pub coins: u32,
+}
+
+#[derive(Debug, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct BoosterPack {
+    pub item_id: i32,
+    pub series: u32,
+}
+
+/// One card series' archetypes by rarity.
+#[derive(Debug, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct RarityPool {
+    pub common: Vec<i32>,
+    pub uncommon: Vec<i32>,
+    pub rare: Vec<i32>,
+}
+
+#[derive(Debug, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct DeckPack {
+    pub item_id: i32,
+    /// One row per copy.
+    pub cards: Vec<i32>,
+}
+
+impl CardPacks {
+    /// The cards `item_id` opens into, or `None` when it isn't a pack. A booster is 1 rare, 3
+    /// uncommon and 6 common cards (wiki), picked from `seed`; a starter deck is fixed.
+    pub fn open(&self, item_id: i32, mut seed: u64) -> Option<Vec<i32>> {
+        if let Some(deck) = self.starter_decks.iter().find(|deck| deck.item_id == item_id) {
+            return Some(deck.cards.clone());
+        }
+        let booster = self.boosters.iter().find(|pack| pack.item_id == item_id)?;
+        let pool = self.pools.get(&booster.series.to_string())?;
+        let mut pick = |tier: &[i32], count: usize| -> Vec<i32> {
+            (0..count)
+                .map(|_| {
+                    // ponytail: xorshift, not a dice roll anyone can bet on; nothing here is scarce.
+                    seed ^= seed << 13;
+                    seed ^= seed >> 7;
+                    seed ^= seed << 17;
+                    tier[(seed % tier.len() as u64) as usize]
+                })
+                .collect()
+        };
+        let mut cards = pick(&pool.rare, 1);
+        cards.extend(pick(&pool.uncommon, 3));
+        cards.extend(pick(&pool.common, 6));
+        Some(cards)
+    }
+
+    fn valid(&self) -> bool {
+        let pool_ok = |p: &RarityPool| {
+            [&p.common, &p.uncommon, &p.rare].iter().all(|t| !t.is_empty() && t.iter().all(|c| *c > 0))
+        };
+        !self.source.is_empty()
+            && self.pools.values().all(pool_ok)
+            && self.boosters.iter().all(|b| self.pools.contains_key(&b.series.to_string()))
+            && self.starter_decks.iter().all(|d| d.cards.len() >= 40 && d.cards.iter().all(|c| *c > 0))
+            && self.sales.iter().all(|s| s.coins > 0 && self.open(s.item_id, 1).is_some())
+    }
 }
 
 /// L935: how a Skirmish or Scenario win reported by the card window pays (R values, bounded in
@@ -221,6 +308,9 @@ pub struct DeckPrize {
 /// The most copies of one card a sync carries for a character (the client's own `default.cln`
 /// holds up to 100).
 const MAX_EARNED_COPIES: i32 = 100;
+/// ponytail: a card login writes every copy in one frame (about 10 bytes each), so purchases stop
+/// here; split that frame if a player ever needs more.
+const MAX_TOTAL_COPIES: usize = 4_000;
 
 /// The cards a character has earned beyond the starter set, and the decks that already paid.
 /// Saved; the card window learns them from the collection sync at its next login.
@@ -243,6 +333,16 @@ impl EarnedCards {
         for card in cards {
             *self.copies.entry(*card).or_default() += 1;
         }
+    }
+
+    /// Whether every card in `cards` can still be kept, so a purchase never takes coins for nothing.
+    pub fn has_room_for(&self, cards: &[i32]) -> bool {
+        let total: usize = self.copies.values().map(|&held| held.max(0) as usize).sum();
+        total + cards.len() <= MAX_TOTAL_COPIES
+            && cards.iter().all(|card| {
+                let bought = cards.iter().filter(|other| *other == card).count() as i32;
+                self.copies.get(card).copied().unwrap_or(0) + bought <= MAX_EARNED_COPIES
+            })
     }
 
     /// Pays `prize` the first time `deck` is beaten; true when it paid.
@@ -647,6 +747,9 @@ impl Content {
                 "card duel needs distinct game types 1 to 3, 1 to 3600 seconds and at most 10000 coins",
             ));
         }
+        if self.launch.as_ref().and_then(|l| l.packs.as_ref()).is_some_and(|packs| !packs.valid()) {
+            return Err(invalid("card packs need a source, full pools and 40-card starter decks"));
+        }
         let (prizes, sourced) = self.launch.as_ref().map_or((&[][..], true), |launch| {
             (&launch.prizes[..], launch.prizes.is_empty() || !launch.prizes_source.is_empty())
         });
@@ -714,6 +817,15 @@ impl Content {
     /// T765: the launch settings, when Trading Card Game rows may start.
     pub fn launch(&self) -> Option<&Launch> {
         self.launch.as_ref()
+    }
+
+    /// The packs each NPC sells, as (item, name line, coins) rows.
+    pub fn pack_sales(&self) -> Vec<(u64, Vec<(i32, u32, u32)>)> {
+        let mut by_npc = BTreeMap::<u64, Vec<(i32, u32, u32)>>::new();
+        for sale in self.launch.iter().filter_map(|l| l.packs.as_ref()).flat_map(|p| &p.sales) {
+            by_npc.entry(sale.npc_id).or_default().push((sale.item_id, sale.name_id, sale.coins));
+        }
+        by_npc.into_iter().collect()
     }
 
     /// The cards deck `minigame_id` pays the first time it is beaten.
@@ -806,6 +918,36 @@ mod tests {
             packet.extend(value.to_le_bytes());
         }
         packet
+    }
+
+    /// A collection refuses a pack that would pass either bound.
+    #[test]
+    fn a_full_collection_has_no_room_for_a_pack() {
+        let mut earned = EarnedCards::default();
+        earned.add(&vec![5; MAX_EARNED_COPIES as usize - 1]);
+        assert!(earned.has_room_for(&[5]));
+        assert!(!earned.has_room_for(&[5, 5]), "one card's bound");
+        assert!(earned.has_room_for(&[6, 6]));
+        for card in 100..140 {
+            earned.add(&vec![card; MAX_EARNED_COPIES as usize]);
+        }
+        assert!(!earned.has_room_for(&[6]), "the whole collection's bound");
+    }
+
+    /// Every shipped pack opens to the right number of cards, and a seed varies a booster.
+    #[test]
+    fn a_pack_opens_into_its_cards() {
+        let cards = Content::load(&crate::content::bundled_content().join(CONTENT_FILE)).unwrap();
+        let packs = cards.launch().unwrap().packs.as_ref().unwrap();
+        for pack in &packs.boosters {
+            assert_eq!(packs.open(pack.item_id, 88_172_645_463_325_252).unwrap().len(), 10);
+        }
+        for deck in &packs.starter_decks {
+            assert_eq!(packs.open(deck.item_id, 1).unwrap().len(), 40);
+        }
+        let item = packs.boosters[0].item_id;
+        assert_ne!(packs.open(item, 7), packs.open(item, 991));
+        assert_eq!(packs.open(1, 7), None, "not a pack");
     }
 
     /// A deck pays once, and earned copies stack on the starter's.
