@@ -33108,8 +33108,23 @@
       "location_evidence": [
         "Boardwalk area; video nameplate in 25 frames (Qwzd_9ILWjA/00020, s_4bpO1xPDs/00316)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3952922,
+          "title": "One Man's Trash is Another Man's Treasure",
+          "title_string_id": 101419,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "One Man's Trash is Another Man's Treasure (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_one_man_s_trash_is_another_man_s_treasure_ac35b5)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3952922
+      ],
       "quests_given_text": [
         "\"Grab the tires that washed up on the beach\" (252834380, 2412802182; title not found); Riddle #3 of Sandstorm's Grand Opening (Part D)"
       ],
@@ -33559,11 +33574,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:617; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1858 (ModelId=311, ModelFileName=human_m_freestyle_02.agr, NameId=45558)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.76702,
       "model_id": 311,
-      "model_file_name": "human_m_freestyle_02.agr"
+      "model_file_name": "human_m_freestyle_02.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000613,

@@ -6501,10 +6501,37 @@
     {
       "id": 3040063,
       "title_string_id": 5100630,
-      "giver_npc_id": 9000000136,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "giver_npc_id": 9000000186,
+      "prerequisite_quest_ids": [
+        3040062
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 5100635,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Madam Zelda (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_return_from_the_rumbledome_bc2966)."
+            }
+          ],
+          "npc_id": 9000000136
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Card Duelist: Return from the Rumbledome (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_return_from_the_rumbledome_bc2966)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -6550,7 +6577,8 @@
       "description_string_id": 5100631,
       "intro_text_string_id": 5100629,
       "end_text_string_id": 5100632,
-      "enabled": false
+      "enabled": true,
+      "job": 120
     }
   ]
 }

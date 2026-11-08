@@ -16283,8 +16283,23 @@
       "location_evidence": [
         "\"Near the water in Shrouded Glade\" (57548928). Video: nameplate with Edvard (EkNbw2nCVQc/00012, /00014) and with Chef Safrie at the cooking table and Wishing Well (QBr1g_qkZMY/00000, /00030, l7dWE7ImZ8w/00126)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3952928,
+          "title": "Overboard!",
+          "title_string_id": 390263,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Overboard! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_overboard_bd7224)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3952928
+      ],
       "quests_given_text": [
         "Rescue Shelby: oars (\"Emil Jadefish accidentally left his friend Shelby stranded on a small island in Shrouded Glade. He can't rescue her without his oars\" 2310020106; \"Find Emil's oars floating in the water within Shrouded Glade.\" 4169512516); apology errand (\"Emil really wants to apologize to Shelby\" 420566424); fish release (\"Emil would like for you to catch some fish from Lakeshore and then release them in the water next to him in Shrouded Glade.\" 1558693511; \"Release the fish in Shrouded Glade\" 953406926)."
       ],
@@ -16734,11 +16749,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:144; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1367 (ModelId=468, ModelFileName=fairy_druid_m.adr, NameId=45399)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.136566,
       "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr"
+      "model_file_name": "fairy_druid_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000681,

@@ -6359,6 +6359,275 @@
       "job": 120,
       "description_string_id": 413826,
       "enabled": true
+    },
+    {
+      "id": 3952795,
+      "title_string_id": 46739,
+      "giver_npc_id": 9500001002,
+      "prerequisite_quest_ids": [
+        3950388
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 70475,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect mugs of sasparilla - 0/4 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_drinks_on_the_house_71e425)."
+            }
+          ],
+          "node_type": "quest-mugs-of-sasparilla",
+          "quantity": 4
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 70502,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver sasparilla to Sal (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_drinks_on_the_house_71e425)."
+            }
+          ],
+          "npc_id": 9500000996
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 70506,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver sasparilla to Happalot (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_drinks_on_the_house_71e425)."
+            }
+          ],
+          "npc_id": 9500000984
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 70510,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver sasparilla to Delilah (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_drinks_on_the_house_71e425)."
+            }
+          ],
+          "npc_id": 9500000973
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 70508,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver sasparilla to Chuggoom (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_drinks_on_the_house_71e425)."
+            }
+          ],
+          "npc_id": 9500000970
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 6,
+          "text_string_id": 46779,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Twingnbor (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_drinks_on_the_house_71e425)."
+            }
+          ],
+          "npc_id": 9500001002
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Drinks on the House (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_drinks_on_the_house_71e425)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Drinks on the House (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_drinks_on_the_house_71e425)."
+        }
+      ],
+      "description_string_id": 46738,
+      "intro_text_string_id": 46738,
+      "enabled": true
+    },
+    {
+      "id": 3952922,
+      "title_string_id": 101419,
+      "giver_npc_id": 9500000612,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 101421,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect tires from the beach in Seaside - 0/10 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_one_man_s_trash_is_another_man_s_treasure_ac35b5)."
+            }
+          ],
+          "node_type": "quest-tires",
+          "quantity": 10
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 101423,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Pablo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_one_man_s_trash_is_another_man_s_treasure_ac35b5)."
+            }
+          ],
+          "npc_id": 9500000612
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 61,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "One Man's Trash is Another Man's Treasure (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_one_man_s_trash_is_another_man_s_treasure_ac35b5)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "One Man's Trash is Another Man's Treasure (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_one_man_s_trash_is_another_man_s_treasure_ac35b5)."
+        }
+      ],
+      "description_string_id": 101425,
+      "intro_text_string_id": 101425,
+      "enabled": true
+    },
+    {
+      "id": 3952926,
+      "title_string_id": 3330,
+      "giver_npc_id": 9500000490,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 415417,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find candy bags - 0/8 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_oops_29af81)."
+            }
+          ],
+          "node_type": "quest-candy-bags-2",
+          "quantity": 8
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 415419,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Guard Snapdragon (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_oops_29af81)."
+            }
+          ],
+          "npc_id": 9500000490
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Oops! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_oops_29af81)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Oops! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_oops_29af81)."
+        }
+      ],
+      "description_string_id": 415276,
+      "enabled": true
+    },
+    {
+      "id": 3952928,
+      "title_string_id": 390263,
+      "giver_npc_id": 9500000680,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 390268,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the oars - (0/2) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_overboard_bd7224)."
+            }
+          ],
+          "node_type": "quest-oars",
+          "quantity": 2
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 390274,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return the oars to Emil Jadefish (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_overboard_bd7224)."
+            }
+          ],
+          "npc_id": 9500000680
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 7,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Overboard! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_overboard_bd7224)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Overboard! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_overboard_bd7224)."
+        }
+      ],
+      "description_string_id": 390262,
+      "intro_text_string_id": 390262,
+      "enabled": true
     }
   ]
 }

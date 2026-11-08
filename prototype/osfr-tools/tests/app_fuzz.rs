@@ -1132,7 +1132,8 @@ fn t3_routed_hostile_corpus_content_and_trace_on_off() {
         "W90 routed corpus: {count} mutations, elapsed {:?}",
         start.elapsed()
     );
-    assert!(start.elapsed() < Duration::from_secs(60));
+    // A hang guard, not a benchmark: the corpus alone takes about 60 s in a debug build now.
+    assert!(start.elapsed() < Duration::from_secs(120));
 }
 
 #[test]

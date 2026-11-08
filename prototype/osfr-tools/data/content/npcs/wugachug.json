@@ -17623,10 +17623,23 @@
               "evidence": "Spread the Good Cheer (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_spread_the_good_cheer_19c4b8)."
             }
           ]
+        },
+        {
+          "quest_id": 3952795,
+          "title": "Drinks on the House",
+          "title_string_id": 46739,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Drinks on the House (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_drinks_on_the_house_71e425)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3950388
+        3950388,
+        3952795
       ],
       "quests_given_text": [
         "Kart Driver: Endorsement Deal (Shooblemoot sends the player: \"Find Twingnbor in Wugachug. He will give you the specifics\" 1589182333; \"Talk to Twingnbor in Wugachug about a possible sponsorship deal.\" 1814784711; \"Return to Twingnbor\" 2415598343). The party-hosting jobs: \"Pick up the jugs of sasparilla behind Twingnbor and bring them to Sal, Delilah, Happalot, and Chuggoom in Wugachug.\" (1099236009); \"Pick up some mugs of sasparilla from the table behind Twingnbor ...\" (2543985805); \"Return to Twingnbor and tell him that the party is a success.\" (2888060771); also \"Twingnbor is running low on sasparilla. Do him a favor and let Sasparilla Brewmaster Wugawump know.\" (840324519)."

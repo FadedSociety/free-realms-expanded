@@ -29002,10 +29002,23 @@
               "evidence": "The Search for Snorg (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_search_for_snorg_4152bb)."
             }
           ]
+        },
+        {
+          "quest_id": 3952926,
+          "title": "Oops!",
+          "title_string_id": 3330,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Oops! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_oops_29af81)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3950425
+        3950425,
+        3952926
       ],
       "quests_given_text": [
         "Oops!"
