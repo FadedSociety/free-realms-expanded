@@ -969,12 +969,12 @@ fn therin_is_drawable_and_the_quest_content_resolves() {
     );
 
     // The neighbouring records keep their recovered titles. T334 enabled 3100003 and T411
-    // enables 3100004 ("Rush Order"); T542 enables 3100001 (Become a Miner) and 3100005
-    // ("Gem Appraisal") stays disabled.
+    // enables 3100004 ("Rush Order"); T542 enables 3100001 (Become a Miner); 3100005
+    // ("Gem Appraisal") went live for Miners on 2026-11-08.
     for (id, title, enabled) in [
         (3_100_001_u32, 139_748_u32, true),
         (RUSH_ORDER, RUSH_ORDER_TITLE, true),
-        (3_100_005, 76_770, false),
+        (3_100_005, 76_770, true),
     ] {
         let record = row(&quests["records"].as_array().unwrap(), u64::from(id));
         assert_eq!(
@@ -1650,7 +1650,8 @@ fn the_record_and_both_npcs_resolve() {
         assert_eq!(
             record["enabled"],
             // Warrior Weapon (3020006) is on again since the cudgel recipe was reconstructed.
-            json!(id == u64::from(RUSH_ORDER) || id == 3_020_006),
+            // Gem Appraisal (3100005) went live for Miners on 2026-11-08.
+            json!(id == u64::from(RUSH_ORDER) || id == 3_020_006 || id == 3_100_005),
             "quest {id} enabled state"
         );
     }
@@ -2092,9 +2093,9 @@ fn the_objective_is_produced_by_the_shipped_mining_board() {
         "the stale empty-record tags are gone"
     );
 
-    // Gem Appraisal stays disabled. T729 enabled the Southvale gate 3100019, so 3100020 follows it
+    // Gem Appraisal is live for Miners. T729 enabled the Southvale gate 3100019, so 3100020 follows it
     // and now pays a reward (the reachability gate refuses an empty one).
-    assert_eq!(row(records, 3_100_005)["enabled"], json!(false));
+    assert_eq!(row(records, 3_100_005)["enabled"], json!(true));
     assert_eq!(
         row(records, 3_100_020)["prerequisite_quest_ids"],
         json!([3_100_019])

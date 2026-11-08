@@ -8632,10 +8632,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Caleb_Sleepyswing"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 312,
-      "model_file_name": "human_m_freestyle_03.agr"
+      "model_file_name": "human_m_freestyle_03.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000886,
@@ -41772,8 +41779,55 @@
       "location_evidence": [
         "Wildwood Speedway (276795004)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3080008,
+          "title": "Kart Driver: You Want to Go Fast",
+          "title_string_id": 394434,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 6; name 'Kart Driver: You Want To Go Fast?'; title id cell 740273092 ucdt; 1281527898 ucdt, 1302444103 ugdt (spelled \"To\" in the first, \"to\" in the others)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080008 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3080008
+      ],
       "quests_given_text": [
         "Target of Kart Driver: You Want To Go Fast?; sends the player to Blammo for a sponsor (241877165)."
       ],
@@ -42085,11 +42139,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1756; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3013 (ModelId=838, ModelFileName=human_m_tr_walker_jr.agr, NameId=101905)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.300186,
       "model_id": 838,
-      "model_file_name": "human_m_tr_walker_jr.agr"
+      "model_file_name": "human_m_tr_walker_jr.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000951,
@@ -44172,12 +44233,53 @@
               "evidence": "title_string_id corrected from raw locale hash 149184716 to Global.Text id 403458 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3060008,
+          "title": "Demo Derby: Break 'er In",
+          "title_string_id": 403449,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 1: Thunder Falls and Crash Davis (training, karts, Crash for Coin), row 5; name \"Demo Derby: Break 'er In\"; title id cell 67778496 ucdt; 2552025369 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3060008 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3060014,
         3060015,
-        3060016
+        3060016,
+        3060008
       ],
       "quests_given_text": [
         "Demo Derby: Curious Crash (inferred), Demo Derby: Arena Revenge (inferred), Demo Derby: Seeking a Sponsor (sends the player to Kanan in Stillwater Crossing, 880667942)."
@@ -44648,11 +44750,18 @@
             "kind": "client",
             "evidence": "(R) The client model named after this NPC (human_m_tucker_thunderjolt.agr); the row drew human_m_samuel_bunker.agr, a generic or another NPC's model. Checked in lab/tools/model-view and against the NPC's wiki picture."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.148948,
       "model_id": 1334,
-      "model_file_name": "human_m_tucker_thunderjolt.agr"
+      "model_file_name": "human_m_tucker_thunderjolt.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000955,

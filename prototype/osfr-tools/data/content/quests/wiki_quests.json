@@ -6628,6 +6628,63 @@
       "description_string_id": 390262,
       "intro_text_string_id": 390262,
       "enabled": true
+    },
+    {
+      "id": 3953011,
+      "title_string_id": 416478,
+      "giver_npc_id": 9500000467,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 416483,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Play and beat Dani's Creepy Crawly deck (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_creepy_crawly_cards_39c23c)."
+            }
+          ],
+          "minigame_id": 710,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 398206,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Dani (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_creepy_crawly_cards_39c23c)."
+            }
+          ],
+          "npc_id": 9500000467
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 2026-11-08: the small coin fallback; the wiki's own reward for this quest is a Chiller Boombox, not yet granted."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Creepy Crawly Cards (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_creepy_crawly_cards_39c23c)."
+        }
+      ],
+      "job": 120,
+      "description_string_id": 416479,
+      "intro_text_string_id": 416477,
+      "enabled": true,
+      "end_text_string_id": 416480
     }
   ]
 }

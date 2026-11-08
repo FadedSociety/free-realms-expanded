@@ -103,7 +103,8 @@ fn challenging_tr_is_offered_by_linx_and_paid_once() {
         "a duplicate 49/14",
     );
     assert_no_offer(&mut game, &linx, LINX, &mut now, "Linx after");
-    assert_no_offer(&mut game, &walker, TR_WALKER, &mut now, "T.R. after");
+    // T.R.'s next link, You Want to Go Fast, is live for Kart Drivers.
+    npc_quest_chain::offer(&mut game, &walker, TR_WALKER, 3_080_008, now);
 }
 
 #[test]

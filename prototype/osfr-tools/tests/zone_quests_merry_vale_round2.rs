@@ -234,7 +234,8 @@ fn tumbolina_distracted_runs_through_braldan_and_survives_a_reconnect() {
     assert_eq!(profile_xp(&game, WARRIOR), xp_before + quest.profile_xp);
     let replay = quest_reply(DISTRACTED, true);
     assert_packet_changes_nothing(&mut game, &tumbolina, &replay, now, "a replayed 49/2");
-    assert_no_offer(&mut game, &tumbolina, TUMBOLINA, &mut now, "after");
+    // Her next link, Too Distracted to Work, is live for Warriors.
+    npc_quest_chain::offer(&mut game, &tumbolina, TUMBOLINA, 3_150_009, now);
 }
 
 #[test]

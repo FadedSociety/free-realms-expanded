@@ -690,7 +690,20 @@
       "prerequisite_quest_ids": [
         3150008
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 71239,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Aster (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_too_distracted_to_work_9d2567)."
+            }
+          ],
+          "npc_id": 9000000243
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -725,19 +738,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
           "kind": "reconstructed",
           "evidence": "(R) source explicitly says after row W8; mapped that page label to the preceding batch content key"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         },
         {
           "kind": "reconstructed",
@@ -747,15 +752,68 @@
       "description_string_id": 71234,
       "intro_text_string_id": 71232,
       "end_text_string_id": 71235,
-      "enabled": false
+      "enabled": true,
+      "job": 32
     },
     {
       "id": 3150010,
       "title_string_id": 387489,
       "giver_npc_id": 9000000243,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3150009
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 387438,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Visit Caleb Sleepyswing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_achieve_level_10_4ef1d9)."
+            }
+          ],
+          "npc_id": 9000000040
+        },
+        {
+          "kind": "job_level",
+          "id": 2,
+          "text_string_id": 387498,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reach Level 10 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_achieve_level_10_4ef1d9)."
+            }
+          ],
+          "profile_id": 32,
+          "level": 10
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 91812,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Aster (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_achieve_level_10_4ef1d9)."
+            }
+          ],
+          "npc_id": 9000000243
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Warrior: Achieve Level 10 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_achieve_level_10_4ef1d9)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -775,19 +833,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
           "kind": "reconstructed",
           "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         },
         {
           "kind": "reconstructed",
@@ -797,7 +847,8 @@
       "description_string_id": 387490,
       "intro_text_string_id": 387488,
       "end_text_string_id": 387491,
-      "enabled": false
+      "enabled": true,
+      "job": 32
     },
     {
       "id": 3150011,

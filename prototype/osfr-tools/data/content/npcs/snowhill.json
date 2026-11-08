@@ -38305,11 +38305,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2349; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3607 (ModelId=382, ModelFileName=dwarf_miner_m.adr, NameId=5456). NameId resolves in the client locale to 'Sorin'."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.24,
       "model_id": 382,
-      "model_file_name": "dwarf_miner_m.adr"
+      "model_file_name": "dwarf_miner_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000772,

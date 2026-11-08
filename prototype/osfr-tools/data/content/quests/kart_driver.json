@@ -602,9 +602,37 @@
     {
       "id": 3080008,
       "title_string_id": 394434,
-      "giver_npc_id": 9000000540,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9500000950,
+      "prerequisite_quest_ids": [
+        3080007
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 394449,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win the You Want to Go Fast race. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_you_want_to_go_fast_8b63f9)."
+            }
+          ],
+          "minigame_id": 630,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394401,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to T.R. Walker Jr. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_you_want_to_go_fast_8b63f9)."
+            }
+          ],
+          "npc_id": 9500000950
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -616,6 +644,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 525 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/kart-driver.json, record 3080008)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 2026-11-08: a Kart Driver quest, so only a Kart Driver is offered it; it follows Challenging T.R. on the wiki, and its reward is the wiki's own star value."
             }
           ]
         }
@@ -635,10 +667,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -651,17 +679,18 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) 2026-11-08: a Kart Driver quest, so only a Kart Driver is offered it; it follows Challenging T.R. on the wiki, and its reward is the wiki's own star value."
         }
       ],
       "description_string_id": 394435,
       "intro_text_string_id": 394433,
       "end_text_string_id": 394436,
-      "enabled": false
+      "enabled": true,
+      "job": 48
     },
     {
       "id": 3080009,

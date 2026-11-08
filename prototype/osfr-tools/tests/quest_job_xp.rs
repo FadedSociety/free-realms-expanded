@@ -1000,11 +1000,40 @@ fn content_overflow_is_rejected_at_load() {
     let _ = fs::remove_dir_all(&scratch);
 }
 
+/// The job-line quests wired on 2026-11-08 are offered only to their own job.
+#[test]
+fn the_wired_job_line_quests_keep_their_job_gates() {
+    for (file, id, job) in [
+        ("demo_derby_driver.json", 3_060_008_u64, 49),
+        ("miner.json", 3_100_005, 14),
+        ("warrior.json", 3_150_009, 32),
+        ("warrior.json", 3_150_010, 32),
+        ("wiki_quests.json", 3_953_011, 120),
+    ] {
+        let path = content_dir().join("quests").join(file);
+        let document: Value = serde_json::from_slice(&fs::read(path).unwrap()).unwrap();
+        let records = document["records"].as_array().unwrap();
+        let record = records.iter().find(|record| record["id"] == id);
+        assert_eq!(record.expect("the quest ships")["job"], json!(job), "quest {id}");
+    }
+}
+
 #[test]
 fn configured_job_xp_and_job_gates_match_the_task_table() {
     let content = content_dir();
     // (file, quest id, giver, prerequisites, reward coins, job gate, profile, XP)
-    let expected: [(&str, u32, u64, &[u32], u32, Option<i32>, i32, u32); 30] = [
+    let expected: [(&str, u32, u64, &[u32], u32, Option<i32>, i32, u32); 31] = [
+        // L1057: the Kart line's next link, gated like the rest of it.
+        (
+            "kart_driver.json",
+            3_080_008,
+            9_500_000_950,
+            &[3_080_007],
+            0,
+            Some(KART_DRIVER),
+            KART_DRIVER,
+            525, // L926: wiki stars
+        ),
         (
             "adventurer.json",
             INTRODUCE_YOURSELF,
@@ -1358,6 +1387,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             3_100_004 => "(R) T411:",
             3_080_007 | 3_080_009 => "(R) T732:",
             3_080_019 => "(R) T726:",
+            3_080_008 => "(R) 2026-11-08:",
             _ => "",
         };
         source.as_array().is_some_and(|tags| {

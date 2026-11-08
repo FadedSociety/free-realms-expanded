@@ -452,9 +452,37 @@
     {
       "id": 3060008,
       "title_string_id": 403449,
-      "giver_npc_id": 9000000529,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9000000495,
+      "prerequisite_quest_ids": [
+        3060013
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 394060,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Knockout 4 cars (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_break_er_in_618e35)."
+            }
+          ],
+          "minigame_id": 604,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394061,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Tucker Thunderjolt outside of Thunder Falls Speedway (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_break_er_in_618e35)."
+            }
+          ],
+          "npc_id": 9000000495
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -485,10 +513,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -498,13 +522,12 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49,
+      "description_string_id": 394017,
+      "intro_text_string_id": 393374
     },
     {
       "id": 3060009,
