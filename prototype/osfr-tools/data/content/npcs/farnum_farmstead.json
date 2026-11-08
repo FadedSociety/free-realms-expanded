@@ -7678,8 +7678,49 @@
       "location_evidence": [
         "Farnum Farmstead (2169546441). Not seen in video."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953285,
+          "title": "Rivaling Rucks",
+          "title_string_id": 390113,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Rivaling Rucks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rivaling_rucks_ef5f21)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3953168,
+          "title": "Furious Foraging",
+          "title_string_id": 390121,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Furious Foraging (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_furious_foraging_3472cb)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3953373,
+          "title": "Vegetable Medley",
+          "title_string_id": 390211,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Vegetable Medley (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_vegetable_medley_87584d)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953285,
+        3953168,
+        3953373
+      ],
       "quests_given_text": [
         "Rivaling Rucks (\"Beat Rucks high score in the Harvesting minigame!\" 437865636; \"Rucks knows who the best harvester around is, and challenges you to a friendly match!\" 29811132; repeat \"Rucks wants a rematch, he was going easy on you last time!\" 4171824254, 4177750251; objective \"Speak to Rucks\" 3899334583)."
       ],
@@ -7985,10 +8026,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob%3ARucks"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr"
+      "model_file_name": "fairy_druid_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000279,
@@ -8468,10 +8516,23 @@
               "evidence": "Picking Up Chicks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_picking_up_chicks_e4a523)."
             }
           ]
+        },
+        {
+          "quest_id": 3953125,
+          "title": "Enough For Dinner",
+          "title_string_id": 19155,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Enough For Dinner (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_enough_for_dinner_849959)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3951362
+        3951362,
+        3953125
       ],
       "quests_given_text": [
         "An untitled harvesting quest: \"Help Tamara by harvesting.\" (214303431), \"Return to Tamara at Farnum Farmstead\" (932572323), \"Return to Tamara\" (2747406420). Rucks's challenge confirms it: \"I heard that you helped Tamara collect ingredients for dinner...\" (2169546441). Title and rewards unknown; mentioned in Adventurer gaps."

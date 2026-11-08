@@ -17468,8 +17468,49 @@
       "location_evidence": [
         "\"Hanging out on a porch near Oxalis\" (1207163613). [video: marker \"Funnel Birdweed\", low confidence, 9YtzJEW_TEs/00032]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953669,
+          "title": "The Concoction",
+          "title_string_id": 38328,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Concoction (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_concoction_45a51d)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3953589,
+          "title": "Not Sweet Enough",
+          "title_string_id": 38351,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Not Sweet Enough (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_not_sweet_enough_893338)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3953396,
+          "title": "A Pinch of Choy",
+          "title_string_id": 38364,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Pinch of Choy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_pinch_of_choy_f9d2a7)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953669,
+        3953589,
+        3953396
+      ],
       "quests_given_text": [
         "Harvest gummyfruit (1396874048, 2133810612), then chugaroot (811508545) and choychoy (2607838681) for his drink. Title not found."
       ],
@@ -17847,11 +17888,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2131; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3388 (ModelId=32, ModelFileName=fairy_m_farmer_01.adr, NameId=38029)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.620095,
       "model_id": 32,
-      "model_file_name": "fairy_m_farmer_01.adr"
+      "model_file_name": "fairy_m_farmer_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000901,
@@ -21225,8 +21273,23 @@
       "location_evidence": [
         "East of Greta (\"Last I saw him he was off to the east of here\", 1024620748). [video: his line appears while the tracker reads \"Chapter 1: The Missing Sisters\", I4VncbC3xYw/00000, /00016; the Adventurer page does not link him to that quest, so the tie is weak]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953013,
+          "title": "A Bounty of Berries",
+          "title_string_id": 37487,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Bounty of Berries (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_bounty_of_berries_45a977)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953013
+      ],
       "quests_given_text": [
         "\"Return the snowberries to Hans\" (1244371158)."
       ],
@@ -32263,8 +32326,36 @@
       "location_evidence": [
         "\"In the garden near one of the huts at Pixie Nursery\" (437740973)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953300,
+          "title": "Scatterbrain",
+          "title_string_id": 21960,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Scatterbrain (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_scatterbrain_17c7cc)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3953294,
+          "title": "Sanctuary Delivery",
+          "title_string_id": 18788,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Sanctuary Delivery (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sanctuary_delivery_3fca3f)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953300,
+        3953294
+      ],
       "quests_given_text": [
         "Seller in the butterfly-nectar errand (\"The only person who sells it is Peacepetal in the Pixie Nursery\", 2271138909; \"Get some nectar from Peacepetal at the Pixie Nursery for Ginger's butterflies\", 42174500). Also a Merry Vale invitation: \"Speak with Peacepetal about taking a vacation to Merry Vale\" (3074765659)."
       ],
@@ -46087,8 +46178,23 @@
       "location_evidence": [
         "\"Find Voggun at the Tree Circle\" (1591728724). [video: green marker 67 to 110 m, huZ4Hl_YSIc/00020, /00034, Ml2qwkrJtR4/00038]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953153,
+          "title": "Flower BAD!",
+          "title_string_id": 39895,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Flower BAD! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_flower_bad_c5fe90)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953153
+      ],
       "quests_given_text": [
         "Destroy the Troll Ritualists' cauldron in the Fort so he can summon spirits again (1599080019, 2353925221); clear the angry flowers (1899056516, 3075021592). Titles not found."
       ],

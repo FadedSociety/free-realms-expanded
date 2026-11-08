@@ -7480,11 +7480,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3430; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4863 (ModelId=42, ModelFileName=fairy_f_02.adr, NameId=3069)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.848005,
       "model_id": 42,
-      "model_file_name": "fairy_f_02.adr"
+      "model_file_name": "fairy_f_02.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000735,
@@ -43439,11 +43446,24 @@
               "evidence": "Day 9: Snowhill Soccer (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_day_9_snowhill_soccer_a49743)."
             }
           ]
+        },
+        {
+          "quest_id": 3953095,
+          "title": "Day 11: Snowhill Derby",
+          "title_string_id": 441118,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Day 11: Snowhill Derby (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_day_11_snowhill_derby_97de36)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3070042,
-        3950114
+        3950114,
+        3953095
       ],
       "quests_given_text": [
         "The 12 daily quests (12 Days quests)."
@@ -46052,11 +46072,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2323; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3580 (ModelId=36, ModelFileName=fairy_f_valinda.adr, NameId=186)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.230107,
       "model_id": 36,
-      "model_file_name": "fairy_f_valinda.adr"
+      "model_file_name": "fairy_f_valinda.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000780,
@@ -46593,8 +46620,49 @@
       "location_evidence": [
         "\"Willie lives in Snowhill at 3 Icecrest Ct\" (client 1529110536); crate by his house (4073640662). [video: green marker 33-67 m near the ice cave frames, _a9VF878icg/00016]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953151,
+          "title": "Flattery is Everything",
+          "title_string_id": 36840,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Flattery is Everything (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_flattery_is_everything_7b54a6)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3953175,
+          "title": "Getting the Girl",
+          "title_string_id": 36850,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Getting the Girl (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_getting_the_girl_368679)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3953383,
+          "title": "Woe is Willie",
+          "title_string_id": 36873,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Woe is Willie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_woe_is_willie_d19cda)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953151,
+        3953175,
+        3953383
+      ],
       "quests_given_text": [
         "Woe is Willie (client title 1008265997): recite his poem to Carrie, bring flowers from the Pixie Nursery, a present from his crate."
       ],
@@ -46960,9 +47028,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3905 spawnNpcWithGuid(33691); src/Resources/Npcs.json Id=33691"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": 0.914959985
+      "heading": 0.914959985,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000782,
@@ -48736,8 +48811,23 @@
       "location_evidence": [
         "Near the post office, south of the central tree."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953183,
+          "title": "Groceries for Terrence",
+          "title_string_id": 72434,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Groceries for Terrence (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_groceries_for_terrence_6624dc)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953183
+      ],
       "quests_given_text": [],
       "quests_accepted": [],
       "quests_accepted_reason": null,

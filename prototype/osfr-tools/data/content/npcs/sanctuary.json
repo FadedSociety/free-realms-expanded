@@ -9770,8 +9770,23 @@
       "location_evidence": [
         "Pixiewood Hills"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953116,
+          "title": "Double, Double, Toil and Trouble",
+          "title_string_id": 415291,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Double, Double, Toil and Trouble (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_double_double_toil_and_trouble_1b36f3)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953116
+      ],
       "quests_given_text": [
         "Double, Double, Toil and Trouble"
       ],
@@ -10147,10 +10162,17 @@
             "kind": "client",
             "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 1709,
-      "model_file_name": "human_f_costume_brunhilda.agr"
+      "model_file_name": "human_f_costume_brunhilda.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000457,
@@ -21297,8 +21319,23 @@
       "location_evidence": [
         "Souvenir Stand in the Memorial Caverns (2294982218)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953155,
+          "title": "Food for Fhred",
+          "title_string_id": 21551,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Food for Fhred (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_food_for_fhred_da4505)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953155
+      ],
       "quests_given_text": [
         "Food for Fhred (waffles from Jacque's Cafe, 967708077)"
       ],
@@ -55890,8 +55927,23 @@
       "location_evidence": [
         "Pixiewood Hills"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953110,
+          "title": "Dem Bones",
+          "title_string_id": 415287,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Dem Bones (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_dem_bones_eddff2)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953110
+      ],
       "quests_given_text": [
         "Dem Bones"
       ],
@@ -56257,9 +56309,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3662 spawnNpcWithGuid(33438); src/Resources/Npcs.json Id=33438"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -1.24565005
+      "heading": -1.24565005,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000535,
@@ -56570,9 +56629,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3456 spawnNpcWithGuid(33165); src/Resources/Npcs.json Id=33165"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": 1.02903392
+      "heading": 1.02903392,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000207,
@@ -61254,8 +61320,23 @@
       "location_evidence": [
         "Memorial Caverns (2975777843)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953286,
+          "title": "Robgoblin Recycling Program",
+          "title_string_id": 75969,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Robgoblin Recycling Program (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_robgoblin_recycling_program_58a3e8)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953286
+      ],
       "quests_given_text": [
         "Sold a fake treasure map (2676418910); fliers task (2746100802, title unknown)"
       ],

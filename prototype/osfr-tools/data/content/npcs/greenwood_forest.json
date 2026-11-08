@@ -85,9 +85,49 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part C. The forest, the dig site and the wildlife camp, row 89; source cell: [client][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3953164,
+          "title": "Friendly Competition",
+          "title_string_id": 70383,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Friendly Competition (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_friendly_competition_727cfd)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3953367,
+          "title": "Turning the Tables",
+          "title_string_id": 70392,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Turning the Tables (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_turning_the_tables_3bdfbe)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3953112,
+          "title": "Digging for Glory",
+          "title_string_id": 71548,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Digging for Glory (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_digging_for_glory_601834)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3953164,
+        3953367,
+        3953112
+      ],
       "quests_given_text": [
         "The wiki Greenwood Forest page lists three Ambrose quests: Friendly Competition (client title 1709971177), Turning the Tables (4135591801), Digging for Glory (3896383253). Description by wording: \"Ambrose needs some help if he's going to be able to compete with his arch rival Sir Wellington. Deliver this package to Sir Wellington and get his reaction.\" (3103689650, 2523437218) goes with the package errand; the other two have no description match. Card Duelist: Card Duelist: Confronting Ambrose (Esther sends the player, 208379763, 1796047545), Card Duelist: Something Precious (inferred). Level 20 Card Duelist is needed for his duel (client 2427999653, per Card Duelist). Pays Carson's report (526810817)."
       ],
@@ -5969,9 +6009,23 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part A. The Summer Camp: Camp Chatty and Camp Robbie, row 45; source cell: [client][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3953370,
+          "title": "Unearthing Treasures",
+          "title_string_id": 429356,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Unearthing Treasures (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_unearthing_treasures_19517e)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3953370
+      ],
       "quests_given_text": [
         "Unearthing Treasures (wiki, repeatable; client title 2829905873): \"Counselor Cammy is teaching the campers how to dig for treasures. Give it a try, and play the Artifact Hunt game. Then, show Robbie your findings.\" (2812940865)."
       ],
@@ -8874,9 +8928,23 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part A. The Summer Camp: Camp Chatty and Camp Robbie, row 41; source cell: [client][video][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3953107,
+          "title": "Defensive Strategy",
+          "title_string_id": 429315,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defensive Strategy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_defensive_strategy_d8c5d1)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3953107
+      ],
       "quests_given_text": [
         "Defensive Strategy (wiki, repeatable; client title 2942004367): \"Counselor Tyra has developed a plan to help campers prepare for an attack by forest creatures. Beat her tower defense game.\" (3145602193); \"Beat Counselor Tyra's game, Gardening 101 on medium difficulty.\" (3019507607). Goal target \"Knock out Counselor Tyra\" (1564263106)."
       ],

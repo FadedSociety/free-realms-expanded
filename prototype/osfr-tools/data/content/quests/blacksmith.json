@@ -2042,12 +2042,74 @@
     {
       "id": 3020026,
       "title_string_id": 95098,
-      "giver_npc_id": 9000000006,
+      "giver_npc_id": 9500002016,
       "prerequisite_quest_ids": [
         3020025
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 100284,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the Summersaber (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_lady_of_the_lake_f1e9da)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: plain grey sword (sheets/g_items3.png r1c1, tile of sword_ar_ag_weapon_trainingsword.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_blacksmith_lady_of_the_lake_f1e9da)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "plain weapon mesh; may need a native look as a node actor"
+            }
+          ],
+          "node_type": "quest-summersaber",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 100288,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Anata Caliburn (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_lady_of_the_lake_f1e9da)."
+            }
+          ],
+          "npc_id": 9500002016
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 100295,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Anata (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_lady_of_the_lake_f1e9da)."
+            }
+          ],
+          "npc_id": 9500002016
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Blacksmith: Lady of the Lake (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_lady_of_the_lake_f1e9da)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2082,17 +2144,57 @@
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 16,
+      "description_string_id": 95109,
+      "intro_text_string_id": 95145
     },
     {
       "id": 3020027,
       "title_string_id": 95099,
-      "giver_npc_id": 9000000006,
+      "giver_npc_id": 9500002016,
       "prerequisite_quest_ids": [
         3020026
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 101101,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Nirvi (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_tools_of_the_trade_5d87cb)."
+            }
+          ],
+          "npc_id": 9000000160
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 101238,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Anata (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_tools_of_the_trade_5d87cb)."
+            }
+          ],
+          "npc_id": 9500002016
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Blacksmith: Tools of the Trade (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_tools_of_the_trade_5d87cb)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2127,7 +2229,10 @@
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 16,
+      "description_string_id": 95110,
+      "intro_text_string_id": 95147
     },
     {
       "id": 3020028,

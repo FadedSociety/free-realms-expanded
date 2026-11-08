@@ -284,7 +284,7 @@ fn shipped_npc_rows_cover_1192_of_1209() {
     }
 
     // L932: the two Snowhill soccer gates (1,225).
-    assert_eq!(total, 1242, "shipped NPC rows");
+    assert_eq!(total, 1251, "shipped NPC rows");
     // T876 (was 981 / 844 / 905 / 1091 with the T753 grouping and the community region shapes): the places'
     // music/ambience area families and the client-row regions cover 1,193 rows, of which every one is in a place.
     // T665 moved Sorin and Coach Eddie onto drawn Legacy spawns; one of the two landed outside every
@@ -294,18 +294,19 @@ fn shipped_npc_rows_cover_1192_of_1209() {
     // L932: both Snowhill soccer gates stand in a place (1,208).
     // L1043: the wiki pick-up quests' givers add two rows in a place and a banner region (1,219);
     // the second pick-up batch two more (1,221); Vittorio (Chapter 1) one more (1,222).
-    assert_eq!(in_place, 1225, "rows in a first-party place group");
+    // The research-table quest batch: nine givers in a place (1,234).
+    assert_eq!(in_place, 1234, "rows in a first-party place group");
     // T896 moved sixteen reconstructed rows onto their video-archive points; net, one row fewer stands in the
     // banner regions (892 -> 891) and two fewer in any region shape (953 -> 951).
     // L925's twelve givers: nine stand in a banner region (891 -> 900).
     assert_eq!(
-        in_recovered_region, 913,
+        in_recovered_region, 919,
         "rows in the banner regions 2..=10"
     );
     // L096's two turnstile actors stand in the region 1 fallback sphere, not a banner region (953).
     // L925: the same nine givers (953 -> 962).
-    assert_eq!(in_any_region, 975, "rows in a region (including region 1)");
-    assert_eq!(covered, 1225, "rows in a place or a region");
+    assert_eq!(in_any_region, 981, "rows in a region (including region 1)");
+    assert_eq!(covered, 1234, "rows in a place or a region");
 }
 
 #[test]

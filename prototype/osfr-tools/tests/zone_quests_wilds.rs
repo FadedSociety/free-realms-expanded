@@ -252,8 +252,12 @@ fn early_and_wrong_turn_ins_are_refused() {
     let oxalis = MAP.at(CHARACTER, OXALIS);
 
     // Out of order: the goals are ordered, so Funnel before Zinnea is the wrong NPC.
+    // Funnel has wiki quests of his own now, so his Talk may offer one; it must not credit this quest.
     let funnel = MAP.at(CHARACTER, FUNNEL);
-    assert_no_offer(&mut game, &funnel, FUNNEL, &mut now, "Funnel first");
+    let menu = interact(&mut game, &funnel, FUNNEL, now);
+    let choice = menu_option(&menu, TALK_LABEL);
+    game.handle_in_world(&npc_select(FUNNEL, choice), &funnel, now + 1).expect("Funnel answers a Talk");
+    now += 10;
     assert_eq!(counts(&game, WHO_DONE_IT.id), [0, 0, 0, 0]);
     MAP.step(&mut game, CHARACTER, &WHO_DONE_IT, 0, &mut now);
 

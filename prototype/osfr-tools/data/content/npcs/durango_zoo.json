@@ -1695,9 +1695,23 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 46; source cell: [client]"
             }
           ]
+        },
+        {
+          "quest_id": 3953176,
+          "title": "Glenn's Gone!",
+          "title_string_id": 116067,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Glenn's Gone! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_glenn_s_gone_84e49d)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3953176
+      ],
       "quests_given_text": [
         "Glenn's Gone! (client title 3368872053; ugdt 936988039): \"Help Nugglewug find Glenn!\" (2390453620); \"What am I gonna do!? I just did a count of the kids on the field trip and we're missing one kid, Glenn!\" (2061710255); hand-in \"Return to Nugglewug\" (2126868352)."
       ],
@@ -2015,11 +2029,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:68; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1278 (ModelId=14, ModelFileName=chugawug_m_01.adr, NameId=101638)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.887939,
       "model_id": 14,
-      "model_file_name": "chugawug_m_01.adr"
+      "model_file_name": "chugawug_m_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000261,
@@ -2856,8 +2877,36 @@
       "location_evidence": [
         "Not stated. His animals are \"in Durango Zoo\"."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953111,
+          "title": "Did That Just Happen",
+          "title_string_id": 102139,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Did That Just Happen (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_did_that_just_happen_00f85b)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3953039,
+          "title": "Are you Sirius",
+          "title_string_id": 102158,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Are you Sirius (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_are_you_sirius_b892f9)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953111,
+        3953039
+      ],
       "quests_given_text": [
         "An animal-guessing errand: \"Figure out what Tom is talking about!\" (1173225179); \"Find the animal that Tom is talking about in Durango Zoo.\" (1929227366); two animals: \"Find the dark feathered animal somewhere in Durango Zoo\" (1374780710; the same errand \"Find the dark feathered animal Tom Shalsey spoke of.\", 2602304895) and \"Find the small fluffy animal with a bushy tail in Durango Zoo\" (2685534297; \"Find the fluffy-tailed animal Tom Shalsey talked about.\", 3055939093); hand-in \"Return to Tom Shalsey\" (2727584095). Title not found."
       ],
@@ -3175,11 +3224,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2747; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4081 (ModelId=502, ModelFileName=human_m_freestyle_10.agr, NameId=101631)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.518305,
       "model_id": 502,
-      "model_file_name": "human_m_freestyle_10.agr"
+      "model_file_name": "human_m_freestyle_10.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000264,

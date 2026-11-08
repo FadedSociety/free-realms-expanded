@@ -39060,11 +39060,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1441; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2698 (ModelId=30, ModelFileName=fairy_m_old_01.adr, NameId=16561)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.816159,
       "model_id": 30,
-      "model_file_name": "fairy_m_old_01.adr"
+      "model_file_name": "fairy_m_old_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000161,
@@ -61684,8 +61691,23 @@
       "location_evidence": [
         "\"The Thistlerow hedge maze\" (client 2561505016); his lost barrels are in the north-western end (203677992). [video: markers at 31 m and 51 m, S8hbCvXj8Kg/00000, /00100]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953201,
+          "title": "I'm Okay!",
+          "title_string_id": 16540,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "I'm Okay! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_i_m_okay_c3daa7)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953201
+      ],
       "quests_given_text": [
         "Find Slothi's Lost Merchandise (minigame \"Slothi's Wagon\", client 1051438348). Sends the player to his father Lazi: \"Let Slothi's father know he is alright\" (144747789, 825261180)."
       ],
@@ -62069,11 +62091,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1305; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2562 (ModelId=48, ModelFileName=fairy_m_01.adr, NameId=16539)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -3.10788,
       "model_id": 48,
-      "model_file_name": "fairy_m_01.adr"
+      "model_file_name": "fairy_m_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000213,
@@ -67130,8 +67159,23 @@
       "location_evidence": [
         "Not placed."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953106,
+          "title": "Defending the Hive",
+          "title_string_id": 104039,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defending the Hive (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_defending_the_hive_9afd0e)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953106
+      ],
       "quests_given_text": [
         "Asks the player to find Jimmy (client 2259318549)."
       ],
@@ -67437,11 +67481,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:73; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1283 (ModelId=552, ModelFileName=human_f_freestyle_11.agr, NameId=101632)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.125649,
       "model_id": 552,
-      "model_file_name": "human_f_freestyle_11.agr"
+      "model_file_name": "human_f_freestyle_11.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000223,

@@ -3245,7 +3245,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:205; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1438 (ModelId=309, ModelFileName=sg_gametable_01.adr, NameId=140736)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500002145
     },
     {
       "spawn_guid": 100000001439,
@@ -3267,7 +3268,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:206; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1439 (ModelId=456, ModelFileName=fairy_druid_f.adr, NameId=140739)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500002072
     },
     {
       "spawn_guid": 100000001440,
@@ -3566,7 +3568,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:224; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1457 (ModelId=47, ModelFileName=penguin_baby_01.adr, NameId=45342)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500002037
     },
     {
       "spawn_guid": 100000001460,
@@ -8019,7 +8022,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:560; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1800 (ModelId=440, ModelFileName=fairy_f_tori.agr, NameId=45795)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500002194
     },
     {
       "spawn_guid": 100000001802,
@@ -8041,7 +8045,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:562; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1802 (ModelId=242, ModelFileName=fairychild_m_mohawkshorts.adr, NameId=45794)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500002306
     },
     {
       "spawn_guid": 100000001803,
@@ -17939,7 +17944,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1208; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2465 (ModelId=151, ModelFileName=sg_treasure_chest_01.adr, NameId=384281)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500002356
     },
     {
       "spawn_guid": 100000002466,
@@ -36086,7 +36092,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2279; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3536 (ModelId=339, ModelFileName=human_f_freestyle_01.agr, NameId=40177)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500002249
     },
     {
       "spawn_guid": 100000003537,
@@ -44425,7 +44432,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2760; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4094 (ModelId=325, ModelFileName=sh_table_wartable01.adr, NameId=140744)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500002110
     },
     {
       "spawn_guid": 100000004095,
@@ -53085,7 +53093,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3261; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4627 (ModelId=325, ModelFileName=sh_table_wartable01.adr, NameId=3386)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500002328
     },
     {
       "spawn_guid": 100000004628,

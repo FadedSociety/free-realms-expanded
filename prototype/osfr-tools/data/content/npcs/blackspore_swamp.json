@@ -935,14 +935,30 @@
         "Self-styled sheriff of Mire's Edge (\"I'm the law around here\", 393282882)"
       ],
       "roles": [
-        "ambient"
+        "ambient",
+        "quest_giver"
       ],
       "enemy_kind": null,
       "location_evidence": [
         "Mire's Edge by the fence and a campfire (video mXAxeTJ3vYw/00266, Checkers & Chess label nearby)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953055,
+          "title": "Blackspore's Most Wanted",
+          "title_string_id": 384095,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Blackspore's Most Wanted (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blackspore_s_most_wanted_28d196)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953055
+      ],
       "quests_given_text": [
         "Blackspore's Most Wanted (title 465063335/597712104; fits \"Find the missing Wanted Posters within Mire's Edge!\", 523345657, but match to this giver is inferred); target of Hennessey's \"Scare Bart Purpleton!\" (4245808546); Bart's Badge (client 1366255796/660627039, \"lost\" badge in the Cracked Claw Caverns 2459692326; giver inferred)"
       ],
@@ -1320,11 +1336,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:307; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1540 (ModelId=647, ModelFileName=human_m_sheriff_bart_purpleton.agr, NameId=45294)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.85276,
       "model_id": 647,
-      "model_file_name": "human_m_sheriff_bart_purpleton.agr"
+      "model_file_name": "human_m_sheriff_bart_purpleton.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000003,
@@ -28488,8 +28511,23 @@
       "location_evidence": [
         "Ramirez's Dig Site, \"further into the swamp\" (1196110558); video nameplate 53 m with the dig site marker 40 m"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953274,
+          "title": "Precursor Prospecting",
+          "title_string_id": 91772,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Precursor Prospecting (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_precursor_prospecting_488b30)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953274
+      ],
       "quests_given_text": [
         "Favors for Favors target (\"collect Donovan's payment\", 3963513166; he is \"overdue on filling his relic quota\", 3613220491; \"bowls\" at his site 189045149); named by an archaeology quest from a dwarf (\"Ask Ramirez and Tyrone Shadowshard\", 1130327392, 3533390223); \"Help Ramirez in his prospecting duties\" (2776041758)"
       ],

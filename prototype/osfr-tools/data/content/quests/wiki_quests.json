@@ -6685,6 +6685,3407 @@
       "intro_text_string_id": 416477,
       "enabled": true,
       "end_text_string_id": 416480
+    },
+    {
+      "id": 3953012,
+      "title_string_id": 29629,
+      "giver_npc_id": 9500000848,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 439836,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find 5 stolen sasparillas (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_beautiful_friendship_3cdd8f)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: wooden mug with a hinged lid and blue bands (sheets/b_world_click2.png r1c2, tile of wc_mug_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_a_beautiful_friendship_3cdd8f)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "world's 'Sasparilla Mug' spawn is 3148, which renders as fragments; 533 is the same mesh and draws whole"
+            }
+          ],
+          "node_type": "quest-sasparilla",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 439840,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Rizzle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_beautiful_friendship_3cdd8f)."
+            }
+          ],
+          "npc_id": 9500000848
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Beautiful Friendship (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_beautiful_friendship_3cdd8f)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "A Beautiful Friendship (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_beautiful_friendship_3cdd8f)."
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3953013,
+      "title_string_id": 37487,
+      "giver_npc_id": 9500000907,
+      "prerequisite_quest_ids": [
+        3950068
+      ],
+      "objectives": [
+        {
+          "kind": "gather_resource",
+          "id": 1,
+          "text_string_id": 37490,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Harvest Bumbleberry - (0/5) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_bounty_of_berries_45a977)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: 'Bundle of Bumbleberry' is item 2889 (item-table.json); harvesting.json outputs it in Queensfields Harvesting (109)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: harvesting raises GatherResource{resource_id: output definition} (gameplay/crafting.rs:765); targets.gather lists harvesting.json outputs."
+            }
+          ],
+          "resource_id": 2889,
+          "quantity": 5
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 141476,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give the Berries to Hans (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_bounty_of_berries_45a977)."
+            }
+          ],
+          "npc_id": 9500000907
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 90583,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Hans (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_bounty_of_berries_45a977)."
+            }
+          ],
+          "npc_id": 9500000907
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 75,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Bounty of Berries (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_bounty_of_berries_45a977)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "A Bounty of Berries (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_bounty_of_berries_45a977)."
+        }
+      ],
+      "description_string_id": 37488,
+      "intro_text_string_id": 37486,
+      "enabled": true,
+      "job": 45
+    },
+    {
+      "id": 3953039,
+      "title_string_id": 102158,
+      "giver_npc_id": 9500000263,
+      "prerequisite_quest_ids": [
+        3953111
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 391780,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the small fluffy animal with a bushy tail somewhere in Durango Zoo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_are_you_sirius_b892f9)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: grey squirrel with a bushy tail (sheets/d_creatures.png r0c0, tile of squirrel.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_are_you_sirius_b892f9)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'His tail is fluffy as he jumps through town'"
+            }
+          ],
+          "node_type": "quest-animal",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 102149,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Tom Shalsey (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_are_you_sirius_b892f9)."
+            }
+          ],
+          "npc_id": 9500000263
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Are you Sirius (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_are_you_sirius_b892f9)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Are you Sirius (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_are_you_sirius_b892f9)."
+        }
+      ],
+      "description_string_id": 102140,
+      "intro_text_string_id": 102157,
+      "enabled": true
+    },
+    {
+      "id": 3953055,
+      "title_string_id": 384095,
+      "giver_npc_id": 9500000002,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 384106,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the missing Wanted Posters within Mire's Edge! - (0/10) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blackspore_s_most_wanted_28d196)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: model hsg_wanted_poster_01.adr is in Models.txt, seen by eye below"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: parchment poster headed WANTED (sheets/f_items2.png r2c2, tile of hsg_wanted_poster_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_blackspore_s_most_wanted_28d196)."
+            }
+          ],
+          "node_type": "quest-poster",
+          "quantity": 10
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 91851,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Bart (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blackspore_s_most_wanted_28d196)."
+            }
+          ],
+          "npc_id": 9500000002
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 13,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Blackspore's Most Wanted (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blackspore_s_most_wanted_28d196)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Blackspore's Most Wanted (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blackspore_s_most_wanted_28d196)."
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3953070,
+      "title_string_id": 40231,
+      "giver_npc_id": 9500002249,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 40236,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Play the weapon testing minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bully_defense_101_1b0260)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the 'weapon testing minigame' is the target-dummy game, 79 Hack 'n' Slash: Raine's text says 'our target dummy', and shipped records 3000038 and 3020011 ('Score 12,000 on the Practice Dummy') use 79."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: MiniGameData 79 \"Hack 'n' Slash\" (type 9) is in the server's pinned producer set; objective client text 'Play the weapon testing minigame'."
+            }
+          ],
+          "minigame_id": 79,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 40238,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Raine (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bully_defense_101_1b0260)."
+            }
+          ],
+          "npc_id": 9500002249
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Bully Defense 101 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bully_defense_101_1b0260)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Bully Defense 101 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bully_defense_101_1b0260)."
+        }
+      ],
+      "description_string_id": 40230,
+      "intro_text_string_id": 40230,
+      "enabled": true
+    },
+    {
+      "id": 3953095,
+      "title_string_id": 441118,
+      "giver_npc_id": 9000000492,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 441195,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete a solo Demolition Derby minigame at Frost Ridge Speedway. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_day_11_snowhill_derby_97de36)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 'solo' is not modelled: any finish of the row counts. Frost Ridge Demo Derby (client MiniGameData 40) is the row; the 'solo' rows are not listed separately."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: MiniGameData 40 'Frost Ridge Demo Derby' (type 11) is in the server's pinned producer set; objective client text 'Complete a solo Demolition Derby minigame at Frost Ridge Speedway'."
+            }
+          ],
+          "minigame_id": 40,
+          "count": 1
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Day 11: Snowhill Derby (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_day_11_snowhill_derby_97de36)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Day 11: Snowhill Derby (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_day_11_snowhill_derby_97de36)."
+        }
+      ],
+      "description_string_id": 441119,
+      "intro_text_string_id": 441117,
+      "enabled": true
+    },
+    {
+      "id": 3953106,
+      "title_string_id": 104039,
+      "giver_npc_id": 9500000222,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "text_string_id": 388168,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on the Bixie Defense table in Durango Zoo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_defending_the_hive_9afd0e)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: world spawn(s) in data/content/npc_spawns_extra.json: 'Easy Bixie Defense' spawn_guid 100000004094 model 325 sh_table_wartable01.adr, 41 m from the quest's giver; ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2760; ../lab/references/FreeRealms-Legacy/src/Resources/Npc"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: round war table with a map and carved pieces on it (sheets/a_world_click1.png r2c1, tile of sh_table_wartable01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_defending_the_hive_9afd0e)."
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -565.6613,
+            2.810159,
+            532.6673
+          ],
+          "radius": 8.0
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 104045,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Play the Bixie Tower Defense game - (0/25) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_defending_the_hive_9afd0e)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) condition not modelled: the producer credits one finish for the whole run, so a per-level, per-stage or streak goal becomes finishing the game once."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: MiniGameData 359 'Protect the Hive - Easy' (type 14) is in the server's pinned producer set; objective client text 'Complete 25 straight levels of the Bixie Tower Defense game!'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: 'Easy Bixie Defense' table [359,360,361] stands by Tania Timberclaw; 359 = 'Protect the Hive - Easy' (client MiniGameData)."
+            }
+          ],
+          "minigame_id": 359,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 104046,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Tania Timberclaw (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_defending_the_hive_9afd0e)."
+            }
+          ],
+          "npc_id": 9500000222
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defending the Hive (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_defending_the_hive_9afd0e)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Defending the Hive (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_defending_the_hive_9afd0e)."
+        }
+      ],
+      "description_string_id": 104040,
+      "intro_text_string_id": 104038,
+      "enabled": true
+    },
+    {
+      "id": 3953107,
+      "title_string_id": 429315,
+      "giver_npc_id": 9500000302,
+      "prerequisite_quest_ids": [
+        3950264
+      ],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "text_string_id": 429320,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click the Tower Defense table in Chatty's camp (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_defensive_strategy_d8c5d1)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: world spawn(s) in data/content/npc_spawns_extra.json: 'Tower Defense' spawn_guid 100000004627 model 325 sh_table_wartable01.adr, 8 m from the quest's giver; ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3261; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: round war table with a map and carved pieces on it (sheets/a_world_click1.png r2c1, tile of sh_table_wartable01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_defensive_strategy_d8c5d1)."
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -1566.94,
+            -40.18036,
+            -628.3112
+          ],
+          "radius": 8.0
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 429322,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat 25 straight levels of the Gardening 101 tower defense game (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_defensive_strategy_d8c5d1)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) condition not modelled: the producer credits one finish for the whole run, so a per-level, per-stage or streak goal becomes finishing the game once."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: MiniGameData 257 'Gardening 101 - Medium' (type 14) is in the server's pinned producer set; objective client text 'Beat 25 straight levels of the Gardening 101 tower defense game'."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Gardening 101 has four rows (157/257/357/455); 257 picked as the medium row. tower_defense.json's table beside Counselor Tyra lists only [259] Protect the Hive; confirm or fix that table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The Tower Defense table at this camp serves only game 259 (data/content/tower_defense.json), the game this step's table plays."
+            }
+          ],
+          "minigame_id": 259,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 429324,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Counselor Tyra (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_defensive_strategy_d8c5d1)."
+            }
+          ],
+          "npc_id": 9500000302
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defensive Strategy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_defensive_strategy_d8c5d1)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Defensive Strategy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_defensive_strategy_d8c5d1)."
+        }
+      ],
+      "description_string_id": 429316,
+      "intro_text_string_id": 429314,
+      "enabled": true
+    },
+    {
+      "id": 3953110,
+      "title_string_id": 415287,
+      "giver_npc_id": 9500000534,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "reach_poi",
+          "id": 1,
+          "text_string_id": 415502,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Go to the Blackspore graveyard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_dem_bones_eddff2)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) POI 119 Bone Bog Cemetery is the graveyard in Blackspore; POI 121 Cursed Graveyard is near Sanctuary, so it does not fit"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the wiki links this step to 'Sinking Graveyard', a name our POI table does not have: distrust if a separate place turns up"
+            }
+          ],
+          "poi_id": 119,
+          "zone_id": 0,
+          "position": [
+            -2386.6,
+            -23.8,
+            1236.6
+          ],
+          "radius": 20
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 415504,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find bones - 0/8 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_dem_bones_eddff2)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: large tan bone (sheets/e_items.png r0c2, tile of sg_dogbone.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_dem_bones_eddff2)."
+            }
+          ],
+          "node_type": "quest-bone",
+          "quantity": 8
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 415529,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Skelly in Sanctuary (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_dem_bones_eddff2)."
+            }
+          ],
+          "npc_id": 9500000534
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Dem Bones (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_dem_bones_eddff2)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Dem Bones (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_dem_bones_eddff2)."
+        }
+      ],
+      "description_string_id": 415288,
+      "intro_text_string_id": 415286,
+      "enabled": true
+    },
+    {
+      "id": 3953111,
+      "title_string_id": 102139,
+      "giver_npc_id": 9500000263,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 102147,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the dark feathered animal somewhere in Durango Zoo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_did_that_just_happen_00f85b)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: dark blue and purple raven with spread wings (sheets/d_creatures.png r0c1, tile of birds_raven.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_did_that_just_happen_00f85b)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "pickup_name keeps 'somewhere' on the end, so that is the word model_for looks up; wiki: 'dark feathered wings', the avian Tom lost"
+            }
+          ],
+          "node_type": "quest-somewhere",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 102149,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Tom Shalsey (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_did_that_just_happen_00f85b)."
+            }
+          ],
+          "npc_id": 9500000263
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Did That Just Happen (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_did_that_just_happen_00f85b)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Did That Just Happen (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_did_that_just_happen_00f85b)."
+        }
+      ],
+      "description_string_id": 102140,
+      "intro_text_string_id": 102138,
+      "enabled": true
+    },
+    {
+      "id": 3953112,
+      "title_string_id": 71548,
+      "giver_npc_id": 9000000005,
+      "prerequisite_quest_ids": [
+        3953367
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 70388,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on the Artifacts minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_digging_for_glory_601834)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: world spawn(s) in data/content/npc_spawns_extra.json: 'Ambrose's Dig Site' spawn_guid 100000003495 model 310 sg_archaeologist_tool_node_01.adr, 9 m from the quest's giver; ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2238; ../lab/references/FreeRealms-Legacy/src/Reso"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: wooden tripod with a small pot hanging under it (sheets/a_world_click1.png r2c0, tile of sg_archaeologist_tool_node_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_digging_for_glory_601834)."
+            }
+          ],
+          "npc_id": 9500002001
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 37775,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat the first level (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_digging_for_glory_601834)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) condition not modelled: the producer credits one finish for the whole run, so a per-level, per-stage or streak goal becomes finishing the game once."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: MiniGameData 681 \"Ambrose's Dig\" (type 8) is in the server's pinned producer set; objective client text 'Beat the first level!'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: dig_sites.json opens 681 Ambrose's Dig at his site; wiki says Artifacts Schmartifacts! at his dig."
+            }
+          ],
+          "minigame_id": 681,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 70404,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Ambrose Worcester (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_digging_for_glory_601834)."
+            }
+          ],
+          "npc_id": 9000000005
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Digging for Glory (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_digging_for_glory_601834)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Digging for Glory (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_digging_for_glory_601834)."
+        }
+      ],
+      "description_string_id": 70384,
+      "intro_text_string_id": 71547,
+      "enabled": true
+    },
+    {
+      "id": 3953116,
+      "title_string_id": 415291,
+      "giver_npc_id": 9500000456,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "gather_resource",
+          "id": 1,
+          "text_string_id": 91402,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Harvest Rainleaf - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_double_double_toil_and_trouble_1b36f3)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: 'Bundle of Rainleaf' is item 2884 (item-table.json); harvesting.json outputs it in Queensfields Harvesting (109), Chugaroot Farm Harvesting (113), Lakesfield Harvesting (117)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: harvesting raises GatherResource{resource_id: output definition} (gameplay/crafting.rs:765); targets.gather lists harvesting.json outputs."
+            }
+          ],
+          "resource_id": 2884,
+          "quantity": 3
+        },
+        {
+          "kind": "gather_resource",
+          "id": 2,
+          "text_string_id": 415540,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Harvest Honeytwig - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_double_double_toil_and_trouble_1b36f3)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: 'Bundle of Honeytwig' is item 2881 (item-table.json); harvesting.json outputs it in Queensfields Harvesting (109)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: harvesting raises GatherResource{resource_id: output definition} (gameplay/crafting.rs:765); targets.gather lists harvesting.json outputs."
+            }
+          ],
+          "resource_id": 2881,
+          "quantity": 3
+        },
+        {
+          "kind": "gather_resource",
+          "id": 3,
+          "text_string_id": 37490,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Harvest Bumbleberry - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_double_double_toil_and_trouble_1b36f3)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: 'Bundle of Bumbleberry' is item 2889 (item-table.json); harvesting.json outputs it in Queensfields Harvesting (109)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: harvesting raises GatherResource{resource_id: output definition} (gameplay/crafting.rs:765); targets.gather lists harvesting.json outputs."
+            }
+          ],
+          "resource_id": 2889,
+          "quantity": 3
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 415564,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give the ingredients to Brunhilda in Sanctuary (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_double_double_toil_and_trouble_1b36f3)."
+            }
+          ],
+          "npc_id": 9500000456
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 415566,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Brunhilda (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_double_double_toil_and_trouble_1b36f3)."
+            }
+          ],
+          "npc_id": 9500000456
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Double, Double, Toil and Trouble (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_double_double_toil_and_trouble_1b36f3)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Double, Double, Toil and Trouble (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_double_double_toil_and_trouble_1b36f3)."
+        }
+      ],
+      "description_string_id": 415292,
+      "enabled": true,
+      "job": 45
+    },
+    {
+      "id": 3953125,
+      "title_string_id": 19155,
+      "giver_npc_id": 9500000280,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 390169,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect Stickfruit - 0/2 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_enough_for_dinner_849959)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: model overworld_bush_stickfruit_harvestable_01.adr is what the world draws for this kind of thing; the nearest placed one is 791 m from the quest's giver, so the quest's own instance needs placing"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: harvest plant: brown cone with yellow discs (sheets/h_harvest.png r1c0, tile of overworld_bush_stickfruit_harvestable_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_enough_for_dinner_849959)."
+            }
+          ],
+          "node_type": "quest-stickfruit",
+          "quantity": 2
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 390170,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect Tumtumnip - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_enough_for_dinner_849959)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: model overworld_root_tumtumnip_harvestable_01.adr is in Models.txt, seen by eye below"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: harvest plant: brown cone with green leaves and a sprout on top (sheets/h_harvest.png r0c3, tile of overworld_root_tumtumnip_harvestable_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_enough_for_dinner_849959)."
+            }
+          ],
+          "node_type": "quest-tumtumnip",
+          "quantity": 3
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 390172,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Tamara (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_enough_for_dinner_849959)."
+            }
+          ],
+          "npc_id": 9500000280
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 12,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Enough For Dinner (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_enough_for_dinner_849959)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Enough For Dinner (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_enough_for_dinner_849959)."
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3953151,
+      "title_string_id": 36840,
+      "giver_npc_id": 9500000781,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 36842,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Read the poem to Carrie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_flattery_is_everything_7b54a6)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_flattery_is_everything_7b54a6)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "npc lookup 'carrie' -> 9500000734"
+            }
+          ],
+          "npc_id": 9500000734
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 140711,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Willie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_flattery_is_everything_7b54a6)."
+            }
+          ],
+          "npc_id": 9500000781
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Flattery is Everything (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_flattery_is_everything_7b54a6)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Flattery is Everything (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_flattery_is_everything_7b54a6)."
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3953153,
+      "title_string_id": 39895,
+      "giver_npc_id": 9500000958,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 39897,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect Verdant Chompers - (0/10) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_flower_bad_c5fe90)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: fanged pink and green man-eating plant (sheets/i_click4.png r3c0, tile of maneatingplant.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_flower_bad_c5fe90)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "card: 'mean and hungry plants'; 88 is the world's fanged plant"
+            }
+          ],
+          "node_type": "quest-chomper",
+          "quantity": 10
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 39899,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Voggun (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_flower_bad_c5fe90)."
+            }
+          ],
+          "npc_id": 9500000958
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Flower BAD! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_flower_bad_c5fe90)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Flower BAD! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_flower_bad_c5fe90)."
+        }
+      ],
+      "description_string_id": 41317,
+      "intro_text_string_id": 41317,
+      "enabled": true
+    },
+    {
+      "id": 3953155,
+      "title_string_id": 21551,
+      "giver_npc_id": 9500000477,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 21555,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Get some waffles (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_food_for_fhred_da4505)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_food_for_fhred_da4505)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "npc lookup 'jacque' -> 9500000497"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "card: 'Get some food from Jacque's Cafe in Sanctuary'; Jacque stands at his cafe"
+            }
+          ],
+          "npc_id": 9500000497
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 21562,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return the waffles to Fhred in Memorial Caverns (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_food_for_fhred_da4505)."
+            }
+          ],
+          "npc_id": 9500000477
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Food for Fhred (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_food_for_fhred_da4505)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Food for Fhred (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_food_for_fhred_da4505)."
+        }
+      ],
+      "description_string_id": 21552,
+      "intro_text_string_id": 24967,
+      "enabled": true
+    },
+    {
+      "id": 3953159,
+      "title_string_id": 101934,
+      "giver_npc_id": 9500000579,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 101937,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the tanning lotion (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_forgetful_tanning_e3c95c)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: blue bottle with a palm tree on it (sheets/e_items.png r0c3, tile of ss_sunscreen_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_forgetful_tanning_e3c95c)."
+            }
+          ],
+          "node_type": "quest-lotion",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 101939,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Ellie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_forgetful_tanning_e3c95c)."
+            }
+          ],
+          "npc_id": 9500000579
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 31,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Forgetful Tanning (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_forgetful_tanning_e3c95c)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Forgetful Tanning (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_forgetful_tanning_e3c95c)."
+        }
+      ],
+      "description_string_id": 101935,
+      "intro_text_string_id": 101943,
+      "enabled": true
+    },
+    {
+      "id": 3953164,
+      "title_string_id": 70383,
+      "giver_npc_id": 9000000005,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 70388,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on the Artifacts minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_friendly_competition_727cfd)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: world spawn(s) in data/content/npc_spawns_extra.json: 'Ambrose's Dig Site' spawn_guid 100000003495 model 310 sg_archaeologist_tool_node_01.adr, 9 m from the quest's giver; ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2238; ../lab/references/FreeRealms-Legacy/src/Reso"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: wooden tripod with a small pot hanging under it (sheets/a_world_click1.png r2c0, tile of sg_archaeologist_tool_node_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_friendly_competition_727cfd)."
+            }
+          ],
+          "npc_id": 9500002001
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 37775,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat the first level (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_friendly_competition_727cfd)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) condition not modelled: the producer credits one finish for the whole run, so a per-level, per-stage or streak goal becomes finishing the game once."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: MiniGameData 681 \"Ambrose's Dig\" (type 8) is in the server's pinned producer set; objective client text 'Beat the first level!'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: dig_sites.json opens 681 Ambrose's Dig; wiki says Artifacts Schmartifacts! at his dig."
+            }
+          ],
+          "minigame_id": 681,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 140425,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Ambrose Worcester in Greenwood Forest (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_friendly_competition_727cfd)."
+            }
+          ],
+          "npc_id": 9000000005
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 38,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Friendly Competition (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_friendly_competition_727cfd)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Friendly Competition (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_friendly_competition_727cfd)."
+        }
+      ],
+      "description_string_id": 70384,
+      "enabled": true
+    },
+    {
+      "id": 3953168,
+      "title_string_id": 390121,
+      "giver_npc_id": 9500000278,
+      "prerequisite_quest_ids": [
+        3953285
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 390126,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Score 65,000 points on the Harvesting minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_furious_foraging_3472cb)."
+            }
+          ],
+          "minigame_id": 111,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 390191,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Rucks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_furious_foraging_3472cb)."
+            }
+          ],
+          "npc_id": 9500000278
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 36,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Furious Foraging (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_furious_foraging_3472cb)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Furious Foraging (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_furious_foraging_3472cb)."
+        }
+      ],
+      "description_string_id": 390122,
+      "enabled": true,
+      "job": 45
+    },
+    {
+      "id": 3953171,
+      "title_string_id": 92177,
+      "giver_npc_id": 9500000688,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 92188,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect rabbits - (0/12) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_garden_gnawers_fb8f6d)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: model rabbit.adr is in Models.txt, seen by eye below"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: grey rabbit standing upright (sheets/l_existing.png r3c0, tile of rabbit.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_garden_gnawers_fb8f6d)."
+            }
+          ],
+          "node_type": "quest-rabbit",
+          "quantity": 12
+        },
+        {
+          "kind": "visit_position",
+          "id": 2,
+          "text_string_id": 92190,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Release the rabbits at Durango Zoo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_garden_gnawers_fb8f6d)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 92190 is this step; wiki target is Durango Zoo"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) anchored on zoo employee Mr. Miles, row 9000000156; the zoo has no POI"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -517.9,
+            -0.5,
+            610.3
+          ],
+          "radius": 30
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 92192,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Halister in Shrouded Glade (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_garden_gnawers_fb8f6d)."
+            }
+          ],
+          "npc_id": 9500000688
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 36,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Garden Gnawers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_garden_gnawers_fb8f6d)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Garden Gnawers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_garden_gnawers_fb8f6d)."
+        }
+      ],
+      "description_string_id": 92178,
+      "intro_text_string_id": 92176,
+      "enabled": true
+    },
+    {
+      "id": 3953172,
+      "title_string_id": 140724,
+      "giver_npc_id": 9500002072,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "text_string_id": 384877,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on the game table (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_gardening_101_2432d3)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: world spawn(s) in data/content/npc_spawns_extra.json: 'Hard Garden Defense' spawn_guid 100000001438 model 309 sg_gametable_01.adr, 1 m from the quest's giver; ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:205; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.jso"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: game table with a red cloth and board pieces, on a red pedestal (sheets/a_world_click1.png r2c2, tile of sg_gametable_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_gardening_101_2432d3)."
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            37.90963,
+            63.10709,
+            1253.726
+          ],
+          "radius": 8.0
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 384879,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat the Gardening 101 minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_gardening_101_2432d3)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: MiniGameData 257 'Gardening 101 - Medium' (type 14) is in the server's pinned producer set; objective client text 'Beat the Gardening 101 minigame'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: tower_defense.json table 'Hard Garden Defense' [256,257] stands at Carolyn's spot; 257 = 'Gardening 101 - Medium' (client MiniGameData)."
+            }
+          ],
+          "minigame_id": 257,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 384881,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Carolyn (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_gardening_101_2432d3)."
+            }
+          ],
+          "npc_id": 9500002072
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 26,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Gardening 101 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_gardening_101_2432d3)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Gardening 101 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_gardening_101_2432d3)."
+        }
+      ],
+      "description_string_id": 384873,
+      "intro_text_string_id": 384871,
+      "enabled": true
+    },
+    {
+      "id": 3953175,
+      "title_string_id": 36850,
+      "giver_npc_id": 9500000781,
+      "prerequisite_quest_ids": [
+        3953151
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 36855,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect the present (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_getting_the_girl_368679)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: model evnt_presents_01.adr is in Models.txt, seen by eye below"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: stack of wrapped gifts (sheets/l_existing.png r0c2, tile of evnt_presents_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_getting_the_girl_368679)."
+            }
+          ],
+          "node_type": "quest-present-3",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 36857,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give the present to Carrie at the hot springs (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_getting_the_girl_368679)."
+            }
+          ],
+          "npc_id": 9500000734
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 140711,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Willie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_getting_the_girl_368679)."
+            }
+          ],
+          "npc_id": 9500000781
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Getting the Girl (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_getting_the_girl_368679)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Getting the Girl (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_getting_the_girl_368679)."
+        }
+      ],
+      "description_string_id": 36849,
+      "intro_text_string_id": 36849,
+      "enabled": true
+    },
+    {
+      "id": 3953176,
+      "title_string_id": 116067,
+      "giver_npc_id": 9500000260,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 116077,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Search for Glenn (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_glenn_s_gone_84e49d)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki target(s): ['Glenn']"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_glenn_s_gone_84e49d)."
+            }
+          ],
+          "npc_id": 9500000257
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 116079,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Nugglewug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_glenn_s_gone_84e49d)."
+            }
+          ],
+          "npc_id": 9500000260
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Glenn's Gone! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_glenn_s_gone_84e49d)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Glenn's Gone! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_glenn_s_gone_84e49d)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) stays disabled: Glenn (9500000257) has only a placeholder position at the world origin, so the first step cannot be found."
+        }
+      ],
+      "description_string_id": 116068,
+      "intro_text_string_id": 116066,
+      "enabled": false
+    },
+    {
+      "id": 3953183,
+      "title_string_id": 72434,
+      "giver_npc_id": 9600000007,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 72436,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver the groceries (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_groceries_for_terrence_6624dc)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 72436 is this step; the giver names Terrence at The Roadhouse, and row 9000000488 is the owner of The Roadhouse"
+            }
+          ],
+          "npc_id": 9000000488
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 38,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Groceries for Terrence (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_groceries_for_terrence_6624dc)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Groceries for Terrence (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_groceries_for_terrence_6624dc)."
+        }
+      ],
+      "description_string_id": 72437,
+      "enabled": true
+    },
+    {
+      "id": 3953188,
+      "title_string_id": 102000,
+      "giver_npc_id": 9500000603,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 102002,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Miguel's ball on the beach (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_having_a_ball_9c7721)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: black and white soccer ball (sheets/e_items.png r1c0, tile of sg_soccerball_bbe.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_having_a_ball_9c7721)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "dialog: 'I accidentally kicked my ball'"
+            }
+          ],
+          "node_type": "quest-ball",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 102004,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Miguel (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_having_a_ball_9c7721)."
+            }
+          ],
+          "npc_id": 9500000603
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 13,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Having a Ball (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_having_a_ball_9c7721)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Having a Ball (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_having_a_ball_9c7721)."
+        }
+      ],
+      "description_string_id": 102008,
+      "enabled": true
+    },
+    {
+      "id": 3953201,
+      "title_string_id": 16540,
+      "giver_npc_id": 9500000212,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 16573,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Go talk to Lazi (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_i_m_okay_c3daa7)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 16573 is this step; wiki target Lazi, row 9500000160; only blocker on this quest"
+            }
+          ],
+          "npc_id": 9500000160
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 31,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "I'm Okay! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_i_m_okay_c3daa7)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "I'm Okay! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_i_m_okay_c3daa7)."
+        }
+      ],
+      "description_string_id": 16541,
+      "intro_text_string_id": 24902,
+      "enabled": true
+    },
+    {
+      "id": 3953274,
+      "title_string_id": 91772,
+      "giver_npc_id": 9500000060,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 91776,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete levels of the artifact minigame - (0/5) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_precursor_prospecting_488b30)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) condition not modelled: the producer credits one finish for the whole run, so a per-level, per-stage or streak goal becomes finishing the game once."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: MiniGameData 682 \"Tyrone's Dig\" (type 8) is in the server's pinned producer set; objective client text \"Hunt for precursor artifacts at Ramirez's dig site in Blackspore.\"."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client text 91776 'Hunt for precursor artifacts at Ramirez's dig site in Blackspore'; (R) the only Blackspore dig is 682 Tyrone's Dig Site."
+            }
+          ],
+          "minigame_id": 682,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 90268,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Ramirez (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_precursor_prospecting_488b30)."
+            }
+          ],
+          "npc_id": 9500000060
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Precursor Prospecting (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_precursor_prospecting_488b30)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Precursor Prospecting (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_precursor_prospecting_488b30)."
+        }
+      ],
+      "description_string_id": 91773,
+      "intro_text_string_id": 91771,
+      "enabled": true
+    },
+    {
+      "id": 3953277,
+      "title_string_id": 101468,
+      "giver_npc_id": 9500000614,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 101480,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Leash Nessi (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_put_a_leash_on_it_60c05a)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 101480 is this step; wiki target Nessi, row 9500000610 (Poco Pogo's dog)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the leashing is modelled as a click on her"
+            }
+          ],
+          "npc_id": 9500000610
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 101482,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Poco on the Seaside beach (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_put_a_leash_on_it_60c05a)."
+            }
+          ],
+          "npc_id": 9500000615
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 61,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Put a Leash on It! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_put_a_leash_on_it_60c05a)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Put a Leash on It! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_put_a_leash_on_it_60c05a)."
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3953285,
+      "title_string_id": 390113,
+      "giver_npc_id": 9500000278,
+      "prerequisite_quest_ids": [
+        3953125
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 390118,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Score 50,000 points on the Harvesting minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rivaling_rucks_ef5f21)."
+            }
+          ],
+          "minigame_id": 111,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 390191,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Rucks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rivaling_rucks_ef5f21)."
+            }
+          ],
+          "npc_id": 9500000278
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Rivaling Rucks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rivaling_rucks_ef5f21)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Rivaling Rucks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rivaling_rucks_ef5f21)."
+        }
+      ],
+      "description_string_id": 390114,
+      "intro_text_string_id": 390112,
+      "enabled": true,
+      "job": 45
+    },
+    {
+      "id": 3953286,
+      "title_string_id": 75969,
+      "giver_npc_id": 9500000545,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 76069,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click the chest to start looking for fliers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_robgoblin_recycling_program_58a3e8)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: world spawn(s) in data/content/npc_spawns_extra.json: 'Zob's Barrel' spawn_guid 100000002465 model 151 sg_treasure_chest_01.adr, 2 m from the quest's giver; ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1208; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: iron-bound silver treasure chest (sheets/c_click3.png r2c2, tile of sg_treasure_chest_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_robgoblin_recycling_program_58a3e8)."
+            }
+          ],
+          "npc_id": 9500002356
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 76073,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find all the flyers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_robgoblin_recycling_program_58a3e8)."
+            }
+          ],
+          "node_type": "quest-all-the-flyers",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 384293,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Zobs in the Memorial Caverns (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_robgoblin_recycling_program_58a3e8)."
+            }
+          ],
+          "npc_id": 9500000545
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 75,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Robgoblin Recycling Program (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_robgoblin_recycling_program_58a3e8)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Robgoblin Recycling Program (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_robgoblin_recycling_program_58a3e8)."
+        }
+      ],
+      "description_string_id": 76063,
+      "intro_text_string_id": 76061,
+      "enabled": true
+    },
+    {
+      "id": 3953294,
+      "title_string_id": 18788,
+      "giver_npc_id": 9500000928,
+      "prerequisite_quest_ids": [
+        3953300
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 18793,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver flowers to Buzz (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sanctuary_delivery_3fca3f)."
+            }
+          ],
+          "npc_id": 9500000457
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 18804,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Peacepetal (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sanctuary_delivery_3fca3f)."
+            }
+          ],
+          "npc_id": 9500000928
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Sanctuary Delivery (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sanctuary_delivery_3fca3f)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Sanctuary Delivery (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sanctuary_delivery_3fca3f)."
+        }
+      ],
+      "description_string_id": 18789,
+      "intro_text_string_id": 24925,
+      "enabled": true,
+      "end_text_string_id": 2119
+    },
+    {
+      "id": 3953295,
+      "title_string_id": 406432,
+      "giver_npc_id": 9500000559,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 406445,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to the person in Riddle #1 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sandstorm_s_grand_opening_3186ef)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 406445 is this step; the wiki's answer list names Raina Rush first"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the wiki gives the three answers but not which riddle each solves; assigned in the listed order"
+            }
+          ],
+          "npc_id": 9000000177
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 406449,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to the person in Riddle #2 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sandstorm_s_grand_opening_3186ef)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 406449 is this step; the wiki's answer list names Speedy second"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) assigned in the listed order"
+            }
+          ],
+          "npc_id": 9500000535
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 406451,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to the person in Riddle #3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sandstorm_s_grand_opening_3186ef)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 406451 is this step; the wiki's answer list names Pablo Gable third"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) assigned in the listed order"
+            }
+          ],
+          "npc_id": 9500000612
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 406453,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Bill Riddly (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sandstorm_s_grand_opening_3186ef)."
+            }
+          ],
+          "npc_id": 9500000559
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Sandstorm's Grand Opening (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sandstorm_s_grand_opening_3186ef)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Sandstorm's Grand Opening (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sandstorm_s_grand_opening_3186ef)."
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3953300,
+      "title_string_id": 21960,
+      "giver_npc_id": 9500000928,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 70306,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Gather all the seeds - 0/4 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_scatterbrain_17c7cc)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: tan open sack (sheets/e_items.png r3c3, tile of sg_chugawug_sacks_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_scatterbrain_17c7cc)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "dialog: 'those sacks of seeds'"
+            }
+          ],
+          "node_type": "quest-seed",
+          "quantity": 4
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 70308,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Peacepetal (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_scatterbrain_17c7cc)."
+            }
+          ],
+          "npc_id": 9500000928
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Scatterbrain (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_scatterbrain_17c7cc)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Scatterbrain (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_scatterbrain_17c7cc)."
+        }
+      ],
+      "description_string_id": 70297,
+      "intro_text_string_id": 70295,
+      "enabled": true,
+      "end_text_string_id": 70298
+    },
+    {
+      "id": 3953304,
+      "title_string_id": 101969,
+      "giver_npc_id": 9500000579,
+      "prerequisite_quest_ids": [
+        3953159
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 101971,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Brendan (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sharing_is_caring_62d362)."
+            }
+          ],
+          "npc_id": 9500000561
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Sharing is Caring (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sharing_is_caring_62d362)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Sharing is Caring (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sharing_is_caring_62d362)."
+        }
+      ],
+      "description_string_id": 101970,
+      "intro_text_string_id": 101975,
+      "enabled": true
+    },
+    {
+      "id": 3953315,
+      "title_string_id": 389883,
+      "giver_npc_id": 9500000659,
+      "prerequisite_quest_ids": [
+        3953323
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 389888,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pick up Aedon (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snow_place_like_home_06ecaa)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_snow_place_like_home_06ecaa)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "npc lookup 'aedon' -> 9500002037"
+            }
+          ],
+          "npc_id": 9500002037
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 389890,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Take Aedon to Valinda in Snowhill (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snow_place_like_home_06ecaa)."
+            }
+          ],
+          "npc_id": 9500000779
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 389659,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Cella Cedarnook in Shrouded Glade (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snow_place_like_home_06ecaa)."
+            }
+          ],
+          "npc_id": 9500000659
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Snow Place Like Home (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snow_place_like_home_06ecaa)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Snow Place Like Home (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snow_place_like_home_06ecaa)."
+        }
+      ],
+      "description_string_id": 389882,
+      "intro_text_string_id": 389882,
+      "enabled": true
+    },
+    {
+      "id": 3953323,
+      "title_string_id": 389648,
+      "giver_npc_id": 9500000659,
+      "prerequisite_quest_ids": [
+        3950348
+      ],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "text_string_id": 389657,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cook up some Gummyfruit Gumbo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_something_to_snack_on_465966)."
+            }
+          ],
+          "recipe_id": 35,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 389999,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Feed the Gumbo to Aedon in Shrouded Glade (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_something_to_snack_on_465966)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_something_to_snack_on_465966)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "npc lookup 'aedon' -> 9500002037"
+            }
+          ],
+          "npc_id": 9500002037
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 390000,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Cella Cedarnook (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_something_to_snack_on_465966)."
+            }
+          ],
+          "npc_id": 9500000659
+        },
+        {
+          "kind": "gather_resource",
+          "id": 4,
+          "text_string_id": 389663,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Harvest some gummyfruit - (0/6) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_something_to_snack_on_465966)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: 'Bundle of Gummyfruit' is item 2875 (item-table.json); harvesting.json outputs it in Queensfields Harvesting (109), Chugaroot Farm Harvesting (113), Lakesfield Harvesting (117)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: harvesting raises GatherResource{resource_id: output definition} (gameplay/crafting.rs:765); targets.gather lists harvesting.json outputs."
+            }
+          ],
+          "resource_id": 2875,
+          "quantity": 6
+        },
+        {
+          "kind": "gather_resource",
+          "id": 5,
+          "text_string_id": 389665,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Harvest some honeytwig - (0/6) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_something_to_snack_on_465966)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: 'Bundle of Honeytwig' is item 2881 (item-table.json); harvesting.json outputs it in Queensfields Harvesting (109)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: harvesting raises GatherResource{resource_id: output definition} (gameplay/crafting.rs:765); targets.gather lists harvesting.json outputs."
+            }
+          ],
+          "resource_id": 2881,
+          "quantity": 6
+        },
+        {
+          "kind": "gather_resource",
+          "id": 6,
+          "text_string_id": 389667,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Harvest some tumtumnip - (0/6) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_something_to_snack_on_465966)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: 'Bundle of Tumtumnip' is item 2890 (item-table.json); harvesting.json outputs it in Farnum's Farm Harvesting (111)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: harvesting raises GatherResource{resource_id: output definition} (gameplay/crafting.rs:765); targets.gather lists harvesting.json outputs."
+            }
+          ],
+          "resource_id": 2890,
+          "quantity": 6
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 7,
+          "text_string_id": 389670,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give the ingredients to Cella Cedarnook (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_something_to_snack_on_465966)."
+            }
+          ],
+          "npc_id": 9500000659
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 8,
+          "text_string_id": 390000,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Cella Cedarnook (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_something_to_snack_on_465966)."
+            }
+          ],
+          "npc_id": 9500000659
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 26,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Something to Snack On (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_something_to_snack_on_465966)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Something to Snack On (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_something_to_snack_on_465966)."
+        }
+      ],
+      "enabled": true,
+      "job": 45
+    },
+    {
+      "id": 3953344,
+      "title_string_id": 101317,
+      "giver_npc_id": 9500000552,
+      "prerequisite_quest_ids": [
+        3950216
+      ],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "text_string_id": 101321,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Scout near Rainchaser (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_new_place_bae20e)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki links this step to Rainchaser, row 9500000617"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) anchored on that row's position"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -109.2767,
+            -46.54817,
+            -1269.609
+          ],
+          "radius": 15
+        },
+        {
+          "kind": "visit_position",
+          "id": 2,
+          "text_string_id": 101325,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Scout near Sundancer (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_new_place_bae20e)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki links this step to Sundancer, row 9500000631"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) anchored on that row's position"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -716.4009,
+            -6.756301,
+            -1235.616
+          ],
+          "radius": 15
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 101329,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Aziwug in Seaside (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_new_place_bae20e)."
+            }
+          ],
+          "npc_id": 9500000552
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The New Place (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_new_place_bae20e)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "The New Place (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_new_place_bae20e)."
+        }
+      ],
+      "description_string_id": 101335,
+      "intro_text_string_id": 101335,
+      "enabled": true
+    },
+    {
+      "id": 3953367,
+      "title_string_id": 70392,
+      "giver_npc_id": 9000000005,
+      "prerequisite_quest_ids": [
+        3953164
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 70398,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver the package (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_turning_the_tables_3bdfbe)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 70398 is this step; card 70393 and the giver's line 70391 name Sir Wellington"
+            }
+          ],
+          "npc_id": 9500000211
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 70404,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Ambrose Worcester (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_turning_the_tables_3bdfbe)."
+            }
+          ],
+          "npc_id": 9000000005
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 38,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Turning the Tables (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_turning_the_tables_3bdfbe)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Turning the Tables (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_turning_the_tables_3bdfbe)."
+        }
+      ],
+      "description_string_id": 70393,
+      "intro_text_string_id": 70391,
+      "enabled": true
+    },
+    {
+      "id": 3953369,
+      "title_string_id": 101364,
+      "giver_npc_id": 9500000552,
+      "prerequisite_quest_ids": [
+        3953344
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 101367,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Meika (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_two_feet_no_socks_da032d)."
+            }
+          ],
+          "npc_id": 9500002194
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 101374,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Swatch (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_two_feet_no_socks_da032d)."
+            }
+          ],
+          "npc_id": 9500002306
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 101376,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return the socks to Sockalug in Seaside (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_two_feet_no_socks_da032d)."
+            }
+          ],
+          "npc_id": 9500000627
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Two Feet No Socks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_two_feet_no_socks_da032d)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Two Feet No Socks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_two_feet_no_socks_da032d)."
+        }
+      ],
+      "description_string_id": 101378,
+      "intro_text_string_id": 101378,
+      "enabled": true
+    },
+    {
+      "id": 3953370,
+      "title_string_id": 429356,
+      "giver_npc_id": 9500000296,
+      "prerequisite_quest_ids": [
+        3950333
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 70388,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on the Artifacts minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_unearthing_treasures_19517e)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: MiniGameData 681 \"Ambrose's Dig\" (type 8) is in the server's pinned producer set; objective client text 'Click on the Artifacts minigame'."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 'Click on the Artifacts minigame' has no client event of its own here; treating it as playing the dig. Greenwood Forest's dig is Ambrose's (dig_sites.json)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 'Click on the Artifacts minigame' is the click on the dig site; the win is the next step."
+            }
+          ],
+          "npc_id": 9500002001
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 429363,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat the first three levels - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_unearthing_treasures_19517e)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) condition not modelled: the producer credits one finish for the whole run, so a per-level, per-stage or streak goal becomes finishing the game once."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: MiniGameData 681 \"Ambrose's Dig\" (type 8) is in the server's pinned producer set; objective client text 'Beat the first three levels'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client text 429363 'Beat the first three levels'; the Type8 win credits a finish per run (npc_minigame_win)."
+            }
+          ],
+          "minigame_id": 681,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 429365,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Counselor Cammy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_unearthing_treasures_19517e)."
+            }
+          ],
+          "npc_id": 9500000296
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Unearthing Treasures (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_unearthing_treasures_19517e)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Unearthing Treasures (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_unearthing_treasures_19517e)."
+        }
+      ],
+      "description_string_id": 429355,
+      "intro_text_string_id": 429355,
+      "enabled": true
+    },
+    {
+      "id": 3953373,
+      "title_string_id": 390211,
+      "giver_npc_id": 9500000278,
+      "prerequisite_quest_ids": [
+        3953168
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 390220,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Score 70,000 points on the Harvesting minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_vegetable_medley_87584d)."
+            }
+          ],
+          "minigame_id": 111,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 390191,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Rucks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_vegetable_medley_87584d)."
+            }
+          ],
+          "npc_id": 9500000278
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Vegetable Medley (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_vegetable_medley_87584d)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Vegetable Medley (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_vegetable_medley_87584d)."
+        }
+      ],
+      "enabled": true,
+      "job": 45
+    },
+    {
+      "id": 3953383,
+      "title_string_id": 36873,
+      "giver_npc_id": 9500000781,
+      "prerequisite_quest_ids": [
+        3953175
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 36876,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect the flowers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_woe_is_willie_d19cda)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: model ss_deco_flower_04.adr is in Models.txt, seen by eye below"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: blue-green flowers in a pot (sheets/l_existing.png r0c3, tile of ss_deco_flower_04.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_woe_is_willie_d19cda)."
+            }
+          ],
+          "node_type": "quest-flower-2",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 36878,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give the flowers to Carrie at the Snowhill hot springs (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_woe_is_willie_d19cda)."
+            }
+          ],
+          "npc_id": 9500000734
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 140711,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Willie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_woe_is_willie_d19cda)."
+            }
+          ],
+          "npc_id": 9500000781
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 61,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Woe is Willie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_woe_is_willie_d19cda)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Woe is Willie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_woe_is_willie_d19cda)."
+        }
+      ],
+      "description_string_id": 36872,
+      "intro_text_string_id": 36872,
+      "enabled": true
+    },
+    {
+      "id": 3953396,
+      "title_string_id": 38364,
+      "giver_npc_id": 9500000900,
+      "prerequisite_quest_ids": [
+        3953589
+      ],
+      "objectives": [
+        {
+          "kind": "gather_resource",
+          "id": 1,
+          "text_string_id": 38367,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Harvest choychoy - 0/4 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_pinch_of_choy_f9d2a7)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: 'Bundle of Choychoy' is item 2879 (item-table.json); harvesting.json outputs it in Chugaroot Farm Harvesting (113)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: harvesting raises GatherResource{resource_id: output definition} (gameplay/crafting.rs:765); targets.gather lists harvesting.json outputs."
+            }
+          ],
+          "resource_id": 2879,
+          "quantity": 4
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 38332,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Funnel Bindweed (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_pinch_of_choy_f9d2a7)."
+            }
+          ],
+          "npc_id": 9500000900
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 90468,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Funnel Bindweed (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_pinch_of_choy_f9d2a7)."
+            }
+          ],
+          "npc_id": 9500000900
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Pinch of Choy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_pinch_of_choy_f9d2a7)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "A Pinch of Choy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_pinch_of_choy_f9d2a7)."
+        }
+      ],
+      "description_string_id": 38366,
+      "intro_text_string_id": 38365,
+      "enabled": true,
+      "end_text_string_id": 2127,
+      "job": 45
+    },
+    {
+      "id": 3953589,
+      "title_string_id": 38351,
+      "giver_npc_id": 9500000900,
+      "prerequisite_quest_ids": [
+        3953669
+      ],
+      "objectives": [
+        {
+          "kind": "gather_resource",
+          "id": 1,
+          "text_string_id": 38354,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Harvest chugaroot - 0/10 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_not_sweet_enough_893338)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: 'Bundle of Chugaroot' is item 2888 (item-table.json); harvesting.json outputs it in Chugaroot Farm Harvesting (113)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: harvesting raises GatherResource{resource_id: output definition} (gameplay/crafting.rs:765); targets.gather lists harvesting.json outputs."
+            }
+          ],
+          "resource_id": 2888,
+          "quantity": 10
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 38332,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Funnel Bindweed (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_not_sweet_enough_893338)."
+            }
+          ],
+          "npc_id": 9500000900
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 90468,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Funnel Bindweed (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_not_sweet_enough_893338)."
+            }
+          ],
+          "npc_id": 9500000900
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Not Sweet Enough (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_not_sweet_enough_893338)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Not Sweet Enough (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_not_sweet_enough_893338)."
+        }
+      ],
+      "description_string_id": 38352,
+      "intro_text_string_id": 38350,
+      "enabled": true,
+      "end_text_string_id": 38358,
+      "job": 45
+    },
+    {
+      "id": 3953669,
+      "title_string_id": 38328,
+      "giver_npc_id": 9500000900,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "gather_resource",
+          "id": 1,
+          "text_string_id": 38330,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Harvest Gummyfruit - (0/5) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_concoction_45a51d)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: 'Bundle of Gummyfruit' is item 2875 (item-table.json); harvesting.json outputs it in Queensfields Harvesting (109), Chugaroot Farm Harvesting (113), Lakesfield Harvesting (117)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: harvesting raises GatherResource{resource_id: output definition} (gameplay/crafting.rs:765); targets.gather lists harvesting.json outputs."
+            }
+          ],
+          "resource_id": 2875,
+          "quantity": 5
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 38332,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Funnel Bindweed (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_concoction_45a51d)."
+            }
+          ],
+          "npc_id": 9500000900
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 90468,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Funnel Bindweed (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_concoction_45a51d)."
+            }
+          ],
+          "npc_id": 9500000900
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 61,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Concoction (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_concoction_45a51d)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "The Concoction (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_concoction_45a51d)."
+        }
+      ],
+      "description_string_id": 38329,
+      "intro_text_string_id": 38327,
+      "enabled": true,
+      "job": 45
     }
   ]
 }

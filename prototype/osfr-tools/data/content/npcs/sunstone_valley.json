@@ -24804,9 +24804,23 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part C. Whirly's Scrap Camp (robgoblins), row 60; source cell: [client][video][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3953012,
+          "title": "A Beautiful Friendship",
+          "title_string_id": 29629,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Beautiful Friendship (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_beautiful_friendship_3cdd8f)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3953012
+      ],
       "quests_given_text": [
         "The five-quest chain A Beautiful Friendship, Ka-Boom or Not To Boom, Junk or Bust, Robot Woes (repeatable per the wiki), The Legendary Sunstone; hand-in of Wheelie Pete's For Rizzle. Gate: a level 8 combat job (wiki; client 2365384286 by wording)."
       ],
@@ -25256,11 +25270,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2593; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3926 (ModelId=1681, ModelFileName=robgoblin_m_gogglesgears.adr, NameId=440140)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.696464,
       "model_id": 1681,
-      "model_file_name": "robgoblin_m_gogglesgears.adr"
+      "model_file_name": "robgoblin_m_gogglesgears.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000186,

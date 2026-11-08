@@ -2625,8 +2625,36 @@
       "location_evidence": [
         "Ocean Treasures Cafe, near Sockalug (wiki)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953344,
+          "title": "The New Place",
+          "title_string_id": 101317,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The New Place (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_new_place_bae20e)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3953369,
+          "title": "Two Feet No Socks",
+          "title_string_id": 101364,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Two Feet No Socks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_two_feet_no_socks_da032d)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953344,
+        3953369
+      ],
       "quests_given_text": [
         "Scout Seaside for two spots to practise stunts near Sundancer and Rainchaser (1726284025, 2830201619); his mother's socks (3646459664); title not found"
       ],
@@ -6096,8 +6124,23 @@
       "location_evidence": [
         "Sandstorm Speedway, \"follow the beach North\" (4224156990, 2670444010)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953295,
+          "title": "Sandstorm's Grand Opening",
+          "title_string_id": 406432,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Sandstorm's Grand Opening (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sandstorm_s_grand_opening_3186ef)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953295
+      ],
       "quests_given_text": [
         "Sandstorm's Grand Opening (title 1822039336): \"Find some good kart and derby drivers to compete at Sandstorm Speedway in Seaside\" (2359616845); riddles ending with Pablo Gable; reward 1 Blast Speedster (video MJkBn2nwbVU/00216). Finding the Sandstorm Speedway (title 1050061561) is a related title with no giver found. See Kart Driver"
       ],
@@ -7304,11 +7347,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:665; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1907 (ModelId=555, ModelFileName=human_m_freestyle_09.agr, NameId=91661)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.97439,
       "model_id": 555,
-      "model_file_name": "human_m_freestyle_09.agr"
+      "model_file_name": "human_m_freestyle_09.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000562,
@@ -15930,8 +15980,36 @@
       "location_evidence": [
         "The tanning lotion she left at the Ocean Treasures Cafe (449460827)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953159,
+          "title": "Forgetful Tanning",
+          "title_string_id": 101934,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Forgetful Tanning (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_forgetful_tanning_e3c95c)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3953304,
+          "title": "Sharing is Caring",
+          "title_string_id": 101969,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Sharing is Caring (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sharing_is_caring_62d362)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953159,
+        3953304
+      ],
       "quests_given_text": [
         "Fetch Ellie's Lotion, then share it with Brendan (644158232)"
       ],
@@ -16315,11 +16393,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:619; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1860 (ModelId=785, ModelFileName=human_seaside_f.adr, NameId=101931)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 3.091527,
       "model_id": 785,
-      "model_file_name": "human_seaside_f.adr"
+      "model_file_name": "human_seaside_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000580,
@@ -28617,8 +28702,23 @@
       "location_evidence": [
         "Over the cliff; the ball lies \"near Kai's house\" (1607714631)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953188,
+          "title": "Having a Ball",
+          "title_string_id": 102000,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Having a Ball (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_having_a_ball_9c7721)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953188
+      ],
       "quests_given_text": [
         "Having a Ball (title 2104117819; \"Retrieve it for him!\", 146198445). Wiki lists the quest on his page"
       ],
@@ -29068,11 +29168,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:765; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2008 (ModelId=690, ModelFileName=humanchild_m_swirltrimbig.adr, NameId=101989)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.561412,
       "model_id": 690,
-      "model_file_name": "humanchild_m_swirltrimbig.adr"
+      "model_file_name": "humanchild_m_swirltrimbig.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000153,
@@ -32653,11 +32760,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:762; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2005 (ModelId=171, ModelFileName=dog_large_shortears.adr, NameId=94177)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.235671,
       "model_id": 171,
-      "model_file_name": "dog_large_shortears.adr"
+      "model_file_name": "dog_large_shortears.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000611,
@@ -34020,8 +34134,23 @@
       "location_evidence": [
         "Oceanfront Homes, \"the overgrown Hedge ... in front of Piparoo's house\" (1852344770)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953277,
+          "title": "Put a Leash on It!",
+          "title_string_id": 101468,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Put a Leash on It! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_put_a_leash_on_it_60c05a)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953277
+      ],
       "quests_given_text": [
         "\"Piparoo in Seaside asked that you trim his hedge\" (699883137, 955715423; title not found); the dog quest above"
       ],
@@ -34399,11 +34528,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:763; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2006 (ModelId=30, ModelFileName=fairy_m_old_01.adr, NameId=45572)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.61064,
       "model_id": 30,
-      "model_file_name": "fairy_m_old_01.adr"
+      "model_file_name": "fairy_m_old_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000615,
@@ -34815,11 +34951,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:688; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1930 (ModelId=660, ModelFileName=fairy_m_freestyle_11.agr, NameId=45573)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.468382,
       "model_id": 660,
-      "model_file_name": "fairy_m_freestyle_11.agr"
+      "model_file_name": "fairy_m_freestyle_11.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000616,
