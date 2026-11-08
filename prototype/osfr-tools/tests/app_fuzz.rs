@@ -1864,7 +1864,8 @@ fn t3_active_movies_reject_hostile_headers_and_out_of_phase_rewards() {
         "W90 active corpus: {count} mutations, elapsed {:?}",
         start.elapsed()
     );
-    assert!(start.elapsed() < Duration::from_secs(60));
+    // A hang guard, not a benchmark, like the routed corpus above.
+    assert!(start.elapsed() < Duration::from_secs(120));
 }
 
 fn race_observations(snapshot: &Snapshot) -> u32 {

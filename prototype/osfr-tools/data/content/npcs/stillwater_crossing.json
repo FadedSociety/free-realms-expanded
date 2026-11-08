@@ -7559,12 +7559,49 @@
               "evidence": "title_string_id corrected from raw locale hash 1633659058 to Global.Text id 403467 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3060025,
+          "title": "Demo Derby: Paws 'n Claws Smash-a-thon",
+          "title_string_id": 403468,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 3: Paws 'n Claws and the Frost Ridge arena, row 22; name \"Demo Derby: Paws 'n Claws Smash-a-thon\"; title id cell 3683532341 ucdt; 574054201 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3060025 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3060017,
         3060018,
-        3060024
+        3060024,
+        3060025
       ],
       "quests_given_text": [
         "Demo Derby: Seeking a Sponsor (hand-in; Tucker Thunderjolt of Thunder Falls sends the player: 880667942), then, by inference, Demo Derby: A Lukewarm Welcome, Demo Derby: Defeating Diggs and Demo Derby: Think of the Kittens (charity-derby fliers around the town: 2706224773, 3634961039). Uniform pick-up: \"You'll need to see Kanan at Stillwater Crossing to pick it up.\" (2308551674, 2712739880). Candidate offer text: \"I'm looking to replace a member of the Paws 'n Claws Crashing Crew\" (186107631, speaker not named)."

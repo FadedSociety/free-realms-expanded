@@ -533,8 +533,36 @@
       "id": 3060009,
       "title_string_id": 403456,
       "giver_npc_id": 9000000289,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3060010
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 394068,
+          "minigame_id": 609,
+          "count": 1,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 2026-11-08: finishing this quest's own derby row 609 counts for this goal (Compete in the derby); the goal's own condition is not modelled."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 93090,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Crash Davis (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_dealing_damage_96d2fe)."
+            }
+          ],
+          "npc_id": 9000000289
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -580,14 +608,81 @@
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49,
+      "description_string_id": 394024,
+      "intro_text_string_id": 393381
     },
     {
       "id": 3060010,
       "title_string_id": 403455,
       "giver_npc_id": 9000000289,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3060011
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 394072,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Willow (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_spare_parts_8d87d9)."
+            }
+          ],
+          "npc_id": 9500000961,
+          "dialogue_string_id": 395705,
+          "lines": [
+            {
+              "text_id": 395705
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 394073,
+          "minigame_id": 608,
+          "count": 1,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 2026-11-08: finishing this quest's own derby row 608 counts for this goal (Challenge Willow in the derby); the goal's own condition is not modelled."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 395707,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "See Willow for kart parts (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_spare_parts_8d87d9)."
+            }
+          ],
+          "npc_id": 9500000961,
+          "dialogue_string_id": 395709,
+          "lines": [
+            {
+              "text_id": 395709
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 93090,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Crash Davis (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_spare_parts_8d87d9)."
+            }
+          ],
+          "npc_id": 9000000289
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -633,7 +728,10 @@
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49,
+      "description_string_id": 394023,
+      "intro_text_string_id": 393380
     },
     {
       "id": 3060011,
@@ -1517,9 +1615,33 @@
     {
       "id": 3060025,
       "title_string_id": 403468,
-      "giver_npc_id": 9000000375,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9000000124,
+      "prerequisite_quest_ids": [
+        3060024
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 395067,
+          "minigame_id": 616,
+          "count": 1,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 2026-11-08: finishing this quest's own derby row 616 counts for this goal (Score 12 points); the goal's own condition is not modelled."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 2026-11-08: the client's two goals, Score 12 points (395067) and Place in the top 3 (400447), both as bounds on the one match; the derby reports both facts."
+            }
+          ],
+          "require": {
+            "min_score": 12,
+            "max_placement": 3
+          }
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1565,7 +1687,10 @@
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49,
+      "description_string_id": 394036,
+      "intro_text_string_id": 393393
     },
     {
       "id": 3060026,

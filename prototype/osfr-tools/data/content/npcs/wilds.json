@@ -11452,6 +11452,78 @@
               "evidence": "title_string_id corrected from raw locale hash 2255832689 to Global.Text id 403485 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3060010,
+          "title": "Demo Derby: Spare Parts",
+          "title_string_id": 403455,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 1: Thunder Falls and Crash Davis (training, karts, Crash for Coin), row 7; name 'Demo Derby: Spare Parts'; title id cell 1543086689 ucdt; 1174291843 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3060010 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            }
+          ]
+        },
+        {
+          "quest_id": 3060009,
+          "title": "Demo Derby: Dealing Damage",
+          "title_string_id": 403456,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 1: Thunder Falls and Crash Davis (training, karts, Crash for Coin), row 6; name 'Demo Derby: Dealing Damage'; title id cell 3877728003 ucdt; 1706453965 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3060009 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
@@ -11460,7 +11532,9 @@
         3060011,
         3060012,
         3060013,
-        3060044
+        3060044,
+        3060010,
+        3060009
       ],
       "quests_given_text": [
         "Demo Derby: License to Drive (inferred), Demo Derby: Taking the Wheel (inferred), Demo Derby: Dealing Damage, Demo Derby: Spare Parts, Demo Derby: So Long, Betty!, Demo Derby: Thunder Falls Crash for Coin (inferred), Demo Derby: Tucker's Troubles (inferred), Demo Derby: Wildwood Derby 1000."
@@ -47608,11 +47682,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1809; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3066 (ModelId=1296, ModelFileName=fairy_f_willow_slamdash.agr, NameId=19366)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.214843,
       "model_id": 1296,
-      "model_file_name": "fairy_f_willow_slamdash.agr"
+      "model_file_name": "fairy_f_willow_slamdash.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000962,

@@ -196,7 +196,7 @@ fn bundled_activity_content_loads_without_lab() {
             .map(|row| row.game_id())
             .collect::<Vec<_>>(),
         // L931: the Games window rows 40/41, tutorials 289/290 and quest rows 607-627 join 604.
-        [39, 604, 40, 41, 289, 290, 607, 615, 616, 624, 627],
+        [39, 604, 40, 41, 289, 290, 607, 615, 616, 624, 627, 603, 605, 606, 608, 609, 610, 611, 612, 613, 614, 617, 618, 619, 620, 621, 622, 623, 625, 626],
         "the bundle hosts the default derby row, the T791 extra row and the L931 rows"
     );
     let package: Value =

@@ -147,7 +147,8 @@ fn the_flier_run_is_offered_walked_and_paid_once() {
         now,
         "a duplicate 49/14",
     );
-    assert_no_offer(&mut game, &kanan(CHARACTER), KANAN, &mut now, "Kanan after");
+    // Kanan's next link, the Paws 'n Claws Smash-a-thon, is live for Demo Derby Drivers.
+    offer(&mut game, &kanan(CHARACTER), KANAN, 3_060_025, now);
 }
 
 #[test]

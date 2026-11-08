@@ -58,8 +58,9 @@ const LICENSE_TO_DRIVE: u32 = 3_060_005;
 const DEFAULT_GAME: i32 = 39;
 const BREAK_ER_IN: i32 = 604;
 /// L931: the shipped hosted rows in file order after the default row: 604, the Games window rows
-/// 40/41 and tutorials 289/290, then the quest rows 607, 615, 616, 624 and 627.
-const SHIPPED_ROWS: [i32; 11] = [39, 604, 40, 41, 289, 290, 607, 615, 616, 624, 627];
+/// 40/41 and tutorials 289/290, then the quest rows 607, 615, 616, 624 and 627, then the rest of
+/// the client's named derby rows (2026-11-08).
+const SHIPPED_ROWS: [i32; 30] = [39, 604, 40, 41, 289, 290, 607, 615, 616, 624, 627, 603, 605, 606, 608, 609, 610, 611, 612, 613, 614, 617, 618, 619, 620, 621, 622, 623, 625, 626];
 const DERBY_FILES: [&str; 4] = [
     "derby_entry.json",
     "derby_gates.json",

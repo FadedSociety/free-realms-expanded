@@ -143,6 +143,253 @@
           "evidence": "Resources/MiniGameData.txt row 627 '627^11^393331^394482^9870^3^0^^0^0^0^^0^' is TYPE 11, NAME_ID 393331 (Frost Ridge Invitational), DESCRIPTION_ID 394482. L931 lists it so the derby can host it; this file is not the complete client MiniGameData table."
         }
       ]
+    },
+    {
+      "id": 603,
+      "game_type_id": 11,
+      "name_string_id": 393292,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 603 is TYPE 11, NAME_ID 393292, DESCRIPTION_ID 394458."
+        }
+      ]
+    },
+    {
+      "id": 605,
+      "game_type_id": 11,
+      "name_string_id": 393296,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 605 is TYPE 11, NAME_ID 393296, DESCRIPTION_ID 394460."
+        }
+      ]
+    },
+    {
+      "id": 606,
+      "game_type_id": 11,
+      "name_string_id": 393297,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 606 is TYPE 11, NAME_ID 393297, DESCRIPTION_ID 394461."
+        }
+      ]
+    },
+    {
+      "id": 608,
+      "game_type_id": 11,
+      "name_string_id": 393300,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 608 is TYPE 11, NAME_ID 393300, DESCRIPTION_ID 394463."
+        }
+      ]
+    },
+    {
+      "id": 609,
+      "game_type_id": 11,
+      "name_string_id": 393301,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 609 is TYPE 11, NAME_ID 393301, DESCRIPTION_ID 394464."
+        }
+      ]
+    },
+    {
+      "id": 610,
+      "game_type_id": 11,
+      "name_string_id": 393303,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 610 is TYPE 11, NAME_ID 393303, DESCRIPTION_ID 394465."
+        }
+      ]
+    },
+    {
+      "id": 611,
+      "game_type_id": 11,
+      "name_string_id": 393304,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 611 is TYPE 11, NAME_ID 393304, DESCRIPTION_ID 394466."
+        }
+      ]
+    },
+    {
+      "id": 612,
+      "game_type_id": 11,
+      "name_string_id": 393306,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 612 is TYPE 11, NAME_ID 393306, DESCRIPTION_ID 394467."
+        }
+      ]
+    },
+    {
+      "id": 613,
+      "game_type_id": 11,
+      "name_string_id": 393308,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 613 is TYPE 11, NAME_ID 393308, DESCRIPTION_ID 393348."
+        }
+      ]
+    },
+    {
+      "id": 614,
+      "game_type_id": 11,
+      "name_string_id": 393309,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 614 is TYPE 11, NAME_ID 393309, DESCRIPTION_ID 394469."
+        }
+      ]
+    },
+    {
+      "id": 617,
+      "game_type_id": 11,
+      "name_string_id": 393315,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 617 is TYPE 11, NAME_ID 393315, DESCRIPTION_ID 394472."
+        }
+      ]
+    },
+    {
+      "id": 618,
+      "game_type_id": 11,
+      "name_string_id": 393316,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 618 is TYPE 11, NAME_ID 393316, DESCRIPTION_ID 394473."
+        }
+      ]
+    },
+    {
+      "id": 619,
+      "game_type_id": 11,
+      "name_string_id": 393318,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 619 is TYPE 11, NAME_ID 393318, DESCRIPTION_ID 394474."
+        }
+      ]
+    },
+    {
+      "id": 620,
+      "game_type_id": 11,
+      "name_string_id": 393319,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 620 is TYPE 11, NAME_ID 393319, DESCRIPTION_ID 394475."
+        }
+      ]
+    },
+    {
+      "id": 621,
+      "game_type_id": 11,
+      "name_string_id": 393322,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 621 is TYPE 11, NAME_ID 393322, DESCRIPTION_ID 394476."
+        }
+      ]
+    },
+    {
+      "id": 622,
+      "game_type_id": 11,
+      "name_string_id": 393324,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 622 is TYPE 11, NAME_ID 393324, DESCRIPTION_ID 394477."
+        }
+      ]
+    },
+    {
+      "id": 623,
+      "game_type_id": 11,
+      "name_string_id": 393326,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 623 is TYPE 11, NAME_ID 393326, DESCRIPTION_ID 394478."
+        }
+      ]
+    },
+    {
+      "id": 625,
+      "game_type_id": 11,
+      "name_string_id": 393329,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 625 is TYPE 11, NAME_ID 393329, DESCRIPTION_ID 394480."
+        }
+      ]
+    },
+    {
+      "id": 626,
+      "game_type_id": 11,
+      "name_string_id": 393330,
+      "dungeon_id": null,
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 626 is TYPE 11, NAME_ID 393330, DESCRIPTION_ID 394481."
+        }
+      ]
     }
   ]
 }
