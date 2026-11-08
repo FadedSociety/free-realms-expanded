@@ -29,6 +29,9 @@ use serde_json::Value;
 use std::io::{ErrorKind, Read, Write};
 use std::net::{IpAddr, SocketAddr, TcpStream};
 
+/// What a card login's ticket names: its character and that row's client scenario, or a refusal.
+type Redeemed = Result<(u64, Option<i32>), &'static str>;
+
 /// (R) The gateway's own player ceilings: a stranger cannot hold more sockets than players.
 const MAX_CONNECTIONS: usize = 16;
 const MAX_PER_ADDRESS: usize = 4;
@@ -177,7 +180,7 @@ impl CardListener {
     fn poll(
         &mut self,
         now_ms: u64,
-        mut redeem: impl FnMut(&str, &str) -> Result<u64, &'static str>,
+        mut redeem: impl FnMut(&str, &str) -> Redeemed,
     ) {
         for _ in 0..4 {
             let Ok((stream, peer)) = self.listener.accept() else {
@@ -232,7 +235,7 @@ impl Connection {
         port: u16,
         now_ms: u64,
         lobby: Option<&osfr_tools::card_game::Lobby>,
-        redeem: &mut impl FnMut(&str, &str) -> Result<u64, &'static str>,
+        redeem: &mut impl FnMut(&str, &str) -> Redeemed,
         events: &mut Vec<Value>,
         records: &mut Vec<(u64, card_service::SinglePlayerRecord)>,
     ) -> Option<&'static str> {
@@ -274,10 +277,12 @@ impl Connection {
                 Some(Err(_)) => return Some("bad_message"),
                 None => {}
             }
-            let (mut login, mut name) = (None, String::new());
+            let (mut login, mut name, mut scenario) = (None, String::new(), None);
             let logged_in = self.character.is_some();
             let reply = card_service::reply(&body, host, port, logged_in, |l| {
                 let redeemed = redeem(&l.ticket, &l.character_id);
+                scenario = redeemed.ok().and_then(|(_, scenario)| scenario);
+                let redeemed = redeemed.map(|(character, _)| character);
                 // T805: the 411's shape for its event: lengths only, never a value.
                 let lengths = json!({
                     "session_id":l.session_id.len(),"character_name":l.character_name.len(),
@@ -307,7 +312,7 @@ impl Connection {
                         Some(Ok(character)) if self.character.is_none() => {
                             self.character = Some(character);
                             if let Some(lobby) = lobby {
-                                if !self.enter_lobby(character, lobby, &name, events) {
+                                if !self.enter_lobby(character, scenario, lobby, &name, events) {
                                     return Some("write_failed");
                                 }
                             }
@@ -330,17 +335,28 @@ impl Connection {
     }
 
     /// T813: push the lobby after the first successful login (the 81 is already written): the
-    /// three frames of `card_service::lobby_entry`, then one `card_lobby` event. False when the
-    /// peer cannot take them.
+    /// three frames of `card_service::lobby_entry`, then one `card_lobby` event. A deck row's
+    /// `scenario` swaps the lobby screen for its fight. False when the peer cannot take them.
     fn enter_lobby(
         &mut self,
         character: u64,
+        scenario: Option<i32>,
         lobby: &osfr_tools::card_game::Lobby,
         name: &str,
         events: &mut Vec<Value>,
     ) -> bool {
         let account = card_service::account_id(character);
+        // The fight waits for a saved deck, so without cards it would never start.
+        let scenario = scenario.filter(|_| !lobby.collection.is_empty());
         let mut bodies = card_service::lobby_entry(account, lobby, name).to_vec();
+        // A deck row's fight replaces the lobby: ahead of the 92, whose map screen starts it.
+        if let Some(scenario) = scenario {
+            bodies.pop();
+            bodies.insert(1, card_service::initiate_challenge(account, scenario));
+            // ponytail: the starter only, so decks the player built are not listed for a deck
+            // row; keeping 361's decks and replaying them here is the upgrade.
+            bodies.push(card_service::online_decks(&lobby.collection));
+        }
         // T825: the collection sync starts right after the lobby.
         if !lobby.collection.is_empty() {
             bodies.push(card_service::sync_start(account, &lobby.collection));
@@ -355,10 +371,14 @@ impl Connection {
                 return false;
             }
         }
-        events.push(json!({
+        let mut event = json!({
             "event":"card_lobby","peer":self.peer.to_string(),"character":character,
             "account":account,"group":lobby.group_id
-        }));
+        });
+        if let Some(scenario) = scenario {
+            event["scenario"] = scenario.into();
+        }
+        events.push(event);
         true
     }
 
@@ -612,13 +632,13 @@ impl Server {
         ticket: &str,
         character: &str,
         now_ms: u64,
-    ) -> Result<u64, &'static str> {
+    ) -> Redeemed {
         for session in self.sessions.values_mut() {
             let Some(game) = session.gateway.gameplay_mut() else {
                 continue;
             };
             if let Some(redeemed) = game.redeem_card_ticket(ticket, character, now_ms) {
-                return redeemed;
+                return redeemed.map(|guid| (guid, game.card_scenario()));
             }
         }
         Err(card_service::UNKNOWN_TICKET)
@@ -645,7 +665,7 @@ pub(super) mod tests {
     }
 
     /// A redeem that knows no ticket.
-    fn refuse(_: &str, _: &str) -> Result<u64, &'static str> {
+    fn refuse(_: &str, _: &str) -> Redeemed {
         Err(card_service::UNKNOWN_TICKET)
     }
 
@@ -737,6 +757,17 @@ pub(super) mod tests {
         ticket: &str,
         accept: Result<u64, &'static str>,
     ) -> (bool, i32, i32, Vec<(String, String)>) {
+        log_in_to(card, client, character_id, ticket, accept.map(|guid| (guid, None)))
+    }
+
+    /// [`log_in`] for a redeem that also names the row's client scenario.
+    fn log_in_to(
+        card: &mut CardListener,
+        client: &mut TcpStream,
+        character_id: &str,
+        ticket: &str,
+        accept: Redeemed,
+    ) -> (bool, i32, i32, Vec<(String, String)>) {
         client
             .write_all(&frame(Some(ROUTING), &session_login(character_id, ticket)))
             .unwrap();
@@ -766,7 +797,7 @@ pub(super) mod tests {
         let mut card = listener();
         let mut refused = client(&card);
         let (ok, code, account, seen) =
-            log_in(&mut card, &mut refused, "5041", "77", refuse("", ""));
+            log_in(&mut card, &mut refused, "5041", "77", Err(card_service::UNKNOWN_TICKET));
         assert_eq!(
             (ok, code, account),
             (false, 63, 0),
@@ -872,7 +903,7 @@ pub(super) mod tests {
             "source": [{"kind":"reconstructed","evidence":"F824 test"}]
         }));
         let mut refused = client(&card);
-        log_in(&mut card, &mut refused, "", "77", refuse("", ""));
+        log_in(&mut card, &mut refused, "", "77", Err(card_service::UNKNOWN_TICKET));
         let guid = 5041u64;
         let mut player = client(&card);
         let (ok, ..) = log_in(&mut card, &mut player, "", "78", Ok(guid));
@@ -934,6 +965,30 @@ pub(super) mod tests {
                 "character":guid,"account":account,"group":1
             })]
         );
+    }
+
+    /// A deck row's login: its challenge lands before the 92 whose map screen consumes it, and
+    /// no 291 follows to swap that screen for the lobby.
+    #[test]
+    fn a_deck_login_queues_its_challenge_before_the_map_screen() {
+        if !test_support::bin_test_target("card") {
+            return;
+        }
+        let mut card = open_with_launch(json!({
+            "port": 1, "ticket_ttl_ms": 60_000,
+            "lobby": {"group_id": 1, "lobby_type": 5, "role": 2,
+                "collection": [{"archetype_id": 100_009_946, "copies": 3}]},
+            "source": [{"kind":"reconstructed","evidence":"deck login test"}]
+        }));
+        let guid = 5041u64;
+        let mut player = client(&card);
+        assert!(log_in_to(&mut card, &mut player, "", "78", Ok((guid, Some(6)))).0);
+        let pushed: Vec<_> = (0..5).map(|_| answer(&mut card, &mut player, 3)).collect();
+        let classes: Vec<_> = pushed.iter().map(|b| card_service::class_id(b).unwrap()).collect();
+        assert_eq!(classes, [94, 486, 92, 363, 83], "the deck, then the collection sync; no 291");
+        let account = card_service::account_id(guid);
+        assert_eq!(pushed[1], card_service::initiate_challenge(account, 6));
+        assert!(card.events.iter().any(|e| e["event"] == "card_lobby" && e["scenario"] == 6));
     }
 
     /// T825: the client side of one command, routed like the client's (`101921e0`).
@@ -1627,7 +1682,9 @@ pub(super) mod tests {
             connection_id: scene.session.request.id,
         };
         server.sessions.insert(key, scene.session);
-        server.card = Some(listener());
+        let mut service = listener();
+        service.lobby = Some(serde_json::from_value(cards["launch"]["lobby"].clone()).unwrap());
+        server.card = Some(service);
 
         let mut window = client(server.card.as_ref().unwrap());
         window
@@ -1639,6 +1696,12 @@ pub(super) mod tests {
         let (success, _, account, _) =
             read_results(&answer_with(|| server.poll_card(2_000), &mut window));
         assert!(success, "the minting session's ticket logs in");
+        answer_with(|| server.poll_card(2_001), &mut window);
+        assert_eq!(
+            answer_with(|| server.poll_card(2_002), &mut window),
+            card_service::initiate_challenge(account, 1),
+            "row 490 is Sam's first script"
+        );
 
         let coins = |server: &Server| {
             server.sessions[&key]

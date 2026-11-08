@@ -29,7 +29,8 @@
 //!   `Resources` list of the TCG `.lst` and `.dds` art; that is the 39/16 preload name too.
 //! * Rows publish entry type 1 (the world tunnel); `server_type` (Legacy's 2, the client tunnel
 //!   `00be78c0`) stays in data for the launch slice.
-//! * The row's MiniGameData link (`minigame_id`) stays in data; no wire field is known to hold it.
+//! * The row's MiniGameData link (`minigame_id`) is not in the published row; it names the run and
+//!   picks the client's scenario (`SCENARIO_BLOCKS`).
 //! * T545: `type16_minigame_ids` lists every client `MiniGameData.txt` TYPE 16 row. The admin
 //!   `realm duel` credit refuses every other id, so a kart, derby or Treasure War row cannot
 //!   stand in for a card duel.
@@ -70,7 +71,7 @@ const MAX_TYPE16_IDS: usize = 1024;
 #[serde(deny_unknown_fields)]
 pub struct Row {
     pub id: u32,
-    /// The client `MiniGameData.txt` row this activity opens (data only, see the module docs).
+    /// The client `MiniGameData.txt` row this activity opens (see the module docs).
     pub minigame_id: u32,
     pub app_system_id: u32,
     pub category: u32,
@@ -91,6 +92,31 @@ pub struct Row {
     /// The lobby is -1; the wire carries the i32 bit pattern (R).
     pub difficulty: i32,
     pub source: Vec<Source>,
+}
+
+/// `(first row, last row, first scenario)`: the client script `MMOScenario_N` of each
+/// `MiniGameData.txt` card row. The client's index has 1..=37 and 39..=121 and no row list; 38 is
+/// its built-in tutorial (`104b9160`). Each owner's rows are one run of numbers, and the DLL's
+/// intro switch `1047aac0` names the owners (N 6 "says Poe", 55 Tyrone, 59 Sir Wellington, 77
+/// Jonathon, 89 Darkcheat, 113 Jort, 121 Ironteeth), which pins the blocks. (R) 39, 64 and 65
+/// (rows 661, 710, 711): no owner names them; they follow the row order.
+const SCENARIO_BLOCKS: [(i32, i32, i32); 7] = [
+    (500, 537, 1),
+    (661, 661, 39),
+    (666, 669, 40),
+    (684, 703, 44),
+    (710, 711, 64),
+    (387, 426, 66),
+    (1083, 1098, 106),
+];
+
+/// The client scenario a card row launches; `None` for the rows that open the lobby.
+fn scenario_of(minigame_id: i32) -> Option<i32> {
+    SCENARIO_BLOCKS.iter().find_map(|&(first, last, scenario)| {
+        (first..=last)
+            .contains(&minigame_id)
+            .then(|| scenario + minigame_id - first)
+    })
 }
 
 /// (R) The decks one NPC duels with: Sam Potts opened her deck's offer from her own Talk (the
@@ -350,12 +376,20 @@ impl Launches {
             .map_err(|_| invalid("card mini-game id is out of range"))?;
         let mut spec = RunSpec::empty(game_id, CARD_GAME_TYPE, RunMode::CardClient);
         spec.preload_file.clone_from(&self.preload_file);
+        (spec.name_id, spec.description_id) = (row.name_id as i32, row.description_id as i32);
+        spec.difficulty = row.difficulty.max(1);
         let offered = self.runs.offer(spec)?;
         if offered.accepted {
             self.entered = self.runs.current_instance_id().map(|run| (run, game_id));
             self.playing = None;
         }
         Ok(offered)
+    }
+
+    /// The client scenario of the row in play, for the card login's challenge.
+    pub fn scenario(&self) -> Option<i32> {
+        let (run, row) = self.entered?;
+        scenario_of(row).filter(|_| self.runs.current_instance_id() == Some(run))
     }
 
     /// The run's lifecycle packets (39/5 start, 39/6 leave, 39/7 ack). A 39/37, while the run is
@@ -677,6 +711,27 @@ mod tests {
         packet
     }
 
+    /// The client has 1..=121, each one row; the owners' intros pin the blocks.
+    #[test]
+    fn every_client_scenario_is_exactly_one_row() {
+        let mut numbers: Vec<i32> = SCENARIO_BLOCKS
+            .iter()
+            .flat_map(|&(first, last, scenario)| {
+                (0..=last - first).map(move |offset| scenario + offset)
+            })
+            .collect();
+        numbers.sort_unstable();
+        assert_eq!(numbers, (1..=121).collect::<Vec<_>>());
+        let named = [(505, 6), (695, 55), (699, 59), (398, 77), (410, 89), (1090, 113), (1098, 121)];
+        for (row, scenario) in named {
+            assert_eq!(scenario_of(row), Some(scenario), "row {row}");
+        }
+        assert_eq!(scenario_of(537), Some(38), "the client's own tutorial");
+        for lobby in [499, 727, 1036, 9997] {
+            assert_eq!(scenario_of(lobby), None, "row {lobby}");
+        }
+    }
+
     fn launches() -> Launches {
         let launch: Launch = serde_json::from_value(serde_json::json!({
             "ticket_ttl_ms": 120_000,
@@ -711,6 +766,26 @@ mod tests {
         let cards = Content::load(&crate::content::bundled_content().join(CONTENT_FILE)).unwrap();
         let offer = launches.begin(cards.row(row).unwrap()).unwrap();
         i32::from_le_bytes(offer.replies[0][3..7].try_into().unwrap())
+    }
+
+    /// The start screen reads its title and description from the offer; the row in play picks
+    /// the client scenario, and the lobby row has none.
+    #[test]
+    fn a_card_offer_names_its_row_and_scenario() {
+        let cards = Content::load(&crate::content::bundled_content().join(CONTENT_FILE)).unwrap();
+        let mut launches = launches();
+        let row = cards.row(491).unwrap();
+        let offer = launches.begin(row).unwrap();
+        // The 39/16 body after its 15-byte header: name, icon, description, difficulty.
+        let field = |at: usize| i32::from_le_bytes(offer.replies[0][at..at + 4].try_into().unwrap());
+        assert_eq!(field(11), row.minigame_id as i32, "the header's last field");
+        assert_eq!(field(15), row.name_id as i32);
+        assert_eq!(field(23), row.description_id as i32);
+        assert_eq!(field(27), row.difficulty);
+        assert_eq!(launches.scenario(), Some(5), "Poe's Trick Deck, row 504");
+        let mut lobby = self::launches();
+        lobby.begin(cards.row(7).unwrap()).unwrap();
+        assert_eq!(lobby.scenario(), None);
     }
 
     const START: i32 = SinglePlayerRecord::STARTED;

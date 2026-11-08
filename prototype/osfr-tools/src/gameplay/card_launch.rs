@@ -157,4 +157,9 @@ impl Gameplay {
             .as_mut()?
             .redeem(ticket, character, now_ms)
     }
+
+    /// The client scenario of the card row in play, for the card login's challenge.
+    pub fn card_scenario(&self) -> Option<i32> {
+        self.card_launches.as_ref()?.scenario()
+    }
 }

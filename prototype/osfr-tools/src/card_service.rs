@@ -495,6 +495,59 @@ fn group_entry(account: i32, place: [i32; 3], role: i32, name: &str) -> [Vec<u8>
     [groups, join, display]
 }
 
+/// `MatchCommand_InitiateChallenge`: the client plays one of its own `MMOScenario_N` scripts.
+pub const INITIATE_CHALLENGE: i32 = 486;
+
+/// 486 v2 (reader `1017e170`, writer `1017e1e0`): the three class headers plus the MatchCommand
+/// level's (`1017d9d0`), the account, the match id (none here), then `scenario` and two ints the
+/// client only stores (`1017df80`). Execute raises event 193 and the main window keeps the pair
+/// (`1037d6b0`); the map screen opens the deck dialog for it when it is created (`104b0690` ->
+/// `103e7530` -> `104b9160`). The client's own Join of the root group is what creates that screen
+/// (`10371cd0`), so this has to arrive before the 92, and a 291 would swap it for the lobby.
+pub fn initiate_challenge(account: i32, scenario: i32) -> Vec<u8> {
+    let mut body = sync_command(INITIATE_CHALLENGE, 2, []);
+    for value in [INITIATE_CHALLENGE, 2, account, 0, scenario, 0, 0] {
+        put_int(&mut body, value);
+    }
+    body
+}
+
+/// `DeckCommand_PopulateOnlineDeckData`: the player's saved decks.
+pub const POPULATE_ONLINE_DECKS: i32 = 363;
+
+/// The only deck class the client's factory makes (`ZPDeck`, reader `10442580`). Version 6 is the
+/// newest without its embedded hero archetype (7+) and its extra list (13).
+const ZP_DECK: [i32; 2] = [90002, 6];
+const STARTER_DECK: &str = "Starter Deck";
+
+/// 363 v1 (reader `100a6d80`, execute `100a61a0`): the three class headers, a count, then each
+/// deck: present (0) and a [`ZP_DECK`], whose header comes twice (its own level and the `Deck`
+/// level, `10099a10`): the deck's id, a string, its name, a string, a flag, the cards as
+/// `(archetype, series)` pairs, one per copy; then the starter flag (`100985c0`: no Delete), two
+/// flags, the ZPDeck level's two ints and an empty old list. The challenge dialog waits for a
+/// saved deck (`103e74d0`).
+pub fn online_decks(cards: &[crate::card_game::StarterCard]) -> Vec<u8> {
+    let [class, version] = ZP_DECK;
+    let mut body =
+        sync_command(POPULATE_ONLINE_DECKS, 1, [1, 0, class, version, class, version]);
+    // The dialog finds the chosen row by its shown name (`10399350`), so id and name are one.
+    for text in [STARTER_DECK, "", STARTER_DECK, ""] {
+        put_string(&mut body, text);
+    }
+    put_int(&mut body, 0);
+    put_int(&mut body, cards.iter().map(|card| card.copies).sum());
+    for card in cards {
+        for _ in 0..card.copies {
+            put_int(&mut body, card.archetype_id);
+            put_int(&mut body, 0);
+        }
+    }
+    for value in [1, 0, 0, 0, 0, 0] {
+        put_int(&mut body, value);
+    }
+    body
+}
+
 /// T825: the client's lobby status, echoed. 137 `LobbyCommand_ChangeStatus` v1 (reader
 /// `1015ea00`, writer `1015ea60`): the LobbyCommand level, then the status. The client sends one
 /// on every screen change (`1037c540`: 3 hub, 2 lobby, 7 collection, ...); a server copy sets the
@@ -801,6 +854,44 @@ mod tests {
         }
         put_string(&mut body, name);
         body
+    }
+
+    /// 486 v2 as its reader takes it (`1017e170`): four class headers, then five ints.
+    #[test]
+    fn a_challenge_is_laid_out_for_the_match_command_reader() {
+        let body = initiate_challenge(4_099, 6);
+        let mut reader = Reader::new(&body);
+        for _ in 0..4 {
+            assert_eq!((reader.int().unwrap(), reader.int().unwrap()), (486, 2));
+        }
+        let values: Vec<i32> = (0..5).map(|_| reader.int().unwrap()).collect();
+        assert_eq!(values, [4_099, 0, 6, 0, 0], "account, match, scenario, two stored ints");
+        assert!(reader.finished());
+    }
+
+    /// 363 as its reader takes it: one present `ZPDeck` v6 holding one row per copy.
+    #[test]
+    fn the_starter_deck_is_one_row_per_copy() {
+        let cards = [crate::card_game::StarterCard { archetype_id: 100_009_946, copies: 3 }];
+        let body = online_decks(&cards);
+        let mut reader = Reader::new(&body);
+        for _ in 0..3 {
+            assert_eq!((reader.int().unwrap(), reader.int().unwrap()), (363, 1));
+        }
+        assert_eq!((reader.int().unwrap(), reader.int().unwrap()), (1, 0), "one deck, present");
+        for _ in 0..2 {
+            assert_eq!((reader.int().unwrap(), reader.int().unwrap()), (90_002, 6));
+        }
+        let texts: Vec<String> = (0..4).map(|_| reader.string().unwrap()).collect();
+        assert_eq!(texts[0], texts[2], "the dialog looks a deck up by its shown name");
+        assert_eq!(reader.int().unwrap(), 0);
+        assert_eq!(reader.int().unwrap(), 3);
+        for _ in 0..3 {
+            assert_eq!((reader.int().unwrap(), reader.int().unwrap()), (100_009_946, 0));
+        }
+        let tail: Vec<i32> = (0..6).map(|_| reader.int().unwrap()).collect();
+        assert_eq!(tail, [1, 0, 0, 0, 0, 0], "starter flag, flags, two ints, an empty list");
+        assert!(reader.finished());
     }
 
     /// L935: both header layouts the decoder accepts give the same record, and the name is dropped.
