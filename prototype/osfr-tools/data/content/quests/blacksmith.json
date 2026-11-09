@@ -854,7 +854,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 1383,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Blacksmith Gloves (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_dull_challenge_500db6)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "16": 888
           },
@@ -947,7 +958,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 10851,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Blacksmith Square Shard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_hammer_quality_f26e44)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "16": 1024
           },
@@ -1582,7 +1604,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 2620,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Blacksmith Apron (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_local_bonesaw_shortage_67a718)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "16": 800
           },
@@ -1688,7 +1721,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 6458,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Blacksmith Hammer (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_breaking_bank_7c05e7)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "16": 1313
           },
@@ -1861,7 +1905,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 90,
           "items": [],
           "job_xp": {
             "16": 300
@@ -1870,6 +1914,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020020)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "90 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_silver_appearance_aef198)."
             }
           ]
         }
@@ -2323,7 +2371,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 10852,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Blacksmith Square Shard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_lady_of_the_lake_f1e9da)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -2408,7 +2467,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 21354,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Blacksmith Gloves (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_tools_of_the_trade_5d87cb)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {

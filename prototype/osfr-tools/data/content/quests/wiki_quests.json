@@ -1057,7 +1057,22 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 9099,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Mystery Gift (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_going_batty_245eb0)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 34 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -1713,7 +1728,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 9050,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Camp Chatty Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_meet_and_greet_aa36f4)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -1767,7 +1793,22 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 9099,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Mystery Gift (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_mum_s_the_word_53d00e)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 34 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -1821,7 +1862,18 @@
       "rewards": [
         {
           "coins": 61,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 23474,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "A Bag of Fake Money (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_need_bigger_bags_1ded73)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -2128,7 +2180,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 9051,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Camp Robbie Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rags_to_riches_4e4683)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -2206,7 +2269,18 @@
       "rewards": [
         {
           "coins": 12,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 1836,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Simple Pet Shampoo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sad_penguin_cdde61)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -2640,7 +2714,22 @@
       "rewards": [
         {
           "coins": 30,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 3084,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Medium Replenishment Potion (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_spread_the_good_cheer_19c4b8)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -2760,7 +2849,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 9119,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Macaroni Art Necklace (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_that_robgoblin_s_story_c9b34a)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -3613,7 +3713,22 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 9099,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Mystery Gift (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_apples_ee35c8)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 34 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -3992,7 +4107,22 @@
       "rewards": [
         {
           "coins": 30,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 3084,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Medium Replenishment Potion (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_happy_on_the_inside_068718)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -4047,7 +4177,22 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 1912,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Holiday Mystery Gift (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_gifting_tree_b608e7)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 4 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -4291,7 +4436,22 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 9099,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Mystery Gift (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bundles_of_balloons_8cb1e1)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 34 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -4529,7 +4689,18 @@
       "rewards": [
         {
           "coins": 30,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 3614,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Slimy Spotted Caterpillar (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_grubby_hands_242608)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -4957,7 +5128,22 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 7291,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Orange-Strapped Flip-Flops (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_starfish_picking_c2b1d3)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -5312,7 +5498,22 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 3017,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Treasure Map Wall Hanging (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_farewell_feast_18bee1)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -5410,7 +5611,18 @@
       "rewards": [
         {
           "coins": 24,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 23134,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Xerces Blue Butterfly (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_beautiful_butterflies_1a0f0a)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -5521,7 +5733,22 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 1912,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Holiday Mystery Gift (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_curious_gift_baskets_3cdd14)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 4 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -5654,7 +5881,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76627,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Fruit Cake (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_present_problems_47802d)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -5751,7 +5989,28 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 16537,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Werewolf Cake Slice (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_dark_future_4c3d3e)."
+                }
+              ]
+            },
+            {
+              "definition_id": 10433,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Vampire Cake Slice (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_dark_future_4c3d3e)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -5804,7 +6063,22 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 1912,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Holiday Mystery Gift (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pretty_presents_0a1c33)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 4 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -6114,7 +6388,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 69832,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Jack-O-Lantern Outfit (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_deck_of_buzzing_076b3b)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -6170,7 +6455,32 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 15921,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Star Shot Candle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_matching_wits_fe2285)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            },
+            {
+              "definition_id": 60255,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Seaside Sticker (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_matching_wits_fe2285)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -6445,7 +6755,18 @@
       "rewards": [
         {
           "coins": 30,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 3021,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Medium Health Potion (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_drinks_on_the_house_71e425)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -6555,7 +6876,22 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 9099,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Mystery Gift (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_oops_29af81)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 34 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -6609,7 +6945,22 @@
       "rewards": [
         {
           "coins": 7,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 7294,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Board Shorts (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_overboard_bd7224)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -7257,7 +7608,22 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 9099,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Mystery Gift (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_defensive_strategy_d8c5d1)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 34 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -7347,7 +7713,22 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 9099,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Mystery Gift (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_dem_bones_eddff2)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 34 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -7624,7 +8005,22 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 9099,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Mystery Gift (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_double_double_toil_and_trouble_1b36f3)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 34 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -7716,7 +8112,18 @@
       "rewards": [
         {
           "coins": 12,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 31259,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "x5 Sparkling Corn on the Cob (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_enough_for_dinner_849959)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -8674,7 +9081,18 @@
       "rewards": [
         {
           "coins": 15,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 3021,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Medium Health Potion (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_precursor_prospecting_488b30)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -9030,7 +9448,62 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 58585,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Blast Speedster Chassis (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sandstorm_s_grand_opening_3186ef)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            },
+            {
+              "definition_id": 60922,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Blast Speedster Steering Column (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sandstorm_s_grand_opening_3186ef)."
+                }
+              ]
+            },
+            {
+              "definition_id": 60923,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Blast Speedster Tires (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sandstorm_s_grand_opening_3186ef)."
+                }
+              ]
+            },
+            {
+              "definition_id": 60920,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Blast Speedster Engine (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sandstorm_s_grand_opening_3186ef)."
+                }
+              ]
+            },
+            {
+              "definition_id": 60921,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Blast Speedster Turbo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sandstorm_s_grand_opening_3186ef)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -9216,7 +9689,22 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 34323,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Kitty Light Plaid Sweater (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snow_place_like_home_06ecaa)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -9380,7 +9868,18 @@
       "rewards": [
         {
           "coins": 26,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 31256,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Sparkling Banana (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_something_to_snack_on_465966)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -9535,7 +10034,18 @@
       "rewards": [
         {
           "coins": 38,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 23405,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Fragile Ancient Mask (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_turning_the_tables_3bdfbe)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -9696,7 +10206,22 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 9099,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Mystery Gift (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_unearthing_treasures_19517e)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 34 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -9833,7 +10358,18 @@
       "rewards": [
         {
           "coins": 61,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 3382,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pixiewood Doll Gear (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_woe_is_willie_d19cda)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -10570,7 +11106,18 @@
       "rewards": [
         {
           "coins": 30,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 3870,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Gold Gamer Medal (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_race_against_grime_68b662)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -10682,7 +11229,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 9055,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Camp Robbie Shorts (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_certified_treasure_hunter_53ce56)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -10840,7 +11398,22 @@
       "rewards": [
         {
           "coins": 2,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 7289,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Wild T-Shirt (Red) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_combo_challenge_5874dc)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -11084,7 +11657,22 @@
       "rewards": [
         {
           "coins": 6,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 223,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Baseball Cap (red) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_mudpie_7fdf7f)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -11275,7 +11863,22 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 7294,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Board Shorts (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pool_of_seashells_2c94fc)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -11466,7 +12069,22 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 9099,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Mystery Gift (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_great_treeble_race_112705)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 34 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -11586,7 +12204,22 @@
       "rewards": [
         {
           "coins": 2,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 55149,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Sugar Zinger (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wrapper_round_up_6e0adb)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -12107,7 +12740,22 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 9099,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Mystery Gift (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_feeding_the_crowd_b6c048)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 34 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -12392,7 +13040,18 @@
       "rewards": [
         {
           "coins": 24,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 23466,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Cave Torch (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_flickering_flames_9b734f)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -12535,7 +13194,22 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 9099,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Mystery Gift (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_forest_friends_954cf8)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 34 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -12790,7 +13464,32 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 16038,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Sand Castle Creation Kit (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hidden_treasure_537386)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            },
+            {
+              "definition_id": 60255,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Seaside Sticker (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hidden_treasure_537386)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -12902,7 +13601,22 @@
       "rewards": [
         {
           "coins": 6,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 7291,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Orange-Strapped Flip-Flops (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_horrible_hiccups_700a03)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -13480,7 +14194,18 @@
       "rewards": [
         {
           "coins": 24,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 3021,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Medium Health Potion (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_power_source_313708)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -13523,7 +14248,22 @@
       "rewards": [
         {
           "coins": 6,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 7294,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Board Shorts (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_scaredy_pants_e9a30b)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -13664,7 +14404,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76634,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Penguin Cut-Out Cookie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snowman_showdown_0555d1)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -13783,7 +14534,32 @@
       "rewards": [
         {
           "coins": 24,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 3023,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Medium Energy Potion (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_strong_soil_90814e)."
+                }
+              ]
+            },
+            {
+              "definition_id": 3084,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Medium Replenishment Potion (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_strong_soil_90814e)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -13870,7 +14646,22 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 9099,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Mystery Gift (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_great_scavenger_hunt_02164b)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 34 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -13959,7 +14750,18 @@
       "rewards": [
         {
           "coins": 61,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 23316,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Shiny Fancy Ring (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_where_is_everyone_7d0c2e)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -14015,7 +14817,18 @@
       "rewards": [
         {
           "coins": 36,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 3023,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Medium Energy Potion (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_delivery_to_aunt_daisy_d0cdc6)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -14347,7 +15160,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 60255,
+              "count": 2,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Seaside Sticker (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_boom_powder_preparation_78db82)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -14405,7 +15229,18 @@
       "rewards": [
         {
           "coins": 15,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 3021,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Medium Health Potion (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_button_down_mushrooms_0a08b6)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -14804,7 +15639,22 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 1912,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Holiday Mystery Gift (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_holiday_recital_ccf51b)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 4 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -15554,7 +16404,22 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 9099,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Mystery Gift (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toadal_trouble_eb749d)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 34 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -15938,7 +16803,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 9054,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Camp Chatty Shorts (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_camp_troubles_049260)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -16595,7 +17471,18 @@
       "rewards": [
         {
           "coins": 75,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 3792,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pristine Button (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_volunteers_5f7af1)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -17032,7 +17919,18 @@
       "rewards": [
         {
           "coins": 30,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 3904,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Checkmate Seasnail (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_well_wishes_6918c3)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -17129,7 +18027,32 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 22921,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Straw Hat (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cook_off_contest_b40269)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            },
+            {
+              "definition_id": 60255,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Seaside Sticker (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cook_off_contest_b40269)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {

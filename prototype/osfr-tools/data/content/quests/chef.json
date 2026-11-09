@@ -532,7 +532,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75919,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Toaster Chef Hat (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_package_recovery_bf0fa0)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "45": 125
           },
@@ -1138,7 +1149,66 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 2875,
+              "count": 3,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Bundle of Gummyfruit (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_snowy_treats_201713)."
+                }
+              ]
+            },
+            {
+              "definition_id": 2889,
+              "count": 3,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Bundle of Bumbleberry (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_snowy_treats_201713)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            },
+            {
+              "definition_id": 2877,
+              "count": 3,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Bundle of Spiralmint (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_snowy_treats_201713)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            },
+            {
+              "definition_id": 75588,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Chef's Eggbeater of Talent II (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_snowy_treats_201713)."
+                }
+              ]
+            },
+            {
+              "definition_id": 75921,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Chopped Up Chef Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_snowy_treats_201713)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "45": 75
           },
@@ -1501,7 +1571,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75656,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Chef's Ring of Talent II (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_queensfields_b91ebc)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "45": 100
           },
@@ -2245,7 +2326,28 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 6418,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Chef Egg Beater (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_double_dog_dare_74bb63)."
+                }
+              ]
+            },
+            {
+              "definition_id": 1827,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Chef Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_double_dog_dare_74bb63)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "45": 1250
           },
@@ -2431,7 +2533,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 13790,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Chef Shoes (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_glerga_d5dab4)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "45": 2000
           },
@@ -2701,7 +2814,28 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 10855,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Chef Triangle Shard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_cloo_s_cooking_academy_27ca42)."
+                }
+              ]
+            },
+            {
+              "definition_id": 14541,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Chef Hat (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_cloo_s_cooking_academy_27ca42)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -2873,7 +3007,28 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 6598,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Chef Skillet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_cooking_with_cloo_67faa0)."
+                }
+              ]
+            },
+            {
+              "definition_id": 13739,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Chef Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_cooking_with_cloo_67faa0)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {

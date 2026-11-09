@@ -264,7 +264,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75968,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Flat Rate Postman Short Shorts (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_mail_marksman_5acbc6)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "4": 76
           },
@@ -373,7 +384,28 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76518,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Postman's Power Shard of Timing I (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_beware_of_ankle_biters_fd9014)."
+                }
+              ]
+            },
+            {
+              "definition_id": 75965,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Flat Rate Postman Wristbands (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_beware_of_ankle_biters_fd9014)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "4": 101
           },
@@ -466,7 +498,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75964,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Flat Rate Postman Shoes (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_it_s_a_postal_disaster_bbad08)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "4": 64
           },
@@ -559,7 +602,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75966,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Flat Rate Postman Hat (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_sort_of_a_mess_e87136)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "4": 64
           },
@@ -663,8 +717,19 @@
       ],
       "rewards": [
         {
-          "coins": 0,
-          "items": [],
+          "coins": 8,
+          "items": [
+            {
+              "definition_id": 76520,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Postman's Power Shard of Timing II (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_running_the_route_ed8949)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "4": 63
           },
@@ -672,6 +737,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 63 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130008)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "8 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_running_the_route_ed8949)."
             }
           ]
         }
@@ -757,7 +826,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75969,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Telegram Postman Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_special_delivery_64ccc7)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "4": 63
           },
@@ -1449,7 +1529,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 9,
           "items": [],
           "job_xp": {
             "4": 950
@@ -1458,6 +1538,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 950 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130018)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "9 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_invitation_only_8bc4f7)."
             }
           ]
         }
@@ -1538,7 +1622,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 13071,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Postman Hat (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_where_s_the_sasparilla_0ac3cb)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "4": 950
           },
@@ -1736,7 +1831,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 10866,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Postman Triangle Shard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_sorting_it_out_484532)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "4": 950
           },
@@ -2015,8 +2121,19 @@
       ],
       "rewards": [
         {
-          "coins": 0,
-          "items": [],
+          "coins": 9,
+          "items": [
+            {
+              "definition_id": 12852,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Postman Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_what_a_mess_45a700)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "4": 950
           },
@@ -2024,6 +2141,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 950 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130024)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "9 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_what_a_mess_45a700)."
             }
           ]
         }
@@ -2112,8 +2233,19 @@
       ],
       "rewards": [
         {
-          "coins": 0,
-          "items": [],
+          "coins": 9,
+          "items": [
+            {
+              "definition_id": 13019,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Postman Gloves (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_a_plea_for_help_e6cdc8)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "4": 950
           },
@@ -2121,6 +2253,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 950 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130025)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "9 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_a_plea_for_help_e6cdc8)."
             }
           ]
         }

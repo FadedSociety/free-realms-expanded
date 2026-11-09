@@ -3344,8 +3344,23 @@
       ],
       "rewards": [
         {
-          "coins": 0,
-          "items": [],
+          "coins": 9,
+          "items": [
+            {
+              "definition_id": 248,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Striped T-Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_weapon_shipment_9e92ce)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "1": 225
           },
@@ -3353,6 +3368,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000037)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "9 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_weapon_shipment_9e92ce)."
             }
           ]
         }
@@ -3460,8 +3479,23 @@
       ],
       "rewards": [
         {
-          "coins": 0,
-          "items": [],
+          "coins": 9,
+          "items": [
+            {
+              "definition_id": 7290,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Swimmer Short Sleeve (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_armor_shipment_c10f94)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "1": 225
           },
@@ -3469,6 +3503,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000038)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "9 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_armor_shipment_c10f94)."
             }
           ]
         }
@@ -4540,7 +4578,22 @@
       "rewards": [
         {
           "coins": 12,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 223,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Baseball Cap (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_how_to_clean_98dc41)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {

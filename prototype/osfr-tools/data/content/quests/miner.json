@@ -1228,7 +1228,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 21589,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Miner Helmet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_gems_for_good_luck_094308)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "14": 750
           },
@@ -1354,7 +1365,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 10860,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Miner Triangle Shard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_marriage_proposal_516b00)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "14": 750
           },
@@ -1433,7 +1455,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 30,
           "items": [],
           "job_xp": {
             "14": 750
@@ -1442,6 +1464,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 750 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/miner.json, record 3100016)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "30 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_checking_the_chug_a6fd33)."
             }
           ]
         }
@@ -1527,7 +1553,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 21736,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Miner Overalls (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_grumpore_s_challenge_5c084d)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "14": 750
           },
@@ -2021,7 +2058,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 2479,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Miner Gloves (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_smelting_secrets_297157)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {

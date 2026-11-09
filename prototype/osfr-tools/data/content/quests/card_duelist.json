@@ -484,7 +484,36 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 7299,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "One Stripe Shirt (male only) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_so_over_archery_2e5a11)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 37 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            },
+            {
+              "definition_id": 7296,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Ruffled Blouse (female only) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_so_over_archery_2e5a11)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "120": 300
           },
@@ -602,7 +631,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 427,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Bermuda Shorts (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_cardie_4_life_a5068f)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 68 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "120": 300
           },
@@ -1125,7 +1169,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 7304,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Striped Sandals (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_an_old_friend_3ebb62)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "120": 500
           },
@@ -1218,7 +1277,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 199,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Hoodie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_battle_bry_10c7f7)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 67 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "120": 500
           },
@@ -1559,7 +1633,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 7303,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Striped Polo Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_serious_business_2ae94d)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "120": 1000
           },
@@ -1664,7 +1753,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 7289,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Wild T-Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_snowhill_showdown_d025d3)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "120": 1000
           },
@@ -1769,7 +1873,36 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 51087,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Duelist Chaos Cap (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_shifty_dealings_97575f)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 35 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            },
+            {
+              "definition_id": 33728,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Stripe Ruffled Blouse (green) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_shifty_dealings_97575f)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 35 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "120": 1000
           },
@@ -1886,7 +2019,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 7297,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Flannel Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_misplaced_deck_08a920)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 37 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "120": 1800
           },
@@ -1979,7 +2127,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 7294,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Board Shorts (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_squash_the_shuffler_d5504b)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "120": 1800
           },
@@ -2100,7 +2263,36 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 423,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Hightops (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_parcel_recovery_2e8f15)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 132 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            },
+            {
+              "definition_id": 195,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Hightops (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_parcel_recovery_2e8f15)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 132 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "120": 1800
           },
@@ -2233,7 +2425,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 32437,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Heart T-Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_monty_has_em_all_4c3e81)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 35 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "120": 1800
           },
@@ -2326,7 +2533,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 51192,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Duelist Order Cap (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_just_one_more_08b7dd)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 35 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "120": 1800
           },
@@ -2431,7 +2653,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 7291,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Orange-Strapped Flip-Flops (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_finding_the_fish_05f7f3)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "120": 2300
           },
@@ -2629,7 +2866,36 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 189,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Baggy Jeans (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_herme_the_hermit_1de372)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 66 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            },
+            {
+              "definition_id": 193,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Layered Skirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_herme_the_hermit_1de372)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 72 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "120": 2300
           },
@@ -3037,7 +3303,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 60,
           "items": [],
           "job_xp": {
             "120": 100
@@ -3046,6 +3312,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040030)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "60 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_dominic_s_new_card_7eb74f)."
             }
           ]
         }
@@ -3166,7 +3436,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 50,
           "items": [],
           "job_xp": {
             "120": 100
@@ -3175,6 +3445,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040031)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "50 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_break_time_cdf3e6)."
             }
           ]
         }
@@ -3636,7 +3910,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 50,
           "items": [],
           "job_xp": {
             "120": 100
@@ -3645,6 +3919,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040036)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "50 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_alleged_thievery_94c1f9)."
             }
           ]
         }
@@ -3741,7 +4019,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 50,
           "items": [],
           "job_xp": {
             "120": 100
@@ -3750,6 +4028,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040037)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "50 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_something_precious_6336c7)."
             }
           ]
         }
@@ -3998,7 +4280,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 100,
           "items": [],
           "job_xp": {
             "120": 100
@@ -4007,6 +4289,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040040)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "100 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cardie_partay_ed015a)."
             }
           ]
         }
@@ -4115,7 +4401,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 100,
           "items": [],
           "job_xp": {
             "120": 100
@@ -4124,6 +4410,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040041)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "100 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_final_dig_2fa06d)."
             }
           ]
         }
@@ -4299,7 +4589,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 77677,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "none (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_defenders_duty_37dbfd)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -4521,7 +4822,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 77677,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "none (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_suspicious_sneak_d95bae)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -4603,7 +4915,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 77677,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "none (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_to_catch_a_sneak_0549df)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -4732,7 +5055,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 77677,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "none (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_finder_of_secrets_1f1fb2)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -4814,7 +5148,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 77677,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "none (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_guide_to_the_baron_0bb3f9)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -4943,7 +5288,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 77677,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "none (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_master_explorer_e1d695)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -5025,7 +5381,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 77677,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "none (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_confronting_the_baron_04c4fe)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -6049,7 +6416,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 5000,
           "items": [],
           "job_xp": {
             "120": 2000
@@ -6058,6 +6425,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 2000 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040059)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "5000 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_junkmaker_jort_26efa0)."
             }
           ]
         }
@@ -6209,7 +6580,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 5000,
           "items": [],
           "job_xp": {
             "120": 2000
@@ -6218,6 +6589,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 2000 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040060)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "5000 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_milo_e_lizardo_b3b932)."
             }
           ]
         }
@@ -6369,7 +6744,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 5000,
           "items": [],
           "job_xp": {
             "120": 2000
@@ -6378,6 +6753,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 2000 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040061)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "5000 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_quizzical_yucca_440f35)."
             }
           ]
         }
@@ -6529,7 +6908,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 2500,
           "items": [],
           "job_xp": {
             "120": 2000
@@ -6538,6 +6917,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 2000 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040062)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "2500 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_ironteeth_643062)."
             }
           ]
         }

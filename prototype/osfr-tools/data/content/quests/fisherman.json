@@ -616,7 +616,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 4,
           "items": [],
           "job_xp": {
             "137": 40
@@ -625,6 +625,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 40 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/fisherman.json, record 3070009)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "4 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_itty_bitty_bait_677f98)."
             }
           ]
         }
@@ -721,7 +725,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 12,
           "items": [],
           "job_xp": {
             "137": 60
@@ -730,6 +734,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 60 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/fisherman.json, record 3070010)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "12 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_much_bigger_bait_36d0e7)."
             }
           ]
         }
@@ -897,7 +905,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 49,
           "items": [],
           "job_xp": {
             "137": 40
@@ -906,6 +914,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 40 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/fisherman.json, record 3070012)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "49 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_better_bacon_bait_056288)."
             }
           ]
         }
@@ -999,7 +1011,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 26,
           "items": [],
           "job_xp": {
             "137": 80
@@ -1008,6 +1020,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 80 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/fisherman.json, record 3070013)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "26 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bacon_bait_5a4f29)."
             }
           ]
         }

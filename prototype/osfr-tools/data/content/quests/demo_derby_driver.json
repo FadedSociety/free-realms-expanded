@@ -521,7 +521,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 59624,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Stock Turbo Tank (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_break_er_in_618e35)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 375
           },
@@ -601,7 +612,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 14038,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Rookie Demo Derby Boots (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_dealing_damage_96d2fe)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 338
           },
@@ -721,7 +743,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 59614,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Derby Advanced Engine (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_spare_parts_8d87d9)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 300
           },
@@ -1096,7 +1129,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 13,
           "items": [],
           "job_xp": {
             "49": 338
@@ -1105,6 +1138,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 338 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060014)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "13 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_curious_crash_da0f6f)."
             }
           ]
         }
@@ -1193,7 +1230,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 59650,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Power Steering Plus (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_arena_revenge_d85ab6)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 375
           },
@@ -1446,7 +1494,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 59651,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Power Steering Minus (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_defeating_diggs_085d17)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 825
           },
