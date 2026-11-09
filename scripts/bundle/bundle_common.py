@@ -100,7 +100,7 @@ ACTIVITY_MAX_BYTES = {
     "kart_rows.json": 64 * 1024,
     "derby_entry.json": 512 * 1024,
     "derby_gates.json": 16 * 1024,
-    "derby_rows.json": 64 * 1024,
+    "derby_rows.json": 256 * 1024,  # derby_gateway.rs MAX_ROWS_BYTES: arena rows carry slots and pickups
     "derby_minigames.json": 64 * 1024,
     "mining.json": 1024 * 1024,
     "harvesting.json": 1024 * 1024,
@@ -474,11 +474,12 @@ def _check_derby_rows(rows, minigames, gate_npcs) -> None:
     ):
         raise ValueError("content/derby_rows.json or derby_minigames.json is invalid")
     derby_ids = {r.get("id") for r in records if r.get("game_type_id") == 11}
+    # A row with the default id 39 overrides the default row in place (derby_gateway.rs build), so
+    # the captured derby_entry.json stays byte-identical while its rules change.
     for row in hosted:
         npcs = row.get("npcs")
         if (
             row["game_id"] not in derby_ids
-            or row["game_id"] == 39
             or not isinstance(npcs, list)
             or not 1 <= len(npcs) <= 16
             or not set(npcs) <= set(gate_npcs)

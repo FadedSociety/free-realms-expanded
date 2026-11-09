@@ -6,11 +6,12 @@
 //! These tests drive `DerbyService` directly with explicit clocks; the route tests that enter the
 //! shipped rows through a real gateway live in `derby_rows.rs`.
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 
 use osfr_tools::derby::{
-    DerbyAction, DerbyMessage, DerbyPhase, DerbyRules, DerbyService, DerbyVehicleTemplate,
-    NpcDriving, ParticipantKey, VehicleHitReport, VehiclePose, decode_inner, encode_inner,
+    DerbyAction, DerbyDriver, DerbyGoal, DerbyMessage, DerbyPhase, DerbyRules, DerbyService,
+    DerbyVehicleTemplate, NpcDriving, ParticipantKey, VehicleHitReport, VehiclePose, decode_inner,
+    encode_inner,
 };
 
 const HUMAN: ParticipantKey = ParticipantKey(0x1000_0000_0000_0001);
@@ -25,6 +26,7 @@ fn driving() -> NpcDriving {
         spawn_radius_m: 12.0,
         bump_impact: 5.0,
         bump_interval_ms: 1_500,
+        human_chasers: 4,
     }
 }
 
@@ -282,6 +284,71 @@ fn a_human_hit_lands_on_a_driven_npc_where_it_stands() {
         "a 100 impact knocks out a 100 health NPC"
     );
     assert_eq!(service.driver(HUMAN).unwrap().score, 2);
+}
+
+/// (R) A row's goal is read off the driver's own facts: knocking out the named driver the roster
+/// fields (slot 1, Erica Diggs 19355) meets a goal that names her and misses one that names
+/// someone else; `won` carries it into the quest result, and the knock-out is counted by name.
+#[test]
+fn a_named_knock_out_meets_the_rows_goal_and_another_name_misses_it() {
+    for (required, expected) in [(19_355, true), (19_366, false)] {
+        let rules = DerbyRules {
+            time_limit_ms: Some(120_000),
+            ..DerbyRules::default()
+        };
+        let mut service = service(rules, Some(driving()));
+        service
+            .set_npc_drivers(vec![DerbyDriver {
+                name_string_id: 19_355,
+                model_id: 1_311,
+            }])
+            .unwrap();
+        service
+            .set_goal(DerbyGoal {
+                named_knockouts: BTreeMap::from([(required, 1)]),
+                min_knockouts: Some(1),
+                ..DerbyGoal::default()
+            })
+            .unwrap();
+        run_to_live(&mut service);
+        service
+            .handle_client(HUMAN, &pose_packet(HUMAN, START), 4_200)
+            .unwrap();
+        let placed = npc_poses(&service.tick(4_300).unwrap());
+        let slot_one = npc_keys(&service)[0];
+        let (_, position) = placed
+            .iter()
+            .find(|(key, _)| *key == slot_one)
+            .copied()
+            .expect("slot 1 is placed");
+        service
+            .handle_client(HUMAN, &pose_packet(HUMAN, position), 4_310)
+            .unwrap();
+        let report = encode_inner(&DerbyMessage::VehicleHit(VehicleHitReport {
+            reporter: HUMAN,
+            other: slot_one,
+            impact_bits: 100.0_f32.to_bits(),
+        }))
+        .unwrap();
+        service.handle_client(HUMAN, &report, 4_320).unwrap();
+        let human = service.driver(HUMAN).unwrap();
+        assert_eq!(human.knockouts_made, 1);
+        assert_eq!(human.named_knockouts.get(&19_355), Some(&1));
+
+        service.tick(4_100 + 120_000).unwrap();
+        assert_eq!(service.phase(), DerbyPhase::Results);
+        let result = service.participant_result(HUMAN).unwrap();
+        assert_eq!(result.won, expected, "goal names {required}");
+        assert_eq!(result.quest_result().won, expected);
+    }
+    assert!(
+        !DerbyGoal {
+            max_placement: Some(9),
+            ..DerbyGoal::default()
+        }
+        .is_valid(),
+        "a placement past the results list is refused"
+    );
 }
 
 #[test]

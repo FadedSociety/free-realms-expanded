@@ -103,7 +103,14 @@ impl Shipped {
             NEXT.fetch_add(1, Ordering::Relaxed)
         ));
         copy_dir(&reference_content(), &path);
-        for file in ["derby_gates.json", "derby_entry.json"] {
+        // The rows file carries the explicit default row 39 (score target off, the clock alone
+        // ends the match) and the table that proves the hosted ids.
+        for file in [
+            "derby_gates.json",
+            "derby_entry.json",
+            "derby_rows.json",
+            "derby_minigames.json",
+        ] {
             let source = data().join(file);
             // `derby_entry.json` is what makes the route playable; a missing package must reach
             // the driver menu as "no offer", so a canary fails on the behaviour, not on a copy.
@@ -479,18 +486,24 @@ fn drive_to_results(
     for (index, npc) in npcs.iter().take(4).enumerate() {
         let at = respawn_at + 100 + index as u64 * 100;
         beside(gateway, key, *npc, at - 1);
-        let out = gateway
+        gateway
             .handle_at(&wrap(&hit_for(key, *npc, 10_000.0)), at)
             .unwrap();
-        if index == 3 {
-            assert_eq!(
-                gateway.gameplay().unwrap().derby_phase(),
-                Some(DerbyPhase::Results)
-            );
-            return (respawn_at + 400, out.replies);
-        }
     }
-    panic!("the shipped 22-point target was not reached");
+    assert_eq!(
+        gateway.gameplay().unwrap().derby_phase(),
+        Some(DerbyPhase::Running),
+        "no score target: eleven knock-outs end nothing"
+    );
+    // The countdown reached 0 at base + 2_004; the shipped 240 s clock ends the match.
+    let finished_at = base + 2_004 + 240_000;
+    let finished = gateway.tick_at(finished_at).unwrap();
+    assert_eq!(
+        gateway.gameplay().unwrap().derby_phase(),
+        Some(DerbyPhase::Results),
+        "the shipped clock ends the match"
+    );
+    (finished_at, finished.replies)
 }
 
 fn completion_bundle(replies: &[Vec<u8>]) -> Vec<u8> {
@@ -875,7 +888,17 @@ fn malformed_content_is_refused_and_the_shipped_definition_is_real() {
     assert_eq!(shipped.schema_version, 1);
     assert_eq!(shipped.game_id, 39);
     assert_eq!(shipped.rules.max_drivers, 8);
+    // The captured file keeps its first-to-22 target (`bundle_activity_content` pins its bytes);
+    // the hosted default row (`derby_rows.json` row 39) turns it off, as retail high scores reach
+    // 50 in one match (`nb5-qin8zz0_154.00`), so the clock alone ends free play.
     assert_eq!(shipped.rules.score_target, Some(22));
+    let hosted = DerbyGateway::load(&data(), None).unwrap().unwrap();
+    assert_eq!(hosted.rows()[0].game_id(), 39);
+    assert_eq!(hosted.rows()[0].package().rules.score_target, None);
+    assert_eq!(
+        hosted.rows()[0].package().rules.time_limit_ms,
+        Some(240_000)
+    );
     // L931: the live arena's clock (Sanctuary VehicleGames Derby.TimeLimitSeconds 240).
     assert_eq!(shipped.rules.time_limit_ms, Some(240_000));
     assert_eq!(shipped.completion_reward_coins, COMPLETION_COINS);

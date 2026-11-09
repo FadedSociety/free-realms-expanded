@@ -391,7 +391,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) T313/T369: the finished derby is credited at the server's Results transition in src/gameplay/derby_session.rs (the once-per-instance take_completion ledger), whatever the flat payout. The shipped package has no time limit, so Results comes from its 22-point score target, scored from client 34/16 contact reports the server bounds; no 39/18 claim, reconnect or replay credits. Cancelling, quitting, a lobby timeout or an unfinished match pays and credits nothing."
+          "evidence": "(R) T313/T369: the finished derby is credited at the server's Results transition in src/gameplay/derby_session.rs (the once-per-instance take_completion ledger), whatever the flat payout. Results comes from the row's 240 s clock (derby_rows.json; the 22-point target is gone, as the live High Scores board reaches 50), with client 34/16 contact reports the server bounds; no 39/18 claim, reconnect or replay credits. Cancelling, quitting, a lobby timeout or an unfinished match pays and credits nothing."
         },
         {
           "kind": "reconstructed",
@@ -1981,13 +1981,9 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) 2026-11-08: the client's two goals, Score 12 points (395067) and Place in the top 3 (400447), both as bounds on the one match; the derby reports both facts."
+              "evidence": "(R) 2026-11-09: the client's two goals, Score 12 points (395067) and Place in the top 3 (400447), are the derby row's own goal (derby_rows.json 616 goal: min_score 12, max_placement 3); the server credits the finish only when it is met, so this objective carries no require of its own."
             }
-          ],
-          "require": {
-            "min_score": 12,
-            "max_placement": 3
-          }
+          ]
         }
       ],
       "rewards": [

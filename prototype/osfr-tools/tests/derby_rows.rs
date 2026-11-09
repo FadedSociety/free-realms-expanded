@@ -75,6 +75,9 @@ const READY: [u8; 2] = 13_u16.to_le_bytes();
 const NPC_DRIVERS: usize = 7;
 const KNOCKOUTS_TO_WIN: usize = 4;
 const RESULTS_HOLD_MS: u64 = 10_000;
+/// From a match's base time to the tick that ends it: the countdown reaches 0 at base + 2_004 and
+/// the shipped clock runs 240 s.
+const FINISH_AT: u64 = 2_004 + 240_000;
 
 fn test_source() -> Value {
     json!([{
@@ -279,8 +282,9 @@ fn beside(gateway: &mut Gateway, key: ParticipantKey, npc: ParticipantKey, now: 
     gateway_send(gateway, &pose_at(key, at.expect("the car has a pose")), now);
 }
 
-/// Knock out all seven NPC drivers, wait out their respawn, then knock out four more for the
-/// shipped first-to-22 target. Returns the final results reply bodies.
+/// Knock out all seven NPC drivers, wait out their respawn, knock out four more, then let the
+/// shipped 240 s clock end the match (no score target: retail high scores reach 50 in one match,
+/// `nb5-qin8zz0_154.00`). Returns the finishing tick's reply bodies.
 fn drive_to_results(
     gateway: &mut Gateway,
     key: ParticipantKey,
@@ -293,11 +297,6 @@ fn drive_to_results(
         beside(gateway, key, *npc, at - 1);
         let out = gateway_send(gateway, &hit_for(key, *npc, 10_000.0), at);
         assert!(!out.is_empty(), "the contact is resolved by the server");
-        assert_eq!(
-            gateway.gameplay().unwrap().derby_phase(),
-            Some(DerbyPhase::Running),
-            "the first seven knockouts stay below the 22-point target"
-        );
     }
     let respawn_at = base + 8_000;
     gateway_send(gateway, &pose(key), respawn_at - 100);
@@ -313,17 +312,24 @@ fn drive_to_results(
     for (index, npc) in npcs.iter().take(KNOCKOUTS_TO_WIN).enumerate() {
         let at = respawn_at + 100 + index as u64 * 100;
         beside(gateway, key, *npc, at - 1);
-        let out = gateway_send(gateway, &hit_for(key, *npc, 10_000.0), at);
-        if index + 1 == KNOCKOUTS_TO_WIN {
-            assert_eq!(
-                gateway.gameplay().unwrap().derby_phase(),
-                Some(DerbyPhase::Results),
-                "the shipped 22-point target ends the match"
-            );
-            return out;
-        }
+        gateway_send(gateway, &hit_for(key, *npc, 10_000.0), at);
     }
-    panic!("the shipped 22-point target was not reached");
+    assert_eq!(
+        gateway.gameplay().unwrap().derby_phase(),
+        Some(DerbyPhase::Running),
+        "eleven knock-outs end nothing: only the clock does"
+    );
+    let finished = gateway.tick_at(base + FINISH_AT).unwrap();
+    assert_eq!(
+        gateway.gameplay().unwrap().derby_phase(),
+        Some(DerbyPhase::Results),
+        "the shipped 240 s clock ends the match"
+    );
+    finished
+        .replies
+        .iter()
+        .map(|packet| packet[7..].to_vec())
+        .collect()
 }
 
 fn money(gateway: &Gateway) -> (u32, u32) {
@@ -524,13 +530,25 @@ fn duplicated_rows_and_the_default_id_are_rejected() {
         "a refused load changes no file"
     );
 
-    package.write_rows(vec![one_row(DEFAULT_GAME, &[MAD_JACK])]);
-    let error = DerbyGateway::load(package.path(), None)
-        .err()
-        .expect("the package is refused");
-    assert!(
-        error.to_string().contains("duplicate derby row game id 39"),
-        "the default package id is already hosted: {error}"
+    // A row with the default package's own id overrides the default row in place of the
+    // captured `derby_entry.json` (its NPCs and rules), so the capture itself never changes.
+    let mut default_row = one_row(DEFAULT_GAME, &[MAD_JACK]);
+    default_row["rules"] = json!({"score_target": null, "time_limit_ms": 90_000});
+    package.write_rows(vec![default_row]);
+    let gateway = DerbyGateway::load(package.path(), None)
+        .expect("the default-id row overrides the default row")
+        .expect("the default package exists");
+    assert_eq!(gateway.rows().len(), 1, "no second row 39 is hosted");
+    assert_eq!(gateway.rows()[0].game_id(), DEFAULT_GAME);
+    assert_eq!(gateway.rows()[0].package().rules.score_target, None);
+    assert_eq!(
+        gateway.rows()[0].package().rules.time_limit_ms,
+        Some(90_000)
+    );
+    assert!(gateway.rows_for(CRASH).next().is_none(), "the override's NPCs");
+    assert_eq!(
+        gateway.rows_for(MAD_JACK).next().map(|row| row.game_id()),
+        Some(DEFAULT_GAME)
     );
 }
 
@@ -831,7 +849,11 @@ fn finished_match_credits_once_and_replays_change_nothing() {
     assert_eq!(ledger(&gateway), vec![first]);
 
     // Replaying the record that drove the match to results changes nothing.
-    let replay = gateway_send(&mut gateway, &hit_for(key, npcs[0], 10_000.0), NOW + 8_500);
+    let replay = gateway_send(
+        &mut gateway,
+        &hit_for(key, npcs[0], 10_000.0),
+        NOW + FINISH_AT + 100,
+    );
     assert!(
         replay.is_empty(),
         "the results phase ignores a contact replay"
@@ -858,7 +880,7 @@ fn finished_match_credits_once_and_replays_change_nothing() {
         phase_for(key, 10),
         start_request(first),
     ] {
-        gateway_send(&mut gateway, &record, NOW + 9_000);
+        gateway_send(&mut gateway, &record, NOW + FINISH_AT + 600);
     }
     assert_eq!(
         saved_bytes(&gateway),
@@ -871,7 +893,7 @@ fn finished_match_credits_once_and_replays_change_nothing() {
         "the replayed finish credits nothing"
     );
 
-    let base = NOW + 8_400 + RESULTS_HOLD_MS + 20_000;
+    let base = NOW + FINISH_AT + RESULTS_HOLD_MS + 20_000;
     let (second, game_id) = enter_derby(&mut gateway, CRASH, base);
     assert_eq!(
         game_id, BREAK_ER_IN,
@@ -1099,12 +1121,81 @@ fn shipped_quest_rows_run_driven_matches_on_the_clock() {
         assert!(row.npc_driving().is_some(), "row {}", row.game_id());
         let rules = &row.package().rules;
         assert_eq!(rules.time_limit_ms, Some(240_000), "row {}", row.game_id());
+        // Retail high scores reach 50 in one match (`nb5-qin8zz0_154.00`): the clock alone ends
+        // it, except the Wildwood Derby 1000 (626), whose client text 394481 says the first to 22
+        // points wins.
+        let target = (row.game_id() == 626).then_some(22);
+        assert_eq!(rules.score_target, target, "row {}", row.game_id());
+    }
+}
+
+/// The Frost Ridge and Tangletrack rows zone into their own arenas (maps.md 5.2, 5.3) with their
+/// retail rosters and their own start slots, through the Games window Play the player uses.
+#[test]
+fn arena_rows_play_in_their_own_arena_with_their_roster() {
+    let frost_ridge = [19_354, 19_357, 19_352, 19_351, 19_353, 19_355, 19_356];
+    // Six names read off the 2009 results board; the seventh car's driver, Jess Roadrunner 19342,
+    // is the client's one unplaced Tangletrack driver name (R).
+    let tangletrack = [19_337, 19_340, 19_338, 19_343, 19_341, 19_339, 19_342];
+    for (offset, (live_row, game, arena, start, names)) in [
+        (67_u32, 40_i32, "sh_dm_arena", [240.0_f32, 106.0, 215.0], &frost_ridge[..]),
+        (68, 41, "bw_dm_arena", [305.0, 3.0, 265.0], &tangletrack[..]),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let guid = 931_300 + offset as u64;
+        let fixture = derby_fixture(guid);
+        fixture.copy_content("activity_catalogue.json");
+        let (_, position) = npc_location(CRASH);
+        let mut gateway = fixture.session(guid, position, None);
+        let mut replies = gateway_send(&mut gateway, &play(live_row), NOW);
         assert_eq!(
-            rules.score_target,
-            Some(22),
-            "row {} keeps first-to-22",
-            row.game_id()
+            gateway.gameplay().unwrap().current_zone().unwrap().name,
+            arena,
+            "row {live_row} zones into its own arena"
         );
+        replies.extend(gateway_send(&mut gateway, &READY, NOW + 1));
+        replies.extend(gateway_send(&mut gateway, &LOADED, NOW + 2));
+        assert_eq!(offer_game_id(&replies), game);
+        let instance = offer_instance(&replies);
+        let key = ParticipantKey(guid);
+        gateway_send(&mut gateway, &start_request(instance), NOW + 300);
+        let setup = gateway_send(&mut gateway, &register_for(key), NOW + 400);
+        let at = |bits: &[u32; 16]| [12, 13, 14].map(|slot| f32::from_bits(bits[slot]));
+        let near = |a: [f32; 3], b: [f32; 3]| a.iter().zip(b).all(|(x, y)| (x - y).abs() < 0.01);
+        let mut drivers = Vec::new();
+        let mut human_start = None;
+        for (index, packet) in setup.iter().enumerate() {
+            let Ok(DerbyMessage::CreateVehicle(car)) = decode_inner(packet) else {
+                continue;
+            };
+            if car.key == key {
+                human_start = Some(at(&car.start_transform_bits));
+                continue;
+            }
+            // L959: a named slot's driver NPC precedes its car; an unnamed slot has none.
+            if let Some(npc) = index
+                .checked_sub(1)
+                .and_then(|i| osfr_tools::startup_world::parse_add_npc(&setup[i]).ok())
+            {
+                assert_eq!(npc.actor_id, car.key.0);
+                assert!(
+                    near(at(&car.start_transform_bits), npc.position[..3].try_into().unwrap()),
+                    "the driver stands at the car's own slot"
+                );
+                assert!(
+                    !near(at(&car.start_transform_bits), [360.09, 15.0, 215.0]),
+                    "row {live_row}: the Wildwood slots are not reused"
+                );
+                drivers.push(npc.name_string_id);
+            }
+        }
+        assert!(
+            near(human_start.expect("the player's car"), start),
+            "row {live_row}: the player's car starts in its arena: {human_start:?}"
+        );
+        assert_eq!(drivers, names, "row {live_row}: the arena's own roster");
     }
 }
 
@@ -1192,18 +1283,65 @@ fn driven_row_finishes_on_the_clock_and_credits_its_own_id() {
     );
 
     // Countdown zero was acknowledged at NOW + 2_004: the 240 s limit ends the match.
-    gateway.tick_at(NOW + 2_004 + 240_000).unwrap();
+    let finished = gateway.tick_at(NOW + 2_004 + 240_000).unwrap();
     assert_eq!(
         gateway.gameplay().unwrap().derby_phase(),
         Some(DerbyPhase::Results)
     );
+    // (R) Wear and Tear's goal (four health power-ups, top 3) was not met by an idle car: the
+    // match pays its completion once, says so, and credits no quest.
     assert_eq!(
         counts(gateway.gameplay().unwrap(), LICENSE_TO_DRIVE),
-        vec![1, 0],
-        "only the entered row's objective is credited"
+        vec![0, 0],
+        "a missed goal credits nothing"
+    );
+    assert!(
+        finished
+            .replies
+            .iter()
+            .any(|reply| String::from_utf8_lossy(reply).contains("didn't meet this derby's goal")),
+        "the results say the goal was missed"
     );
     let (coins_after, xp_after) = money(&gateway);
     assert_eq!((coins_after, xp_after), (coins_before + 25, xp_before + 10));
+    assert_eq!(ledger(&gateway), vec![instance]);
+}
+
+/// A goal row met through play: Paws 'n Claws Smash-a-thon (616, Frost Ridge: score 12, top 3)
+/// is entered at a gate by its open objective, zones into `sh_dm_arena`, and eleven knock-outs
+/// meet the goal, so the clocked finish credits it.
+#[test]
+fn a_met_goal_row_credits_its_quest_from_its_own_arena() {
+    const SMASH_A_THON: i32 = 616;
+    let guid = 931_006;
+    let fixture = derby_fixture(guid);
+    patch_derby_quest(&fixture, &[SMASH_A_THON], 1);
+    let (_, position) = npc_location(CRASH);
+    let mut gateway = fixture.session(guid, position, None);
+    {
+        let character = gateway.state().clone();
+        accept_license(gateway.gameplay_mut().unwrap(), &character);
+    }
+    let (instance, game_id) = enter_derby(&mut gateway, CRASH, NOW);
+    assert_eq!(game_id, SMASH_A_THON);
+    assert_eq!(
+        gateway.gameplay().unwrap().current_zone().unwrap().name,
+        "sh_dm_arena",
+        "a Frost Ridge quest row plays in the snow arena"
+    );
+    let (key, npcs) = start_and_ready(&mut gateway, instance, SMASH_A_THON, NOW);
+    let results = drive_to_results(&mut gateway, key, &npcs, NOW);
+    assert!(
+        !results
+            .iter()
+            .any(|reply| String::from_utf8_lossy(reply).contains("didn't meet")),
+        "score 22 in first place meets the goal"
+    );
+    assert_eq!(
+        counts(gateway.gameplay().unwrap(), LICENSE_TO_DRIVE),
+        vec![1],
+        "the met goal credits the row"
+    );
     assert_eq!(ledger(&gateway), vec![instance]);
 }
 
@@ -1306,13 +1444,13 @@ fn the_shipped_derby_plays_in_its_arena_and_returns_to_the_world() {
     drive_to_results(&mut gateway, key, &npcs, NOW);
     // The results hold ends (close enabled) and the client closes the match (39/6).
     gateway
-        .tick_at(NOW + 8_400 + RESULTS_HOLD_MS + 1_000)
+        .tick_at(NOW + FINISH_AT + RESULTS_HOLD_MS + 1_000)
         .unwrap();
     let mut quit = vec![39, 0, 6];
     for word in [instance, -1, -1] {
         quit.extend(word.to_le_bytes());
     }
-    gateway_send(&mut gateway, &quit, NOW + 8_400 + RESULTS_HOLD_MS + 1_100);
+    gateway_send(&mut gateway, &quit, NOW + FINISH_AT + RESULTS_HOLD_MS + 1_100);
     assert!(!gateway.gameplay().unwrap().derby_active());
     assert_ne!(
         zone(&gateway),

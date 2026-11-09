@@ -55,7 +55,8 @@ class ActivityContentGateTest(unittest.TestCase):
     def test_derby_rows_are_checked_against_gates_and_table(self):
         self.refuse(
             "derby_rows.json",
-            lambda value: value["rows"][0].update(npcs=[9000000295]),
+            # rows[0] is the explicit default row 39; 604 (Break 'er In) follows it.
+            lambda value: value["rows"][1].update(npcs=[9000000295]),
             "row 604 is invalid",
         )
         self.refuse(

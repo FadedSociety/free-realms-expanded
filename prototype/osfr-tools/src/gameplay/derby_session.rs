@@ -2,6 +2,9 @@
 use super::*;
 
 const NO_CLASS_CONTENT: &str = "derby entry requires class content";
+/// (R) The results line when a goal row's finished match misses its goal: paid, not credited.
+pub const DERBY_GOAL_MISSED: &str =
+    "You didn't meet this derby's goal. The match still paid; try it again for the quest.";
 
 /// Predecessor saves recorded the job a connection-local match replaced. Current saves keep the
 /// profile itself on that job (`saved_profile_state`), so only an older save carries this marker.
@@ -271,9 +274,11 @@ impl Gameplay {
         // driver's. A missing result (a phase race) claims no fact, so no bound the
         // producer can report is met by accident; `knocked_out` stays conservative.
         let facts = derby.completion_result(character.guid);
+        // A missing result claims no fact; a goal row with no facts cannot have met its goal.
+        let goal_free = !derby.has_goal();
         let result = facts.map_or_else(
             || crate::quest_engine::MinigameResult {
-                won: true,
+                won: goal_free,
                 elapsed_seconds: None,
                 score: None,
                 placement: None,
@@ -283,7 +288,14 @@ impl Gameplay {
             },
             crate::derby::DerbyParticipantResult::quest_result,
         );
-        self.credit_minigame(minigame_id, result, out)?;
+        // (R) A row with a goal (knock-outs, named drivers, power-ups, placement) credits its
+        // quest only when the goal was met; the match still pays its completion. Free play and
+        // the tutorials have no goal, so they credit on finishing as before.
+        if result.won {
+            self.credit_minigame(minigame_id, result, out)?;
+        } else {
+            out.replies.push(chat::system(DERBY_GOAL_MISSED));
+        }
         // T229: the same handover pays the derby's Station Cash kind, whatever the coin grant does.
         self.pay_earned_station_cash(crate::station_cash::EarnSource::DerbyMatch, out)?;
         let Some(grant) = grant else {

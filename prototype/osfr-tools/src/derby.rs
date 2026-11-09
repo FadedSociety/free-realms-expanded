@@ -226,7 +226,7 @@ impl fmt::Display for DerbyError {
 
 impl std::error::Error for DerbyError {}
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 #[repr(u32)]
 pub enum PickupKind {
@@ -787,6 +787,69 @@ impl Default for DerbyRules {
     }
 }
 
+/// (R) A row's goal: what this driver's finished match must show for the row to count as won
+/// (`DerbyParticipantResult::won`, the quest credit). Every unset bound is free; an empty goal is
+/// always met, so free play and the tutorials credit on finishing. The bounds are the fanbyte
+/// minigame pages' goals and the client's goal strings (`opus/minigames/derby.md`).
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct DerbyGoal {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub min_score: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_placement: Option<u8>,
+    /// Knock-outs made, any driver.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub min_knockouts: Option<u32>,
+    /// Times knocked out, at most (0 is "don't get knocked out").
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_knockouts_taken: Option<u32>,
+    /// Knock-outs of each named AI driver (`DerbyDriver::name_string_id`), this many each.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub named_knockouts: BTreeMap<i32, u32>,
+    /// Power-ups taken, this many of each kind.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub pickups: BTreeMap<PickupKind, u32>,
+}
+
+impl DerbyGoal {
+    /// No bound at all: the match counts as won on finishing.
+    pub fn is_empty(&self) -> bool {
+        *self == Self::default()
+    }
+
+    /// Content bounds: positive counts, a placement a results list can hold, real name ids.
+    pub fn is_valid(&self) -> bool {
+        self.min_score.is_none_or(|score| (1..=1_000_000).contains(&score))
+            && self
+                .max_placement
+                .is_none_or(|place| (1..=MAX_DERBY_DRIVERS as u8).contains(&place))
+            && self.min_knockouts.is_none_or(|count| (1..=10_000).contains(&count))
+            && self.max_knockouts_taken.is_none_or(|count| count <= 10_000)
+            && self
+                .named_knockouts
+                .iter()
+                .all(|(name, count)| *name > 0 && (1..=10_000).contains(count))
+            && self.pickups.values().all(|count| (1..=10_000).contains(count))
+    }
+
+    /// Whether `state`, placed `placement` in the results, meets every bound.
+    pub fn met(&self, state: &DerbyDriverState, placement: u8) -> bool {
+        self.min_score.is_none_or(|min| state.score >= min)
+            && self.max_placement.is_none_or(|max| placement <= max)
+            && self.min_knockouts.is_none_or(|min| state.knockouts_made >= min)
+            && self
+                .max_knockouts_taken
+                .is_none_or(|max| state.knockouts_taken <= max)
+            && self.named_knockouts.iter().all(|(name, count)| {
+                state.named_knockouts.get(name).is_some_and(|made| made >= count)
+            })
+            && self.pickups.iter().all(|(kind, count)| {
+                state.pickups_taken.get(kind).is_some_and(|taken| taken >= count)
+            })
+    }
+}
+
 /// (L931, R) Server-driven NPC drivers. The client owns the arena (start slots, walls) and the retail
 /// NPC AI is unrecovered, so the server only chases: once a human's first pose arrives each NPC
 /// appears on a ring around it, then drives straight at the nearest living driver and bumps it. The
@@ -804,6 +867,15 @@ pub struct NpcDriving {
     pub bump_impact: f32,
     /// Minimum time between two bumps by the same NPC.
     pub bump_interval_ms: u64,
+    /// (R) How many NPCs (the first slots) hunt the nearest human rather than the nearest car.
+    /// Native run 20261104T005019Z: with every NPC chasing the nearest car they piled up far from
+    /// the player and never reached them; retail's AI reached the human within 20 s.
+    #[serde(default = "default_human_chasers")]
+    pub human_chasers: usize,
+}
+
+fn default_human_chasers() -> usize {
+    4
 }
 
 impl NpcDriving {
@@ -817,6 +889,7 @@ impl NpcDriving {
             && self.bump_impact > 0.0
             && self.bump_impact <= rules.max_impact
             && (100..=60_000).contains(&self.bump_interval_ms)
+            && self.human_chasers <= MAX_DERBY_DRIVERS
     }
 }
 
@@ -858,6 +931,10 @@ pub struct DerbyDriverState {
     pub shield_until_ms: Option<u64>,
     pub attack_until_ms: Option<u64>,
     pub ultimate_until_ms: Option<u64>,
+    /// (R) Knock-outs this driver made of each named AI driver, by `name_string_id`.
+    pub named_knockouts: BTreeMap<i32, u32>,
+    /// (R) Power-ups this driver took, by kind.
+    pub pickups_taken: BTreeMap<PickupKind, u32>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -867,6 +944,8 @@ pub struct DerbyParticipantResult {
     pub placement: u8,
     /// Any contact reduced this driver to zero health during the match.
     pub knocked_out: bool,
+    /// (R) The row's goal was met (an empty goal always is): the quest credit.
+    pub won: bool,
 }
 
 impl DerbyParticipantResult {
@@ -876,7 +955,7 @@ impl DerbyParticipantResult {
     /// participant's own knock-out counts.
     pub fn quest_result(self) -> crate::quest_engine::MinigameResult {
         crate::quest_engine::MinigameResult {
-            won: true,
+            won: self.won,
             elapsed_seconds: None,
             score: Some(self.score).filter(|score| *score <= crate::content::MAX_MINIGAME_SCORE),
             placement: Some(self.placement),
@@ -927,6 +1006,29 @@ pub struct DerbyService {
     npc_vehicles: Vec<DerbyVehicleTemplate>,
     /// L959: the AI drivers by slot, slot 1 first; a slot past the end gets no driver NPC.
     npc_drivers: Vec<DerbyDriver>,
+    /// (R) The row's goal; empty for free play.
+    goal: DerbyGoal,
+}
+
+/// A fresh driver's facts before the match.
+fn fresh_state(key: ParticipantKey, human: bool, health: u32) -> DerbyDriverState {
+    DerbyDriverState {
+        key,
+        human,
+        connected: true,
+        health,
+        score: 0,
+        damage_dealt: 0,
+        damage_received: 0,
+        knockouts_made: 0,
+        knockouts_taken: 0,
+        boost: 0.0,
+        shield_until_ms: None,
+        attack_until_ms: None,
+        ultimate_until_ms: None,
+        named_knockouts: BTreeMap::new(),
+        pickups_taken: BTreeMap::new(),
+    }
 }
 
 impl DerbyService {
@@ -999,21 +1101,7 @@ impl DerbyService {
         drivers.insert(
             owner,
             Driver {
-                state: DerbyDriverState {
-                    key: owner,
-                    human: true,
-                    connected: true,
-                    health: rules.start_health,
-                    score: 0,
-                    damage_dealt: 0,
-                    damage_received: 0,
-                    knockouts_made: 0,
-                    knockouts_taken: 0,
-                    boost: 0.0,
-                    shield_until_ms: None,
-                    attack_until_ms: None,
-                    ultimate_until_ms: None,
-                },
+                state: fresh_state(owner, true, rules.start_health),
                 vehicle,
                 pose: None,
                 pose_at_ms: None,
@@ -1046,7 +1134,28 @@ impl DerbyService {
             npc_bumped_ms: BTreeMap::new(),
             npc_vehicles: Vec::new(),
             npc_drivers: Vec::new(),
+            goal: DerbyGoal::default(),
         })
+    }
+
+    /// (R) The row's goal (see [`DerbyGoal`]); call before the match is set up.
+    pub fn set_goal(&mut self, goal: DerbyGoal) -> Result<(), DerbyError> {
+        if !goal.is_valid() {
+            return Err(DerbyError::InvalidField("derby goal"));
+        }
+        self.goal = goal;
+        Ok(())
+    }
+
+    /// The name id of an AI driver's NPC (`set_npc_drivers`, by slot); a human or an unnamed slot
+    /// has none.
+    fn driver_name(&self, key: ParticipantKey) -> Option<i32> {
+        let driver = self.drivers.get(&key)?;
+        if driver.state.human {
+            return None;
+        }
+        let slot = (key.0 & 0xff) as usize;
+        Some(self.npc_drivers.get(slot.checked_sub(1)?)?.name_string_id)
     }
 
     /// (L931, R) Let the NPC drivers chase and bump instead of standing still; call before the
@@ -1160,11 +1269,18 @@ impl DerbyService {
             .values()
             .filter(|other| other.state.connected && other.state.score > driver.state.score)
             .count();
+        let placement = u8::try_from(place).ok()?;
         Some(DerbyParticipantResult {
             score: driver.state.score,
-            placement: u8::try_from(place).ok()?,
+            placement,
             knocked_out: driver.state.knockouts_taken > 0,
+            won: self.goal.met(&driver.state, placement),
         })
+    }
+
+    /// (R) The row's goal, for the lines a results screen or a refusal names.
+    pub fn goal(&self) -> &DerbyGoal {
+        &self.goal
     }
 
     pub fn add_human(
@@ -1190,21 +1306,7 @@ impl DerbyService {
         self.drivers.insert(
             key,
             Driver {
-                state: DerbyDriverState {
-                    key,
-                    human: true,
-                    connected: true,
-                    health: self.rules.start_health,
-                    score: 0,
-                    damage_dealt: 0,
-                    damage_received: 0,
-                    knockouts_made: 0,
-                    knockouts_taken: 0,
-                    boost: 0.0,
-                    shield_until_ms: None,
-                    attack_until_ms: None,
-                    ultimate_until_ms: None,
-                },
+                state: fresh_state(key, true, self.rules.start_health),
                 vehicle,
                 pose: None,
                 pose_at_ms: None,
@@ -1437,21 +1539,7 @@ impl DerbyService {
             self.drivers.insert(
                 key,
                 Driver {
-                    state: DerbyDriverState {
-                        key,
-                        human: false,
-                        connected: true,
-                        health: self.rules.start_health,
-                        score: 0,
-                        damage_dealt: 0,
-                        damage_received: 0,
-                        knockouts_made: 0,
-                        knockouts_taken: 0,
-                        boost: 0.0,
-                        shield_until_ms: None,
-                        attack_until_ms: None,
-                        ultimate_until_ms: None,
-                    },
+                    state: fresh_state(key, false, self.rules.start_health),
                     // A driven NPC without a start slot has no pose (so no contact) until
                     // `drive_npcs` places it.
                     pose: placed.then_some(VehiclePose {
@@ -1714,6 +1802,7 @@ impl DerbyService {
         } else {
             self.rules.knockout_points
         };
+        let victim_name = self.driver_name(report.other);
         let victim = self.drivers.get_mut(&report.other).ok_or(UNKNOWN_DRIVER)?;
         victim.state.damage_received = victim.state.damage_received.saturating_add(damage);
         victim.state.health = victim.state.health.saturating_sub(damage);
@@ -1731,6 +1820,10 @@ impl DerbyService {
         if knocked_out {
             attacker.state.score = attacker.state.score.saturating_add(points);
             attacker.state.knockouts_made = attacker.state.knockouts_made.saturating_add(1);
+            if let Some(name) = victim_name {
+                let made = attacker.state.named_knockouts.entry(name).or_insert(0);
+                *made = made.saturating_add(1);
+            }
         }
         self.push_broadcast(&mut actions, self.state_message(sender))?;
         self.push_broadcast(&mut actions, self.state_message(report.other))?;
@@ -1812,6 +1905,8 @@ impl DerbyService {
             .remove(&id)
             .ok_or(DerbyError::InvalidField("unknown pickup"))?;
         let driver = self.drivers.get_mut(&sender).ok_or(UNKNOWN_DRIVER)?;
+        let taken = driver.state.pickups_taken.entry(pickup.kind).or_insert(0);
+        *taken = taken.saturating_add(1);
         match pickup.kind {
             PickupKind::Health => {
                 driver.state.health = driver
@@ -2128,7 +2223,16 @@ impl DerbyService {
                 continue;
             };
             let alive = self.drivers[&key].state.health > 0;
-            let target = alive.then(|| self.nearest_driver(key, from)).flatten();
+            // (R) The first `human_chasers` slots hunt the player; the rest fight whoever is
+            // nearest, so an idle human still cannot stay first.
+            let target = alive
+                .then(|| {
+                    (slot < npc.human_chasers)
+                        .then(|| self.nearest_driver_matching(key, from, true))
+                        .flatten()
+                        .or_else(|| self.nearest_driver(key, from))
+                })
+                .flatten();
             // The placement step only faces the human; driving starts with the next step.
             let (position, heading) = match (placed, target) {
                 (Some(_), Some((_, goal))) => {
@@ -2169,10 +2273,23 @@ impl DerbyService {
         from: ParticipantKey,
         position: [f32; 3],
     ) -> Option<(ParticipantKey, [f32; 3])> {
+        self.nearest_driver_matching(from, position, false)
+    }
+
+    /// As [`Self::nearest_driver`]; `humans_only` restricts the field to human drivers.
+    fn nearest_driver_matching(
+        &self,
+        from: ParticipantKey,
+        position: [f32; 3],
+        humans_only: bool,
+    ) -> Option<(ParticipantKey, [f32; 3])> {
         self.drivers
             .iter()
             .filter(|(key, driver)| {
-                **key != from && driver.state.connected && driver.state.health > 0
+                **key != from
+                    && driver.state.connected
+                    && driver.state.health > 0
+                    && (!humans_only || driver.state.human)
             })
             .filter_map(|(key, driver)| Some((*key, driver.pose.as_ref().and_then(pose_position)?)))
             .min_by(|left, right| {

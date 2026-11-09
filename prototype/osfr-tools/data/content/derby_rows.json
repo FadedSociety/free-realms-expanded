@@ -5,18 +5,17 @@
     "speed_mps": 13.0,
     "spawn_radius_m": 25.0,
     "bump_impact": 500.0,
-    "bump_interval_ms": 1500
+    "bump_interval_ms": 1500,
+    "human_chasers": 4
   },
   "rows": [
     {
-      "game_id": 604,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
-      "rules": null,
+      "game_id": 39,
+      "npcs": [9500001021, 9000000391, 9000000289, 9500000731, 9000000183],
+      "rules": {
+        "time_limit_ms": 240000,
+        "score_target": null
+      },
       "pickups": null,
       "completion_reward_coins": null,
       "completion_reward_xp": null,
@@ -25,7 +24,40 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 39 '39^11^37938^37938^9869^1^0^^0^0^0^^0^' is TYPE 11, NAME_ID 37938 (Wildwood Demo Derby): the default package's own row (derby_entry.json game_id 39), entered from every derby gate (derby_gates.json)."
+        },
+        {
+          "kind": "video",
+          "evidence": "nb5-qin8zz0_154.00: the Wildwood High Scores board reaches 50 points in one match and the race runs its 4:00 clock to DERBY COMPLETE (_434.00), so no score target ends free play early."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) This row overrides the default row in place (DerbyGateway::build) so the captured derby_entry.json stays as recorded: the same package with score_target off and the 240 s clock (Sanctuary VehicleGames Derby.TimeLimitSeconds); npc_driving as default_npc_driving."
+        }
+      ]
+    },
+    {
+      "game_id": 604,
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
+      "rules": {
+        "score_target": null
+      },
+      "pickups": null,
+      "completion_reward_coins": null,
+      "completion_reward_xp": null,
+      "npc_driving": {
+        "pose_interval_ms": 50,
+        "speed_mps": 13.0,
+        "spawn_radius_m": 25.0,
+        "bump_impact": 500.0,
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -35,21 +67,61 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC assignment: derby_gates.json lists the four arena drivers 9000000391, 9000000289, 9500000731 and 9000000183, but which arena each driver runs is not recovered, so every gate may enter row 604. Unset fields inherit derby_entry.json: the same vehicle, rules, pickups and 25 coin / 10 Demo Derby Driver XP completion reward as the default row 39. L931: the server drives the seven AI cars, as live (opus/minigames/derby.md: every AI car's 34/5 came from the server, about 19 Hz); the same tunables as the other rows, and default_npc_driving does the same for row 39."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte 'Break 'er In': Knock out 4 drivers."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
         }
-      ]
+      ],
+      "goal": {
+        "min_knockouts": 4
+      }
     },
     {
       "game_id": 40,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
-      "pickups": null,
+      "pickups": [
+        {
+          "id": 1,
+          "definition_id": 469,
+          "kind": "health",
+          "position_bits": [1130430464, 1121189888, 1129119744, 1065353216],
+          "unknown_floats_bits": [1069547520, 1374],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 2,
+          "definition_id": 469,
+          "kind": "health",
+          "position_bits": [1132396544, 1121189888, 1129119744, 1065353216],
+          "unknown_floats_bits": [1069547520, 1374],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 3,
+          "definition_id": 943,
+          "kind": "boost",
+          "position_bits": [1130758144, 1120927744, 1133903872, 1065353216],
+          "unknown_floats_bits": [1069547520, 1349],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 4,
+          "definition_id": 486,
+          "kind": "shield",
+          "position_bits": [1132396544, 1120927744, 1133740032, 1065353216],
+          "unknown_floats_bits": [1069547520, 1274],
+          "response_parameters_bits": [0, 0, 0]
+        }
+      ],
       "completion_reward_coins": null,
       "completion_reward_xp": null,
       "npc_driving": {
@@ -57,7 +129,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -67,21 +140,113 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule: completion only, the Wildwood row's rule on the one arena package. (R) NPC drivers: this row sets npc_driving (DerbyService::drive_npcs chases the nearest living car and bumps it) because the placeholder NPCs of the base package stand at a spot no contact can reach, so placement and knock-out would never differ between matches. The numbers are tunables. A match ends at the inherited first-to-22 score or this row's 240 s time limit (R: Sanctuary-BubbaJoeX src/Resources/VehicleGames.json Derby.TimeLimitSeconds is 240; retail clips run 3 to 4 minutes). The row runs on the one arena package; which scene the client shows for this id is unverified."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Frost Ridge's arena is the client's sh_dm_arena (the snow arena in afyPqIZqD-U_250.00; sheet C8; maps.md 5.2). No capture holds its start slots: Studio POST /api/probe (mesh floors, 2026-11-09) shows a raised pile at y 116 over x 220-270, z 240-260 (sh_dm_boulders and crystals at 242, 242) and the drivable snow floor at y 100-106 around it; the player's car starts at (240, 104 + 2, 215) on the north band facing +z and the seven AI cars on probed floor spots (north band z 200-210, south band z 290-310), 2 m up; the client's physics settles them. Sky as the Snowhill soccer arena (soccer.json). geometry_id 102 is the Wildwood arena's and is unverified here. Native item 14 corrects these. Power-ups: the capture's four kinds and definitions at four probed floor spots, 1 m up (R)."
+        },
+        {
+          "kind": "video",
+          "evidence": "The arena's results board names its drivers: Frost Ridge afyPqIZqD-U_250.00 (Skids Smash 'n' Dash, Ariana Iceblock, Spike Slickclash, J. P. Screecher, Flash Jammer, Erica Diggs, Dani Frostflash); Tangletrack Q5gizyhmuZ0_120.00 and _248.00 (Jammer Blindrush, Kat Darkhollow, Scarlett Slamdash, Jarid Lockgear Jr, Flash Sideswipe, Dee Driftcatcher). Name ids from the client locale; (R) bodies reuse the Wildwood roster's models except Erica Diggs 1311 and J. P. Screecher 1321 (FreeRealms-Legacy Npcs.json)."
+        }
+      ],
+      "scene": {
+        "envelope_flag": 1,
+        "scene": "sh_dm_arena",
+        "type_id": 2,
+        "position": [240.0, 106.0, 215.0, 1.0],
+        "rotation": [0.0, 0.0, 1.0, 0.0],
+        "sky": "sky_snowhill24.xml",
+        "tutorial": false,
+        "unknown": 3,
+        "id": 0,
+        "update_radius": 0.0,
+        "geometry_id": 102,
+        "override_update_radius": true,
+        "wait_for_zone_ready": false
+      },
+      "start_transform_bits": [1065353216, 0, 2147483648, 0, 0, 1065353216, 0, 0, 0, 0, 1065353216, 0, 1131413504, 1121189888, 1129775104, 1065353216],
+      "npc_start_transform_bits": [
+        [1055193390, 0, 3211065646, 0, 0, 1065353216, 0, 0, 1063581998, 0, 1055193390, 0, 1130758144, 1121320960, 1129447424, 1065353216],
+        [1055193390, 0, 1063581998, 0, 0, 1065353216, 0, 0, 3211065646, 0, 1055193390, 0, 1132068864, 1121189888, 1129447424, 1065353216],
+        [1058642330, 0, 1061997773, 0, 0, 1065353216, 0, 0, 3209481421, 0, 1058642330, 0, 1132593152, 1121452032, 1128792064, 1065353216],
+        [1058642330, 0, 3209481421, 0, 0, 1065353216, 0, 0, 1061997773, 0, 1058642330, 0, 1130102784, 1121583104, 1128792064, 1065353216],
+        [3212689693, 0, 3188151789, 0, 0, 1065353216, 0, 0, 1040668141, 0, 3212689693, 0, 1130758144, 1120927744, 1133576192, 1065353216],
+        [3212689693, 0, 1040668141, 0, 0, 1065353216, 0, 0, 3188151789, 0, 3212689693, 0, 1132068864, 1120927744, 1133576192, 1065353216],
+        [3212836864, 0, 2769105202, 0, 0, 1065353216, 0, 0, 621621554, 0, 3212836864, 0, 1131413504, 1120665600, 1134231552, 1065353216]
+      ],
+      "npc_drivers": [
+        {
+          "name_string_id": 19354,
+          "model_id": 1331
+        },
+        {
+          "name_string_id": 19357,
+          "model_id": 888
+        },
+        {
+          "name_string_id": 19352,
+          "model_id": 870
+        },
+        {
+          "name_string_id": 19351,
+          "model_id": 1321
+        },
+        {
+          "name_string_id": 19353,
+          "model_id": 891
+        },
+        {
+          "name_string_id": 19355,
+          "model_id": 1311
+        },
+        {
+          "name_string_id": 19356,
+          "model_id": 870
         }
       ]
     },
     {
       "game_id": 41,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
-      "pickups": null,
+      "pickups": [
+        {
+          "id": 1,
+          "definition_id": 469,
+          "kind": "health",
+          "position_bits": [1133248512, 1074580685, 1132068864, 1065353216],
+          "unknown_floats_bits": [1069547520, 1374],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 2,
+          "definition_id": 469,
+          "kind": "health",
+          "position_bits": [1133248512, 1074580685, 1133412352, 1065353216],
+          "unknown_floats_bits": [1069547520, 1374],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 3,
+          "definition_id": 943,
+          "kind": "boost",
+          "position_bits": [1134723072, 1082759578, 1133576192, 1065353216],
+          "unknown_floats_bits": [1069547520, 1349],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 4,
+          "definition_id": 486,
+          "kind": "shield",
+          "position_bits": [1134886912, 1074580685, 1131741184, 1065353216],
+          "unknown_floats_bits": [1069547520, 1274],
+          "response_parameters_bits": [0, 0, 0]
+        }
+      ],
       "completion_reward_coins": null,
       "completion_reward_xp": null,
       "npc_driving": {
@@ -89,7 +254,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -99,19 +265,78 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule: completion only, the Wildwood row's rule on the one arena package. (R) NPC drivers: this row sets npc_driving (DerbyService::drive_npcs chases the nearest living car and bumps it) because the placeholder NPCs of the base package stand at a spot no contact can reach, so placement and knock-out would never differ between matches. The numbers are tunables. A match ends at the inherited first-to-22 score or this row's 240 s time limit (R: Sanctuary-BubbaJoeX src/Resources/VehicleGames.json Derby.TimeLimitSeconds is 240; retail clips run 3 to 4 minutes). The row runs on the one arena package; which scene the client shows for this id is unverified."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Tangletrack's arena is the client's bw_dm_arena (the purple-floored Briarwood arena in Q5gizyhmuZ0_120.00; sheet C8; maps.md 5.3). No capture holds its start slots: Studio POST /api/probe (mesh floors, 2026-11-09) shows one flat floor at y 1.22 over x 265-330, z 235-295, rising east of x 340; the player's car starts at (305, 1.2 + 2, 265) facing +z and the seven AI cars on a 20 m ring around it facing in, all on that floor; the client's physics settles them. Sky as the Briarwood soccer arena (soccer.json). geometry_id 102 is the Wildwood arena's and is unverified here. Native item 14 corrects these. Power-ups: the capture's four kinds and definitions at four probed floor spots, 1 m up (R)."
+        },
+        {
+          "kind": "video",
+          "evidence": "The arena's results board names its drivers: Frost Ridge afyPqIZqD-U_250.00 (Skids Smash 'n' Dash, Ariana Iceblock, Spike Slickclash, J. P. Screecher, Flash Jammer, Erica Diggs, Dani Frostflash); Tangletrack Q5gizyhmuZ0_120.00 and _248.00 (Jammer Blindrush, Kat Darkhollow, Scarlett Slamdash, Jarid Lockgear Jr, Flash Sideswipe, Dee Driftcatcher). Name ids from the client locale; (R) bodies reuse the Wildwood roster's models except Erica Diggs 1311 and J. P. Screecher 1321 (FreeRealms-Legacy Npcs.json)."
+        }
+      ],
+      "scene": {
+        "envelope_flag": 1,
+        "scene": "bw_dm_arena",
+        "type_id": 2,
+        "position": [305.0, 3.0, 265.0, 1.0],
+        "rotation": [0.0, 0.0, 1.0, 0.0],
+        "sky": "sky_briarwood24.xml",
+        "tutorial": false,
+        "unknown": 3,
+        "id": 0,
+        "update_radius": 0.0,
+        "geometry_id": 102,
+        "override_update_radius": true,
+        "wait_for_zone_ready": false
+      },
+      "start_transform_bits": [1065353216, 0, 2147483648, 0, 0, 1065353216, 0, 0, 0, 0, 1065353216, 0, 1134067712, 1077936128, 1132756992, 1065353216],
+      "npc_start_transform_bits": [
+        [613232946, 0, 1065353216, 0, 0, 1065353216, 0, 0, 3212836864, 0, 613232946, 0, 1134723072, 1077936128, 1132756992, 1065353216],
+        [3209176604, 0, 1059036423, 0, 0, 1065353216, 0, 0, 3206520071, 0, 3209176604, 0, 1134476322, 1077936128, 1133269373, 1065353216],
+        [3212416224, 0, 3194215559, 0, 0, 1065353216, 0, 0, 1046731911, 0, 3212416224, 0, 1133921881, 1077936128, 1133395921, 1065353216],
+        [3202229762, 0, 3211175397, 0, 0, 1065353216, 0, 0, 1063691749, 0, 3202229762, 0, 1133477253, 1077936128, 1133041342, 1065353216],
+        [1054746114, 0, 3211175397, 0, 0, 1065353216, 0, 0, 1063691749, 0, 1054746114, 0, 1133477253, 1077936128, 1132472642, 1065353216],
+        [1064932576, 0, 3194215559, 0, 0, 1065353216, 0, 0, 1046731911, 0, 1064932576, 0, 1133921881, 1077936128, 1131774046, 1065353216],
+        [1061692956, 0, 1059036423, 0, 0, 1065353216, 0, 0, 3206520071, 0, 1061692956, 0, 1134476322, 1077936128, 1132027142, 1065353216]
+      ],
+      "npc_drivers": [
+        {
+          "name_string_id": 19337,
+          "model_id": 1331
+        },
+        {
+          "name_string_id": 19340,
+          "model_id": 888
+        },
+        {
+          "name_string_id": 19338,
+          "model_id": 1297
+        },
+        {
+          "name_string_id": 19343,
+          "model_id": 891
+        },
+        {
+          "name_string_id": 19341,
+          "model_id": 870
+        },
+        {
+          "name_string_id": 19339,
+          "model_id": 888
+        },
+        {
+          "name_string_id": 19342,
+          "model_id": 870
         }
       ]
     },
     {
       "game_id": 289,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
       "pickups": null,
       "completion_reward_coins": null,
@@ -121,7 +346,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -140,14 +366,10 @@
     },
     {
       "game_id": 290,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
       "pickups": null,
       "completion_reward_coins": null,
@@ -157,7 +379,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -172,14 +395,10 @@
     },
     {
       "game_id": 607,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
       "pickups": null,
       "completion_reward_coins": null,
@@ -189,7 +408,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -203,21 +423,64 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule in reported facts: placement <= 4 and no knock-out taken (knocked_out false). The 'collect 4 health power-ups' count is not a fact the derby reports (the shipped arena places no pick-ups; their positions belong to the client arena), so it is not modelled. (R) NPC drivers: this row sets npc_driving (DerbyService::drive_npcs chases the nearest living car and bumps it) because the placeholder NPCs of the base package stand at a spot no contact can reach, so placement and knock-out would never differ between matches. The numbers are tunables. A match ends at the inherited first-to-22 score or this row's 240 s time limit (R: Sanctuary-BubbaJoeX src/Resources/VehicleGames.json Derby.TimeLimitSeconds is 240; retail clips run 3 to 4 minutes). The row runs on the one arena package; which scene the client shows for this id is unverified."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte 'Wear and Tear': Pick up 4 health power-ups; place in the top 3."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
         }
-      ]
+      ],
+      "goal": {
+        "pickups": {
+          "health": 4
+        },
+        "max_placement": 3
+      }
     },
     {
       "game_id": 615,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
-      "pickups": null,
+      "pickups": [
+        {
+          "id": 1,
+          "definition_id": 469,
+          "kind": "health",
+          "position_bits": [1130430464, 1121189888, 1129119744, 1065353216],
+          "unknown_floats_bits": [1069547520, 1374],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 2,
+          "definition_id": 469,
+          "kind": "health",
+          "position_bits": [1132396544, 1121189888, 1129119744, 1065353216],
+          "unknown_floats_bits": [1069547520, 1374],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 3,
+          "definition_id": 943,
+          "kind": "boost",
+          "position_bits": [1130758144, 1120927744, 1133903872, 1065353216],
+          "unknown_floats_bits": [1069547520, 1349],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 4,
+          "definition_id": 486,
+          "kind": "shield",
+          "position_bits": [1132396544, 1120927744, 1133740032, 1065353216],
+          "unknown_floats_bits": [1069547520, 1274],
+          "response_parameters_bits": [0, 0, 0]
+        }
+      ],
       "completion_reward_coins": null,
       "completion_reward_xp": null,
       "npc_driving": {
@@ -225,7 +488,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -239,21 +503,128 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule in reported facts: placement 1, no knock-out taken (knocked_out false) and score >= 6. The three named drivers cannot be told apart among the NPC keys, so 'knock out three main drivers' is the score of three knock-outs at the 2-point rate (a 3-point leader knock-out can shorten it; accepted). (R) NPC drivers: this row sets npc_driving (DerbyService::drive_npcs chases the nearest living car and bumps it) because the placeholder NPCs of the base package stand at a spot no contact can reach, so placement and knock-out would never differ between matches. The numbers are tunables. A match ends at the inherited first-to-22 score or this row's 240 s time limit (R: Sanctuary-BubbaJoeX src/Resources/VehicleGames.json Derby.TimeLimitSeconds is 240; retail clips run 3 to 4 minutes). The row runs on the one arena package; which scene the client shows for this id is unverified."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Frost Ridge's arena is the client's sh_dm_arena (the snow arena in afyPqIZqD-U_250.00; sheet C8; maps.md 5.2). No capture holds its start slots: Studio POST /api/probe (mesh floors, 2026-11-09) shows a raised pile at y 116 over x 220-270, z 240-260 (sh_dm_boulders and crystals at 242, 242) and the drivable snow floor at y 100-106 around it; the player's car starts at (240, 104 + 2, 215) on the north band facing +z and the seven AI cars on probed floor spots (north band z 200-210, south band z 290-310), 2 m up; the client's physics settles them. Sky as the Snowhill soccer arena (soccer.json). geometry_id 102 is the Wildwood arena's and is unverified here. Native item 14 corrects these. Power-ups: the capture's four kinds and definitions at four probed floor spots, 1 m up (R)."
+        },
+        {
+          "kind": "video",
+          "evidence": "The arena's results board names its drivers: Frost Ridge afyPqIZqD-U_250.00 (Skids Smash 'n' Dash, Ariana Iceblock, Spike Slickclash, J. P. Screecher, Flash Jammer, Erica Diggs, Dani Frostflash); Tangletrack Q5gizyhmuZ0_120.00 and _248.00 (Jammer Blindrush, Kat Darkhollow, Scarlett Slamdash, Jarid Lockgear Jr, Flash Sideswipe, Dee Driftcatcher). Name ids from the client locale; (R) bodies reuse the Wildwood roster's models except Erica Diggs 1311 and J. P. Screecher 1321 (FreeRealms-Legacy Npcs.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "client strings (L931 notes) 'Taking on the Tank': 1st place, no knock-out; client goal 400904 'Knock out Claudio 'The Tank' DeMarco' (394520), fielded in slot 1 (R, model 1319 from FreeRealms-Legacy Npcs.json row 3094). The other two 'main drivers' are not named by id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
         }
-      ]
+      ],
+      "scene": {
+        "envelope_flag": 1,
+        "scene": "sh_dm_arena",
+        "type_id": 2,
+        "position": [240.0, 106.0, 215.0, 1.0],
+        "rotation": [0.0, 0.0, 1.0, 0.0],
+        "sky": "sky_snowhill24.xml",
+        "tutorial": false,
+        "unknown": 3,
+        "id": 0,
+        "update_radius": 0.0,
+        "geometry_id": 102,
+        "override_update_radius": true,
+        "wait_for_zone_ready": false
+      },
+      "start_transform_bits": [1065353216, 0, 2147483648, 0, 0, 1065353216, 0, 0, 0, 0, 1065353216, 0, 1131413504, 1121189888, 1129775104, 1065353216],
+      "npc_start_transform_bits": [
+        [1055193390, 0, 3211065646, 0, 0, 1065353216, 0, 0, 1063581998, 0, 1055193390, 0, 1130758144, 1121320960, 1129447424, 1065353216],
+        [1055193390, 0, 1063581998, 0, 0, 1065353216, 0, 0, 3211065646, 0, 1055193390, 0, 1132068864, 1121189888, 1129447424, 1065353216],
+        [1058642330, 0, 1061997773, 0, 0, 1065353216, 0, 0, 3209481421, 0, 1058642330, 0, 1132593152, 1121452032, 1128792064, 1065353216],
+        [1058642330, 0, 3209481421, 0, 0, 1065353216, 0, 0, 1061997773, 0, 1058642330, 0, 1130102784, 1121583104, 1128792064, 1065353216],
+        [3212689693, 0, 3188151789, 0, 0, 1065353216, 0, 0, 1040668141, 0, 3212689693, 0, 1130758144, 1120927744, 1133576192, 1065353216],
+        [3212689693, 0, 1040668141, 0, 0, 1065353216, 0, 0, 3188151789, 0, 3212689693, 0, 1132068864, 1120927744, 1133576192, 1065353216],
+        [3212836864, 0, 2769105202, 0, 0, 1065353216, 0, 0, 621621554, 0, 3212836864, 0, 1131413504, 1120665600, 1134231552, 1065353216]
+      ],
+      "npc_drivers": [
+        {
+          "name_string_id": 394520,
+          "model_id": 1319
+        },
+        {
+          "name_string_id": 19357,
+          "model_id": 888
+        },
+        {
+          "name_string_id": 19352,
+          "model_id": 870
+        },
+        {
+          "name_string_id": 19351,
+          "model_id": 1321
+        },
+        {
+          "name_string_id": 19353,
+          "model_id": 891
+        },
+        {
+          "name_string_id": 19355,
+          "model_id": 1311
+        },
+        {
+          "name_string_id": 19356,
+          "model_id": 870
+        }
+      ],
+      "goal": {
+        "max_placement": 1,
+        "max_knockouts_taken": 0,
+        "named_knockouts": {
+          "394520": 1
+        }
+      }
     },
     {
       "game_id": 616,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
-      "pickups": null,
+      "pickups": [
+        {
+          "id": 1,
+          "definition_id": 469,
+          "kind": "health",
+          "position_bits": [1130430464, 1121189888, 1129119744, 1065353216],
+          "unknown_floats_bits": [1069547520, 1374],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 2,
+          "definition_id": 469,
+          "kind": "health",
+          "position_bits": [1132396544, 1121189888, 1129119744, 1065353216],
+          "unknown_floats_bits": [1069547520, 1374],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 3,
+          "definition_id": 943,
+          "kind": "boost",
+          "position_bits": [1130758144, 1120927744, 1133903872, 1065353216],
+          "unknown_floats_bits": [1069547520, 1349],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 4,
+          "definition_id": 486,
+          "kind": "shield",
+          "position_bits": [1132396544, 1120927744, 1133740032, 1065353216],
+          "unknown_floats_bits": [1069547520, 1274],
+          "response_parameters_bits": [0, 0, 0]
+        }
+      ],
       "completion_reward_coins": null,
       "completion_reward_xp": null,
       "npc_driving": {
@@ -261,7 +632,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -275,21 +647,125 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule in reported facts: score >= 12 and placement <= 3; both are facts the derby reports directly. (R) NPC drivers: this row sets npc_driving (DerbyService::drive_npcs chases the nearest living car and bumps it) because the placeholder NPCs of the base package stand at a spot no contact can reach, so placement and knock-out would never differ between matches. The numbers are tunables. A match ends at the inherited first-to-22 score or this row's 240 s time limit (R: Sanctuary-BubbaJoeX src/Resources/VehicleGames.json Derby.TimeLimitSeconds is 240; retail clips run 3 to 4 minutes). The row runs on the one arena package; which scene the client shows for this id is unverified."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Frost Ridge's arena is the client's sh_dm_arena (the snow arena in afyPqIZqD-U_250.00; sheet C8; maps.md 5.2). No capture holds its start slots: Studio POST /api/probe (mesh floors, 2026-11-09) shows a raised pile at y 116 over x 220-270, z 240-260 (sh_dm_boulders and crystals at 242, 242) and the drivable snow floor at y 100-106 around it; the player's car starts at (240, 104 + 2, 215) on the north band facing +z and the seven AI cars on probed floor spots (north band z 200-210, south band z 290-310), 2 m up; the client's physics settles them. Sky as the Snowhill soccer arena (soccer.json). geometry_id 102 is the Wildwood arena's and is unverified here. Native item 14 corrects these. Power-ups: the capture's four kinds and definitions at four probed floor spots, 1 m up (R)."
+        },
+        {
+          "kind": "video",
+          "evidence": "The arena's results board names its drivers: Frost Ridge afyPqIZqD-U_250.00 (Skids Smash 'n' Dash, Ariana Iceblock, Spike Slickclash, J. P. Screecher, Flash Jammer, Erica Diggs, Dani Frostflash); Tangletrack Q5gizyhmuZ0_120.00 and _248.00 (Jammer Blindrush, Kat Darkhollow, Scarlett Slamdash, Jarid Lockgear Jr, Flash Sideswipe, Dee Driftcatcher). Name ids from the client locale; (R) bodies reuse the Wildwood roster's models except Erica Diggs 1311 and J. P. Screecher 1321 (FreeRealms-Legacy Npcs.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "client strings (L931 notes) 'Paws 'n Claws Smash-a-thon': score 12, top 3 (the quest's own require says the same)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
         }
-      ]
+      ],
+      "scene": {
+        "envelope_flag": 1,
+        "scene": "sh_dm_arena",
+        "type_id": 2,
+        "position": [240.0, 106.0, 215.0, 1.0],
+        "rotation": [0.0, 0.0, 1.0, 0.0],
+        "sky": "sky_snowhill24.xml",
+        "tutorial": false,
+        "unknown": 3,
+        "id": 0,
+        "update_radius": 0.0,
+        "geometry_id": 102,
+        "override_update_radius": true,
+        "wait_for_zone_ready": false
+      },
+      "start_transform_bits": [1065353216, 0, 2147483648, 0, 0, 1065353216, 0, 0, 0, 0, 1065353216, 0, 1131413504, 1121189888, 1129775104, 1065353216],
+      "npc_start_transform_bits": [
+        [1055193390, 0, 3211065646, 0, 0, 1065353216, 0, 0, 1063581998, 0, 1055193390, 0, 1130758144, 1121320960, 1129447424, 1065353216],
+        [1055193390, 0, 1063581998, 0, 0, 1065353216, 0, 0, 3211065646, 0, 1055193390, 0, 1132068864, 1121189888, 1129447424, 1065353216],
+        [1058642330, 0, 1061997773, 0, 0, 1065353216, 0, 0, 3209481421, 0, 1058642330, 0, 1132593152, 1121452032, 1128792064, 1065353216],
+        [1058642330, 0, 3209481421, 0, 0, 1065353216, 0, 0, 1061997773, 0, 1058642330, 0, 1130102784, 1121583104, 1128792064, 1065353216],
+        [3212689693, 0, 3188151789, 0, 0, 1065353216, 0, 0, 1040668141, 0, 3212689693, 0, 1130758144, 1120927744, 1133576192, 1065353216],
+        [3212689693, 0, 1040668141, 0, 0, 1065353216, 0, 0, 3188151789, 0, 3212689693, 0, 1132068864, 1120927744, 1133576192, 1065353216],
+        [3212836864, 0, 2769105202, 0, 0, 1065353216, 0, 0, 621621554, 0, 3212836864, 0, 1131413504, 1120665600, 1134231552, 1065353216]
+      ],
+      "npc_drivers": [
+        {
+          "name_string_id": 19354,
+          "model_id": 1331
+        },
+        {
+          "name_string_id": 19357,
+          "model_id": 888
+        },
+        {
+          "name_string_id": 19352,
+          "model_id": 870
+        },
+        {
+          "name_string_id": 19351,
+          "model_id": 1321
+        },
+        {
+          "name_string_id": 19353,
+          "model_id": 891
+        },
+        {
+          "name_string_id": 19355,
+          "model_id": 1311
+        },
+        {
+          "name_string_id": 19356,
+          "model_id": 870
+        }
+      ],
+      "goal": {
+        "min_score": 12,
+        "max_placement": 3
+      }
     },
     {
       "game_id": 624,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
-      "pickups": null,
+      "pickups": [
+        {
+          "id": 1,
+          "definition_id": 469,
+          "kind": "health",
+          "position_bits": [1133248512, 1074580685, 1132068864, 1065353216],
+          "unknown_floats_bits": [1069547520, 1374],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 2,
+          "definition_id": 469,
+          "kind": "health",
+          "position_bits": [1133248512, 1074580685, 1133412352, 1065353216],
+          "unknown_floats_bits": [1069547520, 1374],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 3,
+          "definition_id": 943,
+          "kind": "boost",
+          "position_bits": [1134723072, 1082759578, 1133576192, 1065353216],
+          "unknown_floats_bits": [1069547520, 1349],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 4,
+          "definition_id": 486,
+          "kind": "shield",
+          "position_bits": [1134886912, 1074580685, 1131741184, 1065353216],
+          "unknown_floats_bits": [1069547520, 1274],
+          "response_parameters_bits": [0, 0, 0]
+        }
+      ],
       "completion_reward_coins": null,
       "completion_reward_xp": null,
       "npc_driving": {
@@ -297,7 +773,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -311,21 +788,125 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule in reported facts: placement 1. The three pirate drivers are not distinguished among the NPC keys: every NPC is a rival. (R) NPC drivers: this row sets npc_driving (DerbyService::drive_npcs chases the nearest living car and bumps it) because the placeholder NPCs of the base package stand at a spot no contact can reach, so placement and knock-out would never differ between matches. The numbers are tunables. A match ends at the inherited first-to-22 score or this row's 240 s time limit (R: Sanctuary-BubbaJoeX src/Resources/VehicleGames.json Derby.TimeLimitSeconds is 240; retail clips run 3 to 4 minutes). The row runs on the one arena package; which scene the client shows for this id is unverified."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Tangletrack's arena is the client's bw_dm_arena (the purple-floored Briarwood arena in Q5gizyhmuZ0_120.00; sheet C8; maps.md 5.3). No capture holds its start slots: Studio POST /api/probe (mesh floors, 2026-11-09) shows one flat floor at y 1.22 over x 265-330, z 235-295, rising east of x 340; the player's car starts at (305, 1.2 + 2, 265) facing +z and the seven AI cars on a 20 m ring around it facing in, all on that floor; the client's physics settles them. Sky as the Briarwood soccer arena (soccer.json). geometry_id 102 is the Wildwood arena's and is unverified here. Native item 14 corrects these. Power-ups: the capture's four kinds and definitions at four probed floor spots, 1 m up (R)."
+        },
+        {
+          "kind": "video",
+          "evidence": "The arena's results board names its drivers: Frost Ridge afyPqIZqD-U_250.00 (Skids Smash 'n' Dash, Ariana Iceblock, Spike Slickclash, J. P. Screecher, Flash Jammer, Erica Diggs, Dani Frostflash); Tangletrack Q5gizyhmuZ0_120.00 and _248.00 (Jammer Blindrush, Kat Darkhollow, Scarlett Slamdash, Jarid Lockgear Jr, Flash Sideswipe, Dee Driftcatcher). Name ids from the client locale; (R) bodies reuse the Wildwood roster's models except Erica Diggs 1311 and J. P. Screecher 1321 (FreeRealms-Legacy Npcs.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte 'Tangletrack Trio': 1st place without getting knocked out 5 times."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
         }
-      ]
+      ],
+      "scene": {
+        "envelope_flag": 1,
+        "scene": "bw_dm_arena",
+        "type_id": 2,
+        "position": [305.0, 3.0, 265.0, 1.0],
+        "rotation": [0.0, 0.0, 1.0, 0.0],
+        "sky": "sky_briarwood24.xml",
+        "tutorial": false,
+        "unknown": 3,
+        "id": 0,
+        "update_radius": 0.0,
+        "geometry_id": 102,
+        "override_update_radius": true,
+        "wait_for_zone_ready": false
+      },
+      "start_transform_bits": [1065353216, 0, 2147483648, 0, 0, 1065353216, 0, 0, 0, 0, 1065353216, 0, 1134067712, 1077936128, 1132756992, 1065353216],
+      "npc_start_transform_bits": [
+        [613232946, 0, 1065353216, 0, 0, 1065353216, 0, 0, 3212836864, 0, 613232946, 0, 1134723072, 1077936128, 1132756992, 1065353216],
+        [3209176604, 0, 1059036423, 0, 0, 1065353216, 0, 0, 3206520071, 0, 3209176604, 0, 1134476322, 1077936128, 1133269373, 1065353216],
+        [3212416224, 0, 3194215559, 0, 0, 1065353216, 0, 0, 1046731911, 0, 3212416224, 0, 1133921881, 1077936128, 1133395921, 1065353216],
+        [3202229762, 0, 3211175397, 0, 0, 1065353216, 0, 0, 1063691749, 0, 3202229762, 0, 1133477253, 1077936128, 1133041342, 1065353216],
+        [1054746114, 0, 3211175397, 0, 0, 1065353216, 0, 0, 1063691749, 0, 1054746114, 0, 1133477253, 1077936128, 1132472642, 1065353216],
+        [1064932576, 0, 3194215559, 0, 0, 1065353216, 0, 0, 1046731911, 0, 1064932576, 0, 1133921881, 1077936128, 1131774046, 1065353216],
+        [1061692956, 0, 1059036423, 0, 0, 1065353216, 0, 0, 3206520071, 0, 1061692956, 0, 1134476322, 1077936128, 1132027142, 1065353216]
+      ],
+      "npc_drivers": [
+        {
+          "name_string_id": 19337,
+          "model_id": 1331
+        },
+        {
+          "name_string_id": 19340,
+          "model_id": 888
+        },
+        {
+          "name_string_id": 19338,
+          "model_id": 1297
+        },
+        {
+          "name_string_id": 19343,
+          "model_id": 891
+        },
+        {
+          "name_string_id": 19341,
+          "model_id": 870
+        },
+        {
+          "name_string_id": 19339,
+          "model_id": 888
+        },
+        {
+          "name_string_id": 19342,
+          "model_id": 870
+        }
+      ],
+      "goal": {
+        "max_placement": 1,
+        "max_knockouts_taken": 4
+      }
     },
     {
       "game_id": 627,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
-      "pickups": null,
+      "pickups": [
+        {
+          "id": 1,
+          "definition_id": 469,
+          "kind": "health",
+          "position_bits": [1130430464, 1121189888, 1129119744, 1065353216],
+          "unknown_floats_bits": [1069547520, 1374],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 2,
+          "definition_id": 469,
+          "kind": "health",
+          "position_bits": [1132396544, 1121189888, 1129119744, 1065353216],
+          "unknown_floats_bits": [1069547520, 1374],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 3,
+          "definition_id": 943,
+          "kind": "boost",
+          "position_bits": [1130758144, 1120927744, 1133903872, 1065353216],
+          "unknown_floats_bits": [1069547520, 1349],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 4,
+          "definition_id": 486,
+          "kind": "shield",
+          "position_bits": [1132396544, 1120927744, 1133740032, 1065353216],
+          "unknown_floats_bits": [1069547520, 1274],
+          "response_parameters_bits": [0, 0, 0]
+        }
+      ],
       "completion_reward_coins": null,
       "completion_reward_xp": null,
       "npc_driving": {
@@ -333,7 +914,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -343,19 +925,78 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule: completion only. 'All-or-nothing' reads as a winner-takes-all derby, but no bound is certified; the row reports score, placement and knock-out for a later quest to ask. (R) NPC drivers: this row sets npc_driving (DerbyService::drive_npcs chases the nearest living car and bumps it) because the placeholder NPCs of the base package stand at a spot no contact can reach, so placement and knock-out would never differ between matches. The numbers are tunables. A match ends at the inherited first-to-22 score or this row's 240 s time limit (R: Sanctuary-BubbaJoeX src/Resources/VehicleGames.json Derby.TimeLimitSeconds is 240; retail clips run 3 to 4 minutes). The row runs on the one arena package; which scene the client shows for this id is unverified."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Frost Ridge's arena is the client's sh_dm_arena (the snow arena in afyPqIZqD-U_250.00; sheet C8; maps.md 5.2). No capture holds its start slots: Studio POST /api/probe (mesh floors, 2026-11-09) shows a raised pile at y 116 over x 220-270, z 240-260 (sh_dm_boulders and crystals at 242, 242) and the drivable snow floor at y 100-106 around it; the player's car starts at (240, 104 + 2, 215) on the north band facing +z and the seven AI cars on probed floor spots (north band z 200-210, south band z 290-310), 2 m up; the client's physics settles them. Sky as the Snowhill soccer arena (soccer.json). geometry_id 102 is the Wildwood arena's and is unverified here. Native item 14 corrects these. Power-ups: the capture's four kinds and definitions at four probed floor spots, 1 m up (R)."
+        },
+        {
+          "kind": "video",
+          "evidence": "The arena's results board names its drivers: Frost Ridge afyPqIZqD-U_250.00 (Skids Smash 'n' Dash, Ariana Iceblock, Spike Slickclash, J. P. Screecher, Flash Jammer, Erica Diggs, Dani Frostflash); Tangletrack Q5gizyhmuZ0_120.00 and _248.00 (Jammer Blindrush, Kat Darkhollow, Scarlett Slamdash, Jarid Lockgear Jr, Flash Sideswipe, Dee Driftcatcher). Name ids from the client locale; (R) bodies reuse the Wildwood roster's models except Erica Diggs 1311 and J. P. Screecher 1321 (FreeRealms-Legacy Npcs.json)."
+        }
+      ],
+      "scene": {
+        "envelope_flag": 1,
+        "scene": "sh_dm_arena",
+        "type_id": 2,
+        "position": [240.0, 106.0, 215.0, 1.0],
+        "rotation": [0.0, 0.0, 1.0, 0.0],
+        "sky": "sky_snowhill24.xml",
+        "tutorial": false,
+        "unknown": 3,
+        "id": 0,
+        "update_radius": 0.0,
+        "geometry_id": 102,
+        "override_update_radius": true,
+        "wait_for_zone_ready": false
+      },
+      "start_transform_bits": [1065353216, 0, 2147483648, 0, 0, 1065353216, 0, 0, 0, 0, 1065353216, 0, 1131413504, 1121189888, 1129775104, 1065353216],
+      "npc_start_transform_bits": [
+        [1055193390, 0, 3211065646, 0, 0, 1065353216, 0, 0, 1063581998, 0, 1055193390, 0, 1130758144, 1121320960, 1129447424, 1065353216],
+        [1055193390, 0, 1063581998, 0, 0, 1065353216, 0, 0, 3211065646, 0, 1055193390, 0, 1132068864, 1121189888, 1129447424, 1065353216],
+        [1058642330, 0, 1061997773, 0, 0, 1065353216, 0, 0, 3209481421, 0, 1058642330, 0, 1132593152, 1121452032, 1128792064, 1065353216],
+        [1058642330, 0, 3209481421, 0, 0, 1065353216, 0, 0, 1061997773, 0, 1058642330, 0, 1130102784, 1121583104, 1128792064, 1065353216],
+        [3212689693, 0, 3188151789, 0, 0, 1065353216, 0, 0, 1040668141, 0, 3212689693, 0, 1130758144, 1120927744, 1133576192, 1065353216],
+        [3212689693, 0, 1040668141, 0, 0, 1065353216, 0, 0, 3188151789, 0, 3212689693, 0, 1132068864, 1120927744, 1133576192, 1065353216],
+        [3212836864, 0, 2769105202, 0, 0, 1065353216, 0, 0, 621621554, 0, 3212836864, 0, 1131413504, 1120665600, 1134231552, 1065353216]
+      ],
+      "npc_drivers": [
+        {
+          "name_string_id": 19354,
+          "model_id": 1331
+        },
+        {
+          "name_string_id": 19357,
+          "model_id": 888
+        },
+        {
+          "name_string_id": 19352,
+          "model_id": 870
+        },
+        {
+          "name_string_id": 19351,
+          "model_id": 1321
+        },
+        {
+          "name_string_id": 19353,
+          "model_id": 891
+        },
+        {
+          "name_string_id": 19355,
+          "model_id": 1311
+        },
+        {
+          "name_string_id": 19356,
+          "model_id": 870
         }
       ]
     },
     {
       "game_id": 603,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
       "pickups": null,
       "completion_reward_coins": null,
@@ -365,7 +1006,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -375,19 +1017,26 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule: completion only on the one arena package; which arena and which rivals the row's text names are not modelled, and no score, placement or knock-out bound is certified. NPC assignment and driving as the other hosted rows."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte 'Taking the Wheel': Place in the top 3."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
         }
-      ]
+      ],
+      "goal": {
+        "max_placement": 3
+      }
     },
     {
       "game_id": 605,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
       "pickups": null,
       "completion_reward_coins": null,
@@ -397,7 +1046,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -407,19 +1057,26 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule: completion only on the one arena package; which arena and which rivals the row's text names are not modelled, and no score, placement or knock-out bound is certified. NPC assignment and driving as the other hosted rows."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte 'License to Drive': Come in 1st place."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
         }
-      ]
+      ],
+      "goal": {
+        "max_placement": 1
+      }
     },
     {
       "game_id": 606,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
       "pickups": null,
       "completion_reward_coins": null,
@@ -429,7 +1086,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -439,19 +1097,27 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule: completion only on the one arena package; which arena and which rivals the row's text names are not modelled, and no score, placement or knock-out bound is certified. NPC assignment and driving as the other hosted rows."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte 'Routine Maintenance': Knock out 10 drivers; don't get knocked out."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
         }
-      ]
+      ],
+      "goal": {
+        "min_knockouts": 10,
+        "max_knockouts_taken": 0
+      }
     },
     {
       "game_id": 608,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
       "pickups": null,
       "completion_reward_coins": null,
@@ -461,7 +1127,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -471,19 +1138,28 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule: completion only on the one arena package; which arena and which rivals the row's text names are not modelled, and no score, placement or knock-out bound is certified. NPC assignment and driving as the other hosted rows."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "client locale 395062 'Knock out Willow Slamdash 2 times' (fanbyte 'Spare Parts' says 3; the client's own goal text wins). Willow Slamdash is Wildwood slot 2 (19366)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
         }
-      ]
+      ],
+      "goal": {
+        "named_knockouts": {
+          "19366": 2
+        }
+      }
     },
     {
       "game_id": 609,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
       "pickups": null,
       "completion_reward_coins": null,
@@ -493,7 +1169,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -503,19 +1180,27 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule: completion only on the one arena package; which arena and which rivals the row's text names are not modelled, and no score, placement or knock-out bound is certified. NPC assignment and driving as the other hosted rows."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte 'Dealing Damage': Score 9 points; place in the top 3."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
         }
-      ]
+      ],
+      "goal": {
+        "min_score": 9,
+        "max_placement": 3
+      }
     },
     {
       "game_id": 610,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
       "pickups": null,
       "completion_reward_coins": null,
@@ -525,7 +1210,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -535,19 +1221,62 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule: completion only on the one arena package; which arena and which rivals the row's text names are not modelled, and no score, placement or knock-out bound is certified. NPC assignment and driving as the other hosted rows."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte 'Arena Revenge': knock out Nash Wright, Miss Purple, Mr. Green, Mr. Yellow, Lillian Rush (client locale 395064, 400119, 400121, 400123, 400127); Billy Doe and the mystery crew member have no client name row, so they are not required. (R) The row fields that crew with Tucker Thunderjolt and Mikko Ragerunner filling slots 6-7; models for the crew other than Nash Wright (Legacy Npcs.json 1325) reuse Wildwood bodies."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
         }
-      ]
+      ],
+      "npc_drivers": [
+        {
+          "name_string_id": 394250,
+          "model_id": 1325
+        },
+        {
+          "name_string_id": 394512,
+          "model_id": 888
+        },
+        {
+          "name_string_id": 394513,
+          "model_id": 870
+        },
+        {
+          "name_string_id": 394514,
+          "model_id": 891
+        },
+        {
+          "name_string_id": 394516,
+          "model_id": 1297
+        },
+        {
+          "name_string_id": 19365,
+          "model_id": 1331
+        },
+        {
+          "name_string_id": 19367,
+          "model_id": 870
+        }
+      ],
+      "goal": {
+        "named_knockouts": {
+          "394250": 1,
+          "394512": 1,
+          "394513": 1,
+          "394514": 1,
+          "394516": 1
+        }
+      }
     },
     {
       "game_id": 611,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
       "pickups": null,
       "completion_reward_coins": null,
@@ -557,7 +1286,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -567,21 +1297,61 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule: completion only on the one arena package; which arena and which rivals the row's text names are not modelled, and no score, placement or knock-out bound is certified. NPC assignment and driving as the other hosted rows."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte 'Seeking a Sponsor': Score 9 points."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
         }
-      ]
+      ],
+      "goal": {
+        "min_score": 9
+      }
     },
     {
       "game_id": 612,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
-      "pickups": null,
+      "pickups": [
+        {
+          "id": 1,
+          "definition_id": 469,
+          "kind": "health",
+          "position_bits": [1130430464, 1121189888, 1129119744, 1065353216],
+          "unknown_floats_bits": [1069547520, 1374],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 2,
+          "definition_id": 469,
+          "kind": "health",
+          "position_bits": [1132396544, 1121189888, 1129119744, 1065353216],
+          "unknown_floats_bits": [1069547520, 1374],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 3,
+          "definition_id": 943,
+          "kind": "boost",
+          "position_bits": [1130758144, 1120927744, 1133903872, 1065353216],
+          "unknown_floats_bits": [1069547520, 1349],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 4,
+          "definition_id": 486,
+          "kind": "shield",
+          "position_bits": [1132396544, 1120927744, 1133740032, 1065353216],
+          "unknown_floats_bits": [1069547520, 1274],
+          "response_parameters_bits": [0, 0, 0]
+        }
+      ],
       "completion_reward_coins": null,
       "completion_reward_xp": null,
       "npc_driving": {
@@ -589,7 +1359,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -599,19 +1370,92 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule: completion only on the one arena package; which arena and which rivals the row's text names are not modelled, and no score, placement or knock-out bound is certified. NPC assignment and driving as the other hosted rows."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Frost Ridge's arena is the client's sh_dm_arena (the snow arena in afyPqIZqD-U_250.00; sheet C8; maps.md 5.2). No capture holds its start slots: Studio POST /api/probe (mesh floors, 2026-11-09) shows a raised pile at y 116 over x 220-270, z 240-260 (sh_dm_boulders and crystals at 242, 242) and the drivable snow floor at y 100-106 around it; the player's car starts at (240, 104 + 2, 215) on the north band facing +z and the seven AI cars on probed floor spots (north band z 200-210, south band z 290-310), 2 m up; the client's physics settles them. Sky as the Snowhill soccer arena (soccer.json). geometry_id 102 is the Wildwood arena's and is unverified here. Native item 14 corrects these. Power-ups: the capture's four kinds and definitions at four probed floor spots, 1 m up (R)."
+        },
+        {
+          "kind": "video",
+          "evidence": "The arena's results board names its drivers: Frost Ridge afyPqIZqD-U_250.00 (Skids Smash 'n' Dash, Ariana Iceblock, Spike Slickclash, J. P. Screecher, Flash Jammer, Erica Diggs, Dani Frostflash); Tangletrack Q5gizyhmuZ0_120.00 and _248.00 (Jammer Blindrush, Kat Darkhollow, Scarlett Slamdash, Jarid Lockgear Jr, Flash Sideswipe, Dee Driftcatcher). Name ids from the client locale; (R) bodies reuse the Wildwood roster's models except Erica Diggs 1311 and J. P. Screecher 1321 (FreeRealms-Legacy Npcs.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte 'Defeating Diggs' (Frost Ridge): Knock out Erica Diggs 3 times; come in 1st place (client locale 395066 'Knock out Erica Diggs 3 times'). Erica Diggs is Frost Ridge slot 6 (19355)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
         }
-      ]
+      ],
+      "scene": {
+        "envelope_flag": 1,
+        "scene": "sh_dm_arena",
+        "type_id": 2,
+        "position": [240.0, 106.0, 215.0, 1.0],
+        "rotation": [0.0, 0.0, 1.0, 0.0],
+        "sky": "sky_snowhill24.xml",
+        "tutorial": false,
+        "unknown": 3,
+        "id": 0,
+        "update_radius": 0.0,
+        "geometry_id": 102,
+        "override_update_radius": true,
+        "wait_for_zone_ready": false
+      },
+      "start_transform_bits": [1065353216, 0, 2147483648, 0, 0, 1065353216, 0, 0, 0, 0, 1065353216, 0, 1131413504, 1121189888, 1129775104, 1065353216],
+      "npc_start_transform_bits": [
+        [1055193390, 0, 3211065646, 0, 0, 1065353216, 0, 0, 1063581998, 0, 1055193390, 0, 1130758144, 1121320960, 1129447424, 1065353216],
+        [1055193390, 0, 1063581998, 0, 0, 1065353216, 0, 0, 3211065646, 0, 1055193390, 0, 1132068864, 1121189888, 1129447424, 1065353216],
+        [1058642330, 0, 1061997773, 0, 0, 1065353216, 0, 0, 3209481421, 0, 1058642330, 0, 1132593152, 1121452032, 1128792064, 1065353216],
+        [1058642330, 0, 3209481421, 0, 0, 1065353216, 0, 0, 1061997773, 0, 1058642330, 0, 1130102784, 1121583104, 1128792064, 1065353216],
+        [3212689693, 0, 3188151789, 0, 0, 1065353216, 0, 0, 1040668141, 0, 3212689693, 0, 1130758144, 1120927744, 1133576192, 1065353216],
+        [3212689693, 0, 1040668141, 0, 0, 1065353216, 0, 0, 3188151789, 0, 3212689693, 0, 1132068864, 1120927744, 1133576192, 1065353216],
+        [3212836864, 0, 2769105202, 0, 0, 1065353216, 0, 0, 621621554, 0, 3212836864, 0, 1131413504, 1120665600, 1134231552, 1065353216]
+      ],
+      "npc_drivers": [
+        {
+          "name_string_id": 19354,
+          "model_id": 1331
+        },
+        {
+          "name_string_id": 19357,
+          "model_id": 888
+        },
+        {
+          "name_string_id": 19352,
+          "model_id": 870
+        },
+        {
+          "name_string_id": 19351,
+          "model_id": 1321
+        },
+        {
+          "name_string_id": 19353,
+          "model_id": 891
+        },
+        {
+          "name_string_id": 19355,
+          "model_id": 1311
+        },
+        {
+          "name_string_id": 19356,
+          "model_id": 870
+        }
+      ],
+      "goal": {
+        "named_knockouts": {
+          "19355": 3
+        },
+        "max_placement": 1
+      }
     },
     {
       "game_id": 613,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
       "pickups": null,
       "completion_reward_coins": null,
@@ -621,7 +1465,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -636,14 +1481,10 @@
     },
     {
       "game_id": 614,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
       "pickups": null,
       "completion_reward_coins": null,
@@ -653,7 +1494,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -668,14 +1510,10 @@
     },
     {
       "game_id": 617,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
       "pickups": null,
       "completion_reward_coins": null,
@@ -685,7 +1523,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -695,19 +1534,26 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule: completion only on the one arena package; which arena and which rivals the row's text names are not modelled, and no score, placement or knock-out bound is certified. NPC assignment and driving as the other hosted rows."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte 'The Odd Audition' (Wildwood): Knock out 10 cars."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
         }
-      ]
+      ],
+      "goal": {
+        "min_knockouts": 10
+      }
     },
     {
       "game_id": 618,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
       "pickups": null,
       "completion_reward_coins": null,
@@ -717,7 +1563,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -727,19 +1574,27 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule: completion only on the one arena package; which arena and which rivals the row's text names are not modelled, and no score, placement or knock-out bound is certified. NPC assignment and driving as the other hosted rows."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte 'Stunt Double' (Wildwood): Come in 1st place; don't get knocked out more than 3 times."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
         }
-      ]
+      ],
+      "goal": {
+        "max_placement": 1,
+        "max_knockouts_taken": 3
+      }
     },
     {
       "game_id": 619,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
       "pickups": null,
       "completion_reward_coins": null,
@@ -749,7 +1604,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -759,19 +1615,26 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule: completion only on the one arena package; which arena and which rivals the row's text names are not modelled, and no score, placement or knock-out bound is certified. NPC assignment and driving as the other hosted rows."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte 'Action!' (Wildwood): Score 16 points."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
         }
-      ]
+      ],
+      "goal": {
+        "min_score": 16
+      }
     },
     {
       "game_id": 620,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
       "pickups": null,
       "completion_reward_coins": null,
@@ -781,7 +1644,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -791,19 +1655,32 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule: completion only on the one arena package; which arena and which rivals the row's text names are not modelled, and no score, placement or knock-out bound is certified. NPC assignment and driving as the other hosted rows."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte 'Hurtin' Crewe Act II' (Wildwood): collect a health, attack, boost overload and shield power-up, then Go Ultimate. (R) The order and the early end when Ultimate comes last are not modelled; the clock ends the match."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
         }
-      ]
+      ],
+      "goal": {
+        "pickups": {
+          "health": 1,
+          "attack_up": 1,
+          "boost": 1,
+          "shield": 1,
+          "ultimate": 1
+        }
+      }
     },
     {
       "game_id": 621,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
       "pickups": null,
       "completion_reward_coins": null,
@@ -813,7 +1690,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -823,21 +1701,93 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule: completion only on the one arena package; which arena and which rivals the row's text names are not modelled, and no score, placement or knock-out bound is certified. NPC assignment and driving as the other hosted rows."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte 'Encore!' (Wildwood): Knock out Sir Horace 3 times (client locale 395075). (R) Sir Horace (394257) takes Wildwood slot 1 with a reused body."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
         }
-      ]
+      ],
+      "npc_drivers": [
+        {
+          "name_string_id": 394257,
+          "model_id": 1331
+        },
+        {
+          "name_string_id": 19366,
+          "model_id": 1297
+        },
+        {
+          "name_string_id": 19367,
+          "model_id": 870
+        },
+        {
+          "name_string_id": 19368,
+          "model_id": 891
+        },
+        {
+          "name_string_id": 19369,
+          "model_id": 888
+        },
+        {
+          "name_string_id": 19370,
+          "model_id": 870
+        },
+        {
+          "name_string_id": 19371,
+          "model_id": 870
+        }
+      ],
+      "goal": {
+        "named_knockouts": {
+          "394257": 3
+        }
+      }
     },
     {
       "game_id": 622,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
-      "pickups": null,
+      "pickups": [
+        {
+          "id": 1,
+          "definition_id": 469,
+          "kind": "health",
+          "position_bits": [1133248512, 1074580685, 1132068864, 1065353216],
+          "unknown_floats_bits": [1069547520, 1374],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 2,
+          "definition_id": 469,
+          "kind": "health",
+          "position_bits": [1133248512, 1074580685, 1133412352, 1065353216],
+          "unknown_floats_bits": [1069547520, 1374],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 3,
+          "definition_id": 943,
+          "kind": "boost",
+          "position_bits": [1134723072, 1082759578, 1133576192, 1065353216],
+          "unknown_floats_bits": [1069547520, 1349],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 4,
+          "definition_id": 486,
+          "kind": "shield",
+          "position_bits": [1134886912, 1074580685, 1131741184, 1065353216],
+          "unknown_floats_bits": [1069547520, 1274],
+          "response_parameters_bits": [0, 0, 0]
+        }
+      ],
       "completion_reward_coins": null,
       "completion_reward_xp": null,
       "npc_driving": {
@@ -845,7 +1795,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -855,21 +1806,127 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule: completion only on the one arena package; which arena and which rivals the row's text names are not modelled, and no score, placement or knock-out bound is certified. NPC assignment and driving as the other hosted rows."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Tangletrack's arena is the client's bw_dm_arena (the purple-floored Briarwood arena in Q5gizyhmuZ0_120.00; sheet C8; maps.md 5.3). No capture holds its start slots: Studio POST /api/probe (mesh floors, 2026-11-09) shows one flat floor at y 1.22 over x 265-330, z 235-295, rising east of x 340; the player's car starts at (305, 1.2 + 2, 265) facing +z and the seven AI cars on a 20 m ring around it facing in, all on that floor; the client's physics settles them. Sky as the Briarwood soccer arena (soccer.json). geometry_id 102 is the Wildwood arena's and is unverified here. Native item 14 corrects these. Power-ups: the capture's four kinds and definitions at four probed floor spots, 1 m up (R)."
+        },
+        {
+          "kind": "video",
+          "evidence": "The arena's results board names its drivers: Frost Ridge afyPqIZqD-U_250.00 (Skids Smash 'n' Dash, Ariana Iceblock, Spike Slickclash, J. P. Screecher, Flash Jammer, Erica Diggs, Dani Frostflash); Tangletrack Q5gizyhmuZ0_120.00 and _248.00 (Jammer Blindrush, Kat Darkhollow, Scarlett Slamdash, Jarid Lockgear Jr, Flash Sideswipe, Dee Driftcatcher). Name ids from the client locale; (R) bodies reuse the Wildwood roster's models except Erica Diggs 1311 and J. P. Screecher 1321 (FreeRealms-Legacy Npcs.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte 'Down and Dirty Derby' (Tangletrack): Come in 1st place; collect 4 attack power-ups."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
         }
-      ]
+      ],
+      "scene": {
+        "envelope_flag": 1,
+        "scene": "bw_dm_arena",
+        "type_id": 2,
+        "position": [305.0, 3.0, 265.0, 1.0],
+        "rotation": [0.0, 0.0, 1.0, 0.0],
+        "sky": "sky_briarwood24.xml",
+        "tutorial": false,
+        "unknown": 3,
+        "id": 0,
+        "update_radius": 0.0,
+        "geometry_id": 102,
+        "override_update_radius": true,
+        "wait_for_zone_ready": false
+      },
+      "start_transform_bits": [1065353216, 0, 2147483648, 0, 0, 1065353216, 0, 0, 0, 0, 1065353216, 0, 1134067712, 1077936128, 1132756992, 1065353216],
+      "npc_start_transform_bits": [
+        [613232946, 0, 1065353216, 0, 0, 1065353216, 0, 0, 3212836864, 0, 613232946, 0, 1134723072, 1077936128, 1132756992, 1065353216],
+        [3209176604, 0, 1059036423, 0, 0, 1065353216, 0, 0, 3206520071, 0, 3209176604, 0, 1134476322, 1077936128, 1133269373, 1065353216],
+        [3212416224, 0, 3194215559, 0, 0, 1065353216, 0, 0, 1046731911, 0, 3212416224, 0, 1133921881, 1077936128, 1133395921, 1065353216],
+        [3202229762, 0, 3211175397, 0, 0, 1065353216, 0, 0, 1063691749, 0, 3202229762, 0, 1133477253, 1077936128, 1133041342, 1065353216],
+        [1054746114, 0, 3211175397, 0, 0, 1065353216, 0, 0, 1063691749, 0, 1054746114, 0, 1133477253, 1077936128, 1132472642, 1065353216],
+        [1064932576, 0, 3194215559, 0, 0, 1065353216, 0, 0, 1046731911, 0, 1064932576, 0, 1133921881, 1077936128, 1131774046, 1065353216],
+        [1061692956, 0, 1059036423, 0, 0, 1065353216, 0, 0, 3206520071, 0, 1061692956, 0, 1134476322, 1077936128, 1132027142, 1065353216]
+      ],
+      "npc_drivers": [
+        {
+          "name_string_id": 19337,
+          "model_id": 1331
+        },
+        {
+          "name_string_id": 19340,
+          "model_id": 888
+        },
+        {
+          "name_string_id": 19338,
+          "model_id": 1297
+        },
+        {
+          "name_string_id": 19343,
+          "model_id": 891
+        },
+        {
+          "name_string_id": 19341,
+          "model_id": 870
+        },
+        {
+          "name_string_id": 19339,
+          "model_id": 888
+        },
+        {
+          "name_string_id": 19342,
+          "model_id": 870
+        }
+      ],
+      "goal": {
+        "max_placement": 1,
+        "pickups": {
+          "attack_up": 4
+        }
+      }
     },
     {
       "game_id": 623,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
-      "pickups": null,
+      "pickups": [
+        {
+          "id": 1,
+          "definition_id": 469,
+          "kind": "health",
+          "position_bits": [1133248512, 1074580685, 1132068864, 1065353216],
+          "unknown_floats_bits": [1069547520, 1374],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 2,
+          "definition_id": 469,
+          "kind": "health",
+          "position_bits": [1133248512, 1074580685, 1133412352, 1065353216],
+          "unknown_floats_bits": [1069547520, 1374],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 3,
+          "definition_id": 943,
+          "kind": "boost",
+          "position_bits": [1134723072, 1082759578, 1133576192, 1065353216],
+          "unknown_floats_bits": [1069547520, 1349],
+          "response_parameters_bits": [0, 0, 0]
+        },
+        {
+          "id": 4,
+          "definition_id": 486,
+          "kind": "shield",
+          "position_bits": [1134886912, 1074580685, 1131741184, 1065353216],
+          "unknown_floats_bits": [1069547520, 1274],
+          "response_parameters_bits": [0, 0, 0]
+        }
+      ],
       "completion_reward_coins": null,
       "completion_reward_xp": null,
       "npc_driving": {
@@ -877,7 +1934,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -887,19 +1945,89 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule: completion only on the one arena package; which arena and which rivals the row's text names are not modelled, and no score, placement or knock-out bound is certified. NPC assignment and driving as the other hosted rows."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Tangletrack's arena is the client's bw_dm_arena (the purple-floored Briarwood arena in Q5gizyhmuZ0_120.00; sheet C8; maps.md 5.3). No capture holds its start slots: Studio POST /api/probe (mesh floors, 2026-11-09) shows one flat floor at y 1.22 over x 265-330, z 235-295, rising east of x 340; the player's car starts at (305, 1.2 + 2, 265) facing +z and the seven AI cars on a 20 m ring around it facing in, all on that floor; the client's physics settles them. Sky as the Briarwood soccer arena (soccer.json). geometry_id 102 is the Wildwood arena's and is unverified here. Native item 14 corrects these. Power-ups: the capture's four kinds and definitions at four probed floor spots, 1 m up (R)."
+        },
+        {
+          "kind": "video",
+          "evidence": "The arena's results board names its drivers: Frost Ridge afyPqIZqD-U_250.00 (Skids Smash 'n' Dash, Ariana Iceblock, Spike Slickclash, J. P. Screecher, Flash Jammer, Erica Diggs, Dani Frostflash); Tangletrack Q5gizyhmuZ0_120.00 and _248.00 (Jammer Blindrush, Kat Darkhollow, Scarlett Slamdash, Jarid Lockgear Jr, Flash Sideswipe, Dee Driftcatcher). Name ids from the client locale; (R) bodies reuse the Wildwood roster's models except Erica Diggs 1311 and J. P. Screecher 1321 (FreeRealms-Legacy Npcs.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte 'Not One, But a Few' (Tangletrack): Come in 1st place."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
         }
-      ]
+      ],
+      "scene": {
+        "envelope_flag": 1,
+        "scene": "bw_dm_arena",
+        "type_id": 2,
+        "position": [305.0, 3.0, 265.0, 1.0],
+        "rotation": [0.0, 0.0, 1.0, 0.0],
+        "sky": "sky_briarwood24.xml",
+        "tutorial": false,
+        "unknown": 3,
+        "id": 0,
+        "update_radius": 0.0,
+        "geometry_id": 102,
+        "override_update_radius": true,
+        "wait_for_zone_ready": false
+      },
+      "start_transform_bits": [1065353216, 0, 2147483648, 0, 0, 1065353216, 0, 0, 0, 0, 1065353216, 0, 1134067712, 1077936128, 1132756992, 1065353216],
+      "npc_start_transform_bits": [
+        [613232946, 0, 1065353216, 0, 0, 1065353216, 0, 0, 3212836864, 0, 613232946, 0, 1134723072, 1077936128, 1132756992, 1065353216],
+        [3209176604, 0, 1059036423, 0, 0, 1065353216, 0, 0, 3206520071, 0, 3209176604, 0, 1134476322, 1077936128, 1133269373, 1065353216],
+        [3212416224, 0, 3194215559, 0, 0, 1065353216, 0, 0, 1046731911, 0, 3212416224, 0, 1133921881, 1077936128, 1133395921, 1065353216],
+        [3202229762, 0, 3211175397, 0, 0, 1065353216, 0, 0, 1063691749, 0, 3202229762, 0, 1133477253, 1077936128, 1133041342, 1065353216],
+        [1054746114, 0, 3211175397, 0, 0, 1065353216, 0, 0, 1063691749, 0, 1054746114, 0, 1133477253, 1077936128, 1132472642, 1065353216],
+        [1064932576, 0, 3194215559, 0, 0, 1065353216, 0, 0, 1046731911, 0, 1064932576, 0, 1133921881, 1077936128, 1131774046, 1065353216],
+        [1061692956, 0, 1059036423, 0, 0, 1065353216, 0, 0, 3206520071, 0, 1061692956, 0, 1134476322, 1077936128, 1132027142, 1065353216]
+      ],
+      "npc_drivers": [
+        {
+          "name_string_id": 19337,
+          "model_id": 1331
+        },
+        {
+          "name_string_id": 19340,
+          "model_id": 888
+        },
+        {
+          "name_string_id": 19338,
+          "model_id": 1297
+        },
+        {
+          "name_string_id": 19343,
+          "model_id": 891
+        },
+        {
+          "name_string_id": 19341,
+          "model_id": 870
+        },
+        {
+          "name_string_id": 19339,
+          "model_id": 888
+        },
+        {
+          "name_string_id": 19342,
+          "model_id": 870
+        }
+      ],
+      "goal": {
+        "max_placement": 1
+      }
     },
     {
       "game_id": 625,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": null
       },
       "pickups": null,
       "completion_reward_coins": null,
@@ -909,7 +2037,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -919,19 +2048,26 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule: completion only on the one arena package; which arena and which rivals the row's text names are not modelled, and no score, placement or knock-out bound is certified. NPC assignment and driving as the other hosted rows."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fanbyte 'Thunder Falls Crash for Coin': Knock out 12 cars."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
         }
-      ]
+      ],
+      "goal": {
+        "min_knockouts": 12
+      }
     },
     {
       "game_id": 626,
-      "npcs": [
-        9000000391,
-        9000000289,
-        9500000731,
-        9000000183
-      ],
+      "npcs": [9000000391, 9000000289, 9500000731, 9000000183],
       "rules": {
-        "time_limit_ms": 240000
+        "time_limit_ms": 240000,
+        "score_target": 22
       },
       "pickups": null,
       "completion_reward_coins": null,
@@ -941,7 +2077,8 @@
         "speed_mps": 13.0,
         "spawn_radius_m": 25.0,
         "bump_impact": 500.0,
-        "bump_interval_ms": 1500
+        "bump_interval_ms": 1500,
+        "human_chasers": 4
       },
       "source": [
         {
@@ -951,8 +2088,19 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rule: completion only on the one arena package; which arena and which rivals the row's text names are not modelled, and no score, placement or knock-out bound is certified. NPC assignment and driving as the other hosted rows."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "client text 394481 'The Wildwood Derby 1000 ... Whoever scores 22 points first takes home the prize' and goal 394053 'Take first place during the Wildwood Derby 1000!': this row keeps the first-to-22 target with its 240 s clock and asks first place."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
         }
-      ]
+      ],
+      "goal": {
+        "max_placement": 1
+      }
     }
   ]
 }

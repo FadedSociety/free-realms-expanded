@@ -25,7 +25,7 @@ use crate::{
     character_store::CharacterState,
     content::{MinigameRow, SourceTag, check_sources, read_minigame_rows},
     derby::{
-        DEMO_DERBY_LOBBY_NAME_ID, DEMO_DERBY_TYPE_ID, DerbyAction, DerbyError,
+        DEMO_DERBY_LOBBY_NAME_ID, DEMO_DERBY_TYPE_ID, DerbyAction, DerbyError, DerbyGoal,
         DerbyParticipantResult, DerbyPhase, DerbyPickup, DerbyRules, DerbyService,
         DerbyVehicleTemplate, NpcDriving, ParticipantKey,
     },
@@ -58,7 +58,8 @@ pub const MAX_COMPLETION_REWARD: u32 = 10_000;
 pub const MAX_DERBY_ROWS: usize = 32;
 /// Save-size bound on the paid-match ledger; the newest rows are kept.
 pub const MAX_PAID_MATCHES: usize = 32;
-const MAX_ROWS_BYTES: usize = 64 * 1024;
+/// (R) Size bound on `derby_rows.json`; the arena rows carry start slots and pickups per row.
+const MAX_ROWS_BYTES: usize = 256 * 1024;
 /// The hosted-row proof beside `derby_entry.json`; see the module docs.
 pub const MINIGAMES_FILE: &str = "derby_minigames.json";
 const ACTIVE_STATUS_MASK: u32 = (1 << crate::derby::DERBY_ACTIVE_STATUS_BIT) | 1;
@@ -96,6 +97,9 @@ pub struct DerbyGatewayContent {
     /// driver.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub npc_drivers: Vec<crate::derby::DerbyDriver>,
+    /// (R) The row's goal for its quest credit (`DerbyGoal`); none credits on finishing.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub goal: Option<DerbyGoal>,
     /// Retired F117 payout row. Accepted and ignored only so an operator's F117-era
     /// `derby_entry.json` still loads; `completion_reward_coins`/`_xp` replaced it (F206/T219).
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -122,6 +126,24 @@ struct DerbyRowContent {
     /// L931 (R): chase-and-bump NPC drivers for this row; unset keeps inert placeholder NPCs.
     #[serde(default)]
     npc_driving: Option<NpcDriving>,
+    /// The arena this row zones into (Frost Ridge's `sh_dm_arena`, Tangletrack's `bw_dm_arena`);
+    /// unset inherits the default package's.
+    #[serde(default)]
+    scene: Option<ZoneTransition>,
+    /// The player's car start transform in that arena (row-major 4x4 bits, as the vehicle's);
+    /// unset keeps the default package's slot.
+    #[serde(default)]
+    start_transform_bits: Option<[u32; 16]>,
+    /// The AI cars' start slots in that arena, slot 1 first (row-major 4x4 bits); the bodies stay
+    /// the default package's. A slot past the end keeps its default transform.
+    #[serde(default)]
+    npc_start_transform_bits: Option<Vec<[u32; 16]>>,
+    /// The arena's AI drivers by slot (the roster the row fields).
+    #[serde(default)]
+    npc_drivers: Option<Vec<crate::derby::DerbyDriver>>,
+    /// (R) The row's goal; unset inherits the default package's (none for free play).
+    #[serde(default)]
+    goal: Option<DerbyGoal>,
     source: Vec<SourceTag>,
 }
 
@@ -393,13 +415,31 @@ fn resolve_row(
                 .map_err(|error| invalid(format!("derby row {}: {error}", row.game_id)))?
         }
     };
+    let mut vehicle = default.vehicle.clone();
+    if let Some(start) = row.start_transform_bits {
+        vehicle.start_transform_bits = start;
+    }
+    let mut npc_vehicles = default.npc_vehicles.clone();
+    if let Some(slots) = row.npc_start_transform_bits {
+        if slots.len() > npc_vehicles.len() {
+            return Err(invalid(format!(
+                "derby row {} places more AI cars than the package has",
+                row.game_id
+            )));
+        }
+        for (car, start) in npc_vehicles.iter_mut().zip(slots) {
+            car.start_transform_bits = start;
+        }
+    }
     let package = DerbyGatewayContent {
         schema_version: default.schema_version,
         game_id: row.game_id,
-        vehicle: default.vehicle.clone(),
-        scene: default.scene.clone(),
-        npc_vehicles: default.npc_vehicles.clone(),
-        npc_drivers: default.npc_drivers.clone(),
+        vehicle,
+        scene: row.scene.or_else(|| default.scene.clone()),
+        npc_vehicles,
+        npc_drivers: row
+            .npc_drivers
+            .unwrap_or_else(|| default.npc_drivers.clone()),
         rules,
         pickups: row.pickups.unwrap_or_else(|| default.pickups.clone()),
         pickup_schedule: default.pickup_schedule.clone(),
@@ -409,6 +449,7 @@ fn resolve_row(
         completion_reward_xp: row
             .completion_reward_xp
             .unwrap_or(default.completion_reward_xp),
+        goal: row.goal.or_else(|| default.goal.clone()),
         reward: None,
     };
     validate_content(&package)
@@ -515,8 +556,11 @@ impl DerbyGateway {
                 Some((i32::try_from(row.id).ok()?, name))
             })
             .collect();
-        let mut game_ids = BTreeSet::from([content.game_id]);
+        let mut game_ids = BTreeSet::new();
         let mut hosted = Vec::with_capacity(rows.len() + 1);
+        // A row carrying the default package's own id overrides the default row (its rules, NPCs,
+        // goal); `derby_entry.json` itself stays as captured.
+        let mut default_row = None;
         for row in rows {
             if row.game_id <= 0 {
                 return Err(invalid(format!(
@@ -530,16 +574,23 @@ impl DerbyGateway {
                     row.game_id
                 )));
             }
-            hosted.push(resolve_row(row, &content, &gate_npcs, minigames)?);
+            let driving = row.npc_driving.or(default_npc_driving);
+            let mut resolved = resolve_row(row, &content, &gate_npcs, minigames)?;
+            if resolved.game_id() == content.game_id {
+                resolved.npc_driving = driving;
+                default_row = Some(resolved);
+            } else {
+                hosted.push(resolved);
+            }
         }
         let content = Arc::new(content);
         hosted.insert(
             0,
-            DerbyRow {
+            default_row.unwrap_or_else(|| DerbyRow {
                 package: Arc::clone(&content),
                 npcs: gate_npcs,
                 npc_driving: default_npc_driving,
-            },
+            }),
         );
         Ok(Self {
             content,
@@ -690,6 +741,9 @@ impl DerbyGateway {
             .map_err(|error| invalid(error.to_string()))?;
         service
             .set_npc_drivers(package.npc_drivers.clone())
+            .map_err(|error| invalid(error.to_string()))?;
+        service
+            .set_goal(package.goal.clone().unwrap_or_default())
             .map_err(|error| invalid(error.to_string()))?;
         service.set_name_id(self.row_names.get(&package.game_id).copied());
         service.set_pickup_schedule(package.pickup_schedule.clone());
@@ -847,6 +901,14 @@ impl DerbyGateway {
         Some(instance)
     }
 
+    /// (R) Whether the live row (the default package when none is live) asks a goal of its match.
+    pub fn has_goal(&self) -> bool {
+        self.active_package()
+            .goal
+            .as_ref()
+            .is_some_and(|goal| !goal.is_empty())
+    }
+
     /// (R) T787: the owner's own result facts once the match is showing Results.
     /// `None` before Results or for a foreign key; the quest credit then carries no
     /// score, placement or knock-out claim.
@@ -1001,9 +1063,25 @@ fn validate_content(content: &DerbyGatewayContent) -> io::Result<()> {
         content.pickups.clone(),
     )
     .map_err(|error: DerbyError| invalid(error.to_string()))?;
-    // The AI cars and drivers are checked at load too, not first at a player's entry.
+    // The AI cars, drivers and goal are checked at load too, not first at a player's entry.
     service
         .set_npc_vehicles(content.npc_vehicles.clone())
         .and_then(|()| service.set_npc_drivers(content.npc_drivers.clone()))
-        .map_err(|error| invalid(error.to_string()))
+        .and_then(|()| service.set_goal(content.goal.clone().unwrap_or_default()))
+        .map_err(|error| invalid(error.to_string()))?;
+    // A named knock-out goal needs that driver in the row's roster, or it could never be met.
+    let fielded = |name: &i32| {
+        content
+            .npc_drivers
+            .iter()
+            .any(|driver| driver.name_string_id == *name)
+    };
+    if content
+        .goal
+        .as_ref()
+        .is_some_and(|goal| !goal.named_knockouts.keys().all(fielded))
+    {
+        return Err(invalid("derby goal names a driver the row does not field"));
+    }
+    Ok(())
 }
