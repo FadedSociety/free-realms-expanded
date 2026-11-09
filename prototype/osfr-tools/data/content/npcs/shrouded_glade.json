@@ -6105,11 +6105,18 @@
             "kind": "legacy-data",
             "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:203; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1436 (ModelId=468, ModelFileName=fairy_druid_m.adr, NameId=45356)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.513423,
       "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr"
+      "model_file_name": "fairy_druid_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000659,
@@ -6637,10 +6644,23 @@
               "evidence": "Popularly Healthy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_popularly_healthy_1cc042)."
             }
           ]
+        },
+        {
+          "quest_id": 3954662,
+          "title": "Only the Freshest",
+          "title_string_id": 428822,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Only the Freshest (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_only_the_freshest_90c392)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3951987
+        3951987,
+        3954662
       ],
       "quests_given_text": [
         "Gumbo, Choychoy and gathering requests (736487779; 647277422 \"overwhelmed with orders\"; 2037818938; 817411980; 2009413847; title entries \"Gummyfruit Gumbo\" ucdt 1322860907 and \"Crispy Choychoy Delight\" ucdt 1373537820); a mystery-meat stock (\"Chef Safrie in Shrouded Glade might have some\", 1543421549). See the row on Chef (\"no complete quest mapping\")."
@@ -13799,8 +13819,49 @@
       "location_evidence": [
         "The Gardener's Hutch (\"Edvard is tending to plant life at the Gardner's Hutch.\" 2307488951; \"Speak to Edvard Leafsnipper at the Gardener's Hutch.\" 3413491354). Video: nameplate next to Emil Jadefish and the round tree house (EkNbw2nCVQc/00012, /00014, /00016, /00018); RbRv_A5daaQ/00212, /00230 (distance marker) beside a wooden water tower."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954730,
+          "title": "Strong Soil",
+          "title_string_id": 16503,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Strong Soil (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_strong_soil_90814e)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3954900,
+          "title": "Growing Green",
+          "title_string_id": 91904,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Growing Green (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_growing_green_1b687a)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3954876,
+          "title": "Feel Better Flowers",
+          "title_string_id": 385478,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Feel Better Flowers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_feel_better_flowers_f19101)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954730,
+        3954900,
+        3954876
+      ],
       "quests_given_text": [
         "Edvard's gardening: missing tools (484860584; shovels 853289627, watering buckets 1160798607, fertilizer bags 1246254551, gardening picks 3794212657, \"Return the missing garden tools to Edvard Leafsnipper at the Gardener's Hutch.\" 1480660843); fertilizer (\"Edvard makes his own special blend of fertilizer ... harvest sunleaf, punkin, and rainleaf.\" 1191354260; \"Edvard would like for you to add the fertilizer to potted ferns around Shrouded Glade.\" 3346727576; 275780311 \"yellow potted ferns\"); a well-water planting task (2268351299). The post-invasion helper line: \"Things have been difficult since the invasion. The lights are still acting up, and Edvard the gardener has been having trouble regrowing his plants.\" (3115356372). Items \"Edvard's Fertilizer\" (763047425), \"Edvard's Shovel\" (3688564881), \"Edvard's Gardening Pick\" (556949301). Rare flower to Ceard (3168642161)."
       ],
@@ -14260,11 +14321,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:146; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1371 (ModelId=468, ModelFileName=fairy_druid_m.adr, NameId=45324)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.710733,
       "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr"
+      "model_file_name": "fairy_druid_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000675,
@@ -20927,9 +20995,23 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part A. Rumble Ridge: the Freewheelers and Wheelie Pete's Roadhouse, row 35; source cell: [client][video][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3954475,
+          "title": "A Helping Hand",
+          "title_string_id": 3783,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Helping Hand (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_helping_hand_f4bb2c)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3954475
+      ],
       "quests_given_text": [
         "The druid arc, see #Quest index: Fortify Our Defenses, Essssspionage and the later druid titles (\"Headmaster Merk wants you to set up a defense for the Druid Camp\" 2188759314; \"Headmaster Merk needs you to find evidence that the Dwarves are behind the invasion\" 754690363; \"Speak with Headmaster Merk to help take back Shrouded Glade.\" 1812947502); hands over Power Stones (3121392492).",
         "Friend or Foe: The Tradesgoblin and Friend or Foe: The Monster (wiki Sunstone list); target of Aiding our Allies and the middle stop in Friend or Foe: The Savage; gives the Gloam power stone in House Cleaning (\"Take this power stone. Use it to absorb the Gloam influence off of the spikes\", 402239456)."
@@ -28610,11 +28692,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:198; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1431 (ModelId=456, ModelFileName=fairy_druid_f.adr, NameId=45382)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.556232,
       "model_id": 456,
-      "model_file_name": "fairy_druid_f.adr"
+      "model_file_name": "fairy_druid_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000708,
@@ -29161,8 +29250,23 @@
       "location_evidence": [
         "\"Near the greenhouse left of the Druid Academy\" (3297457098); \"at the greenhouse in Shrouded Glade\" (728830620). Not in video."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954688,
+          "title": "Power Source",
+          "title_string_id": 91619,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Power Source (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_power_source_313708)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954688
+      ],
       "quests_given_text": [
         "Light sources (\"Phyll has asked you to check all of the light sources around Shrouded Glade to make sure they are still glowing brightly.\" 2425225872; 23 of them, 2244724547); receives Tran's rare flower (\"Deliver the flower to Phyll Chlorowing in Shrouded Glade.\" 34073552); Jack's flower (examines what Halle's cat Jack brought back, 319637804, 637881647, 3400054560; plants a seed and checks it, 1352505336, 2770299069)."
       ],
@@ -32045,8 +32149,23 @@
       "location_evidence": [
         "The Academy grounds. Video: nameplate beside Arestol and Erid Torridwick (T1Gie2A5nEE/00024, /00034); xKFWYQT6AHE/00206 (glowing green arched gateway)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954534,
+          "title": "Cool Kids",
+          "title_string_id": 384411,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cool Kids (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cool_kids_a7981f)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954534
+      ],
       "quests_given_text": [
         "Looking for Lavender stop (title ucdt 2150004359; Feldman in Sanctuary: \"Talk to Suni Sorrowsmile in the Shrouded Glade. Return to Feldman in Sanctuary when done.\" 690633245; \"Feldman got a tip that Lavender's old classmate, Suni Sorrowsmile at Shrouded Glade, might have some useful information.\" 2592016959; Sanctuary page row Feldman); Ice magic notes (\"Suni Sorrowsmile wants to see if you can convince Arestol to borrow some notes on druid ice magic.\" 3997502434; deliver to Suni, 1684153362); asks the player to recruit Nayli (2131007632) and to unfreeze Keldon (507761266)."
       ],
@@ -32424,11 +32543,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:187; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1419 (ModelId=456, ModelFileName=fairy_druid_f.adr, NameId=45429)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.042622,
       "model_id": 456,
-      "model_file_name": "fairy_druid_f.adr"
+      "model_file_name": "fairy_druid_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000716,

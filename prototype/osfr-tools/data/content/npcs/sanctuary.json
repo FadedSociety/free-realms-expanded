@@ -10558,8 +10558,23 @@
       "location_evidence": [
         "Pixiewood Hills (4136650602)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3955038,
+          "title": "Toadal Trouble",
+          "title_string_id": 415279,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Toadal Trouble (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toadal_trouble_eb749d)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3955038
+      ],
       "quests_given_text": [
         "Toadal Trouble"
       ],
@@ -10931,9 +10946,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3651 spawnNpcWithGuid(33427); src/Resources/Npcs.json Id=33427"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -1.93813001
+      "heading": -1.93813001,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000459,
@@ -15328,10 +15350,23 @@
               "evidence": "Creepy Crawly Cards (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_creepy_crawly_cards_39c23c)."
             }
           ]
+        },
+        {
+          "quest_id": 3954510,
+          "title": "Bound for Blackspore",
+          "title_string_id": 46148,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Bound for Blackspore (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bound_for_blackspore_45c668)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3953011
+        3953011,
+        3954510
       ],
       "quests_given_text": [
         "Creepy Crawly Cards (Super Spooktacular, wiki); pet-trick audience (4174833278)"
@@ -25071,10 +25106,23 @@
               "evidence": "title_string_id corrected from raw locale hash 1312962408 to Global.Text id 45368 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3954774,
+          "title": "Where is Everyone",
+          "title_string_id": 10166,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Where is Everyone (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_where_is_everyone_7d0c2e)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3150015
+        3150015,
+        3954774
       ],
       "quests_given_text": [
         "Warrior: Finding Facts About Fastvi; Where is Everyone?; Cakey Madness (Birthday Bash daily); A Profitable Package and A Formal Report (wiki appearances only); target of Chapter 1: Good Help is Hard to Find (Geoffrey gives it) and of Warrior: General Concerns (Warrior, Adventurer)"
@@ -31261,8 +31309,23 @@
       "location_evidence": [
         "Pixiewood Hills (wiki Birthday Bash); \"Helga Humbleloaf in Sanctuary\" (1166496790)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954573,
+          "title": "Feeding the Crowd",
+          "title_string_id": 428089,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Feeding the Crowd (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_feeding_the_crowd_b6c048)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954573
+      ],
       "quests_given_text": [
         "Feeding the Crowd (daily, Birthday Bash; client title 48859144; video tracker \"Gather bumbleberry 2/5\", xC7asgOhJKc/00024); a \"Food for All\" donation quest (wiki not found; client 2126401800, title unknown)"
       ],
@@ -31708,9 +31771,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3564 spawnNpcWithGuid(33334); src/Resources/Npcs.json Id=33334"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": 0.557256955
+      "heading": 0.557256955,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000107,
@@ -55413,12 +55483,25 @@
               "evidence": "title_string_id corrected from raw locale hash 3534696757 to Global.Text id 71480 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3954612,
+          "title": "History Comes Alive!",
+          "title_string_id": 15297,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "History Comes Alive! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_history_comes_alive_b403a5)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3150016,
         3150018,
-        3150019
+        3150019,
+        3954612
       ],
       "quests_given_text": [
         "Warrior: Achieve Level 15; Warrior: Legend of Fastvi Frostflutter; Warrior: Asking Old Folks (Warrior)"

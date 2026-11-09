@@ -1121,8 +1121,34 @@
       "title_string_id": 414943,
       "giver_npc_id": 9000000053,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 414987,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 414987 'Find a clue around the area', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "node_type": "quest-clue-2",
+          "quantity": 1
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Soccer Star: Trophy Detective pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1160,7 +1186,8 @@
       "description_string_id": 414944,
       "intro_text_string_id": 414942,
       "end_text_string_id": 414945,
-      "enabled": false
+      "enabled": true,
+      "job": 52
     },
     {
       "id": 3140022,

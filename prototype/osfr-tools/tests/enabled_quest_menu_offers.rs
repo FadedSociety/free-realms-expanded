@@ -480,7 +480,7 @@ impl Client {
 #[test]
 fn every_enabled_quest_is_offered_by_its_own_giver() {
     let shipped = shipped();
-    let fixture = Fixture::new();
+    let fixture = Fixture::new().with_bulk_quests();
     let enabled = shipped.enabled();
     let pass = shipped.walk_layers(&fixture, &enabled);
     let mut failures: Vec<String> = pass
@@ -535,7 +535,7 @@ fn every_enabled_quest_is_offered_by_its_own_giver() {
 #[test]
 fn a_disabled_quest_is_never_offered() {
     let shipped = shipped();
-    let fixture = Fixture::new();
+    let fixture = Fixture::new().with_bulk_quests();
     // A disabled record with objectives is refused by the disabled flag alone;
     // an empty one is refused twice over and is not sampled. The loader binds
     // a quest to its own giver only, so that giver is the one menu that could
@@ -573,7 +573,7 @@ fn a_disabled_quest_is_never_offered() {
 #[test]
 fn an_out_of_range_or_wrong_giver_click_offers_nothing() {
     let shipped = shipped();
-    let fixture = Fixture::new();
+    let fixture = Fixture::new().with_bulk_quests();
     let (mut client, quest, actor) = shipped.root_offer(&fixture);
     // Back to a quest the giver would offer, so every refusal below is the click's.
     assert!(client.send(quest_reply(quest, false)).unwrap().changed);
@@ -630,7 +630,7 @@ fn an_out_of_range_or_wrong_giver_click_offers_nothing() {
 #[test]
 fn the_offer_survives_a_real_reload_and_is_per_character() {
     let shipped = shipped();
-    let fixture = Fixture::new();
+    let fixture = Fixture::new().with_bulk_quests();
     // A giver with two enabled root quests under one job: one Talk offers one,
     // the next Talk the other.
     let mut roots = BTreeMap::<(u64, Option<i32>), Vec<u32>>::new();
@@ -710,7 +710,7 @@ fn the_offer_survives_a_real_reload_and_is_per_character() {
 #[test]
 fn the_offer_menu_does_not_consume_the_quest_or_the_actor() {
     let shipped = shipped();
-    let fixture = Fixture::new();
+    let fixture = Fixture::new().with_bulk_quests();
     let (mut client, quest, actor) = shipped.root_offer(&fixture);
     assert!(client.send(quest_reply(quest, false)).unwrap().changed);
     let before = (client.game.state(), saved(&client.game));
@@ -747,7 +747,7 @@ fn the_offer_menu_does_not_consume_the_quest_or_the_actor() {
 #[test]
 fn the_gate_uses_no_dev_commands() {
     let shipped = shipped();
-    let fixture = Fixture::new();
+    let fixture = Fixture::new().with_bulk_quests();
     let (client, quest, _) = shipped.root_offer(&fixture);
     for header in &MENU_REQUESTS[..3] {
         assert!(

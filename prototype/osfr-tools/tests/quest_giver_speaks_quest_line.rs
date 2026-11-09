@@ -17,7 +17,7 @@ fn offers(replies: &[Vec<u8>]) -> usize {
 
 #[test]
 fn a_lone_action_skips_the_wheel_and_a_giver_opens_on_its_quest_window() {
-    let fixture = Fixture::minimal(CHARACTER);
+    let fixture = Fixture::minimal(CHARACTER).with_bulk_quests();
     let mut game = zone_player(&fixture, CHARACTER, ADVENTURER);
     game.open_quests_directly();
     let character = character_at_for(CHARACTER, 0, content_position("briarwood.json", DARREL));
@@ -40,7 +40,7 @@ fn a_lone_action_skips_the_wheel_and_a_giver_opens_on_its_quest_window() {
 
 #[test]
 fn an_offer_left_open_is_offered_again_in_session_and_after_a_reload() {
-    let fixture = Fixture::minimal(CHARACTER);
+    let fixture = Fixture::minimal(CHARACTER).with_bulk_quests();
     let mut game = zone_player(&fixture, CHARACTER, ADVENTURER);
     game.open_quests_directly();
     let character = character_at_for(CHARACTER, 0, content_position("briarwood.json", DARREL));

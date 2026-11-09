@@ -3412,11 +3412,52 @@
               "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
             }
           ]
+        },
+        {
+          "quest_id": 3070011,
+          "title": "Fisherman: Bigger is Better",
+          "title_string_id": 419156,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Cluster B - Jonah Relicreel's bait (Sacred Grove Shallows), row 7; name 'Fisherman: Bigger is Better'; title id cell 3611566187 / 1268993754"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3070011 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row 5; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3070039,
-        3070007
+        3070007,
+        3070011
       ],
       "quests_given_text": [
         "Fisherman: McScuttle Family Farm (fish up Katie McScuttle's boots, 1523245831) and Fisherman: Setting Ernest Straight."
@@ -5337,8 +5378,23 @@
       "location_evidence": [
         "\"Near the farm at Rainbow Lake\" (737299599, 2254108162)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954580,
+          "title": "Finicky Felines",
+          "title_string_id": 409948,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Finicky Felines (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_finicky_felines_c8dabf)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954580
+      ],
       "quests_given_text": [
         "Feed her cats toothy tetra (3085461285, 3501614680; title not found); receives Derek's cheery-salmon bouquet (412924721, 3141180838)."
       ],
@@ -5644,10 +5700,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AKim_McScuttle"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 456,
-      "model_file_name": "fairy_druid_f.adr"
+      "model_file_name": "fairy_druid_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000348,
@@ -12155,8 +12218,23 @@
       "location_evidence": [
         "\"The camp just south of Lakeshore\" (1902395840). Wiki: Lakeshore. No video."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954585,
+          "title": "Flickering Flames",
+          "title_string_id": 41208,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Flickering Flames (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_flickering_flames_9b734f)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954585
+      ],
       "quests_given_text": [
         "\"Flickering Flames\" (client title 3747371429; wiki Quest:Flickering Flames is listed under her): collect bixie wax from Queensfields and flame flowers from Lakeshore (2821918514, 3015081219, 3496409322; \"Flame flowers grow near the water's edge in Lakeshore\", 3683204054)."
       ],
@@ -16262,46 +16340,6 @@
       ],
       "quests_given": [
         {
-          "quest_id": 3070033,
-          "title": "Fisherman: An Offering",
-          "title_string_id": 409413,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Cluster F - Lakeshore, Rainbow Lake and the McScuttle family, row 29; name 'Fisherman: An Offering'; title id cell 3719837526 / 1187024573"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3070033 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 3719837526 to Global.Text id 409413 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
           "quest_id": 3954085,
           "title": "Feed the Ducks",
           "title_string_id": 73289,
@@ -16315,7 +16353,6 @@
         }
       ],
       "quest_ids_given": [
-        3070033,
         3954085
       ],
       "quests_given_text": [

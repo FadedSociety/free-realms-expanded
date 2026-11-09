@@ -1010,9 +1010,90 @@
     {
       "id": 3060014,
       "title_string_id": 403457,
-      "giver_npc_id": 9000000495,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9000000289,
+      "prerequisite_quest_ids": [
+        3060009
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 400086,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Investigate the crash (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_curious_crash_da0f6f)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: model sg_broken_racecar_01.adr is in Models.txt, seen by eye below"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: blue and orange kart broken into pieces, loose wheels (sheets/b_world_click2.png r3c0, tile of sg_broken_racecar_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_demo_derby_curious_crash_da0f6f)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "world spawn of 902 stands 40 m from Crash Davis"
+            }
+          ],
+          "node_type": "quest-crash",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 394076,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pick up the helmet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_curious_crash_da0f6f)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: white and red racing helmet (sheets/g_items3.png r1c0, tile of freestyle_human_m_head_motorcyclehelmetplain.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_demo_derby_curious_crash_da0f6f)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "a player-head part; check it natively"
+            }
+          ],
+          "node_type": "quest-helmet-2",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 394077,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Nash Wright (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_curious_crash_da0f6f)."
+            }
+          ],
+          "npc_id": 9500003190
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 93090,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Crash Davis (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_curious_crash_da0f6f)."
+            }
+          ],
+          "npc_id": 9000000289
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1058,14 +1139,57 @@
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49,
+      "description_string_id": 393382,
+      "intro_text_string_id": 393382
     },
     {
       "id": 3060015,
       "title_string_id": 403458,
-      "giver_npc_id": 9000000495,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9000000289,
+      "prerequisite_quest_ids": [
+        3060014
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 394058,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Tucker Thunderjolt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_arena_revenge_d85ab6)."
+            }
+          ],
+          "npc_id": 9000000495
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 394078,
+          "minigame_id": 610,
+          "count": 1,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 2026-11-08: finishing this quest's own derby row 610 counts for this goal (Knock out every car); the goal's own condition is not modelled."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 394079,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Tucker Thunderjolt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_arena_revenge_d85ab6)."
+            }
+          ],
+          "npc_id": 9000000495
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1111,7 +1235,10 @@
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49,
+      "description_string_id": 393383,
+      "intro_text_string_id": 393383
     },
     {
       "id": 3060016,

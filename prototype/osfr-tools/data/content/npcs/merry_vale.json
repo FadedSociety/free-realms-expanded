@@ -15433,7 +15433,7 @@
       ],
       "name": "Lucky Chance McXander",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 5100463,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -25919,9 +25919,36 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part D. Townsfolk and visitors, row 72; source cell: [client][video]"
             }
           ]
+        },
+        {
+          "quest_id": 3954832,
+          "title": "Chores, What a Bore!",
+          "title_string_id": 41744,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Chores, What a Bore! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chores_what_a_bore_6e3949)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3954779,
+          "title": "A Delivery to Aunt Daisy",
+          "title_string_id": 41861,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Delivery to Aunt Daisy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_delivery_to_aunt_daisy_d0cdc6)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3954832,
+        3954779
+      ],
       "quests_given_text": [
         "Firewood chores (\"Gather firewood in Merry Vale and bring it to Ronnie\", 4158751946; \"Before I can have fun, I have to get all my chores done\", 3010630538; title candidate Chores, What a Bore! 1797539126, by wording); his homework, scattered by a robgoblin (801776192, 2820712755; title not found); a package to his Aunt Daisy at Farnum Farmstead \"so he can see the fairy show\" (1094445753, 3130839664; return trip 832424182)."
       ],

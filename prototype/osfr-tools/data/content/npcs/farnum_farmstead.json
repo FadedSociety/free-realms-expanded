@@ -708,11 +708,18 @@
             "kind": "legacy-data",
             "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1959; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3216 (ModelId=491, ModelFileName=human_f_aunt_daisy.agr, NameId=41222)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.947352,
       "model_id": 491,
-      "model_file_name": "human_f_aunt_daisy.agr"
+      "model_file_name": "human_f_aunt_daisy.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000268,
@@ -745,8 +752,23 @@
       "location_evidence": [
         "Wiki: Farnum's Farm next to the Sheep Watch battle. The client puts a barrel beside her: \"Find all six of Bo's missing sheep. Click on the barrel near Bo to start.\" (1257957983; also 126475530, 565892110, 2724220587, 4249349989). Not seen in video."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954642,
+          "title": "Lost Little Sheep",
+          "title_string_id": 20096,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Lost Little Sheep (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lost_little_sheep_95d89e)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954642
+      ],
       "quests_given_text": [
         "Lost Sheep (find and shear her lost sheep: \"Help Bo find her lost sheep in the area around Farnum Farmstead.\" 56221090, 4107567624; \"Locate and shear Bo's lost sheep before time runs out.\" 2815082361; \"Those fires scared off my sheep, and they are due for a good shearing!\" 1903646073; \"Return to Bo at Farnum Farmstead and speak with her.\" 2516131209). The sheep-finding minigame is named \"Lost Little Sheep\" (title entry 2197762879 / 854738900; \"Complete the 'Lost Little Sheep' minigame\" 1356955216). Peep's lost bowl is a quest for the Adventurer (Peep's Missing Bowl, hand-in Uncle Irving)."
       ],

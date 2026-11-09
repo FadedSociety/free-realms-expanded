@@ -180,7 +180,7 @@ fn the_other_rows_stay_off() {
         3_070_023, 3_070_045, // Fisherman: no disguise or treasure catch
         3_090_024, // Medic: rescue targets
         3_110_021, // Ninja: the hermit's book
-        3_140_021, 3_140_027, 3_140_030, // Soccer Star: no mechanic, no game 328
+        3_140_027, 3_140_030, // Soccer Star: no mechanic, no game 328
         3_010_022, 3_010_023, // Archer, Durango Zoo: smuggler trigger, Chef-only harvest
     ] {
         let quest = shipped_quest(id);

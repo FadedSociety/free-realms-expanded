@@ -86,6 +86,7 @@ pub fn read_json(path: &Path) -> Value {
 pub struct Fixture {
     path: PathBuf,
     character_id: u64,
+    bulk_quests: bool,
 }
 
 impl Fixture {
@@ -113,7 +114,17 @@ impl Fixture {
             path.join("job_trainers.json"),
         )
         .unwrap();
-        Self { path, character_id }
+        Self {
+            path,
+            character_id,
+            bulk_quests: false,
+        }
+    }
+
+    /// Keep the bulk-wired quests live, for a suite that is about every enabled quest.
+    pub fn with_bulk_quests(mut self) -> Self {
+        self.bulk_quests = true;
+        self
     }
 
     /// Copy every repository content file this fixture does not already supply, so
@@ -239,11 +250,18 @@ impl Fixture {
         for entry in fs::read_dir(source.join("quests")).unwrap() {
             let path = entry.unwrap().path();
             if path.extension().is_some_and(|ext| ext == "json") {
-                fs::copy(
-                    &path,
-                    catalogue.join("quests").join(path.file_name().unwrap()),
-                )
-                .unwrap();
+                let target = catalogue.join("quests").join(path.file_name().unwrap());
+                if !self.bulk_quests && path.file_name().is_some_and(|name| name == "wiki_quests.json") {
+                    // Quests wired in bulk are no chain's business here, and each batch puts new
+                    // offers on NPCs these suites expect to stay quiet.
+                    let mut document: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+                    for record in document["records"].as_array_mut().unwrap() {
+                        record["enabled"] = Value::Bool(false);
+                    }
+                    fs::write(&target, serde_json::to_vec(&document).unwrap()).unwrap();
+                } else {
+                    fs::copy(&path, target).unwrap();
+                }
             }
         }
         for name in [

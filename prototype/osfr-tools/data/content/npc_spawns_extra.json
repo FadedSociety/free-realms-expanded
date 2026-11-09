@@ -3078,7 +3078,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:191; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1424 (ModelId=83, ModelFileName=sh_barrel_01.adr, NameId=91619)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500003217
     },
     {
       "spawn_guid": 100000001425,
@@ -6067,7 +6068,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:433; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1667 (ModelId=316, ModelFileName=sh_musicstand_01.adr, NameId=38766)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500003432
     },
     {
       "spawn_guid": 100000001668,
@@ -7618,7 +7620,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:530; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1768 (ModelId=401, ModelFileName=fairy_seaside_f_01.adr, NameId=45559)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500003445
     },
     {
       "spawn_guid": 100000001772,
@@ -7975,7 +7978,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:556; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1796 (ModelId=785, ModelFileName=human_seaside_f.adr, NameId=45798)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500003636
     },
     {
       "spawn_guid": 100000001797,
@@ -8273,7 +8277,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:572; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1812 (ModelId=316, ModelFileName=sh_musicstand_01.adr, NameId=38766)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500003665
     },
     {
       "spawn_guid": 100000001814,
@@ -8919,7 +8924,8 @@
         }
       ],
       "position_w": null,
-      "texture_alias": "3"
+      "texture_alias": "3",
+      "content_key": 9500003434
     },
     {
       "spawn_guid": 100000001852,
@@ -11660,7 +11666,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:785; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2029 (ModelId=439, ModelFileName=human_f_mary.agr, NameId=45589)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500003427
     },
     {
       "spawn_guid": 100000002030,
@@ -17289,7 +17296,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1165; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2422 (ModelId=345, ModelFileName=fairy_royalguard_m.adr, NameId=10082)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500003114
     },
     {
       "spawn_guid": 100000002425,
@@ -21299,7 +21307,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1388; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2645 (ModelId=199, ModelFileName=chugawug_m_bandit_01.adr, NameId=45892)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500003531
     },
     {
       "spawn_guid": 100000002646,
@@ -24756,7 +24765,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1605; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2862 (ModelId=64, ModelFileName=chugawug_f_greenwood_soldier.adr, NameId=116838)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500003185
     },
     {
       "spawn_guid": 100000002864,
@@ -30620,8 +30630,8 @@
       "legacy_npc_id": 3221,
       "model_id": 83,
       "model_file_name": "sh_barrel_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Barrel",
+      "name_string_id": 18919,
       "position": [
         -2116.908,
         -57.49182,
@@ -30635,7 +30645,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1964; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3221 (ModelId=83, ModelFileName=sh_barrel_01.adr, NameId=None)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500003335
     },
     {
       "spawn_guid": 100000003222,
@@ -34922,7 +34933,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2218; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3475 (ModelId=584, ModelFileName=sg_papers_01.adr, NameId=45893)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500003013
     },
     {
       "spawn_guid": 100000003478,
@@ -45618,7 +45630,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2818; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4152 (ModelId=312, ModelFileName=human_m_freestyle_03.agr, NameId=94635)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500003029
     },
     {
       "spawn_guid": 100000004153,
@@ -53055,7 +53068,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3255; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4621 (ModelId=279, ModelFileName=sg_robgoblin_trunk_01.adr, NameId=429342)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500003292
     },
     {
       "spawn_guid": 100000004622,
@@ -77509,6 +77523,388 @@
       ],
       "position_w": null,
       "content_key": 9500002816
+    },
+    {
+      "spawn_guid": 100000090002,
+      "legacy_npc_id": null,
+      "model_id": 1590,
+      "model_file_name": "human_m_fisherman_01.agr",
+      "name": "Karl Kippersun",
+      "name_string_id": 409224,
+      "position": [
+        -710.6,
+        -69.65833,
+        2401.3
+      ],
+      "heading": -0.01,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "npc_name 409224 'Karl Kippersun' (zone tag Nettleseed). His lines follow Ernest's Darklit Lagoon fishing contest and send the player to Dooba (409225); objective 419163 'Show the fish to Karl'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No wiki page. Video Uq1xKk0lLII frame 00114 shows his Treasure War card: a man holding a fish, race line 'Human'. Body human_m_fisherman_01.agr, a generic human fisherman, not checked by eye against the card. Stands on the Darklit Lagoon shore 3 m from Lila Darklure, y copied from her (terrain grid -69.56). The lagoon POI's own y is 4 m above the terrain grid there (-72.76), so it was not copied."
+        }
+      ],
+      "position_w": null,
+      "content_key": 9500003148
+    },
+    {
+      "spawn_guid": 100000090003,
+      "legacy_npc_id": null,
+      "model_id": 9,
+      "model_file_name": "humanchild_m_tshirtwithbeltbig.adr",
+      "name": "Melvin",
+      "name_string_id": 410213,
+      "position": [
+        136.7,
+        23.588022,
+        393.9
+      ],
+      "heading": 1.56,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "npc_name 410213 'Melvin', zone tag Frostbitten Banks. 410211 and 410248 make him Lenore's grandson; 410219 says he wants to be like the player when he grows up."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No wiki page and no video of him. Body humanchild_m_tshirtwithbeltbig.adr, a generic human child for a grandson (nearest other use 79 m), not checked by eye. Stands at Frostbitten Banks 3 m from Kiel and 9 m from Lenore's record spot, y copied from Kiel (terrain grid 23.44). Lenore's poi_anchor y is 3.2 m above the terrain grid, so it was not copied."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090004,
+      "legacy_npc_id": null,
+      "model_id": 1590,
+      "model_file_name": "human_m_fisherman_01.agr",
+      "name": "Hilbert",
+      "name_string_id": 412185,
+      "position": [
+        382.0,
+        98.17706,
+        127.0
+      ],
+      "heading": -0.8,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "npc_name 412185 'Hilbert' (434623 is the same text). Objective 412150 says he can be found in the Wintery Basin; 412143 has Ernest pair the player with him."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No wiki page; the one video hit (Wv6rlcSc-CY t70) is the quest line only. Race unknown, so body human_m_fisherman_01.agr as a generic fisherman, not checked by eye. Stands at the Wintery Basin POI 3.3 m from Cap'n Sigmundr, y copied from him (terrain grid 98.14)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090005,
+      "legacy_npc_id": null,
+      "model_id": 1588,
+      "model_file_name": "human_f_fisherman_02.agr",
+      "name": "Dixie",
+      "name_string_id": 409447,
+      "position": [
+        -355.5,
+        -73.91435,
+        1936.0
+      ],
+      "heading": -0.78,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "npc_name 409447 'Dixie', zone tag Briarwood. 409427 has the player take leftover fish to her and the other fishermen; 409438 puts them at the other end of the Bayou."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No wiki page; the one video OCR hit (1PEbvqOSQao t164) shows no NPC of that name. Body human_f_fisherman_02.agr, a generic woman fisher used by no other NPC, not checked by eye. Stands at the far end of Brambleback's Bayou from Gunther (the low ground on the zone-0 terrain grid runs from his end at x -546 to about x -350 here), 3 m from Jonathan, y copied from him (terrain grid -73.76)."
+        }
+      ],
+      "position_w": null,
+      "content_key": 9500003079
+    },
+    {
+      "spawn_guid": 100000090006,
+      "legacy_npc_id": null,
+      "model_id": 345,
+      "model_file_name": "fairy_royalguard_m.adr",
+      "name": "Guard Glibbin",
+      "name_string_id": 91091,
+      "position": [
+        -1494.0,
+        -35.049,
+        395.0
+      ],
+      "heading": 0.5,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com/wiki/FR_Mob:Guard_Glibbin: Pixie, male, patrols south east of Sanctuary fairly near the main road; its portrait shows the blue pointed royal guard helmet."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Body fairy_royalguard_m.adr for the portrait's guard helmet. Stands south east of Sanctuary (south is -x and east is +z, from wiki compass statements) 11.6 m from Guard Verbi of the same quest and about 23 m from the street lamp at (-1493, -35, 372) on the road south; y copied from Verbi (terrain grid -35.06). A patrol route is not modelled."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090007,
+      "legacy_npc_id": null,
+      "model_id": 11,
+      "model_file_name": "fairychild_f_sleevesandshorts.adr",
+      "name": "Kapri",
+      "name_string_id": 74589,
+      "position": [
+        -1392.4,
+        -30.39674,
+        251.2
+      ],
+      "heading": 2.34,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com/wiki/FR_Mob:Kapri: Pixie, female, Sanctuary, inside the Dog Park. Playful Puppies calls her a girl at the pet park in the Queensfields; the portrait shows a young face with reddish hair."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Body fairychild_f_sleevesandshorts.adr, a generic pixie child for 'a girl' (nearest other use 217 m), not checked by eye against the portrait. Stands among the spawned dogs and dog owners in the Queensfields, 4.2 m from Buddy, y copied from Buddy (terrain grid -30.36)."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090008,
+      "legacy_npc_id": null,
+      "model_id": 540,
+      "model_file_name": "cat_longhair.adr",
+      "name": "Alice",
+      "name_string_id": 92588,
+      "position": [
+        -62.7,
+        21.04,
+        1144.5
+      ],
+      "heading": -0.78,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com/wiki/FR_Mob:Alice: Cat, female, Shrouded Glade, usually on a bench by Halle Belleflower and by the abandoned cave for Run Away Strays. The quest page places her along the river at an unused cave entrance. The portrait shows a fluffy white cat."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Body cat_longhair.adr for the fluffy coat (nearest other use 137 m), not checked by eye for colour. Stands beside the cave entrance prop sh_cave_entrance_bat_cave_01 at (-65.5, 19.5, 1147.4) on the river. No NPC stands within 15 m, so y comes from the zone-0 terrain grid here."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090009,
+      "legacy_npc_id": null,
+      "model_id": 1577,
+      "model_file_name": "dwarf_m_edwingoldstory.adr",
+      "name": "Spindle",
+      "name_string_id": 420500,
+      "position": [
+        286.82745,
+        26.31312,
+        384.7037
+      ],
+      "heading": -0.195013011,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com/wiki/FR_Mob:Spindle: Dwarf, male, Snowhill, near the phone booth west-southwest of Snowhill Town Hall; marked as a Snow Days event NPC."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Position, heading and body from the Sanctuary emulator: lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3934 and src/Resources/Npcs.json Id 33723 (model 1577). That is 3.5 m from the one sh_telephone_booth_01 prop at (283.4, 26, 385.2); terrain grid 26.24. No NPC stands within 15 m, so y is the emulator's. Body not checked by eye."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090010,
+      "legacy_npc_id": null,
+      "model_id": 345,
+      "model_file_name": "fairy_royalguard_m.adr",
+      "name": "Guard Slashi",
+      "name_string_id": 10077,
+      "position": [
+        -1411.2903,
+        -33.354336,
+        182.45927
+      ],
+      "heading": 0.172293157,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com/wiki/FR_Mob:Guard_Slashi: Pixie, male, flies a circuit by the farm fence around Bixie Hive up to the benches behind Roscoe; the portrait shows a royal guard with a blue helmet and pink wings."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Position and heading from the Sanctuary emulator: lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3594 (Id 33370), between Bixie Hive and Roscoe on that circuit and 0.9 m above the terrain grid, fitting a flyer. No NPC stands within 15 m, so y is the emulator's. Body fairy_royalguard_m.adr from the wiki's male; Sanctuary's table has 344 fairy_royalguard_f.adr, which disagrees."
+        }
+      ],
+      "position_w": null,
+      "content_key": 9500003115
+    },
+    {
+      "spawn_guid": 100000090011,
+      "legacy_npc_id": null,
+      "model_id": 179,
+      "model_file_name": "changeling_m.adr",
+      "name": "Scared Changeling",
+      "name_string_id": 18076,
+      "position": [
+        -43.6,
+        0.02941313,
+        2908.2
+      ],
+      "heading": -0.74,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com/wiki/FR_Mob:Scared_Changeling: Changeling, male, Briarheart Caverns. Client objective 18078 says 'her', which disagrees; the wiki's gender was kept."
+        },
+        {
+          "kind": "client",
+          "evidence": "String 18076 reads exactly 'Scared Changeling' (typed quest_title in the index, beside objective 18077 'Talk to the Scared Changeling')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Body changeling_m.adr, a generic male changeling (nearest other use 920 m), not checked by eye. Stands in Briarheart Caverns 3.1 m from the changeling mage spawn 100000004838, y copied from it. The caverns lie under the terrain grid, so the floor cannot be checked there."
+        }
+      ],
+      "position_w": null,
+      "content_key": 9500003255
+    },
+    {
+      "spawn_guid": 100000090012,
+      "legacy_npc_id": null,
+      "model_id": 50,
+      "model_file_name": "cat_shorthair.adr",
+      "name": "Neelix",
+      "name_string_id": 72980,
+      "position": [
+        -162.6,
+        -79.47127,
+        2604.0
+      ],
+      "heading": -0.85,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com/wiki/FR_Mob:Neelix: Cat, male, Briarheart, in the tunnel between Tanglewood Fort and Briarheart Palace during Mugred's quest. Mugred's quest text calls the cat 'she', near the caves south of Briarheart; the wiki's gender was kept."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Body cat_shorthair.adr, a generic cat (nearest other use 664 m), not checked by eye. Stands in the BriarHeart_Cave tunnel (client area spheres from (-227, -101, 2559) to (-151, -63, 2652)) 2.3 m from Gloompetal, y copied from Gloompetal. The tunnel lies under the terrain grid, so the floor at this exact spot is not verified."
+        }
+      ],
+      "position_w": null,
+      "content_key": 9500003194
+    },
+    {
+      "spawn_guid": 100000090013,
+      "legacy_npc_id": null,
+      "model_id": 398,
+      "model_file_name": "fairy_sanctuary_m_01.adr",
+      "name": "Frolic Steadywings",
+      "name_string_id": 103914,
+      "position": [
+        -1053.0,
+        4.683632,
+        300.6
+      ],
+      "heading": 0.82,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com/wiki/FR_Mob:Frolic_Steadywings: Pixie, male, Royal Palace; no portrait on file."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Videos N4GIxvp51S4 frame 00026 and Ha-VvxikMXg frame 00046 show the nameplate 'Frolic Steadywings' inside the Royal Palace by the red carpet stairs and a planter, too dark to read his body. Body fairy_sanctuary_m_01.adr from the earlier research row in npcs.json. Stands on the palace floor 3.2 m from door guard spawn 100000002337, y copied from it; the exact interior spot is not known."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090014,
+      "legacy_npc_id": null,
+      "model_id": 345,
+      "model_file_name": "fairy_royalguard_m.adr",
+      "name": "Trusty",
+      "name_string_id": 103888,
+      "position": [
+        -1049.0,
+        4.716924,
+        311.6
+      ],
+      "heading": -2.67,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com/wiki/FR_Mob:Trusty: Pixie, male, no portrait. Lofty Letter starts with him in the Royal Palace, a guard stuck on duty; the mob page lists Greenwood Camp instead."
+        },
+        {
+          "kind": "client",
+          "evidence": "String 103888 reads exactly 'Trusty' (typed quest_title in the index)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Body fairy_royalguard_m.adr, the same body as the palace door guards, from the earlier research row in npcs.json. Stands with them 3.2 m from door guard spawn 100000002336, y copied from it. No video frame checked shows him; the OCR hits inspected read Trusty Shovel, a quest marker."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090015,
+      "legacy_npc_id": null,
+      "model_id": 1325,
+      "model_file_name": "human_m_nash_wright.agr",
+      "name": "Nash Wright",
+      "name_string_id": 394250,
+      "position": [
+        -917.2,
+        -38.16463,
+        1194.4
+      ],
+      "heading": 1.15,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com/wiki/FR_Mob:Nash_Wright: Human, male, Thunder Falls Speedway, along the south wall during Demo Derby: Curious Crash; no portrait on file."
+        },
+        {
+          "kind": "client",
+          "evidence": "Models.txt 1325 human_m_nash_wright.agr is his own named model; npc_name 394250 'Nash Wright'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No video of him. Stands at Thunder Falls Speedway 3.8 m south of Crash Davis, who gives the quest, y copied from Crash Davis (terrain grid -38.56). The exact spot along the wall is not known."
+        }
+      ],
+      "position_w": null,
+      "content_key": 9500003190
     }
   ]
 }

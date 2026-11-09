@@ -559,9 +559,11 @@ fn is_quest_binding_and_greeting_change_between(old: &Value, new: &Value) -> boo
         let fields: Vec<&str> = QUEST_BINDING_FIELDS
             .iter()
             .copied()
-            .chain(["greeting_string_id", "greeting_reason", "model_id", "model_file_name", "name_string_id", "field_sources"])
+            .chain(["greeting_string_id", "greeting_reason", "model_id", "model_file_name", "name_string_id", "field_sources", "position"])
             .collect();
-        without_fields(old, &fields) == without_fields(new, &fields)
+        // A record set down onto its floor changes height only.
+        let same_spot = old["position"][0] == new["position"][0] && old["position"][2] == new["position"][2];
+        same_spot && without_fields(old, &fields) == without_fields(new, &fields)
     })
 }
 

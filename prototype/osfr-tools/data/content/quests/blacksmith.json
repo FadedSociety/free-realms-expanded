@@ -738,7 +738,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 2511,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) 2026-11-09: the wiki says Impressing the Axemaker teaches the Rowdy Rumbler Hammer."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "16": 799
           },
@@ -1331,7 +1342,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 2518,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) 2026-11-09: nothing sells this pattern; the quest before the one that forges it hands it over."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "16": 1496
           },
@@ -1440,7 +1462,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 2516,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) 2026-11-09: nothing sells this pattern; the quest before the one that forges it hands it over."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "16": 501
           },
@@ -1610,9 +1643,48 @@
       "title_string_id": 94577,
       "giver_npc_id": 9000000405,
       "prerequisite_quest_ids": [
-        3020017
+        3020017,
+        3020019
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "text_string_id": 94603,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Forge a Rowdy Rumbler Hammer (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_breaking_bank_7c05e7)."
+            }
+          ],
+          "recipe_id": 16,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 94605,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver the hammer to Billie JoBob (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_breaking_bank_7c05e7)."
+            }
+          ],
+          "npc_id": 9500003029
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 95066,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Billie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_breaking_bank_7c05e7)."
+            }
+          ],
+          "npc_id": 9500003029
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1669,7 +1741,8 @@
       "description_string_id": 94578,
       "intro_text_string_id": 94576,
       "end_text_string_id": 94579,
-      "enabled": false
+      "enabled": true,
+      "job": 16
     },
     {
       "id": 3020019,
@@ -1767,11 +1840,25 @@
     {
       "id": 3020020,
       "title_string_id": 95093,
-      "giver_npc_id": 9000000025,
+      "giver_npc_id": 9500003029,
       "prerequisite_quest_ids": [
+        3020018,
         3020019
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 95183,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Silverray in Blackspore (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_silver_appearance_aef198)."
+            }
+          ],
+          "npc_id": 9000000203
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1821,7 +1908,10 @@
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 16,
+      "description_string_id": 95104,
+      "intro_text_string_id": 95135
     },
     {
       "id": 3020021,

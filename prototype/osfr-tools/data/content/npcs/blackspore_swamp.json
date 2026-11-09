@@ -8356,11 +8356,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:297; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1530 (ModelId=653, ModelFileName=fairy_f_darcie_flitterstride.agr, NameId=45299)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.075597,
       "model_id": 653,
-      "model_file_name": "fairy_f_darcie_flitterstride.agr"
+      "model_file_name": "fairy_f_darcie_flitterstride.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000018,
@@ -14754,8 +14761,23 @@
       "location_evidence": [
         "Mire's Edge"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954709,
+          "title": "Shaming the Sheriff",
+          "title_string_id": 384232,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Shaming the Sheriff (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_shaming_the_sheriff_763aff)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954709
+      ],
       "quests_given_text": [
         "Scare Bart Purpleton (title unknown): \"Find some snakes and scare Bart in Mire's Edge!\" (3918771002); goes to Splortata for the snake shipment (2052476458)"
       ],
@@ -15061,11 +15083,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:285; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1518 (ModelId=669, ModelFileName=human_blackspore_thief_m.adr, NameId=78523)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.839715,
       "model_id": 669,
-      "model_file_name": "human_blackspore_thief_m.adr"
+      "model_file_name": "human_blackspore_thief_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000034,

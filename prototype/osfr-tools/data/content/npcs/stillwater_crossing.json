@@ -1115,51 +1115,8 @@
       "location_evidence": [
         "\"Sacred Grove Shallows\" (3124768930)."
       ],
-      "quests_given": [
-        {
-          "quest_id": 3070018,
-          "title": "Fisherman: Fresh Fish Special",
-          "title_string_id": 410333,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Cluster C - Vick Sapshot and Callie Kelpcake (Sacred Grove Shallows), row 14; name 'Fisherman: Fresh Fish Special'; title id cell 3284614772 / 647619036"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3070018 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 3284614772 to Global.Text id 410333 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        }
-      ],
-      "quest_ids_given": [
-        3070018
-      ],
+      "quests_given": [],
+      "quest_ids_given": [],
       "quests_given_text": [
         "Fisherman: Fresh Fish Special (title match is weak on the job page)."
       ],
@@ -6818,46 +6775,6 @@
           ]
         },
         {
-          "quest_id": 3070011,
-          "title": "Fisherman: Bigger is Better",
-          "title_string_id": 419156,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Cluster B - Jonah Relicreel's bait (Sacred Grove Shallows), row 7; name 'Fisherman: Bigger is Better'; title id cell 3611566187 / 1268993754"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3070011 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) source explicitly says after row 5; mapped that page label to the preceding batch content key"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 3611566187 to Global.Text id 419156 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
           "quest_id": 3070012,
           "title": "Better Bacon Bait",
           "title_string_id": 409705,
@@ -6941,7 +6858,6 @@
       "quest_ids_given": [
         3070009,
         3070010,
-        3070011,
         3070012,
         3070013
       ],
@@ -9042,7 +8958,7 @@
       "services_reason": "The regional row lists no distinct service.",
       "position": [
         -1326.172719,
-        -64.82256,
+        -65.82,
         904.592969
       ],
       "position_w": null,
@@ -9328,6 +9244,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Height set to the floor under this spot on the collision data; the anchor's height left the NPC floating."
           }
         ],
         "position_reason": [
@@ -9381,8 +9301,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 14,
+      "model_file_name": "chugawug_m_01.adr"
     },
     {
       "npc_id": 9500000793,
@@ -12799,7 +12733,7 @@
       "services_reason": "The regional row lists no distinct service.",
       "position": [
         -1323.932803,
-        -64.82256,
+        -65.94,
         908.731713
       ],
       "position_w": null,
@@ -13104,6 +13038,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Height set to the floor under this spot on the collision data; the anchor's height left the NPC floating."
           }
         ],
         "position_reason": [
@@ -13157,8 +13095,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "model_id": 553,
+      "model_file_name": "human_m_freestyle_07.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000796,
@@ -14161,8 +14120,23 @@
       "location_evidence": [
         "By a house on the North-Eastern side of the Wintery Basin."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954631,
+          "title": "Keeping the Bears at Bay",
+          "title_string_id": 410104,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Keeping the Bears at Bay (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_keeping_the_bears_at_bay_6b2546)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954631
+      ],
       "quests_given_text": [],
       "quests_accepted": [],
       "quests_accepted_reason": null,
@@ -14171,9 +14145,9 @@
       "services": [],
       "services_reason": null,
       "position": [
-        -1255.41,
-        -59.153,
-        866.651
+        386.0,
+        98.1,
+        122.0
       ],
       "position_w": 1.0,
       "rotation": [
@@ -14193,7 +14167,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": null,
+      "position_reason": "(R) Beside POI 130 Wintery Basin, on the floor there: the wiki's 'Speak to Tad Timbertale in Wintery Basin'. The earlier spot was by a Stillwater cooking table.",
       "heading": 0.0,
       "model_id": 468,
       "model_file_name": "fairy_druid_m.adr",
@@ -14370,12 +14344,12 @@
         ],
         "position": [
           {
-            "kind": "legacy-data",
-            "evidence": "centroid of legacy spawns at the same wiki place: Helena"
+            "kind": "client",
+            "evidence": "PointOfInterests POI 130 Wintery Basin, this record's own placement candidate."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) the giver stands among the NPCs the wiki puts at the same place"
+            "evidence": "(R) Beside POI 130 Wintery Basin, on the floor there: the wiki's 'Speak to Tad Timbertale in Wintery Basin'. The earlier spot was by a Stillwater cooking table."
           }
         ],
         "position_w": [
@@ -14443,8 +14417,15 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: most common model of drawn pixie male NPCs"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     }
   ]
 }

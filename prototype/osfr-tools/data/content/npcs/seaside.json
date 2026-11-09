@@ -10824,8 +10824,23 @@
       "location_evidence": [
         "Luxurious Oceanfront Homes"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954706,
+          "title": "Scaredy Pants",
+          "title_string_id": 389241,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Scaredy Pants (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_scaredy_pants_e9a30b)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954706
+      ],
       "quests_given_text": [
         "Scaredy Pants (title 3459630466; members only; follow-up; wiki rewards 10 coins and Board Shorts)"
       ],
@@ -11209,11 +11224,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:755; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1998 (ModelId=11, ModelFileName=fairychild_f_sleevesandshorts.adr, NameId=45787)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.507625,
       "model_id": 11,
-      "model_file_name": "fairychild_f_sleevesandshorts.adr"
+      "model_file_name": "fairychild_f_sleevesandshorts.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000571,
@@ -12383,11 +12405,24 @@
               "evidence": "Hasty Food Delivery (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hasty_food_delivery_56503a)."
             }
           ]
+        },
+        {
+          "quest_id": 3954516,
+          "title": "Bucket O'Fish",
+          "title_string_id": 101082,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Bucket O'Fish (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bucket_o_fish_503c93)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3951668,
-        3951724
+        3951724,
+        3954516
       ],
       "quests_given_text": [
         "Farewell Feast (title 3030398973, a feast for Jolly Roger's retiring pirate crew, 2493573445); Hasty Food Delivery (title 1798567334, a dish for Seaspray); Bucket O'Fish (title 211779048, repeatable; \"Collect buckets of fish from the Seaside beach\", 740224499); Helping the Local Chef (title 2980787396, repeatable); appears in Touring Seaside, Forcing the Food (title 1601016891), Craving Something Tasty (title 811105456), Hungry Hungry Troll (title 254473930), Cakey Clue (title 2930939421) and the event quest Birthday Cake Bake-off (title 2440607895; client: help cook Crispy Choychoy Delight, 2224135702). Clams from the Cray Caves (853566351, 614981641, 947918158; title not found). Diggy's Shopping List (title 1746864794): harvest Rainleaf, Gummyfruit and Spiralmint from Queensfields and Farnum's Farm (185453723) [inferred]. See Chef"
@@ -15958,11 +15993,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:561; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1801 (ModelId=571, ModelFileName=fairy_f_freestyle_09.agr, NameId=45790)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.747203,
       "model_id": 571,
-      "model_file_name": "fairy_f_freestyle_09.agr"
+      "model_file_name": "fairy_f_freestyle_09.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000579,
@@ -16831,11 +16873,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:520; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1758 (ModelId=211, ModelFileName=bixie_f_mage.adr, NameId=45586)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.902709,
       "model_id": 211,
-      "model_file_name": "bixie_f_mage.adr"
+      "model_file_name": "bixie_f_mage.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000079,
@@ -19626,11 +19675,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:548; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1788 (ModelId=311, ModelFileName=human_m_freestyle_02.agr, NameId=45805)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.852741,
       "model_id": 311,
-      "model_file_name": "human_m_freestyle_02.agr"
+      "model_file_name": "human_m_freestyle_02.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000584,
@@ -21350,9 +21406,23 @@
       "location_evidence": [
         "North side of Seaside \"where the fisherman huts are\" (4042850801); \"helping out with the fireworks near Sizzlebottom\" (570276910)"
       ],
-      "quests_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954813,
+          "title": "Boom Powder Preparation",
+          "title_string_id": 400840,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Boom Powder Preparation (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_boom_powder_preparation_78db82)."
+            }
+          ]
+        }
+      ],
       "quest_ids_given": [
-        3000361
+        3000361,
+        3954813
       ],
       "quests_given_text": [
         "Helmet for Aziwug (3690412624); tin-ore errand for boom powder with extra Seaside Stickers as reward (4186195979; Miner variant 380720476, written \"Hetty\" in 3636694464). Titles not found"
@@ -24251,8 +24321,36 @@
       "location_evidence": [
         "Luxurious Oceanfront Homes (wiki)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954950,
+          "title": "Open House Clean-Up",
+          "title_string_id": 46814,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Open House Clean-Up (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_open_house_clean_up_0f354e)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3954791,
+          "title": "Advertising to the Tourists",
+          "title_string_id": 95029,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Advertising to the Tourists (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_advertising_to_the_tourists_00b8b9)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954950,
+        3954791
+      ],
       "quests_given_text": [
         "Open House Clean-Up (title 3340780897): \"needs help cleaning up the trash on the beach near his house\" (3870630344); then flyers \"to potential buyers of his luxurious home\" (2699835123, 417328208, return 1085025237). Advertising to the Tourists (title 279129978) [inferred] fits the flyer step because the wiki lists it in Emuzz's appearances"
       ],
@@ -24626,11 +24724,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:761; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2004 (ModelId=414, ModelFileName=fairy_seaside_m_01_lod0.adr, NameId=21308)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.161657,
       "model_id": 414,
-      "model_file_name": "fairy_seaside_m_01_lod0.adr"
+      "model_file_name": "fairy_seaside_m_01_lod0.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000594,
@@ -37326,10 +37431,75 @@
               "evidence": "Sister Feud (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sister_feud_0d33b2)."
             }
           ]
+        },
+        {
+          "quest_id": 3954861,
+          "title": "Electric Scouting",
+          "title_string_id": 93923,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Electric Scouting (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_electric_scouting_8ce20e)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3954991,
+          "title": "Scouting for Flo",
+          "title_string_id": 93940,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Scouting for Flo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_scouting_for_flo_f8bba1)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3954939,
+          "title": "Music-a-Thon",
+          "title_string_id": 94537,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Music-a-Thon (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_music_a_thon_3f3f1b)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3954981,
+          "title": "Rockin' the Stage",
+          "title_string_id": 391839,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Rockin' the Stage (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rockin_the_stage_3d40bc)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3955011,
+          "title": "Such a Show Off!",
+          "title_string_id": 391884,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Such a Show Off! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_such_a_show_off_f975c4)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3950370
+        3950370,
+        3954861,
+        3954991,
+        3954939,
+        3954981,
+        3955011
       ],
       "quests_given_text": [
         "Talent show recruiting: Electra Dozen and Flurrie Flo (above); Music Conducting minigame (title 626088874, \"Take your shot ... clicking on the Music Stand next to Sandi\", 3231682468); letter to Snowi in Snowhill (929955078); returning a cancelled booking from Wugachug (983365281). Titles not found"
@@ -38853,8 +39023,23 @@
       "location_evidence": [
         "Beach, with a sand pail (3755032823)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954610,
+          "title": "Hidden Treasure",
+          "title_string_id": 400043,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Hidden Treasure (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hidden_treasure_537386)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954610
+      ],
       "quests_given_text": [
         "Dig up hidden treasure in the sand piles, with \"Treasure Hunters\" rummaging the same piles (1156039679, 4081053882); links to the fireworks show; title not found"
       ],
@@ -39238,11 +39423,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:723; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1965 (ModelId=241, ModelFileName=fairychild_f_pigtailsdress.adr, NameId=95006)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.798433,
       "model_id": 241,
-      "model_file_name": "fairychild_f_pigtailsdress.adr"
+      "model_file_name": "fairychild_f_pigtailsdress.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000625,
@@ -39782,8 +39974,23 @@
       "location_evidence": [
         "Luxurious Oceanfront Homes"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954617,
+          "title": "Horrible Hiccups",
+          "title_string_id": 101396,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Horrible Hiccups (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_horrible_hiccups_700a03)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954617
+      ],
       "quests_given_text": [
         "Horrible Hiccups (title 1267696845; members only; scare Cutes with a 30-second illusion; wiki rewards 10 coins and Orange-Strapped Flip-Flops)"
       ],
@@ -40243,11 +40450,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:772; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2015 (ModelId=9, ModelFileName=humanchild_m_tshirtwithbeltbig.adr, NameId=45553)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.760915,
       "model_id": 9,
-      "model_file_name": "humanchild_m_tshirtwithbeltbig.adr"
+      "model_file_name": "humanchild_m_tshirtwithbeltbig.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000627,
@@ -49087,11 +49301,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:722; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1964 (ModelId=312, ModelFileName=human_m_freestyle_03.agr, NameId=45562)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.195888,
       "model_id": 312,
-      "model_file_name": "human_m_freestyle_03.agr"
+      "model_file_name": "human_m_freestyle_03.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000646,

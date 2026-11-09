@@ -27967,11 +27967,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1524; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2781 (ModelId=65, ModelFileName=chugawug_m_greenwood_soldier.adr, NameId=140651)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.726064,
       "model_id": 65,
-      "model_file_name": "chugawug_m_greenwood_soldier.adr"
+      "model_file_name": "chugawug_m_greenwood_soldier.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000136,
@@ -29102,8 +29109,23 @@
       "location_evidence": [
         "Wiki: the tunnel between the fort and the palace; client: \"Speak to Gloompetal in Briarheart\" (2427333532)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954524,
+          "title": "Change of Heart",
+          "title_string_id": 16611,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Change of Heart (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_change_of_heart_bc1b60)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954524
+      ],
       "quests_given_text": [
         "Change of Heart."
       ],
@@ -29481,11 +29503,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1597; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2854 (ModelId=178, ModelFileName=changeling_f.adr, NameId=16610)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.443052,
       "model_id": 178,
-      "model_file_name": "changeling_f.adr"
+      "model_file_name": "changeling_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000140,
@@ -31573,12 +31602,53 @@
               "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
             }
           ]
+        },
+        {
+          "quest_id": 3070033,
+          "title": "Fisherman: An Offering",
+          "title_string_id": 409413,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Cluster F - Lakeshore, Rainbow Lake and the McScuttle family, row 29; name 'Fisherman: An Offering'; title id cell 3719837526 / 1187024573"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3070033 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3953698,
         3070020,
-        3070025
+        3070025,
+        3070033
       ],
       "quests_given_text": [
         "Fisherman: Hungry Chugs, Fisherman: Fishy Fungus, Fisherman: Ink Cod Ink, Fisherman: Restocking the Stream, Fisherman: Undercover, Fisherman: VIP Fish, Fisherman: Say Cheese!."
@@ -46044,10 +46114,23 @@
               "evidence": "Bye Bye, Butterfly (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bye_bye_butterfly_665d94)."
             }
           ]
+        },
+        {
+          "quest_id": 3954923,
+          "title": "Kitty, Get the Spider!",
+          "title_string_id": 72036,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Kitty, Get the Spider! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kitty_get_the_spider_807341)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3951159
+        3951159,
+        3954923
       ],
       "quests_given_text": [],
       "quests_accepted": [],
@@ -50538,8 +50621,36 @@
       "location_evidence": [
         "Nettleseed (\"fertilizer to the violet mushrooms near the lower lake in Nettleseed\", client 553097526)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3955059,
+          "title": "You've Got to Keep it Vegetated",
+          "title_string_id": 41783,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "You've Got to Keep it Vegetated (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_you_ve_got_to_keep_it_vegetated_f8a222)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3954823,
+          "title": "Button Down Mushrooms",
+          "title_string_id": 41793,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Button Down Mushrooms (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_button_down_mushrooms_0a08b6)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3955059,
+        3954823
+      ],
       "quests_given_text": [
         "Plant trees to replace felled ones (client 1782896953); recover axes in Tanglewood Fort (3787195752). Titles not found."
       ],
@@ -50847,11 +50958,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1570; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2827 (ModelId=74, ModelFileName=treesoldier.adr, NameId=41603)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 3.074634,
       "model_id": 74,
-      "model_file_name": "treesoldier.adr"
+      "model_file_name": "treesoldier.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000163,
@@ -61901,10 +62019,23 @@
               "evidence": "I'm Okay! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_i_m_okay_c3daa7)."
             }
           ]
+        },
+        {
+          "quest_id": 3954649,
+          "title": "Missing Merchandise",
+          "title_string_id": 45194,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Missing Merchandise (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_missing_merchandise_9c6f69)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3953201
+        3953201,
+        3954649
       ],
       "quests_given_text": [
         "Find Slothi's Lost Merchandise (minigame \"Slothi's Wagon\", client 1051438348). Sends the player to his father Lazi: \"Let Slothi's father know he is alright\" (144747789, 825261180)."
@@ -76274,8 +76405,23 @@
       "location_evidence": [
         "Brambleback's Bayou, Brambleback's Bayou"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954595,
+          "title": "Funky Fungus",
+          "title_string_id": 410372,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Funky Fungus (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_funky_fungus_c89b66)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954595
+      ],
       "quests_given_text": [],
       "quests_accepted": [],
       "quests_accepted_reason": null,
@@ -76556,8 +76702,15 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: most common model of drawn human female NPCs"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500002003,

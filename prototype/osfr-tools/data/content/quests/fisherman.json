@@ -776,12 +776,50 @@
     {
       "id": 3070011,
       "title_string_id": 419156,
-      "giver_npc_id": 9000000117,
+      "giver_npc_id": 9000000319,
       "prerequisite_quest_ids": [
         3070009
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "collect_item",
+          "id": 1,
+          "text_string_id": 419161,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 419161 'Catch a large creeping cod', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "item_id": 68082,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 419163,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 419163 'Show the fish to Karl', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9500003148
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: Bigger is Better pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -819,16 +857,44 @@
       "description_string_id": 419157,
       "intro_text_string_id": 419155,
       "end_text_string_id": 419158,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070012,
       "title_string_id": 409705,
       "giver_npc_id": 9000000117,
       "prerequisite_quest_ids": [
-        3070011
+        3070011,
+        3070013
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "collect_item",
+          "id": 1,
+          "text_string_id": 409913,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reel in large Baconfish - 0/8 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_better_bacon_bait_056288)."
+            }
+          ],
+          "item_id": 68070,
+          "quantity": 8
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 409825,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Jonah Relicreel (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_better_bacon_bait_056288)."
+            }
+          ],
+          "npc_id": 9000000117
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -881,16 +947,56 @@
       "description_string_id": 409706,
       "intro_text_string_id": 409704,
       "end_text_string_id": 409707,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3070013,
       "title_string_id": 409701,
       "giver_npc_id": 9000000117,
       "prerequisite_quest_ids": [
+        3070010,
         3070011
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "any_of",
+          "id": 1,
+          "text_string_id": 409887,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reel in Baconfish - 0/8 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bacon_bait_5a4f29)."
+            }
+          ],
+          "count": 8,
+          "alternatives": [
+            {
+              "kind": "collect_item",
+              "item_id": 68069
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68070
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68071
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 409825,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Jonah Relicreel (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bacon_bait_5a4f29)."
+            }
+          ],
+          "npc_id": 9000000117
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -943,15 +1049,66 @@
       "description_string_id": 409702,
       "intro_text_string_id": 409700,
       "end_text_string_id": 409703,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3070014,
       "title_string_id": 419010,
       "giver_npc_id": 9000000229,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "any_of",
+          "id": 1,
+          "text_string_id": 419015,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 419015 'Catch cheery salmon', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "count": 1,
+          "alternatives": [
+            {
+              "kind": "collect_item",
+              "item_id": 68062
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68063
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68064
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 419017,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 419017 'Take the fish to Vick Sapshot', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000229
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: Picky Palettes pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -989,15 +1146,54 @@
       "description_string_id": 419011,
       "intro_text_string_id": 419009,
       "end_text_string_id": 419012,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070015,
       "title_string_id": 409076,
       "giver_npc_id": 9000000229,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "collect_item",
+          "id": 1,
+          "text_string_id": 409088,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409088 'Reel in the shark', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "item_id": 68113,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 409090,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409090 'Return to Vick Sapshot', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000229
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: Beware of Sharks! pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1039,7 +1235,8 @@
       "description_string_id": 409077,
       "intro_text_string_id": 409075,
       "end_text_string_id": 409078,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070016,
@@ -1138,10 +1335,58 @@
     {
       "id": 3070018,
       "title_string_id": 410333,
-      "giver_npc_id": 9000000041,
+      "giver_npc_id": 9000000133,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "any_of",
+          "id": 1,
+          "text_string_id": 410339,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 410339 'Reel in Frostgill Smelt', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "count": 1,
+          "alternatives": [
+            {
+              "kind": "collect_item",
+              "item_id": 68017
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68018
+            }
+          ]
+        },
+        {
+          "kind": "gather_resource",
+          "id": 2,
+          "text_string_id": 410343,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 410343 'Harvest some Spiralmint', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "resource_id": 2877,
+          "quantity": 1
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: Fresh Fish Special pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1179,7 +1424,8 @@
       "description_string_id": 410334,
       "intro_text_string_id": 410332,
       "end_text_string_id": 410335,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070019,
@@ -2148,10 +2394,95 @@
     {
       "id": 3070033,
       "title_string_id": 409413,
-      "giver_npc_id": 9000000233,
+      "giver_npc_id": 9000000339,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 409418,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409418 'Deliver to Snorg', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000470
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 409420,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409420 'Deliver to General Spattonug', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9500000135
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 409423,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409423 'Deliver to Sergeant Cargug', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9500000209
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 409425,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409425 'Return to Gunther', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000339
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 409426,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409426 'Talk to Dixie', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9500003079
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 6,
+          "text_string_id": 409429,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409429 'Return to Gunther', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000339
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: An Offering pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2189,7 +2520,8 @@
       "description_string_id": 409414,
       "intro_text_string_id": 409412,
       "end_text_string_id": 409415,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070034,
@@ -2676,10 +3008,61 @@
     {
       "id": 3070041,
       "title_string_id": 410251,
-      "giver_npc_id": 9000000349,
+      "giver_npc_id": 9000000131,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "any_of",
+          "id": 1,
+          "text_string_id": 410256,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 410256 'Reel in some Blue Thornfin', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "count": 1,
+          "alternatives": [
+            {
+              "kind": "collect_item",
+              "item_id": 68014
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68015
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68016
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 410258,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 410258 'Visit Valinda', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9500000779
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: Fish Food pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2717,7 +3100,8 @@
       "description_string_id": 410252,
       "intro_text_string_id": 410250,
       "end_text_string_id": 410253,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070042,

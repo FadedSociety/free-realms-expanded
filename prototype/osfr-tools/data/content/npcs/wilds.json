@@ -10011,8 +10011,51 @@
       "location_evidence": [
         "The Sidekicks' soccer camp \"in the North Wilds\" (3612474566, 614559999, 2293602278); \"near the Sidekicks practice area\" (2172763363)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3140021,
+          "title": "Soccer Star: Trophy Detective",
+          "title_string_id": 414943,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Soccer Star.md: Quest line > Arc 3 - The trophy and the finals, row 18; name 'Soccer Star: Trophy Detective'; title id cell 3673117254 ucdt; 13513875 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3140021 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3140021
+      ],
       "quests_given_text": [
         "The Soccer Star line from Meeting The Team on: Soccer Star: The Perfect Mascot, Soccer Star: Achieve Level 2, Soccer Star: Slowing The Snowspurs, Soccer Star: Goal Stopper, Soccer Star: Power Game, Soccer Star: Achieve Level 5, Soccer Star: Briarwood's Fancy Feet, Soccer Star: Mascot Madness, Soccer Star: Achieve Level 8, Soccer Star: Cheetahs Double Challenge, Soccer Star: Missing Soccer Balls, Soccer Star: Mud Hopping, Soccer Star: Achieve Level 10, Soccer Star: Black Widows' Rematch, Soccer Star: Trophy Detective, Soccer Star: Returning The Trophy, Soccer Star: Achieve Level 13, Soccer Star: Making The Finals, Soccer Star: Twinkle Toes, Soccer Star: Achieve Level 15, Soccer Star: Ants In The Pants, Soccer Star: Robgoblin Troublemakers, Soccer Star: Achieve Level 19, Soccer Star: Tournament Champion."
       ],
@@ -10336,11 +10379,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2948; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4282 (ModelId=1456, ModelFileName=human_m_coach_eddie.agr, NameId=401743). NameId resolves in the client locale to 'Coach \"Golden Leg\" Eddie'."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.740464,
       "model_id": 1456,
-      "model_file_name": "human_m_coach_eddie.agr"
+      "model_file_name": "human_m_coach_eddie.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000888,
@@ -11524,6 +11574,78 @@
               "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
             }
           ]
+        },
+        {
+          "quest_id": 3060014,
+          "title": "Demo Derby: Curious Crash",
+          "title_string_id": 403457,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 2: Tucker Thunderjolt, Samuel and Nash (Thunder Falls), row 11; name 'Demo Derby: Curious Crash'; title id cell 3214709128 ucdt; 2618187823 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3060014 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            }
+          ]
+        },
+        {
+          "quest_id": 3060015,
+          "title": "Demo Derby: Arena Revenge",
+          "title_string_id": 403458,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 2: Tucker Thunderjolt, Samuel and Nash (Thunder Falls), row 12; name 'Demo Derby: Arena Revenge'; title id cell 149184716 ucdt; 143239822 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3060015 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
@@ -11534,7 +11656,9 @@
         3060013,
         3060044,
         3060010,
-        3060009
+        3060009,
+        3060014,
+        3060015
       ],
       "quests_given_text": [
         "Demo Derby: License to Drive (inferred), Demo Derby: Taking the Wheel (inferred), Demo Derby: Dealing Damage, Demo Derby: Spare Parts, Demo Derby: So Long, Betty!, Demo Derby: Thunder Falls Crash for Coin (inferred), Demo Derby: Tucker's Troubles (inferred), Demo Derby: Wildwood Derby 1000."
@@ -18778,9 +18902,23 @@
       "location_evidence": [
         "\"Glerga is located at the Robgoblin Camp near her cooking table\" (1460064979); \"north of Lakeshore\" (501743235)."
       ],
-      "quests_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954498,
+          "title": "Bigger Fish to Fry",
+          "title_string_id": 20836,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Bigger Fish to Fry (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bigger_fish_to_fry_555c83)."
+            }
+          ]
+        }
+      ],
       "quest_ids_given": [
-        3050031
+        3050031,
+        3954498
       ],
       "quests_given_text": [
         "Chef: Glerga (Lucca sends the player), Chef: Family Style!, Chef: Reach Level 20; Burnetta's leftover-meal errand (1376567889, 113617067); worm-soup and stirfry orders (1337449147, 1444357337); Slugmud Surprise (1744403283); also appears in the Birthday Bash event (Chef)."
@@ -30735,10 +30873,23 @@
               "evidence": "Noglash Delivery (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_noglash_delivery_39e1dc)."
             }
           ]
+        },
+        {
+          "quest_id": 3954584,
+          "title": "Flag Dancin'",
+          "title_string_id": 21055,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Flag Dancin' (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_flag_dancin_d59205)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3954177
+        3954177,
+        3954584
       ],
       "quests_given_text": [
         "Gather the stew ingredients (3164390028, 4198948159) and bring the stew to Hogosh (837473822, 224929741; a timed delivery, 1406814003). The client title Noglash Delivery (ucdt 2943440397) fits by wording only."
@@ -44439,86 +44590,6 @@
       ],
       "quests_given": [
         {
-          "quest_id": 3060014,
-          "title": "Demo Derby: Curious Crash",
-          "title_string_id": 403457,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 2: Tucker Thunderjolt, Samuel and Nash (Thunder Falls), row 11; name 'Demo Derby: Curious Crash'; title id cell 3214709128 ucdt; 2618187823 ugdt"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3060014 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 3214709128 to Global.Text id 403457 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
-          "quest_id": 3060015,
-          "title": "Demo Derby: Arena Revenge",
-          "title_string_id": 403458,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 2: Tucker Thunderjolt, Samuel and Nash (Thunder Falls), row 12; name 'Demo Derby: Arena Revenge'; title id cell 149184716 ucdt; 143239822 ugdt"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3060015 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 149184716 to Global.Text id 403458 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
           "quest_id": 3060008,
           "title": "Demo Derby: Break 'er In",
           "title_string_id": 403449,
@@ -44560,8 +44631,6 @@
         }
       ],
       "quest_ids_given": [
-        3060014,
-        3060015,
         3060016,
         3060008
       ],

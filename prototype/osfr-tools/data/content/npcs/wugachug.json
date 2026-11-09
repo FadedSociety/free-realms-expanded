@@ -905,9 +905,36 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part A. The entrance, the Sasparilla Brewery and the Party Tent, row 39; source cell: [client]"
             }
           ]
+        },
+        {
+          "quest_id": 3954882,
+          "title": "Fixing the Flavor",
+          "title_string_id": 71867,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Fixing the Flavor (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fixing_the_flavor_d85644)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3954982,
+          "title": "Root of the Problem",
+          "title_string_id": 386159,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Root of the Problem (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_root_of_the_problem_52a24c)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3954882,
+        3954982
+      ],
       "quests_given_text": [
         "Drinks on the House (client title 1647480589, by wording): \"Ask Brockoom in Wugachug for your free mug of sasparilla.\" (2038130101); \"Brockoom handles the finished sasparilla, go ask him for a mug on the house\" (2121570718, 277320658). The flavour chain: \"Brockoom needs to pinpoint what is wrong with the flavor of the sasparilla\" (2411928607; chugaroot 3300909015, 2439817213; \"Find some ingredients to sweeten the sasparilla\", 1502291556; \"Brockoom said the mountain spring water is missing an ingredient!\", 4290753224; samples 3180083845, 3850122351). Quest titles for the chain not found."
       ],
@@ -1215,11 +1242,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:388; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1621 (ModelId=14, ModelFileName=chugawug_m_01.adr, NameId=41238)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.159348,
       "model_id": 14,
-      "model_file_name": "chugawug_m_01.adr"
+      "model_file_name": "chugawug_m_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000969,
@@ -14640,11 +14674,37 @@
               "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
             }
           ]
+        },
+        {
+          "quest_id": 3954594,
+          "title": "Funding the Fun",
+          "title_string_id": 45181,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Funding the Fun (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_funding_the_fun_d9f59a)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3955014,
+          "title": "Taste Testing",
+          "title_string_id": 71709,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Taste Testing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_taste_testing_708738)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3040020,
-        3040021
+        3040021,
+        3954594,
+        3955014
       ],
       "quests_given_text": [
         "The Brewery errand chain: \"A Sasparilla Brewmaster never rests! I need you to speak with Brockoom ... Farmer Murglot ... Guard Thoomlug\" (3759436651; objective 1685817269); bixie trouble (\"wants you to deal with the bixies\", 3598316925; \"Hurry to Brewmaster Wugawump and tell him about the bixies in Sweetwater Climb!\", 2694227573); party scouting (\"scout out some party locations\", 1392384911, 3411949842; thanks 1425009787); sasparilla bills to Runalug (2048485603, 3134368944); a job for Virtalot (4219676670, 1637372591); the party-tent monsters (2070279671, by wording); the thugawug raid letter to Glugmort (\"Deliver Sasparilla Brewmaster Wugawump's letter to Glugmort at the Greenwood Camp.\", 2970237973). Job quests: Card Duelist: Squash the Shuffler (wiki giver) and Card Duelist: Parcel Recovery (wiki lists him; the video shows Runalug first). Sends the reward: \"go tell Brockoom to let you have some of the private stock!\" (307692584)."
@@ -18943,8 +19003,36 @@
       "location_evidence": [
         "\"near the stage in Wugachug\" (796026419, 3495645016). [video: nameplate on four frames, 18 m and 43 m from the cooking table and the Chugaroot Patch, FMJhD6JeqqA/00014, /00018, /00020]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954977,
+          "title": "Ready to Rock",
+          "title_string_id": 71699,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Ready to Rock (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ready_to_rock_3d3363)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3954854,
+          "title": "Done Deal",
+          "title_string_id": 391804,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Done Deal (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_done_deal_355893)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954977,
+        3954854
+      ],
       "quests_given_text": [
         "The band chain, by text: \"Wootmoot is not happy with Sandi's talent agency and wants you to let her know her services are no longer needed.\" (359256987; \"Please go to Seaside and let Sandi know that I no longer require her services.\", 983365281; \"That will be the last time I ever book talent from Sandi.\", 2261976758); the bounce back: \"Head back to Wugachug and talk to Wootmoot. Perhaps your talent for music can convince him to hire Sandi again.\" (1517784129, 3148922920); \"Play the Feeling the Beat! minigame on Novice difficulty to entertain Wootmoot.\" (1120510395; \"Wootmoot can't wait to hear what you have in store for him!\", 3746960612). The missing rockstar: \"Find clues as to the fate of the missing rockstar and return them to Wootmoot in Wugachug.\" (497711267); this ties the Pear Jam search on NPCs - Wilds (774116531, 2736597354) to Wootmoot as the host. Quest titles not found."
       ],
@@ -19328,11 +19416,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:393; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1626 (ModelId=668, ModelFileName=chugawug_m_02_ltgreen_drinking.agr, NameId=41251)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.708994,
       "model_id": 668,
-      "model_file_name": "chugawug_m_02_ltgreen_drinking.agr"
+      "model_file_name": "chugawug_m_02_ltgreen_drinking.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500001006,

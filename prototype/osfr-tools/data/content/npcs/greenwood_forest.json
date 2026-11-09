@@ -7966,9 +7966,23 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part A. The Summer Camp: Camp Chatty and Camp Robbie, row 47; source cell: [client][video][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3954740,
+          "title": "The Great Scavenger Hunt",
+          "title_string_id": 429342,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Great Scavenger Hunt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_great_scavenger_hunt_02164b)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3954740
+      ],
       "quests_given_text": [
         "The Great Scavenger Hunt (wiki, repeatable; client title 3084618415): \"Counselor Jenny lost--err, that is, organized a scavenger hunt in the area around Camp Robbie. Gather up the things on her list as quickly as you can!\" (516462579); \"Interact with the chest and I'll start timing you.\" (2401927115); minigame \"Jenny's Great Scavenger Hunt\" (854327481). The tracker title is also shown in video IYzJU-RjbPE/00076."
       ],
@@ -8488,9 +8502,23 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part A. The Summer Camp: Camp Chatty and Camp Robbie, row 43; source cell: [client][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3954588,
+          "title": "Forest Friends",
+          "title_string_id": 429431,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Forest Friends (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_forest_friends_954cf8)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3954588
+      ],
       "quests_given_text": [
         "Forest Friends (wiki, repeatable; client title 1392465804): \"Counselor Kaela has a special blend of pet food that is healthy and nutritious for various forest critters. You can hand feed some of the animals nearby.\" (1156875691). Goal target \"Knock out Counselor Kaela\" (314220268)."
       ],
@@ -11514,8 +11542,8 @@
       ],
       "roles": [
         "quest_giver",
-        "vendor",
-        "trainer"
+        "trainer",
+        "vendor"
       ],
       "enemy_kind": null,
       "location_evidence": [
@@ -11649,9 +11677,23 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part B. The Greenwood Camp (chugawug archer camp) and the merchants around it, row 59; source cell: [client][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3954604,
+          "title": "Greenwood Situation Report",
+          "title_string_id": 47853,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Greenwood Situation Report (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_greenwood_situation_report_7f5bbd)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3954604
+      ],
       "quests_given_text": [
         "The bandit book chapter: Military Intelligence, Scouting the Stompers, Searching the Hideout, Stompenmugg and likely Thugawhomp (dev titles 2-1 to 2-5); A Bandit's Life (the first title in the wiki's Greenwood Camp list; giver not stated). Receives the letters and reports in the Larkspur, Henry/Wompugg, Wugawump and Archers-on-Patrol quests (see cross-reference). Sends the player to Wompugg's mask hand-in (\"Ask Glugmort at the Greenwood Camp how to handle Wompugg\", 163346496). Food receiver in Glugmort's Palate and A Fancy Meal for Glugmort. After the negotiation step: \"Glugmort owes [player] a favor for clearing up his ninja problem\" (2798390498). Also asks for bandit work: \"Defeat Bandit Patrolmen near the Greenwood Archer camp\" (370784815)."
       ],
