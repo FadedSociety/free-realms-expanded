@@ -76,6 +76,46 @@ pub fn reference_content() -> PathBuf {
         })
 }
 
+/// The release item table cut down to the rows quest rewards name. The reference content has
+/// no table, and a turn-in refuses a reward item it cannot define; the whole table would be
+/// parsed again for every fixture, because the content cache is per directory.
+fn reward_item_table() -> &'static str {
+    static TABLE: OnceLock<String> = OnceLock::new();
+    TABLE.get_or_init(|| {
+        let mut wanted = BTreeSet::new();
+        for entry in fs::read_dir(content_dir().join("quests")).unwrap() {
+            let doc = read_json(&entry.unwrap().path());
+            for record in doc["records"].as_array().into_iter().flatten() {
+                for reward in record["rewards"].as_array().into_iter().flatten() {
+                    for item in reward["items"].as_array().into_iter().flatten() {
+                        wanted.extend(item["definition_id"].as_i64());
+                    }
+                }
+            }
+        }
+        let mut table =
+            read_json(&Path::new(env!("CARGO_MANIFEST_DIR")).join("data/release/item-table.json"));
+        table["rows"]
+            .as_array_mut()
+            .unwrap()
+            .retain(|row| row[0].as_i64().is_some_and(|id| wanted.contains(&id)));
+        table.to_string()
+    })
+}
+
+/// The reference content plus the reward item table, for a suite that loads gameplay content
+/// without a `Fixture`. One copy per test binary, under Cargo's test scratch directory.
+pub fn reference_with_reward_items() -> &'static Path {
+    static DIRECTORY: OnceLock<PathBuf> = OnceLock::new();
+    DIRECTORY.get_or_init(|| {
+        let path = Path::new(env!("CARGO_TARGET_TMPDIR"))
+            .join(concat!("reward-content-", env!("CARGO_CRATE_NAME")));
+        copy_tree(&reference_content(), &path);
+        fs::write(path.join("item-table.json"), reward_item_table()).unwrap();
+        path
+    })
+}
+
 pub fn read_json(path: &Path) -> Value {
     serde_json::from_slice(
         &fs::read(path).unwrap_or_else(|error| panic!("{}: {error}", path.display())),
@@ -114,6 +154,7 @@ impl Fixture {
             path.join("job_trainers.json"),
         )
         .unwrap();
+        fs::write(path.join("item-table.json"), reward_item_table()).unwrap();
         Self {
             path,
             character_id,

@@ -27,7 +27,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 6,
           "items": [],
           "job_xp": {
             "2": 15
@@ -36,6 +36,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T202: Ninja: The Ninja Path is a one-talk referral and had no reward row. Ninja.md says \"Experience comes from Ninja quests, battles in the Wilds, and dungeons\" (wiki) but gives no per-quest number. Zero coins and 15 Ninja (profile 2) job XP make the line advance the job without inventing a coin payout."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "6 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_ninja_path_b1b52a); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -128,7 +132,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 6,
           "items": [],
           "job_xp": {
             "2": 25
@@ -137,6 +141,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T202: Ninja: Stolen Away is a single kill and had no reward row. Ninja.md gives no per-quest XP; zero coins and 25 Ninja (profile 2) job XP use the T202 (R) kill rung and do not invent a coin payout."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "6 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_stolen_away_fbadf0); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -345,7 +353,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75092,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Ninja's Blade of Dragonstrike (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ninja_silence_is_golden_and_deadly_5d44e6)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "2": 100
           },
@@ -581,13 +600,17 @@
       ],
       "rewards": [
         {
-          "coins": 15,
+          "coins": 5,
           "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T668: no client, wiki or repo source names a reward for this gate (quest-lines/quests.json q3110007 open: no coins, XP or item rewards found). 15 coins, no item and no job XP mirror the Warrior W5 and Ninja Achieve Level 10 level-gate payout (3150005, 3110013)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "5 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ninja_achieve_level_5_3a4563); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -1007,13 +1030,17 @@
       ],
       "rewards": [
         {
-          "coins": 15,
+          "coins": 6,
           "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T662: no client, wiki or repo source names a reward for this gate (quest-lines/quests.json q3110013 open: no coins, XP or item rewards found). 15 coins, no item and no job XP mirror the Warrior W5 level-gate payout (3150005, T361)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "6 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ninja_achieve_level_10_e93190); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -1664,7 +1691,28 @@
       "rewards": [
         {
           "coins": 15,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76250,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Chunin Ninja Gi (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ninja_ice_troll_rampage_6d3a38)."
+                }
+              ]
+            },
+            {
+              "definition_id": 76254,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Chunin Ninja Hakama (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ninja_ice_troll_rampage_6d3a38)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "2": 593
           },
@@ -1676,6 +1724,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 593 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/ninja.json, record 3110023)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "The reward items are the wiki's reward cells (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ninja_ice_troll_rampage_6d3a38); this replaces the earlier note that no item is granted."
             }
           ]
         }
@@ -1768,13 +1820,17 @@
       ],
       "rewards": [
         {
-          "coins": 15,
+          "coins": 5,
           "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T665: no reward line in the client, wiki or articles (answer lab/references/quest-lines/quests.json q3110024: 'none found'; Ninja.md row F6 'unknown'). 15 coins is the T361 level-gate payout rung; no item, no job XP."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "5 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ninja_achieve_level_20_b7d43f); this replaces the earlier reconstructed amount."
             }
           ]
         }

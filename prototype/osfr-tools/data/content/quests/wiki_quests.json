@@ -7015,7 +7015,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 69825,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Chiller Boombox (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_creepy_crawly_cards_39c23c)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {

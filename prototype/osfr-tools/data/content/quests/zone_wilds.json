@@ -65,7 +65,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 11014,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Unmoving Orb (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_who_done_it_65278d)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "1": 30
           },
@@ -136,7 +147,22 @@
       "rewards": [
         {
           "coins": 2,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 7289,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Wild T-Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_making_amends_7e7375)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours); the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "1": 20
           },

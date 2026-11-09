@@ -30,13 +30,17 @@
       ],
       "rewards": [
         {
-          "coins": 5,
+          "coins": 6,
           "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T542: five coins, the W110 fallback for an unknown quest payout; no job XP is paid (a locked job must not block the turn-in), no item and no membership bonus is inferred."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "6 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_become_a_miner_1893a3); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -234,7 +238,28 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76147,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Landfill Miner Hat (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_all_i_got_e9e696)."
+                }
+              ]
+            },
+            {
+              "definition_id": 75701,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Miner's Power Shard of Timing I (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_all_i_got_e9e696)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "14": 75
           },
@@ -246,6 +271,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 75 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/miner.json, record 3100003)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "The reward items are the wiki's reward cells (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_all_i_got_e9e696); this replaces the earlier note that no item is granted."
             }
           ]
         }
@@ -391,7 +420,28 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75700,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Miner's Power Shard of Talent I (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_rush_order_805f52)."
+                }
+              ]
+            },
+            {
+              "definition_id": 76148,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Landfill Miner Pants (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_rush_order_805f52)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "14": 100
           },
@@ -403,6 +453,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/miner.json, record 3100004)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "The reward items are the wiki's reward cells (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_rush_order_805f52); this replaces the earlier note that no item is granted."
             }
           ]
         }
@@ -531,7 +585,28 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76144,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Landfill Miner Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_gem_appraisal_e7552d)."
+                }
+              ]
+            },
+            {
+              "definition_id": 75604,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Miner's Shovel of Talent II (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_gem_appraisal_e7552d)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "14": 125
           },
@@ -626,13 +701,17 @@
       ],
       "rewards": [
         {
-          "coins": 15,
+          "coins": 5,
           "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T665: the guide's reward cell is unknown and the answer lab/references/quest-lines/quests.json q3100006 records none. 15 coins is the T361 level-gate payout rung (warrior 3150005); no item and no job XP, so no pinned XP table moves."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "5 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_reach_level_5_cb63cb); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -1041,13 +1120,17 @@
       ],
       "rewards": [
         {
-          "coins": 15,
+          "coins": 6,
           "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T729: no source gives this level gate a reward (quest-lines/quests.json q3100012: rewards empty). Fifteen coins are the T361/T663 level-gate payout, paid once by the 49/14 turn-in; no item and no job XP."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "6 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_reach_level_10_4a80f3); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -1123,7 +1206,7 @@
       ],
       "rewards": [
         {
-          "coins": 5,
+          "coins": 30,
           "items": [],
           "job_xp": {
             "14": 750
@@ -1136,6 +1219,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 750 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/miner.json, record 3100013)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "30 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_finding_southvale_0f77f3); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -1747,13 +1834,17 @@
       ],
       "rewards": [
         {
-          "coins": 15,
+          "coins": 6,
           "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T729: no source gives this level gate a reward (quest-lines/quests.json q3100019: rewards empty). Fifteen coins are the T361/T663 level-gate payout, paid once by the 49/14 turn-in; no item and no job XP. Global.Text 387521 '30 Ticket Chest' is tagged quest_reward beside these strings, but nothing ties it to this quest and the server has no such item, so it is not used."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "6 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_reach_level_15_fd93f9); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -1828,7 +1919,7 @@
       ],
       "rewards": [
         {
-          "coins": 5,
+          "coins": 61,
           "items": [],
           "job_xp": {
             "14": 1917
@@ -1841,6 +1932,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 1917 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/miner.json, record 3100020)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "61 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_see_for_yourself_3a1854); this replaces the earlier reconstructed amount."
             }
           ]
         }

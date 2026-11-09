@@ -709,13 +709,17 @@
       ],
       "rewards": [
         {
-          "coins": 15,
+          "coins": 5,
           "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T667: the level-gate payout is 15 coins, paid once by the 49/14 turn-in, with no item and no job XP: the same reconstructed gate pay as Chef level 5 (T723), Warrior W5 (T361) and Postman level 10 (T663). The answer for this quest records no reward (quest-lines/quests.json: none evidenced), so the number is ours and lives in data."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "5 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_reach_level_5_4f14c1); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -1188,13 +1192,17 @@
       ],
       "rewards": [
         {
-          "coins": 15,
+          "coins": 5,
           "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T723: the level-gate payout is 15 coins, paid once by the 49/14 turn-in, with no item and no job XP: the same reconstructed gate pay as Warrior W5 (T361) and Postman level 10 (T663). The answer for this quest records no reward (quest-lines/quests.json: unknown), so the number is ours and lives in data."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "5 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_reach_level_10_4c0bd2); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -1702,13 +1710,17 @@
       ],
       "rewards": [
         {
-          "coins": 15,
+          "coins": 6,
           "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T723: the level-gate payout is 15 coins, paid once by the 49/14 turn-in, with no item and no job XP: the same reconstructed gate pay as Warrior W5 (T361) and Postman level 10 (T663). The answer for this quest records no reward (quest-lines/quests.json: unknown), so the number is ours and lives in data."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "6 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_reach_level_15_61667c); this replaces the earlier reconstructed amount."
             }
           ]
         }

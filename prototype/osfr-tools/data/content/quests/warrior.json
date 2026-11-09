@@ -252,7 +252,38 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 46168,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Warrior Tunic (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_one_with_your_weapon_e49a3e)."
+                }
+              ]
+            },
+            {
+              "definition_id": 10835,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Warrior Triangle Shard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_one_with_your_weapon_e49a3e)."
+                }
+              ]
+            },
+            {
+              "definition_id": 47012,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Warrior Pauldrons (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_one_with_your_weapon_e49a3e)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "32": 47
           },
@@ -264,6 +295,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 47 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/warrior.json, record 3150004)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "The reward items are the wiki's reward cells (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_one_with_your_weapon_e49a3e); this replaces the earlier note that no item is granted."
             }
           ]
         }
@@ -347,13 +382,17 @@
       ],
       "rewards": [
         {
-          "coins": 15,
+          "coins": 5,
           "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T361: W5's guide reward cell is unknown; 15 coins are this task's reconstructed gate-quest payout, paid once by the 49/14 turn-in. The client text 'Reach level 5 as a warrior, then return to Steele.' (248116931) and Warrior guide row W5 are the reward evidence. No item and no job XP are granted, so the pinned quest_job_xp table is untouched."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "5 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_achieve_level_5_1ca314); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -520,7 +559,28 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 46459,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Warrior Gauntlets (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_you_deserve_better_a33338)."
+                }
+              ]
+            },
+            {
+              "definition_id": 46284,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Warrior Hightops (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_you_deserve_better_a33338)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "32": 47
           },
@@ -532,6 +592,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 47 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/warrior.json, record 3150007)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "The reward items are the wiki's reward cells (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_you_deserve_better_a33338); this replaces the earlier note that no item is granted."
             }
           ]
         }
@@ -624,7 +688,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 10839,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Warrior Square Shard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_distracted_dfae74)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "32": 209
           },
@@ -636,6 +711,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 209 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/warrior.json, record 3150008)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "The reward items are the wiki's reward cells (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_distracted_dfae74); this replaces the earlier note that no item is granted."
             }
           ]
         }
@@ -707,7 +786,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76333,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Second Wind Warrior Helm (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_too_distracted_to_work_9d2567)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "32": 100
           },
@@ -1219,13 +1309,17 @@
       ],
       "rewards": [
         {
-          "coins": 15,
+          "coins": 6,
           "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T723: the level-gate payout is 15 coins, paid once by the 49/14 turn-in, with no item and no job XP: the same reconstructed gate pay as Warrior W5 (T361) and Postman level 10 (T663). The answer for this quest records no reward (quest-lines/quests.json: unknown), so the number is ours and lives in data."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "6 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_achieve_level_15_7be33d); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -1461,7 +1555,28 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 46318,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Warrior Hightops (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_asking_old_folks_75a859)."
+                }
+              ]
+            },
+            {
+              "definition_id": 10840,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Warrior Square Shard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_asking_old_folks_75a859)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "32": 360
           },
@@ -1473,6 +1588,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 360 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/warrior.json, record 3150019)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "The reward items are the wiki's reward cells (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_asking_old_folks_75a859); this replaces the earlier note that no item is granted."
             }
           ]
         }

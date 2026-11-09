@@ -155,7 +155,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75799,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Drawing Blacksmith Gloves (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_smithy_merchandise_4b4f0b)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "16": 75
           },
@@ -457,7 +468,28 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 21015,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Blacksmith Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_warrior_weapon_6057f6)."
+                }
+              ]
+            },
+            {
+              "definition_id": 6725,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Blacksmith Tongs (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_warrior_weapon_6057f6)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "16": 500
           },
@@ -545,7 +577,7 @@
       ],
       "rewards": [
         {
-          "coins": 5,
+          "coins": 61,
           "items": [],
           "job_xp": {
             "16": 444
@@ -558,6 +590,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 444 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020007)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "61 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_bat_fighter_cc8bc8); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -1165,7 +1201,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 1378,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Blacksmith Boots (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_supply_delivery_211817)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "16": 664
           },
@@ -1252,7 +1299,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 30,
           "items": [],
           "job_xp": {
             "16": 200
@@ -1261,6 +1308,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 200 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020014)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "30 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_do_work_b6a88a)."
             }
           ]
         }
@@ -1831,13 +1882,17 @@
       ],
       "rewards": [
         {
-          "coins": 15,
+          "coins": 6,
           "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T671: quest-lines/quests.json q3020019 states no reward ('rewards_missing'). 15 coins, no item and no job XP mirror the shipped level-gate payout (Warrior W5 3150005, Chef 3050020, Wizard 3160024); the number is ours and lives in data."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "6 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_reach_level_15_a70bda); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -2181,13 +2236,17 @@
       ],
       "rewards": [
         {
-          "coins": 15,
+          "coins": 6,
           "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T660: no reward is recorded for Blacksmith: Reach Level 20 in the client text, the wiki or the quest-lines answer (quest-lines/quests.json q3020024, rewards empty); 15 coins is the T361 gate-quest payout, paid once by the 49/14 turn-in. No item and no job XP, so the pinned quest_job_xp table is untouched."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "6 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_reach_level_20_89dd73); this replaces the earlier reconstructed amount."
             }
           ]
         }

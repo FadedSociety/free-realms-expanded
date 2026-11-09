@@ -932,8 +932,9 @@ fn learning_then_catching_and_turning_in_pays_once() {
     assert_eq!(rig.coins(), coins + 10);
 
     rig.take_end(TESTING_THE_WATERS, 408_261);
-    rig.turn_in(TESTING_THE_WATERS, 10, 10); // L926: wiki stars (3070004 pays 10; 3070003 still 25)
-    assert_eq!(rig.coins(), coins + 20);
+    // Wiki reward: 3070004 pays 3 coins and 10 stars (3070003 still 10 coins, 25 stars).
+    rig.turn_in(TESTING_THE_WATERS, 3, 10);
+    assert_eq!(rig.coins(), coins + 13);
     assert_eq!(rig.fisherman_xp(), xp + 45); // L926: wiki stars (25 + 10 catch + 10)
     assert_eq!(rig.status(TESTING_THE_WATERS), QuestStatus::Completed);
     assert_eq!(rig.game.state().npc_quests.unwrap().pending_turnin, None);
@@ -948,7 +949,7 @@ fn learning_then_catching_and_turning_in_pays_once() {
         rows.iter().all(|row| row[0] != QUEST_CHOICE as u32),
         "a completed chapter is not re-offered: {rows:?}"
     );
-    assert_eq!(rig.coins(), coins + 20);
+    assert_eq!(rig.coins(), coins + 13);
     assert_eq!(rig.fisherman_xp(), xp + 45); // L926: wiki stars (25 + 10 catch + 10)
     assert_eq!(rig.fishing_items(), 1);
 }
@@ -1152,7 +1153,7 @@ fn the_two_records_load_with_the_real_game_id_and_giver() {
     assert_eq!(objectives[0]["id"], json!(1));
     assert_eq!(objectives[0]["npc_id"], json!(REED));
     assert_objective_sources(objectives);
-    assert_reward_shape(learn, 25);
+    assert_reward_shape(learn, 10, 25);
 
     let testing = find_record(TESTING_THE_WATERS);
     assert_eq!(testing["enabled"], json!(true));
@@ -1172,7 +1173,7 @@ fn the_two_records_load_with_the_real_game_id_and_giver() {
     assert_eq!(objectives[1]["kind"], json!("talk_to_npc"));
     assert_eq!(objectives[1]["id"], json!(2));
     assert_eq!(objectives[1]["npc_id"], json!(REED));
-    assert_reward_shape(testing, 10); // L926: wiki stars
+    assert_reward_shape(testing, 3, 10); // wiki coins; L926: wiki stars
 
     // T542 enables the Jobs-window record 3070001 (Reed, one Talk, five coins); the
     // narrative alternative 3070002 stays unpublished.
@@ -1244,10 +1245,10 @@ fn assert_objective_sources(objectives: &[Value]) {
     }
 }
 
-fn assert_reward_shape(record: &Value, xp: u32) {
+fn assert_reward_shape(record: &Value, coins: u32, xp: u32) {
     let rewards = record["rewards"].as_array().unwrap();
     assert_eq!(rewards.len(), 1);
-    assert_eq!(rewards[0]["coins"], json!(10));
+    assert_eq!(rewards[0]["coins"], json!(coins));
     assert_eq!(rewards[0]["items"], json!([]));
     assert_eq!(rewards[0]["job_xp"], json!({"137": xp}));
     assert!(

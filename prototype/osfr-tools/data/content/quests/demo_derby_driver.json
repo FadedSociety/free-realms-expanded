@@ -200,7 +200,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 622,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Demo Derby Pants (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_rules_of_the_road_5bb282)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 188
           },
@@ -318,7 +329,18 @@
       "rewards": [
         {
           "coins": 20,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 59654,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Derby Basic Jumping Springs (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_license_to_drive_ce11d0)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 188
           },
@@ -834,7 +856,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 602,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Demo Derby Helmet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_so_long_betty_2ba799)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 300
           },
@@ -978,7 +1011,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 14015,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Demo Derby Boots (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_tucker_s_troubles_a7e676)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 400
           },
@@ -1342,7 +1386,18 @@
       "rewards": [
         {
           "coins": 20,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 15157,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Rookie Demo Derby Pants (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_seeking_a_sponsor_02a042)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 375
           },
@@ -1844,7 +1899,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76053,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Frame-Notched Derby Boots (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_think_of_the_kittens_06a484)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 188
           },
@@ -1927,7 +1993,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 59663,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Turning Minus (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_paws_n_claws_smash_a_thon_6ba69c)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 200
           },
@@ -2195,7 +2272,18 @@
       "rewards": [
         {
           "coins": 20,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76056,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Leaf-Springed Derby Jacket (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_stunt_double_5ba215)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 213
           },

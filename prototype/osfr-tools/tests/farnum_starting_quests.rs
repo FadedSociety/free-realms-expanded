@@ -243,7 +243,7 @@ fn cleetus_offers_both_quests_to_the_right_job() {
         COPPER_TITLE,
         COPPER_DESCRIPTION,
     );
-    assert_offer_reward(&packet, 5, 15);
+    assert_offer_reward(&packet, 10, 15);
     assert_eq!(
         quest_status(&miner, COPPER_COLLECTION),
         QuestStatus::Offered
@@ -470,13 +470,13 @@ fn copper_collection_counts_five_gathers_from_the_node_path() {
         COPPER_END_TEXT,
         now + 100,
     );
-    assert_end_reward(&end, COPPER_COLLECTION, 5, 15);
+    assert_end_reward(&end, COPPER_COLLECTION, 10, 15);
     finish_quest(
         &mut game,
         &character,
         COPPER_COLLECTION,
         MINER,
-        5,
+        10,
         15,
         now + 200,
     );
@@ -632,7 +632,7 @@ fn the_two_new_records_load_and_their_targets_exist() {
     };
     for (id, title, coins, profile, xp) in [
         (FIGHTING_THE_PACK, FIGHTING_TITLE, 18, BRAWLER, 25),
-        (COPPER_COLLECTION, COPPER_TITLE, 5, MINER, 15),
+        (COPPER_COLLECTION, COPPER_TITLE, 10, MINER, 15),
     ] {
         let quest = record(id);
         assert_eq!(quest["enabled"].as_bool(), Some(true), "quest {id} enabled");

@@ -96,7 +96,7 @@
       ],
       "rewards": [
         {
-          "coins": 5,
+          "coins": 7,
           "items": [],
           "job_xp": {
             "48": 25
@@ -109,6 +109,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T202: The Burden of Fame is a four-talk entry quest. Kart Driver.md records no quest XP or coin figure (the video set shows none), so 25 Kart Driver (profile 48) job XP is the T202 (R) collect/referral rung; the existing five-coin amount is unchanged."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "7 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_burden_of_fame_431f91); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -636,7 +640,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 13434,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Kart Driver Jersey (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_you_want_to_go_fast_8b63f9)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 525
           },
@@ -720,7 +735,7 @@
       ],
       "rewards": [
         {
-          "coins": 5,
+          "coins": 13,
           "items": [],
           "job_xp": {
             "48": 15
@@ -733,6 +748,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T202: one-talk referral rung = 15 Kart Driver (profile 48) job XP. The quest answer and the client locale record no coin or XP amount for this quest, so the value is reconstructed, not recovered."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "13 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_exploder_s_league_sponsorship_da6a67); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -1311,7 +1330,7 @@
       ],
       "rewards": [
         {
-          "coins": 5,
+          "coins": 13,
           "items": [],
           "job_xp": {
             "48": 30
@@ -1320,6 +1339,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T726: no source gives this quest a reward (quest-lines/quests.json q3080019: no reward line; 394688 belongs to The Price of Fame). 5 coins and 30 Kart Driver (profile 48) job XP repeat the enabled sibling 3080002's rung in kart_driver.json; no item."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "13 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_seaside_board_of_tourism_sponsorship_fe502a); this replaces the earlier reconstructed amount."
             }
           ]
         }

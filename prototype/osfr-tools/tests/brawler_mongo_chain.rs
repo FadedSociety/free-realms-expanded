@@ -65,7 +65,8 @@ const GLOVES: i32 = 75_855;
 const MYSTERY_PACK: i32 = 10_482;
 const POTION: i32 = 11_002;
 const BATTLE_COINS: u32 = 19;
-const QUEST_COINS: u32 = 5;
+const QUEST_COINS: u32 = 6; // C1, the wiki's reward cell
+const SECOND_COINS: u32 = 5; // C2
 const BATTLE_XP: u32 = 50;
 const QUEST_XP: u32 = 25;
 const SECOND_XP: u32 = 75; // L926: wiki stars (C2, 3030005; C1 still pays 25)
@@ -468,7 +469,7 @@ fn carlos_offers_bringing_back_brazenfist_only_to_brawlers() {
     assert_eq!(activated, [2], "step 2 opens only after step 1");
     assert_eq!(counts(&game, FIRST), vec![1, 0]);
 
-    // The exact payout is the quest's 5 coins / 25 Brawler XP, paid once at 49/14.
+    // The exact payout is the quest's 6 coins / 25 Brawler XP, paid once at 49/14.
     let initial = economy(&game);
     finish_battle(&mut game, &mut character, &mut at);
     let after_run = economy(&game);
@@ -857,7 +858,7 @@ fn honor_lost_requires_the_first_quest_and_reuses_the_fight() {
     let end = open_end_screen(&mut game, &character, SECOND, SECOND_END_TEXT, &mut at);
     assert_eq!(
         i32::from_le_bytes(end[27..31].try_into().unwrap()),
-        QUEST_COINS as i32
+        SECOND_COINS as i32
     );
     at += 100;
     finish_quest(
@@ -865,13 +866,13 @@ fn honor_lost_requires_the_first_quest_and_reuses_the_fight() {
         &character,
         SECOND,
         BRAWLER,
-        QUEST_COINS,
+        SECOND_COINS,
         SECOND_XP,
         at,
     );
     assert_eq!(
         coins(&game),
-        before_second_run.coins + BATTLE_COINS + QUEST_COINS
+        before_second_run.coins + BATTLE_COINS + SECOND_COINS
     );
     assert_eq!(
         profile_xp(&game, BRAWLER),
@@ -1278,8 +1279,9 @@ fn the_battle_and_quest_content_load_with_real_targets() {
         );
         let rewards = record["rewards"].as_array().unwrap();
         assert_eq!(rewards.len(), 1);
-        assert_eq!(rewards[0]["coins"], QUEST_COINS);
-        assert_eq!(rewards[0]["items"].as_array().unwrap().len(), 0);
+        assert_eq!(rewards[0]["coins"], if id == FIRST { QUEST_COINS } else { SECOND_COINS });
+        // C2 pays the wiki's two items, the Saved by the Bell Pants and Boots.
+        assert_eq!(rewards[0]["items"].as_array().unwrap().len(), if id == FIRST { 0 } else { 2 });
         assert_eq!(rewards[0]["job_xp"]["43"], if id == FIRST { QUEST_XP } else { SECOND_XP }); // L926: wiki stars
         assert!(
             !record["source"].as_array().unwrap().is_empty(),

@@ -27,13 +27,13 @@ mod npc_quest_chain;
 use npc_quest_chain::{
     Fixture, accept, assert_packet_changes_nothing, character_at_for, coins, content_dir,
     end_screen_reward, finish_quest, offer, pending_turnin, profile_xp, quest_end_reply,
-    release_end_screen, talk_step,
+    release_end_screen, seed_active_profile, seed_quest, talk_step,
 };
 use osfr_tools::{
     character_store::CharacterState,
     gameplay::Gameplay,
     npc_interaction::{NpcInteraction, decode_quest_offer_49_1},
-    quest_engine::{CharacterEligibility, QuestEngine, QuestProgress, QuestStatus},
+    quest_engine::{CharacterEligibility, QuestEngine, QuestStatus},
 };
 
 const CHARACTER: u64 = 318_001;
@@ -43,17 +43,25 @@ const ADVENTURER: i32 = 1;
 const COBBLESTONE_GIVER: u64 = 9_000_000_189;
 /// Ricky Danger 9_500_000_254, the one-talk objective target of quest 3000021.
 const COBBLESTONE_TARGET: u64 = 9_500_000_254;
-/// Supply Master Leo 9000000479; gives the no-reward quest 3020014 (T729 gave 3100020, the
-/// previous fixture, a reward when it enabled its prerequisite).
-const EMPTY_REWARD_GIVER: u64 = 9_000_000_479;
-/// 3020014's prerequisite. Content disables it, so the test restores the
-/// completed-quest save state that `repair_counters` preserves for exactly this case.
-const DISABLED_PREREQUISITE: u32 = 3_020_013;
+/// Sam Potts 9000000187 (Sanctuary); gives the no-coin quest 3040004 "Practice Makes
+/// Perfect". The earlier fixtures each gained a reward later: T729 gave 3100020 one, and the
+/// wiki pass gave 3020014 its 30 coins.
+const EMPTY_REWARD_GIVER: u64 = 9_000_000_187;
+/// 3040004's prerequisite, 3040005 "52 Card Pick-Up" (eight `quest-sam-s-cards` nodes, then
+/// Sam). The test seeds it completed with its full counters.
+const EMPTY_REWARD_PREREQUISITE: u32 = 3_040_005;
+const EMPTY_REWARD_PREREQUISITE_COUNTS: [u32; 2] = [8, 1];
+/// The Card Duelist profile; 3040004 is gated on it being the active job.
+const CARD_DUELIST: i32 = 120;
 /// One Talk, 5 coins and 20 Adventurer XP, no items and no display rows.
 const REWARD_QUEST: u32 = 3_000_021;
-/// Enabled record with no coins or items; since L926 its only reward is 200 Blacksmith job XP, so its bundle is still the 69-byte base.
-const EMPTY_REWARD_QUEST: u32 = 3_020_014;
-/// Greenwood Forest giver 9000000444; quest 3000024 pays 13 coins and 25 Adventurer XP.
+/// Enabled record with no coins or items; its only reward is 300 Card Duelist job XP (L926
+/// wiki stars), so its bundle is still the 69-byte base. No enabled quest on this content
+/// has a reward with no stars either.
+const EMPTY_REWARD_QUEST: u32 = 3_040_004;
+const EMPTY_REWARD_STARS: i32 = 300;
+/// Greenwood Forest giver 9000000444; quest 3000024 pays 13 coins, 25 Adventurer XP and five
+/// Queen's Firecrackers.
 const SECOND_GIVER: u64 = 9_000_000_444;
 const SECOND_REWARD_QUEST: u32 = 3_000_024;
 
@@ -79,24 +87,18 @@ fn engine(character_id: u64) -> QuestEngine {
     .expect("split quest content loads")
 }
 
-/// A session whose save already completed 3020014's prerequisite before content
-/// disabled it: `repair_counters` preserves that historical progress, and the real
-/// Talk path then offers the enabled no-reward quest. No other enabled quest has an
-/// empty reward and an offerable giver on this content.
+/// An active Card Duelist whose save already completed 3040004's prerequisite, so the real
+/// Talk path at Sam offers the enabled no-coin quest (Sam lists 3040004 first). No other
+/// enabled quest with an empty coin and item reward has a giver this fixture can reach.
 fn game_with_completed_prerequisite(fixture: &Fixture) -> Gameplay {
     let mut state = fixture.game(None).state();
-    state
-        .npc_quests
-        .as_mut()
-        .expect("the fixture binds the quest catalogue")
-        .quests
-        .insert(
-            DISABLED_PREREQUISITE,
-            QuestProgress {
-                status: QuestStatus::Completed,
-                counts: Vec::new(),
-            },
-        );
+    seed_active_profile(&mut state, CARD_DUELIST, &[]);
+    seed_quest(
+        &mut state,
+        EMPTY_REWARD_PREREQUISITE,
+        QuestStatus::Completed,
+        &EMPTY_REWARD_PREREQUISITE_COUNTS,
+    );
     fixture.game(Some(state))
 }
 
@@ -221,8 +223,8 @@ fn an_empty_reward_quest_still_sends_the_69_byte_base() {
     );
     assert_eq!(
         i32::from_le_bytes(bundle[5..9].try_into().unwrap()),
-        200, // L926: wiki stars (3020014 pays 200 Blacksmith XP)
-        "the stars word is the 200 wiki-star job XP"
+        EMPTY_REWARD_STARS, // L926: wiki stars (3040004 pays 300 Card Duelist XP)
+        "the stars word is the wiki-star job XP"
     );
     assert_eq!(
         u64::from_le_bytes(bundle[37..45].try_into().unwrap()),

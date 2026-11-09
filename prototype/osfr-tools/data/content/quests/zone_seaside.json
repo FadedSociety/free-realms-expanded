@@ -601,7 +601,22 @@
       "rewards": [
         {
           "coins": 40,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 15916,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Golden Summer Sparkler (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_booming_problem_3e0a5d)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 3 rows (colours); the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "1": 25
           },
@@ -613,6 +628,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T503: fork value, unverified; job XP 25 to profile 1 (Adventurer) is the T202 collect rung (notes/Autopilot/T202.md:137-141) and pays the Adventurer whatever job is active. No item is granted."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "The reward items are the wiki's reward cells (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_booming_problem_3e0a5d); this replaces the earlier note that no item is granted."
             }
           ]
         }

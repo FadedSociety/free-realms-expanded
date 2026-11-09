@@ -69,7 +69,7 @@ const SKIPPED: [u32; 2] = [3_000_030, 3_000_031];
 const ADVENTURER: i32 = 1;
 const MINER: i32 = 14;
 const BRAWLER: i32 = 43;
-const REWARD_COINS: u32 = 8;
+const REWARD_COINS: u32 = 26; // the wiki's reward cell, both quests
 const REWARD_XP: u32 = 225; // L926: wiki stars (3000033 and 3000034 both pay 225)
 const RUMORS_INTRO: u32 = 90_725;
 const RUMORS_TITLE: u32 = 90_726;
@@ -836,7 +836,7 @@ fn a_wrong_position_or_npc_or_forged_turn_in_changes_nothing() {
     assert_unchanged(&game, &before, "a premature 49/14");
     assert_eq!(counts(&game, RUMORS), [1, 0]);
 
-    // A near-cap wallet makes the content's 8-coin grant overflow the client's
+    // A near-cap wallet makes the content's 26-coin grant overflow the client's
     // i32 coin field. The refusal must not pay XP or an item, must leave the
     // pending screen retryable, and must not change one serialized byte. (No
     // reward row has an item, so bag capacity is not consulted by this grant.)

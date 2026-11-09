@@ -182,7 +182,28 @@
       "rewards": [
         {
           "coins": 10,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 2239,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Medic Boots (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_house_call_c716a1)."
+                }
+              ]
+            },
+            {
+              "definition_id": 18754,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Medic Cap (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_house_call_c716a1)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "11": 47
           },
@@ -194,6 +215,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 47 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090003)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "The reward items are the wiki's reward cells (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_house_call_c716a1); this replaces the earlier note that no item is granted."
             }
           ]
         }
@@ -315,7 +340,28 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 10823,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Medic Triangle Shard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_palatable_pills_188d33)."
+                }
+              ]
+            },
+            {
+              "definition_id": 10826,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Medic Square Shard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_palatable_pills_188d33)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "11": 31
           },
@@ -327,6 +373,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 31 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090004)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "The reward items are the wiki's reward cells (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_palatable_pills_188d33); this replaces the earlier note that no item is granted."
             }
           ]
         }
@@ -415,7 +465,28 @@
       "rewards": [
         {
           "coins": 15,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 4613,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Medic Scalpel (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_take_your_vitamins_da5ecc)."
+                }
+              ]
+            },
+            {
+              "definition_id": 524,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Medic Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_take_your_vitamins_da5ecc)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "11": 47
           },
@@ -427,6 +498,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 47 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090005)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "The reward items are the wiki's reward cells (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_take_your_vitamins_da5ecc); this replaces the earlier note that no item is granted."
             }
           ]
         }
@@ -518,7 +593,7 @@
       ],
       "rewards": [
         {
-          "coins": 5,
+          "coins": 6,
           "items": [],
           "job_xp": {
             "11": 25
@@ -527,6 +602,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T278: the guide row 6 reward cell is unknown. Five coins and 25 Medic (profile 11) job XP follow the existing W110/T194 referral fallback. No item is granted; the level-five ability lesson itself is not a reward item."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "6 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_achieve_level_5_7467da); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -1875,7 +1954,7 @@
       ],
       "rewards": [
         {
-          "coins": 5,
+          "coins": 6,
           "items": [],
           "job_xp": {
             "11": 25
@@ -1884,6 +1963,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T743: 5 coins and 25 Medic (profile 11) XP, the Medic level-gate payout of 3090006 (T278). The client has no reward text for this quest. No item is granted."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "6 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_achieve_level_20_12423f); this replaces the earlier reconstructed amount."
             }
           ]
         }

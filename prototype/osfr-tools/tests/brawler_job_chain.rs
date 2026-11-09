@@ -36,7 +36,7 @@ const HOOLIGAN_FIGHT: u32 = 3_030_007;
 const SEARCH_BLACKSPORE: u32 = 3_030_008;
 const GIVEN_TO_GUARD: u32 = 3_030_009;
 const HOOLIGAN_DEFINITION: u32 = 930_050;
-const QUEST_REWARD_COINS: u32 = 5;
+const CHAPTER_COINS: u32 = 6 + 15 + 15; // C3, C4 and C5
 const QUEST_REWARD_JOB_XP: u32 = 32; // L926: wiki stars (quest 3030009)
 const BRAWLER: i32 = 43;
 const ADVENTURER: i32 = 1;
@@ -50,9 +50,18 @@ fn content_dir() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
 }
 
+/// The wiki's coin reward for each quest of the chapter.
+fn reward_coins(quest_id: u32) -> u32 {
+    match quest_id {
+        REFERRAL_TO_JONES => 6,
+        HOOLIGAN_FIGHT | SEARCH_BLACKSPORE => 15,
+        GIVEN_TO_GUARD => 31,
+        other => panic!("no pinned reward for quest {other}"),
+    }
+}
+
 fn gameplay_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../lab/references/opening-anvil-placement-v1/content")
+    npc_quest_chain::reference_with_reward_items().to_path_buf()
 }
 
 fn character_at(position: [f32; 3]) -> CharacterState {
@@ -515,7 +524,7 @@ fn finish_turnin(game: &mut Gameplay, character: &CharacterState, quest_id: u32,
     let state = game.state();
     assert_eq!(
         state.inventory.coins,
-        before + QUEST_REWARD_COINS,
+        before + reward_coins(quest_id),
         "quest {quest_id} paid the wrong amount"
     );
     let quests = state.npc_quests.unwrap();
@@ -864,7 +873,7 @@ fn chapter_drives_npc_and_combat_paths_and_restores_pending_turnin() {
         "a different NPC changed the pending turn-in"
     );
     character.position = jones;
-    // C3's exact five-coin payout is asserted by `finish_turnin`; the review of
+    // C3's exact coin payout is asserted by `finish_turnin`; the review of
     // c65b2b2 found the old test only checked the chapter total.
     finish_turnin(&mut game, &character, REFERRAL_TO_JONES, &mut now);
     assert_refusal_changes_nothing(
@@ -969,7 +978,7 @@ fn chapter_drives_npc_and_combat_paths_and_restores_pending_turnin() {
     assert!(paid.changed);
     assert_eq!(
         game.state().inventory.coins,
-        before_reconnect + QUEST_REWARD_COINS
+        before_reconnect + reward_coins(HOOLIGAN_FIGHT)
     );
     assert_eq!(
         game.state().npc_quests.unwrap().quests[&HOOLIGAN_FIGHT].status,
@@ -1032,7 +1041,7 @@ fn chapter_drives_npc_and_combat_paths_and_restores_pending_turnin() {
 
     assert_eq!(
         game.state().inventory.coins,
-        initial_coins + 3 * QUEST_REWARD_COINS
+        initial_coins + CHAPTER_COINS
     );
     let quests = game.state().npc_quests.unwrap();
     for quest_id in [REFERRAL_TO_JONES, HOOLIGAN_FIGHT, SEARCH_BLACKSPORE] {
@@ -1048,7 +1057,7 @@ fn chapter_drives_npc_and_combat_paths_and_restores_pending_turnin() {
     let reloaded = reloaded.state();
     assert_eq!(
         reloaded.inventory.coins,
-        initial_coins + 3 * QUEST_REWARD_COINS
+        initial_coins + CHAPTER_COINS
     );
     let quests = reloaded.npc_quests.unwrap();
     assert_eq!(quests.pending_turnin, None);
@@ -1200,7 +1209,7 @@ fn carlos_to_jones_to_blackspore_completes_in_order() {
     let initial = complete_chapter(&mut game, &character, &mut now);
 
     let state = game.state();
-    assert_eq!(state.inventory.coins, initial + 3 * QUEST_REWARD_COINS);
+    assert_eq!(state.inventory.coins, initial + CHAPTER_COINS);
     let quests = state
         .npc_quests
         .as_ref()
@@ -1326,7 +1335,7 @@ fn chapter_rewards_are_paid_once() {
     let (mut game, character) = fresh_game();
     let mut now = 7_000;
     let initial = complete_chapter(&mut game, &character, &mut now);
-    let total = initial + 3 * QUEST_REWARD_COINS;
+    let total = initial + CHAPTER_COINS;
     assert_eq!(game.state().inventory.coins, total);
 
     for quest_id in [REFERRAL_TO_JONES, HOOLIGAN_FIGHT, SEARCH_BLACKSPORE] {
@@ -1357,7 +1366,7 @@ fn offer_gates_and_save_reload_survive() {
 
     let mut reloaded = load_game(Some(game.state()));
     let state = reloaded.state();
-    assert_eq!(state.inventory.coins, initial + 3 * QUEST_REWARD_COINS);
+    assert_eq!(state.inventory.coins, initial + CHAPTER_COINS);
     let quests = state
         .npc_quests
         .as_ref()
@@ -1520,7 +1529,7 @@ fn sabastian_offers_given_to_guard_after_honor_lost() {
 }
 
 /// T331: the C6 delivery is the real Petra actor: the Talk completes the only objective, the
-/// 49/13 names the drawn actor, and 49/14 pays exactly five coins and 32 Brawler XP once.
+/// 49/13 names the drawn actor, and 49/14 pays exactly 31 coins and 32 Brawler XP once.
 #[test]
 fn delivering_the_offer_to_petra_completes_and_pays_once() {
     let (mut game, character) = fresh_game();
@@ -1562,17 +1571,23 @@ fn delivering_the_offer_to_petra_completes_and_pays_once() {
     let state = game.state();
     assert_eq!(
         state.inventory.coins,
-        coins_before + QUEST_REWARD_COINS,
-        "C6 must pay exactly five coins"
+        coins_before + reward_coins(GIVEN_TO_GUARD),
+        "C6 must pay exactly its coins"
     );
     assert_eq!(
         profile_xp(&game, BRAWLER),
         xp_before + QUEST_REWARD_JOB_XP,
         "C6 must pay 32 Brawler XP"
     );
+    let granted: Vec<i32> = state.inventory.items[inventory_before.items.len()..]
+        .iter()
+        .map(|item| item.definition_id)
+        .collect();
+    assert_eq!(granted, [10_817], "C6 grants the wiki's reward item, once");
     assert_eq!(
-        state.inventory.items, inventory_before.items,
-        "C6 must not grant an item"
+        state.inventory.items[..inventory_before.items.len()],
+        inventory_before.items[..],
+        "C6 must not touch the items already held"
     );
     assert_eq!(
         state.inventory.equipment, inventory_before.equipment,
@@ -1606,7 +1621,7 @@ fn delivering_the_offer_to_petra_completes_and_pays_once() {
     assert_eq!(saved(&game), paid);
     assert_eq!(
         game.state().inventory.coins,
-        coins_before + QUEST_REWARD_COINS
+        coins_before + reward_coins(GIVEN_TO_GUARD)
     );
 }
 
@@ -1787,7 +1802,7 @@ fn refusals_wrong_target_and_replay_change_nothing() {
         .handle_in_world(&quest_end_reply(GIVEN_TO_GUARD), &petra_at, now)
         .expect("the restored wallet pays the turn-in");
     assert!(paid.changed);
-    assert_eq!(game.state().inventory.coins, wallet + QUEST_REWARD_COINS);
+    assert_eq!(game.state().inventory.coins, wallet + reward_coins(GIVEN_TO_GUARD));
     assert_eq!(profile_xp(&game, BRAWLER), capped_xp + QUEST_REWARD_JOB_XP);
     assert_eq!(
         game.state().npc_quests.as_ref().unwrap().quests[&GIVEN_TO_GUARD].status,
@@ -1847,7 +1862,7 @@ fn progress_survives_a_reload() {
         QuestStatus::Completed
     );
     assert_eq!(state.npc_quests.as_ref().unwrap().pending_turnin, None);
-    assert_eq!(state.inventory.coins, coins_before + QUEST_REWARD_COINS);
+    assert_eq!(state.inventory.coins, coins_before + reward_coins(GIVEN_TO_GUARD));
     assert_eq!(profile_xp(&game, BRAWLER), xp_before + QUEST_REWARD_JOB_XP);
     now += 100;
     assert_refusal_changes_nothing(
@@ -1911,7 +1926,7 @@ fn two_brawlers_progress_independently() {
     finish_turnin(&mut second, &second_at, GIVEN_TO_GUARD, &mut now);
     assert_eq!(
         second.state().inventory.coins,
-        second_coins + QUEST_REWARD_COINS
+        second_coins + reward_coins(GIVEN_TO_GUARD)
     );
     assert_eq!(
         profile_xp(&second, BRAWLER),
@@ -1939,7 +1954,7 @@ fn two_brawlers_progress_independently() {
     assert!(paid.changed);
     assert_eq!(
         first.state().inventory.coins,
-        first_wallet + QUEST_REWARD_COINS
+        first_wallet + reward_coins(GIVEN_TO_GUARD)
     );
     assert_eq!(profile_xp(&first, BRAWLER), first_xp + QUEST_REWARD_JOB_XP);
     assert_eq!(
@@ -2135,8 +2150,8 @@ fn the_spawn_and_content_are_reachable() {
     );
     assert_eq!(
         i32::from_le_bytes(end[27..31].try_into().unwrap()),
-        i32::try_from(QUEST_REWARD_COINS).unwrap(),
-        "the end screen displays the five-coin reward"
+        i32::try_from(reward_coins(GIVEN_TO_GUARD)).unwrap(),
+        "the end screen displays the coin reward"
     );
     assert_eq!(
         i32::from_le_bytes(end[31..35].try_into().unwrap()),

@@ -4,8 +4,9 @@
 //! Data-only slice. The shipped `job_browser.json` maps every row's original quest id to a
 //! regional record; the trainer in `job_trainers.json` is the giver, the one talk target and
 //! the turn-in (the original was started from the Jobs window, and the 49/15 offer path needs
-//! a giver: `gameplay/npc_quests.rs::register_breadcrumb_quests`). A finished quest pays the
-//! W110 five-coin fallback and no job XP, so a locked profile can never refuse the turn-in
+//! a giver: `gameplay/npc_quests.rs::register_breadcrumb_quests`). A finished quest pays its
+//! coins (the W110 five-coin fallback, or the wiki's reward cell where one is known: Become a
+//! Miner pays 6) and no job XP, so a locked profile can never refuse the turn-in
 //! (`tests/quest_job_xp.rs::locked_profile_turnin_is_refused_cleanly`).
 //!
 //! Every request here runs the production path in `tests/support/npc_quest_chain.rs`: the
@@ -41,14 +42,18 @@ use quest_records::{RawQuest, read_quests, shipped_quest};
 use serde_json::Value;
 use std::collections::BTreeMap;
 
-/// One mapped Jobs-window row: profile, original id, regional Become-a record, and the
-/// trainer the regional quest names (`job_trainers.json`).
+/// One mapped Jobs-window row: profile, original id, regional Become-a record, the
+/// trainer the regional quest names (`job_trainers.json`) and the coins its turn-in pays.
 struct Mapped {
     profile: i32,
     original: i32,
     regional: u32,
     trainer: u64,
+    coins: u32,
 }
+
+/// The W110 five-coin fallback every row paid until a wiki reward cell was found.
+const FALLBACK_COINS: u32 = 5;
 
 /// The rows in `job_browser.json` order.
 const MAPPED: [Mapped; 12] = [
@@ -57,72 +62,85 @@ const MAPPED: [Mapped; 12] = [
         original: 1968,
         regional: 3_070_001,
         trainer: 9_000_000_181,
+        coins: FALLBACK_COINS,
     },
     Mapped {
         profile: 52,
         original: 1965,
         regional: 3_140_001,
         trainer: 9_000_000_140,
+        coins: FALLBACK_COINS,
     },
     Mapped {
         profile: 49,
         original: 1960,
         regional: 3_060_047,
         trainer: 9_000_000_391,
+        coins: FALLBACK_COINS,
     },
     Mapped {
         profile: 48,
         original: 1961,
         regional: 3_080_050,
         trainer: 9_000_000_039,
+        coins: FALLBACK_COINS,
     },
     Mapped {
         profile: 45,
         original: 1978,
         regional: 3_050_034,
         trainer: 9_000_000_467,
+        coins: FALLBACK_COINS,
     },
     Mapped {
         profile: 35,
         original: 1952,
         regional: 3_010_035,
         trainer: 9_000_000_387,
+        coins: FALLBACK_COINS,
     },
     Mapped {
         profile: 32,
         original: 1966,
         regional: 3_150_025,
         trainer: 9_000_000_076,
+        coins: FALLBACK_COINS,
     },
+    // Become a Miner: the wiki's reward cell is 6 coins.
     Mapped {
         profile: 14,
         original: 1979,
         regional: 3_100_001,
         trainer: 9_000_000_405,
+        coins: 6,
     },
     Mapped {
         profile: 12,
         original: 1967,
         regional: 3_160_035,
         trainer: 9_000_000_324,
+        coins: FALLBACK_COINS,
     },
     Mapped {
         profile: 11,
         original: 1962,
         regional: 3_090_034,
         trainer: 9_000_000_161,
+        coins: FALLBACK_COINS,
     },
     Mapped {
         profile: 4,
         original: 1964,
         regional: 3_130_001,
         trainer: 9_000_000_091,
+        coins: FALLBACK_COINS,
     },
     Mapped {
         profile: 2,
         original: 1963,
         regional: 3_110_026,
         trainer: 9_000_000_223,
+        coins: FALLBACK_COINS,
     },
 ];
 
@@ -218,13 +236,13 @@ fn start_quest_offers_and_completes_become_a() {
     let quest = quest(mapped);
     assert_eq!(quest_status(&game, mapped.regional), QuestStatus::Active);
 
-    // Walk to the trainer and talk: the step completes, the held 49/13 shows the five-coin
+    // Walk to the trainer and talk: the step completes, the held 49/13 shows the row's coin
     // bundle and the 49/14 turn-in pays it once, with no job XP.
     let xp_before = profile_xp(&game, ADVENTURER);
     let coins_before = coins(&game);
     let mut now = 2_000;
     MAP.turn_in(&mut game, CHARACTER, &quest, ADVENTURER, &mut now);
-    assert_eq!(coins(&game), coins_before + 5, "five coins");
+    assert_eq!(coins(&game), coins_before + mapped.coins, "the row's coins");
     assert_eq!(profile_xp(&game, ADVENTURER), xp_before, "no job XP");
     assert_eq!(quest_status(&game, mapped.regional), QuestStatus::Completed);
     assert_eq!(pending_offer(&game), None);
@@ -305,8 +323,12 @@ fn each_mapped_row_reaches_an_enabled_quest() {
             shipped.objectives[0].get("dialogue_string_id").is_none(),
             "quest {regional}: no dialogue line"
         );
+        let expected = MAPPED
+            .iter()
+            .find(|row| row.regional == regional)
+            .unwrap_or_else(|| panic!("quest {regional}: not a row this suite maps"));
         let (rewards, xp) = shipped.reward_totals(profile as i32);
-        assert_eq!(rewards, 5, "quest {regional}: five coins");
+        assert_eq!(rewards, expected.coins, "quest {regional}: its own coin reward");
         assert_eq!(xp, 0, "quest {regional}: no job XP");
         assert!(
             shipped
@@ -460,11 +482,11 @@ fn progress_survives_a_reconnect() {
 
     let mut now = 6_000;
     MAP.turn_in(&mut game, CHARACTER, &quest, ADVENTURER, &mut now);
-    assert_eq!(coins(&game), 5);
+    assert_eq!(coins(&game), mapped.coins);
     assert_eq!(quest_status(&game, mapped.regional), QuestStatus::Completed);
 
     // The completion is durable: another reconnect keeps it and pays nothing more.
     let game = fixture.reload_serialized(&game);
     assert_eq!(quest_status(&game, mapped.regional), QuestStatus::Completed);
-    assert_eq!(coins(&game), 5);
+    assert_eq!(coins(&game), mapped.coins);
 }

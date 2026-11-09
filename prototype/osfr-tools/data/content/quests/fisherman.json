@@ -272,7 +272,7 @@
       ],
       "rewards": [
         {
-          "coins": 10,
+          "coins": 3,
           "items": [],
           "job_xp": {
             "137": 10
@@ -285,6 +285,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 10 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/fisherman.json, record 3070004)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "3 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_testing_the_waters_16e974); this replaces the earlier reconstructed amount."
             }
           ]
         }

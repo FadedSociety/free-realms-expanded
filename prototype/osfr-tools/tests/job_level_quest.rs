@@ -53,7 +53,8 @@ const W4: u32 = 3_150_004;
 const W5: u32 = 3_150_005;
 const W5_END: u32 = 387_435;
 const W5_OBJECTIVE: u32 = 1;
-const W5_REWARD_COINS: u32 = 15;
+/// The wiki's reward cell for 3150005 (was the reconstructed 15).
+const W5_REWARD_COINS: u32 = 5;
 const RANK_FIVE_XP: u32 = 400;
 const OPEN_WORLD: u32 = 0;
 const SECOND_CHARACTER: u64 = 194_019;
@@ -630,7 +631,8 @@ fn a_near_cap_wallet_refuses_the_turn_in_atomically() {
     let steele = avatar_at(STEELE);
     let mut now = 1_000;
     let mut state = warrior_state(&fixture, CHARACTER, 0);
-    state.inventory.coins = i32::MAX as u32 - 10;
+    // One coin short of room for the payout: the paid balance would be `i32::MAX + 1`.
+    state.inventory.coins = i32::MAX as u32 - W5_REWARD_COINS + 1;
     let mut game = fixture.game(Some(state));
     accept_w5(&mut game, &steele, &mut now);
     complete_with_realm_level(&mut game, &steele, now + 10);
@@ -646,7 +648,7 @@ fn a_near_cap_wallet_refuses_the_turn_in_atomically() {
         .expect("a near-cap wallet is a refusal, not an error");
     assert!(
         !refused.changed,
-        "a 15-coin payout over the wire coin cap is refused"
+        "a {W5_REWARD_COINS}-coin payout over the wire coin cap is refused"
     );
     assert_eq!(saved(&game), before, "the refused payout changed the save");
     assert_eq!(coins(&game), wallet);
@@ -710,7 +712,7 @@ fn the_progress_and_reward_survive_a_reload() {
     let mut paid = fixture.reload_serialized(&game);
     assert_eq!(quest_status(&paid, W5), QuestStatus::Completed);
     assert_eq!(counts(&paid, W5), vec![1]);
-    assert_eq!(coins(&paid), paid_coins, "the 15 coins survive a reload");
+    assert_eq!(coins(&paid), paid_coins, "the {W5_REWARD_COINS} coins survive a reload");
 
     now += 10;
     assert_packet_changes_nothing(

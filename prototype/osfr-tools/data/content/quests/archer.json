@@ -621,13 +621,17 @@
       ],
       "rewards": [
         {
-          "coins": 15,
+          "coins": 5,
           "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T671: no client, wiki or repo source names a reward for this gate (quest-lines/quests.json q3010009 'rewards_missing'). 15 coins, no item and no job XP mirror the shipped level-gate payout (Warrior W5 3150005, Chef 3050020, Wizard 3160024, Ninja 3110013); the number is ours and lives in data."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "5 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_achieve_level_5_e07ac2); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -802,7 +806,18 @@
       "rewards": [
         {
           "coins": 10,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75740,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Point Blank Archer Gloves (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_pondblaster_payback_c05c1b)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "35": 88
           },
@@ -915,7 +930,7 @@
       ],
       "rewards": [
         {
-          "coins": 10,
+          "coins": 7,
           "items": [],
           "job_xp": {
             "35": 88
@@ -928,6 +943,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 88 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/archer.json, record 3010012)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "7 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_archer_departure_93a803); this replaces the earlier reconstructed amount."
             }
           ]
         }

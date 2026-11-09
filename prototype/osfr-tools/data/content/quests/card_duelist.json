@@ -865,7 +865,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 248,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Striped T-Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_half_a_deck_143a79)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours); the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "120": 300
           },
@@ -1421,7 +1436,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 203,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Small Stitched Pants (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_cardie_party_064ea5)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 69 rows (colours); the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "120": 1000
           },
@@ -2761,7 +2791,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 7290,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Swimmer Short Sleeve (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_proof_is_in_the_cards_752299)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours); the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "120": 2300
           },
@@ -3000,7 +3045,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 340,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Robgoblin T-Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_playing_a_prodigy_685e66)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 35 rows (colours); the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "120": 2300
           },
@@ -3121,7 +3181,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 51122,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Duelist Machine Cap (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_best_of_the_best_f1bdc1)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 35 rows (colours); the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "120": 2500
           },
@@ -3823,7 +3898,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 50,
           "items": [],
           "job_xp": {
             "120": 100
@@ -3832,6 +3907,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/card-duelist.json, record 3040035)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "50 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_confronting_ambrose_43e151)."
             }
           ]
         }

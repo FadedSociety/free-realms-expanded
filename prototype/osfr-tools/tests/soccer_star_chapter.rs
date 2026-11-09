@@ -83,7 +83,7 @@ const DESCRIPTION: u32 = 402_583;
 const END_TEXT: u32 = 402_584;
 /// Global.Text 441183 "Win a Snowhill Soccer minigame" (guide 2216136620), the goal line.
 const GOAL_TEXT: u32 = 441_183;
-const QUEST_COINS: u32 = 10;
+const QUEST_COINS: u32 = 30;
 const QUEST_XP: u32 = 25;
 /// The shipped `soccer.json` reward for a won match (not the quest's).
 const MATCH_COINS: u32 = 10;

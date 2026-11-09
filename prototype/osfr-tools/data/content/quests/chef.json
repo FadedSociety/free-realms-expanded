@@ -416,7 +416,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 10856,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Chef Square Shard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_delivery_derailed_dbc735)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "45": 250
           },
@@ -627,7 +638,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75656,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Chef's Ring of Talent II (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_queensfields_b91ebc)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "45": 100
           },
@@ -783,7 +805,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75665,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Chef's Power Shard of Timing I (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_ranger_requisition_054e21)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "45": 100
           },
@@ -906,7 +939,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75919,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Toaster Chef Hat (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_fireworks_frenzy_2146d1)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "45": 125
           },
@@ -994,7 +1038,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75656,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Chef's Ring of Talent II (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_perry_s_pastures_a93928)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "45": 100
           },
@@ -1362,7 +1417,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75665,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Chef's Power Shard of Timing I (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_gavin_gone_missing_fb2d76)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "45": 100
           },
@@ -1487,7 +1553,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75919,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Toaster Chef Hat (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_harvest_hiccup_56014a)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "45": 125
           },
@@ -1752,13 +1829,17 @@
       ],
       "rewards": [
         {
-          "coins": 15,
+          "coins": 5,
           "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T723: the level-gate payout is 15 coins, paid once by the 49/14 turn-in, with no item and no job XP: the same reconstructed gate pay as Warrior W5 (T361) and Postman level 10 (T663). The answer for this quest records no reward (quest-lines/quests.json: unknown), so the number is ours and lives in data."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "5 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_reach_level_5_d2443a); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -2058,7 +2139,7 @@
       ],
       "rewards": [
         {
-          "coins": 5,
+          "coins": 31,
           "items": [],
           "job_xp": {
             "45": 1250
@@ -2071,6 +2152,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 1250 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050024)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "31 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_chugawhat_282975); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -2211,7 +2296,7 @@
       ],
       "rewards": [
         {
-          "coins": 5,
+          "coins": 61,
           "items": [],
           "job_xp": {
             "45": 1250
@@ -2224,6 +2309,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 1250 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050026)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "61 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_the_food_reviewer_5e6115); this replaces the earlier reconstructed amount."
             }
           ]
         }

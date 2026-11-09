@@ -38,7 +38,7 @@ pub const PILL_COINS: u32 = 5;
 pub const PILL_XP: u32 = 31; // L926: wiki stars
 pub const VITAMIN_COINS: u32 = 15;
 pub const VITAMIN_XP: u32 = 47; // L926: wiki stars
-pub const LEVEL_COINS: u32 = 5;
+pub const LEVEL_COINS: u32 = 6; // the wiki's reward cell
 pub const LEVEL_XP: u32 = 25;
 /// Client title and text ids for the two level-five records; every value resolves
 /// in the client locale table (77437/387463 are the titles the guide names).
@@ -194,11 +194,29 @@ pub fn assert_enabled_medic_chapter_records() {
                 .all(|reward| reward["job_xp"]["11"].as_u64().is_some_and(|xp| xp > 0)),
             "quest {quest_id}: the reward must name Medic (profile 11) XP"
         );
-        assert!(
-            rewards.iter().all(|reward| reward["items"]
+        // Exactly the wiki's reward cells: the three chapter quests grant their Amateur Medic
+        // pieces; the exam and the two level gates grant nothing.
+        let expected_items: Vec<(i64, u64)> = match quest_id as u32 {
+            HOUSE_CALL => vec![(2_239, 1), (18_754, 1)],
+            PILLS => vec![(10_823, 1), (10_826, 1)],
+            VITAMINS => vec![(4_613, 1), (524, 1)],
+            _ => vec![],
+        };
+        assert_eq!(rewards.len(), 1, "quest {quest_id}: one reward bundle");
+        assert_eq!(
+            rewards[0]["items"]
                 .as_array()
-                .is_some_and(|items| items.is_empty())),
-            "quest {quest_id}: no invented item is granted"
+                .unwrap()
+                .iter()
+                .map(|item| {
+                    (
+                        item["definition_id"].as_i64().unwrap(),
+                        item["count"].as_u64().unwrap(),
+                    )
+                })
+                .collect::<Vec<_>>(),
+            expected_items,
+            "quest {quest_id}: exactly the wiki's reward items are granted"
         );
     }
 

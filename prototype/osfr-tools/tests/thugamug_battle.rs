@@ -854,10 +854,10 @@ const MISSING_SISTERS: u32 = 3_000_029;
 const THIEVERY: u32 = 3_000_032;
 const INTRO_TEXT: u32 = 90_702;
 const END_TEXT: u32 = 90_705;
-const QUEST_COINS: u32 = 13;
+const QUEST_COINS: u32 = 36;
 const QUEST_XP: u32 = 225; // L926: wiki stars (3000032)
 const MISSING_SISTERS_END_TEXT: u32 = 90_624;
-const MISSING_SISTERS_COINS: u32 = 5;
+const MISSING_SISTERS_COINS: u32 = 30;
 const MISSING_SISTERS_XP: u32 = 225; // L926: wiki stars (3000029)
 const GEOFFREY: u64 = 9_000_000_330;
 /// A drawable `legacy_data` Sanctuary quest giver who offers no enabled quest.
@@ -1413,7 +1413,7 @@ fn geoffrey_offers_thugamugs_thievery_after_the_missing_sisters() {
 }
 
 /// The chapter's dungeon step is the T282 bridge battle; the results Close leaves
-/// 1/1 on it and the Talk step open, and 49/14 pays 13 coins + 225 Adventurer XP once.
+/// 1/1 on it and the Talk step open, and 49/14 pays 36 coins + 225 Adventurer XP once.
 #[test]
 fn winning_the_bridge_battle_completes_the_chapter_and_pays_once() {
     let fixture = Fixture::new();
@@ -1572,7 +1572,7 @@ fn a_premature_wrong_or_forged_turn_in_changes_nothing() {
     session.open_end_screen(THIEVERY, END_TEXT);
     assert_eq!(session.pending(), Some(THIEVERY));
 
-    // The coin balance cannot hold the 13-coin grant: the grant is refused for
+    // The coin balance cannot hold the 36-coin grant: the grant is refused for
     // this player, nothing is paid, and the pending screen stays retryable.
     let mut capped = reopen_with(
         &fixture,

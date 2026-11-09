@@ -203,7 +203,7 @@
       ],
       "rewards": [
         {
-          "coins": 5,
+          "coins": 6,
           "items": [],
           "job_xp": {
             "43": 25
@@ -212,6 +212,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T252: the retail quest payout is unknown; five coins and 25 Brawler (profile 43) XP follow the W110/T101/T202 small-quest fallback. No item is granted because the Brawler trainer already grants the starter outfit, so a second free grant would be a sellable duplicate."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "6 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_bringing_back_brazenfist_6c5d05); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -300,7 +304,28 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75857,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Saved by the Bell Brawler Pants (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_honor_lost_1b0858)."
+                }
+              ]
+            },
+            {
+              "definition_id": 75854,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Saved by the Bell Brawler Boots (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_honor_lost_1b0858)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "43": 75
           },
@@ -312,6 +337,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 75 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030005)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "The reward items are the wiki's reward cells (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_honor_lost_1b0858); this replaces the earlier note that no item is granted."
             }
           ]
         }
@@ -372,8 +401,19 @@
       ],
       "rewards": [
         {
-          "coins": 5,
-          "items": [],
+          "coins": 6,
+          "items": [
+            {
+              "definition_id": 75289,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Brawler's Power Shard of Vitality I (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_building_your_rep_8ee82a)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "43": 50
           },
@@ -385,6 +425,14 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 50 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030006)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "The reward items are the wiki's reward cells (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_building_your_rep_8ee82a); this replaces the earlier note that no item is granted."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "6 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_building_your_rep_8ee82a); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -468,8 +516,19 @@
       ],
       "rewards": [
         {
-          "coins": 5,
-          "items": [],
+          "coins": 15,
+          "items": [
+            {
+              "definition_id": 75858,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Saved by the Bell Brawler Shoulderpads (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_delinquent_dilemma_8aeffc)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "43": 50
           },
@@ -481,6 +540,14 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 50 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030007)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "The reward items are the wiki's reward cells (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_delinquent_dilemma_8aeffc); this replaces the earlier note that no item is granted."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "15 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_delinquent_dilemma_8aeffc); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -558,8 +625,19 @@
       ],
       "rewards": [
         {
-          "coins": 5,
-          "items": [],
+          "coins": 15,
+          "items": [
+            {
+              "definition_id": 75855,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Saved by the Bell Brawler Gloves (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_bad_business_ca1135)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "43": 63
           },
@@ -571,6 +649,14 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 63 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030008)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "The reward items are the wiki's reward cells (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_bad_business_ca1135); this replaces the earlier note that no item is granted."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "15 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_bad_business_ca1135); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -653,8 +739,19 @@
       ],
       "rewards": [
         {
-          "coins": 5,
-          "items": [],
+          "coins": 31,
+          "items": [
+            {
+              "definition_id": 10817,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Brawler Triangle Shard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_given_to_guard_2c00ef)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "43": 32
           },
@@ -666,6 +763,14 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 32 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030009)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "The reward items are the wiki's reward cells (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_given_to_guard_2c00ef); this replaces the earlier note that no item is granted."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "31 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_given_to_guard_2c00ef); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -1480,13 +1585,17 @@
       ],
       "rewards": [
         {
-          "coins": 15,
+          "coins": 5,
           "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T660: no reward is recorded for Brawler: Achieve Level 5 in the client text, the wiki or the quest-lines answer (quest-lines/quests.json q3030021, rewards empty); 15 coins is the T361 gate-quest payout, paid once by the 49/14 turn-in. No item and no job XP, so the pinned quest_job_xp table is untouched."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "5 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_achieve_level_5_33bb19); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -1703,7 +1812,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 9637,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Brawler Pants (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_finding_a_buyer_a4416c)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "43": 125
           },
@@ -1715,6 +1835,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 125 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030024)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "The reward items are the wiki's reward cells (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_finding_a_buyer_a4416c); this replaces the earlier note that no item is granted."
             }
           ]
         }
@@ -1924,7 +2048,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 9532,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Brawler Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_iou_47a058)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "43": 25
           },

@@ -221,7 +221,7 @@ fn burden_of_fame(game: &mut Gameplay, now: &mut u64) {
         *now,
     );
     *now += 10;
-    finish_quest(game, &raina, BURDEN_OF_FAME, KART_DRIVER, 5, 25, *now);
+    finish_quest(game, &raina, BURDEN_OF_FAME, KART_DRIVER, 7, 25, *now);
 }
 
 fn ranger_requisition(game: &mut Gameplay, now: &mut u64) {
@@ -263,7 +263,7 @@ fn ninja_path(game: &mut Gameplay, now: &mut u64) {
     *now += 10;
     release_end_screen(game, &grosh, NINJA_PATH, GROSH, NINJA_END_TEXT, 15, *now);
     *now += 10;
-    finish_quest(game, &grosh, NINJA_PATH, NINJA, 0, 15, *now);
+    finish_quest(game, &grosh, NINJA_PATH, NINJA, 6, 15, *now);
 }
 
 #[test]
@@ -347,7 +347,7 @@ fn kart_line_pays_its_job_xp_once() {
     burden_of_fame(&mut game, &mut now);
     assert_eq!(profile_xp(&game, KART_DRIVER), 25);
     assert_eq!(profile_xp(&game, ADVENTURER), 15);
-    assert_eq!(coins(&game), 10);
+    assert_eq!(coins(&game), 12, "Introduce Yourself's 5 coins plus Burden of Fame's 7");
 
     let finished = saved(&game);
     now += 10;
@@ -370,7 +370,7 @@ fn ninja_line_pays_its_job_xp_once() {
 
     ninja_path(&mut game, &mut now);
     assert_eq!(profile_xp(&game, NINJA), 15);
-    assert_eq!(coins(&game), 0, "the zero-coin Ninja row pays XP only");
+    assert_eq!(coins(&game), 6, "the Ninja Path row pays the wiki's 6 coins with its XP");
 }
 
 #[test]
@@ -411,7 +411,7 @@ fn xp_follows_the_quest_job_not_the_active_job() {
     let brawler_before = profile_xp(&game, BRAWLER);
     switch_job(&mut game, &grosh, BRAWLER, now);
     now += 10;
-    finish_quest(&mut game, &grosh, NINJA_PATH, NINJA, 0, 15, now);
+    finish_quest(&mut game, &grosh, NINJA_PATH, NINJA, 6, 15, now);
 
     assert_eq!(
         active_job(&game),
@@ -778,7 +778,7 @@ fn xp_survives_relog_and_is_not_repaid() {
     // The replayed 49/13 arrives with the speaker spawn; the client's 49/14 settles
     // the pending screen without needing the session-only held packet.
     now += 10;
-    finish_quest(&mut game, &grosh, NINJA_PATH, NINJA, 0, 15, now);
+    finish_quest(&mut game, &grosh, NINJA_PATH, NINJA, 6, 15, now);
     let finished = saved(&game);
 
     game = fixture.reload(&game);
@@ -816,7 +816,7 @@ fn xp_survives_relog_and_is_not_repaid() {
         "replayed accept after relog",
     );
     assert_eq!(profile_xp(&game, NINJA), 15);
-    assert_eq!(coins(&game), 0, "the zero-coin Ninja row pays XP only");
+    assert_eq!(coins(&game), 6, "the Ninja Path row's 6 coins are paid once");
 }
 
 #[test]
@@ -1021,8 +1021,9 @@ fn the_wired_job_line_quests_keep_their_job_gates() {
 #[test]
 fn configured_job_xp_and_job_gates_match_the_task_table() {
     let content = content_dir();
-    // (file, quest id, giver, prerequisites, reward coins, job gate, profile, XP)
-    let expected: [(&str, u32, u64, &[u32], u32, Option<i32>, i32, u32); 31] = [
+    // (file, quest id, giver, prerequisites, reward coins, reward item ids, job gate, profile, XP).
+    // Coins and items are the wiki's (lab/tools/quest_rewards.py, 2026-11-09).
+    let expected: [(&str, u32, u64, &[u32], u32, &[u32], Option<i32>, i32, u32); 31] = [
         // L1057: the Kart line's next link, gated like the rest of it.
         (
             "kart_driver.json",
@@ -1030,6 +1031,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             9_500_000_950,
             &[3_080_007],
             0,
+            &[13_434],
             Some(KART_DRIVER),
             KART_DRIVER,
             525, // L926: wiki stars
@@ -1040,6 +1042,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             MERIGOLD,
             &[],
             5,
+            &[],
             None,
             ADVENTURER,
             15,
@@ -1050,6 +1053,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             9_000_000_189,
             &[],
             5,
+            &[],
             None,
             ADVENTURER,
             20,
@@ -1060,6 +1064,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             9_000_000_227,
             &[],
             5,
+            &[],
             None,
             ADVENTURER,
             15,
@@ -1069,7 +1074,8 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             3_000_059,
             9_500_000_254,
             &[3_000_021],
-            5,
+            7,
+            &[],
             None,
             ADVENTURER,
             30,
@@ -1079,7 +1085,8 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             3_000_060,
             9_500_000_254,
             &[3_000_059],
-            5,
+            2,
+            &[],
             None,
             ADVENTURER,
             25,
@@ -1090,6 +1097,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             AUGUSTE,
             &[],
             5,
+            &[],
             Some(CHEF),
             CHEF,
             25,
@@ -1100,18 +1108,20 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             AUGUSTE,
             &[],
             0,
+            &[75_665],
             Some(CHEF),
             CHEF,
             100, // L926: wiki stars
         ),
         // T669: Chef: The Food Reviewer (M8), band 3 gate (min_level 10 replaces the disabled
-        // 3050025 prerequisite); the guide's reward cell is unknown, so the small-quest rung (L926: now the wiki stars).
+        // 3050025 prerequisite); the wiki's 61 coins and stars replace the small-quest rung.
         (
             "chef.json",
             3_050_026,
             9_000_000_061,
             &[],
-            5,
+            61,
+            &[],
             Some(CHEF),
             CHEF,
             1250, // L926: wiki stars
@@ -1121,7 +1131,8 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             BURDEN_OF_FAME,
             RAINA,
             &[],
-            5,
+            7,
+            &[],
             Some(KART_DRIVER),
             KART_DRIVER,
             25,
@@ -1132,19 +1143,21 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             MUSTANG,
             &[BURDEN_OF_FAME],
             5,
+            &[],
             Some(KART_DRIVER),
             KART_DRIVER,
             30,
         ),
         // T726: the Seaside Board of Tourism Sponsorship (Petal Oceanmist, 9500000613);
-        // 5 coins / 30 Kart Driver XP repeat 3080002's rung (no source gives a reward).
+        // the wiki's 13 coins, and 30 Kart Driver XP repeating 3080002's rung.
         // F745 keeps the row as the decision pin the final scan's allowlist needs.
         (
             "kart_driver.json",
             3_080_019,
             9_500_000_613,
             &[],
-            5,
+            13,
+            &[],
             Some(KART_DRIVER),
             KART_DRIVER,
             30,
@@ -1157,6 +1170,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             9_500_000_164,
             &[],
             5,
+            &[],
             Some(KART_DRIVER),
             KART_DRIVER,
             188, // L926: wiki stars
@@ -1166,18 +1180,20 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             3_080_009,
             9_500_000_872,
             &[],
-            5,
+            13,
+            &[],
             Some(KART_DRIVER),
             KART_DRIVER,
             15,
         ),
-        ("ninja.json", NINJA_PATH, TY, &[], 0, Some(NINJA), NINJA, 15),
+        ("ninja.json", NINJA_PATH, TY, &[], 6, &[], Some(NINJA), NINJA, 15),
         (
             "ninja.json",
             3_110_002,
             9_000_000_335,
             &[NINJA_PATH],
-            0,
+            6,
+            &[],
             Some(NINJA),
             NINJA,
             25,
@@ -1188,6 +1204,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             TY,
             &[3_110_002],
             5,
+            &[75_092],
             Some(NINJA),
             NINJA,
             100, // L926: wiki stars
@@ -1201,6 +1218,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             CLEETUS,
             &[],
             18,
+            &[],
             Some(BRAWLER),
             BRAWLER,
             25,
@@ -1210,7 +1228,8 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             3_000_016,
             CLEETUS,
             &[],
-            5,
+            10,
+            &[],
             Some(MINER),
             MINER,
             15,
@@ -1222,46 +1241,51 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             3_000_029,
             GEOFFREY,
             &[],
-            5,
+            30,
+            &[],
             None,
             ADVENTURER,
             225, // L926: wiki stars
         ),
         // T277: the Royal Courier's independent Local Hero entry. Like T279 it has
         // no prerequisite and no job gate; its 25 XP pays the explicit Adventurer
-        // profile and its 13 coins are the guide's final popup.
+        // profile, its 13 coins are the guide's final popup and the wiki adds the
+        // Queen's Firecrackers.
         (
             "adventurer.json",
             3_000_024,
             ROYAL_COURIER,
             &[],
             13,
+            &[3_992],
             None,
             ADVENTURER,
             25,
         ),
         // T330: the chapter after T279's playable 3000029. The disabled middle
         // records are skipped, so its only prerequisite is the playable chapter;
-        // it keeps T277's 13-coin chapter rung and pays explicit profile 1.
+        // it pays the wiki's 36 coins and explicit profile 1.
         (
             "adventurer.json",
             3_000_032,
             GEOFFREY,
             &[3_000_029],
-            13,
+            36,
+            &[],
             None,
             ADVENTURER,
             225, // L926: wiki stars
         ),
         // T377: the next two chapter records. The disabled E2/E3 are skipped, so E5
-        // chains from the playable E4 and E6 from E5. Both keep the small-referral
-        // fallback (8 coins, explicit Adventurer profile-1 XP, no item).
+        // chains from the playable E4 and E6 from E5. Both pay the wiki's 26 coins
+        // and explicit Adventurer profile-1 XP, no item.
         (
             "adventurer.json",
             3_000_033,
             GEOFFREY,
             &[3_000_032],
-            8,
+            26,
+            &[],
             None,
             ADVENTURER,
             225, // L926: wiki stars
@@ -1271,7 +1295,8 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             3_000_034,
             GEOFFREY,
             &[3_000_033],
-            8,
+            26,
+            &[],
             None,
             ADVENTURER,
             225, // L926: wiki stars
@@ -1284,7 +1309,8 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             3_030_004,
             9_000_000_042,
             &[],
-            5,
+            6,
+            &[],
             Some(BRAWLER),
             BRAWLER,
             25,
@@ -1295,66 +1321,74 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             9_000_000_042,
             &[3_030_004],
             5,
+            &[75_857, 75_854],
             Some(BRAWLER),
             BRAWLER,
             75, // L926: wiki stars
         ),
-        // T331: C6 keeps the Brawler hand-off gate and the small-chapter 5-coin rung.
+        // T331: C6 keeps the Brawler hand-off gate; the wiki's 31 coins and the Amateur
+        // Brawler Triangle Shard replace the small-chapter rung.
         (
             "brawler.json",
             3_030_009,
             9_000_000_446,
             &[3_030_008],
-            5,
+            31,
+            &[10_817],
             Some(BRAWLER),
             BRAWLER,
             32, // L926: wiki stars
         ),
         // T724: Brawler: IOU! (M8), a playtest entry behind the band gate (min_level 5 replaces the
-        // disabled 3030026 prerequisite); the guide's reward cell is unknown, so the small-quest rung.
+        // disabled 3030026 prerequisite); the small-quest coin rung plus the wiki's Pro Brawler Shirt.
         (
             "brawler.json",
             3_030_027,
             9_000_000_009,
             &[],
             5,
+            &[9_532],
             Some(BRAWLER),
             BRAWLER,
             25,
         ),
         // T669: Brawler: Finding a Buyer (M5) behind the same band gate and T660's Achieve Level 5;
-        // Petra offers it and the guide's reward cell is unknown, so the small-quest rung.
+        // Petra offers it; the small-quest coin rung plus the wiki's Pro Brawler Pants.
         (
             "brawler.json",
             3_030_024,
             9_000_000_428,
             &[3_030_021],
             5,
+            &[9_637],
             Some(BRAWLER),
             BRAWLER,
             125, // L926: wiki stars
         ),
         // T334: the second Miner chapter, after T300's playable 3100002. 5 coins
-        // and 15 Miner XP mirror the first rung; the guide's reward cell is unknown
-        // and no item is granted.
+        // mirror the first rung; the wiki grants the Landfill Miner Hat and the
+        // Miner's Power Shard of Timing I.
         (
             "miner.json",
             3_100_003,
             9_000_000_217,
             &[3_100_002],
             5,
+            &[76_147, 75_701],
             Some(MINER),
             MINER,
             75, // L926: wiki stars
         ),
-        // T411: the third Miner chapter, Trixi's Rush Order after 3100003. 5 coins and
-        // 20 Miner XP follow the small follow-up rate; no item is granted.
+        // T411: the third Miner chapter, Trixi's Rush Order after 3100003. 5 coins
+        // follow the small follow-up rate; the wiki grants the Miner's Power Shard of
+        // Talent I and the Landfill Miner Pants.
         (
             "miner.json",
             3_100_004,
             9_000_000_220,
             &[3_100_003],
             5,
+            &[75_700, 76_148],
             Some(MINER),
             MINER,
             100, // L926: wiki stars
@@ -1399,7 +1433,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             })
         })
     };
-    for (file, quest_id, giver, prerequisites, coins, job, profile, xp) in expected {
+    for (file, quest_id, giver, prerequisites, coins, items, job, profile, xp) in expected {
         let document: Value =
             serde_json::from_slice(&fs::read(content.join("quests").join(file)).unwrap()).unwrap();
         let record = document["records"]
@@ -1435,8 +1469,22 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
         let rewards = record["rewards"].as_array().unwrap();
         assert_eq!(rewards.len(), 1, "{file}: quest {quest_id} pays one row");
         let reward = &rewards[0];
-        assert_eq!(reward["coins"].as_u64(), Some(u64::from(coins)));
-        assert_eq!(reward["items"], json!([]));
+        assert_eq!(
+            reward["coins"].as_u64(),
+            Some(u64::from(coins)),
+            "{file}: quest {quest_id} pays the wiki's coins"
+        );
+        let granted: Vec<u64> = reward["items"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|item| item["definition_id"].as_u64().unwrap())
+            .collect();
+        let wiki_items: Vec<u64> = items.iter().map(|&id| u64::from(id)).collect();
+        assert_eq!(
+            granted, wiki_items,
+            "{file}: quest {quest_id} grants exactly the wiki's items"
+        );
         assert_eq!(
             reward["job_xp"],
             json!({ profile.to_string(): xp }),
@@ -1513,7 +1561,8 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
                 continue;
             }
             // T665: the Ninja gates Ice Troll Rampage (3110023) and Achieve Level 20 (3110024)
-            // carry job gate 2 and pay coins only; tests/zone_quests_snowhill_dartmoor.rs covers them.
+            // carry job gate 2 and pay no job XP (coins, and Ice Troll Rampage's wiki items);
+            // tests/zone_quests_snowhill_dartmoor.rs covers them.
             if file == "ninja.json" && [3_110_023, 3_110_024].contains(&id) {
                 continue;
             }

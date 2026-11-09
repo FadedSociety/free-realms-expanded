@@ -893,13 +893,17 @@
       ],
       "rewards": [
         {
-          "coins": 10,
+          "coins": 22,
           "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T730: quest-lines/quests.json q3000011 cites no reward (its 20 coins and 50 Brawler XP cover this quest and Pull the Plug together, notes/Tasks.md:104). The opening's own stage 910009 'Where's the Help?' pays 10 coins (tests/fixtures/quests/opening.json), so the regional quest pays the same. No job XP: no job gate and no source."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "22 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_where_s_the_help_2ba736); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -1300,7 +1304,7 @@
       ],
       "rewards": [
         {
-          "coins": 5,
+          "coins": 10,
           "items": [],
           "job_xp": {
             "14": 15
@@ -1313,6 +1317,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "10 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cleetus_copper_collection_7c393c); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -1496,7 +1504,7 @@
       ],
       "rewards": [
         {
-          "coins": 5,
+          "coins": 7,
           "items": [
             {
               "definition_id": 30923,
@@ -1518,6 +1526,10 @@
             {
               "kind": "video",
               "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:92; 3JXpHghLOTs/00014 shows one Shimmering Air Triangle Shard; catalogue 30923 chosen by exact locale name (R numeric binding)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "7 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_peep_s_missing_bowl_9c7d6c); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -2043,7 +2055,18 @@
       "rewards": [
         {
           "coins": 13,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 3992,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Queen's Firecrackers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_local_hero_257901)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "1": 25
           },
@@ -2500,7 +2523,7 @@
       ],
       "rewards": [
         {
-          "coins": 5,
+          "coins": 30,
           "items": [],
           "job_xp": {
             "1": 225
@@ -2517,6 +2540,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000029)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "30 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_missing_sisters_2b90b2); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -2775,7 +2802,7 @@
       ],
       "rewards": [
         {
-          "coins": 13,
+          "coins": 36,
           "items": [],
           "job_xp": {
             "1": 225
@@ -2788,6 +2815,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000032)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "36 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_thugamug_s_thievery_86e032); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -2900,7 +2931,7 @@
       ],
       "rewards": [
         {
-          "coins": 8,
+          "coins": 26,
           "items": [],
           "job_xp": {
             "1": 225
@@ -2913,6 +2944,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000033)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "26 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_rumors_of_briarwood_2018e3); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -3019,7 +3054,7 @@
       ],
       "rewards": [
         {
-          "coins": 8,
+          "coins": 26,
           "items": [],
           "job_xp": {
             "1": 225
@@ -3032,6 +3067,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000034)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "26 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_shrouded_history_f43287); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -3142,7 +3181,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 26,
           "items": [],
           "job_xp": {
             "1": 225
@@ -3151,6 +3190,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000035)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "26 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_forgotten_princess_66a775)."
             }
           ]
         }
@@ -3229,8 +3272,23 @@
       ],
       "rewards": [
         {
-          "coins": 0,
-          "items": [],
+          "coins": 9,
+          "items": [
+            {
+              "definition_id": 340,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Robgoblin T-Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_find_the_caravan_56e4b2)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 35 rows (colours); the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "1": 225
           },
@@ -3238,6 +3296,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000036)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "9 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_find_the_caravan_56e4b2)."
             }
           ]
         }
@@ -3577,8 +3639,23 @@
       ],
       "rewards": [
         {
-          "coins": 0,
-          "items": [],
+          "coins": 30,
+          "items": [
+            {
+              "definition_id": 7289,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Wild T-Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_small_wooden_box_6bf6ae)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours); the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "1": 225
           },
@@ -3586,6 +3663,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000039)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "30 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_small_wooden_box_6bf6ae)."
             }
           ]
         }
@@ -4973,7 +5054,7 @@
       ],
       "rewards": [
         {
-          "coins": 5,
+          "coins": 7,
           "items": [],
           "job_xp": {
             "1": 30
@@ -4986,6 +5067,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T202: Call the Crew! is a two-step ordered chapter referral (Shakey, then Ricky). Adventurer.md gives no XP figure; 30 Adventurer (profile 1) job XP is the T202 (R) chapter-finale rung and the existing five-coin amount is unchanged."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "7 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_call_the_crew_b2bb2d); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -5039,7 +5124,7 @@
       ],
       "rewards": [
         {
-          "coins": 5,
+          "coins": 2,
           "items": [],
           "job_xp": {
             "1": 25
@@ -5052,6 +5137,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T202: Back for More is a one-talk follow-up. Adventurer.md gives no XP figure; 25 Adventurer (profile 1) job XP is the T202 (R) follow-up rung and the existing five-coin amount is unchanged."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "2 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_back_for_more_ee1bef); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -5103,13 +5192,17 @@
       ],
       "rewards": [
         {
-          "coins": 20,
+          "coins": 9,
           "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T360: notes/Build Guides/Content/Dungeons/Sheep Watch.md has no quest payout; its Rewards table lists only the dungeon's own rewards (122 Stars, an 8-coin prize-wheel slot, a 51-coin members bonus, wheel clothing, achievements and a reward text with no amount; checked 2026-10-21). The retail quest payout is unknown. 20 coins is the W110 small-referral fallback in the existing small final-era coin style. No item is granted (a free, sellable grant is avoided) and job_xp is empty so tests/quest_job_xp.rs's pinned configured-XP table is unchanged."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "9 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_investigate_the_wolves_7529b0); this replaces the earlier reconstructed amount."
             }
           ]
         }

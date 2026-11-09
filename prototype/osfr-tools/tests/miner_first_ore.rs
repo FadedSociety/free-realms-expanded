@@ -1195,7 +1195,8 @@ fn all_i_got_is_offered_after_the_first_ore() {
 }
 
 /// T334: the Talk to Trixi completes the one objective, opens the held 49/13 and the 49/14
-/// pays exactly 5 coins + 75 Miner XP with no item. Both replayed replies are inert.
+/// pays exactly 5 coins + 75 Miner XP and grants the wiki's two items (76147, 75701) once.
+/// Both replayed replies are inert.
 #[test]
 fn talking_to_trixi_completes_and_pays_once() {
     let fixture = Fixture::new();
@@ -1231,10 +1232,14 @@ fn talking_to_trixi_completes_and_pays_once() {
         xp_before + 75, // L926: wiki stars
         "exactly 75 Miner XP"
     );
+    // The wiki's reward cells: Landfill Miner Hat and Miner's Power Shard of Timing I.
+    let mut expected_items = items_before;
+    expected_items.extend([(76_147, 1), (75_701, 1)]);
+    expected_items.sort_unstable();
     assert_eq!(
         item_ledger(&game),
-        items_before,
-        "the referral grants no item and consumes none"
+        expected_items,
+        "the referral grants exactly the wiki's two items and consumes none"
     );
 
     // A replayed end reply and a replayed accept pay nothing.
@@ -1591,7 +1596,16 @@ fn the_record_and_both_npcs_resolve() {
     let rewards = quest["rewards"].as_array().unwrap();
     assert_eq!(rewards.len(), 1);
     assert_eq!(rewards[0]["coins"], json!(5));
-    assert_eq!(rewards[0]["items"], json!([]));
+    // The wiki's reward cells: Landfill Miner Hat and Miner's Power Shard of Timing I.
+    assert_eq!(
+        rewards[0]["items"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|item| (item["definition_id"].as_i64().unwrap(), item["count"].as_u64().unwrap()))
+            .collect::<Vec<_>>(),
+        vec![(76_147, 1), (75_701, 1)]
+    );
     assert_eq!(rewards[0]["job_xp"], json!({"14": 75})); // L926: wiki stars
     assert!(has_source(&rewards[0], "reconstructed"));
     assert!(has_source(quest, "reconstructed"));
@@ -1794,8 +1808,8 @@ fn rush_order_is_offered_after_all_i_got() {
 }
 
 /// T411: Smitty Talk, one six-ore copper-vein win, Trixi Talk; the 49/14 pays exactly 5 coins
-/// + 100 profile-14 XP once from the live state (after a job switch), grants no item, and the
-/// counters, coins and XP survive `game_store` reloads.
+/// + 100 profile-14 XP once from the live state (after a job switch), grants the wiki's two
+/// items (75700, 76148) once, and the counters, coins and XP survive `game_store` reloads.
 #[test]
 fn smitty_then_copper_then_trixi_pays_once() {
     let fixture = six_ore_fixture();
@@ -1876,10 +1890,14 @@ fn smitty_then_copper_then_trixi_pays_once() {
     finish_quest(&mut game, &at_trixi, RUSH_ORDER, MINER, 5, 100, at + 300); // L926: wiki stars
     assert_eq!(profile_xp(&game, MINER), xp_after_mining + 100); // L926: wiki stars
     assert_eq!(profile_xp(&game, BRAWLER), brawler_before);
+    // The wiki's reward cells: Miner's Power Shard of Talent I and Landfill Miner Pants.
+    let mut expected_items = items_before;
+    expected_items.extend([(75_700, 1), (76_148, 1)]);
+    expected_items.sort_unstable();
     assert_eq!(
         item_ledger(&game),
-        items_before,
-        "the quest grants no item and consumes none"
+        expected_items,
+        "the quest grants exactly the wiki's two items and consumes none"
     );
 
     // A reload keeps the paid result; replays pay nothing and Trixi offers nothing more.
@@ -2076,7 +2094,16 @@ fn the_objective_is_produced_by_the_shipped_mining_board() {
     let rewards = quest["rewards"].as_array().unwrap();
     assert_eq!(rewards.len(), 1);
     assert_eq!(rewards[0]["coins"], json!(5));
-    assert_eq!(rewards[0]["items"], json!([]));
+    // The wiki's reward cells: Miner's Power Shard of Talent I and Landfill Miner Pants.
+    assert_eq!(
+        rewards[0]["items"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|item| (item["definition_id"].as_i64().unwrap(), item["count"].as_u64().unwrap()))
+            .collect::<Vec<_>>(),
+        vec![(75_700, 1), (76_148, 1)]
+    );
     assert_eq!(rewards[0]["job_xp"], json!({"14": 100})); // L926: wiki stars
     assert!(has_source(&rewards[0], "reconstructed"));
     let evidence: Vec<&str> = quest["source"]

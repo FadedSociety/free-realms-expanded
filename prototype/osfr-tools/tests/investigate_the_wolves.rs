@@ -1,6 +1,6 @@
 //! T360: Anne at Farnum Farmstead gives "Investigate the Wolves" (quest
 //! 3000061), one `complete_dungeon` step on the T319 Sheep Watch battle 12350,
-//! turned back in to Anne for 20 coins.
+//! turned back in to Anne for 9 coins.
 //!
 //! This is content plus a test: the quest record lives in
 //! `data/content/quests/adventurer.json`, the registry ids in `jobs.json` (the
@@ -93,7 +93,7 @@ const INTRO: u32 = 101_014;
 const DESCRIPTION: u32 = 101_016;
 const END_TEXT: u32 = 101_007;
 const GOAL_TEXT: u32 = 388_319;
-const COINS: u32 = 20;
+const COINS: u32 = 9;
 const ADVENTURER: i32 = 1;
 const MINER: i32 = 14;
 const BRAWLER: i32 = 43;
@@ -413,7 +413,7 @@ fn open_end_screen(game: &mut Gameplay, at: &CharacterState, now: &mut u64) -> V
     assert_eq!(
         end_screen_reward(&end),
         (COINS, 0),
-        "the shared 49/13 reader: 20 coins and no job-XP stars"
+        "the shared 49/13 reader: 9 coins and no job-XP stars"
     );
     end
 }
@@ -456,7 +456,7 @@ fn anne_offers_investigate_the_wolves_and_accepts_it() {
 
 /// The real marker -> Go -> win path credits objective 1 once; a duplicate win
 /// changes nothing; the results Close returns to the world; the return Talk
-/// carries end text 101007 and the 20-coin reward, paid once by 49/14.
+/// carries end text 101007 and the 9-coin reward, paid once by 49/14.
 #[test]
 fn winning_sheep_watch_completes_the_objective_and_returns_to_anne() {
     let fixture = Fixture::new();
@@ -512,7 +512,7 @@ fn winning_sheep_watch_completes_the_objective_and_returns_to_anne() {
     let coins_before = coins(&game);
     finish_quest(&mut game, &at, QUEST, ADVENTURER, COINS, 0, now);
     now += 10;
-    assert_eq!(coins(&game), coins_before + COINS, "49/14 pays 20 coins");
+    assert_eq!(coins(&game), coins_before + COINS, "49/14 pays 9 coins");
     assert_eq!(quest_status(&game, QUEST), QuestStatus::Completed);
 
     // Replayed turn-in and accept pay nothing and change no byte.
@@ -1000,7 +1000,7 @@ fn a_live_change_before_the_turn_in_survives() {
 /// A live vendor purchase commits between the win and the turn-in and survives
 /// the 49/14 payout: Vela's real 26/8 -> 26/10 Shop -> 66/43 buy debits the
 /// catalogue price and adds a new stack of the item (the opening bag has none),
-/// then 49/14 adds only its own 20 coins on the live wallet and bag, never
+/// then 49/14 adds only its own 9 coins on the live wallet and bag, never
 /// restoring the accept-time snapshot. The item and price come from
 /// `vendors.json`/`stores.json`, the same content the 165/10/66/43 route reads.
 /// This is the real merchant transaction; `a_live_change_before_the_turn_in_survives`
@@ -1082,7 +1082,7 @@ fn a_vendor_purchase_before_the_turn_in_survives() {
     assert_eq!(quest_status(&game, QUEST), QuestStatus::Completed);
 }
 
-/// A wallet that cannot hold the 20-coin grant refuses the turn-in atomically:
+/// A wallet that cannot hold the 9-coin grant refuses the turn-in atomically:
 /// no coins, no save bytes and the pending end screen stays retryable. The same
 /// pending save with a normal wallet pays exactly once.
 #[test]

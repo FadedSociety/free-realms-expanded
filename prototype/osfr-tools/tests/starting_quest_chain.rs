@@ -518,7 +518,7 @@ fn highroad_entry_chain_finishes_through_the_real_quest_engine() {
             QuestEvent::TalkToNpc { npc_id: BURT_CREWE },
             QuestEvent::TalkToNpc { npc_id: RAINA_RUSH },
         ],
-        5,
+        7,
     );
     let loaded = engine.state().clone();
     engine =
@@ -540,7 +540,8 @@ fn highroad_entry_chain_finishes_through_the_real_quest_engine() {
         5,
     );
 
-    assert_eq!(rewards.inventory.state().coins, starting_coins + 15);
+    // 5 (3000020) + 7 (3080001) + 5 (3080002).
+    assert_eq!(rewards.inventory.state().coins, starting_coins + 17);
     assert_eq!(
         engine.progress(3_000_020).unwrap().status,
         QuestStatus::Completed
@@ -595,7 +596,7 @@ fn cobblestone_post_opening_chain_finishes_and_is_not_rewarded_twice() {
                 npc_id: RICKY_DANGER,
             },
         ],
-        5,
+        7,
     );
     rewards = finish_quest(
         &mut engine,
@@ -603,10 +604,11 @@ fn cobblestone_post_opening_chain_finishes_and_is_not_rewarded_twice() {
         3_000_060,
         RICKY_DANGER,
         &[QuestEvent::TalkToNpc { npc_id: SAMANTHA }],
-        5,
+        2,
     );
 
-    assert_eq!(rewards.inventory.state().coins, starting_coins + 15);
+    // 5 (3000021) + 7 (3000059) + 2 (3000060).
+    assert_eq!(rewards.inventory.state().coins, starting_coins + 14);
     for quest_id in [3_000_021, 3_000_059, 3_000_060] {
         assert_eq!(
             engine.progress(quest_id).unwrap().status,

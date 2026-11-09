@@ -370,8 +370,8 @@ fn the_star_word_sums_every_profile_and_the_miner_is_paid_only_its_share() {
     let southvale = ZoneQuest::from_record(find_quest(&patched, SOUTHVALE), DERP, MILI, MINER);
     assert_eq!(
         (southvale.coins, southvale.xp, southvale.profile_xp),
-        (5, 20, 15),
-        "5 coins, a 20-star total and the Miner's 15 XP share"
+        (30, 20, 15),
+        "30 coins, a 20-star total and the Miner's 15 XP share"
     );
     let mut now = 1_000;
 

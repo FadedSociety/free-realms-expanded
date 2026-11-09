@@ -940,7 +940,28 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
             rewards[0]["job_xp"]["32"].as_u64(),
             Some(u64::from(chapter_xp(record["id"].as_u64().unwrap() as u32))) // L926: wiki stars
         );
-        assert_eq!(rewards[0]["items"], serde_json::json!([]));
+        // W4 grants the wiki's reward cells (Amateur Warrior Tunic, Triangle Shard, Pauldrons);
+        // W1 grants nothing.
+        let expected_items: Vec<(i64, u64)> = match record["id"].as_u64().unwrap() as u32 {
+            W4 => vec![(46_168, 1), (10_835, 1), (47_012, 1)],
+            _ => vec![],
+        };
+        assert_eq!(
+            rewards[0]["items"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|item| {
+                    (
+                        item["definition_id"].as_i64().unwrap(),
+                        item["count"].as_u64().unwrap(),
+                    )
+                })
+                .collect::<Vec<_>>(),
+            expected_items,
+            "quest {} reward items",
+            record["id"]
+        );
         assert!(
             rewards[0]["source"]
                 .as_array()
@@ -1007,7 +1028,7 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
         Some(i64::from(WARRIOR))
     );
     assert_eq!(w5["objectives"][0]["level"].as_u64(), Some(5));
-    assert_eq!(w5["rewards"][0]["coins"].as_u64(), Some(15));
+    assert_eq!(w5["rewards"][0]["coins"].as_u64(), Some(5));
     assert_eq!(w5["rewards"][0]["items"], serde_json::json!([]));
     assert_eq!(w5["rewards"][0]["job_xp"], serde_json::json!({}));
 

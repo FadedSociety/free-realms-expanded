@@ -1435,13 +1435,17 @@
       ],
       "rewards": [
         {
-          "coins": 15,
+          "coins": 6,
           "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T663: no source gives this quest a reward (quest-lines/quests.json q3130017: 'unknown; no reward data in record, client text or wiki'). Fifteen coins are the T361 level-gate payout the Warrior W5 gate uses, paid once by the 49/14 turn-in; no item and no job XP, so the pinned quest_job_xp table is untouched."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "6 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_achieve_level_10_63e217); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -2024,7 +2028,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 9,
           "items": [],
           "job_xp": {
             "4": 950
@@ -2033,6 +2037,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 950 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130023)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "9 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_fair_warning_c41bc0)."
             }
           ]
         }
@@ -2837,7 +2845,28 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 10867,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Postman Triangle Shard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_outpost_ordeal_28d8ee)."
+                }
+              ]
+            },
+            {
+              "definition_id": 1762,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Postman Hat (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_outpost_ordeal_28d8ee)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {

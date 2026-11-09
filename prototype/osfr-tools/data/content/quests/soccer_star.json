@@ -199,7 +199,7 @@
       ],
       "rewards": [
         {
-          "coins": 10,
+          "coins": 30,
           "items": [],
           "job_xp": {
             "52": 25
@@ -208,6 +208,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T409: the guide records no Snowy Scrimmage reward ('Rewards are largely unknown'; no quest-complete frame). 10 coins and 25 Soccer Star (profile 52) XP are the T244 job-entry rung on the T202 small bonus ladder (25 for a single follow-up objective); no item is granted."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "30 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_soccer_star_snowy_scrimmage_7b6c90); this replaces the earlier reconstructed amount."
             }
           ]
         }
@@ -335,8 +339,19 @@
       ],
       "rewards": [
         {
-          "coins": 5,
-          "items": [],
+          "coins": 30,
+          "items": [
+            {
+              "definition_id": 62517,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Soccer Star Triangle Shard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_soccer_star_meeting_the_team_8c5bab)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "52": 25
           },
@@ -344,6 +359,14 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T665: no reward is evidenced (answer lab/references/quest-lines/quests.json q3140005; the jerseys are consumed, not a reward). 5 coins and 25 Soccer Star (profile 52) XP repeat the Warrior follow-up rung (T257/T202); no item."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "The reward items are the wiki's reward cells (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_soccer_star_meeting_the_team_8c5bab); this replaces the earlier note that no item is granted."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "30 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_soccer_star_meeting_the_team_8c5bab); this replaces the earlier reconstructed amount."
             }
           ]
         }
