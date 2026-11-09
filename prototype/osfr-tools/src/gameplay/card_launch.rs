@@ -205,6 +205,21 @@ impl Gameplay {
         self.card_launches.as_ref()?.scenario()
     }
 
+    /// The decks this character built, offered beside the starter for a deck row's fight.
+    pub fn built_decks(&self) -> Vec<crate::card_game::BuiltDeck> {
+        self.earned_cards.decks.clone()
+    }
+
+    /// Whether this character can keep `deck`.
+    pub fn can_keep_deck(&self, deck: &crate::card_game::BuiltDeck) -> bool {
+        self.earned_cards.has_room_for_deck(deck)
+    }
+
+    /// Applies a deck the card window saved or removed; true when something changed.
+    pub fn change_built_deck(&mut self, change: crate::card_game::DeckChange) -> bool {
+        self.earned_cards.change_deck(change)
+    }
+
     /// The cards this character has earned, for the card login's collection sync.
     pub fn earned_cards(&self) -> Vec<crate::card_game::StarterCard> {
         self.earned_cards.rows()

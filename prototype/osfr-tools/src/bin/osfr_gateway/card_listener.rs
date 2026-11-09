@@ -29,9 +29,30 @@ use serde_json::Value;
 use std::io::{ErrorKind, Read, Write};
 use std::net::{IpAddr, SocketAddr, TcpStream};
 
-/// What a card login's ticket names: its character, that row's client scenario and the cards the
-/// character has earned; or a refusal.
-type Redeemed = Result<(u64, Option<i32>, Vec<osfr_tools::card_game::StarterCard>), &'static str>;
+/// What a card login's ticket names: its character, that row's client scenario, the cards the
+/// character has earned, the decks it has built and its photo booth headshot (empty for none);
+/// or a refusal.
+type Redeemed = Result<
+    (
+        u64,
+        Option<i32>,
+        Vec<osfr_tools::card_game::StarterCard>,
+        Vec<osfr_tools::card_game::BuiltDeck>,
+        Vec<u8>,
+    ),
+    &'static str,
+>;
+
+/// What a connection hands back to `Server::poll_card`: single-player records and deck changes.
+type Outbox<'a> = (
+    &'a mut Vec<(u64, card_service::SinglePlayerRecord)>,
+    &'a mut Vec<(u64, osfr_tools::card_game::DeckChange)>,
+);
+/// How much of a deck save that could not be read is logged.
+const DECK_LOG_BYTES: usize = 160;
+/// (R) Deck saves and deletes one card window may make: more than a player needs, few enough
+/// that a client looping them cannot keep the realm writing its save.
+const MAX_DECK_COMMANDS: u32 = 128;
 
 /// (R) The gateway's own player ceilings: a stranger cannot hold more sockets than players.
 const MAX_CONNECTIONS: usize = 16;
@@ -57,6 +78,8 @@ pub(super) struct CardListener {
     /// L935: the single-player records of logged-in connections since the last drain, with the
     /// character each connection logged in as (`Server::poll_card` settles them).
     records: Vec<(u64, card_service::SinglePlayerRecord)>,
+    /// The decks logged-in connections saved or removed since the last drain.
+    decks: Vec<(u64, osfr_tools::card_game::DeckChange)>,
     /// T813: the lobby a login enters, from the launch block (none: the login stops there).
     lobby: Option<osfr_tools::card_game::Lobby>,
 }
@@ -84,6 +107,9 @@ struct Connection {
     sync: SyncStep,
     /// The collection this login synced: the starter set plus what the character has earned.
     cards: Vec<osfr_tools::card_game::StarterCard>,
+    headshot: Vec<u8>,
+    deck_commands: u32,
+    avatar_requests: u32,
     unhandled: u32,
     answered: Answered,
 }
@@ -174,6 +200,7 @@ impl CardListener {
             connections: Vec::new(),
             events: Vec::new(),
             records: Vec::new(),
+            decks: Vec::new(),
             lobby: None,
         })
     }
@@ -209,6 +236,9 @@ impl CardListener {
                     name: String::new(),
                     sync: SyncStep::Off,
                     cards: Vec::new(),
+                    headshot: Vec::new(),
+                    deck_commands: 0,
+                    avatar_requests: 0,
                     unhandled: 0,
                     answered: Answered::default(),
                 });
@@ -217,9 +247,11 @@ impl CardListener {
             }
         }
         let (host, port) = (self.host.clone(), self.port);
-        let (events, records, lobby) = (&mut self.events, &mut self.records, self.lobby.as_ref());
+        let (events, records, decks) = (&mut self.events, &mut self.records, &mut self.decks);
+        let lobby = self.lobby.as_ref();
         self.connections.retain_mut(|c| {
-            let Some(reason) = c.serve(&host, port, now_ms, lobby, &mut redeem, events, records)
+            let outbox = (&mut *records, &mut *decks);
+            let Some(reason) = c.serve(&host, port, now_ms, lobby, &mut redeem, events, outbox)
             else {
                 return true;
             };
@@ -241,7 +273,7 @@ impl Connection {
         lobby: Option<&osfr_tools::card_game::Lobby>,
         redeem: &mut impl FnMut(&str, &str) -> Redeemed,
         events: &mut Vec<Value>,
-        records: &mut Vec<(u64, card_service::SinglePlayerRecord)>,
+        (records, decks): Outbox<'_>,
     ) -> Option<&'static str> {
         if self.character.is_none() && now_ms.saturating_sub(self.opened_ms) > LOGIN_DEADLINE_MS {
             return Some("deadline");
@@ -273,7 +305,7 @@ impl Connection {
                 Ok(None) => return None,
                 Err(_) => return Some("bad_frame"),
             };
-            match self.lobby_command(&body, lobby, events, records) {
+            match self.lobby_command(&body, lobby, events, (&mut *records, &mut *decks)) {
                 Some(Ok(reply)) if reply.is_empty() || self.stream.write_all(&reply).is_ok() => {
                     continue;
                 }
@@ -281,13 +313,13 @@ impl Connection {
                 Some(Err(_)) => return Some("bad_message"),
                 None => {}
             }
-            let (mut login, mut name, mut scenario, mut earned) =
-                (None, String::new(), None, Vec::new());
+            let (mut login, mut name, mut scenario, mut earned, mut built, mut headshot) =
+                (None, String::new(), None, Vec::new(), Vec::new(), Vec::new());
             let logged_in = self.character.is_some();
             let reply = card_service::reply(&body, host, port, logged_in, |l| {
                 let redeemed = redeem(&l.ticket, &l.character_id);
-                let redeemed = redeemed.map(|(character, for_row, cards)| {
-                    (scenario, earned) = (for_row, cards);
+                let redeemed = redeemed.map(|(character, for_row, cards, decks, face)| {
+                    (scenario, earned, built, headshot) = (for_row, cards, decks, face);
                     character
                 });
                 // T805: the 411's shape for its event: lengths only, never a value.
@@ -318,12 +350,14 @@ impl Connection {
                         Some(Err(_)) => return Some("login_refused"),
                         Some(Ok(character)) if self.character.is_none() => {
                             self.character = Some(character);
+                            self.headshot = std::mem::take(&mut headshot);
                             if let Some(lobby) = lobby {
                                 self.cards = osfr_tools::card_game::collection_with(
                                     &lobby.collection,
                                     &earned,
                                 );
-                                if !self.enter_lobby(character, scenario, lobby, &name, events) {
+                                if !self.enter_lobby(character, scenario, &built, lobby, &name, events)
+                                {
                                     return Some("write_failed");
                                 }
                             }
@@ -352,6 +386,7 @@ impl Connection {
         &mut self,
         character: u64,
         scenario: Option<i32>,
+        built: &[osfr_tools::card_game::BuiltDeck],
         lobby: &osfr_tools::card_game::Lobby,
         name: &str,
         events: &mut Vec<Value>,
@@ -364,9 +399,7 @@ impl Connection {
         if let Some(scenario) = scenario {
             bodies.pop();
             bodies.insert(1, card_service::initiate_challenge(account, scenario));
-            // ponytail: the starter only, so decks the player built are not listed for a deck
-            // row; keeping 361's decks and replaying them here is the upgrade.
-            bodies.push(card_service::online_decks(&lobby.collection));
+            bodies.push(card_service::online_decks(&lobby.collection, built));
         }
         // T825: the collection sync starts right after the lobby.
         if !self.cards.is_empty() {
@@ -410,7 +443,7 @@ impl Connection {
         body: &[u8],
         lobby: Option<&osfr_tools::card_game::Lobby>,
         events: &mut Vec<Value>,
-        records: &mut Vec<(u64, card_service::SinglePlayerRecord)>,
+        (records, decks): Outbox<'_>,
     ) -> Option<io::Result<Vec<u8>>> {
         let character = self.character?;
         let account = card_service::account_id(character);
@@ -456,6 +489,56 @@ impl Connection {
                 self.log_answer(body, None, "", 0, events);
                 if record.account == account && records.len() < MAX_RECORDS_PER_POLL {
                     records.push((character, record));
+                }
+                Ok(Vec::new())
+            }
+            card_service::ADD_ONLINE_DECK => {
+                self.deck_commands = self.deck_commands.saturating_add(1);
+                let (log, allowed) =
+                    (self.deck_commands <= LOGGED_PER_KIND, self.deck_commands <= MAX_DECK_COMMANDS);
+                let Ok(deck) = card_service::add_online_deck(body) else {
+                    if log {
+                        let head = osfr_tools::trace::hex_prefix_len(body, false, DECK_LOG_BYTES);
+                        events.push(json!({"event":"card_deck_unread","character":character,"head":head}));
+                    }
+                    return Some(Ok(Vec::new()));
+                };
+                let kept = deck.storable(&self.cards);
+                if log {
+                    events.push(json!({
+                        "event":"card_deck_saved","character":character,"cards":deck.cards.len(),
+                        "kept":kept,"playable":deck.playable()
+                    }));
+                }
+                if kept && allowed && decks.len() < MAX_RECORDS_PER_POLL {
+                    decks.push((character, osfr_tools::card_game::DeckChange::Save(deck)));
+                }
+                Ok(Vec::new())
+            }
+            card_service::REQUEST_AVATAR_IMAGES => {
+                let ids = card_service::avatar_request(body).ok();
+                self.avatar_requests = self.avatar_requests.saturating_add(1);
+                if self.avatar_requests <= LOGGED_PER_KIND {
+                    let head = ids
+                        .is_none()
+                        .then(|| osfr_tools::trace::hex_prefix_len(body, false, DECK_LOG_BYTES))
+                        .flatten();
+                    events.push(json!({"event":"card_avatar_request","character":character,"account":account,"ids":ids,"head":head}));
+                }
+                let own = ids.is_some_and(|ids| ids.contains(&account));
+                Ok(if own && !self.headshot.is_empty() {
+                    card_service::send_avatar_image(account, &self.headshot)
+                } else {
+                    Vec::new()
+                })
+            }
+            card_service::DELETE_ONLINE_DECK => {
+                self.deck_commands = self.deck_commands.saturating_add(1);
+                if let Ok(id) = card_service::delete_online_deck(body)
+                    && self.deck_commands <= MAX_DECK_COMMANDS
+                    && decks.len() < MAX_RECORDS_PER_POLL
+                {
+                    decks.push((character, osfr_tools::card_game::DeckChange::Delete(id)));
                 }
                 Ok(Vec::new())
             }
@@ -561,9 +644,51 @@ impl Server {
             println!("{event}");
         }
         let records: Vec<_> = card.records.drain(..).collect();
+        let decks: Vec<_> = card.decks.drain(..).collect();
         self.card = Some(card);
         for (character, record) in records {
             self.settle_card_record(character, &record, now_ms);
+        }
+        for (character, change) in decks {
+            self.change_card_deck(character, change);
+        }
+    }
+
+    /// Saves a deck the card window built or removed, staged like a single-player record.
+    fn change_card_deck(&mut self, character: u64, change: osfr_tools::card_game::DeckChange) {
+        let Some(session) = self
+            .sessions
+            .values_mut()
+            .find(|session| session.character_guid == character)
+        else {
+            return;
+        };
+        use osfr_tools::card_game::{DeckChange, MAX_BUILT_DECKS, MIN_DECK_CARDS};
+        let mut staged = session.gateway.clone();
+        let Some(game) = staged.gameplay_mut() else {
+            return;
+        };
+        // The client saves any deck without comment, so the player hears it here.
+        let notice = match &change {
+            DeckChange::Save(deck) if !game.can_keep_deck(deck) => Some(format!(
+                "Your deck was not saved: you already have {MAX_BUILT_DECKS} decks. Delete one first."
+            )),
+            DeckChange::Save(deck) if !deck.playable() => Some(format!(
+                "Your deck is saved with {} of {MIN_DECK_CARDS} cards. It needs {MIN_DECK_CARDS} before you can duel with it.",
+                deck.cards.len()
+            )),
+            _ => None,
+        };
+        if game.change_built_deck(change) {
+            if save(&session.state_path, &staged.snapshot()).is_err() {
+                println!("{}", json!({"event":"card_deck_save_failed","character":character}));
+                return;
+            }
+            session.gateway = staged;
+        }
+        if let Some(line) = notice {
+            // A full queue only loses the notice.
+            let _ = session.queue_shared_message(&wrap_application(&osfr_tools::chat::system(&line)));
         }
     }
 
@@ -642,12 +767,18 @@ impl Server {
         character: &str,
         now_ms: u64,
     ) -> Redeemed {
+        let portraits = self.world.portraits.clone();
         for session in self.sessions.values_mut() {
             let Some(game) = session.gateway.gameplay_mut() else {
                 continue;
             };
             if let Some(redeemed) = game.redeem_card_ticket(ticket, character, now_ms) {
-                return redeemed.map(|guid| (guid, game.card_scenario(), game.earned_cards()));
+                return redeemed.map(|guid| {
+                    let face = portraits.as_deref().map_or_else(Vec::new, |root| {
+                        osfr_tools::portrait_upload::image(root, guid, "Headshot")
+                    });
+                    (guid, game.card_scenario(), game.earned_cards(), game.built_decks(), face)
+                });
             }
         }
         Err(card_service::UNKNOWN_TICKET)
@@ -766,7 +897,7 @@ pub(super) mod tests {
         ticket: &str,
         accept: Result<u64, &'static str>,
     ) -> (bool, i32, i32, Vec<(String, String)>) {
-        log_in_to(card, client, character_id, ticket, accept.map(|guid| (guid, None, Vec::new())))
+        log_in_to(card, client, character_id, ticket, accept.map(|guid| (guid, None, Vec::new(), Vec::new(), Vec::new())))
     }
 
     /// [`log_in`] for a redeem that also names the row's client scenario.
@@ -991,15 +1122,16 @@ pub(super) mod tests {
         }));
         let guid = 5041u64;
         let earned = osfr_tools::card_game::StarterCard { archetype_id: 7, copies: 1 };
+        let built = osfr_tools::card_game::BuiltDeck { id: "d".into(), name: "Mine".into(), cards: vec![7] };
         let mut player = client(&card);
-        assert!(log_in_to(&mut card, &mut player, "", "78", Ok((guid, Some(6), vec![earned.clone()]))).0);
+        assert!(log_in_to(&mut card, &mut player, "", "78", Ok((guid, Some(6), vec![earned.clone()], vec![built.clone()], Vec::new()))).0);
         let pushed: Vec<_> = (0..5).map(|_| answer(&mut card, &mut player, 3)).collect();
         let classes: Vec<_> = pushed.iter().map(|b| card_service::class_id(b).unwrap()).collect();
         assert_eq!(classes, [94, 486, 92, 363, 83], "the deck, then the collection sync; no 291");
         let account = card_service::account_id(guid);
         assert_eq!(pushed[1], card_service::initiate_challenge(account, 6));
         let starter = osfr_tools::card_game::StarterCard { archetype_id: 100_009_946, copies: 3 };
-        assert_eq!(pushed[3], card_service::online_decks(std::slice::from_ref(&starter)), "the starter only");
+        assert_eq!(pushed[3], card_service::online_decks(std::slice::from_ref(&starter), &[built]), "starter, built deck");
         assert_eq!(pushed[4], card_service::sync_start(account, &[starter, earned]), "earned cards sync");
         assert!(card.events.iter().any(|e| e["event"] == "card_lobby" && e["scenario"] == 6));
     }

@@ -311,6 +311,52 @@ const MAX_EARNED_COPIES: i32 = 100;
 /// ponytail: a card login writes every copy in one frame (about 10 bytes each), so purchases stop
 /// here; split that frame if a player ever needs more.
 const MAX_TOTAL_COPIES: usize = 4_000;
+/// The client's own deck rules: at least 40 cards, at most 3 of a card.
+pub const MIN_DECK_CARDS: usize = 40;
+const MAX_COPIES_IN_DECK: usize = 3;
+/// (R) The most decks a character keeps, the largest deck and the longest name: a card login
+/// writes them all in one 363, which has to stay under the 64 KiB frame limit.
+pub const MAX_BUILT_DECKS: usize = 32;
+pub const MAX_DECK_CARDS: usize = 200;
+const MAX_DECK_NAME: usize = 64;
+
+/// A deck the player built and saved in the card window (361), offered again for deck-row fights.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct BuiltDeck {
+    pub id: String,
+    pub name: String,
+    /// One row per copy.
+    pub cards: Vec<i32>,
+}
+
+impl BuiltDeck {
+    /// Enough cards to duel with. The client saves shorter decks without comment.
+    pub fn playable(&self) -> bool {
+        self.cards.len() >= MIN_DECK_CARDS
+    }
+
+    /// A deck worth keeping, finished or not: named, within bounds, at most 3 of a card, and made
+    /// only of cards in `owned`.
+    pub fn storable(&self, owned: &[StarterCard]) -> bool {
+        let named = !self.name.is_empty() && self.name.len() <= MAX_DECK_NAME && self.id.len() <= MAX_DECK_NAME;
+        let sized = !self.cards.is_empty() && self.cards.len() <= MAX_DECK_CARDS;
+        named
+            && sized
+            && self.cards.iter().all(|card| {
+                let used = self.cards.iter().filter(|other| *other == card).count();
+                let held = owned.iter().find(|row| row.archetype_id == *card).map_or(0, |row| row.copies);
+                used <= MAX_COPIES_IN_DECK && i32::try_from(used).is_ok_and(|used| used <= held)
+            })
+    }
+}
+
+/// A change the card window made to the saved decks.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum DeckChange {
+    Save(BuiltDeck),
+    Delete(String),
+}
 
 /// The cards a character has earned beyond the starter set, and the decks that already paid.
 /// Saved; the card window learns them from the collection sync at its next login.
@@ -321,11 +367,44 @@ pub struct EarnedCards {
     pub copies: BTreeMap<i32, i32>,
     #[serde(default)]
     pub beaten: BTreeSet<u32>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub decks: Vec<BuiltDeck>,
 }
 
 impl EarnedCards {
     pub fn is_empty(&self) -> bool {
-        self.copies.is_empty() && self.beaten.is_empty()
+        self.copies.is_empty() && self.beaten.is_empty() && self.decks.is_empty()
+    }
+
+    /// Whether `deck` can be kept: it replaces one already held, or there is room for another.
+    pub fn has_room_for_deck(&self, deck: &BuiltDeck) -> bool {
+        self.decks.len() < MAX_BUILT_DECKS
+            || self.decks.iter().any(|held| held.name == deck.name || held.id == deck.id)
+    }
+
+    /// Applies a deck change; true when the saved decks changed. A deck saved under a name or
+    /// id already held replaces it, and a full list refuses a new one.
+    pub fn change_deck(&mut self, change: DeckChange) -> bool {
+        match change {
+            DeckChange::Save(deck) => {
+                let same = |held: &BuiltDeck| held.name == deck.name || held.id == deck.id;
+                if let Some(held) = self.decks.iter_mut().find(|held| same(held)) {
+                    let changed = *held != deck;
+                    *held = deck;
+                    return changed;
+                }
+                let room = self.decks.len() < MAX_BUILT_DECKS;
+                if room {
+                    self.decks.push(deck);
+                }
+                room
+            }
+            DeckChange::Delete(key) => {
+                let before = self.decks.len();
+                self.decks.retain(|held| held.id != key && held.name != key);
+                self.decks.len() != before
+            }
+        }
     }
 
     /// Adds one copy of each card.
@@ -486,6 +565,9 @@ impl Launches {
     /// [`Win`]. A record with no live run, no duel settings, an older start or no matching start
     /// changes nothing and pays nothing.
     pub fn record(&mut self, record: &SinglePlayerRecord, now_ms: u64) -> Option<Win> {
+        // (R) The record carries no score: a win is always first to 12, and a duel has no grades.
+        const WIN_STARS: u32 = 3;
+        const WIN_SCORE: i32 = 12;
         let (instance, minigame_id) = self.entered?;
         if self.runs.current_instance_id() != Some(instance) {
             self.entered = None;
@@ -505,15 +587,17 @@ impl Launches {
                 let (started, at_ms) = self.playing.take_if(|(s, _)| *s == record.started)?;
                 let elapsed_seconds =
                     u32::try_from(now_ms.saturating_sub(at_ms) / 1_000).unwrap_or(u32::MAX);
-                (record.result == SinglePlayerRecord::WON
+                let won = record.result == SinglePlayerRecord::WON
                     && duel.game_types.contains(&record.game_type)
-                    && elapsed_seconds >= duel.min_seconds)
-                    .then_some(Win {
-                        minigame_id: u32::try_from(minigame_id).ok()?,
-                        started,
-                        elapsed_seconds,
-                        coins: duel.win_coins,
-                    })
+                    && elapsed_seconds >= duel.min_seconds;
+                let win = won.then_some(Win {
+                    minigame_id: u32::try_from(minigame_id).ok()?,
+                    started,
+                    elapsed_seconds,
+                    coins: duel.win_coins,
+                })?;
+                self.runs.note_client_win(instance, WIN_STARS, elapsed_seconds, WIN_SCORE);
+                Some(win)
             }
             _ => None,
         }
@@ -918,6 +1002,65 @@ mod tests {
             packet.extend(value.to_le_bytes());
         }
         packet
+    }
+
+    fn deck(name: &str, cards: Vec<i32>) -> BuiltDeck {
+        BuiltDeck { id: format!("id-{name}"), name: name.to_owned(), cards }
+    }
+
+    /// 14 kinds of card, three of each, then `extra` more kinds.
+    fn forty_cards(extra: i32) -> Vec<i32> {
+        (1..=14).chain(100..100 + extra).flat_map(|card| [card; 3]).collect()
+    }
+
+    #[test]
+    fn a_deck_is_kept_if_its_cards_are_owned_and_duels_need_forty() {
+        let owned: Vec<_> = (1..=14).map(|card| StarterCard { archetype_id: card, copies: 3 }).collect();
+        let cards = forty_cards(0);
+        assert_eq!(cards.len(), 42);
+        assert!(deck("Mine", cards.clone()).storable(&owned) && deck("Mine", cards.clone()).playable());
+        assert!(!deck("", cards.clone()).storable(&owned), "unnamed");
+        let draft = deck("Mine", cards[..39].to_vec());
+        assert!(draft.storable(&owned) && !draft.playable(), "a draft is kept but cannot duel");
+        assert!(!deck("Mine", Vec::new()).storable(&owned), "empty");
+        assert!(!deck("Mine", forty_cards(1)).storable(&owned), "a card not owned");
+        let mut plenty = owned.clone();
+        plenty[0].copies = 4;
+        let mut four = cards.clone();
+        four.push(1);
+        assert!(!deck("Mine", four).storable(&plenty), "four of a card, even when four are held");
+        let mut short_of_one = owned.clone();
+        short_of_one[0].copies = 1;
+        assert!(!deck("Mine", cards.clone()).storable(&short_of_one), "more copies than held");
+        let mut long_id = deck("Mine", cards);
+        long_id.id = "x".repeat(MAX_DECK_NAME + 1);
+        assert!(!long_id.storable(&owned), "an oversized id");
+    }
+
+    #[test]
+    fn saving_a_deck_replaces_its_name_and_a_full_list_refuses_more() {
+        let mut earned = EarnedCards::default();
+        assert!(earned.change_deck(DeckChange::Save(deck("A", vec![1]))));
+        assert!(!earned.change_deck(DeckChange::Save(deck("A", vec![1]))), "nothing changed");
+        assert!(earned.change_deck(DeckChange::Save(deck("A", vec![2]))));
+        assert_eq!(earned.decks.len(), 1);
+        for index in 1..MAX_BUILT_DECKS {
+            assert!(earned.change_deck(DeckChange::Save(deck(&index.to_string(), vec![1]))));
+        }
+        assert!(!earned.has_room_for_deck(&deck("late", vec![1])));
+        assert!(earned.has_room_for_deck(&deck("A", vec![3])), "replacing needs no room");
+        assert!(!earned.change_deck(DeckChange::Save(deck("late", vec![1]))), "full");
+        assert!(earned.change_deck(DeckChange::Delete("id-A".to_owned())), "by id");
+        assert!(earned.change_deck(DeckChange::Delete("1".to_owned())), "by name");
+        assert!(!earned.change_deck(DeckChange::Delete("gone".to_owned())));
+    }
+
+    /// A save written before built decks reads back, and one with none writes no new field.
+    #[test]
+    fn a_save_without_decks_keeps_its_old_shape() {
+        let back: EarnedCards = serde_json::from_str(r#"{"copies":{"7":1},"beaten":[507]}"#).unwrap();
+        assert!(back.decks.is_empty());
+        assert!(!serde_json::to_string(&back).unwrap().contains("decks"));
     }
 
     /// A collection refuses a pack that would pass either bound.

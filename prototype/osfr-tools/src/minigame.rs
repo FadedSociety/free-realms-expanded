@@ -234,6 +234,16 @@ struct Run {
     /// ticket 39/0x28 stored (`00ad47f0`), so a card run starts only after one.
     #[serde(default)]
     ticketed: bool,
+    /// A run the client plays itself (the card window) and won; its close reports the win.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    client_win: Option<ClientWin>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+struct ClientWin {
+    stars: u32,
+    elapsed_seconds: u32,
+    score: i32,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -398,6 +408,7 @@ impl MinigameRuns {
             wheel_entry: None,
             wheel_stopped: false,
             ticketed: false,
+            client_win: None,
         });
         Ok(RunOutcome {
             accepted: true,
@@ -494,13 +505,29 @@ impl MinigameRuns {
                     RunState::Offered | RunState::Starting | RunState::Playing
                 ) =>
                 {
-                    let reply = state_remove_packet(id, run.spec.game_id);
-                    self.retire(RunState::Cancelled);
+                    // 39/19 alone takes the client's end screen down its lost path.
+                    let game_id = run.spec.game_id;
+                    let (state, replies) = match run.client_win {
+                        Some(win) => {
+                            let mut replies = vec![payload_packet(id, game_id, "OnGameWonMsg")?];
+                            replies.extend(result_packets(
+                                id,
+                                game_id,
+                                true,
+                                win.stars,
+                                win.elapsed_seconds,
+                                win.score,
+                            )?);
+                            (RunState::Won, replies)
+                        }
+                        None => (RunState::Cancelled, vec![state_remove_packet(id, game_id)]),
+                    };
+                    self.retire(state);
                     Ok(RunOutcome {
                         accepted: true,
                         changed: true,
-                        state: Some(RunState::Cancelled),
-                        replies: vec![reply],
+                        state: Some(state),
+                        replies,
                         ..Default::default()
                     })
                 }
@@ -647,6 +674,13 @@ impl MinigameRuns {
             replies: vec![packet],
             ..Default::default()
         })
+    }
+
+    /// A run the client played itself and won: the window's close will report the win.
+    pub fn note_client_win(&mut self, instance_id: i32, stars: u32, elapsed_seconds: u32, score: i32) {
+        if let Some(run) = self.current.as_mut().filter(|run| run.instance_id == instance_id) {
+            run.client_win = Some(ClientWin { stars, elapsed_seconds, score });
+        }
     }
 
     /// L957: a quit in play settled as a loss with no reward. The loss result set ends with 39/19

@@ -123,6 +123,18 @@ impl<'a> Reader<'a> {
         Ok(first.unwrap_or_default())
     }
 
+    /// `length` raw bytes (`10013690`).
+    fn raw(&mut self, length: usize) -> io::Result<&'a [u8]> {
+        let end = self
+            .at
+            .checked_add(length)
+            .filter(|end| *end <= self.bytes.len())
+            .ok_or_else(|| invalid("card command is truncated"))?;
+        let bytes = &self.bytes[self.at..end];
+        self.at = end;
+        Ok(bytes)
+    }
+
     pub fn finished(&self) -> bool {
         self.at == self.bytes.len()
     }
@@ -516,6 +528,13 @@ pub fn initiate_challenge(account: i32, scenario: i32) -> Vec<u8> {
 
 /// `DeckCommand_PopulateOnlineDeckData`: the player's saved decks.
 pub const POPULATE_ONLINE_DECKS: i32 = 363;
+/// `DeckCommand_AddOnlineDeck` and `_DeleteOnlineDeck`: the client saved or removed a deck.
+pub const ADD_ONLINE_DECK: i32 = 361;
+pub const REQUEST_AVATAR_IMAGES: i32 = 501;
+pub const SEND_AVATAR_IMAGE: i32 = 502;
+/// (R) More ids than a table of players holds; a longer list is damaged.
+const MAX_AVATAR_REQUEST: usize = 64;
+pub const DELETE_ONLINE_DECK: i32 = 362;
 
 /// The only deck class the client's factory makes (`ZPDeck`, reader `10442580`). Version 6 is the
 /// newest without its embedded hero archetype (7+) and its extra list (13).
@@ -528,26 +547,130 @@ const STARTER_DECK: &str = "Starter Deck";
 /// `(archetype, series)` pairs, one per copy; then the starter flag (`100985c0`: no Delete), two
 /// flags, the ZPDeck level's two ints and an empty old list. The challenge dialog waits for a
 /// saved deck (`103e74d0`).
-pub fn online_decks(cards: &[crate::card_game::StarterCard]) -> Vec<u8> {
-    let [class, version] = ZP_DECK;
-    let mut body =
-        sync_command(POPULATE_ONLINE_DECKS, 1, [1, 0, class, version, class, version]);
-    // The dialog finds the chosen row by its shown name (`10399350`), so id and name are one.
-    for text in [STARTER_DECK, "", STARTER_DECK, ""] {
-        put_string(&mut body, text);
-    }
-    put_int(&mut body, 0);
-    put_int(&mut body, cards.iter().map(|card| card.copies).sum());
-    for card in cards {
-        for _ in 0..card.copies {
-            put_int(&mut body, card.archetype_id);
-            put_int(&mut body, 0);
-        }
-    }
-    for value in [1, 0, 0, 0, 0, 0] {
-        put_int(&mut body, value);
+pub fn online_decks(
+    cards: &[crate::card_game::StarterCard],
+    built: &[crate::card_game::BuiltDeck],
+) -> Vec<u8> {
+    let built: Vec<_> = built
+        .iter()
+        .filter(|deck| deck.playable() && deck.name != STARTER_DECK)
+        .collect();
+    let mut body = sync_command(POPULATE_ONLINE_DECKS, 1, [built.len() as i32 + 1]);
+    let starter: Vec<i32> = cards
+        .iter()
+        .flat_map(|card| std::iter::repeat_n(card.archetype_id, card.copies.max(0) as usize))
+        .collect();
+    put_deck(&mut body, STARTER_DECK, &starter);
+    for deck in built {
+        put_deck(&mut body, &deck.name, &deck.cards);
     }
     body
+}
+
+fn put_deck(body: &mut Vec<u8>, name: &str, cards: &[i32]) {
+    let [class, version] = ZP_DECK;
+    for value in [0, class, version, class, version] {
+        put_int(body, value);
+    }
+    // The dialog finds the chosen row by its shown name (`10399350`), so id and name are one.
+    for text in [name, "", name, ""] {
+        put_string(body, text);
+    }
+    put_int(body, 0);
+    put_int(body, cards.len() as i32);
+    for card in cards {
+        put_int(body, *card);
+        put_int(body, 0);
+    }
+    for value in [1, 0, 0, 0, 0, 0] {
+        put_int(body, value);
+    }
+}
+
+/// 501 `AccountCommand_RequestAvatarImages` (reader `100111d0`): the class headers, the account
+/// level, then the ids whose pictures the window wants. Like 487, the number of header levels is
+/// taken from the bytes.
+pub fn avatar_request(body: &[u8]) -> io::Result<Vec<i32>> {
+    [2, 3]
+        .iter()
+        .find_map(|levels| avatar_request_with(body, *levels).ok())
+        .ok_or_else(|| invalid("avatar request is malformed"))
+}
+
+fn avatar_request_with(body: &[u8], levels: usize) -> io::Result<Vec<i32>> {
+    let mut reader = Reader::new(body);
+    for _ in 0..levels {
+        if reader.int()? != REQUEST_AVATAR_IMAGES {
+            return Err(invalid("avatar request has the wrong class id"));
+        }
+        reader.int()?;
+    }
+    reader.int()?;
+    let count = usize::try_from(reader.int()?)
+        .ok()
+        .filter(|count| *count <= MAX_AVATAR_REQUEST)
+        .ok_or_else(|| invalid("avatar request size is invalid"))?;
+    let ids = (0..count).map(|_| reader.int()).collect::<io::Result<Vec<_>>>()?;
+    if !reader.finished() {
+        return Err(invalid("avatar request has trailing bytes"));
+    }
+    Ok(ids)
+}
+
+/// 502 `AccountCommand_SendAvatarImage` (reader `100137c0`, execute `10013490`): the class level,
+/// the account level with the picture's owner, then the image file's length and bytes.
+pub fn send_avatar_image(account: i32, image: &[u8]) -> Vec<u8> {
+    let mut body = Vec::with_capacity(image.len() + 16);
+    for _ in 0..2 {
+        put_int(&mut body, SEND_AVATAR_IMAGE);
+        put_int(&mut body, 1);
+    }
+    put_int(&mut body, account);
+    put_int(&mut body, image.len() as i32);
+    body.extend_from_slice(image);
+    body
+}
+
+/// 361 (reader `100a5470`, deck writer `100a53b0`): the class headers, the serialized deck's
+/// length and bytes, one int. The bytes are a present flag and a `ZPDeck` at the client's own
+/// version; its 4 strings, flag and cards lead every version (`10099a10`), so the tail is left
+/// alone and the deck goes back out at [`ZP_DECK`]'s version.
+pub fn add_online_deck(body: &[u8]) -> io::Result<crate::card_game::BuiltDeck> {
+    let mut reader = Reader::new(body);
+    reader.headers(ADD_ONLINE_DECK)?;
+    let length = usize::try_from(reader.int()?).map_err(|_| invalid("deck length is invalid"))?;
+    let mut deck = Reader::new(reader.raw(length)?);
+    if deck.int()? != 0 {
+        return Err(invalid("the saved deck is absent"));
+    }
+    for _ in 0..2 {
+        if deck.int()? != ZP_DECK[0] {
+            return Err(invalid("the saved deck is another class"));
+        }
+        deck.int()?;
+    }
+    let id = deck.string()?;
+    deck.string()?;
+    let name = deck.string()?;
+    deck.string()?;
+    deck.int()?;
+    let count = usize::try_from(deck.int()?)
+        .ok()
+        .filter(|count| *count <= crate::card_game::MAX_DECK_CARDS)
+        .ok_or_else(|| invalid("deck size is invalid"))?;
+    let mut cards = Vec::with_capacity(count);
+    for _ in 0..count {
+        cards.push(deck.int()?);
+        deck.int()?;
+    }
+    Ok(crate::card_game::BuiltDeck { id, name, cards })
+}
+
+/// 362 (reader `100a5820`): the class headers and the deck's id.
+pub fn delete_online_deck(body: &[u8]) -> io::Result<String> {
+    let mut reader = Reader::new(body);
+    reader.headers(DELETE_ONLINE_DECK)?;
+    reader.string()
 }
 
 /// T825: the client's lobby status, echoed. 137 `LobbyCommand_ChangeStatus` v1 (reader
@@ -871,11 +994,137 @@ mod tests {
         assert!(reader.finished());
     }
 
+    #[test]
+    fn a_face_request_is_read_at_either_header_depth_and_answered_with_the_picture() {
+        for levels in [2, 3] {
+            let mut body = Vec::new();
+            for _ in 0..levels {
+                put_int(&mut body, REQUEST_AVATAR_IMAGES);
+                put_int(&mut body, 1);
+            }
+            for value in [4_099, 2, 4_099, -3] {
+                put_int(&mut body, value);
+            }
+            assert_eq!(avatar_request(&body).unwrap(), [4_099, -3], "{levels} levels");
+        }
+        assert!(avatar_request(&[1, 2]).is_err());
+
+        let reply = send_avatar_image(4_099, &[9, 8, 7]);
+        let mut reader = Reader::new(&reply);
+        for _ in 0..2 {
+            assert_eq!((reader.int().unwrap(), reader.int().unwrap()), (502, 1));
+        }
+        assert_eq!((reader.int().unwrap(), reader.int().unwrap()), (4_099, 3));
+        assert_eq!(reader.raw(3).unwrap(), [9, 8, 7]);
+        assert!(reader.finished());
+    }
+
+    /// A saved deck as the DLL writes it, at a newer version with fields after the cards.
+    fn saved_deck(name: &str, cards: &[i32]) -> Vec<u8> {
+        let mut blob = Vec::new();
+        for value in [0, 90_002, 10, 90_002, 10] {
+            put_int(&mut blob, value);
+        }
+        for text in ["deck-7", "", name, ""] {
+            put_string(&mut blob, text);
+        }
+        put_int(&mut blob, 0);
+        put_int(&mut blob, cards.len() as i32);
+        for card in cards {
+            put_int(&mut blob, *card);
+            put_int(&mut blob, 0);
+        }
+        for value in [1, 0, 0, 5, 9] {
+            put_int(&mut blob, value);
+        }
+        let mut body = Vec::new();
+        put_headers(&mut body, ADD_ONLINE_DECK, 1);
+        put_int(&mut body, blob.len() as i32);
+        body.extend(blob);
+        put_int(&mut body, 0);
+        body
+    }
+
+    #[test]
+    fn a_saved_deck_is_read_and_goes_back_out_after_the_starter() {
+        let deck = add_online_deck(&saved_deck("Ninjas", &[7; 40])).unwrap();
+        assert_eq!((deck.id.as_str(), deck.name.as_str()), ("deck-7", "Ninjas"));
+        assert_eq!(deck.cards, [7; 40]);
+        let starter = [crate::card_game::StarterCard { archetype_id: 1, copies: 1 }];
+        let body = online_decks(&starter, std::slice::from_ref(&deck));
+        let mut reader = Reader::new(&body);
+        reader.headers(POPULATE_ONLINE_DECKS).unwrap();
+        assert_eq!(reader.int().unwrap(), 2, "the starter and the built deck");
+        for (name, count) in [(STARTER_DECK, 1), ("Ninjas", 40)] {
+            assert_eq!(reader.int().unwrap(), 0, "present");
+            for _ in 0..2 {
+                assert_eq!((reader.int().unwrap(), reader.int().unwrap()), (90_002, 6));
+            }
+            for text in [name, "", name, ""] {
+                assert_eq!(reader.string().unwrap(), text);
+            }
+            reader.int().unwrap();
+            assert_eq!(reader.int().unwrap(), count);
+            for _ in 0..count * 2 {
+                reader.int().unwrap();
+            }
+            for _ in 0..6 {
+                reader.int().unwrap();
+            }
+        }
+        assert!(reader.finished());
+    }
+
+    /// The client keeps short decks, but a fight must not offer one.
+    #[test]
+    fn an_unfinished_deck_is_not_offered_for_a_fight() {
+        let starter = [crate::card_game::StarterCard { archetype_id: 1, copies: 1 }];
+        let draft = add_online_deck(&saved_deck("Draft", &[7; 16])).unwrap();
+        assert_eq!(online_decks(&starter, &[draft]), online_decks(&starter, &[]));
+    }
+
+    /// A deck may not borrow the starter's name, and the largest list fits one frame.
+    #[test]
+    fn the_deck_list_stays_one_frame_and_keeps_one_starter() {
+        use crate::card_game::{BuiltDeck, MAX_BUILT_DECKS, MAX_DECK_CARDS, StarterCard};
+        let starter = [StarterCard { archetype_id: 1, copies: 45 }];
+        let same = BuiltDeck { id: STARTER_DECK.into(), name: STARTER_DECK.into(), cards: vec![7; 40] };
+        assert_eq!(online_decks(&starter, &[same]), online_decks(&starter, &[]));
+        let largest: Vec<_> = (0..MAX_BUILT_DECKS)
+            .map(|index| BuiltDeck {
+                id: String::new(),
+                name: format!("{index:064}"),
+                cards: vec![i32::MAX; MAX_DECK_CARDS],
+            })
+            .collect();
+        assert!(server_frame(&online_decks(&starter, &largest)).len() < MAX_FRAME);
+    }
+
+    #[test]
+    fn a_damaged_deck_save_is_refused() {
+        let good = saved_deck("Ninjas", &[7]);
+        for cut in 0..good.len() - 1 {
+            assert!(add_online_deck(&good[..cut]).is_err(), "cut at {cut}");
+        }
+        let mut body = Vec::new();
+        put_headers(&mut body, ADD_ONLINE_DECK, 1);
+        put_int(&mut body, -1);
+        assert!(add_online_deck(&body).is_err(), "a negative length");
+    }
+
+    #[test]
+    fn a_deck_delete_names_its_id() {
+        let mut body = Vec::new();
+        put_headers(&mut body, DELETE_ONLINE_DECK, 1);
+        put_string(&mut body, "deck-7");
+        assert_eq!(delete_online_deck(&body).unwrap(), "deck-7");
+    }
+
     /// 363 as its reader takes it: one present `ZPDeck` v6 holding one row per copy.
     #[test]
     fn the_starter_deck_is_one_row_per_copy() {
         let cards = [crate::card_game::StarterCard { archetype_id: 100_009_946, copies: 3 }];
-        let body = online_decks(&cards);
+        let body = online_decks(&cards, &[]);
         let mut reader = Reader::new(&body);
         for _ in 0..3 {
             assert_eq!((reader.int().unwrap(), reader.int().unwrap()), (363, 1));

@@ -88,6 +88,12 @@ fn finish(
 /// A Card Duelist on Poe's quest 3040011 (asks for MiniGameData 507) who has pressed Play on `row`
 /// and opened the card window (the 39/37 ticket request).
 fn launched(row: u32) -> (Fixture, Gameplay) {
+    let (fixture, game, _) = launched_run(row);
+    (fixture, game)
+}
+
+/// [`launched`], with the run's instance for packets that name it.
+fn launched_run(row: u32) -> (Fixture, Gameplay, i32) {
     let fixture = fixture_with(&[POES_BEST_DECK]);
     // The release curve file carries the job's `activity_xp`, as in the other L927 suites.
     fs::copy(
@@ -107,7 +113,30 @@ fn launched(row: u32) -> (Fixture, Gameplay) {
         "the launch ticket answers the 39/37"
     );
     // The fixture's content directory is deleted with it, and the game reads it when it pays XP.
-    (fixture, game)
+    (fixture, game, instance)
+}
+
+/// What the card window's close (39/6) tells the client, which picks its end screen from it.
+fn closing_packets(result: i32) -> Vec<Vec<u8>> {
+    let (_fixture, mut game, instance) = launched_run(POES_TOURNAMENT_ROW);
+    start(&mut game, SCENARIO, 1_793_000_001, 1_000_000);
+    finish(&mut game, SCENARIO, result, 1_793_000_001, 1_600_000);
+    send(&mut game, &at(POE), &client(6, instance), 1_700_000).replies
+}
+
+#[test]
+fn a_won_duel_reports_the_win_when_the_window_closes() {
+    let replies = closing_packets(WIN);
+    let result = replies.iter().find(|p| p.starts_with(&[39, 0, 18])).expect("the win's result");
+    assert_eq!(result[15], 1, "won");
+    assert!(replies.last().unwrap().starts_with(&[39, 0, 19]), "the run still ends");
+}
+
+#[test]
+fn a_lost_duel_closes_without_a_result() {
+    let replies = closing_packets(2);
+    assert_eq!(replies.len(), 1);
+    assert!(replies[0].starts_with(&[39, 0, 19]));
 }
 
 #[test]
