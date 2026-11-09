@@ -15008,8 +15008,55 @@
       "location_evidence": [
         "PCA Camp (\"Speak to Emahl in the PCA camp\", 2141364795, 4180007081). Wiki: PCA Camp, Northern Wilds."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3130033,
+          "title": "Postman: Outpost Ordeal",
+          "title_string_id": 130252,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 6 - Shrouded Glade and the PCA Camp (Brin Galeglow, Postmaster Lane, Emahl), row 30; name 'Postman: Outpost Ordeal'; title id cell 2064072475 ucdt; 2469827298 ugdt; 3139498656 unprefixed"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 6 - Shrouded Glade and the PCA Camp (Brin Galeglow, Postmaster Lane, Emahl), row 30; name 'Postman: Outpost Ordeal'; title id cell 2064072475 ucdt; 2469827298 ugdt; 3139498656 unprefixed"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3130033 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3130033
+      ],
       "quests_given_text": [
         "Postman: Outpost Ordeal (wiki giver; the client strings read as the postmasters sending the player, 3339918828). The minigame \"PCA Takedown\" (67846304; \"Peg the PCA Campers!\", 1050922580) is the fight."
       ],
@@ -30676,9 +30723,23 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 118; source cell: [client]"
             }
           ]
+        },
+        {
+          "quest_id": 3954177,
+          "title": "Noglash Delivery",
+          "title_string_id": 45528,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Noglash Delivery (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_noglash_delivery_39e1dc)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3954177
+      ],
       "quests_given_text": [
         "Gather the stew ingredients (3164390028, 4198948159) and bring the stew to Hogosh (837473822, 224929741; a timed delivery, 1406814003). The client title Noglash Delivery (ucdt 2943440397) fits by wording only."
       ],
@@ -30986,11 +31047,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1851; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3108 (ModelId=167, ModelFileName=troll_peasant_02.adr, NameId=20958)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.311565,
       "model_id": 167,
-      "model_file_name": "troll_peasant_02.adr"
+      "model_file_name": "troll_peasant_02.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000415,

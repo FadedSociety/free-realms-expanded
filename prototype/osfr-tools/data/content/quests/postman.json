@@ -140,8 +140,46 @@
       "prerequisite_quest_ids": [
         3130001
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 103839,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Can You Deliver minigame. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_can_you_deliver_3a79bf)."
+            }
+          ],
+          "minigame_id": 238,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 103843,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Felipe in Sanctuary (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_can_you_deliver_3a79bf)."
+            }
+          ],
+          "npc_id": 9000000086
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Postman: Can You Deliver (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_can_you_deliver_3a79bf)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -185,14 +223,44 @@
         }
       ],
       "description_string_id": 93382,
-      "enabled": false
+      "enabled": true,
+      "job": 4,
+      "intro_text_string_id": 103827
     },
     {
       "id": 3130004,
       "title_string_id": 103917,
       "giver_npc_id": 9000000086,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3130003
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 103922,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Mail Marksman minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_mail_marksman_5acbc6)."
+            }
+          ],
+          "minigame_id": 239,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 103843,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Felipe in Sanctuary (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_mail_marksman_5acbc6)."
+            }
+          ],
+          "npc_id": 9000000086
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -253,14 +321,55 @@
       "description_string_id": 103918,
       "intro_text_string_id": 103916,
       "end_text_string_id": 103919,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130005,
       "title_string_id": 104217,
       "giver_npc_id": 9000000086,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3130004
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 104235,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Ditch the Doggies minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_beware_of_ankle_biters_fd9014)."
+            }
+          ],
+          "minigame_id": 240,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 104237,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Felipe in Sanctuary (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_beware_of_ankle_biters_fd9014)."
+            }
+          ],
+          "npc_id": 9000000086
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 104239,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Flitter at the Sanctuary Post Office. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_beware_of_ankle_biters_fd9014)."
+            }
+          ],
+          "npc_id": 9000000091
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -317,14 +426,43 @@
       "description_string_id": 104218,
       "intro_text_string_id": 104216,
       "end_text_string_id": 104219,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130006,
       "title_string_id": 104359,
       "giver_npc_id": 9000000091,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3130005
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 104378,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Scattered Mail minigame. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_it_s_a_postal_disaster_bbad08)."
+            }
+          ],
+          "minigame_id": 241,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 104239,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Flitter at the Sanctuary Post Office (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_it_s_a_postal_disaster_bbad08)."
+            }
+          ],
+          "npc_id": 9000000091
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -381,14 +519,43 @@
       "description_string_id": 104360,
       "intro_text_string_id": 104358,
       "end_text_string_id": 104361,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130007,
       "title_string_id": 141809,
       "giver_npc_id": 9000000091,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3130006
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 141815,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Sanctuary Mail Sorting minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_sort_of_a_mess_e87136)."
+            }
+          ],
+          "minigame_id": 376,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 141817,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Flitter (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_sort_of_a_mess_e87136)."
+            }
+          ],
+          "npc_id": 9000000091
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -445,14 +612,55 @@
       "description_string_id": 141810,
       "intro_text_string_id": 141808,
       "end_text_string_id": 141811,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130008,
       "title_string_id": 115007,
       "giver_npc_id": 9000000091,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3130007
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 115015,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Take the overdue mail to Felipe in Sanctuary (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_running_the_route_ed8949)."
+            }
+          ],
+          "npc_id": 9000000086
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 115017,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Running the Route minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_running_the_route_ed8949)."
+            }
+          ],
+          "minigame_id": 270,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 24629,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Felipe (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_running_the_route_ed8949)."
+            }
+          ],
+          "npc_id": 9000000086
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -509,14 +717,43 @@
       "description_string_id": 115008,
       "intro_text_string_id": 115006,
       "end_text_string_id": 115009,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130009,
       "title_string_id": 115047,
       "giver_npc_id": 9000000086,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3130008
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 115054,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the It's a Dancing Telegram! minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_special_delivery_64ccc7)."
+            }
+          ],
+          "minigame_id": 302,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 103843,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Felipe in Sanctuary (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_special_delivery_64ccc7)."
+            }
+          ],
+          "npc_id": 9000000086
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -573,15 +810,60 @@
       "description_string_id": 115048,
       "intro_text_string_id": 115046,
       "end_text_string_id": 115049,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130010,
       "title_string_id": 387931,
       "giver_npc_id": 9000000086,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3130009
+      ],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "text_string_id": 387948,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Postman: Level 5 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_achieve_level_5_1067ab)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 387948 is this step; profile 4 from live records 3130017/3130031 (postman.json)"
+            }
+          ],
+          "profile_id": 4,
+          "level": 5
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 24629,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Felipe (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_achieve_level_5_1067ab)."
+            }
+          ],
+          "npc_id": 9000000086
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Postman: Achieve Level 5 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_achieve_level_5_1067ab)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -623,7 +905,8 @@
       "description_string_id": 387932,
       "intro_text_string_id": 387930,
       "end_text_string_id": 387933,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130011,
@@ -2119,9 +2402,61 @@
       "id": 3130033,
       "title_string_id": 130252,
       "giver_npc_id": 9000000317,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3130032
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 130257,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the PCA Takedown minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_outpost_ordeal_28d8ee)."
+            }
+          ],
+          "minigame_id": 276,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 130259,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Emahl in the PCA Camp (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_outpost_ordeal_28d8ee)."
+            }
+          ],
+          "npc_id": 9000000317
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 130261,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Report to Loryn in Snowhill (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_outpost_ordeal_28d8ee)."
+            }
+          ],
+          "npc_id": 9000000132
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Postman: Outpost Ordeal (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_outpost_ordeal_28d8ee)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2163,7 +2498,8 @@
       "description_string_id": 130253,
       "intro_text_string_id": 130251,
       "end_text_string_id": 130254,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     }
   ]
 }

@@ -107,6 +107,7 @@ mod seeds;
 mod startup_health;
 mod style_card_use;
 mod tower_defense_table;
+mod world_challenge;
 use self::coin_authoring::unloaded;
 use self::npc::{dialogue_packet, quest_offer_packet_with};
 use crate::station_cash::EarnSource;
@@ -392,6 +393,7 @@ pub struct Gameplay {
     game_clock: crate::game_clock::GameClock, // T469 game_clock.json; never saved
     /// T474 live treat, cake and transformation effects (`gameplay/item_use.rs`); session-only, never saved.
     consumable_effects: crate::consumable_effects::EffectStack,
+    world_challenge: Box<world_challenge::State>,
 }
 
 #[derive(Default)]
@@ -1225,6 +1227,7 @@ impl Gameplay {
         let (categories, quests, combat) =
             content_presence::core(directory, &mut presence, quests, combat)?;
         Ok(Self {
+            world_challenge: world_challenge::State::load(npc_content, npc_interaction.as_mut())?,
             mystery_chests,
             pending_chest: None,
             dance_off: dance_off::TickState::default(),
@@ -1672,6 +1675,7 @@ impl Gameplay {
         // W160: a fishing round belongs to one connection. Paid catches are already saved;
         // only the cast in flight is dropped.
         self.fishing.reset_all();
+        self.world_challenge.reset();
     }
 
     /// L012: saves carry the pre-match pose while a soccer match is active.
@@ -2203,7 +2207,7 @@ impl Gameplay {
         if let Some(out) = self.handle_card_game(inner, character, now_ms)? {
             return Ok(out);
         }
-        if let Some(out) = self.handle_daily_wheel(inner)? {
+        if let Some(out) = self.handle_open_world_games(inner, character, now_ms)? {
             return Ok(out);
         }
         if let Some(out) = self.handle_chess(inner, character, now_ms)? {

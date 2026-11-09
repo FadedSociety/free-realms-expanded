@@ -33425,8 +33425,23 @@
       "location_evidence": [
         "Splortata's Camp, a hollow tree in the north-west corner with a campfire (wiki Exploration); \"a camp northwest of here\" (2052476458)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953987,
+          "title": "A Race Against Grime",
+          "title_string_id": 90665,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Race Against Grime (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_race_against_grime_68b662)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953987
+      ],
       "quests_given_text": [
         "Speak to Splortata about a shipment of snakes (1935203322; Hennessey's Bart errand); scattered goods errand \"grab the goods scattered around the nearby swamp before they get sucked into the mire\" (422574455, 1211021947, 2284917970); title unknown"
       ],
@@ -33810,11 +33825,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:238; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1471 (ModelId=190, ModelFileName=robgoblin_f_basic.adr, NameId=45303)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.167539,
       "model_id": 190,
-      "model_file_name": "robgoblin_f_basic.adr"
+      "model_file_name": "robgoblin_f_basic.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000067,

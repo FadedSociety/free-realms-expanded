@@ -10467,6 +10467,1199 @@
       "job": 137,
       "description_string_id": 410289,
       "enabled": true
+    },
+    {
+      "id": 3953979,
+      "title_string_id": 72090,
+      "giver_npc_id": 9500000205,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 389140,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win the Dig Within minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_dirt_covered_map_294afb)."
+            }
+          ],
+          "minigame_id": 555,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 389141,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Recruit Agga (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_dirt_covered_map_294afb)."
+            }
+          ],
+          "npc_id": 9500000205
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Dirt Covered Map (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_dirt_covered_map_294afb)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "A Dirt Covered Map (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_dirt_covered_map_294afb)."
+        }
+      ],
+      "description_string_id": 72089,
+      "intro_text_string_id": 72089,
+      "enabled": true
+    },
+    {
+      "id": 3953987,
+      "title_string_id": 90665,
+      "giver_npc_id": 9500000066,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 387245,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click the Trunk (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_race_against_grime_68b662)."
+            }
+          ],
+          "npc_id": 9500002667
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 387240,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the A Race Against Grime minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_race_against_grime_68b662)."
+            }
+          ],
+          "minigame_id": 553,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 90681,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Splortata (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_race_against_grime_68b662)."
+            }
+          ],
+          "npc_id": 9500000066
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Race Against Grime (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_race_against_grime_68b662)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "A Race Against Grime (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_race_against_grime_68b662)."
+        }
+      ],
+      "description_string_id": 90664,
+      "intro_text_string_id": 90664,
+      "enabled": true
+    },
+    {
+      "id": 3954019,
+      "title_string_id": 47230,
+      "giver_npc_id": 9500000554,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 47235,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Play the Brain Freeze Mix-up minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brain_freeze_mix_up_ab4177)."
+            }
+          ],
+          "minigame_id": 249,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 101213,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Banani (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brain_freeze_mix_up_ab4177)."
+            }
+          ],
+          "npc_id": 9500000554
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Brain Freeze Mix-up (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brain_freeze_mix_up_ab4177)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Brain Freeze Mix-up (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brain_freeze_mix_up_ab4177)."
+        }
+      ],
+      "description_string_id": 47229,
+      "intro_text_string_id": 47229,
+      "enabled": true
+    },
+    {
+      "id": 3954033,
+      "title_string_id": 429174,
+      "giver_npc_id": 9500000318,
+      "prerequisite_quest_ids": [
+        3950333
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 429179,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Artifacts Schmartifacts! or Jenny's Scavenger Hunt minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_certified_treasure_hunter_53ce56)."
+            }
+          ],
+          "minigame_id": 1038,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 429119,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Robbie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_certified_treasure_hunter_53ce56)."
+            }
+          ],
+          "npc_id": 9500000318
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Certified Treasure Hunter (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_certified_treasure_hunter_53ce56)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Certified Treasure Hunter (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_certified_treasure_hunter_53ce56)."
+        }
+      ],
+      "description_string_id": 429175,
+      "intro_text_string_id": 429173,
+      "enabled": true
+    },
+    {
+      "id": 3954036,
+      "title_string_id": 72094,
+      "giver_npc_id": 9500000205,
+      "prerequisite_quest_ids": [
+        3953979
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 389144,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Ask Sperry for the map fragment (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_checkers_for_a_chart_8076eb)."
+            }
+          ],
+          "npc_id": 9500000217
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 46357,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win a game of Checkers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_checkers_for_a_chart_8076eb)."
+            }
+          ],
+          "minigame_id": 21,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 389148,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect the map fragment from Sperry (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_checkers_for_a_chart_8076eb)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki target(s): ['Sperry']"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_checkers_for_a_chart_8076eb)."
+            }
+          ],
+          "npc_id": 9500000217
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 389141,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Recruit Agga (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_checkers_for_a_chart_8076eb)."
+            }
+          ],
+          "npc_id": 9500000205
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Checkers for a Chart (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_checkers_for_a_chart_8076eb)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Checkers for a Chart (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_checkers_for_a_chart_8076eb)."
+        }
+      ],
+      "description_string_id": 72095,
+      "intro_text_string_id": 72093,
+      "enabled": true
+    },
+    {
+      "id": 3954042,
+      "title_string_id": 389233,
+      "giver_npc_id": 9500000617,
+      "prerequisite_quest_ids": [
+        3954201
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 391176,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click the Seashell Bucket (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_combo_challenge_5874dc)."
+            }
+          ],
+          "npc_id": 9500002612
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 390939,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat the Combo Challenge minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_combo_challenge_5874dc)."
+            }
+          ],
+          "minigame_id": 573,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 94592,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Rainchaser (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_combo_challenge_5874dc)."
+            }
+          ],
+          "npc_id": 9500000617
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 2,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Combo Challenge (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_combo_challenge_5874dc)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Combo Challenge (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_combo_challenge_5874dc)."
+        }
+      ],
+      "description_string_id": 389234,
+      "intro_text_string_id": 389232,
+      "enabled": true
+    },
+    {
+      "id": 3954085,
+      "title_string_id": 73289,
+      "giver_npc_id": 9000000233,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 73289,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Feed the Ducks! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_feed_the_ducks_da1e4c)."
+            }
+          ],
+          "minigame_id": 224,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 74627,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Waterwings in Lakeshore (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_feed_the_ducks_da1e4c)."
+            }
+          ],
+          "npc_id": 9000000233
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Feed the Ducks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_feed_the_ducks_da1e4c)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Feed the Ducks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_feed_the_ducks_da1e4c)."
+        }
+      ],
+      "description_string_id": 74619,
+      "intro_text_string_id": 74617,
+      "enabled": true
+    },
+    {
+      "id": 3954106,
+      "title_string_id": 115533,
+      "giver_npc_id": 9500000368,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 141709,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat the Free the Balloons minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_free_the_balloons_c1fdb5)."
+            }
+          ],
+          "minigame_id": 305,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 141711,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Aida Humblehoop (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_free_the_balloons_c1fdb5)."
+            }
+          ],
+          "npc_id": 9500000368
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Free the Balloons! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_free_the_balloons_c1fdb5)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Free the Balloons! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_free_the_balloons_c1fdb5)."
+        }
+      ],
+      "description_string_id": 115532,
+      "intro_text_string_id": 115532,
+      "enabled": true
+    },
+    {
+      "id": 3954150,
+      "title_string_id": 36669,
+      "giver_npc_id": 9500000160,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 130477,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on the barrel (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lazi_s_pigs_fb5d44)."
+            }
+          ],
+          "npc_id": 9500002385
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 36671,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Pig Pen Panic minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lazi_s_pigs_fb5d44)."
+            }
+          ],
+          "minigame_id": 126,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 36673,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Lazi (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lazi_s_pigs_fb5d44)."
+            }
+          ],
+          "npc_id": 9500000160
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 31,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Lazi's Pigs (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lazi_s_pigs_fb5d44)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Lazi's Pigs (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lazi_s_pigs_fb5d44)."
+        }
+      ],
+      "description_string_id": 36676,
+      "intro_text_string_id": 36675,
+      "enabled": true
+    },
+    {
+      "id": 3954167,
+      "title_string_id": 389249,
+      "giver_npc_id": 9500000606,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 391186,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on the Trusty Shovel (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_mudpie_7fdf7f)."
+            }
+          ],
+          "npc_id": 9500002668
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 390956,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat the Mudpie! minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_mudpie_7fdf7f)."
+            }
+          ],
+          "minigame_id": 574,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 390958,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Mr. Mudd (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_mudpie_7fdf7f)."
+            }
+          ],
+          "npc_id": 9500000606
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 6,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Mudpie! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_mudpie_7fdf7f)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Mudpie! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_mudpie_7fdf7f)."
+        }
+      ],
+      "description_string_id": 389250,
+      "intro_text_string_id": 389248,
+      "enabled": true
+    },
+    {
+      "id": 3954177,
+      "title_string_id": 45528,
+      "giver_npc_id": 9500000925,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 70599,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Noglash Delivery minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_noglash_delivery_39e1dc)."
+            }
+          ],
+          "minigame_id": 209,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 139329,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click the barrel (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_noglash_delivery_39e1dc)."
+            }
+          ],
+          "npc_id": 9500002385
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 23400,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Nog (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_noglash_delivery_39e1dc)."
+            }
+          ],
+          "npc_id": 9500000925
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Noglash Delivery (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_noglash_delivery_39e1dc)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Noglash Delivery (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_noglash_delivery_39e1dc)."
+        }
+      ],
+      "description_string_id": 70595,
+      "intro_text_string_id": 70593,
+      "enabled": true
+    },
+    {
+      "id": 3954178,
+      "title_string_id": 46625,
+      "giver_npc_id": 9500000358,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 70436,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Nooklings' Deliveries minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_nooklings_deliveries_58f6ea)."
+            }
+          ],
+          "minigame_id": 214,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 70438,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Mister Nooklings and speak with him (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_nooklings_deliveries_58f6ea)."
+            }
+          ],
+          "npc_id": 9500000358
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Nooklings' Deliveries (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_nooklings_deliveries_58f6ea)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Nooklings' Deliveries (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_nooklings_deliveries_58f6ea)."
+        }
+      ],
+      "description_string_id": 70432,
+      "intro_text_string_id": 70430,
+      "enabled": true
+    },
+    {
+      "id": 3954201,
+      "title_string_id": 389229,
+      "giver_npc_id": 9500000617,
+      "prerequisite_quest_ids": [
+        3951427
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 391174,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on the Seashell Bucket (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pool_of_seashells_2c94fc)."
+            }
+          ],
+          "npc_id": 9500002612
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 390928,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat the Pool of Seashells minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pool_of_seashells_2c94fc)."
+            }
+          ],
+          "minigame_id": 571,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 94592,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Rainchaser (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pool_of_seashells_2c94fc)."
+            }
+          ],
+          "npc_id": 9500000617
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pool of Seashells (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pool_of_seashells_2c94fc)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Pool of Seashells (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pool_of_seashells_2c94fc)."
+        }
+      ],
+      "description_string_id": 389228,
+      "intro_text_string_id": 389228,
+      "enabled": true
+    },
+    {
+      "id": 3954217,
+      "title_string_id": 386150,
+      "giver_npc_id": 9500000419,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 386211,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat the Rimpadun's Plan minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rimpadun_s_plan_88081b)."
+            }
+          ],
+          "minigame_id": 1026,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 386213,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Rimpadun (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rimpadun_s_plan_88081b)."
+            }
+          ],
+          "npc_id": 9500000419
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 386215,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Mayor McFairy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rimpadun_s_plan_88081b)."
+            }
+          ],
+          "npc_id": 9500000405
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 14,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Rimpadun's Plan (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rimpadun_s_plan_88081b)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Rimpadun's Plan (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rimpadun_s_plan_88081b)."
+        }
+      ],
+      "description_string_id": 386149,
+      "intro_text_string_id": 386149,
+      "enabled": true
+    },
+    {
+      "id": 3954231,
+      "title_string_id": 389253,
+      "giver_npc_id": 9500000594,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 390963,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat the Shift Swap minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_shift_swap_5f415d)."
+            }
+          ],
+          "minigame_id": 575,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 390965,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Kendall (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_shift_swap_5f415d)."
+            }
+          ],
+          "npc_id": 9500000594
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 2,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Shift Swap (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_shift_swap_5f415d)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Shift Swap (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_shift_swap_5f415d)."
+        }
+      ],
+      "description_string_id": 389252,
+      "intro_text_string_id": 389252,
+      "enabled": true
+    },
+    {
+      "id": 3954262,
+      "title_string_id": 429253,
+      "giver_npc_id": 9500000299,
+      "prerequisite_quest_ids": [
+        3950264
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 429258,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on the barrel to start the race (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_great_treeble_race_112705)."
+            }
+          ],
+          "npc_id": 9500002385
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 429265,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat the record time (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_great_treeble_race_112705)."
+            }
+          ],
+          "minigame_id": 1037,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 429267,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Counselor Jake (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_great_treeble_race_112705)."
+            }
+          ],
+          "npc_id": 9500000299
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Great Treeble Race (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_great_treeble_race_112705)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "The Great Treeble Race (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_great_treeble_race_112705)."
+        }
+      ],
+      "description_string_id": 429254,
+      "intro_text_string_id": 429252,
+      "enabled": true
+    },
+    {
+      "id": 3954290,
+      "title_string_id": 36436,
+      "giver_npc_id": 9500000142,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 130488,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on the mail bag (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_urgent_missive_c9db84)."
+            }
+          ],
+          "npc_id": 9500002519
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 36494,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Urgent Missive minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_urgent_missive_c9db84)."
+            }
+          ],
+          "minigame_id": 125,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 36496,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Gorg (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_urgent_missive_c9db84)."
+            }
+          ],
+          "npc_id": 9500000142
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Urgent Missive (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_urgent_missive_c9db84)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Urgent Missive (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_urgent_missive_c9db84)."
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3954302,
+      "title_string_id": 390190,
+      "giver_npc_id": 9500000264,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 391771,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat the Sugar Rush minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wrapper_round_up_6e0adb)."
+            }
+          ],
+          "minigame_id": 306,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 391773,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Zanna Sugarzing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wrapper_round_up_6e0adb)."
+            }
+          ],
+          "npc_id": 9500000264
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 2,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Wrapper Round-Up (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wrapper_round_up_6e0adb)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Wrapper Round-Up (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wrapper_round_up_6e0adb)."
+        }
+      ],
+      "description_string_id": 391763,
+      "intro_text_string_id": 391763,
+      "enabled": true
+    },
+    {
+      "id": 3954303,
+      "title_string_id": 47325,
+      "giver_npc_id": 9500000236,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 70653,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Wumpig's Deliveries minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wumpig_s_deliveries_2da3d7)."
+            }
+          ],
+          "minigame_id": 219,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 70655,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Wumpig (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wumpig_s_deliveries_2da3d7)."
+            }
+          ],
+          "npc_id": 9500000236
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Wumpig's Deliveries (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wumpig_s_deliveries_2da3d7)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Wumpig's Deliveries (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wumpig_s_deliveries_2da3d7)."
+        }
+      ],
+      "description_string_id": 70645,
+      "intro_text_string_id": 70645,
+      "enabled": true
     }
   ]
 }

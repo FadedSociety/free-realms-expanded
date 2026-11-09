@@ -793,6 +793,7 @@ impl Gameplay {
                         npc_interaction::NpcAction::Lobby { .. } => "lobby",
                         npc_interaction::NpcAction::Fish => "fish",
                         npc_interaction::NpcAction::Learn { .. } => "learn",
+                        npc_interaction::NpcAction::Challenge { .. } => "challenge",
                     };
                     serde_json::json!({
                         "id": option.id,
@@ -1036,6 +1037,18 @@ impl Gameplay {
                     out = self.commit_if_changed(|staged| staged.begin_fishing(key, character))?;
                     // Leave the NPC dialog camera first (it otherwise outlives a menu choice,
                     // as the quest accept showed in native run 200411).
+                    out.replies.insert(0, END_DIALOG_26_4.to_vec());
+                }
+                Ok(NpcSelection::Challenge(id)) => {
+                    consume_menu = true;
+                    npc_event(select_event(
+                        runtime_guid,
+                        Some(key),
+                        option_id,
+                        "challenge",
+                    ));
+                    out = self.commit_if_changed(|staged| staged.begin_world_challenge(id, key, character.zone_id))?;
+                    // The dialog camera closes before the 39/16 start screen.
                     out.replies.insert(0, END_DIALOG_26_4.to_vec());
                 }
                 Ok(NpcSelection::Quest(quest)) => {

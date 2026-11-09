@@ -139,6 +139,18 @@ pub fn service() -> NpcInteraction {
         .expect("NPC content loads through the real loader")
 }
 
+/// [`service`] as the running game has it: each in-world game listed on its giver's menu.
+#[allow(dead_code)] // Only the suite that compares real 26/9 menus needs it.
+pub fn service_as_served() -> NpcInteraction {
+    let data = content_dir();
+    let mut service = service();
+    if let Some(games) = osfr_tools::world_challenge::Challenges::load(&data).expect("games load") {
+        let offers: Vec<_> = games.rows().map(|r| (r.giver, r.id, r.name_id)).collect();
+        service.set_challenge_gates(&offers);
+    }
+    service
+}
+
 /// Real Talk selection through the service the router calls.
 #[allow(dead_code)] // T773 reads the whole context instead; the body-only suites use this.
 pub fn service_talk_body(service: &mut NpcInteraction, npc_id: u64) -> Option<u32> {

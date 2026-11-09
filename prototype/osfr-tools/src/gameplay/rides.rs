@@ -527,6 +527,7 @@ impl Gameplay {
     /// so a join hook the world tick queued is emitted and saved here.
     pub fn pet_tick(&mut self, character: &CharacterState, now_ms: u64) -> Option<Outcome> {
         let mut out = Outcome::default();
+        self.tick_world_challenge(character, now_ms, &mut out); // L937
         self.credit_dance_off_join(&mut out);
         self.follow_pet(character, now_ms, &mut out);
         self.sync_happy_buff(character, now_ms, &mut out);

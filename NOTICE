@@ -26,6 +26,11 @@ Credits
 
 - Sanctuary (Open-Source-Free-Realms) and FreeRealms-Legacy, the community Free Realms server projects: read as
   references, and code adapted from them with credit (AGPL-3.0).
+- The Sanctuary fork by BubbaJoeX (AGPL-3.0): prototype/osfr-tools/src/world_challenge.rs, src/gameplay/world_challenge.rs,
+  its
+  layout.rs and wire.rs, and data/content/world_challenges.json adapt its in-world challenge
+  code (Challenges/ChallengeManager.cs, ChallengeLayout.cs, the HUD packets) and rows
+  (Resources/Challenges.json).
 - FreeRealmsLocaleTools, used to build the client's text packs.
 - fr-adr-toolkit, used to check our reading of the client's actor and model files.
 - League-Soccer (awest813) and GameplayFootball, for the soccer ball physics and AI we adapted (Apache-2.0).

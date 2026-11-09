@@ -27,6 +27,7 @@
 //!   | won Spot the Difference (`Gameplay::handle_spot` -> `npc_minigame_win_id_only`) | game id | `spot_game.json` `games[].game_id` |
 //!   | finished Pirate's Plunder match (`Gameplay::settle_pirates`) | arena's row | `ship_combat.json` `arenas[].minigame_id` |
 //!   | won Tower Defense game (`Gameplay::handle_tower_defense` -> `npc_minigame_win_id_only`, L962) | game id | `tower_defense.json` `games[].game_id` |
+//!   | in-world challenge win (`Gameplay::settle_world_challenge` -> `npc_minigame_win`) | row id | `world_challenges.json` `challenges[].id` |
 //!
 //!   Chess sends the row id as the 39/18 game id through its `RunSpec`; it reports
 //!   an elapsed time and no score (the results page always carries zero). A craft
@@ -93,6 +94,7 @@ use osfr_tools::{
     pets::PetContent,
     recipes::{CraftingJob, RecipeCatalog},
     ship_combat, soccer_entry, spot_game, sword_game, tower_defense,
+    world_challenge::Challenges,
 };
 use serde_json::Value;
 use std::{
@@ -362,6 +364,14 @@ impl Targets {
             match recipe.job {
                 CraftingJob::Blacksmith => targets.producer(minigame, SCORE_AND_ELAPSED),
                 CraftingJob::Chef | CraftingJob::Miner => targets.producer(minigame, []),
+            }
+        }
+
+        // L937: `Challenges::load` owns the file. A won challenge sends the row's MiniGameData id
+        // in its 39/18 with the things taken as the score and the server-measured seconds.
+        if let Some(challenges) = Challenges::load(root)? {
+            for row in challenges.rows() {
+                targets.producer(row.id, SCORE_AND_ELAPSED);
             }
         }
 

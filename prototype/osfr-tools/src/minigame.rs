@@ -53,6 +53,9 @@ pub enum RunMode {
     /// stores the ticket and enables the Start button; 39/5 is then answered with 39/17 alone,
     /// which runs `Startup` (`00ad47f0`) on the stored ticket.
     CardClient,
+    /// L937: a type-1 in-world challenge (`world_challenge.rs`). No movie, no preload: the server
+    /// is the game, 39/5 is answered with 39/17 alone, and the owning module adds the HUD packets.
+    InWorld,
 }
 
 /// One offer goal (Lua `BaseClient.MiniGameGoals`) in the wire order of the client reader
@@ -201,7 +204,7 @@ impl RunSpec {
             } if *encounter_id <= 0 || *player_guid == 0 => {
                 return Err(invalid("invalid encounter launch identity"));
             }
-            RunMode::Encounter { .. } | RunMode::CardClient => {}
+            RunMode::Encounter { .. } | RunMode::CardClient | RunMode::InWorld => {}
         }
         Ok(())
     }
@@ -766,15 +769,19 @@ impl MinigameRuns {
         }
         let score = activity.score();
         let score_i32 = i32::try_from(score).map_err(invalid)?;
-        let mut replies = vec![payload_packet(
-            instance_id,
-            run.spec.game_id,
-            if result.won {
-                "OnGameWonMsg"
-            } else {
-                "OnGameLostMsg"
-            },
-        )?];
+        // L937: an in-world run has no movie to tell, so its sequence starts at the 39/18.
+        let mut replies = Vec::new();
+        if run.spec.mode != RunMode::InWorld {
+            replies.push(payload_packet(
+                instance_id,
+                run.spec.game_id,
+                if result.won {
+                    "OnGameWonMsg"
+                } else {
+                    "OnGameLostMsg"
+                },
+            )?);
+        }
         replies.extend(result_packets(
             instance_id,
             run.spec.game_id,
@@ -838,12 +845,17 @@ impl MinigameRuns {
                 start_ack_packet(run.instance_id, run.spec.game_id),
             ],
             // 39/17 runs the card manager's `Startup` (`00ad47f0`) on the ticket 39/0x28 stored.
-            RunMode::CardClient => vec![start_ack_packet(run.instance_id, run.spec.game_id)],
+            RunMode::CardClient | RunMode::InWorld => {
+                vec![start_ack_packet(run.instance_id, run.spec.game_id)]
+            }
         };
         // (R) Ahead of 39/17, the Sanctuary fork's order: the HUD opens on the rows it finds.
         let goals = (run.spec.objectives.iter())
             .flat_map(|goal| [goal_row_packet(goal), goal_activate_packet(goal)]);
-        replies.splice(0..0, goals);
+        // An in-world run's goals open one at a time, and the win and bonus goals never show.
+        if run.spec.mode != RunMode::InWorld {
+            replies.splice(0..0, goals);
+        }
         self.current.as_mut().unwrap().state = RunState::Starting;
         Ok(RunOutcome {
             accepted: true,
@@ -882,6 +894,22 @@ impl MinigameRuns {
 /// 39/16 info record: reader `009bfc50` / body reader `009bdd70`.
 fn info_packet(instance_id: i32, spec: &RunSpec) -> io::Result<Vec<u8>> {
     let mut bytes = family39_header(16, instance_id, spec.game_id);
+    info_body(&mut bytes, spec)?;
+    bytes.extend(0_i32.to_le_bytes());
+    Ok(bytes)
+}
+
+/// L937 (R): 39/68 `MiniGameUpdateRewardPacket` (sub-opcode from the client's constructor, see
+/// `restoration/piece_063.rs`): the info body again, of which the client keeps the three reward
+/// bundles. The body layout is the community fork's; no capture shows it.
+pub(crate) fn reward_update_packet(instance_id: i32, spec: &RunSpec) -> io::Result<Vec<u8>> {
+    let mut bytes = family39_header(68, instance_id, spec.game_id);
+    info_body(&mut bytes, spec)?;
+    Ok(bytes)
+}
+
+/// The info record after its header, up to but excluding the trailing ignored dword.
+fn info_body(bytes: &mut Vec<u8>, spec: &RunSpec) -> io::Result<()> {
     for value in [
         spec.name_id,
         spec.icon_id,
@@ -897,7 +925,7 @@ fn info_packet(instance_id: i32, spec: &RunSpec) -> io::Result<Vec<u8>> {
     let goal_count = i32::try_from(spec.objectives.len()).map_err(invalid)?;
     bytes.extend(goal_count.to_le_bytes());
     for goal in &spec.objectives {
-        goal.encode(&mut bytes);
+        goal.encode(bytes);
     }
     bytes.extend(spec.flags);
     bytes.extend(
@@ -913,8 +941,7 @@ fn info_packet(instance_id: i32, spec: &RunSpec) -> io::Result<Vec<u8>> {
     bytes.extend(spec.game_id.to_le_bytes());
     bytes.extend([0, 0, 0, u8::from(spec.hidden_offer)]);
     bytes.extend(0_i32.to_le_bytes());
-    bytes.extend(0_i32.to_le_bytes());
-    Ok(bytes)
+    Ok(())
 }
 
 /// 47/1 (dispatch `00a91bf0`, reader `00a8d1f0`, row `00cb81e0`): the goal's row in the in-game
@@ -1095,7 +1122,7 @@ fn wheel_prize_packet(instance_id: i32, game_id: i32, entry: &RewardBundleRow) -
     bytes
 }
 
-fn family39_header(sub: u8, instance_id: i32, game_id: i32) -> Vec<u8> {
+pub(crate) fn family39_header(sub: u8, instance_id: i32, game_id: i32) -> Vec<u8> {
     let mut bytes = FAMILY_MINIGAME.to_le_bytes().to_vec();
     bytes.push(sub);
     for value in [instance_id, -1, game_id] {

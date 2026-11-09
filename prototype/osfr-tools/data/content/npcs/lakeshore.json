@@ -10147,8 +10147,23 @@
       "location_evidence": [
         "\"Mister Nooklings can be found in Lakeshore\" (852648536). [video: green marker 35 m from the Lakeshore Warpstone prompt, huZ4Hl_YSIc/00000, /00004; 22 distance-marker frames, 0IaICGnTWWQ/00024; one nameplate misread as \"Mistie Nooklings\"]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954178,
+          "title": "Nooklings' Deliveries",
+          "title_string_id": 46625,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Nooklings' Deliveries (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_nooklings_deliveries_58f6ea)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954178
+      ],
       "quests_given_text": [
         "\"Nooklings' Deliveries\" crate minigame (client name 440883800; 412564503, 2218098576). Gives Throck the \"large bag of holding\" (Miner, 2372739662, 2985492213). A fish buyer in Fisherman: Fish Market (3341966803). Gives Pookie's treat for Sunni (960839014). \"Find Mister Nookling's shovel\" (3085199299)."
       ],
@@ -16137,10 +16152,23 @@
               "evidence": "title_string_id corrected from raw locale hash 3719837526 to Global.Text id 409413 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3954085,
+          "title": "Feed the Ducks",
+          "title_string_id": 73289,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Feed the Ducks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_feed_the_ducks_da1e4c)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3070033
+        3070033,
+        3954085
       ],
       "quests_given_text": [
         "Fisherman: An Offering (bring an amethyst for his lost lucky stone). Duck-feeding job with hot-pepper bait (see town quests). Fish orders: Glerga sends fresh-fish orders to him (2671507062, 3074019718, 3804187014)."

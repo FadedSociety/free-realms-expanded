@@ -3268,8 +3268,23 @@
       "location_evidence": [
         "The zoo, by her candy cart. [video: nameplate on 7 frames of one recording, with the client names Tania Timberclaw and Pipagug, but no zone label, banner or prompt, so this does not place her: piWfe7lXZ9I/00000, /00003, /00009, /00015, /00018, /00024, /00033]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954302,
+          "title": "Wrapper Round-Up",
+          "title_string_id": 390190,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Wrapper Round-Up (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wrapper_round_up_6e0adb)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954302
+      ],
       "quests_given_text": [
         "The wrapper clean-up quest: \"Help Zanna Sugarzing clean up the candy wrappers around Durango Zoo!\" (2376338173); \"Help Zanna collect all the litter that's been dropped around the Zoo.\" (3509372953); objectives \"Speak to Zanna Sugarzing\" (1396257395), \"Bring the trash you've collected back to Zanna.\" (1138310231), \"Return to Zanna\" (3829174861). Quest title not matched (see quest table). Her reward line, by wording only: \"I'm going to give you one of my most special treats, just make sure you don't leave it lying around the zoo!\" (1761703098)."
       ],
@@ -3653,11 +3668,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:81; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1295 (ModelId=573, ModelFileName=fairy_f_freestyle_11.agr, NameId=101639)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.760803,
       "model_id": 573,
-      "model_file_name": "fairy_f_freestyle_11.agr"
+      "model_file_name": "fairy_f_freestyle_11.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000265,

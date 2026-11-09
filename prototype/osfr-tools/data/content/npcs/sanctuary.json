@@ -21284,9 +21284,16 @@
             "kind": "reconstructed",
             "evidence": "(R) facing kept from the earlier Sanctuary-main placement; the video index gives a position, not a heading"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -0.771869999
+      "heading": -0.771869999,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000477,

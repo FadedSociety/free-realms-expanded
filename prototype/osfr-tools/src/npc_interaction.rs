@@ -128,6 +128,10 @@ pub enum NpcAction {
     Learn {
         profile: i32,
     },
+    /// L937: an in-world challenge. Offered only by the giver named in `world_challenges.json`.
+    Challenge {
+        id: u32,
+    },
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -257,6 +261,8 @@ pub enum NpcSelection {
     Lobby(u32),
     /// The caller decides whether the job is taught (`Profiles::learn`).
     Learn(Trainer),
+    /// The caller decides whether the challenge may start (`Gameplay::begin_world_challenge`).
+    Challenge(u32),
 }
 
 impl NpcContent {
@@ -413,6 +419,8 @@ struct NpcContent {
     fish_string_id: u32,
     /// (R) Jobs each NPC teaches (W176).
     job_trainers: BTreeMap<u64, Vec<Trainer>>,
+    /// L937: the challenges each NPC offers, as `(MiniGameData id, menu label locale id)`.
+    challenge_gates: BTreeMap<u64, Vec<(u32, u32)>>,
 }
 
 /// One player's NPC session: the shared content plus the menu or shop they have open.
@@ -542,6 +550,7 @@ impl NpcInteraction {
                 fish_gates: BTreeSet::new(),
                 fish_string_id: 0,
                 job_trainers: BTreeMap::new(),
+                challenge_gates: BTreeMap::new(),
             }),
             active: None,
             foreign_click: false,
@@ -648,6 +657,26 @@ impl NpcInteraction {
         let content = Arc::make_mut(&mut self.content);
         content.fish_gates = known.into_iter().collect();
         content.fish_string_id = string_id;
+        unknown
+    }
+
+    /// L937: list each `(giver, challenge id, label locale id)` in the giver's menu. Returns the
+    /// givers that are not NPC content, like [`Self::set_race_gates`].
+    pub fn set_challenge_gates(&mut self, offers: &[(u64, u32, u32)]) -> Vec<u64> {
+        let content = Arc::make_mut(&mut self.content);
+        content.challenge_gates.clear();
+        let mut unknown = Vec::new();
+        for &(giver, id, label) in offers {
+            if content.npcs.contains_key(&giver) {
+                content
+                    .challenge_gates
+                    .entry(giver)
+                    .or_default()
+                    .push((id, label));
+            } else if !unknown.contains(&giver) {
+                unknown.push(giver);
+            }
+        }
         unknown
     }
 
@@ -793,6 +822,7 @@ impl NpcInteraction {
             NpcAction::Pirates { arena } => Ok(NpcSelection::Pirates(arena)),
             NpcAction::BoardGame { game } => Ok(NpcSelection::BoardGame(game)),
             NpcAction::Lobby { lobby_type } => Ok(NpcSelection::Lobby(lobby_type)),
+            NpcAction::Challenge { id } => Ok(NpcSelection::Challenge(id)),
             NpcAction::Learn { profile } => {
                 let trainer = self
                     .content
@@ -1224,6 +1254,15 @@ impl NpcInteraction {
             options.retain(|(action, _)| !matches!(action, NpcAction::Talk));
             options.extend(table.games.iter().map(|&(game, name)| (NpcAction::BoardGame { game }, name)));
             options.extend(table.lobbies.iter().map(|&(lobby_type, name)| (NpcAction::Lobby { lobby_type }, name)));
+        }
+        for &(id, label) in self
+            .content
+            .challenge_gates
+            .get(&npc.npc_id)
+            .into_iter()
+            .flatten()
+        {
+            options.push((NpcAction::Challenge { id }, label));
         }
         for trainer in self
             .content

@@ -3658,8 +3658,23 @@
       "location_evidence": [
         "Boardwalk (\"up on the boardwalk\", 1684353005); video nameplate in 11 frames (Qwzd_9ILWjA/00020)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954019,
+          "title": "Brain Freeze Mix-up",
+          "title_string_id": 47230,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Brain Freeze Mix-up (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brain_freeze_mix_up_ab4177)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954019
+      ],
       "quests_given_text": [
         "\"Banani needs help serving her smoothies\" (4074499682, 760536665, 3736489917, deliver smoothies to beachgoers); title may be Smoothie Operator (title 3623532997) [inferred, weak]; Sanford's smoothie errand (1369612081); autograph target (1063951341)"
       ],
@@ -24648,8 +24663,23 @@
       "location_evidence": [
         "Seaside; video nameplate in 10 frames (1gt4j8_A5Hc/00052)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954231,
+          "title": "Shift Swap",
+          "title_string_id": 389253,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Shift Swap (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_shift_swap_5f415d)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954231
+      ],
       "quests_given_text": [
         "Tell the on-duty lifeguards at all four lifeguard towers that shift is over (805342411, 1551901404); title not found"
       ],
@@ -25099,11 +25129,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:706; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1948 (ModelId=775, ModelFileName=human_m_kendall.agr, NameId=117195)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.425682,
       "model_id": 775,
-      "model_file_name": "human_m_kendall.agr"
+      "model_file_name": "human_m_kendall.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000595,
@@ -30581,8 +30618,23 @@
       "location_evidence": [
         "Beaches of Seaside; video nameplate in 23 frames (s_4bpO1xPDs/00732)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954167,
+          "title": "Mudpie!",
+          "title_string_id": 389249,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Mudpie! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_mudpie_7fdf7f)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954167
+      ],
       "quests_given_text": [
         "Members-only per wiki: clean up Trash Piles with Mr. Mudd's Trusty Shovel (1593657666, 1585648176, 4052676854); title not found"
       ],
@@ -31042,11 +31094,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:709; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1951 (ModelId=184, ModelFileName=human_m_freestyle_01.agr, NameId=45587)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.687766,
       "model_id": 184,
-      "model_file_name": "human_m_freestyle_01.agr"
+      "model_file_name": "human_m_freestyle_01.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000607,
@@ -35526,11 +35585,37 @@
               "evidence": "Starfish Picking (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_starfish_picking_c2b1d3)."
             }
           ]
+        },
+        {
+          "quest_id": 3954201,
+          "title": "Pool of Seashells",
+          "title_string_id": 389229,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pool of Seashells (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pool_of_seashells_2c94fc)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3954042,
+          "title": "Combo Challenge",
+          "title_string_id": 389233,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Combo Challenge (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_combo_challenge_5874dc)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3951316,
-        3951427
+        3951427,
+        3954201,
+        3954042
       ],
       "quests_given_text": [
         "Lost Turtle (title 3550976283; \"Oh no! I've lost my pet turtle!\" video AW041GUrkus/00158); Starfish Picking (title 1626187908; offer shows \"You receive 15 coins\", AW041GUrkus/00220); Combo Challenge (title 2096369689; a frame after completion shows \"You receive 1 Wild T-Shirt\", AW041GUrkus/00346, 00348); Pool of Seashells (title 46229354, bucket minigame 1544766839). Scouting errand for Aziwug (3802378602)"

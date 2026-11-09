@@ -34,7 +34,7 @@ mod npc_greetings;
 use npc_greetings::{
     GREETING_HEADER, MENU_HEADER, character_at, content_dir, gameplay_dir, gameplay_talk_body,
     greeting_bindings, interact, lab_report, locale_id_to_text, locale_rows, npc_position,
-    npc_record, npc_records, read_json, select, service, service_talk_body,
+    npc_record, npc_records, read_json, select, service_as_served as service, service_talk_body,
 };
 use osfr_tools::{
     gameplay::Gameplay,

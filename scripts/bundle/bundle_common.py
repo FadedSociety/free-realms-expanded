@@ -87,6 +87,7 @@ ACTIVITY_CONTENT = (
     "mining_nodes.json",  # harvest_nodes.rs: clickable copper veins
     "harvest_nodes.json",  # harvest_nodes.rs: clickable mushroom nodes
     "quest_nodes.json",  # harvest_nodes.rs: (R) quest-only pickup nodes (T503)
+    "world_challenges.json",  # world_challenge.rs: (R) the type-1 in-world challenges (L937)
 )
 
 # Mirrors the per-file bounds in the Rust loaders and bundle checks.
@@ -108,6 +109,7 @@ ACTIVITY_MAX_BYTES = {
     "mining_nodes.json": 1024 * 1024,
     "harvest_nodes.json": 1024 * 1024,
     "quest_nodes.json": 1024 * 1024,
+    "world_challenges.json": 1024 * 1024,
 }
 
 # (R) Generated runtime content: the builder writes each file only when the

@@ -7502,9 +7502,23 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part A. The Summer Camp: Camp Chatty and Camp Robbie, row 42; source cell: [client][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3954262,
+          "title": "The Great Treeble Race",
+          "title_string_id": 429253,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Great Treeble Race (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_great_treeble_race_112705)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3954262
+      ],
       "quests_given_text": [
         "The Great Treeble Race (wiki, repeatable; client title 992380722): \"Counselor Jake challenges you to beat the current best time for running around the lake.\" (3570151688); \"He's challenging everyone to beat the record time running around the lake\" (3231929936). Goal target \"Knock out Counselor Jake\" (22760277)."
       ],
@@ -20259,10 +20273,23 @@
               "evidence": "Rags to Riches (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rags_to_riches_4e4683)."
             }
           ]
+        },
+        {
+          "quest_id": 3954033,
+          "title": "Certified Treasure Hunter",
+          "title_string_id": 429174,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Certified Treasure Hunter (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_certified_treasure_hunter_53ce56)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3950333
+        3950333,
+        3954033
       ],
       "quests_given_text": [
         "Rags to Riches (wiki; client title 40276724; Robbie: \"Yeah, welcome to my camp... if you hang out here, you can go from rags, to being rich!\" 2093705484); Certified Treasure Hunter (wiki; client title 2090142817; \"win either a scavenger hunt or dig up some artifacts\", 3882605396, 645926711); Bigfooted Friend (wiki; client title 1628471361; \"Now that you're officially part of Robbie's camp, he asks that you help their misunderstood friend, Bigfoot\", 3849973998). Hand-in for Unearthing Treasures (\"show Robbie your findings\", 2812940865). The daily junk pile in his tent is Rob Robbie daily (see the quest table)."

@@ -1,0 +1,2437 @@
+{
+  "schema_version": 2,
+  "source": [
+    "L937: client minigame TYPE 1 (SAMPLE) in-world timed challenges, one row per MiniGameData id. Names, descriptions, icons and difficulties are the client's own; every count, timer, radius, reward and distance is a reconstruction (R).",
+    "Adapted from the Sanctuary community server fork (BubbaJoeX) Resources/Challenges.json and ChallengeManager.cs, AGPL-3.0; see NOTICE.",
+    "Not built: 301 (Mail Morph transform) and 585 (booster and bombs) need an ability system; 302 visits two of its three recipients (Toilin has no NPC row).",
+    "Only a win pays and credits quests. A job-less row (profile 0) pays the active job. xp is the fallback; the job's activity_xp (data/release/job_xp_curve.json) pays instead where one challenge is one unit of the job's activity (not for the combat jobs, whose rate is per kill)."
+  ],
+  "tuning": {
+    "start_range": 30.0,
+    "abandon_margin": 60.0,
+    "touch_range": 2.2,
+    "flag_range": 4.0,
+    "return_range": 4.5,
+    "deliver_range": 3.5,
+    "click_range": 6.0,
+    "min_center_distance": 6.0,
+    "min_spacing": 4.0,
+    "max_rise": 8.0,
+    "attempts_per_point": 12,
+    "walk_cell": 2.0,
+    "walk_step": 1.4,
+    "prop_clearance": 0.5,
+    "body_height": 1.8
+  },
+  "challenges": [
+    {
+      "id": 14,
+      "title": "What a Mess!",
+      "giver": 9000000132,
+      "name_id": 115976,
+      "description_id": 5073,
+      "icon_id": 312,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 5,
+          "radius": 40.0,
+          "name_id": 115976,
+          "model_id": 27
+        },
+        {
+          "kind": "use",
+          "count": 5,
+          "radius": 40.0,
+          "name_id": 115976,
+          "model_id": 76
+        }
+      ],
+      "bonuses": [],
+      "coins": 50,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_what_a_mess",
+        "goals read by hand from the wiki page (R)",
+        "Find the Excess Mail scattered around to: hand-picked model",
+        "Deliver the mail: mailbox model",
+        "giver: the quest's giver (R)",
+        "time limit 120 s, coins, xp: (R) by difficulty"
+      ]
+    },
+    {
+      "id": 29,
+      "title": "Find Slothi's Lost Merchandise",
+      "giver": 9500000212,
+      "name_id": 16959,
+      "description_id": 16960,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 8,
+          "radius": 40.0,
+          "name_id": 16959,
+          "model_id": 83
+        }
+      ],
+      "bonuses": [],
+      "coins": 50,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_find_slothi_s_lost_merchandise",
+        "Find all the barrels: checked model for 'Find all the barrels'",
+        "giver: the quest's giver (R)",
+        "time limit 120 s, coins, xp: (R) by difficulty"
+      ]
+    },
+    {
+      "id": 36,
+      "title": "Lost Little Sheep",
+      "giver": 9500000268,
+      "name_id": 20096,
+      "description_id": 20099,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 5,
+          "radius": 30.0,
+          "name_id": 20096,
+          "model_id": 3240
+        }
+      ],
+      "bonuses": [],
+      "coins": 45,
+      "xp": 33,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_lost_little_sheep",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Find the sheep: fork model",
+        "giver: the quest's giver (R)",
+        "time limit 120 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 74,
+      "title": "Archer: Test of Agility",
+      "giver": 9000000387,
+      "name_id": 22102,
+      "description_id": 22103,
+      "icon_id": 9550,
+      "difficulty": 1,
+      "profile": 35,
+      "time_limit_seconds": 90,
+      "coins": 70,
+      "xp": 41,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "use",
+          "count": 6,
+          "name_id": 22102,
+          "radius": 30,
+          "model_id": 226
+        }
+      ],
+      "bonuses": [],
+      "source": [
+        "MiniGameData.txt row 74 (client): name, description, icon and difficulty ids; type 1 (SAMPLE).",
+        "Sanctuary BubbaJoeX fork Challenges.json row 74 (AGPL-3.0): kind, count, timer, radius, model and rewards are its reconstruction, kept here as (R).",
+        "(R) giver: Lugabow (Greenwood, content key 9000000387). Count 6 is the wiki quest page 'Archer: Test of Agility' (touch all six target dummies), which outranks the fork row's ten; the 90 s timer is the fork's.",
+        "L937 hand row"
+      ]
+    },
+    {
+      "id": 125,
+      "title": "Urgent Missive",
+      "giver": 9500000142,
+      "name_id": 36436,
+      "description_id": 36440,
+      "icon_id": 9550,
+      "difficulty": 1,
+      "profile": 4,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "deliver",
+          "count": 7,
+          "radius": 40.0,
+          "name_id": 36442,
+          "recipients": [
+            9000000470,
+            9500000209,
+            9500000201,
+            9000000071,
+            9500000191,
+            9500000213,
+            9500000198
+          ]
+        }
+      ],
+      "bonuses": [],
+      "coins": 30,
+      "xp": 27,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_urgent_missive",
+        "3 of 10 people have no drawn NPC and are left out (R)",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "giver: the quest's giver (R)",
+        "time limit 120 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 126,
+      "title": "Pig Pen Panic",
+      "giver": 9500000160,
+      "name_id": 36607,
+      "description_id": 36603,
+      "icon_id": 9550,
+      "difficulty": 3,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 6,
+          "radius": 30.0,
+          "name_id": 36607,
+          "model_id": 3286
+        }
+      ],
+      "bonuses": [],
+      "coins": 50,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_pig_pen_panic",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Grab those pigs: checked model for 'Grab those pigs'",
+        "giver: fork names lazi (R)",
+        "time limit 120 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 172,
+      "title": "Catch the Crate Thief!",
+      "giver": 9500000270,
+      "name_id": 38705,
+      "description_id": 389725,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "catch",
+          "count": 1,
+          "radius": 40.0,
+          "name_id": 38705,
+          "model_id": 84
+        }
+      ],
+      "bonuses": [],
+      "coins": 50,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_catch_the_crate_thief",
+        "goals read by hand from the wiki page (R)",
+        "Catch the Crate Thief!: hand-picked model",
+        "giver: the quest's giver (R)",
+        "time limit 120 s, coins, xp: (R) by difficulty"
+      ]
+    },
+    {
+      "id": 200,
+      "title": "Perry's Problem",
+      "giver": 9000000422,
+      "name_id": 7656,
+      "description_id": 39761,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 8,
+          "radius": 40.0,
+          "name_id": 7656,
+          "model_id": 212
+        }
+      ],
+      "bonuses": [],
+      "coins": 50,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_perry_s_problem",
+        "Find the first Baby Chick Return the fir: checked model for 'Find the first Baby Chick Return the first Baby Chick Find the second Baby Chick Return the second Baby Chick Find the third Baby Chick Return the third Baby Chick Find the fourth Baby Chick Return the fourth Baby Chick The cows will briefly stun you'",
+        "giver: the quest's giver (R)",
+        "time limit 120 s, coins, xp: (R) by difficulty"
+      ]
+    },
+    {
+      "id": 209,
+      "title": "Noglash Delivery",
+      "giver": 9500000925,
+      "name_id": 45528,
+      "description_id": 45529,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 3,
+          "radius": 40.0,
+          "name_id": 45530,
+          "model_id": 3490
+        },
+        {
+          "kind": "return",
+          "count": 1,
+          "name_id": 45532
+        }
+      ],
+      "bonuses": [],
+      "coins": 50,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_noglash_delivery",
+        "goals read by hand from the wiki page (R)",
+        "Collect the Noglash Stew Roots: hand-picked model",
+        "giver: the quest's giver (R)",
+        "time limit 120 s, coins, xp: (R) by difficulty"
+      ]
+    },
+    {
+      "id": 212,
+      "title": "Greenwood Situation Report",
+      "giver": 9000000334,
+      "name_id": 47853,
+      "description_id": 45932,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "catch",
+          "count": 5,
+          "radius": 45.0,
+          "name_id": 47853,
+          "model_id": 214
+        }
+      ],
+      "bonuses": [],
+      "coins": 45,
+      "xp": 33,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_greenwood_situation_report",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Greenwood Situation Report: fork model",
+        "giver: fork names glugmort (R)",
+        "time limit 120 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 214,
+      "title": "Nooklings' Deliveries",
+      "giver": 9500000358,
+      "name_id": 46625,
+      "description_id": 46093,
+      "icon_id": 9550,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 90,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "deliver",
+          "count": 3,
+          "name_id": 46625,
+          "recipients": [
+            9500000365,
+            9500000350,
+            9000000194
+          ]
+        }
+      ],
+      "bonuses": [],
+      "coins": 40,
+      "xp": 30,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_nooklings_deliveries",
+        "recipients: the 3 nearest drawn NPCs (R)",
+        "giver: the quest's giver (R)",
+        "time limit 90 s, coins, xp: (R) by difficulty"
+      ]
+    },
+    {
+      "id": 216,
+      "title": "Snowmen on the Loose!",
+      "giver": 9500000755,
+      "name_id": 382833,
+      "description_id": 45984,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "catch",
+          "count": 6,
+          "radius": 35.0,
+          "name_id": 382833,
+          "model_id": 140
+        }
+      ],
+      "bonuses": [],
+      "coins": 50,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_snowmen_on_the_loose",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Snowmen on the Loose!: fork model",
+        "giver: fork names lealin (R)",
+        "time limit 120 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 218,
+      "title": "Chicken Run",
+      "giver": 9500000975,
+      "name_id": 45620,
+      "description_id": 73633,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "catch",
+          "count": 8,
+          "radius": 40.0,
+          "name_id": 45620,
+          "model_id": 212
+        }
+      ],
+      "bonuses": [],
+      "coins": 60,
+      "xp": 39,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_chicken_run",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Chicken Run: fork model",
+        "giver: wiki names farmer murglot",
+        "time limit 120 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 219,
+      "title": "Wumpig's Deliveries",
+      "giver": 9500000236,
+      "name_id": 47325,
+      "description_id": 47371,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "deliver",
+          "count": 4,
+          "name_id": 429935,
+          "recipients": [
+            9500000097,
+            9500000179,
+            9500000104,
+            9500000102
+          ]
+        }
+      ],
+      "bonuses": [],
+      "coins": 50,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_wumpig_s_deliveries",
+        "recipients: the 4 nearest drawn NPCs (R)",
+        "giver: the quest's giver (R)",
+        "time limit 120 s, coins, xp: (R) by difficulty"
+      ]
+    },
+    {
+      "id": 224,
+      "title": "Feed the Ducks",
+      "giver": 9000000233,
+      "name_id": 73289,
+      "description_id": 73290,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 121,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 10,
+          "radius": 35.0,
+          "name_id": 73449,
+          "model_id": 417
+        },
+        {
+          "kind": "return",
+          "count": 1,
+          "name_id": 73453
+        }
+      ],
+      "bonuses": [],
+      "coins": 50,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_feed_the_ducks",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Feed the Ducks!: fork model",
+        "giver: fork names waterwings (R)",
+        "time limit 121 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 226,
+      "title": "Going Coco-Nuts!",
+      "giver": 9500000616,
+      "name_id": 75538,
+      "description_id": 75462,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "deliver",
+          "count": 4,
+          "name_id": 75463,
+          "recipients": [
+            9500000554,
+            9500000578,
+            9500000550,
+            9500000568
+          ]
+        }
+      ],
+      "bonuses": [],
+      "coins": 50,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_going_coco_nuts",
+        "recipients: the 4 nearest drawn NPCs (R)",
+        "giver: the quest's giver (R)",
+        "time limit 120 s, coins, xp: (R) by difficulty"
+      ]
+    },
+    {
+      "id": 227,
+      "title": "Merry Vale Party Flyers",
+      "giver": 9500000405,
+      "name_id": 76488,
+      "description_id": 76489,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 150,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 10,
+          "radius": 60.0,
+          "name_id": 76492,
+          "model_id": 584
+        }
+      ],
+      "bonuses": [],
+      "coins": 70,
+      "xp": 45,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_merry_vale_party_flyers",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Collect Party Flyers: checked model for 'Collect Party Flyers'",
+        "giver: wiki names mayor mcfairy",
+        "time limit 150 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 228,
+      "title": "The Nightmare Before Filming",
+      "giver": 9500000444,
+      "name_id": 74674,
+      "description_id": 76793,
+      "icon_id": 9550,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 90,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 8,
+          "radius": 50.0,
+          "name_id": 76792,
+          "model_id": 844
+        }
+      ],
+      "bonuses": [],
+      "coins": 60,
+      "xp": 41,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_the_nightmare_before_filming",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Find props around Pixiewood: fork model",
+        "giver: fork names barton (R)",
+        "time limit 90 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 229,
+      "title": "Robgoblin Recycling Program",
+      "giver": 9500000545,
+      "name_id": 75969,
+      "description_id": 76937,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 300,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 8,
+          "radius": 40.0,
+          "name_id": 76790,
+          "model_id": 584
+        }
+      ],
+      "bonuses": [],
+      "coins": 50,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_robgoblin_recycling_program",
+        "Find all the scattered fliers: checked model for 'Find all the scattered fliers'",
+        "giver: the quest's giver (R)",
+        "time limit 300 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 234,
+      "title": "Ninja: Handle with Care",
+      "giver": 9000000047,
+      "name_id": 78857,
+      "description_id": 78858,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 2,
+      "time_limit_seconds": 39,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 5,
+          "radius": 35.0,
+          "name_id": 91928,
+          "model_id": 80
+        },
+        {
+          "kind": "return",
+          "count": 1,
+          "name_id": 90450
+        }
+      ],
+      "bonuses": [],
+      "coins": 45,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_ninja_handle_with_care",
+        "goals read by hand from the wiki page (R)",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Collect Chloe's bags: hand-picked model",
+        "giver: wiki names chloe",
+        "time limit 39 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 235,
+      "title": "Ninja: Burst of Speed",
+      "giver": 9000000223,
+      "name_id": 78881,
+      "description_id": 78882,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 2,
+      "time_limit_seconds": 90,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "race",
+          "count": 8,
+          "radius": 50.0,
+          "name_id": 93484
+        }
+      ],
+      "bonuses": [],
+      "coins": 60,
+      "xp": 39,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_ninja_burst_of_speed",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "giver: fork names ty (R)",
+        "time limit 90 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 236,
+      "title": "Ninja: The Masterless Ninja",
+      "giver": 9500000725,
+      "name_id": 78901,
+      "description_id": 387983,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 2,
+      "time_limit_seconds": 90,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "catch",
+          "count": 1,
+          "radius": 30.0,
+          "name_id": 78901,
+          "model_id": 144
+        }
+      ],
+      "bonuses": [],
+      "coins": 25,
+      "xp": 23,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_the_masterless_ninja",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Ninja: The Masterless Ninja: fork model",
+        "giver: fork names annabelle (R)",
+        "time limit 90 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 238,
+      "title": "Can You Deliver?",
+      "giver": 9000000086,
+      "name_id": 93381,
+      "description_id": 93382,
+      "icon_id": 312,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 90,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "use",
+          "count": 6,
+          "radius": 40.0,
+          "name_id": 15675,
+          "model_id": 76
+        }
+      ],
+      "bonuses": [],
+      "coins": 40,
+      "xp": 30,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_can_you_deliver",
+        "Deliver Mail to the Addresses: mailbox model",
+        "giver: wiki names felipe",
+        "time limit 90 s, coins, xp: (R) by difficulty"
+      ]
+    },
+    {
+      "id": 239,
+      "title": "Mail Marksman",
+      "giver": 9000000086,
+      "name_id": 93757,
+      "description_id": 93758,
+      "icon_id": 312,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 90,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "use",
+          "count": 6,
+          "radius": 40.0,
+          "name_id": 15675,
+          "model_id": 76
+        }
+      ],
+      "bonuses": [],
+      "coins": 40,
+      "xp": 30,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_mail_marksman",
+        "Deliver Mail to the Addresses: mailbox model",
+        "giver: wiki names felipe",
+        "time limit 90 s, coins, xp: (R) by difficulty"
+      ]
+    },
+    {
+      "id": 240,
+      "title": "Ditch the Doggies",
+      "giver": 9000000086,
+      "name_id": 93759,
+      "description_id": 93760,
+      "icon_id": 312,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 90,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "use",
+          "count": 6,
+          "radius": 40.0,
+          "name_id": 15675,
+          "model_id": 76
+        }
+      ],
+      "bonuses": [],
+      "coins": 40,
+      "xp": 30,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_ditch_the_doggies",
+        "Deliver Mail to the Addresses: mailbox model",
+        "giver: wiki names felipe",
+        "time limit 90 s, coins, xp: (R) by difficulty"
+      ]
+    },
+    {
+      "id": 241,
+      "title": "Scattered Mail",
+      "giver": 9000000091,
+      "name_id": 21424,
+      "description_id": 100309,
+      "icon_id": 312,
+      "difficulty": 2,
+      "profile": 4,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 10,
+          "radius": 45.0,
+          "name_id": 100312,
+          "model_id": 27
+        },
+        {
+          "kind": "return",
+          "count": 1,
+          "name_id": 21569
+        }
+      ],
+      "bonuses": [],
+      "coins": 70,
+      "xp": 43,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_scattered_mail",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Collect the Dropped Mail: fork model",
+        "giver: wiki names flitter",
+        "time limit 120 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 242,
+      "title": "Running on Sunshine",
+      "giver": 9500000631,
+      "name_id": 46891,
+      "description_id": 103036,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "race",
+          "count": 6,
+          "radius": 45.0,
+          "name_id": 100375
+        },
+        {
+          "kind": "race",
+          "count": 6,
+          "radius": 45.0,
+          "name_id": 100414
+        }
+      ],
+      "bonuses": [],
+      "coins": 50,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_running_on_sunshine",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "giver: fork names sundancer (R)",
+        "time limit 120 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 243,
+      "title": "Bixie Bud Blitz",
+      "giver": 9000000107,
+      "name_id": 141106,
+      "description_id": 100384,
+      "icon_id": 312,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 10,
+          "radius": 40.0,
+          "name_id": 100462,
+          "model_id": 248
+        },
+        {
+          "kind": "return",
+          "count": 1,
+          "name_id": 71372
+        }
+      ],
+      "bonuses": [],
+      "coins": 70,
+      "xp": 43,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_bixie_bud_blitz",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Collect the Bixie Buds: fork model",
+        "giver: fork names honey (R)",
+        "time limit 120 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 244,
+      "title": "The Race is On!",
+      "giver": 9500000631,
+      "name_id": 100437,
+      "description_id": 100479,
+      "icon_id": 9550,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 150,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "race",
+          "count": 8,
+          "radius": 55.0,
+          "name_id": 100375
+        },
+        {
+          "kind": "race",
+          "count": 8,
+          "radius": 55.0,
+          "name_id": 100414
+        }
+      ],
+      "bonuses": [],
+      "coins": 60,
+      "xp": 41,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_the_race_is_on",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "giver: fork names sundancer (R)",
+        "time limit 150 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 245,
+      "title": "One More to Go!",
+      "giver": 9500000631,
+      "name_id": 100581,
+      "description_id": 100649,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 180,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "race",
+          "count": 10,
+          "radius": 65.0,
+          "name_id": 100375
+        },
+        {
+          "kind": "race",
+          "count": 10,
+          "radius": 65.0,
+          "name_id": 100414
+        }
+      ],
+      "bonuses": [],
+      "coins": 70,
+      "xp": 47,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_one_more_to_go",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "giver: fork names sundancer (R)",
+        "time limit 180 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 246,
+      "title": "Merry Vale Package Pickup",
+      "giver": 9000000174,
+      "name_id": 100711,
+      "description_id": 100714,
+      "icon_id": 312,
+      "difficulty": 1,
+      "profile": 4,
+      "time_limit_seconds": 180,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "carry",
+          "count": 5,
+          "radius": 40.0,
+          "name_id": 100711,
+          "model_id": 268
+        }
+      ],
+      "bonuses": [],
+      "coins": 45,
+      "xp": 37,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_merry_vale_package_pickup",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Merry Vale Package Pickup: fork model",
+        "giver: wiki names postmaster vixie",
+        "time limit 180 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 247,
+      "title": "Final Stretch",
+      "giver": 9500000631,
+      "name_id": 100796,
+      "description_id": 100815,
+      "icon_id": 9550,
+      "difficulty": 3,
+      "profile": 0,
+      "time_limit_seconds": 210,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "race",
+          "count": 12,
+          "radius": 75.0,
+          "name_id": 100375
+        },
+        {
+          "kind": "race",
+          "count": 12,
+          "radius": 75.0,
+          "name_id": 100414
+        }
+      ],
+      "bonuses": [],
+      "coins": 80,
+      "xp": 53,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_final_stretch",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "giver: fork names sundancer (R)",
+        "time limit 210 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 248,
+      "title": "Deliver the Mail in Merry Vale",
+      "giver": 9000000174,
+      "name_id": 100908,
+      "description_id": 100966,
+      "icon_id": 312,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 90,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "use",
+          "count": 6,
+          "radius": 40.0,
+          "name_id": 429935,
+          "model_id": 76
+        }
+      ],
+      "bonuses": [],
+      "coins": 40,
+      "xp": 30,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_deliver_the_mail_in_merry_vale",
+        "Deliver: mailbox model",
+        "giver: wiki names postmaster vixie",
+        "time limit 90 s, coins, xp: (R) by difficulty"
+      ]
+    },
+    {
+      "id": 249,
+      "title": "Brain Freeze Mix-up",
+      "giver": 9500000554,
+      "name_id": 47230,
+      "description_id": 101212,
+      "icon_id": 9550,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 150,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "deliver",
+          "count": 3,
+          "name_id": 47230,
+          "recipients": [
+            9500000616,
+            9500000578,
+            9500000568
+          ]
+        }
+      ],
+      "bonuses": [],
+      "coins": 45,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_brain_freeze_mix_up",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "recipients: the 3 nearest drawn NPCs (R)",
+        "giver: the quest's giver (R)",
+        "time limit 150 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 262,
+      "title": "Invitation Investigation",
+      "giver": 9000000080,
+      "name_id": 101584,
+      "description_id": 101585,
+      "icon_id": 312,
+      "difficulty": 2,
+      "profile": 4,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 8,
+          "radius": 45.0,
+          "name_id": 101563,
+          "model_id": 27
+        },
+        {
+          "kind": "return",
+          "count": 1,
+          "name_id": 101565
+        }
+      ],
+      "bonuses": [],
+      "coins": 60,
+      "xp": 39,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_invitation_investigation",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Find the Invitations: fork model",
+        "giver: fork names enve lestamp (R)",
+        "time limit 120 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 264,
+      "title": "Sasparilla Sprint",
+      "giver": 9000000172,
+      "name_id": 103728,
+      "description_id": 103729,
+      "icon_id": 312,
+      "difficulty": 1,
+      "profile": 4,
+      "time_limit_seconds": 150,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "carry",
+          "count": 5,
+          "radius": 40.0,
+          "name_id": 103728,
+          "model_id": 909
+        }
+      ],
+      "bonuses": [],
+      "coins": 45,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_sasparilla_sprint",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Sasparilla Sprint: fork model",
+        "giver: wiki names postchug runalug",
+        "time limit 150 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 265,
+      "title": "Beware of Dogs",
+      "giver": 9000000031,
+      "name_id": 104029,
+      "description_id": 104030,
+      "icon_id": 312,
+      "difficulty": 2,
+      "profile": 4,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 10,
+          "radius": 45.0,
+          "name_id": 100312,
+          "model_id": 27
+        },
+        {
+          "kind": "return",
+          "count": 1,
+          "name_id": 104196
+        }
+      ],
+      "bonuses": [],
+      "coins": 70,
+      "xp": 43,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_beware_of_dogs",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Collect the Dropped Mail: fork model",
+        "giver: wiki names brin galeglow",
+        "time limit 120 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 266,
+      "title": "Always on Time",
+      "giver": 9000000031,
+      "name_id": 115498,
+      "description_id": 115499,
+      "icon_id": 312,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "use",
+          "count": 8,
+          "radius": 40.0,
+          "name_id": 429935,
+          "model_id": 76
+        }
+      ],
+      "bonuses": [],
+      "coins": 50,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_always_on_time",
+        "Deliver: mailbox model",
+        "giver: wiki names brin galeglow",
+        "time limit 120 s, coins, xp: (R) by difficulty"
+      ]
+    },
+    {
+      "id": 270,
+      "title": "Running the Route",
+      "giver": 9000000086,
+      "name_id": 115013,
+      "description_id": 116059,
+      "icon_id": 312,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 90,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "use",
+          "count": 6,
+          "radius": 40.0,
+          "name_id": 15675,
+          "model_id": 76
+        }
+      ],
+      "bonuses": [],
+      "coins": 40,
+      "xp": 30,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_running_the_route",
+        "Deliver Mail to the Addresses: mailbox model",
+        "giver: wiki names felipe",
+        "time limit 90 s, coins, xp: (R) by difficulty"
+      ]
+    },
+    {
+      "id": 276,
+      "title": "PCA Takedown",
+      "giver": 9000000317,
+      "name_id": 130245,
+      "description_id": 130247,
+      "icon_id": 312,
+      "difficulty": 3,
+      "profile": 4,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 6,
+          "radius": 35.0,
+          "name_id": 130360,
+          "model_id": 489
+        }
+      ],
+      "bonuses": [],
+      "coins": 50,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_pca_takedown",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Peg the PCA Campers!: fork model",
+        "giver: fork names emahl (R)",
+        "time limit 120 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 302,
+      "title": "It's a Dancing Telegram!",
+      "giver": 9000000086,
+      "name_id": 139404,
+      "description_id": 139407,
+      "icon_id": 312,
+      "difficulty": 1,
+      "profile": 4,
+      "time_limit_seconds": 180,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "deliver",
+          "count": 3,
+          "name_id": 139404,
+          "recipients": [
+            9500000543,
+            9500000499,
+            9500000466
+          ]
+        }
+      ],
+      "bonuses": [],
+      "coins": 35,
+      "xp": 33,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_it_s_a_dancing_telegram",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "recipients: the 3 nearest drawn NPCs (R)",
+        "giver: wiki names felipe",
+        "time limit 180 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 305,
+      "title": "Free the Balloons",
+      "giver": 9500000368,
+      "name_id": 141705,
+      "description_id": 2848,
+      "icon_id": 312,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 180,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 10,
+          "radius": 45.0,
+          "name_id": 115556,
+          "model_id": 89
+        },
+        {
+          "kind": "return",
+          "count": 1,
+          "name_id": 115558
+        }
+      ],
+      "bonuses": [],
+      "coins": 70,
+      "xp": 43,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_free_the_balloons",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Collect balloons: checked model for 'Collect balloons'",
+        "giver: fork names aida humblehoop (R)",
+        "time limit 180 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 306,
+      "title": "Wrapper Round-Up",
+      "giver": 9500000264,
+      "name_id": 390190,
+      "description_id": 390193,
+      "icon_id": 9550,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 10,
+          "radius": 45.0,
+          "name_id": 390190,
+          "model_id": 1053
+        }
+      ],
+      "bonuses": [],
+      "coins": 70,
+      "xp": 43,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_wrapper_round_up",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Wrapper Round-Up: fork model",
+        "giver: fork names zanna sugarzing (R)",
+        "time limit 120 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 311,
+      "title": "Crystal Collection",
+      "giver": 9500000950,
+      "name_id": 394633,
+      "description_id": 394634,
+      "icon_id": 9550,
+      "difficulty": 1,
+      "profile": 48,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 8,
+          "radius": 45.0,
+          "name_id": 394637,
+          "model_id": 578
+        },
+        {
+          "kind": "return",
+          "count": 1,
+          "name_id": 394407
+        }
+      ],
+      "bonuses": [],
+      "coins": 60,
+      "xp": 39,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_crystal_collection",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Collect the Orange Power Crystals: checked model for 'Collect the Orange Power Crystals'",
+        "giver: wiki names t r walker jr",
+        "time limit 120 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 313,
+      "title": "Mug Madness",
+      "giver": 9500001002,
+      "name_id": 395266,
+      "description_id": 395267,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 48,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 10,
+          "radius": 35.0,
+          "name_id": 395266,
+          "model_id": 3148
+        }
+      ],
+      "bonuses": [],
+      "coins": 70,
+      "xp": 43,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Mug Madness: checked model for 'Mug Madness'",
+        "giver: wiki names twingnbor",
+        "time limit 120 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 314,
+      "title": "The Keys to Victory",
+      "giver": 9000000409,
+      "name_id": 3820,
+      "description_id": 395269,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 48,
+      "time_limit_seconds": 120,
+      "coins": 45,
+      "xp": 35,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 5,
+          "name_id": 3820,
+          "radius": 40,
+          "model_id": 1077
+        }
+      ],
+      "bonuses": [],
+      "source": [
+        "MiniGameData.txt row 314 (client): name, description, icon and difficulty ids; type 1 (SAMPLE).",
+        "No reference row: counts, timer, radius and rewards are (R), read from the client description text and the wiki quest page 'Kart Driver: The Keys to Victory'. Model 1077 is the client's car-keys prop. Giver: Mirana Vega (Tangletrack).",
+        "L937 hand row"
+      ]
+    },
+    {
+      "id": 315,
+      "title": "Celebrity Giveaway",
+      "giver": 9000000217,
+      "name_id": 3830,
+      "description_id": 395291,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 48,
+      "time_limit_seconds": 120,
+      "coins": 40,
+      "xp": 31,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "deliver",
+          "count": 4,
+          "name_id": 3830,
+          "recipients": [
+            9000000472,
+            9000000487,
+            9000000476,
+            9500000730
+          ]
+        }
+      ],
+      "bonuses": [],
+      "source": [
+        "MiniGameData.txt row 315 (client): name, description, icon and difficulty ids; type 1 (SAMPLE).",
+        "Sanctuary BubbaJoeX fork Challenges.json row 315 (AGPL-3.0): kind, count, timer, radius, model and rewards are its reconstruction, kept here as (R).",
+        "(R) giver: Therin (Singing Crystal Mines). Recipients Sorin, Tennin, Spruce Waynehammer and Buren are NPC content.",
+        "L937 hand row"
+      ]
+    },
+    {
+      "id": 383,
+      "title": "Power Source",
+      "giver": 9500000709,
+      "name_id": 91619,
+      "description_id": 91620,
+      "icon_id": 9550,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 90,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 6,
+          "radius": 40.0,
+          "name_id": 384955,
+          "model_id": 578
+        }
+      ],
+      "bonuses": [],
+      "coins": 40,
+      "xp": 30,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_power_source",
+        "Check all of the light sources!: checked model for 'Power Source'",
+        "giver: the quest's giver (R)",
+        "time limit 90 s, coins, xp: (R) by difficulty"
+      ]
+    },
+    {
+      "id": 385,
+      "title": "Royally Thirsty Mushrooms",
+      "giver": 9500000143,
+      "name_id": 389986,
+      "description_id": 390054,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 1,
+      "time_limit_seconds": 90,
+      "coins": 45,
+      "xp": 37,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "use",
+          "count": 5,
+          "name_id": 389986,
+          "radius": 14,
+          "model_id": 93
+        }
+      ],
+      "bonuses": [],
+      "source": [
+        "MiniGameData.txt row 385 (client): name, description, icon and difficulty ids; type 1 (SAMPLE).",
+        "No reference row: counts, timer, radius and rewards are (R), read from the client description text and the wiki quest page 'Royally Thirsty Mushrooms'. The leaky pail is not built: each mushroom is clicked once. Model 93 is a Briarwood mushroom prop, the nearest to a potted mushroom in the client's model table. Giver: Guard Reli (Briarheart Palace).",
+        "L937 hand row"
+      ]
+    },
+    {
+      "id": 551,
+      "title": "Medic: No Pain, No Gain",
+      "giver": 9000000072,
+      "name_id": 74799,
+      "description_id": 141659,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 11,
+      "time_limit_seconds": 150,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "race",
+          "count": 10,
+          "radius": 70.0,
+          "name_id": 100375
+        },
+        {
+          "kind": "race",
+          "count": 10,
+          "radius": 70.0,
+          "name_id": 141796
+        }
+      ],
+      "bonuses": [],
+      "coins": 70,
+      "xp": 47,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_medic_no_pain_no_gain",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "giver: fork names doctor callahan (R)",
+        "time limit 150 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 553,
+      "title": "A Race Against Grime",
+      "giver": 9500000066,
+      "name_id": 90665,
+      "description_id": 383091,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 6,
+          "radius": 40.0,
+          "name_id": 90665,
+          "model_id": 720
+        }
+      ],
+      "bonuses": [],
+      "coins": 50,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_a_race_against_grime",
+        "goals read by hand from the wiki page (R)",
+        "A Race Against Grime: hand-picked model",
+        "giver: the quest's giver (R)",
+        "time limit 120 s, coins, xp: (R) by difficulty"
+      ]
+    },
+    {
+      "id": 555,
+      "title": "Dig Within",
+      "giver": 9500000205,
+      "name_id": 389039,
+      "description_id": 390057,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 30,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 12,
+          "radius": 35.0,
+          "name_id": 389093,
+          "model_id": 693
+        }
+      ],
+      "bonuses": [],
+      "coins": 50,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_dig_within",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Dig up nearby piles of dirt: fork model",
+        "giver: fork names recruit agga (R)",
+        "time limit 30 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 571,
+      "title": "Pool of Seashells",
+      "giver": 9500000617,
+      "name_id": 389229,
+      "description_id": 390135,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 150,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 6,
+          "radius": 35.0,
+          "name_id": 389448,
+          "model_id": 860
+        },
+        {
+          "kind": "return",
+          "count": 1,
+          "name_id": 118005
+        }
+      ],
+      "bonuses": [],
+      "coins": 45,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_pool_of_seashells",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Grab Seashells: fork model",
+        "giver: wiki names rainchaser",
+        "time limit 150 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 572,
+      "title": "Starfish Picking",
+      "giver": 9500000617,
+      "name_id": 101154,
+      "description_id": 390134,
+      "icon_id": 9550,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 150,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 4,
+          "radius": 35.0,
+          "name_id": 389807,
+          "model_id": 859
+        },
+        {
+          "kind": "return",
+          "count": 1,
+          "name_id": 389827
+        }
+      ],
+      "bonuses": [],
+      "coins": 50,
+      "xp": 37,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_starfish_picking",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Grab Starfish: fork model",
+        "giver: fork names rainchaser (R)",
+        "time limit 150 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 573,
+      "title": "Combo Challenge",
+      "giver": 9500000617,
+      "name_id": 389233,
+      "description_id": 390136,
+      "icon_id": 9550,
+      "difficulty": 3,
+      "profile": 0,
+      "time_limit_seconds": 180,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 8,
+          "radius": 35.0,
+          "name_id": 389448,
+          "model_id": 859
+        },
+        {
+          "kind": "return",
+          "count": 1,
+          "name_id": 389424
+        },
+        {
+          "kind": "return",
+          "count": 1,
+          "name_id": 389827
+        }
+      ],
+      "bonuses": [],
+      "coins": 60,
+      "xp": 43,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_combo_challenge",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Grab Seashells: fork model",
+        "giver: fork names rainchaser (R)",
+        "time limit 180 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 574,
+      "title": "Mudpie!",
+      "giver": 9500000606,
+      "name_id": 389249,
+      "description_id": 390137,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 8,
+          "radius": 40.0,
+          "name_id": 390089,
+          "model_id": 862
+        }
+      ],
+      "bonuses": [],
+      "coins": 60,
+      "xp": 39,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_mudpie",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Get rid of Trash Piles: fork model",
+        "giver: fork names mr mudd (R)",
+        "time limit 120 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 575,
+      "title": "Shift Swap",
+      "giver": 9500000594,
+      "name_id": 389253,
+      "description_id": 390354,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "deliver",
+          "count": 4,
+          "name_id": 389253,
+          "recipients": [
+            9500000561,
+            9500000633,
+            9500000586,
+            9000000112
+          ]
+        }
+      ],
+      "bonuses": [],
+      "coins": 40,
+      "xp": 31,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_shift_swap",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "recipients: the 4 nearest drawn NPCs (R)",
+        "giver: the quest's giver (R)",
+        "time limit 120 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 577,
+      "title": "Gathering Coconuts",
+      "giver": 9500000616,
+      "name_id": 389261,
+      "description_id": 390642,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 60,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 4,
+          "radius": 40.0,
+          "name_id": 390632,
+          "model_id": 80
+        },
+        {
+          "kind": "collect",
+          "count": 4,
+          "radius": 40.0,
+          "name_id": 390917,
+          "model_id": 80
+        }
+      ],
+      "bonuses": [],
+      "coins": 60,
+      "xp": 39,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_gathering_coconuts",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Gather coconuts: fork model",
+        "Gather more coconuts!: fork model",
+        "giver: fork names quinton coco (R)",
+        "time limit 60 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 586,
+      "title": "Hidden Treasure",
+      "giver": 9500000624,
+      "name_id": 400043,
+      "description_id": 400044,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "use",
+          "count": 6,
+          "radius": 35.0,
+          "name_id": 400051,
+          "model_id": 694
+        }
+      ],
+      "bonuses": [
+        {
+          "name_id": 400057,
+          "within_seconds": 120
+        }
+      ],
+      "coins": 50,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_hidden_treasure",
+        "goals read by hand from the wiki page (R)",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Search Sand Piles for Shelly's missing t: hand-picked model",
+        "giver: the quest's giver (R)",
+        "time limit 120 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 587,
+      "title": "Guest of Honor",
+      "giver": 9500000949,
+      "name_id": 3761,
+      "description_id": 398273,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 48,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 6,
+          "radius": 40.0,
+          "name_id": 399469,
+          "model_id": 847,
+          "label_id": 7616
+        },
+        {
+          "kind": "return",
+          "count": 1,
+          "name_id": 399471
+        },
+        {
+          "kind": "use",
+          "count": 1,
+          "radius": 8.0,
+          "name_id": 399503,
+          "model_id": 847,
+          "label_id": 115748,
+          "effect_id": 5349
+        }
+      ],
+      "bonuses": [
+        {
+          "name_id": 399498,
+          "within_seconds": 50
+        }
+      ],
+      "coins": 45,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_guest_of_honor",
+        "goals read by hand from the wiki page (R)",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Recover the stolen Fireworks: hand-picked model",
+        "Light Fireworks: hand-picked model",
+        "giver: wiki names squee",
+        "time limit 120 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 588,
+      "title": "Stopping the Sabotage",
+      "giver": 9500000948,
+      "name_id": 3765,
+      "description_id": 398271,
+      "icon_id": 9550,
+      "difficulty": 1,
+      "profile": 48,
+      "time_limit_seconds": 150,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 5,
+          "radius": 35.0,
+          "name_id": 401057,
+          "model_id": 1336
+        }
+      ],
+      "bonuses": [],
+      "coins": 45,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_stopping_the_sabotage",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Scare off the Robgoblin Saboteurs: fork model",
+        "giver: wiki names sparks blitzwing",
+        "time limit 150 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 591,
+      "title": "Making Amends",
+      "giver": 9000000273,
+      "name_id": 3787,
+      "description_id": 395752,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 48,
+      "time_limit_seconds": 150,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "carry",
+          "count": 4,
+          "radius": 40.0,
+          "name_id": 3787,
+          "model_id": 1083
+        }
+      ],
+      "bonuses": [
+        {
+          "name_id": 398265,
+          "within_seconds": 80
+        }
+      ],
+      "coins": 40,
+      "xp": 33,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_making_amends",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Making Amends: fork model",
+        "giver: fork names chase wheeler (R)",
+        "time limit 150 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 593,
+      "title": "Burnt Rubber",
+      "giver": 9500000114,
+      "name_id": 3805,
+      "description_id": 399519,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 48,
+      "time_limit_seconds": 150,
+      "coins": 45,
+      "xp": 35,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "carry",
+          "count": 5,
+          "name_id": 3805,
+          "radius": 35,
+          "model_id": 521
+        }
+      ],
+      "bonuses": [],
+      "source": [
+        "MiniGameData.txt row 593 (client): name, description, icon and difficulty ids; type 1 (SAMPLE).",
+        "Sanctuary BubbaJoeX fork Challenges.json row 593 (AGPL-3.0): kind, count, timer, radius, model and rewards are its reconstruction, kept here as (R).",
+        "(R) giver: Crankle (Tangletrack pit boss). The fork reduces the bucket rule (do not spill) to carrying five back.",
+        "L937 hand row"
+      ]
+    },
+    {
+      "id": 594,
+      "title": "Milk Rocks",
+      "giver": 9500000536,
+      "name_id": 403233,
+      "description_id": 408595,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 90,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 10,
+          "radius": 45.0,
+          "name_id": 408569,
+          "model_id": 673
+        }
+      ],
+      "bonuses": [],
+      "coins": 70,
+      "xp": 43,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_milk_rocks",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Search piles of dirt for rocks: fork model",
+        "giver: fork names sunflower (R)",
+        "time limit 90 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 658,
+      "title": "Booby Trapped!",
+      "giver": 9000000111,
+      "name_id": 393325,
+      "description_id": 398275,
+      "icon_id": 9550,
+      "difficulty": 1,
+      "profile": 49,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "use",
+          "count": 6,
+          "radius": 45.0,
+          "name_id": 393325,
+          "model_id": 1080
+        }
+      ],
+      "bonuses": [],
+      "coins": 50,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Booby Trapped!: fork model",
+        "giver: fork names jackson spinner (R)",
+        "time limit 120 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 659,
+      "title": "Taking Tips",
+      "giver": 9000000289,
+      "name_id": 398632,
+      "description_id": 402690,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "deliver",
+          "count": 4,
+          "name_id": 398632,
+          "recipients": [
+            9000000273,
+            9500000943,
+            9500000891,
+            9500000867
+          ]
+        }
+      ],
+      "bonuses": [],
+      "coins": 50,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_taking_tips",
+        "recipients: the 4 nearest drawn NPCs (R)",
+        "giver: the quest's giver (R)",
+        "time limit 120 s, coins, xp: (R) by difficulty"
+      ]
+    },
+    {
+      "id": 726,
+      "title": "Blacksmith: Hammer Quality",
+      "giver": 9000000069,
+      "name_id": 93813,
+      "description_id": 93814,
+      "icon_id": 9550,
+      "difficulty": 1,
+      "profile": 16,
+      "time_limit_seconds": 60,
+      "coins": 45,
+      "xp": 35,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "use",
+          "count": 1,
+          "name_id": 93813,
+          "radius": 12,
+          "model_id": 387
+        }
+      ],
+      "bonuses": [],
+      "source": [
+        "MiniGameData.txt row 726 (client): name, description, icon and difficulty ids; type 1 (SAMPLE).",
+        "No reference row: counts, timer, radius and rewards are (R), read from the client description text and the wiki quest page 'Blacksmith: Hammer Quality'. One click on the practice dummy (model 387) stands for the few swings. Giver: Derp Axemaker (Dartmoor, legacy-data row).",
+        "L937 hand row"
+      ]
+    },
+    {
+      "id": 1026,
+      "title": "Rimpadun's Plan",
+      "giver": 9500000419,
+      "name_id": 386150,
+      "description_id": 386163,
+      "icon_id": 9550,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 180,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 5,
+          "radius": 40.0,
+          "name_id": 386182,
+          "model_id": 1726
+        },
+        {
+          "kind": "collect",
+          "count": 5,
+          "radius": 40.0,
+          "name_id": 386184,
+          "model_id": 1726
+        },
+        {
+          "kind": "collect",
+          "count": 5,
+          "radius": 40.0,
+          "name_id": 386186,
+          "model_id": 1726
+        },
+        {
+          "kind": "collect",
+          "count": 5,
+          "radius": 40.0,
+          "name_id": 386189,
+          "model_id": 1726
+        },
+        {
+          "kind": "collect",
+          "count": 5,
+          "radius": 40.0,
+          "name_id": 386192,
+          "model_id": 1726
+        }
+      ],
+      "bonuses": [],
+      "coins": 45,
+      "xp": 37,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_rimpadun_s_plan",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "Get some cotton candy from Brennion: checked model for 'Get some cotton candy from Brennion'",
+        "Get some cotton candy from Nymmi: checked model for 'Get some cotton candy from Nymmi'",
+        "Get some cotton candy from Alvie: checked model for 'Get some cotton candy from Alvie'",
+        "Get some cotton candy from Tumbolina: checked model for 'Get some cotton candy from Tumbolina'",
+        "Get some cotton candy from Fenwink: checked model for 'Get some cotton candy from Fenwink'",
+        "giver: the quest's giver (R)",
+        "time limit 180 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 1037,
+      "title": "The Great Treeble Race",
+      "giver": 9500000299,
+      "name_id": 429253,
+      "description_id": 429254,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 55,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "race",
+          "count": 10,
+          "radius": 60.0,
+          "name_id": 429253
+        }
+      ],
+      "bonuses": [],
+      "coins": 70,
+      "xp": 47,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_the_great_treeble_race",
+        "kind, counts, timer: community fork Challenges.json (R)",
+        "giver: fork names counselor jake (R)",
+        "time limit 55 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 1038,
+      "title": "The Great Scavenger Hunt",
+      "giver": 9500000300,
+      "name_id": 429342,
+      "description_id": 429346,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 68,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 6,
+          "radius": 40.0,
+          "name_id": 429342,
+          "model_id": 720
+        }
+      ],
+      "bonuses": [],
+      "coins": 50,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_the_great_scavenger_hunt",
+        "goals read by hand from the wiki page (R)",
+        "Find all the items on the list: hand-picked model",
+        "giver: the quest's giver (R)",
+        "time limit 68 s, coins, xp: wiki or fork, (R)"
+      ]
+    }
+  ]
+}

@@ -3723,7 +3723,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:239; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1472 (ModelId=279, ModelFileName=sg_robgoblin_trunk_01.adr, NameId=384279)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500002667
     },
     {
       "spawn_guid": 100000001474,
@@ -5888,7 +5889,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:413; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1647 (ModelId=83, ModelFileName=sh_barrel_01.adr, NameId=18919)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500002385
     },
     {
       "spawn_guid": 100000001648,
@@ -10509,7 +10511,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:710; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1952 (ModelId=197, ModelFileName=sh_shovel_01.adr, NameId=390129)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500002668
     },
     {
       "spawn_guid": 100000001954,
@@ -10554,7 +10557,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:713; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1955 (ModelId=521, ModelFileName=sh_bucket_01.adr, NameId=389336)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500002612
     },
     {
       "spawn_guid": 100000001956,
@@ -23774,7 +23778,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1534; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2791 (ModelId=80, ModelFileName=bw_sack_02.adr, NameId=36467)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500002519
     },
     {
       "spawn_guid": 100000002793,

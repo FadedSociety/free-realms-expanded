@@ -50,9 +50,23 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part D. Townsfolk and visitors, row 70; source cell: [client][video]"
             }
           ]
+        },
+        {
+          "quest_id": 3954106,
+          "title": "Free the Balloons!",
+          "title_string_id": 115533,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Free the Balloons! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_free_the_balloons_c1fdb5)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3954106
+      ],
       "quests_given_text": [
         "Balloon chase: \"Aida's sister keeps letting her balloons go. Collect the escaped balloons from around Merry Vale and bring them back to Aida.\" (106235904); eight balloons (3047915188); the minigame Free the Balloons (\"Collect the balloon next to Aida to start the Free the Balloons minigame and beat the clock!\", 611085861; minigame ids 2983393384, 4220898004; title candidate \"Free the Balloons?!\" 3920178951, by wording)."
       ],
@@ -25517,9 +25531,23 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part D. Townsfolk and visitors, row 74; source cell: [client]"
             }
           ]
+        },
+        {
+          "quest_id": 3954217,
+          "title": "Rimpadun's Plan",
+          "title_string_id": 386150,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Rimpadun's Plan (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rimpadun_s_plan_88081b)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3954217
+      ],
       "quests_given_text": [
         "Delivery for Rimpadun (title ucdt 859033597; the sasparilla shipment from Wugachug, 2689905545, 567142104; the hand-in text 3306096356 sends the player back to Postchug Runalug; a lost postchug on the road, 2832155800, 4044523960); Rimpadun's Plan (title ucdt 858868354; he wants cotton candy from Merry Vale's residents to take back to Wugachug: 519245279, 962943197, 2214013310; the minigame of the same name, 3431525449); sasparilla for Yvelle's story (2971862998)."
       ],

@@ -61,6 +61,8 @@ occupations!(
     Groom,
     // T560: the daily wheel's movie is open (Flash window over the world).
     Wheel,
+    // L937: an in-world challenge's start screen or run (TYPE 1 minigames).
+    Challenge,
 );
 
 /// What an occupation blocks while it is active.
@@ -119,6 +121,7 @@ impl Occupation {
             Housing => "a house visit",
             Groom => "grooming",
             Wheel => "the prize wheel",
+            Challenge => "a challenge",
         }
     }
 
@@ -144,6 +147,9 @@ impl Occupation {
             // minigame begins under it) and warpstone travel, like the other Flash movies; riding,
             // pets and movement stay open because the wheel is a window, not a scene.
             Wheel => (true, true, false, false, false),
+            // L937 (R): a challenge closes the start gate and warpstone travel and ends a ride (the
+            // run is on foot); pets and movement stay open, the player runs the course.
+            Challenge => (true, true, true, false, false),
         };
         Gates {
             start,
@@ -197,6 +203,7 @@ impl Gameplay {
             Occupation::Housing => self.housing.as_ref().is_some_and(|h| h.in_house()),
             Occupation::Groom => self.pets.is_grooming(),
             Occupation::Wheel => self.daily_wheel.is_active(),
+            Occupation::Challenge => self.world_challenge.is_active(),
         }
     }
 
@@ -262,7 +269,8 @@ mod tests {
                 Kart,
                 Housing,
                 Groom,
-                Wheel
+                Wheel,
+                Challenge
             ]
         );
         assert_eq!(
@@ -290,7 +298,8 @@ mod tests {
                 Soccer,
                 Kart,
                 Housing,
-                Wheel
+                Wheel,
+                Challenge
             ]
         );
         assert_eq!(
@@ -318,7 +327,8 @@ mod tests {
                 Soccer,
                 Kart,
                 FieldEngaged,
-                Housing
+                Housing,
+                Challenge
             ]
         );
         assert_eq!(
@@ -377,7 +387,8 @@ mod tests {
                 Soccer,
                 Kart,
                 Groom,
-                Wheel
+                Wheel,
+                Challenge
             ]
         );
     }

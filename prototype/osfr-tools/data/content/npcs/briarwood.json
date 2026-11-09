@@ -30178,10 +30178,23 @@
               "evidence": "Spinnerette (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_spinnerette_8c6d38)."
             }
           ]
+        },
+        {
+          "quest_id": 3954290,
+          "title": "Urgent Missive",
+          "title_string_id": 36436,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Urgent Missive (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_urgent_missive_c9db84)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3950387
+        3950387,
+        3954290
       ],
       "quests_given_text": [
         "Wiki lists Cut the Vines, Spinnerette, Stopping an Infiltration, Take the Fight to Them and Urgent Missive; see #Town and area quests for each. A sack beside him starts the Urgent Missive minigame (client 1778588367). Sends Warrior trainees there in the older Morninglory errand (client 241976108)."
@@ -38785,8 +38798,23 @@
       "location_evidence": [
         "\"A farm in Bristlewood to the north of Slothi\" (client 825261180); \"Lazi's Pig Farm\" (1854196158)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954150,
+          "title": "Lazi's Pigs",
+          "title_string_id": 36669,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Lazi's Pigs (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lazi_s_pigs_fb5d44)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954150
+      ],
       "quests_given_text": [
         "Lazi's Pigs (minigame Pig Pen Panic, client 34451600)."
       ],
@@ -58161,8 +58189,36 @@
       "location_evidence": [
         "Near Gorg's camp (client 2461766348). [video: green marker 81 m, JYASoEUYplE/00014, /00024]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953979,
+          "title": "A Dirt Covered Map",
+          "title_string_id": 72090,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Dirt Covered Map (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_dirt_covered_map_294afb)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3954036,
+          "title": "Checkers for a Chart",
+          "title_string_id": 72094,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Checkers for a Chart (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_checkers_for_a_chart_8076eb)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953979,
+        3954036
+      ],
       "quests_given_text": [
         "Hedge-maze map pieces buried in dirt piles (client 1119438235, 223088337). Title not found."
       ],
@@ -58622,11 +58678,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1510; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2767 (ModelId=1016, ModelFileName=chugawug_m_greenwood_soldierarcher_01.adr, NameId=72196)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.961228,
       "model_id": 1016,
-      "model_file_name": "chugawug_m_greenwood_soldierarcher_01.adr"
+      "model_file_name": "chugawug_m_greenwood_soldierarcher_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000206,
@@ -73671,8 +73734,23 @@
       "location_evidence": [
         "Nettleseed (\"He can be found in Nettleseed\", client 1884105666)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954303,
+          "title": "Wumpig's Deliveries",
+          "title_string_id": 47325,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Wumpig's Deliveries (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wumpig_s_deliveries_2da3d7)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954303
+      ],
       "quests_given_text": [
         "Wumpig's Deliveries."
       ],
@@ -73980,11 +74058,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1572; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2829 (ModelId=488, ModelFileName=chugawug_farmer_m.adr, NameId=46919)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.71791,
       "model_id": 488,
-      "model_file_name": "chugawug_farmer_m.adr"
+      "model_file_name": "chugawug_farmer_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000237,
