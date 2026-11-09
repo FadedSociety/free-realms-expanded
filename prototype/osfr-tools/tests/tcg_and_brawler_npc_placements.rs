@@ -263,9 +263,7 @@ fn eligibility() -> CharacterEligibility {
     }
 }
 
-const CARD_DUELIST_STILL_OFF: [u32; 8] = [
-    3_040_010, 3_040_029, 3_040_032, 3_040_033, 3_040_039, 3_040_044, 3_040_045, 3_040_053,
-];
+const CARD_DUELIST_STILL_OFF: [u32; 5] = [3_040_010, 3_040_039, 3_040_044, 3_040_045, 3_040_053];
 
 #[test]
 fn card_duelist_and_brawler_quests_stay_disabled() {

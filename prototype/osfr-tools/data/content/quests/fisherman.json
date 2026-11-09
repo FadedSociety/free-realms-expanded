@@ -432,10 +432,57 @@
     {
       "id": 3070007,
       "title_string_id": 409213,
-      "giver_npc_id": 9000000536,
+      "giver_npc_id": 9000000319,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "any_of",
+          "id": 1,
+          "text_string_id": 409218,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409218 'Catch bitter beta - 0/3', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "count": 3,
+          "alternatives": [
+            {
+              "kind": "collect_item",
+              "item_id": 68096
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68097
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 409220,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409220 'Show the fish to Ernest', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000319
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: Find Your Own Spot! pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -477,7 +524,8 @@
       "description_string_id": 409214,
       "intro_text_string_id": 409212,
       "end_text_string_id": 409215,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070008,
@@ -1184,8 +1232,58 @@
       "title_string_id": 409302,
       "giver_npc_id": 9000000339,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "collect_item",
+          "id": 1,
+          "text_string_id": 409307,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409307 'Reel in some fungus', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "item_id": 68000,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 409309,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409309 'Return to Gunther', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000339
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 409311,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409311 'Speak to Reed Stillwater', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000181
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: Fishy Fungus pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1223,17 +1321,81 @@
       "description_string_id": 409303,
       "intro_text_string_id": 409301,
       "end_text_string_id": 409304,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070021,
       "title_string_id": 409326,
-      "giver_npc_id": 9000000339,
+      "giver_npc_id": 9000000181,
       "prerequisite_quest_ids": [
         3070020
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "collect_item",
+          "id": 1,
+          "text_string_id": 409332,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409332 'Reel in some large in cod', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "item_id": 68074,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 409334,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409334 'Return to Reed Stillwater', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000181
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 3,
+          "text_string_id": 409336,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409336 'Pour the ink into Brambleback's Bayou', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "minigame_id": 597,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 409338,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409338 'Talk to Gunther', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000339
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: Ink Cod Ink pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1271,7 +1433,8 @@
       "description_string_id": 409327,
       "intro_text_string_id": 409325,
       "end_text_string_id": 409328,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070022,
@@ -1370,10 +1533,48 @@
     {
       "id": 3070024,
       "title_string_id": 409922,
-      "giver_npc_id": 9000000339,
+      "giver_npc_id": 9000000146,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "collect_item",
+          "id": 1,
+          "text_string_id": 409927,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409927 'Reel in an extra large big Peachy Perch', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "item_id": 68052,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 409930,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409930 'Talk to Merri De'Flor', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000146
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: VIP Fish pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1411,7 +1612,8 @@
       "description_string_id": 409923,
       "intro_text_string_id": 409921,
       "end_text_string_id": 409924,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070025,
@@ -1420,8 +1622,45 @@
       "prerequisite_quest_ids": [
         3070024
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 409725,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409725 'Take your catch to Feldman', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9500000476
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 409727,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409727 'Visit Merri De'Flor', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000146
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: Say Cheese! pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1459,7 +1698,8 @@
       "description_string_id": 409721,
       "intro_text_string_id": 409719,
       "end_text_string_id": 409722,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070026,
@@ -1702,8 +1942,71 @@
       "title_string_id": 409892,
       "giver_npc_id": 9000000146,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 409902,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409902 'Talk to Selvi Slowreel', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000194
+        },
+        {
+          "kind": "any_of",
+          "id": 2,
+          "text_string_id": 409904,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409904 'Reel in some Peachy Perch', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "count": 1,
+          "alternatives": [
+            {
+              "kind": "collect_item",
+              "item_id": 68050
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68051
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68052
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 409907,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409907 'Talk to Merri De'Flor', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000146
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: Fish Fry pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1741,7 +2044,8 @@
       "description_string_id": 409893,
       "intro_text_string_id": 409891,
       "end_text_string_id": 409894,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070032,
@@ -1750,8 +2054,57 @@
       "prerequisite_quest_ids": [
         3070031
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 409983,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409983 'Talk to Mister Nooklings', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9500000358
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 409985,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409985 'Talk to Yoko', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9500002993
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 409988,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409988 'Talk to Merri De'Flor', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000146
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: Fish Market pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1789,7 +2142,8 @@
       "description_string_id": 409976,
       "intro_text_string_id": 409974,
       "end_text_string_id": 409977,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070033,
@@ -1840,12 +2194,85 @@
     {
       "id": 3070034,
       "title_string_id": 409997,
-      "giver_npc_id": 9000000403,
+      "giver_npc_id": 9000000146,
       "prerequisite_quest_ids": [
         3070032
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "text_string_id": 410002,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Investigate the McScuttle farm (lab/references/quest-table-20261102/quests.merged.json client:3070034)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The client sends the player to the farm at Rainbow Lake (410001, 410003); Kim McScuttle stands at the farm, and the wiki puts Katie at its farm house."
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -719.8,
+            -6.9,
+            786.6
+          ],
+          "radius": 12.0
+        },
+        {
+          "kind": "collect_item",
+          "id": 2,
+          "text_string_id": 410004,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 410004 'Reel in Soggy Socks', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "item_id": 68104,
+          "quantity": 1
+        },
+        {
+          "kind": "collect_item",
+          "id": 3,
+          "text_string_id": 410006,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 410006 'Reel in an old boot', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "item_id": 68103,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 410008,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 410008 'Return to Katie McScuttle', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9500002816
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: McScuttle Family Farm pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1883,17 +2310,91 @@
       "description_string_id": 409998,
       "intro_text_string_id": 409996,
       "end_text_string_id": 409999,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070035,
       "title_string_id": 410032,
-      "giver_npc_id": 9000000128,
+      "giver_npc_id": 9500002816,
       "prerequisite_quest_ids": [
         3070034
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 410035,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 410035 'Head to Sacred Grove Shallows', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "minigame_id": 599,
+          "count": 1
+        },
+        {
+          "kind": "visit_position",
+          "id": 2,
+          "text_string_id": 410040,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the tournament pond (lab/references/quest-table-20261102/quests.merged.json client:3070035)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The client sends the player to the tournament pond in Sacred Grove Shallows (410038, 410041); the pond's fishers Dwight Limburger, Anna Mudskipper and Ernest McScuttle stand at this spot."
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -1322.0,
+            -64.82,
+            905.0
+          ],
+          "radius": 12.0
+        },
+        {
+          "kind": "collect_item",
+          "id": 3,
+          "text_string_id": 410042,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 410042 'Reel in the Tickled Trout', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "item_id": 68001,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 410044,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 410044 'Return to Dwight Limburger', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9500000784
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: Setting Ernest Straight pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1931,7 +2432,8 @@
       "description_string_id": 410033,
       "intro_text_string_id": 410031,
       "end_text_string_id": 410034,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070036,
@@ -2220,10 +2722,74 @@
     {
       "id": 3070042,
       "title_string_id": 410109,
-      "giver_npc_id": 9000000492,
+      "giver_npc_id": 9500000784,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "collect_item",
+          "id": 1,
+          "text_string_id": 410114,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 410114 'Reel in a large Finless Fish', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "item_id": 68047,
+          "quantity": 1
+        },
+        {
+          "kind": "collect_item",
+          "id": 2,
+          "text_string_id": 410117,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 410117 'Reel in a large Calico Catfish', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "item_id": 68059,
+          "quantity": 1
+        },
+        {
+          "kind": "collect_item",
+          "id": 3,
+          "text_string_id": 410119,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 410119 'Reel in a medium Toothy Tetra', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "item_id": 68066,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 410122,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 410122 'Talk to Dwight Limburger', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9500000784
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: Fishing Frenzy pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2261,7 +2827,8 @@
       "description_string_id": 410110,
       "intro_text_string_id": 410108,
       "end_text_string_id": 410111,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070043,

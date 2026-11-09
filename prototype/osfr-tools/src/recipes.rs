@@ -287,9 +287,8 @@ impl RecipeCatalog {
             let Some(id) = recipe.recipe_id.filter(|id| learned.contains(id)) else {
                 continue;
             };
-            let Some(pattern_id) = recipe.recipe_item_definition_id else {
-                continue;
-            };
+            // A recipe no pattern item teaches (quests bring these) shows as its product.
+            let pattern_id = (recipe.recipe_item_definition_id).unwrap_or(recipe.output.definition_id);
             let presentation = inventory
                 .presentation(recipe.output.definition_id)
                 .or_else(|_| inventory.presentation(pattern_id))

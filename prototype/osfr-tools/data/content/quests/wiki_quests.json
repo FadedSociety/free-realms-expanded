@@ -11660,6 +11660,77 @@
       "description_string_id": 70645,
       "intro_text_string_id": 70645,
       "enabled": true
+    },
+    {
+      "id": 3954466,
+      "title_string_id": 409693,
+      "giver_npc_id": 9500000792,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_item",
+          "id": 1,
+          "text_string_id": 409831,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reel in Plastic Bags - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_keep_it_clean_a8dd8a)."
+            }
+          ],
+          "item_id": 68105,
+          "quantity": 3
+        },
+        {
+          "kind": "collect_item",
+          "id": 2,
+          "text_string_id": 409833,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reel in Rusty Cans - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_keep_it_clean_a8dd8a)."
+            }
+          ],
+          "item_id": 68106,
+          "quantity": 3
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 409835,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Melanie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_keep_it_clean_a8dd8a)."
+            }
+          ],
+          "npc_id": 9500000792
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 12,
+          "items": [],
+          "job_xp": {
+            "137": 30
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Keep it Clean (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_keep_it_clean_a8dd8a)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Keep it Clean (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_keep_it_clean_a8dd8a)."
+        }
+      ],
+      "job": 137,
+      "description_string_id": 409694,
+      "intro_text_string_id": 409692,
+      "enabled": true
     }
   ]
 }

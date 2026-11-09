@@ -2918,10 +2918,35 @@
     {
       "id": 3040029,
       "title_string_id": 407008,
-      "giver_npc_id": 9000000518,
+      "giver_npc_id": 9000000170,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 407035,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 407035 'Find Dominic', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000074
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Card Duelist: A Card Dueling Rumor pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2963,7 +2988,8 @@
       "description_string_id": 407009,
       "intro_text_string_id": 407007,
       "end_text_string_id": 407010,
-      "enabled": false
+      "enabled": true,
+      "job": 120
     },
     {
       "id": 3040030,
@@ -3196,10 +3222,48 @@
     {
       "id": 3040032,
       "title_string_id": 407012,
-      "giver_npc_id": 9000000082,
+      "giver_npc_id": 9000000074,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 407039,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 407039 'Play and beat 'Dominic's Friendly Deck'', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "minigame_id": 666,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 407041,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 407041 'Speak to Dominic', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000074
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Card Duelist: Quick Game of Cards pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3230,15 +3294,42 @@
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 120
     },
     {
       "id": 3040033,
       "title_string_id": 407024,
       "giver_npc_id": 9000000082,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 407053,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 407053 'Play and beat 'Esther's Challenge Deck'', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "minigame_id": 669,
+          "count": 1
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Card Duelist: Esther's Special Card pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3280,7 +3371,8 @@
       "description_string_id": 407025,
       "intro_text_string_id": 407023,
       "end_text_string_id": 407026,
-      "enabled": false
+      "enabled": true,
+      "job": 120
     },
     {
       "id": 3040034,

@@ -2561,3 +2561,24 @@ fn games_window_ore_rows_credit_their_own_game_and_ore() {
     assert_eq!(game.job_level(crate::mining::MINER_PROFILE_ID), xp);
     assert_eq!(counts(&game), vec![1, 1, 1]);
 }
+
+#[test]
+fn a_quest_brings_the_recipe_no_pattern_teaches() {
+    let mut game = game();
+    let learned = game.learned_recipes.clone();
+    // The opening fixture's recipes all have patterns: make one like the forge quests' recipes.
+    let recipe = (game.recipe_catalog.records.iter_mut())
+        .find(|recipe| recipe.recipe_id.is_some_and(|id| !learned.contains(&id)))
+        .expect("the fixture has a recipe the character has not learned");
+    recipe.recipe_item_definition_id = None;
+    let recipe_id = recipe.recipe_id.unwrap();
+    install(&mut game, ObjectiveKind::CraftRecipe { recipe_id }, 1);
+    let mut out = Outcome::default();
+    game.teach_quest_recipes(&mut out).unwrap();
+    assert!(game.learned_recipes.contains(&recipe_id), "taught");
+    assert_eq!(out.replies.len(), 1, "the client is told once");
+    assert!(out.changed, "what was taught is saved");
+    let mut again = Outcome::default();
+    game.teach_quest_recipes(&mut again).unwrap();
+    assert!(again.replies.is_empty(), "taught only once");
+}

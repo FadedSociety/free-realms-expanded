@@ -8,6 +8,67 @@ fn missing_job_alert() -> Vec<u8> {
 }
 
 impl Gameplay {
+    /// Persist one client recipe id and return its native 0x3f/op1 packet once.
+    pub fn learn_recipe(&mut self, recipe_id: u32) -> io::Result<Option<Vec<u8>>> {
+        let Some(recipe) = self
+            .recipe_catalog
+            .records
+            .iter()
+            .find(|recipe| recipe.recipe_id == Some(recipe_id))
+        else {
+            return Err(invalid("unknown client recipe id"));
+        };
+        if recipe.recipe_item_definition_id.is_none() {
+            return Err(invalid("learned recipe has no client pattern item"));
+        }
+        self.teach_recipe(recipe_id)
+    }
+
+    /// Persist one recipe the catalog knows and return its 0x3f/op1 packet once.
+    fn teach_recipe(&mut self, recipe_id: u32) -> io::Result<Option<Vec<u8>>> {
+        if self.learned_recipes.contains(&recipe_id) {
+            return Ok(None);
+        }
+        let learned = HashSet::from([recipe_id]);
+        let row = self
+            .recipe_catalog
+            .wire_rows(&learned, &self.inventory)
+            .map_err(invalid)?
+            .into_iter()
+            .next()
+            .ok_or_else(|| invalid("learned recipe has no encodable wire row"))?;
+        let packet = crate::recipes::encode_recipe_add(&row.1).map_err(invalid)?;
+        self.learned_recipes.insert(recipe_id);
+        Ok(Some(packet))
+    }
+
+    /// (R) A recipe no pattern item teaches comes with the quest that asks for it: the client has
+    /// no pattern for these, so the live server must have taught them itself. Run on accept and
+    /// on world entry, for quests accepted before this existed.
+    pub(super) fn teach_quest_recipes(&mut self, out: &mut Outcome) -> io::Result<()> {
+        let Some(engine) = self.npc_quests.as_ref() else {
+            return Ok(());
+        };
+        for recipe_id in engine.active_craft_recipes() {
+            let no_pattern = (self.recipe_catalog.records.iter())
+                .any(|r| r.recipe_id == Some(recipe_id) && r.recipe_item_definition_id.is_none());
+            if !no_pattern {
+                continue;
+            }
+            // A row that cannot be encoded loses the recipe, never the login.
+            match self.teach_recipe(recipe_id) {
+                Ok(packet) => {
+                    out.changed |= packet.is_some();
+                    out.replies.extend(packet);
+                }
+                Err(error) => npc_event(serde_json::json!({
+                    "event": "quest_recipe_untaught", "recipe_id": recipe_id, "error": error.to_string()
+                })),
+            }
+        }
+        Ok(())
+    }
+
     /// The running movie, first in the gate's intercept order. At most one can
     /// be active; the order is what the five separate blocks used to encode.
     pub(super) fn running_movie(&self) -> Option<Movie> {

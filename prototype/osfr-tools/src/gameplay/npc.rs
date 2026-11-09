@@ -544,6 +544,7 @@ impl Gameplay {
             // meets. A refused or withdrawn accept starts no quest.
             if accepted {
                 self.sync_job_level_objectives(&mut out)?;
+                self.teach_quest_recipes(&mut out)?;
             }
             // End the NPC dialog so the client leaves dialog camera and restores
             // the HUD (native run 200411 stayed in dialog view after accepting).

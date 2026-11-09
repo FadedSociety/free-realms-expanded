@@ -154,7 +154,14 @@
           "model": 1609
         }
       ],
-      "source": "area and roster: client locale; levels: wiki; schools: L933 (R) positions (scene coordinates, y at the water surface -65.88) and models from the Sanctuary community fork BubbaJoeX 1ff876a src/Resources/Fishing.json pond sg_fishing_medpond (AGPL-3.0 data, credited in NOTICE). Models 1597, 1605, 1609 and 1617 are sg_2fish_trout_big, sg_2fish_trout_med, sg_3fish_trout_big and sg_3fish_trout_med in the client Models.txt (description: fishing models). Checked against the client terrain of this scene (osfr-terrain 2 m height grid of its .gcnk chunks): all 4 positions are over submerged ground, 1.7 to 15.4 m below that water surface (the fork's WaterHeight). L933 (lead): schools follow their scene after the Sacred Grove pairing swap."
+      "source": "area and roster: client locale; levels: wiki; schools: L933 (R) positions (scene coordinates, y at the water surface -65.88) and models from the Sanctuary community fork BubbaJoeX 1ff876a src/Resources/Fishing.json pond sg_fishing_medpond (AGPL-3.0 data, credited in NOTICE). Models 1597, 1605, 1609 and 1617 are sg_2fish_trout_big, sg_2fish_trout_med, sg_3fish_trout_big and sg_3fish_trout_med in the client Models.txt (description: fishing models). Checked against the client terrain of this scene (osfr-terrain 2 m height grid of its .gcnk chunks): all 4 positions are over submerged ground, 1.7 to 15.4 m below that water surface (the fork's WaterHeight). L933 (lead): schools follow their scene after the Sacred Grove pairing swap.",
+      "junk": [
+        "plastic_bag",
+        "rusty_can",
+        "finless_fish",
+        "calico_catfish",
+        "toothy_tetra"
+      ]
     },
     {
       "key": "bramblebacks_bayou",
@@ -203,7 +210,12 @@
           "model": 1609
         }
       ],
-      "source": "area and roster: client locale; levels: wiki except marked R; schools: L933 (R) positions (scene coordinates, y at the water surface -3.48) and models from the Sanctuary community fork BubbaJoeX 1ff876a src/Resources/Fishing.json pond bw_fishing_stream (AGPL-3.0 data, credited in NOTICE). Models 1597, 1605, 1609 and 1617 are sg_2fish_trout_big, sg_2fish_trout_med, sg_3fish_trout_big and sg_3fish_trout_med in the client Models.txt (description: fishing models). Checked against the client terrain of this scene (osfr-terrain 2 m height grid of its .gcnk chunks): all 4 positions are over submerged ground, 5.3 to 6.5 m below that water surface (the fork's WaterHeight)."
+      "source": "area and roster: client locale; levels: wiki except marked R; schools: L933 (R) positions (scene coordinates, y at the water surface -3.48) and models from the Sanctuary community fork BubbaJoeX 1ff876a src/Resources/Fishing.json pond bw_fishing_stream (AGPL-3.0 data, credited in NOTICE). Models 1597, 1605, 1609 and 1617 are sg_2fish_trout_big, sg_2fish_trout_med, sg_3fish_trout_big and sg_3fish_trout_med in the client Models.txt (description: fishing models). Checked against the client terrain of this scene (osfr-terrain 2 m height grid of its .gcnk chunks): all 4 positions are over submerged ground, 5.3 to 6.5 m below that water surface (the fork's WaterHeight).",
+      "junk": [
+        "clump_of_fungus",
+        "plastic_bag",
+        "rusty_can"
+      ]
     },
     {
       "key": "darklit_lagoon",
@@ -251,7 +263,12 @@
           "model": 1609
         }
       ],
-      "source": "area and roster: client locale; levels: wiki; schools: L933 (R) positions (scene coordinates, y at the water surface -3.03) and models from the Sanctuary community fork BubbaJoeX 1ff876a src/Resources/Fishing.json pond bw_fishing_medpond (AGPL-3.0 data, credited in NOTICE). Models 1597, 1605, 1609 and 1617 are sg_2fish_trout_big, sg_2fish_trout_med, sg_3fish_trout_big and sg_3fish_trout_med in the client Models.txt (description: fishing models). Checked against the client terrain of this scene (osfr-terrain 2 m height grid of its .gcnk chunks): all 4 positions are over submerged ground, 4.0 to 5.8 m below that water surface (the fork's WaterHeight)."
+      "source": "area and roster: client locale; levels: wiki; schools: L933 (R) positions (scene coordinates, y at the water surface -3.03) and models from the Sanctuary community fork BubbaJoeX 1ff876a src/Resources/Fishing.json pond bw_fishing_medpond (AGPL-3.0 data, credited in NOTICE). Models 1597, 1605, 1609 and 1617 are sg_2fish_trout_big, sg_2fish_trout_med, sg_3fish_trout_big and sg_3fish_trout_med in the client Models.txt (description: fishing models). Checked against the client terrain of this scene (osfr-terrain 2 m height grid of its .gcnk chunks): all 4 positions are over submerged ground, 4.0 to 5.8 m below that water surface (the fork's WaterHeight).",
+      "junk": [
+        "plastic_bag",
+        "rusty_can",
+        "bitter_betta"
+      ]
     },
     {
       "key": "rainbow_lake",
@@ -300,7 +317,13 @@
           "model": 1609
         }
       ],
-      "source": "area and roster: client locale; levels: wiki; schools: L933 (R) positions (scene coordinates, y at the water surface -66.19) and models from the Sanctuary community fork BubbaJoeX 1ff876a src/Resources/Fishing.json pond sg_fishing_stream (AGPL-3.0 data, credited in NOTICE). Models 1597, 1605, 1609 and 1617 are sg_2fish_trout_big, sg_2fish_trout_med, sg_3fish_trout_big and sg_3fish_trout_med in the client Models.txt (description: fishing models). Checked against the client terrain of this scene (osfr-terrain 2 m height grid of its .gcnk chunks): all 4 positions are over submerged ground, 3.5 to 10.2 m below that water surface (the fork's WaterHeight). L933 (lead): schools follow their scene after the Sacred Grove pairing swap."
+      "source": "area and roster: client locale; levels: wiki; schools: L933 (R) positions (scene coordinates, y at the water surface -66.19) and models from the Sanctuary community fork BubbaJoeX 1ff876a src/Resources/Fishing.json pond sg_fishing_stream (AGPL-3.0 data, credited in NOTICE). Models 1597, 1605, 1609 and 1617 are sg_2fish_trout_big, sg_2fish_trout_med, sg_3fish_trout_big and sg_3fish_trout_med in the client Models.txt (description: fishing models). Checked against the client terrain of this scene (osfr-terrain 2 m height grid of its .gcnk chunks): all 4 positions are over submerged ground, 3.5 to 10.2 m below that water surface (the fork's WaterHeight). L933 (lead): schools follow their scene after the Sacred Grove pairing swap.",
+      "junk": [
+        "old_boot",
+        "soggy_socks",
+        "plastic_bag",
+        "rusty_can"
+      ]
     },
     {
       "key": "wintery_basin",
@@ -348,7 +371,11 @@
           "model": 1609
         }
       ],
-      "source": "area and roster: client locale; levels: wiki; schools: L933 (R) positions (scene coordinates, y at the water surface -0.9) and models from the Sanctuary community fork BubbaJoeX 1ff876a src/Resources/Fishing.json pond sh_fishing_medpond (AGPL-3.0 data, credited in NOTICE). Models 1597, 1605, 1609 and 1617 are sg_2fish_trout_big, sg_2fish_trout_med, sg_3fish_trout_big and sg_3fish_trout_med in the client Models.txt (description: fishing models). Checked against the client terrain of this scene (osfr-terrain 2 m height grid of its .gcnk chunks): all 4 positions are over submerged ground, 5.1 to 8.4 m below that water surface (the fork's WaterHeight)."
+      "source": "area and roster: client locale; levels: wiki; schools: L933 (R) positions (scene coordinates, y at the water surface -0.9) and models from the Sanctuary community fork BubbaJoeX 1ff876a src/Resources/Fishing.json pond sh_fishing_medpond (AGPL-3.0 data, credited in NOTICE). Models 1597, 1605, 1609 and 1617 are sg_2fish_trout_big, sg_2fish_trout_med, sg_3fish_trout_big and sg_3fish_trout_med in the client Models.txt (description: fishing models). Checked against the client terrain of this scene (osfr-terrain 2 m height grid of its .gcnk chunks): all 4 positions are over submerged ground, 5.1 to 8.4 m below that water surface (the fork's WaterHeight).",
+      "junk": [
+        "plastic_bag",
+        "rusty_can"
+      ]
     },
     {
       "key": "frostbitten_banks",
@@ -399,7 +426,11 @@
           "model": 1609
         }
       ],
-      "source": "area and roster: client locale; levels: wiki; schools: L933 (R) positions (scene coordinates, y at the water surface 23.24) and models from the Sanctuary community fork BubbaJoeX 1ff876a src/Resources/Fishing.json pond sh_fishing_stream (AGPL-3.0 data, credited in NOTICE). Models 1597, 1605, 1609 and 1617 are sg_2fish_trout_big, sg_2fish_trout_med, sg_3fish_trout_big and sg_3fish_trout_med in the client Models.txt (description: fishing models). Checked against the client terrain of this scene (osfr-terrain 2 m height grid of its .gcnk chunks): all 4 positions are over submerged ground, 6.3 to 20.2 m below that water surface (the fork's WaterHeight)."
+      "source": "area and roster: client locale; levels: wiki; schools: L933 (R) positions (scene coordinates, y at the water surface 23.24) and models from the Sanctuary community fork BubbaJoeX 1ff876a src/Resources/Fishing.json pond sh_fishing_stream (AGPL-3.0 data, credited in NOTICE). Models 1597, 1605, 1609 and 1617 are sg_2fish_trout_big, sg_2fish_trout_med, sg_3fish_trout_big and sg_3fish_trout_med in the client Models.txt (description: fishing models). Checked against the client terrain of this scene (osfr-terrain 2 m height grid of its .gcnk chunks): all 4 positions are over submerged ground, 6.3 to 20.2 m below that water surface (the fork's WaterHeight).",
+      "junk": [
+        "plastic_bag",
+        "rusty_can"
+      ]
     }
   ],
   "species": [
@@ -1602,6 +1633,126 @@
         "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
       },
       "icon_id": 4273
+    },
+    {
+      "key": "old_boot",
+      "name": "Old Boot",
+      "name_id": 99954,
+      "type_id": 68103,
+      "minimum_level": 1,
+      "rarity": 1,
+      "difficulty": 1,
+      "selection_weight": 40,
+      "weight_kg": [
+        0.2,
+        1.0
+      ],
+      "size_weights": [
+        100,
+        0,
+        0,
+        0
+      ],
+      "icon_id": 4430,
+      "source_tags": {
+        "junk": "(R) Client item table row (name, icon); the live game's junk rates are unknown, this weight is a reconstruction. Junk seen: notes Fisherman.md 'Other catches', video 0LCKMQz3zMs t=246, 272."
+      }
+    },
+    {
+      "key": "soggy_socks",
+      "name": "Soggy Socks",
+      "name_id": 99955,
+      "type_id": 68104,
+      "minimum_level": 1,
+      "rarity": 1,
+      "difficulty": 1,
+      "selection_weight": 40,
+      "weight_kg": [
+        0.2,
+        1.0
+      ],
+      "size_weights": [
+        100,
+        0,
+        0,
+        0
+      ],
+      "icon_id": 4435,
+      "source_tags": {
+        "junk": "(R) Client item table row (name, icon); the live game's junk rates are unknown, this weight is a reconstruction. Junk seen: notes Fisherman.md 'Other catches', video 0LCKMQz3zMs t=246, 272."
+      }
+    },
+    {
+      "key": "plastic_bag",
+      "name": "Plastic Bag",
+      "name_id": 99956,
+      "type_id": 68105,
+      "minimum_level": 1,
+      "rarity": 1,
+      "difficulty": 1,
+      "selection_weight": 20,
+      "weight_kg": [
+        0.2,
+        1.0
+      ],
+      "size_weights": [
+        100,
+        0,
+        0,
+        0
+      ],
+      "icon_id": 4431,
+      "source_tags": {
+        "junk": "(R) Client item table row (name, icon); the live game's junk rates are unknown, this weight is a reconstruction. Junk seen: notes Fisherman.md 'Other catches', video 0LCKMQz3zMs t=246, 272."
+      }
+    },
+    {
+      "key": "rusty_can",
+      "name": "Rusty Can",
+      "name_id": 99957,
+      "type_id": 68106,
+      "minimum_level": 1,
+      "rarity": 1,
+      "difficulty": 1,
+      "selection_weight": 20,
+      "weight_kg": [
+        0.2,
+        1.0
+      ],
+      "size_weights": [
+        100,
+        0,
+        0,
+        0
+      ],
+      "icon_id": 4432,
+      "source_tags": {
+        "junk": "(R) Client item table row (name, icon); the live game's junk rates are unknown, this weight is a reconstruction. Junk seen: notes Fisherman.md 'Other catches', video 0LCKMQz3zMs t=246, 272."
+      }
+    },
+    {
+      "key": "clump_of_fungus",
+      "name": "Clump of Fungus",
+      "name_id": 407586,
+      "type_id": 68000,
+      "minimum_level": 1,
+      "rarity": 1,
+      "difficulty": 1,
+      "selection_weight": 40,
+      "weight_kg": [
+        0.2,
+        1.0
+      ],
+      "size_weights": [
+        100,
+        0,
+        0,
+        0
+      ],
+      "icon_id": 4423,
+      "source_tags": {
+        "junk": "(R) Client item table row (name, icon); the live game's junk rates are unknown, this weight is a reconstruction. Junk seen: notes Fisherman.md 'Other catches', video 0LCKMQz3zMs t=246, 272."
+      }
     }
   ],
   "lures": [

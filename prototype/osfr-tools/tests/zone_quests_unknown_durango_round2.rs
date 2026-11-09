@@ -177,7 +177,7 @@ fn the_other_rows_stay_off() {
     for id in [
         3_030_022, 3_030_036, // Brawler contracts (lead decision)
         3_060_007, // Demo Derby: no objectives
-        3_070_020, 3_070_023, 3_070_045, // Fisherman: no fungus, disguise or treasure catch
+        3_070_023, 3_070_045, // Fisherman: no disguise or treasure catch
         3_090_024, // Medic: rescue targets
         3_110_021, // Ninja: the hermit's book
         3_140_021, 3_140_027, 3_140_030, // Soccer Star: no mechanic, no game 328

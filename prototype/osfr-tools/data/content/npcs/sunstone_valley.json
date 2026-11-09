@@ -13150,11 +13150,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2518; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3851 (ModelId=4051, ModelFileName=dwarf_m_jarvus.adr, NameId=440132)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.898684,
       "model_id": 4051,
-      "model_file_name": "dwarf_m_jarvus.adr"
+      "model_file_name": "dwarf_m_jarvus.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000370,
@@ -23032,50 +23039,6 @@
           ]
         },
         {
-          "quest_id": 3020038,
-          "title": "Blacksmith: From Scraps to Iron",
-          "title_string_id": 439726,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 7: Sunstone Valley (Red Stonehammer), row 38; name 'Blacksmith: From Scraps to Iron'; title id cell ucdt 1013204702, 2861514815 / ugdt 652528783"
-            },
-            {
-              "kind": "wiki",
-              "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 7: Sunstone Valley (Red Stonehammer), row 38; name 'Blacksmith: From Scraps to Iron'; title id cell ucdt 1013204702, 2861514815 / ugdt 652528783"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3020038 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 1013204702 to Global.Text id 439726 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
           "quest_id": 3020039,
           "title": "Blacksmith: Hammering It Out",
           "title_string_id": 439738,
@@ -23202,7 +23165,6 @@
         3020035,
         3020036,
         3020037,
-        3020038,
         3020039,
         3020040,
         3020041
@@ -23902,11 +23864,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2521; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3854 (ModelId=4032, ModelFileName=dwarf_f_factionleader.adr, NameId=438829)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.66127,
       "model_id": 4032,
-      "model_file_name": "dwarf_f_factionleader.adr"
+      "model_file_name": "dwarf_f_factionleader.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000846,
@@ -28172,8 +28141,55 @@
       "location_evidence": [
         "Whirly's Scrap Camp crafting station (wiki)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3020038,
+          "title": "Blacksmith: From Scraps to Iron",
+          "title_string_id": 439726,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 7: Sunstone Valley (Red Stonehammer), row 38; name 'Blacksmith: From Scraps to Iron'; title id cell ucdt 1013204702, 2861514815 / ugdt 652528783"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 7: Sunstone Valley (Red Stonehammer), row 38; name 'Blacksmith: From Scraps to Iron'; title id cell ucdt 1013204702, 2861514815 / ugdt 652528783"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3020038 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3020038
+      ],
       "quests_given_text": [
         "Middle stop of Blacksmith: Scrap Surfin': \"Speak with Scrapsmith Crackle\" (1253461415); wants a Motorsmith Tank Top (3135964703)."
       ],
@@ -28557,11 +28573,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2586; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3919 (ModelId=1682, ModelFileName=robgoblin_m_master.adr, NameId=439983)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.296148,
       "model_id": 1682,
-      "model_file_name": "robgoblin_m_master.adr"
+      "model_file_name": "robgoblin_m_master.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000854,

@@ -3368,10 +3368,55 @@
               "evidence": "title_string_id corrected from raw locale hash 672407544 to Global.Text id 412144 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3070007,
+          "title": "Fisherman: Find Your Own Spot!",
+          "title_string_id": 409213,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Cluster A - Sacred Grove Shallows beginners (Anna Mudskipper, Muggup, Guppie), row 3; name 'Fisherman: Find Your Own Spot!'; title id cell 277440424 / 2174454942"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3070007 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3070039
+        3070039,
+        3070007
       ],
       "quests_given_text": [
         "Fisherman: McScuttle Family Farm (fish up Katie McScuttle's boots, 1523245831) and Fisherman: Setting Ernest Straight."
@@ -3735,10 +3780,17 @@
             "kind": "client",
             "evidence": "(R) The client model named after this NPC (fairy_m_ernest_mcscuttle.agr); the row drew fairy_druid_m.adr, a generic or another NPC's model. Checked in lab/tools/model-view and against the NPC's wiki picture."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 1586,
-      "model_file_name": "fairy_m_ernest_mcscuttle.agr"
+      "model_file_name": "fairy_m_ernest_mcscuttle.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000344,
@@ -9011,12 +9063,94 @@
               "evidence": "title_string_id corrected from raw locale hash 200616204 to Global.Text id 409975 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3070024,
+          "title": "Fisherman: VIP Fish",
+          "title_string_id": 409922,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Cluster D - Gunther at Brambleback's Bayou (Briarwood), row 20; name 'Fisherman: VIP Fish'; title id cell 3818943794 / 3523108011"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3070024 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
+        },
+        {
+          "quest_id": 3070034,
+          "title": "Fisherman: McScuttle Family Farm",
+          "title_string_id": 409997,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Cluster F - Lakeshore, Rainbow Lake and the McScuttle family, row 30; name 'Fisherman: McScuttle Family Farm'; title id cell 2241805448 / 1384302499"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3070034 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row 28; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3070030,
         3070031,
-        3070032
+        3070032,
+        3070024,
+        3070034
       ],
       "quests_given_text": [
         "Fisherman: Fisherman: Bluerose's Best Bait, Fisherman: Fish Fry, Fisherman: Fish Market, Fisherman: McScuttle Family Farm. Chef fish-dish orders: Flutterfish Medley, Butter Flyfish Flambe, Purple-Nosed Sharkfin Soup, Baconfish Bits, Toothy Tetra Vitamins, Feral Catfish Oil (see Chef). Demo Derby: So Long, Betty! (Crash Davis's sponsor, 1097952445). Taste-tester interview for Darkthorne (777462508, 3935731894; Chef line in NPCs - Briarwood). Family-recipe request for Bordon Cloo (3604292456; see town quests). Receives the water-boil warning (see town quests)."
@@ -9417,9 +9551,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3760 spawnNpcWithGuid(33538); src/Resources/Npcs.json Id=33538"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -2.40588683
+      "heading": -2.40588683,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000356,
@@ -13893,8 +14034,15 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000365,

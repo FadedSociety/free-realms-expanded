@@ -2773,8 +2773,59 @@
       "title_string_id": 439718,
       "giver_npc_id": 9000000179,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "text_string_id": 439774,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 439774 'Smelt Tin Bars', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "recipe_id": 5,
+          "quantity": 1
+        },
+        {
+          "kind": "craft_recipe",
+          "id": 2,
+          "text_string_id": 439776,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 439776 'Forge the Motorsmith Boots', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "recipe_id": 186,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 439778,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 439778 'Return to Red Stonehammer', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000179
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Blacksmith: Can We Build It? pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2816,7 +2867,8 @@
       "description_string_id": 439719,
       "intro_text_string_id": 439717,
       "end_text_string_id": 439720,
-      "enabled": false
+      "enabled": true,
+      "job": 16
     },
     {
       "id": 3020037,
@@ -2875,10 +2927,73 @@
     {
       "id": 3020038,
       "title_string_id": 439726,
-      "giver_npc_id": 9000000179,
+      "giver_npc_id": 9000000193,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "text_string_id": 439991,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 439991 'Smelt Iron Bars', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "recipe_id": 6,
+          "quantity": 1
+        },
+        {
+          "kind": "craft_recipe",
+          "id": 2,
+          "text_string_id": 439993,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 439993 'Forge the Motorsmith Tank Top', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "recipe_id": 189,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 439995,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 439995 'Speak with Scrapsmith Crackle', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000193
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 439999,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 439999 'Return to Red Stonehammer', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000179
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Blacksmith: From Scraps to Iron pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2920,7 +3035,8 @@
       "description_string_id": 439727,
       "intro_text_string_id": 439725,
       "end_text_string_id": 439728,
-      "enabled": false
+      "enabled": true,
+      "job": 16
     },
     {
       "id": 3020039,
@@ -2973,8 +3089,59 @@
       "title_string_id": 439734,
       "giver_npc_id": 9000000179,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "text_string_id": 440016,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 440016 'Smelt Silver Bars', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "recipe_id": 7,
+          "quantity": 1
+        },
+        {
+          "kind": "craft_recipe",
+          "id": 2,
+          "text_string_id": 440018,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 440018 'Forge the Motorsmith Pants', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "recipe_id": 188,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 440020,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 440020 'Return to Red Stonehammer', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000179
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Blacksmith: Good Ol’ Sunstones pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3012,15 +3179,103 @@
       "description_string_id": 439735,
       "intro_text_string_id": 439733,
       "end_text_string_id": 439736,
-      "enabled": false
+      "enabled": true,
+      "job": 16
     },
     {
       "id": 3020041,
       "title_string_id": 439742,
       "giver_npc_id": 9000000179,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 440166,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 440166 'Speak with Jarvus', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000114
+        },
+        {
+          "kind": "craft_recipe",
+          "id": 2,
+          "text_string_id": 440168,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 440168 'Forge the Motorsmith Welding Mask', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "recipe_id": 191,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 440170,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 440170 'Talk to Jarvus', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000114
+        },
+        {
+          "kind": "craft_recipe",
+          "id": 4,
+          "text_string_id": 440172,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 440172 'Forge the Motorsmith Tool Belt', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "recipe_id": 190,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 440174,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 440174 'Confront Jarvus', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000114
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 6,
+          "text_string_id": 440176,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 440176 'Return to Red Stonehammer', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000179
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Blacksmith: Clash of the Apprentice pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3058,7 +3313,8 @@
       "description_string_id": 439743,
       "intro_text_string_id": 439741,
       "end_text_string_id": 439744,
-      "enabled": false
+      "enabled": true,
+      "job": 16
     },
     {
       "id": 3020042,

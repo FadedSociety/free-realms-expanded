@@ -245,7 +245,7 @@ impl FishingService {
                 !area.name.is_empty()
                     && !area.source.is_empty()
                     && !area.fish.is_empty()
-                    && area.fish.iter().all(|key| species(key).is_some())
+                    && area.fish.iter().chain(&area.junk).all(|key| species(key).is_some())
                     && (1..=MAX_SCHOOLS).contains(&area.schools.len())
                     && area.schools.iter().all(School::valid)
             })
@@ -877,7 +877,7 @@ impl FishingService {
                 }
                 // Select before any mutation, so a refused cast changes nothing.
                 let sequence = tracked.cast_sequence.wrapping_add(1).max(1);
-                let selected = select_species(tracked, sequence)?;
+                let selected = select_species(tracked, sequence, &self.item_definitions)?;
                 tracked.session.request(&request)?;
                 tracked.cast_sequence = sequence;
                 let now = now_ms;
@@ -1466,7 +1466,11 @@ fn validate_cast(target: Vec4, anchor: Vec4) -> Result<(), Error> {
     Ok(())
 }
 
-fn select_species(tracked: &Tracked, seed: u32) -> Result<&'static Species, Error> {
+fn select_species(
+    tracked: &Tracked,
+    seed: u32,
+    item_definitions: &BTreeMap<(String, u8), i32>,
+) -> Result<&'static Species, Error> {
     let fishing_area = area(&tracked.area_key).ok_or(Error::InvalidValue)?;
     let lure = tracked
         .lure_key
@@ -1474,8 +1478,18 @@ fn select_species(tracked: &Tracked, seed: u32) -> Result<&'static Species, Erro
         .and_then(|key| CONTENT.lures.iter().find(|l| l.key == key));
     let mut choices = Vec::new();
     let mut total = 0u64;
-    for key in &fishing_area.fish {
+    // Junk bites like a fish, but only the Fish Finder's own roster is ever listed.
+    for key in fishing_area.fish.iter().chain(&fishing_area.junk) {
         let Some(fish) = species(key) else { continue };
+        // An extra bite with no item in any size it can roll could only ever get away.
+        if fishing_area.junk.contains(key)
+            && !(1u8..=4).any(|grade| {
+                fish.size_weights[usize::from(grade) - 1] > 0
+                    && item_definitions.contains_key(&(key.clone(), grade))
+            })
+        {
+            continue;
+        }
         if fish.minimum_level > tracked.fisherman_level {
             continue;
         }
@@ -1946,6 +1960,10 @@ struct Area {
     key: String,
     name: String,
     fish: Vec<String>,
+    /// What bites here without being on the Fish Finder: non-fish catches (a boot, a rusty can),
+    /// and fish a quest's text sends the player here for.
+    #[serde(default)]
+    junk: Vec<String>,
     /// Where the area's fish schools float, in the coordinates of the area's own client scene
     /// (one scene per area, `fishing_spots.json`). A round fished in place at a guide (an
     /// uncached scene) gets the same coordinates, which mean nothing there (R).

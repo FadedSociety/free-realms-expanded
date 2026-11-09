@@ -1655,6 +1655,19 @@ impl QuestEngine {
         self.state.quests.get(&quest_id)
     }
 
+    /// The recipes the active quests ask the player to craft.
+    pub fn active_craft_recipes(&self) -> Vec<u32> {
+        (self.state.quests.iter())
+            .filter(|(_, progress)| progress.status == QuestStatus::Active)
+            .filter_map(|(id, _)| self.definitions.get(id))
+            .flat_map(|definition| &definition.objectives)
+            .filter_map(|objective| match objective.kind {
+                ObjectiveKind::CraftRecipe { recipe_id } => Some(recipe_id),
+                _ => None,
+            })
+            .collect()
+    }
+
     /// Unfinished goals of an active quest that can be worked on now: all of them, or only
     /// the first one when the quest is ordered (R; the same rule as `accept`). Empty for a
     /// quest that is not active, which keeps a forged or stale selection from tracking.

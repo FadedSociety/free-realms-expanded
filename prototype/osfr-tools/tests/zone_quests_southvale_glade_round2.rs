@@ -177,8 +177,8 @@ fn the_pet_trainer_rows_wait_for_a_pet_trainer_profile() {
 #[test]
 fn the_other_round_two_rows_stay_off() {
     for id in [
-        // Sunstone Valley: Grunt Work (Sunstone ore), Can We Build It? (tin ore, forging).
-        3_020_033, 3_020_036,
+        // Sunstone Valley: Grunt Work (Sunstone ore).
+        3_020_033,
         // Wildwood: An Incomplete Set, Wildwood Derby 1000 (no objectives in any source).
         3_060_031, 3_060_044,
     ] {

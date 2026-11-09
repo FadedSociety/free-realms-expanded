@@ -28104,7 +28104,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1825; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3082 (ModelId=354, ModelFileName=human_f_ninja_01.agr, NameId=78752)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500002993
     },
     {
       "spawn_guid": 100000003083,
@@ -77481,6 +77482,33 @@
         }
       ],
       "position_w": null
+    },
+    {
+      "spawn_guid": 100000090001,
+      "legacy_npc_id": null,
+      "model_id": 572,
+      "model_file_name": "fairy_f_freestyle_10.agr",
+      "name": "Katie McScuttle",
+      "name_string_id": 410010,
+      "position": [
+        -715.8,
+        -6.88701,
+        789.6
+      ],
+      "heading": 3.14,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com/wiki/FR_Mob:Katie_McScuttle: Pixie, female, Rainbow Lake, at the farm house; its portrait shows a short blonde bob and red wings."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Model chosen by eye from the client's pixie models to fit the portrait; stands beside Kim McScuttle at the farm."
+        }
+      ],
+      "position_w": null,
+      "content_key": 9500002816
     }
   ]
 }

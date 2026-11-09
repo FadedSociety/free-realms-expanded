@@ -1913,8 +1913,51 @@
       "location_evidence": [
         "\"Sacred Grove Shallows\" (384168896)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3070042,
+          "title": "Fisherman: Fishing Frenzy",
+          "title_string_id": 410109,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Cluster G - Big J's crew at Wintery Basin (Snowhill), row 38; name 'Fisherman: Fishing Frenzy'; title id cell 3824034041 / 2858840631"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3070042 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3070042
+      ],
       "quests_given_text": [
         "Fetch quest, title not found (1000005671 \"Return to Dwight Limburger\")."
       ],
@@ -2208,8 +2251,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "model_id": 555,
+      "model_file_name": "human_m_freestyle_09.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000785,
@@ -8473,8 +8537,23 @@
       "location_evidence": [
         "\"Sacred Grove Shallows\" (2431397463). [video: nameplate with a quest-giver \"?\" beside a wooden fish-drying rack and barrels, 0LCKMQz3zMs/00298; offer bubble /00292]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3954466,
+          "title": "Keep it Clean",
+          "title_string_id": 409693,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Keep it Clean (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_keep_it_clean_a8dd8a)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3954466
+      ],
       "quests_given_text": [
         "Keep it Clean (reel in Plastic Bags and Rusty Cans, then return); Shallows: Catch of the Day (nameplate beside the completion frame; Callie Kelpcake's text is the other giver candidate). Video reward: \"You receive 30 stars and 16 coins\" (0LCKMQz3zMs/00298; a 2x Power Hour banner was up, so the coin figure may be doubled)."
       ],
@@ -8856,10 +8935,17 @@
             "kind": "client",
             "evidence": "(R) The client model named after this NPC (human_f_melanie.agr); the row drew humanchild_f_skirtandtunic.adr, a generic or another NPC's model. Checked in lab/tools/model-view and against the NPC's wiki picture."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 3894,
-      "model_file_name": "human_f_melanie.agr"
+      "model_file_name": "human_f_melanie.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000157,
@@ -10358,12 +10444,53 @@
               "evidence": "title_string_id corrected from raw locale hash 3481931046 to Global.Text id 408259 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3070021,
+          "title": "Fisherman: Ink Cod Ink",
+          "title_string_id": 409326,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Cluster D - Gunther at Brambleback's Bayou (Briarwood), row 17; name 'Fisherman: Ink Cod Ink'; title id cell 1551424341 / 2552104441"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3070021 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row 16; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3070003,
         3070004,
-        3070001
+        3070001,
+        3070021
       ],
       "quests_given_text": [
         "Become a Fisherman and Being a Better Fisherman (the job pages name him as the contact; the wiki starts them from the Message Board in Sanctuary), Learn to Fish!, Testing the Waters. Identifies odd catches: Fisherman: What Is It?! and Fisherman: Good Enough to Eat! mention him; he turns in the fungus and the ink cod in Fisherman: Fishy Fungus and Fisherman: Ink Cod Ink. Shows the way to Brambleback's Bayou (2651529106)."

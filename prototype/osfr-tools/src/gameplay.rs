@@ -1570,35 +1570,6 @@ impl Gameplay {
         crate::recipes::encode_recipe_replace_all(&rows).map_err(invalid)
     }
 
-    /// Persist one client recipe id and return its native 0x3f/op1 packet once.
-    pub fn learn_recipe(&mut self, recipe_id: u32) -> io::Result<Option<Vec<u8>>> {
-        let Some(recipe) = self
-            .recipe_catalog
-            .records
-            .iter()
-            .find(|recipe| recipe.recipe_id == Some(recipe_id))
-        else {
-            return Err(invalid("unknown client recipe id"));
-        };
-        if recipe.recipe_item_definition_id.is_none() {
-            return Err(invalid("learned recipe has no client pattern item"));
-        }
-        if self.learned_recipes.contains(&recipe_id) {
-            return Ok(None);
-        }
-        let learned = HashSet::from([recipe_id]);
-        let row = self
-            .recipe_catalog
-            .wire_rows(&learned, &self.inventory)
-            .map_err(invalid)?
-            .into_iter()
-            .next()
-            .ok_or_else(|| invalid("learned recipe has no encodable wire row"))?;
-        let packet = crate::recipes::encode_recipe_add(&row.1).map_err(invalid)?;
-        self.learned_recipes.insert(recipe_id);
-        Ok(Some(packet))
-    }
-
     fn learned_recipe_for_key(&self, key: &str) -> bool {
         self.recipe_catalog
             .by_key(key)
@@ -1916,6 +1887,7 @@ impl Gameplay {
         self.append_warp_definitions(character, &mut out);
         self.append_activity_list(&mut out);
         self.append_item_bar(character.guid, now_ms, &mut out)?;
+        self.teach_quest_recipes(&mut out)?;
         out.replies.push(self.recipe_replace_all_packet()?);
         self.enter_world(character, now_ms, &mut out);
         self.sync_client_objectives(&mut out);
@@ -4808,6 +4780,7 @@ impl Gameplay {
         out.replies.extend(self.combat.initialization(position));
         let quest = self.quests.initialization()?;
         self.apply_quest(quest, &mut out)?;
+        self.teach_quest_recipes(&mut out)?;
         out.replies.push(self.recipe_replace_all_packet()?);
         out.replies.push(chat::system(
             "Rust restoration is live. Talk to the nearby guide, or type realm help in chat.",

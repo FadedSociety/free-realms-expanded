@@ -21456,12 +21456,49 @@
               "evidence": "Card Duelist: Keeping Quiet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_keeping_quiet_9a6c27)."
             }
           ]
+        },
+        {
+          "quest_id": 3040032,
+          "title": "Card Duelist: Quick Game of Cards",
+          "title_string_id": 407012,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 31; name 'Card Duelist: Quick Game of Cards'; title id cell 1411608127 ucdt; 596530846 ugdt; bare title 3585980374 ucdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3040032 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3040034,
         3952471,
-        3952472
+        3952472,
+        3040032
       ],
       "quests_given_text": [
         "Card Duelist: A Card Dueling Rumor (Poe Tatters sends the player here), Card Duelist: Dominic's New Card, Card Duelist: Break Time, Card Duelist: Esther, the Brains."
@@ -23666,8 +23703,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 551,
+      "model_file_name": "human_f_freestyle_10.agr"
     },
     {
       "npc_id": 9000000082,
@@ -23704,46 +23755,6 @@
         "\"Near the dig site\" Dominic patrols (client 1712657984)."
       ],
       "quests_given": [
-        {
-          "quest_id": 3040032,
-          "title": "Card Duelist: Quick Game of Cards",
-          "title_string_id": 407012,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 31; name 'Card Duelist: Quick Game of Cards'; title id cell 1411608127 ucdt; 596530846 ugdt; bare title 3585980374 ucdt"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3040032 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 1411608127 to Global.Text id 407012 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
         {
           "quest_id": 3040033,
           "title": null,
@@ -23954,7 +23965,6 @@
         }
       ],
       "quest_ids_given": [
-        3040032,
         3040033,
         3040035,
         3040031,
@@ -31473,18 +31483,30 @@
       ],
       "quests_given": [
         {
-          "quest_id": 3070024,
-          "title": "Fisherman: VIP Fish",
-          "title_string_id": 409922,
+          "quest_id": 3953698,
+          "title": "Bayou: Catch of the Day",
+          "title_string_id": 410462,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Bayou: Catch of the Day (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bayou_catch_of_the_day_4bd84f)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3070020,
+          "title": "Fisherman: Fishy Fungus",
+          "title_string_id": 409302,
           "relation": "gives",
           "source": [
             {
               "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Cluster D - Gunther at Brambleback's Bayou (Briarwood), row 20; name 'Fisherman: VIP Fish'; title id cell 3818943794 / 3523108011"
+              "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Cluster D - Gunther at Brambleback's Bayou (Briarwood), row 16; name 'Fisherman: Fishy Fungus'; title id cell 2361775528 / 3837772952"
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) quest id 3070024 is a stable batch key; the guide does not provide a numeric server quest id"
+              "evidence": "(R) quest id 3070020 is a stable batch key; the guide does not provide a numeric server quest id"
             },
             {
               "kind": "reconstructed",
@@ -31507,27 +31529,56 @@
               "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
             },
             {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 3818943794 to Global.Text id 409922 (content_check text_raw_hash, 2026-10-15)"
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
             }
           ]
         },
         {
-          "quest_id": 3953698,
-          "title": "Bayou: Catch of the Day",
-          "title_string_id": 410462,
+          "quest_id": 3070025,
+          "title": "Fisherman: Say Cheese!",
+          "title_string_id": 409720,
           "relation": "gives",
           "source": [
             {
-              "kind": "wiki",
-              "evidence": "Bayou: Catch of the Day (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bayou_catch_of_the_day_4bd84f)."
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Cluster D - Gunther at Brambleback's Bayou (Briarwood), row 21; name 'Fisherman: Say Cheese!'; title id cell 2902383387 / 1381408625"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3070025 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row 20; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
             }
           ]
         }
       ],
       "quest_ids_given": [
-        3070024,
-        3953698
+        3953698,
+        3070020,
+        3070025
       ],
       "quests_given_text": [
         "Fisherman: Hungry Chugs, Fisherman: Fishy Fungus, Fisherman: Ink Cod Ink, Fisherman: Restocking the Stream, Fisherman: Undercover, Fisherman: VIP Fish, Fisherman: Say Cheese!."
