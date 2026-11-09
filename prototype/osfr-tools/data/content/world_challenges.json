@@ -3,7 +3,7 @@
   "source": [
     "L937: client minigame TYPE 1 (SAMPLE) in-world timed challenges, one row per MiniGameData id. Names, descriptions, icons and difficulties are the client's own; every count, timer, radius, reward and distance is a reconstruction (R).",
     "Adapted from the Sanctuary community server fork (BubbaJoeX) Resources/Challenges.json and ChallengeManager.cs, AGPL-3.0; see NOTICE.",
-    "Not built: 301 (Mail Morph transform) and 585 (booster and bombs) need an ability system; 302 visits two of its three recipients (Toilin has no NPC row).",
+    "Not built: 301 (Mail Morph transform) needs an ability system; 302 visits two of its three recipients (Toilin has no NPC row).",
     "Only a win pays and credits quests. A job-less row (profile 0) pays the active job. xp is the fallback; the job's activity_xp (data/release/job_xp_curve.json) pays instead where one challenge is one unit of the job's activity (not for the combat jobs, whose rate is per kill)."
   ],
   "tuning": {
@@ -2431,6 +2431,333 @@
         "Find all the items on the list: hand-picked model",
         "giver: the quest's giver (R)",
         "time limit 68 s, coins, xp: wiki or fork, (R)"
+      ]
+    },
+    {
+      "id": 538,
+      "title": "Chef: Package Recovery!",
+      "giver": 9500004075,
+      "name_id": 94299,
+      "description_id": 101660,
+      "icon_id": 9550,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 90,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 5,
+          "radius": 40.0,
+          "name_id": 101999,
+          "label_id": 101663,
+          "model_id": 268
+        }
+      ],
+      "bonuses": [],
+      "coins": 40,
+      "xp": 30,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_package_recovery",
+        "Recover five Stolen Packages: mail package model (R)",
+        "giver: Jonelle's Mailbag, the wiki's start",
+        "time limit 90 s, coins, xp: wiki or (R) by difficulty"
+      ]
+    },
+    {
+      "id": 539,
+      "title": "Chef: Fireworks Frenzy!",
+      "giver": 9500004006,
+      "name_id": 104138,
+      "description_id": 115776,
+      "icon_id": 9550,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 90,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 5,
+          "radius": 40.0,
+          "name_id": 115750,
+          "label_id": 115749,
+          "model_id": 847
+        }
+      ],
+      "bonuses": [],
+      "coins": 40,
+      "xp": 30,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_fireworks_frenzy",
+        "Collect five Piles of Fireworks: the fireworks model (R)",
+        "giver: the Crate of Fireworks, the wiki's start",
+        "time limit 90 s, coins, xp: wiki or (R) by difficulty"
+      ]
+    },
+    {
+      "id": 540,
+      "title": "Chef: Harvest Hiccup!",
+      "giver": 9000000096,
+      "name_id": 116497,
+      "description_id": 116983,
+      "icon_id": 9550,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 5,
+          "radius": 40.0,
+          "name_id": 116971,
+          "label_id": 116966,
+          "model_id": 80
+        }
+      ],
+      "bonuses": [],
+      "coins": 40,
+      "xp": 30,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals and two minutes: wiki fr_minigame_harvest_hiccup",
+        "Collect five Bundles of Ingredients: sack model (R)",
+        "giver: Gavin Greenpetal, the quest's giver",
+        "time limit 120 s, coins, xp: wiki or (R) by difficulty"
+      ]
+    },
+    {
+      "id": 232,
+      "title": "The Truant List",
+      "giver": 9500000718,
+      "name_id": 77562,
+      "description_id": 77563,
+      "icon_id": 9550,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 90,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 5,
+          "radius": 100.0,
+          "name_id": 77634,
+          "label_id": 77547,
+          "model_id": 468
+        },
+        {
+          "kind": "return",
+          "count": 1,
+          "name_id": 77690
+        }
+      ],
+      "bonuses": [],
+      "coins": 40,
+      "xp": 30,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_the_truant_list",
+        "Truant Druids: the male fairy druid body the named truants use (R); radius from their spawns 48 to 112 m from Tilda",
+        "giver: Tilda Timidleaf, named by the goal 'Return to Tilda'",
+        "time limit 90 s, coins, xp: wiki or (R) by difficulty"
+      ]
+    },
+    {
+      "id": 263,
+      "title": "Seaside Mail Delivery",
+      "giver": 9000000080,
+      "name_id": 101614,
+      "description_id": 101615,
+      "icon_id": 312,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 90,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "use",
+          "count": 6,
+          "radius": 45.0,
+          "name_id": 102050,
+          "model_id": 76
+        }
+      ],
+      "bonuses": [],
+      "coins": 40,
+      "xp": 30,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_seaside_mail_delivery",
+        "Deliver the mail: mailbox model, six addresses (R)",
+        "giver: Enve LeStamp, the wiki's start at the postboxes beside them",
+        "time limit 90 s, coins, xp: wiki or (R) by difficulty"
+      ]
+    },
+    {
+      "id": 660,
+      "title": "Kart Driver: Self Promotion",
+      "giver": 9500000868,
+      "name_id": 394655,
+      "description_id": 399601,
+      "icon_id": 9550,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 150,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "deliver",
+          "count": 1,
+          "name_id": 399602,
+          "recipients": [
+            9500000331
+          ]
+        },
+        {
+          "kind": "deliver",
+          "count": 1,
+          "name_id": 115578,
+          "recipients": [
+            9000000178
+          ]
+        },
+        {
+          "kind": "deliver",
+          "count": 1,
+          "name_id": 399606,
+          "recipients": [
+            9000000015
+          ]
+        }
+      ],
+      "bonuses": [],
+      "coins": 40,
+      "xp": 30,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_self_promotion (Cillian, Ranger Ricardo, Assistant Archy)",
+        "giver: Amber Violet, the wiki's start at the barrel next to her",
+        "time limit 150 s, coins, xp: wiki or (R) by difficulty"
+      ]
+    },
+    {
+      "id": 215,
+      "title": "The Handy Boys",
+      "giver": 9500000879,
+      "name_id": 46085,
+      "description_id": 46094,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 180,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 3,
+          "radius": 45.0,
+          "name_id": 46087,
+          "model_id": 4
+        },
+        {
+          "kind": "return",
+          "count": 1,
+          "name_id": 22275
+        }
+      ],
+      "bonuses": [
+        {
+          "name_id": 73025,
+          "within_seconds": 59
+        }
+      ],
+      "coins": 50,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_find_the_handy_boys",
+        "the Handy Boys: basic robgoblin body, three (R)",
+        "giver: Boss Biggins, named by the goal 'Return to Boss Biggins'",
+        "time limit 180 s, coins, xp: wiki or (R) by difficulty"
+      ]
+    },
+    {
+      "id": 590,
+      "title": "A Helping Hand",
+      "giver": 9000000273,
+      "name_id": 3783,
+      "description_id": 395372,
+      "icon_id": 9550,
+      "difficulty": 2,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "collect",
+          "count": 5,
+          "radius": 40.0,
+          "name_id": 395172,
+          "label_id": 395172,
+          "model_id": 1083
+        }
+      ],
+      "bonuses": [],
+      "coins": 50,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_helping_hand (the guard dogs are not modelled)",
+        "Stolen Parts: car parts model, five (R)",
+        "giver: Chase Wheeler, the wiki's start at his kart",
+        "time limit 120 s, coins, xp: wiki or (R) by difficulty"
+      ]
+    },
+    {
+      "id": 585,
+      "title": "Even the Odds",
+      "giver": 9500000956,
+      "name_id": 3739,
+      "description_id": 394232,
+      "icon_id": 9550,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 90,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "use",
+          "count": 3,
+          "radius": 30.0,
+          "name_id": 394229,
+          "model_id": 1384
+        },
+        {
+          "kind": "use",
+          "count": 1,
+          "radius": 30.0,
+          "name_id": 394994,
+          "model_id": 1079
+        }
+      ],
+      "bonuses": [
+        {
+          "name_id": 395000,
+          "within_seconds": 60
+        }
+      ],
+      "coins": 40,
+      "xp": 30,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals: wiki fr_minigame_even_the_odds",
+        "the pit crew's bombs: bomb model, three (R); Linx Redline's kart: his kart model",
+        "giver: Verve McNichols, the quest's giver (R)",
+        "time limit 90 s, coins, xp: wiki or (R) by difficulty"
       ]
     }
   ]

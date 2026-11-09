@@ -866,56 +866,11 @@
           ]
         },
         {
-          "quest_id": 3050013,
-          "title": null,
-          "title_string_id": 104142,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 2: Highroad Junction (Auguste Frydaze), row H4; name \"Chef: Perry's Pastures\"; title id cell ucdt 3343686488 / ugdt 1841482134"
-            },
-            {
-              "kind": "wiki",
-              "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 2: Highroad Junction (Auguste Frydaze), row H4; name \"Chef: Perry's Pastures\"; title id cell ucdt 3343686488 / ugdt 1841482134"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3050013 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) source explicitly says after row H3; mapped that page label to the preceding batch content key"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 3343686488 to Global.Text id 104142 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
           "quest_id": 3050004
         }
       ],
       "quest_ids_given": [
         3050011,
-        3050013,
         3050004
       ],
       "quests_given_text": [
@@ -8026,10 +7981,55 @@
               "evidence": "title_string_id corrected from raw locale hash 1021355619 to Global.Text id 104138 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3050013,
+          "title": "Chef: Perry's Pastures",
+          "title_string_id": 104142,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 2: Highroad Junction (Auguste Frydaze), row H4; name \"Chef: Perry's Pastures\"; title id cell ucdt 3343686488 / ugdt 1841482134"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 2: Highroad Junction (Auguste Frydaze), row H4; name \"Chef: Perry's Pastures\"; title id cell ucdt 3343686488 / ugdt 1841482134"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3050013 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row H3; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3050012
+        3050012,
+        3050013
       ],
       "quests_given_text": [
         "Chef: Fireworks Frenzy! (video giver Ricardo; five \"Collect the ... of Fireworks\" goals); target of Chef: Ranger Requisition (\"Ingredients for Auguste?\" 3360869312). He then points the player at Perry (\"Ranger Ricardo has pointed you at Perry, who runs Perry's Pastures, north of Highroad Junction\" 2373419185)."

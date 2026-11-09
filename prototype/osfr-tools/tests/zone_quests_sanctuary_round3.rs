@@ -455,13 +455,12 @@ use Blocker::{Giver, NoJobGate, NoProfile, Prerequisite};
 /// Become a Postman (3130001). L1022's card games lifted 3040004 and 3040009, whose only blocker
 /// was their minigame, so the list is eleven now; the Chapter 1 wiring lifted 3000039 (Vittorio
 /// drawn, its prerequisite live), so ten; job 120's starter outfit lifted 3040003 and 3040011 (the
-/// Card Duelist line, 2026-11-08), so eight; the test name keeps the T723 count for the protected
+/// Card Duelist line, 2026-11-08), so eight; Gavin's branch of Queensfields went live, so seven; the test name keeps the T723 count for the protected
 /// test list.
 #[test]
 fn the_other_fifteen_still_have_a_blocker() {
-    const OFF: [(u32, &[Blocker]); 8] = [
+    const OFF: [(u32, &[Blocker]); 7] = [
         (3_020_031, &[Giver, Prerequisite]),
-        (3_050_018, &[Prerequisite]),
         (3_070_026, &[Giver]),
         (3_120_010, &[NoJobGate(121), NoProfile(121)]),
         (3_150_014, &[Prerequisite]),

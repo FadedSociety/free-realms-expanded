@@ -8170,50 +8170,6 @@
           ]
         },
         {
-          "quest_id": 3050032,
-          "title": null,
-          "title_string_id": 73272,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 4: level 15 to 20 (Glerga, then Bordon Cloo), row M14; name \"Chef: Cloo's Cooking Academy\"; title id cell ucdt 4050986377 / ugdt 788125205"
-            },
-            {
-              "kind": "wiki",
-              "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 4: level 15 to 20 (Glerga, then Bordon Cloo), row M14; name \"Chef: Cloo's Cooking Academy\"; title id cell ucdt 4050986377 / ugdt 788125205"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3050032 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) source explicitly says after row M13; mapped that page label to the preceding batch content key"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 4050986377 to Global.Text id 73272 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
           "quest_id": 3050033,
           "title": "Chef: Cooking with Cloo",
           "title_string_id": 73251,
@@ -8261,7 +8217,6 @@
       "quest_ids_given": [
         3050020,
         3050021,
-        3050032,
         3050033
       ],
       "quests_given_text": [
@@ -32382,11 +32337,18 @@
             "kind": "legacy-data",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3437 (spawnNpcWithGuid(33146, 100000033146, -1503.994, -34.46316, 377.915, -0.560599925)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33146 (NameId=7666, ModelId=377, ModelFileName=fairy_farmer_f.adr), row added in e3deee7."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.560599925,
       "model_id": 377,
-      "model_file_name": "fairy_farmer_f.adr"
+      "model_file_name": "fairy_farmer_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000496,

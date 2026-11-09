@@ -33435,10 +33435,23 @@
               "evidence": "Late Library Books (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_late_library_books_b1c7da)."
             }
           ]
+        },
+        {
+          "quest_id": 3955502,
+          "title": "Skipping Class",
+          "title_string_id": 91575,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Skipping Class (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_skipping_class_cc6677)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3950687
+        3950687,
+        3955502
       ],
       "quests_given_text": [
         "Truant Druids (a minigame: \"Tilda needs help rounding up some truant students. Interact with the attendance sheet next to her to begin.\" 3972585747; \"Send the truant druids back to class.\" 423915354; \"Thank you for finding the truant students. I think today's lesson will be to write on the blackboard, 'I will not skip class' at least 300 times.\" 784081024); Overdue books (\"Tilda has asked you to do a bit of traveling and get some of her overdue books back from Rourke Ironfist in Lakeshore, Murphy in Snowhill, and Anura in Sanctuary.\" 1613887895; \"Return the overdue books to Tilda Timidleaf at the Druid Academy in Shrouded Glade.\" 2539558607); the \"How to Clean\" book for the Royal Palace maids (264599173, 4071971276; row F3 of Adventurer); receives Milla's excuse in Excuses, Excuses! (below)."

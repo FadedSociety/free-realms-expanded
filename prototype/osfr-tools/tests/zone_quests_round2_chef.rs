@@ -269,7 +269,7 @@ fn the_other_round_two_rows_stay_off_with_a_blocker() {
     // Stubs with no goal: a mechanic (artifact clicks, bixie and hooligan kills, a basket and
     // five pickups, a prank and balls to nab) or a fact (no source gives the goal) is missing.
     for id in [
-        3_000_012, 3_010_010, 3_050_006, 3_050_017, 3_070_002, 3_140_013,
+        3_000_012, 3_010_010, 3_050_006, 3_070_002, 3_140_013,
     ] {
         assert!(
             off(id).objectives.is_empty(),

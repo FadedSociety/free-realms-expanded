@@ -478,7 +478,57 @@
       "prerequisite_quest_ids": [
         3050007
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 100538,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on Jonelle's Mailbag (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_package_recovery_bf0fa0)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: world spawn(s) in data/content/npc_spawns_extra.json: 'Jonelle's Mailbag' spawn_guid 100000004095 model 80 bw_sack_02.adr, 1 m from the quest's giver; ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2761; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: tied blue cloth sack with a patch (sheets/a_world_click1.png r3c0, tile of bw_sack_02.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_chef_package_recovery_bf0fa0)."
+            }
+          ],
+          "npc_id": 9500004075
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 100540,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat the Package Recovery! minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_package_recovery_bf0fa0)."
+            }
+          ],
+          "minigame_id": 538,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 139895,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Jonelle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_package_recovery_bf0fa0)."
+            }
+          ],
+          "npc_id": 9000000120
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -530,12 +580,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 94300,
       "intro_text_string_id": 94298,
       "end_text_string_id": 94301,
-      "enabled": false
+      "enabled": true,
+      "job": 45
     },
     {
       "id": 3050009,
@@ -544,7 +599,20 @@
       "prerequisite_quest_ids": [
         3050008
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 100550,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find a pixie named Honey (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_queensfields_b91ebc)."
+            }
+          ],
+          "npc_id": 9000000107
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -596,12 +664,20 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 100544,
       "intro_text_string_id": 100542,
       "end_text_string_id": 100545,
-      "enabled": false
+      "enabled": true,
+      "job": 45,
+      "excludes_quest_ids": [
+        3050018
+      ]
     },
     {
       "id": 3050010,
@@ -765,7 +841,57 @@
       "prerequisite_quest_ids": [
         3050011
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 115583,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on the Crate of Fireworks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_fireworks_frenzy_2146d1)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: world spawn(s) in data/content/npc_spawns_extra.json: 'Crate of Fireworks' spawn_guid 100000002941 model 847 sg_fireworks_01.adr, 2 m from the quest's giver; ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1684; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.jso"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: wooden crate full of fireworks rockets (sheets/a_world_click1.png r3c1, tile of sg_fireworks_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_chef_fireworks_frenzy_2146d1)."
+            }
+          ],
+          "npc_id": 9500004006
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 115589,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat the Fireworks Frenzy! minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_fireworks_frenzy_2146d1)."
+            }
+          ],
+          "minigame_id": 539,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 140022,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Ranger Ricardo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_fireworks_frenzy_2146d1)."
+            }
+          ],
+          "npc_id": 9000000178
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -821,21 +947,39 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 104139,
       "intro_text_string_id": 104137,
       "end_text_string_id": 104140,
-      "enabled": false
+      "enabled": true,
+      "job": 45
     },
     {
       "id": 3050013,
       "title_string_id": 104142,
-      "giver_npc_id": 9000000019,
+      "giver_npc_id": 9000000178,
       "prerequisite_quest_ids": [
         3050012
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 7493,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Perry (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_perry_s_pastures_a93928)."
+            }
+          ],
+          "npc_id": 9000000422
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -887,21 +1031,110 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 104143,
       "intro_text_string_id": 104141,
       "end_text_string_id": 104144,
-      "enabled": false
+      "enabled": true,
+      "job": 45
     },
     {
       "id": 3050014,
       "title_string_id": 139211,
-      "giver_npc_id": 9000000526,
+      "giver_npc_id": 9000000422,
       "prerequisite_quest_ids": [
         3050013
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 139230,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on the Harvesting Tools (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_snowy_treats_201713)."
+            }
+          ],
+          "node_type": "quest-tool-1",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 139232,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Gather some Snowberry - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_snowy_treats_201713)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: world spawn(s) in data/content/npc_spawns_extra.json: 'Snowberry Plant' spawn_guid 100000033868 model 3652 overworld_bush_snowberry_harvestable_01.adr, 11 m from the quest's giver; Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4027 spawnNpcWithGuid(33868); src/Resources/N"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "this spawn has no quest_wire npc id yet (a crowd name or a name already taken by a row)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: harvest plant: blue-green cone with white trim (sheets/h_harvest.png r1c2, tile of overworld_bush_snowberry_harvestable_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_chef_snowy_treats_201713)."
+            }
+          ],
+          "node_type": "quest-snowberry-2",
+          "quantity": 3
+        },
+        {
+          "kind": "collect_node",
+          "id": 3,
+          "text_string_id": 384728,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Gather some Starnut - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_snowy_treats_201713)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: world spawn(s) in data/content/npc_spawns_extra.json: 'Starnut Plant' spawn_guid 100000033892 model 3654 overworld_tree_starnut_harvestable_01.adr, 19 m from the quest's giver; Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4051 spawnNpcWithGuid(33892); src/Resources/Npcs."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "this spawn has no quest_wire npc id yet (a crowd name or a name already taken by a row)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: harvest plant: green cone with a small tree on top (sheets/h_harvest.png r1c3, tile of overworld_tree_starnut_harvestable_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_chef_snowy_treats_201713)."
+            }
+          ],
+          "node_type": "quest-starnut-3",
+          "quantity": 3
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 39772,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Perry (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_snowy_treats_201713)."
+            }
+          ],
+          "npc_id": 9000000422
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -957,12 +1190,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 139212,
       "intro_text_string_id": 139210,
       "end_text_string_id": 139213,
-      "enabled": false
+      "enabled": true,
+      "job": 45
     },
     {
       "id": 3050015,
@@ -1116,7 +1354,66 @@
       "prerequisite_quest_ids": [
         3050016
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 116947,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on the Basket of Ingredients (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_harvest_hiccup_56014a)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: wicker basket full of colourful food (sheets/e_items.png r3c1, tile of sg_eggbasket_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_chef_harvest_hiccup_56014a)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wicker basket of food, stand-in"
+            }
+          ],
+          "node_type": "quest-ingredient",
+          "quantity": 1
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 116949,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat the Harvest Hiccup! minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_harvest_hiccup_56014a)."
+            }
+          ],
+          "minigame_id": 540,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 139403,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Gavin Greenpetal (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_harvest_hiccup_56014a)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki target and quest giver is Gavin Greenpetal"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no 'return to' line exists for him; 139403 (take the ingredients back to Gavin) is the nearest client line and reads slightly differently"
+            }
+          ],
+          "npc_id": 9000000096
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1168,12 +1465,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 116498,
       "intro_text_string_id": 116496,
       "end_text_string_id": 116499,
-      "enabled": false
+      "enabled": true,
+      "job": 45
     },
     {
       "id": 3050018,
@@ -1182,7 +1484,20 @@
       "prerequisite_quest_ids": [
         3050017
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 100550,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find a pixie named Honey (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_queensfields_b91ebc)."
+            }
+          ],
+          "npc_id": 9000000107
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1234,12 +1549,20 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 100544,
       "intro_text_string_id": 100542,
       "end_text_string_id": 100545,
-      "enabled": false
+      "enabled": true,
+      "excludes_quest_ids": [
+        3050009
+      ],
+      "job": 45
     },
     {
       "id": 3050019,
@@ -1874,7 +2197,51 @@
       "prerequisite_quest_ids": [
         3050026
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 72563,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Perfectly smash fruits for Fried Starnut Stick (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_double_dog_dare_74bb63)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Any finish of this game counts: the goal's 'perfectly' is not modelled."
+            }
+          ],
+          "minigame_id": 185,
+          "count": 1
+        },
+        {
+          "kind": "craft_recipe",
+          "id": 2,
+          "text_string_id": 78168,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cook Fried Starnut Stick - (0/3) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_double_dog_dare_74bb63)."
+            }
+          ],
+          "recipe_id": 45,
+          "quantity": 3
+        },
+        {
+          "kind": "craft_recipe",
+          "id": 3,
+          "text_string_id": 78170,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cook Spicy Vegetable Stirfry - (0/3) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_double_dog_dare_74bb63)."
+            }
+          ],
+          "recipe_id": 52,
+          "quantity": 3
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1926,19 +2293,72 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 24314,
-      "end_text_string_id": 24315,
-      "enabled": false
+      "enabled": true,
+      "job": 45,
+      "intro_text_string_id": 25003
     },
     {
       "id": 3050028,
       "title_string_id": 387259,
       "giver_npc_id": 9000000133,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3050027
+      ],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "text_string_id": 387280,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Chef: Level 15 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_achieve_level_15_139c66)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 387280 is this step; profile 45 from live records 3050020/3050023/3050031"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the table holds two rows for this quest; this is the one with a client id"
+            }
+          ],
+          "profile_id": 45,
+          "level": 15
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 387282,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Lucca (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_achieve_level_15_139c66)."
+            }
+          ],
+          "npc_id": 9000000133
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 6,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Chef: Achieve Level 15 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_achieve_level_15_139c66)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1975,12 +2395,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 387260,
       "intro_text_string_id": 387258,
       "end_text_string_id": 387261,
-      "enabled": false
+      "enabled": true,
+      "job": 45
     },
     {
       "id": 3050029,
@@ -1989,7 +2414,20 @@
       "prerequisite_quest_ids": [
         3050028
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 72705,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Visit Glerga at the Robgoblin Camp (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_glerga_d5dab4)."
+            }
+          ],
+          "npc_id": 9000000332
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -2041,11 +2479,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 72676,
       "end_text_string_id": 72677,
-      "enabled": false
+      "enabled": true,
+      "job": 45,
+      "intro_text_string_id": 72614
     },
     {
       "id": 3050030,
@@ -2223,12 +2667,50 @@
     {
       "id": 3050032,
       "title_string_id": 73272,
-      "giver_npc_id": 9000000028,
+      "giver_npc_id": 9000000332,
       "prerequisite_quest_ids": [
         3050031
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 140343,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cook Briarmelon Surprise (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_cloo_s_cooking_academy_27ca42)."
+            }
+          ],
+          "minigame_id": 198,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 140346,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Bordon Cloo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_cloo_s_cooking_academy_27ca42)."
+            }
+          ],
+          "npc_id": 9000000028
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Chef: Cloo's Cooking Academy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_cloo_s_cooking_academy_27ca42)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2265,11 +2747,21 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "quests.merged.json client_ids for this quest, read against the client's line (the block around the title held another quest's text)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "description_string_id": 73273,
-      "intro_text_string_id": 73271,
-      "enabled": false
+      "description_string_id": 140371,
+      "intro_text_string_id": 73281,
+      "enabled": true,
+      "job": 45,
+      "end_text_string_id": 140338
     },
     {
       "id": 3050033,
@@ -2278,8 +2770,119 @@
       "prerequisite_quest_ids": [
         3050032
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "text_string_id": 140399,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cook Gummyfruit Topped Sundae (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_cooking_with_cloo_67faa0)."
+            }
+          ],
+          "recipe_id": 43,
+          "quantity": 1
+        },
+        {
+          "kind": "craft_recipe",
+          "id": 2,
+          "text_string_id": 140401,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cook Starnut Sundae (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_cooking_with_cloo_67faa0)."
+            }
+          ],
+          "recipe_id": 46,
+          "quantity": 1
+        },
+        {
+          "kind": "craft_recipe",
+          "id": 3,
+          "text_string_id": 140405,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cook Royal Stew Du Jour (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_cooking_with_cloo_67faa0)."
+            }
+          ],
+          "recipe_id": 50,
+          "quantity": 1
+        },
+        {
+          "kind": "craft_recipe",
+          "id": 4,
+          "text_string_id": 140407,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cook Seared Stainberry (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_cooking_with_cloo_67faa0)."
+            }
+          ],
+          "recipe_id": 51,
+          "quantity": 1
+        },
+        {
+          "kind": "craft_recipe",
+          "id": 5,
+          "text_string_id": 140409,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cook Moonbean Sundae Sweettreat (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_cooking_with_cloo_67faa0)."
+            }
+          ],
+          "recipe_id": 56,
+          "quantity": 1
+        },
+        {
+          "kind": "craft_recipe",
+          "id": 6,
+          "text_string_id": 140411,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cook Moonbean Mousse (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_cooking_with_cloo_67faa0)."
+            }
+          ],
+          "recipe_id": 59,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 7,
+          "text_string_id": 140117,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Bordon Cloo in Snowhill (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_cooking_with_cloo_67faa0)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki target and quest giver is Bordon Cloo"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 140117 'return to bordon cloo' is a reused client line; the wiki says Snowhill but his row and the quest's location say Sanctuary, so the text omits the place"
+            }
+          ],
+          "npc_id": 9000000028
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Chef: Cooking with Cloo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_cooking_with_cloo_67faa0)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2316,11 +2919,21 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "quests.merged.json client_ids for this quest, read against the client's line (the block around the title held another quest's text)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 73252,
-      "intro_text_string_id": 73250,
-      "enabled": false
+      "intro_text_string_id": 140415,
+      "enabled": true,
+      "job": 45,
+      "end_text_string_id": 140416
     },
     {
       "id": 3050034,

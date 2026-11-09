@@ -16987,102 +16987,6 @@
           ]
         },
         {
-          "quest_id": 3130018,
-          "title": "Postman: Invitation Only",
-          "title_string_id": 130182,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 15; name 'Postman: Invitation Only'; title id cell 2484879015 ucdt; 3429675711 ugdt"
-            },
-            {
-              "kind": "wiki",
-              "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 15; name 'Postman: Invitation Only'; title id cell 2484879015 ucdt; 3429675711 ugdt"
-            },
-            {
-              "kind": "video",
-              "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 15; name 'Postman: Invitation Only'; title id cell 2484879015 ucdt; 3429675711 ugdt"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3130018 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 2484879015 to Global.Text id 130182 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
-          "quest_id": 3130019,
-          "title": null,
-          "title_string_id": 130193,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 16; name \"Postman: Where's the Sasparilla?\"; title id cell 1960073937 ucdt; 2073355985 ugdt"
-            },
-            {
-              "kind": "wiki",
-              "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 16; name \"Postman: Where's the Sasparilla?\"; title id cell 1960073937 ucdt; 2073355985 ugdt"
-            },
-            {
-              "kind": "video",
-              "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 16; name \"Postman: Where's the Sasparilla?\"; title id cell 1960073937 ucdt; 2073355985 ugdt"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3130019 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 1960073937 to Global.Text id 130193 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
           "quest_id": 3952371,
           "title": "Seaside Treasure Hunting",
           "title_string_id": 100217,
@@ -17097,8 +17001,6 @@
       ],
       "quest_ids_given": [
         3130016,
-        3130018,
-        3130019,
         3952371
       ],
       "quests_given_text": [
@@ -18309,10 +18211,108 @@
               "evidence": "title_string_id corrected from raw locale hash 3313962189 to Global.Text id 387935 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3130018,
+          "title": "Postman: Invitation Only",
+          "title_string_id": 130182,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 15; name 'Postman: Invitation Only'; title id cell 2484879015 ucdt; 3429675711 ugdt"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 15; name 'Postman: Invitation Only'; title id cell 2484879015 ucdt; 3429675711 ugdt"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 15; name 'Postman: Invitation Only'; title id cell 2484879015 ucdt; 3429675711 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3130018 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
+        },
+        {
+          "quest_id": 3130019,
+          "title": "Postman: Where's the Sasparilla",
+          "title_string_id": 130193,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 16; name \"Postman: Where's the Sasparilla?\"; title id cell 1960073937 ucdt; 2073355985 ugdt"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 16; name \"Postman: Where's the Sasparilla?\"; title id cell 1960073937 ucdt; 2073355985 ugdt"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 16; name \"Postman: Where's the Sasparilla?\"; title id cell 1960073937 ucdt; 2073355985 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3130019 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3130017
+        3130017,
+        3130018,
+        3130019
       ],
       "quests_given_text": [
         "Half a Dozen (wiki Quest page, 15 coins; title 592038755; Tozer gives it, Enve receives); Postman: Invitation Only (title 2484879015, \"Deliver the party invitations for Enve LeStamp\", 631359764; Seaside Mail Delivery minigame, video vcRIx8EficY/00000); complaints desk for lost parcels (3470990346); \"Your training will continue once you have reached level 10 as a postman\" (2557899825)"
@@ -43611,8 +43611,23 @@
       "location_evidence": [
         "Her cook-off table, \"lugged all the way to Seaside\" (757623943), \"a long way from home\" (2382249389)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3955364,
+          "title": "Cook-off Contest",
+          "title_string_id": 400114,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cook-off Contest (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cook_off_contest_b40269)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3955364
+      ],
       "quests_given_text": [
         "Cook-off Contest (title 1708640854, mystery pot roast, 467466749); Cook-off Catastrophe (title 2620912414, \"knock out some Cray Royal Servants\", then the Prince of Low Tide, 1851684279). See Chef and Prince of Low Tide"
       ],
@@ -44004,10 +44019,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ATeaspoon_Tarisa"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 456,
-      "model_file_name": "fairy_druid_f.adr"
+      "model_file_name": "fairy_druid_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000634,

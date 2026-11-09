@@ -1416,9 +1416,37 @@
     {
       "id": 3130018,
       "title_string_id": 130182,
-      "giver_npc_id": 9000000079,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9000000080,
+      "prerequisite_quest_ids": [
+        3130017
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 130188,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Seaside Mail Delivery minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_invitation_only_8bc4f7)."
+            }
+          ],
+          "minigame_id": 263,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 130190,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Enve LeStamp in Seaside (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_invitation_only_8bc4f7)."
+            }
+          ],
+          "npc_id": 9000000080
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1474,19 +1502,39 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 130183,
       "intro_text_string_id": 130181,
       "end_text_string_id": 130184,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130019,
       "title_string_id": 130193,
-      "giver_npc_id": 9000000079,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9000000080,
+      "prerequisite_quest_ids": [
+        3130018
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 130199,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Postchug Runalug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_where_s_the_sasparilla_0ac3cb)."
+            }
+          ],
+          "npc_id": 9000000172
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1542,19 +1590,52 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 130194,
       "intro_text_string_id": 130192,
       "end_text_string_id": 130195,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130020,
       "title_string_id": 130203,
       "giver_npc_id": 9000000172,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3130019
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 130213,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Sasparilla Sprint minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_jug_clean_up_61f50a)."
+            }
+          ],
+          "minigame_id": 264,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 130217,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Postchug Runalug in Wugachug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_jug_clean_up_61f50a)."
+            }
+          ],
+          "npc_id": 9000000172
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1606,19 +1687,52 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 130204,
       "intro_text_string_id": 130202,
       "end_text_string_id": 130205,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130021,
       "title_string_id": 130220,
       "giver_npc_id": 9000000172,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3130020
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 130227,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Wugachug Mail Sorting minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_sorting_it_out_484532)."
+            }
+          ],
+          "minigame_id": 378,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 130229,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Postchug Runalug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_sorting_it_out_484532)."
+            }
+          ],
+          "npc_id": 9000000172
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1670,20 +1784,69 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 130221,
       "intro_text_string_id": 130219,
       "end_text_string_id": 130222,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130022,
       "title_string_id": 387939,
       "giver_npc_id": 9000000172,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3130021
+      ],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "text_string_id": 387962,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Postman: Achieve Level 15 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_achieve_level_15_0e53e4)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the table's client id 387939 is the quest title; 387962 'reach level 15 as a postman' is the step line; profile 4 from live records 3130017/3130031"
+            }
+          ],
+          "profile_id": 4,
+          "level": 15
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 46562,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Postchug Runalug in Wugachug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_achieve_level_15_0e53e4)."
+            }
+          ],
+          "npc_id": 9000000172
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Postman: Achieve Level 15 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_achieve_level_15_0e53e4)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1720,19 +1883,39 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 387940,
       "intro_text_string_id": 387938,
       "end_text_string_id": 387941,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130023,
       "title_string_id": 130232,
       "giver_npc_id": 9000000172,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3130022
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 130240,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Loryn (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_fair_warning_c41bc0)."
+            }
+          ],
+          "npc_id": 9000000132
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1784,19 +1967,52 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 130233,
       "intro_text_string_id": 130231,
       "end_text_string_id": 130234,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130024,
       "title_string_id": 130264,
       "giver_npc_id": 9000000132,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3130023
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 130270,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the What A Mess! minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_what_a_mess_45a700)."
+            }
+          ],
+          "minigame_id": 14,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 3463,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Loryn (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_what_a_mess_45a700)."
+            }
+          ],
+          "npc_id": 9000000132
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1848,19 +2064,52 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 130265,
       "intro_text_string_id": 130263,
       "end_text_string_id": 130266,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130025,
       "title_string_id": 130282,
       "giver_npc_id": 9000000132,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3130024
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 130290,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Snowhill Mail Sorting minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_a_plea_for_help_e6cdc8)."
+            }
+          ],
+          "minigame_id": 379,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 130292,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Loryn (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_a_plea_for_help_e6cdc8)."
+            }
+          ],
+          "npc_id": 9000000132
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1912,12 +2161,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 130283,
       "intro_text_string_id": 130281,
       "end_text_string_id": 130284,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130026,

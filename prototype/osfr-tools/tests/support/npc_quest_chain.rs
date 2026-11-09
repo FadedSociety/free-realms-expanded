@@ -251,12 +251,15 @@ impl Fixture {
             let path = entry.unwrap().path();
             if path.extension().is_some_and(|ext| ext == "json") {
                 let target = catalogue.join("quests").join(path.file_name().unwrap());
-                if !self.bulk_quests && path.file_name().is_some_and(|name| name == "wiki_quests.json") {
+                if !self.bulk_quests {
                     // Quests wired in bulk are no chain's business here, and each batch puts new
                     // offers on NPCs these suites expect to stay quiet.
+                    let whole_file = path.file_name().is_some_and(|name| name == "wiki_quests.json");
                     let mut document: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
                     for record in document["records"].as_array_mut().unwrap() {
-                        record["enabled"] = Value::Bool(false);
+                        if whole_file || wired_from_the_tables(record) {
+                            record["enabled"] = Value::Bool(false);
+                        }
                     }
                     fs::write(&target, serde_json::to_vec(&document).unwrap()).unwrap();
                 } else {
@@ -1580,4 +1583,11 @@ pub fn collect(
             );
         }
     }
+}
+
+/// A quest `lab/tools/quest_wire.py` switched on: it says so in its sources.
+fn wired_from_the_tables(record: &Value) -> bool {
+    record["source"].as_array().into_iter().flatten().any(|tag| {
+        tag["evidence"].as_str().is_some_and(|text| text.contains("bulk-wired by"))
+    })
 }

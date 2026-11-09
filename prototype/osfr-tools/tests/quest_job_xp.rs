@@ -1537,8 +1537,13 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
                     "{file}: quest {id} gained unexpected job XP"
                 );
             }
+            // A job line switched on by quest_wire carries its job and says so in its sources;
+            // enabled_quest_reachability covers those.
+            let wired = record["source"].as_array().into_iter().flatten().any(|tag| {
+                tag["evidence"].as_str().is_some_and(|text| text.contains("bulk-wired by"))
+            });
             assert!(
-                record.get("job").is_none(),
+                wired || record.get("job").is_none(),
                 "{file}: quest {id} gained an unexpected job gate"
             );
         }

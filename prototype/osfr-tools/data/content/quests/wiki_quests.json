@@ -17051,6 +17051,266 @@
       "description_string_id": 70833,
       "intro_text_string_id": 70831,
       "enabled": true
+    },
+    {
+      "id": 3955364,
+      "title_string_id": 400114,
+      "giver_npc_id": 9000000213,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 400441,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on the cooking table (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cook_off_contest_b40269)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: model sg_cooking_table_nodes_01.adr is what the world draws for this kind of thing; the nearest placed one is 634 m from the quest's giver, so the quest's own instance needs placing"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: wooden worktable covered in pots, pans and cooking clutter (sheets/a_world_click1.png r0c1, tile of sg_cooking_table_nodes_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_cook_off_contest_b40269)."
+            }
+          ],
+          "node_type": "quest-table-2",
+          "quantity": 1
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 400449,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Score at least 18,000 points on the Mystery Pot Roast minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cook_off_contest_b40269)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Any finish of this game counts: the goal's 18,000 points are not modelled."
+            }
+          ],
+          "minigame_id": 180,
+          "count": 1
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 3,
+          "text_string_id": 400451,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cook some Mystery Pot Roast (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cook_off_contest_b40269)."
+            }
+          ],
+          "minigame_id": 180,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 400735,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Tarisa (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cook_off_contest_b40269)."
+            }
+          ],
+          "npc_id": 9000000213
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cook-off Contest (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cook_off_contest_b40269)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Cook-off Contest (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cook_off_contest_b40269)."
+        },
+        {
+          "kind": "client",
+          "evidence": "quests.merged.json client_ids for this quest, read against the client's line (the block around the title held another quest's text)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "job": 45,
+      "enabled": true,
+      "intro_text_string_id": 400113,
+      "description_string_id": 400115,
+      "end_text_string_id": 400116,
+      "min_level": 8
+    },
+    {
+      "id": 3955403,
+      "title_string_id": 46085,
+      "giver_npc_id": 9500000879,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 139485,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on the tools (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_find_the_handy_boys_41f482)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: red wooden tool chest with handles and latches (sheets/b_world_click2.png r0c3, tile of sg_garage_toolbox_02.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_find_the_handy_boys_41f482)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "card: 'Take these work tools to them'; the tool chest stands in for the bundle of tools"
+            }
+          ],
+          "node_type": "quest-tool",
+          "quantity": 1
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 47860,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete \"The Handy Boys\" minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_find_the_handy_boys_41f482)."
+            }
+          ],
+          "minigame_id": 215,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 22275,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Boss Biggins (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_find_the_handy_boys_41f482)."
+            }
+          ],
+          "npc_id": 9500000879
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find \"The Handy Boys\" (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_find_the_handy_boys_41f482)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Find \"The Handy Boys\" (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_find_the_handy_boys_41f482)."
+        },
+        {
+          "kind": "client",
+          "evidence": "quests.merged.json client_ids for this quest, read against the client's line (the block around the title held another quest's text)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 47885,
+      "intro_text_string_id": 47886,
+      "enabled": true
+    },
+    {
+      "id": 3955502,
+      "title_string_id": 91575,
+      "giver_npc_id": 9500000718,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 116536,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the truant students (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_skipping_class_cc6677)."
+            }
+          ],
+          "minigame_id": 232,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 77690,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Tilda (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_skipping_class_cc6677)."
+            }
+          ],
+          "npc_id": 9500000718
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Skipping Class (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_skipping_class_cc6677)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Skipping Class (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_skipping_class_cc6677)."
+        },
+        {
+          "kind": "client",
+          "evidence": "quests.merged.json client_ids for this quest, read against the client's line (the block around the title held another quest's text)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 91576,
+      "intro_text_string_id": 91574,
+      "enabled": true,
+      "end_text_string_id": 91577
     }
   ]
 }

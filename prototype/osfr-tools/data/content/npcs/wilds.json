@@ -5339,8 +5339,23 @@
       "location_evidence": [
         "Robgoblin Camp (68299626); \"the nearby Robgoblin camp across the river\" from the trolls (3428577762)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3955403,
+          "title": "Find \"The Handy Boys\"",
+          "title_string_id": 46085,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find \"The Handy Boys\" (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_find_the_handy_boys_41f482)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3955403
+      ],
       "quests_given_text": [
         "\"Boss Biggins has asked you to find the stagehands, 'The Handy Boys'. Tell them to stop slackin'\" (2881314966); receives Grosh's sunflowers (1524624793); the Trove text \"Knock out 5 Robgoblin Bruisers in the Robgoblin Trove\" for him (1310294086, 924349008, 679511723). Titles not found."
       ],
@@ -5646,11 +5661,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2716; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4050 (ModelId=189, ModelFileName=robgoblin_m_bruiser.adr, NameId=20515)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.513859,
       "model_id": 189,
-      "model_file_name": "robgoblin_m_bruiser.adr"
+      "model_file_name": "robgoblin_m_bruiser.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000880,
@@ -18914,11 +18936,56 @@
               "evidence": "Bigger Fish to Fry (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bigger_fish_to_fry_555c83)."
             }
           ]
+        },
+        {
+          "quest_id": 3050032,
+          "title": "Chef: Cloo's Cooking Academy",
+          "title_string_id": 73272,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 4: level 15 to 20 (Glerga, then Bordon Cloo), row M14; name \"Chef: Cloo's Cooking Academy\"; title id cell ucdt 4050986377 / ugdt 788125205"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 4: level 15 to 20 (Glerga, then Bordon Cloo), row M14; name \"Chef: Cloo's Cooking Academy\"; title id cell ucdt 4050986377 / ugdt 788125205"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3050032 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row M13; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3050031,
-        3954498
+        3954498,
+        3050032
       ],
       "quests_given_text": [
         "Chef: Glerga (Lucca sends the player), Chef: Family Style!, Chef: Reach Level 20; Burnetta's leftover-meal errand (1376567889, 113617067); worm-soup and stirfry orders (1337449147, 1444357337); Slugmud Surprise (1744403283); also appears in the Birthday Bash event (Chef)."

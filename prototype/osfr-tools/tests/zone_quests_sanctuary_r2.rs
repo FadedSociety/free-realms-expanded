@@ -162,7 +162,7 @@ fn the_pattern_scan_sees_every_item_shape() {
 #[test]
 fn the_other_rows_stay_off_behind_their_blocker() {
     // (quest, prerequisite that is itself disabled, why the row is not wired)
-    let gated: [(u32, u32, &str); 5] = [
+    let gated: [(u32, u32, &str); 4] = [
         (
             3_000_031,
             3_000_030,
@@ -172,11 +172,6 @@ fn the_other_rows_stay_off_behind_their_blocker() {
             3_000_046,
             3_000_045,
             "the box recovery has no mechanic and Darkthorne is an unplaced anchor",
-        ),
-        (
-            3_050_033,
-            3_050_032,
-            "a text-only objective with no dish list: nothing to complete",
         ),
         (
             3_090_025,

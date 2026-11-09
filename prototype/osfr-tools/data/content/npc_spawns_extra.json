@@ -25819,7 +25819,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1684; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2941 (ModelId=847, ModelFileName=sg_fireworks_01.adr, NameId=115748)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500004006
     },
     {
       "spawn_guid": 100000002945,
@@ -44474,7 +44475,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2761; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4095 (ModelId=80, ModelFileName=bw_sack_02.adr, NameId=100552)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500004075
     },
     {
       "spawn_guid": 100000004097,
