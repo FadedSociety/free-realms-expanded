@@ -1174,10 +1174,11 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
     // items T638 moved from their Legacy coin price, plus the 4 boomboxes T495 priced, plus the
     // Training Saddle of Gliding T528 lists, plus the 1,115 housing fixtures T871 moved from
     // their Legacy coin price (the 16 wiki-priced fixtures are already in the 55), plus the Mystery
-    // Key L094 lists at the wiki's 180 SC.
+    // Key L094 lists at the wiki's 180 SC, minus the 7 Balloon Animal pet rows P-shops-marketplace
+    // made earn-only (an event reward, ROADMAP item 10).
     assert_eq!(
         decoded.len(),
-        1_929,
+        1_922,
         "the shipped ride, deed, wiki item, boombox, saddle and housing fixture count"
     );
     assert!(
@@ -1646,8 +1647,15 @@ fn store_packet_matches_the_client_reader_field_for_field() {
             reader.u32();
         }
         reader.u8();
-        reader.u8();
-        reader.u8();
+        // P-shops-marketplace: +241 IsNewItem (`009a56d0` case 26) marks the data's new rows and
+        // nothing else; the client's Hot New Items! category is this flag.
+        assert_eq!(
+            reader.u8(),
+            u8::from(config.new_item_ids.contains(&listing.item_id)),
+            "IsNewItem (item {})",
+            listing.item_id
+        );
+        assert_eq!(reader.u8(), 0, "IsViewOnly is 66/39's");
         // `00b41860` continuation: u32, u32, u8, u32, u32, u32, u8, u8, u32, u32 (31 bytes).
         assert_eq!(reader.u32(), 0, "00b41860 field 1");
         assert_eq!(reader.u32(), 0, "00b41860 field 2");
@@ -1951,8 +1959,10 @@ fn catalogue_navigation_packets_match_the_client_readers() {
     }
     assert_eq!(reader.at, groups.len(), "66/6 trailing bytes");
 
-    // 66/9: one counted bundle group; each entry is the map key, the entry's own bundle id and
-    // its display order.
+    // 66/9: the data's bundle groups (P-shops-marketplace: group 6 is the welcome splash's
+    // Popular Items, `WelcomeHandler:Show` -> `SelectStoreBundleGroup(6)`); each entry is the map
+    // key, the entry's own bundle id and its display order. No group may use the client's
+    // affiliate ids 1-3 (`MarketplaceGroups` in ScriptsBase.lua).
     let bundle_groups = packets
         .iter()
         .find(|packet| packet.starts_with(&[66, 0, 9, 0]))
@@ -1963,20 +1973,32 @@ fn catalogue_navigation_packets_match_the_client_readers() {
     };
     assert_eq!(reader.u16(), 66);
     assert_eq!(reader.u16(), 9);
-    assert_eq!(reader.u32(), 1, "one bundle group");
-    assert_eq!(reader.u32(), config.category_group_id, "group map key");
-    assert_eq!(reader.u32(), config.category_group_id, "group id");
-    assert_eq!(reader.u32(), config.category_name_id, "group name id");
-    assert_eq!(reader.u32(), 0, "group description id");
-    reader.string();
-    reader.string();
-    assert_eq!(reader.u8(), 0, "exclusive");
-    assert_eq!(reader.u32(), 1, "status");
-    assert_eq!(reader.u32() as usize, listings.len(), "entry count");
-    for (index, listing) in listings.iter().enumerate() {
-        assert_eq!(reader.u32(), listing.bundle_id, "entry map key");
-        assert_eq!(reader.u32(), listing.bundle_id, "entry bundle id");
-        assert_eq!(reader.u32(), index as u32 + 1, "entry display order");
+    assert!(!config.bundle_groups.is_empty(), "shipped data configures bundle groups");
+    assert_eq!(reader.u32() as usize, config.bundle_groups.len(), "bundle group count");
+    assert!(config.bundle_groups.iter().any(|group| group.id == 6), "welcome group 6");
+    for group in &config.bundle_groups {
+        assert!(!(1..=3).contains(&group.id), "group {} is a client affiliate id", group.id);
+        assert_eq!(reader.u32(), group.id, "group map key");
+        assert_eq!(reader.u32(), group.id, "group id");
+        assert_eq!(reader.u32(), group.name_id, "group name id");
+        assert_eq!(reader.u32(), group.description_id, "group description id");
+        reader.string();
+        reader.string();
+        assert_eq!(reader.u8(), 0, "exclusive");
+        assert_eq!(reader.u32(), 1, "status");
+        let members: Vec<u32> = group
+            .item_ids
+            .iter()
+            .filter_map(|item| listings.iter().find(|l| l.item_id == *item))
+            .map(|listing| listing.bundle_id)
+            .collect();
+        assert_eq!(members.len(), group.item_ids.len(), "every group row is listed");
+        assert_eq!(reader.u32() as usize, members.len(), "entry count");
+        for (index, bundle_id) in members.iter().enumerate() {
+            assert_eq!(reader.u32(), *bundle_id, "entry map key");
+            assert_eq!(reader.u32(), *bundle_id, "entry bundle id");
+            assert_eq!(reader.u32(), index as u32 + 1, "entry display order");
+        }
     }
     assert_eq!(reader.at, bundle_groups.len(), "66/9 trailing bytes");
 }

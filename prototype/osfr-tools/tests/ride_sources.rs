@@ -167,7 +167,16 @@ fn every_ride_is_sold_by_a_vendor_inside_the_price_bounds() {
     }
     // T452 added 35 OSFR-parity rides (6 of them earn-only) to the 54 seeded ones.
     assert_eq!(rides, 89, "the ride catalogue changed");
-    assert_eq!(shop.sc_catalogue().earn_only().len(), 8);
+    // P-shops-marketplace: the Balloon Animal pet rows are earn-only too (an event reward, ROADMAP
+    // item 10), so count the rides alone.
+    assert_eq!(
+        shop.sc_catalogue()
+            .earn_only()
+            .iter()
+            .filter(|listing| listing.ride)
+            .count(),
+        8
+    );
 }
 
 /// T452: the rides Sanctuary-main 10f129e `Mounts.json` ships and the seed lacked. The Futuristic

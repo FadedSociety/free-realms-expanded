@@ -127,6 +127,9 @@ const MAX_ORDER_HISTORY: usize = 4096;
 /// (R) Bounds for the T657 category table; the values themselves are content.
 const MAX_ITEM_SHELVES: usize = 64;
 const MAX_ITEM_SHELF_KEYS: usize = 256;
+/// (R) Bounds for the bundle groups and the new-item list; the ids themselves are content.
+const MAX_BUNDLE_GROUPS: usize = 32;
+const MAX_BUNDLE_GROUP_ITEMS: usize = 256;
 
 /// (R) Sanity bounds for `sc_rewards.json`; every amount is content, these only bound it.
 pub const MAX_EARN_SC: u32 = 10_000;
@@ -188,6 +191,23 @@ pub struct ItemShelf {
     pub item_types: Vec<i32>,
 }
 
+/// P-shops-marketplace: one 66/9 bundle group (`00b45560`). The client selects a group by its id
+/// (`InGamePurchaseStoreScreen.SelectStoreBundleGroup`, `StoreBundleGroupContents__Refresh`
+/// `009a3a50` looks the id up in the store's group map and lists its bundles). The ids are the
+/// client's own: `ScriptsBase.lua` `WelcomeHandler:Show` selects group 6 for the welcome splash's
+/// Popular Items panel, the marketplace treats 1 (Miniclip), 2 (Bigpoint) and 3 (Members Only)
+/// as affiliate groups, and Legacy `StoreBundleGroups.json` names 4 Featured Items (151325) and 6
+/// Top Sellers (156763). `item_ids` are `stores.json` rows; an id with no listing is skipped.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct BundleGroup {
+    pub id: u32,
+    pub name_id: u32,
+    #[serde(default)]
+    pub description_id: u32,
+    pub item_ids: Vec<i32>,
+}
+
 /// `stores.json.station_cash`: the tunable Marketplace policy. A missing block keeps the feature
 /// off, so older content sets and fixtures keep their payment-free behaviour.
 #[derive(Clone, Debug, Deserialize)]
@@ -209,6 +229,13 @@ pub struct Config {
     /// T657: the top-level categories for every other listing. A listed non-ride row that no shelf
     /// names is refused at load, so no non-ride row falls back to the Rides parent.
     pub item_shelves: Vec<ItemShelf>,
+    /// P-shops-marketplace: the 66/9 bundle groups (see [`BundleGroup`]). Empty keeps the older
+    /// single all-listings group, so fixtures are unchanged.
+    pub bundle_groups: Vec<BundleGroup>,
+    /// P-shops-marketplace: rows whose bundle carries the client's IsNewItem flag (bundle +241,
+    /// `009a56d0` case 26), the rows the Marketplace's own "Hot New Items!" category lists
+    /// (`EnableNewStoreBundleFilter`). Which rows are "new" is content (R).
+    pub new_item_ids: Vec<i32>,
     pub sc_price_scale: f64,
     pub min_price_sc: u32,
     pub max_price_sc: u32,
@@ -230,6 +257,8 @@ impl Default for Config {
             boombox_shelf: None,
             ride_categories: Vec::new(),
             item_shelves: Vec::new(),
+            bundle_groups: Vec::new(),
+            new_item_ids: Vec::new(),
             sc_price_scale: 1.0,
             min_price_sc: 1,
             max_price_sc: 100_000,
@@ -256,6 +285,7 @@ impl Config {
             })
             || !self.ride_categories_valid()
             || !self.item_shelves_valid()
+            || !self.bundle_groups_valid()
             || !self.sc_price_scale.is_finite()
             || self.sc_price_scale <= 0.0
             || self.sc_price_scale > 10.0
@@ -349,6 +379,23 @@ impl Config {
             }
         }
         true
+    }
+
+    /// P-shops-marketplace: each bundle group needs its own non-zero id and a name; its rows and
+    /// the new-item rows are positive ids within a sanity bound.
+    fn bundle_groups_valid(&self) -> bool {
+        let mut ids = BTreeSet::new();
+        self.bundle_groups.len() <= MAX_BUNDLE_GROUPS
+            && self.new_item_ids.len() <= MAX_BUNDLE_GROUP_ITEMS
+            && self.new_item_ids.iter().all(|id| *id > 0)
+            && self.bundle_groups.iter().all(|group| {
+                group.id != 0
+                    && group.name_id != 0
+                    && ids.insert(group.id)
+                    && !group.item_ids.is_empty()
+                    && group.item_ids.len() <= MAX_BUNDLE_GROUP_ITEMS
+                    && group.item_ids.iter().all(|id| *id > 0)
+            })
     }
 
     /// T526: the 66/6 group a ride row lists under: its sub-category, or the Rides parent.
@@ -801,6 +848,9 @@ pub struct Listing {
     /// The item is a ride (`MountCatalog::mount_for_item` knows it, the rule the Rides roster
     /// uses). Only a ride is single-copy: every other listing sells again and again (T484 review).
     pub ride: bool,
+    /// P-shops-marketplace: the bundle carries the client's IsNewItem flag (+241), so the
+    /// "Hot New Items!" category lists it and its tile wears the New! banner.
+    pub new_item: bool,
 }
 
 /// T657: one `stores.json` row as the catalogue sees it. `category_id` is the row's item category
@@ -912,6 +962,7 @@ impl Catalogue {
                 group,
                 deed: presentation.item_type == DEED_ITEM_TYPE,
                 ride,
+                new_item: config.new_item_ids.contains(&item_id),
             };
             if kind == RowKind::EarnOnly {
                 earn_only.push(listing);
@@ -1558,26 +1609,56 @@ fn category_groups_packet(catalogue: &Catalogue) -> Vec<u8> {
     bytes
 }
 
-/// 66/9 + one bundle group (`00b45560`/`00b3d770`/`00b36bb0`/`00b33350`/`00b2a090`).
+/// 66/9 + the bundle groups (`00b45560`/`00b3d770`/`00b36bb0`/`00b33350`/`00b2a090`): the
+/// configured [`BundleGroup`]s, each holding its listed rows in data order; or, with none
+/// configured, the older single group of every listing keyed by the Rides category group (that
+/// key, 1, is the client's Miniclip affiliate group, which is why the shipped data configures its
+/// own groups).
 fn bundle_groups_packet(catalogue: &Catalogue) -> Vec<u8> {
     let config = &catalogue.config;
+    let all: Vec<&Listing> = catalogue.listings.iter().collect();
+    let groups: Vec<(u32, u32, u32, Vec<&Listing>)> = if config.bundle_groups.is_empty() {
+        vec![(
+            config.category_group_id,
+            config.category_name_id,
+            0,
+            all,
+        )]
+    } else {
+        config
+            .bundle_groups
+            .iter()
+            .map(|group| {
+                let members: Vec<&Listing> = group
+                    .item_ids
+                    .iter()
+                    .filter_map(|item| all.iter().copied().find(|l| l.item_id == *item))
+                    .collect();
+                (group.id, group.name_id, group.description_id, members)
+            })
+            // A group none of whose rows is listed (a reduced fixture inventory) is left out.
+            .filter(|(_, _, _, members)| !members.is_empty())
+            .collect()
+    };
     let mut bytes = header(OP_BUNDLE_GROUPS);
-    put_i32(&mut bytes, 1); // one bundle group
-    put_u32(&mut bytes, config.category_group_id);
-    put_u32(&mut bytes, config.category_group_id);
-    put_u32(&mut bytes, config.category_name_id);
-    put_u32(&mut bytes, 0);
-    put_string(&mut bytes, "");
-    put_string(&mut bytes, "");
-    bytes.push(0);
-    put_u32(&mut bytes, 1);
-    put_i32(&mut bytes, catalogue.listings.len() as i32);
-    for (index, listing) in catalogue.listings.iter().enumerate() {
-        // Keyed map entry: map key, the entry's own bundle id, then its display order
-        // (client reader `00b33350` -> `00b2a090` reads both value words).
-        put_u32(&mut bytes, listing.bundle_id);
-        put_u32(&mut bytes, listing.bundle_id);
-        put_u32(&mut bytes, index as u32 + 1);
+    put_i32(&mut bytes, groups.len() as i32);
+    for (id, name_id, description_id, members) in groups {
+        put_u32(&mut bytes, id);
+        put_u32(&mut bytes, id);
+        put_u32(&mut bytes, name_id);
+        put_u32(&mut bytes, description_id);
+        put_string(&mut bytes, "");
+        put_string(&mut bytes, "");
+        bytes.push(0);
+        put_u32(&mut bytes, 1);
+        put_i32(&mut bytes, members.len() as i32);
+        for (index, listing) in members.iter().enumerate() {
+            // Keyed map entry: map key, the entry's own bundle id, then its display order
+            // (client reader `00b33350` -> `00b2a090` reads both value words).
+            put_u32(&mut bytes, listing.bundle_id);
+            put_u32(&mut bytes, listing.bundle_id);
+            put_u32(&mut bytes, index as u32 + 1);
+        }
     }
     bytes
 }
@@ -1651,8 +1732,10 @@ fn bundle_record(bytes: &mut Vec<u8>, catalogue: &Catalogue, listing: &Listing, 
     put_u32(bytes, 0);
     put_u32(bytes, 0);
     put_u32(bytes, 0);
+    // `00b3fa00` ends with three bytes: +240, +241 IsNewItem (`009a56d0` case 26, the "Hot New
+    // Items!" filter and the New! banner) and +242 IsViewOnly (overwritten by 66/39).
     bytes.push(0);
-    bytes.push(0);
+    bytes.push(u8::from(listing.new_item));
     bytes.push(0);
     // Client reader `00b41860` continues after the `00b3fa00` tail with ten more fields:
     // u32, u32, u8, u32, u32, u32, u8, u8, u32, u32 (31 bytes). Only the members-only price
