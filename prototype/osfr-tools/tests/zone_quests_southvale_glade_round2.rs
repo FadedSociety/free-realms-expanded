@@ -177,15 +177,10 @@ fn the_pet_trainer_rows_wait_for_a_pet_trainer_profile() {
 #[test]
 fn the_other_round_two_rows_stay_off() {
     for id in [
-        // Southvale: Bolstering the Bows, Local Bonesaw Shortage (no blacksmith recipe),
-        // Gems For Good Luck, Marriage Proposal (no tourmaline, iron or malachite gather).
-        3_020_015, 3_020_017, 3_100_014, 3_100_015,
         // Sunstone Valley: Grunt Work (Sunstone ore), Can We Build It? (tin ore, forging).
         3_020_033, 3_020_036,
         // Wildwood: An Incomplete Set, Wildwood Derby 1000 (no objectives in any source).
         3_060_031, 3_060_044,
-        // Speedways: the Demolition Derby Tutorial (its minigame row 289 has no server producer).
-        3_060_001,
     ] {
         assert!(!shipped_quest(id).enabled, "quest {id} is enabled");
     }

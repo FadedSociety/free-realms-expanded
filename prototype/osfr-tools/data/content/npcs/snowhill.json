@@ -5529,8 +5529,51 @@
       "location_evidence": [
         "\"In front of the gates to the Frost Ridge Speedway\" (client 2360694093). [video fktAs_GRrjM/00178, /00286; once misread as \"Bart\"]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3060001,
+          "title": "Demolition Derby Tutorial",
+          "title_string_id": 117325,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Entry and tutorial quests (titles without the \"Demo Derby:\" prefix), row T1; name 'Demolition Derby Tutorial'; title id cell 2671266550 ucdt; 128605799 ugdt"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Entry and tutorial quests (titles without the \"Demo Derby:\" prefix), row T1; name 'Demolition Derby Tutorial'; title id cell 2671266550 ucdt; 128605799 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3060001 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3060001
+      ],
       "quests_given_text": [
         "Demolition Derby Tutorial, Demo Derby: Frost Ridge Invitational host."
       ],

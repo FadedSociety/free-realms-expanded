@@ -1281,7 +1281,53 @@
       "prerequisite_quest_ids": [
         3020014
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "text_string_id": 94441,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Forge Focus Fire Bows - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_bolstering_the_bows_d59967)."
+            }
+          ],
+          "recipe_id": 179,
+          "quantity": 3
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 94443,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give the Bows to Mili Ironcall (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_bolstering_the_bows_d59967)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 94443 is this step; the recipient is the quest giver Mili Ironcall"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "hand-over modelled as a talk, as quest_wire's step() already does for 'Give X to Y'; deliver_item would need the forged item's id"
+            }
+          ],
+          "npc_id": 9000000405
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 94521,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Mili (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_bolstering_the_bows_d59967)."
+            }
+          ],
+          "npc_id": 9000000405
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1338,7 +1384,8 @@
       "description_string_id": 94433,
       "intro_text_string_id": 94431,
       "end_text_string_id": 94434,
-      "enabled": false
+      "enabled": true,
+      "job": 16
     },
     {
       "id": 3020016,
@@ -1347,7 +1394,49 @@
       "prerequisite_quest_ids": [
         3020015
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "text_string_id": 94474,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Forge a Chivalrous Guardian Hammer (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_chivalrous_carlos_ab99fb)."
+            }
+          ],
+          "recipe_id": 23,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 94476,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give the Chivalrous Guardian Hammer to Mili Ironcall (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_chivalrous_carlos_ab99fb)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 94476 is this step; recipient named in the text and is the quest giver"
+            }
+          ],
+          "npc_id": 9000000405
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 94478,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Mili Ironcall (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_chivalrous_carlos_ab99fb)."
+            }
+          ],
+          "npc_id": 9000000405
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1404,7 +1493,8 @@
       "description_string_id": 94462,
       "intro_text_string_id": 94460,
       "end_text_string_id": 94463,
-      "enabled": false
+      "enabled": true,
+      "job": 16
     },
     {
       "id": 3020017,
@@ -1413,7 +1503,49 @@
       "prerequisite_quest_ids": [
         3020016
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "text_string_id": 94515,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Forge Anguish Aid Bonesaw - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_local_bonesaw_shortage_67a718)."
+            }
+          ],
+          "recipe_id": 21,
+          "quantity": 3
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 94517,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give the Bonesaws to Mili Ironcall (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_local_bonesaw_shortage_67a718)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 94517 is this step; recipient named in the text and is the quest giver"
+            }
+          ],
+          "npc_id": 9000000405
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 94521,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Mili (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_local_bonesaw_shortage_67a718)."
+            }
+          ],
+          "npc_id": 9000000405
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1470,7 +1602,8 @@
       "description_string_id": 94509,
       "intro_text_string_id": 94507,
       "end_text_string_id": 94510,
-      "enabled": false
+      "enabled": true,
+      "job": 16
     },
     {
       "id": 3020018,

@@ -176,7 +176,7 @@ fn the_wrong_job_and_a_missing_errand_change_nothing() {
 fn the_other_rows_stay_off() {
     for id in [
         3_030_022, 3_030_036, // Brawler contracts (lead decision)
-        3_060_007, 3_060_017, // Demo Derby: Duncan has no NPC row; no objectives
+        3_060_007, // Demo Derby: no objectives
         3_070_020, 3_070_023, 3_070_045, // Fisherman: no fungus, disguise or treasure catch
         3_090_024, // Medic: rescue targets
         3_110_021, // Ninja: the hermit's book

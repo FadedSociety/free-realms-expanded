@@ -329,10 +329,16 @@ impl Targets {
         targets.producer(checkers::GAME_ID as u32, [MinigameFact::Elapsed]);
 
         // `Gameplay::load` merges the optional catalogue under the same root.
-        if root.join("inventory.json").is_file() {
+        // A shipped tree keeps them in `data/release`, beside the `data/content` this root names.
+        let release = root.parent().map(|data| data.join("release"));
+        let inventory = [Some(root.to_path_buf()), release]
+            .into_iter()
+            .flatten()
+            .find(|dir| dir.join("inventory.json").is_file());
+        if let Some(dir) = inventory {
             targets
                 .items
-                .extend(Inventory::load(root, None)?.definition_ids());
+                .extend(Inventory::load(&dir, None)?.definition_ids());
         }
         let recipes = RecipeCatalog::load_runtime(root)?;
         targets

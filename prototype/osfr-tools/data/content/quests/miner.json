@@ -1190,7 +1190,41 @@
       "prerequisite_quest_ids": [
         3100013
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "gather_resource",
+          "id": 1,
+          "text_string_id": 77442,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Mine tourmaline - (0/5) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_gems_for_good_luck_094308)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: item 2751 'Tourmaline' (item-table.json); Iron Mining (MiniGameData 95, rank floor 9) outputs it (mining.json)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: mining and harvesting raise GatherResource{resource_id: output definition} per paid item (gameplay/crafting.rs:765); targets.gather lists mining.json outputs."
+            }
+          ],
+          "resource_id": 2751,
+          "quantity": 5
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 77446,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Show the gems to Mili (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_gems_for_good_luck_094308)."
+            }
+          ],
+          "npc_id": 9000000405
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1247,7 +1281,8 @@
       "description_string_id": 77430,
       "intro_text_string_id": 77428,
       "end_text_string_id": 77431,
-      "enabled": false
+      "enabled": true,
+      "job": 14
     },
     {
       "id": 3100015,
@@ -1256,7 +1291,66 @@
       "prerequisite_quest_ids": [
         3100014
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "gather_resource",
+          "id": 1,
+          "text_string_id": 77497,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Mine iron ore (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_marriage_proposal_516b00)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quantity 1: neither the client text nor the wiki gives a number; 1 is the minimum real goal."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: item 2741 'Iron Ore' (item-table.json); Iron Mining (MiniGameData 95, rank floor 9) outputs it (mining.json)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: mining and harvesting raise GatherResource{resource_id: output definition} per paid item (gameplay/crafting.rs:765); targets.gather lists mining.json outputs."
+            }
+          ],
+          "resource_id": 2741,
+          "quantity": 1
+        },
+        {
+          "kind": "gather_resource",
+          "id": 2,
+          "text_string_id": 77500,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Mine tourmaline - 0/4 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_marriage_proposal_516b00)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: item 2751 'Tourmaline' (item-table.json); Iron Mining (MiniGameData 95, rank floor 9) outputs it (mining.json)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: mining and harvesting raise GatherResource{resource_id: output definition} per paid item (gameplay/crafting.rs:765); targets.gather lists mining.json outputs."
+            }
+          ],
+          "resource_id": 2751,
+          "quantity": 4
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 77501,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Mili (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_marriage_proposal_516b00)."
+            }
+          ],
+          "npc_id": 9000000405
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1313,7 +1407,8 @@
       "description_string_id": 77482,
       "intro_text_string_id": 77480,
       "end_text_string_id": 77483,
-      "enabled": false
+      "enabled": true,
+      "job": 14
     },
     {
       "id": 3100016,
@@ -1322,7 +1417,20 @@
       "prerequisite_quest_ids": [
         3100015
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 77524,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Grumpore (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_checking_the_chug_a6fd33)."
+            }
+          ],
+          "npc_id": 9000000337
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1379,7 +1487,8 @@
       "description_string_id": 77516,
       "intro_text_string_id": 77514,
       "end_text_string_id": 77517,
-      "enabled": false
+      "enabled": true,
+      "job": 14
     },
     {
       "id": 3100017,
@@ -1388,7 +1497,33 @@
       "prerequisite_quest_ids": [
         3100016
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 77527,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Score 100,000+ in the Iron Mining minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_grumpore_s_challenge_5c084d)."
+            }
+          ],
+          "minigame_id": 95,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 77530,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Grumpore (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_grumpore_s_challenge_5c084d)."
+            }
+          ],
+          "npc_id": 9000000337
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1445,7 +1580,8 @@
       "description_string_id": 77550,
       "intro_text_string_id": 77548,
       "end_text_string_id": 77551,
-      "enabled": false
+      "enabled": true,
+      "job": 14
     },
     {
       "id": 3100018,
@@ -1454,7 +1590,41 @@
       "prerequisite_quest_ids": [
         3100017
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "gather_resource",
+          "id": 1,
+          "text_string_id": 77604,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Mine iron ore - 0/15 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_arrowheads_for_lugabow_85b71c)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: item 2741 'Iron Ore' (item-table.json); Iron Mining (MiniGameData 95, rank floor 9) outputs it (mining.json)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: mining and harvesting raise GatherResource{resource_id: output definition} per paid item (gameplay/crafting.rs:765); targets.gather lists mining.json outputs."
+            }
+          ],
+          "resource_id": 2741,
+          "quantity": 15
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 77605,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give the iron to Grumpore (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_arrowheads_for_lugabow_85b71c)."
+            }
+          ],
+          "npc_id": 9000000337
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1509,7 +1679,9 @@
         }
       ],
       "description_string_id": 77601,
-      "enabled": false
+      "enabled": true,
+      "job": 14,
+      "intro_text_string_id": 77596
     },
     {
       "id": 3100019,

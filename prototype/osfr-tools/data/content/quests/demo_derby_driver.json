@@ -6,8 +6,42 @@
       "title_string_id": 117325,
       "giver_npc_id": 9500000731,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 117335,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the tutorial (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demolition_derby_tutorial_00b6f2)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: MiniGameData 289 'Demolition Derby Tutorial' (type 11) is in the server's pinned producer set; objective client text 'Complete the tutorial.'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client MiniGameData 289 'Demolition Derby Tutorial', pinned."
+            }
+          ],
+          "minigame_id": 289,
+          "count": 1
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Demolition Derby Tutorial (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demolition_derby_tutorial_00b6f2)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -42,7 +76,8 @@
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "description_string_id": 117356
     },
     {
       "id": 3060002,
@@ -1182,9 +1217,36 @@
       "id": 3060017,
       "title_string_id": 403460,
       "giver_npc_id": 9000000124,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3060016
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 394083,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to J. P. Screecher (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_a_lukewarm_welcome_7b8358)."
+            }
+          ],
+          "npc_id": 9000000354
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 13,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Demo Derby: A Lukewarm Welcome (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_a_lukewarm_welcome_7b8358)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1215,14 +1277,45 @@
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49,
+      "description_string_id": 393385,
+      "intro_text_string_id": 393385
     },
     {
       "id": 3060018,
       "title_string_id": 403461,
-      "giver_npc_id": 9000000124,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9000000354,
+      "prerequisite_quest_ids": [
+        3060017
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 394084,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Confront Erica Diggs outside of Frost Ridge (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_defeating_diggs_085d17)."
+            }
+          ],
+          "npc_id": 9500000896
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 395066,
+          "minigame_id": 612,
+          "count": 1,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 2026-11-08: finishing this quest's own derby row 612 counts for this goal (Knock out Erica Diggs 3 times); the goal's own condition is not modelled."
+            }
+          ]
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1268,7 +1361,10 @@
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49,
+      "description_string_id": 393386,
+      "intro_text_string_id": 393386
     },
     {
       "id": 3060019,

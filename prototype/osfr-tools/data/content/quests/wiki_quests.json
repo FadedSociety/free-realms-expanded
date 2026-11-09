@@ -10086,6 +10086,387 @@
       "intro_text_string_id": 38327,
       "enabled": true,
       "job": 45
+    },
+    {
+      "id": 3953698,
+      "title_string_id": 410462,
+      "giver_npc_id": 9000000339,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_item",
+          "id": 1,
+          "text_string_id": 410472,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reel in a large Creeping Cod (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bayou_catch_of_the_day_4bd84f)."
+            }
+          ],
+          "item_id": 68082,
+          "quantity": 1
+        },
+        {
+          "kind": "collect_item",
+          "id": 2,
+          "text_string_id": 410474,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reel in a large Blind Swurglefish (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bayou_catch_of_the_day_4bd84f)."
+            }
+          ],
+          "item_id": 68085,
+          "quantity": 1
+        },
+        {
+          "kind": "collect_item",
+          "id": 3,
+          "text_string_id": 410476,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reel in a large Changed Salmon (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bayou_catch_of_the_day_4bd84f)."
+            }
+          ],
+          "item_id": 68095,
+          "quantity": 1
+        },
+        {
+          "kind": "collect_item",
+          "id": 4,
+          "text_string_id": 410480,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reel in an extra large Globfish (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bayou_catch_of_the_day_4bd84f)."
+            }
+          ],
+          "item_id": 68080,
+          "quantity": 1
+        },
+        {
+          "kind": "collect_item",
+          "id": 5,
+          "text_string_id": 410485,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reel in a large Fanged Grouper (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bayou_catch_of_the_day_4bd84f)."
+            }
+          ],
+          "item_id": 68092,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 6,
+          "text_string_id": 409309,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Gunther (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bayou_catch_of_the_day_4bd84f)."
+            }
+          ],
+          "npc_id": 9000000339
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 40,
+          "items": [],
+          "job_xp": {
+            "137": 50
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Bayou: Catch of the Day (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bayou_catch_of_the_day_4bd84f)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Bayou: Catch of the Day (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bayou_catch_of_the_day_4bd84f)."
+        }
+      ],
+      "job": 137,
+      "enabled": true
+    },
+    {
+      "id": 3953730,
+      "title_string_id": 410067,
+      "giver_npc_id": 9000000103,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_item",
+          "id": 1,
+          "text_string_id": 410078,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reel in a medium Frozen Char (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_catch_of_the_day_8860b4)."
+            }
+          ],
+          "item_id": 68027,
+          "quantity": 1
+        },
+        {
+          "kind": "collect_item",
+          "id": 2,
+          "text_string_id": 410080,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reel in a large Spineless Stickleback (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_catch_of_the_day_8860b4)."
+            }
+          ],
+          "item_id": 68040,
+          "quantity": 1
+        },
+        {
+          "kind": "collect_item",
+          "id": 3,
+          "text_string_id": 410082,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reel in a small Winter Piranha (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_catch_of_the_day_8860b4)."
+            }
+          ],
+          "item_id": 68021,
+          "quantity": 1
+        },
+        {
+          "kind": "collect_item",
+          "id": 4,
+          "text_string_id": 410084,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reel in a medium Frostgill Smelt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_catch_of_the_day_8860b4)."
+            }
+          ],
+          "item_id": 68018,
+          "quantity": 1
+        },
+        {
+          "kind": "collect_item",
+          "id": 5,
+          "text_string_id": 410086,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reel in a large Blubracuda (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_catch_of_the_day_8860b4)."
+            }
+          ],
+          "item_id": 68037,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 6,
+          "text_string_id": 116922,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Helena (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_catch_of_the_day_8860b4)."
+            }
+          ],
+          "npc_id": 9000000103
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 17,
+          "items": [],
+          "job_xp": {
+            "137": 50
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Catch of the Day (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_catch_of_the_day_8860b4)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Catch of the Day (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_catch_of_the_day_8860b4)."
+        }
+      ],
+      "job": 137,
+      "description_string_id": 410066,
+      "intro_text_string_id": 410066,
+      "enabled": true
+    },
+    {
+      "id": 3953839,
+      "title_string_id": 409944,
+      "giver_npc_id": 9500000340,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "any_of",
+          "id": 1,
+          "text_string_id": 409965,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reel in Calico Catfish - 0/6 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_is_it_safe_to_swim_ea676b)."
+            }
+          ],
+          "count": 6,
+          "alternatives": [
+            {
+              "kind": "collect_item",
+              "item_id": 68058
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68059
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 409967,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Archie Tingletoes (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_is_it_safe_to_swim_ea676b)."
+            }
+          ],
+          "npc_id": 9500000340
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 14,
+          "items": [],
+          "job_xp": {
+            "137": 30
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Is it Safe to Swim (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_is_it_safe_to_swim_ea676b)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Is it Safe to Swim (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_is_it_safe_to_swim_ea676b)."
+        }
+      ],
+      "job": 137,
+      "description_string_id": 409945,
+      "intro_text_string_id": 409943,
+      "enabled": true
+    },
+    {
+      "id": 3953973,
+      "title_string_id": 410288,
+      "giver_npc_id": 9500000162,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "any_of",
+          "id": 1,
+          "text_string_id": 410310,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reel in Roach Loach - 0/6 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_roach_coach_b4aa3b)."
+            }
+          ],
+          "count": 6,
+          "alternatives": [
+            {
+              "kind": "collect_item",
+              "item_id": 68098
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68099
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68100
+            }
+          ]
+        },
+        {
+          "kind": "any_of",
+          "id": 2,
+          "text_string_id": 410312,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reel in Coach Loach - 0/6 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_roach_coach_b4aa3b)."
+            }
+          ],
+          "count": 6,
+          "alternatives": [
+            {
+              "kind": "collect_item",
+              "item_id": 68023
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68024
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68025
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 410314,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Lenny (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_roach_coach_b4aa3b)."
+            }
+          ],
+          "npc_id": 9500000162
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 22,
+          "items": [],
+          "job_xp": {
+            "137": 30
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Roach Coach (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_roach_coach_b4aa3b)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "The Roach Coach (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_roach_coach_b4aa3b)."
+        }
+      ],
+      "job": 137,
+      "description_string_id": 410289,
+      "enabled": true
     }
   ]
 }

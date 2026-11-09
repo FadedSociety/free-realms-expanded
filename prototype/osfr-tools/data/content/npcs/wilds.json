@@ -15836,11 +15836,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1748; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3005 (ModelId=1311, ModelFileName=human_f_erica_diggs.agr, NameId=19355)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.09991,
       "model_id": 1311,
-      "model_file_name": "human_f_erica_diggs.agr"
+      "model_file_name": "human_f_erica_diggs.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000897,
@@ -23481,11 +23488,48 @@
               "evidence": "title_string_id corrected from raw locale hash 1659681759 to Global.Text id 403462 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3060018,
+          "title": "Demo Derby: Defeating Diggs",
+          "title_string_id": 403461,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 3: Paws 'n Claws and the Frost Ridge arena, row 15; name 'Demo Derby: Defeating Diggs'; title id cell 2889239853 ucdt; 3660968744 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3060018 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3060021,
-        3060022
+        3060022,
+        3060018
       ],
       "quests_given_text": [
         "Demo Derby: Wear and Tear, Demo Derby: Getting Scrappy, Demo Derby: Taking on the Tank, Demo Derby: Dizzy Driver (inferred)."
@@ -23860,11 +23904,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1750; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3007 (ModelId=1321, ModelFileName=human_m_jp_screecher.agr, NameId=19351)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.491086,
       "model_id": 1321,
-      "model_file_name": "human_m_jp_screecher.agr"
+      "model_file_name": "human_m_jp_screecher.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000357,

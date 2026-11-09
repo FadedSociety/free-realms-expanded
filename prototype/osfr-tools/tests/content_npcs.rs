@@ -45,6 +45,9 @@ fn referenced_items(quests: &[Value]) -> Value {
         }
         for goal in quest["objectives"].as_array().into_iter().flatten() {
             ids.extend(goal["item_id"].as_i64().or(goal["definition_id"].as_i64()));
+            for leaf in goal["alternatives"].as_array().into_iter().flatten() {
+                ids.extend(leaf["item_id"].as_i64());
+            }
         }
     }
     let source = json!([{"kind": "reconstructed", "evidence": "(R) test fixture: a quest-referenced catalogue item"}]);
@@ -534,12 +537,12 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
     assert_eq!(db.zones.len(), 17);
     assert_eq!(db.npcs.len(), expected_npc_count);
     assert_eq!(db.jobs.len(), 17);
-    assert_eq!(db.quests.len(), 866); // 45 more from the quest research tables; 40 wiki pick-up, talk and craft quests (quest_wire.py); T498: four Wilds zone quests; T500: three Sanctuary ones; T501: five Merry Vale ones; T502: five Wugachug/Briarwood ones; T503: A Booming Problem; T539: three collect quests; T542: eight Become-a records
+    assert_eq!(db.quests.len(), 870); // 45 more from the quest research tables; 40 wiki pick-up, talk and craft quests (quest_wire.py); T498: four Wilds zone quests; T500: three Sanctuary ones; T501: five Merry Vale ones; T502: five Wugachug/Briarwood ones; T503: A Booming Problem; T539: three collect quests; T542: eight Become-a records
     assert_eq!(resolved_reference_ids.len(), 295);
     assert_eq!(unresolved_ids.len(), 170);
     assert_eq!(
         resolved_giver_occurrences + unresolved_giver_occurrences,
-        866
+        870
     );
     println!(
         "NPC refs: {} resolved, {} unresolved; quest giver occurrences: {} resolved, {} unresolved; positions: {} known, {} unknown",

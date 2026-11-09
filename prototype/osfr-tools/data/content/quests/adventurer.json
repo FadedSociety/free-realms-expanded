@@ -1455,7 +1455,45 @@
       "title_string_id": 37702,
       "giver_npc_id": 9000000225,
       "prerequisite_quest_ids": [],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 37704,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Peep's dog bowl (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_peep_s_missing_bowl_9c7d6c)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: model bowl_basic.adr is in Models.txt, seen by eye below"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: grey pet bowl with bone shapes on it (sheets/e_items.png r2c0, tile of bowl_basic.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_peep_s_missing_bowl_9c7d6c)."
+            }
+          ],
+          "node_type": "quest-bowl",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 37710,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Uncle Irving (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_peep_s_missing_bowl_9c7d6c)."
+            }
+          ],
+          "npc_id": 9000000225
+        }
+      ],
       "rewards": [
         {
           "coins": 5,
@@ -1524,7 +1562,7 @@
       ],
       "description_string_id": 37703,
       "intro_text_string_id": 37701,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000019,

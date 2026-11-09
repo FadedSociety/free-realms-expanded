@@ -37,6 +37,9 @@ fn referenced_items(quests: &[Value]) -> Value {
         }
         for goal in quest["objectives"].as_array().into_iter().flatten() {
             ids.extend(goal["item_id"].as_i64().or(goal["definition_id"].as_i64()));
+            for leaf in goal["alternatives"].as_array().into_iter().flatten() {
+                ids.extend(leaf["item_id"].as_i64());
+            }
         }
     }
     let source = json!([{"kind": "reconstructed", "evidence": "(R) test fixture: a quest-referenced catalogue item"}]);

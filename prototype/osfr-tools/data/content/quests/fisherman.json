@@ -530,7 +530,42 @@
       "title_string_id": 409689,
       "giver_npc_id": 9000000117,
       "prerequisite_quest_ids": [],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "any_of",
+          "id": 1,
+          "text_string_id": 409823,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reel in Slugmud Skippers - 0/4 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_itty_bitty_bait_677f98)."
+            }
+          ],
+          "count": 4,
+          "alternatives": [
+            {
+              "kind": "collect_item",
+              "item_id": 68048
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68049
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 409825,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Jonah Relicreel (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_itty_bitty_bait_677f98)."
+            }
+          ],
+          "npc_id": 9000000117
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -587,7 +622,7 @@
       "description_string_id": 409690,
       "intro_text_string_id": 409688,
       "end_text_string_id": 409691,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3070010,
@@ -596,7 +631,46 @@
       "prerequisite_quest_ids": [
         3070009
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "any_of",
+          "id": 1,
+          "text_string_id": 409879,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reel in Butter Flyfish - 0/6 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_much_bigger_bait_36d0e7)."
+            }
+          ],
+          "count": 6,
+          "alternatives": [
+            {
+              "kind": "collect_item",
+              "item_id": 68053
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68054
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68055
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 409825,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Jonah Relicreel (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_much_bigger_bait_36d0e7)."
+            }
+          ],
+          "npc_id": 9000000117
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -649,7 +723,7 @@
       "description_string_id": 409698,
       "intro_text_string_id": 409696,
       "end_text_string_id": 409699,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3070011,

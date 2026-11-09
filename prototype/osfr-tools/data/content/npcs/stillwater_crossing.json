@@ -5627,6 +5627,18 @@
               "evidence": "title_string_id corrected from raw locale hash 2827127973 to Global.Text id 412195 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3953730,
+          "title": "Catch of the Day",
+          "title_string_id": 410067,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Catch of the Day (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_catch_of_the_day_8860b4)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
@@ -5634,7 +5646,8 @@
         3050016,
         3070040,
         3070043,
-        3070045
+        3070045,
+        3953730
       ],
       "quests_given_text": [
         "Chef: Stillwater Inn (unlocks the job), Chef: Gavin Gone Missing. Reminder strings \"Stillwater - reminder:helena - stillwater inn(v2)\" (2667668579) are dev notes. Receives a flier (4062689597). Farmer's Market customer entries \"Farmer's Market - Helena\" (1773285688) and \"Helena's Shopping List\" (3414646744) exist; whether they are this Helena is unproven."
@@ -7398,10 +7411,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AJonah_Relicreel"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr"
+      "model_file_name": "fairy_druid_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000124,
@@ -7477,46 +7497,6 @@
             {
               "kind": "client",
               "evidence": "title_string_id corrected from raw locale hash 705733870 to Global.Text id 403460 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
-          "quest_id": 3060018,
-          "title": "Demo Derby: Defeating Diggs",
-          "title_string_id": 403461,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 3: Paws 'n Claws and the Frost Ridge arena, row 15; name 'Demo Derby: Defeating Diggs'; title id cell 2889239853 ucdt; 3660968744 ugdt"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3060018 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 2889239853 to Global.Text id 403461 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
         },
@@ -7599,7 +7579,6 @@
       ],
       "quest_ids_given": [
         3060017,
-        3060018,
         3060024,
         3060025
       ],

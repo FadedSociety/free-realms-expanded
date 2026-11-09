@@ -30991,8 +30991,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 65,
+      "model_file_name": "chugawug_m_greenwood_soldier.adr"
     },
     {
       "npc_id": 9500000144,
@@ -31484,10 +31498,23 @@
               "evidence": "title_string_id corrected from raw locale hash 3818943794 to Global.Text id 409922 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3953698,
+          "title": "Bayou: Catch of the Day",
+          "title_string_id": 410462,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Bayou: Catch of the Day (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bayou_catch_of_the_day_4bd84f)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3070024
+        3070024,
+        3953698
       ],
       "quests_given_text": [
         "Fisherman: Hungry Chugs, Fisherman: Fishy Fungus, Fisherman: Ink Cod Ink, Fisherman: Restocking the Stream, Fisherman: Undercover, Fisherman: VIP Fish, Fisherman: Say Cheese!."
@@ -31836,8 +31863,15 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000145,
@@ -39424,8 +39458,23 @@
       "location_evidence": [
         "\"Darklit Lagoon\" (client 2651419407, 4129873076)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3953973,
+          "title": "The Roach Coach",
+          "title_string_id": 410288,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Roach Coach (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_roach_coach_b4aa3b)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3953973
+      ],
       "quests_given_text": [
         "Estelle: gift delivery in Fisherman: A Gift For Estelle. Lenny: roach and coach loach fetch (title not found)."
       ],
@@ -39731,10 +39780,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ALenny"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 312,
-      "model_file_name": "human_m_freestyle_03.agr"
+      "model_file_name": "human_m_freestyle_03.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000163,
@@ -47854,8 +47910,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 339,
+      "model_file_name": "human_f_freestyle_01.agr"
     },
     {
       "npc_id": 9500000182,
@@ -61140,8 +61210,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 382,
+      "model_file_name": "dwarf_miner_m.adr"
     },
     {
       "npc_id": 9500000211,
