@@ -526,7 +526,7 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
     // to npcs/sanctuary.json (1,203); T501 appended Shannon and Sugaboo to npcs/merry_vale.json (1,205);
     // T739 appended four clickable quest props (1,209); L096 the two Wildwood turnstile actors.
     // L925: twelve wiki quest givers. L932: the two Snowhill soccer gates.
-    assert_eq!(content_npcs.len(), 1278);
+    assert_eq!(content_npcs.len(), 1285);
     let expected_npc_count = loader_npcs.len();
     write_json(
         &scratch.join("npcs.json"),
@@ -537,12 +537,12 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
     assert_eq!(db.zones.len(), 17);
     assert_eq!(db.npcs.len(), expected_npc_count);
     assert_eq!(db.jobs.len(), 17);
-    assert_eq!(db.quests.len(), 945); // 45 more from the quest research tables; 40 wiki pick-up, talk and craft quests (quest_wire.py); T498: four Wilds zone quests; T500: three Sanctuary ones; T501: five Merry Vale ones; T502: five Wugachug/Briarwood ones; T503: A Booming Problem; T539: three collect quests; T542: eight Become-a records
+    assert_eq!(db.quests.len(), 959); // 45 more from the quest research tables; 40 wiki pick-up, talk and craft quests (quest_wire.py); T498: four Wilds zone quests; T500: three Sanctuary ones; T501: five Merry Vale ones; T502: five Wugachug/Briarwood ones; T503: A Booming Problem; T539: three collect quests; T542: eight Become-a records
     assert_eq!(resolved_reference_ids.len(), 295);
     assert_eq!(unresolved_ids.len(), 170);
     assert_eq!(
         resolved_giver_occurrences + unresolved_giver_occurrences,
-        945
+        959
     );
     println!(
         "NPC refs: {} resolved, {} unresolved; quest giver occurrences: {} resolved, {} unresolved; positions: {} known, {} unknown",

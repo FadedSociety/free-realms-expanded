@@ -2684,8 +2684,15 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000373,
@@ -13383,9 +13390,36 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part C. The Mainstage fairy show, row 56; source cell: [client][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3955062,
+          "title": "A Change of Script",
+          "title_string_id": 46674,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Change of Script (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_change_of_script_f6df05)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3955069,
+          "title": "A New Star is Born!",
+          "title_string_id": 46709,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A New Star is Born! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_new_star_is_born_2f8237)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3955062,
+        3955069
+      ],
       "quests_given_text": [
         "Script deliveries: \"Deliver Joona's new scripts to some of his performers around Merry Vale.\" (3902203195; cut/live title candidate A Change of Script, 1384728475, by wording); the audition quest (\"ask a few other female performers to come and audition for the starring role\", 925856527; Joelle, Krissa and Tarvie, 606088582); the Tyra dispute; \"find all the missing props for the show that were picked up and carried off by wild animals\" (3531985225, 4099933862; cut title \"NOT LIVE - Propped by Props\", 2819684493, by wording); receives Jarvie's cake for the cast (564042412, 2006273978). Titles not otherwise found."
       ],
@@ -20692,11 +20726,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:973; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2221 (ModelId=454, ModelFileName=sprite_basic_m.adr, NameId=46786)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.119777,
       "model_id": 454,
-      "model_file_name": "sprite_basic_m.adr"
+      "model_file_name": "sprite_basic_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000410,
@@ -29980,11 +30021,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1036; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2290 (ModelId=458, ModelFileName=sprite_basic_f.adr, NameId=46787)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.065769,
       "model_id": 458,
-      "model_file_name": "sprite_basic_f.adr"
+      "model_file_name": "sprite_basic_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000429,

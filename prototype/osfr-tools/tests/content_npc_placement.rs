@@ -333,6 +333,6 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
     // L096 appended the two Wildwood turnstile actors (live_capture).
     // L925 appended twelve fanbyte-wiki quest givers (poi_anchor, 1,223).
     // L932 appended the two Snowhill soccer gates (client_object, 1,225).
-    assert_eq!(npc_count, 1_278);
+    assert_eq!(npc_count, 1285);
     println!("NPC placement sources: {counts:?}");
 }

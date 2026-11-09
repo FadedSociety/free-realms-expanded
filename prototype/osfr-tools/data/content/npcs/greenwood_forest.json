@@ -6447,8 +6447,8 @@
         "Camp Chatty counselor, a pixie male (wiki). Main giver of the Bigfoot hunt. Enemy in Bigfoot Defender."
       ],
       "roles": [
-        "quest_giver",
-        "enemy"
+        "enemy",
+        "quest_giver"
       ],
       "enemy_kind": "Camp Chatty counselor, a pixie male (wiki). Main giver of the Bigfoot hunt. Enemy in Bigfoot Defender.",
       "location_evidence": [
@@ -6514,9 +6514,23 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part A. The Summer Camp: Camp Chatty and Camp Robbie, row 40; source cell: [client][video][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3955105,
+          "title": "Camp Troubles",
+          "title_string_id": 429062,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Camp Troubles (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_camp_troubles_049260)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3955105
+      ],
       "quests_given_text": [
         "Camp Troubles (wiki; client title 3182673722; text 1503619310 \"Bigfoot has been scaring off many campers... See if you can find its lair\", 3971714069 \"Help the camp counselors find Bigfoot's lair\"); Confronting Bigfoot (wiki; video tracker with \"Confront Bigfoot and see what he wants\", \"Speak to Counselor Edmond\", \"Return to Chatty\", \"Talk to Bob\", L27vxozHOls/00280, /00296; reward \"You receive 1 Camp Chatty Hat\", L27vxozHOls/00326); Putting Your Foot Down (wiki, repeatable; client text 3852371818). Details on Bigfoot's Lair. Goal target \"Knock out Counselor Edmond\" (1141526814)."
       ],

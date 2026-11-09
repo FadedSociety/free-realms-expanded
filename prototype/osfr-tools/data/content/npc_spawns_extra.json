@@ -29171,7 +29171,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1885; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3142 (ModelId=77, ModelFileName=troll_forest.adr, NameId=20959)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500003821
     },
     {
       "spawn_guid": 100000003143,
@@ -77843,7 +77844,8 @@
           "evidence": "(R) Videos N4GIxvp51S4 frame 00026 and Ha-VvxikMXg frame 00046 show the nameplate 'Frolic Steadywings' inside the Royal Palace by the red carpet stairs and a planter, too dark to read his body. Body fairy_sanctuary_m_01.adr from the earlier research row in npcs.json. Stands on the palace floor 3.2 m from door guard spawn 100000002337, y copied from it; the exact interior spot is not known."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500003770
     },
     {
       "spawn_guid": 100000090014,
@@ -77905,6 +77907,938 @@
       ],
       "position_w": null,
       "content_key": 9500003190
+    },
+    {
+      "spawn_guid": 100000090016,
+      "legacy_npc_id": null,
+      "model_id": 454,
+      "model_file_name": "sprite_basic_m.adr",
+      "name": "Brennion",
+      "name_string_id": 47182,
+      "position": [
+        -963.8,
+        -38.21,
+        -375.8
+      ],
+      "heading": -1.33,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com/wiki/FR_Mob:Brennion: Fairy, male, Merry Vale; portrait on file (not compared to the body)."
+        },
+        {
+          "kind": "video",
+          "evidence": "reports/placement/index.tsv: Brennion solved at x=-963.8 z=-375.8, error 3.2 m, 2 sightings in 1 video, confidence medium."
+        },
+        {
+          "kind": "client",
+          "evidence": "npc_name 47182 'Brennion'; step 46686 'Deliver to Brennion'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Body from quest-research/npcs.json, by race and gender: 454 sprite_basic_m.adr, the Fairy race body, seen in model-view; not proven to be his look. Has a record (npc 9500000372, placement video_index) with no drawn body. quest_wire's spawned_people() ignores a spawn whose name is already a record, so applying this row also needs content_key 9500000372 (npc_spawns_extra.json). Position kept identical to the record because tests/content_npc_placement.rs requires a bound spawn at the record's exact position. Probe: terrain -38.21, no water, blocked N and NE, slope 14."
+        }
+      ],
+      "position_w": null,
+      "content_key": 9500000372
+    },
+    {
+      "spawn_guid": 100000090018,
+      "legacy_npc_id": null,
+      "model_id": 4210,
+      "model_file_name": "lepregoblin_m_basic.adr",
+      "name": "Lucky Chance McXander",
+      "name_string_id": 5100463,
+      "position": [
+        -1045.9,
+        -38.685,
+        -462.1
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Fandom page Lucky Chance McXander: male robgoblin 'leprechaun' in Merry Vale around Saint Patrick's; picture LuckyChanceMcXander.jpg (viewed) shows a green-suited goblin with an orange beard and a green hat. No Fanbyte page."
+        },
+        {
+          "kind": "video",
+          "evidence": "reports/placement/index.tsv: solved x=-1045.9 z=-462.1, error 4.0 m, 2 sightings in 1 video, confidence high, era_gate ok. Frames show only his quest marker, not his body."
+        },
+        {
+          "kind": "client",
+          "evidence": "npc_name 5100463 'Lucky Chance McXander'; Models.txt 4210 lepregoblin_m_basic.adr (a leprechaun goblin by its file name)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No model carries his name. lepregoblin_m_basic chosen by file name against the Fandom picture and not rendered; it replaces quest-research/npcs.json's unchecked 4106 robgoblin_m_banker. Has a record (npc 9000000134, placement video_index) with no drawn body. quest_wire's spawned_people() ignores a spawn whose name is already a record, so applying this row also needs content_key 9000000134 (npc_spawns_extra.json). Position kept identical to the record. Probe: all directions open, no water, slope 11. Event NPC: Saint Patrick's only."
+        }
+      ],
+      "position_w": null,
+      "content_key": 9000000134
+    },
+    {
+      "spawn_guid": 100000090019,
+      "legacy_npc_id": null,
+      "model_id": 1639,
+      "model_file_name": "dwarf_m_biker.adr",
+      "name": "Gus Geargrinder",
+      "name_string_id": 437262,
+      "position": [
+        -0.2,
+        40.868,
+        1122.4
+      ],
+      "heading": 2.52,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Fandom page Gus Geargrinder: male dwarf, Shrouded Glade, leader of the Freewheelers biker gang; picture Gusgeargrinder.jpg (viewed) shows a bald, goggled dwarf in a black biker jacket. No Fanbyte page."
+        },
+        {
+          "kind": "video",
+          "evidence": "45 OCR frames with his name (live-era, e.g. 5ZQHyCvslXA t=34). reports/haiku-locate evidence: marker 22 m away in MUeqkWyQIOk t=42. No solved position in reports/placement/index.tsv."
+        },
+        {
+          "kind": "client",
+          "evidence": "npc_name 437262 'Gus Geargrinder' (437518 and 438365 are the same text); card 'the person you need to talk to is Gus Geargrinder'; Models.txt 1639 dwarf_m_biker.adr."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) dwarf_m_biker chosen against the Fandom picture and matches his brother Dorn's 1640 dwarf_m_bikerthug; no model carries his name. POSITION IS A JUDGMENT: no source gives his spot. Uses record 9500000687's unanchored position, 10 m from Captain Sunspark (9500000657), who sends the player to him in Trapped and Alone. Jail Break's giver Dorn stands about 785 m away in Sunstone Valley, so that quest's walk is long; moving Dorn is a separate decision. Has a record (npc 9500000687, placement unanchored) with no drawn body. quest_wire's spawned_people() ignores a spawn whose name is already a record, so applying this row also needs content_key 9500000687 (npc_spawns_extra.json)."
+        }
+      ],
+      "position_w": null,
+      "content_key": 9500000687
+    },
+    {
+      "spawn_guid": 100000090020,
+      "legacy_npc_id": null,
+      "model_id": 65,
+      "model_file_name": "chugawug_m_greenwood_soldier.adr",
+      "name": "Wompugg",
+      "name_string_id": 37719,
+      "position": [
+        -2158.7,
+        -32.0,
+        377.9
+      ],
+      "heading": 3.1,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com/wiki/FR_Mob:Wompugg: Chugawug, male, Farnum's Farm, 'South of the farm, in the hills'; portrait on file (not compared). Quest page: 'Follow the green quest arrow to speak to Wompugg'."
+        },
+        {
+          "kind": "client",
+          "evidence": "npc_name 37719 'Wompugg'; 38573 'Speak with Wompugg near Farnum Farmstead'; 37994 'Wompugg is a Greenwood chugawug'; Models.txt 65 chugawug_m_greenwood_soldier.adr."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No video sighting. Greenwood soldier body by race, gender and the client's 'Greenwood chugawug' line; record 9500000282's model 13 is the female body, against the wiki. Position is that record's unanchored spot: in the hills, 25 m above Uncle Irving, but 150 m east of him and only about 50 m south of the sheep pens, so 'south of the farm' is a loose fit. Probe: all directions open, no water, flat. Has a record (npc 9500000282, placement unanchored) with no drawn body. quest_wire's spawned_people() ignores a spawn whose name is already a record, so applying this row also needs content_key 9500000282 (npc_spawns_extra.json)."
+        }
+      ],
+      "position_w": null,
+      "content_key": 9500000282
+    },
+    {
+      "spawn_guid": 100000090021,
+      "legacy_npc_id": null,
+      "model_id": 179,
+      "model_file_name": "changeling_m.adr",
+      "name": "Glumleaf",
+      "name_string_id": 73531,
+      "position": [
+        -859.7,
+        -50.0,
+        1733.9
+      ],
+      "heading": 0.79,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com/wiki/FR_Mob:Glumleaf: Changeling, male, Thistlerow, 'Found in Thistlerow during a quest'; portrait on file (not compared). Quest page Lost and Found: SW corner of the hedge maze."
+        },
+        {
+          "kind": "client",
+          "evidence": "npc_name 73531 'Glumleaf'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No video sighting. Generic male changeling body by the wiki's race and gender. Wiki corner from the Lost and Found page. The hedge pieces in prop_placements_2014.tsv all carry one origin (-814.7, -50, 1778.9), so the walls are unknown: this spot is 45 m off that origin toward the wiki's corner, and the collision probe shows no walls there. CHECK IN GAME that it is inside the maze and not inside a hedge. Has a record (npc 9500000141, placement unanchored) with no drawn body. quest_wire's spawned_people() ignores a spawn whose name is already a record, so applying this row also needs content_key 9500000141 (npc_spawns_extra.json)."
+        }
+      ],
+      "position_w": null,
+      "content_key": 9500000141
+    },
+    {
+      "spawn_guid": 100000090022,
+      "legacy_npc_id": null,
+      "model_id": 178,
+      "model_file_name": "changeling_f.adr",
+      "name": "Glowlum",
+      "name_string_id": 73535,
+      "position": [
+        -859.7,
+        -50.0,
+        1823.9
+      ],
+      "heading": 2.36,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com/wiki/FR_Mob:Glowlum: Changeling, female, Thistlerow, 'Found in Thistlerow during a quest'; portrait on file (not compared). Quest page Lost and Found: near the SE corner of the hedge maze."
+        },
+        {
+          "kind": "client",
+          "evidence": "npc_name 73535 'Glowlum'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No video sighting. Generic female changeling body by the wiki's race and gender. Wiki corner from the Lost and Found page. The hedge pieces in prop_placements_2014.tsv all carry one origin (-814.7, -50, 1778.9), so the walls are unknown: this spot is 45 m off that origin toward the wiki's corner, and the collision probe shows no walls there. CHECK IN GAME that it is inside the maze and not inside a hedge. Has a record (npc 9500000140, placement unanchored) with no drawn body. quest_wire's spawned_people() ignores a spawn whose name is already a record, so applying this row also needs content_key 9500000140 (npc_spawns_extra.json)."
+        }
+      ],
+      "position_w": null,
+      "content_key": 9500000140
+    },
+    {
+      "spawn_guid": 100000090023,
+      "legacy_npc_id": null,
+      "model_id": 179,
+      "model_file_name": "changeling_m.adr",
+      "name": "Noctelun",
+      "name_string_id": 73536,
+      "position": [
+        -814.7,
+        -50.0,
+        1778.9
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com/wiki/FR_Mob:Noctelun: Changeling, male, Thistlerow, 'Found in Thistlerow during a quest'; portrait on file (not compared). Quest page Lost and Found: near the centre of the hedge maze."
+        },
+        {
+          "kind": "client",
+          "evidence": "npc_name 73536 'Noctelun'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No video sighting. Generic male changeling body by the wiki's race and gender. Wiki corner from the Lost and Found page. The hedge pieces in prop_placements_2014.tsv all carry one origin (-814.7, -50, 1778.9), so the walls are unknown: this spot is 45 m off that origin toward the wiki's corner, and the collision probe shows no walls there. CHECK IN GAME that it is inside the maze and not inside a hedge. Has a record (npc 9500000186, placement unanchored) with no drawn body. quest_wire's spawned_people() ignores a spawn whose name is already a record, so applying this row also needs content_key 9500000186 (npc_spawns_extra.json)."
+        }
+      ],
+      "position_w": null,
+      "content_key": 9500000186
+    },
+    {
+      "spawn_guid": 100000090024,
+      "legacy_npc_id": null,
+      "model_id": 178,
+      "model_file_name": "changeling_f.adr",
+      "name": "Lumfall",
+      "name_string_id": 73550,
+      "position": [
+        -769.7,
+        -50.0,
+        1733.9
+      ],
+      "heading": -0.79,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com/wiki/FR_Mob:Lumfall: Changeling, female, Thistlerow, 'Found in Thistlerow during a quest'; portrait on file (not compared). Quest page Lost and Found: near the NW corner of the hedge maze."
+        },
+        {
+          "kind": "client",
+          "evidence": "npc_name 73550 'Lumfall'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No video sighting. Generic female changeling body by the wiki's race and gender. Wiki corner from the Lost and Found page. The hedge pieces in prop_placements_2014.tsv all carry one origin (-814.7, -50, 1778.9), so the walls are unknown: this spot is 45 m off that origin toward the wiki's corner, and the collision probe shows no walls there. CHECK IN GAME that it is inside the maze and not inside a hedge. Has a record (npc 9500000167, placement unanchored) with no drawn body. quest_wire's spawned_people() ignores a spawn whose name is already a record, so applying this row also needs content_key 9500000167 (npc_spawns_extra.json)."
+        }
+      ],
+      "position_w": null,
+      "content_key": 9500000167
+    },
+    {
+      "spawn_guid": 100000090025,
+      "legacy_npc_id": null,
+      "model_id": 179,
+      "model_file_name": "changeling_m.adr",
+      "name": "Jellum",
+      "name_string_id": 73551,
+      "position": [
+        -769.7,
+        -50.0,
+        1823.9
+      ],
+      "heading": -2.36,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com/wiki/FR_Mob:Jellum: Changeling, male, Thistlerow, 'Found in Thistlerow during a quest'; portrait on file (not compared). Quest page Lost and Found: NE corner of the hedge maze."
+        },
+        {
+          "kind": "client",
+          "evidence": "npc_name 73551 'Jellum'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No video sighting. Generic male changeling body by the wiki's race and gender. Wiki corner from the Lost and Found page. The hedge pieces in prop_placements_2014.tsv all carry one origin (-814.7, -50, 1778.9), so the walls are unknown: this spot is 45 m off that origin toward the wiki's corner, and the collision probe shows no walls there. CHECK IN GAME that it is inside the maze and not inside a hedge. Has a record (npc 9500000146, placement unanchored) with no drawn body. quest_wire's spawned_people() ignores a spawn whose name is already a record, so applying this row also needs content_key 9500000146 (npc_spawns_extra.json). Record 9500000146's model 666 is another character's named body (changeling_eggertthemad_m), so it is not used."
+        }
+      ],
+      "position_w": null,
+      "content_key": 9500000146
+    },
+    {
+      "spawn_guid": 100000090026,
+      "legacy_npc_id": null,
+      "model_id": 384,
+      "model_file_name": "fairy_sanctuary_f.adr",
+      "name": "Bonny",
+      "name_string_id": 391234,
+      "position": [
+        -1340,
+        -31.2,
+        225
+      ],
+      "heading": 2.21,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com/wiki/FR_Mob:Bonny: Pixie, female, Queensfields, 'West of Sanctuary's archway'; no portrait on file. Quest page: 'to the west of Sanctuary's entrance archway'. Card: fetching Ammi Lilies 'near the water just outside Sanctuary'."
+        },
+        {
+          "kind": "client",
+          "evidence": "npc_name 391234 'Bonny'; Models.txt 384 fairy_sanctuary_f.adr, the body of Sanctuary's pixie women."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". No video sighting of her (13 OCR hits for 'Bonny' are all player names). The archway is not in our props. This spot is on the bank about 25 m from the river at (-1320, 210), matching the card's 'near the water', and about 145 m north-west of the Sanctuary Warpstone; whether that is 'west of the archway' cannot be proven, and the probe labels it Sanctuary, not Queensfields. Probe: all directions open, no water at the spot, slope 6."
+        }
+      ],
+      "position_w": null,
+      "content_key": 9500003704
+    },
+    {
+      "spawn_guid": 100000090027,
+      "legacy_npc_id": null,
+      "model_id": 345,
+      "model_file_name": "fairy_royalguard_m.adr",
+      "name": "Guard Forbi",
+      "name_string_id": 91093,
+      "position": [
+        -1784,
+        -29.8,
+        566
+      ],
+      "heading": 2.19,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com/wiki/FR_Mob:Guard_Forbi: Pixie, male, Sanctuary; 'off the main road that leads South out of Sanctuary, between the warp stones for Sanctuary and Crossroads, East from the main road, up a hill, standing next to a Hooligan Delinquent'. Portrait viewed: blue cap with red trim."
+        },
+        {
+          "kind": "client",
+          "evidence": "npc_name 91093 'Guard Forbi'; Models.txt 345 fairy_royalguard_m.adr, the body of Guards Glibbin and Slashi and the Royal Guard spawns."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No video sighting of him (no OCR hit). Spot follows the wiki: 7 m from Hooligan 131000102004 at (-1779.5, -28.9, 562.8), east of the road (which runs near z 430 at this latitude) and about 8 m above it. The Hooligans are field_enemies.json rows named 'Hooligan' (the wiki says Hooligan Delinquent), themselves placed by earlier reconstruction; 131000102004 is a level 3-4 roamer. Probe: all directions open, no water, slope 5."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090028,
+      "legacy_npc_id": null,
+      "model_id": 345,
+      "model_file_name": "fairy_royalguard_m.adr",
+      "name": "Guard Nibbs",
+      "name_string_id": 91101,
+      "position": [
+        -1815,
+        -43.45,
+        182
+      ],
+      "heading": -2.82,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com/wiki/FR_Mob:Guard_Nibbs: Pixie, male, Sanctuary; same stretch of road, 'West from the main road, standing next to a Hooligan Delinquent'. Portrait on file (not compared)."
+        },
+        {
+          "kind": "client",
+          "evidence": "npc_name 91101 'Guard Nibbs'; Models.txt 345 fairy_royalguard_m.adr."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No video sighting of him (no OCR hit). Sibling step: the tool stops at Forbi, so Nibbs is not yet in its list, but the quest needs him. Spot is beside Hooligans 131000102035/036, on the west side. The Hooligans are field_enemies.json rows named 'Hooligan' (the wiki says Hooligan Delinquent), themselves placed by earlier reconstruction; those two are level 19-20 elites, too strong for a Chapter 1 quest: consider moving them or him. Probe: all directions open, no water, slope 8."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090029,
+      "legacy_npc_id": null,
+      "model_id": 64,
+      "model_file_name": "chugawug_f_greenwood_soldier.adr",
+      "name": "Private Nabogga",
+      "name_string_id": 72380,
+      "position": [
+        -549,
+        -70.675,
+        2167
+      ],
+      "heading": -0.78,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com/wiki/FR_Mob:Private_Nabogga: Chugawug, female, Briarwood/Bristlewood; no portrait on file. Sibling Private Gorgil's page: 'snoozing in Bristlewood until you complete Cold Water Surprise'."
+        },
+        {
+          "kind": "client",
+          "evidence": "npc_name 72380 'Private Nabogga'; Models.txt 64 chugawug_f_greenwood_soldier.adr, the soldier body worn by Private Gailug and Private Gorglemain."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". No video sighting. No source gives her spot: midway between the other two drawn sentries, Private Chimachug (-633.7, 2011.0) and Private Gorgil (-464.8, 2323.2). Probe: all directions open, no water, flat."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090030,
+      "legacy_npc_id": null,
+      "model_id": 1302,
+      "model_file_name": "fairy_m_pit_boss_buck.agr",
+      "name": "Pit Boss Buck",
+      "name_string_id": 394253,
+      "position": [
+        -262.5,
+        0.15,
+        -20.5
+      ],
+      "heading": -1.57,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Models.txt 1302 fairy_m_pit_boss_buck.agr is his own named model; 394253 'Pit Boss Buck'. Models.txt 1303 ..._incar is the in-car version, not used."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No wiki page and no video sighting. Named model, not rendered. Stands 4 m from J. P. Screecher, who gives the quest at Frost Ridge Speedway (speedway POI at -233, -50); the quest text says nothing about his spot. Probe: all directions open, no water, slope 4."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090031,
+      "legacy_npc_id": null,
+      "model_id": 459,
+      "model_file_name": "fairy_archdruid_f.adr",
+      "name": "Brienne Ultrafang",
+      "name_string_id": 719,
+      "position": [
+        486,
+        65.5,
+        1751
+      ],
+      "heading": -2.36,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Quest page Essssspionage (fr.fanbyte.com): Headmaster Merk calls her 'the Venomlord', 'leader of the Druids of the Viper'; she teaches the Serpent Form. No FR_Mob page and no Fandom page."
+        },
+        {
+          "kind": "video",
+          "evidence": "1 OCR frame of her name, a chat line (c2VFjTmwysw t=62); it does not show her."
+        },
+        {
+          "kind": "client",
+          "evidence": "719 'Brienne Ultrafang'; 814 'Venomlord'; 437338 calls her 'my lady'; Models.txt 459 fairy_archdruid_f.adr."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". Her race is unknown; the archdruid woman body fits the leader of a druid order. Spot is 6 m from Headmaster Merk, who sends the player to her. The wiki puts this in Shrouded Gloam, but Merk's legacy spot is in Sunstone Valley, so she follows him there. Probe: 7 of 8 directions open, no water, flat."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090035,
+      "legacy_npc_id": null,
+      "model_id": 199,
+      "model_file_name": "chugawug_m_bandit_01.adr",
+      "name": "Shady Chugawug Archer",
+      "name_string_id": 5101424,
+      "position": [
+        -2110.0,
+        -56.4,
+        212.0
+      ],
+      "heading": 3.14,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Quest page Looking for Trouble (fr.fanbyte.com): one shady chugawug is 'by the sheep pen', with his line of dialogue. No FR_Mob page."
+        },
+        {
+          "kind": "client",
+          "evidence": "npc_name 37741 'Shady Chugawug'; Models.txt 199 chugawug_m_bandit_01.adr."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Sibling step of Looking for Trouble (the tool stops at the first step). Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". Bandit body chosen for 'shady'; gender not stated. Spot is beside the ewe group at (-2110, 203) Probe: no water, slope under 10."
+        }
+      ],
+      "position_w": null,
+      "content_key": 9500003929
+    },
+    {
+      "spawn_guid": 100000090036,
+      "legacy_npc_id": null,
+      "model_id": 199,
+      "model_file_name": "chugawug_m_bandit_01.adr",
+      "name": "Shady Chugawug Soldier",
+      "name_string_id": 5101425,
+      "position": [
+        -2072,
+        -55.6,
+        214
+      ],
+      "heading": -1.84,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Quest page Looking for Trouble (fr.fanbyte.com): one shady chugawug is 'by the tower defense tables east of the sheep pen', with his line of dialogue. No FR_Mob page."
+        },
+        {
+          "kind": "client",
+          "evidence": "npc_name 37741 'Shady Chugawug'; Models.txt 199 chugawug_m_bandit_01.adr."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Sibling step of Looking for Trouble (the tool stops at the first step). Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". Bandit body chosen for 'shady'; gender not stated. Spot is 6 m from the Garden Defense table at (-2077.9, 212.4) Probe: no water, slope under 10."
+        }
+      ],
+      "position_w": null,
+      "content_key": 9500003931
+    },
+    {
+      "spawn_guid": 100000090037,
+      "legacy_npc_id": null,
+      "model_id": 199,
+      "model_file_name": "chugawug_m_bandit_01.adr",
+      "name": "Shady Chugawug Mage",
+      "name_string_id": 5101427,
+      "position": [
+        -2140,
+        -56.1,
+        236
+      ],
+      "heading": 2.4,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Quest page Looking for Trouble (fr.fanbyte.com): one shady chugawug is 'southeast of the sheep pen, by the trees', with his line of dialogue. No FR_Mob page."
+        },
+        {
+          "kind": "client",
+          "evidence": "npc_name 37741 'Shady Chugawug'; Models.txt 199 chugawug_m_bandit_01.adr."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Sibling step of Looking for Trouble (the tool stops at the first step). Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". Bandit body chosen for 'shady'; gender not stated. Spot is south-east of the ewe group, on open ground. Probe: no water, slope under 10."
+        }
+      ],
+      "position_w": null,
+      "content_key": 9500003930
+    },
+    {
+      "spawn_guid": 100000090038,
+      "legacy_npc_id": null,
+      "model_id": 1590,
+      "model_file_name": "human_m_fisherman_01.agr",
+      "name": "Fisherman",
+      "name_string_id": 20178,
+      "position": [
+        84,
+        24.95,
+        353
+      ],
+      "heading": -1.56,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Quest page The Hole Thing (fr.fanbyte.com) gives 'Fisherman's Dialogue' and 'The fishing hole is to the right and back as you face Big J, behind the boat to the Frostbitten Banks'. No FR_Mob page for him."
+        },
+        {
+          "kind": "client",
+          "evidence": "20178 'Fisherman'; step 92635 'Talk to the fisherman'; Models.txt 1590 human_m_fisherman_01.agr."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". The three spawns named Fisherman are all at Lakeshore; 4 video markers named Fisherman exist and were not traced to a place, so they are not counted as sightings of him. Spot is 11 m past the boat prop (72.9, 353.1) from Big J's side. No ice-hole prop was found by the boat; the nearest fishing-water prop is a pond 88 m away at (59.8, 440.8), which may be the hole, so the exact spot is unknown. Probe: all directions open, no water, slope 14."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090039,
+      "legacy_npc_id": null,
+      "model_id": 345,
+      "model_file_name": "fairy_royalguard_m.adr",
+      "name": "Royal Palace Guard",
+      "name_string_id": 14702,
+      "position": [
+        -1224,
+        1.6,
+        308
+      ],
+      "heading": -1.57,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com/wiki/FR_Mob:Royal_Palace_Guard: Pixie, male, Sanctuary, 'In front of the Royal Palace'; portrait on file (not compared)."
+        },
+        {
+          "kind": "client",
+          "evidence": "14702 'Royal Palace Guard'; 390352 is the palace guard's line ('no one is allowed entry without a pass'); Models.txt 345 fairy_royalguard_m.adr."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No video sighting. Stands between the two Royal Guard spawns 100000033443/444 at the palace approach. Binding one of those spawns is the alternative, but they are named 'Royal Guard', not this client name. Also fits Bravery is in Demand's next step, which the tool stops before reaching; Farnum's Free Advice and Sharing Your Talents use the same step but are switched off. Probe: all directions open, no water, slope 17."
+        }
+      ],
+      "position_w": null,
+      "content_key": 9500003915
+    },
+    {
+      "spawn_guid": 100000090040,
+      "legacy_npc_id": null,
+      "model_id": 184,
+      "model_file_name": "human_m_freestyle_01.agr",
+      "name": "Merry Spectator",
+      "name_string_id": 410595,
+      "position": [
+        -1108.0,
+        -38.7,
+        -352.0
+      ],
+      "heading": -1.77,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Quest page Busting the Fourth Wall (fr.fanbyte.com): goals name the audience by look only. No FR_Mob page."
+        },
+        {
+          "kind": "client",
+          "evidence": "Step text is the client's ('Talk to the human man wearing green'); 71292 calls them spectators; 410595 'Merry Spectator'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". Generic human man body. The shirt colour the step names is NOT checked: no render was made. No named extras exist for this crowd: the card asks the player to 'talk to the audience'. Tarvie, one of Joona's players, stands at y -30 at (-1126, -355), which marks the stage; this spot is in front of it, near Joona. The 410595 'Merry Spectator' name is the client's own, though nothing ties it to this quest. Probe: no water, walkable."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090041,
+      "legacy_npc_id": null,
+      "model_id": 13,
+      "model_file_name": "chugawug_f_01.adr",
+      "name": "Merry Spectator",
+      "name_string_id": 410595,
+      "position": [
+        -1116,
+        -37.8,
+        -346
+      ],
+      "heading": -2.34,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Quest page Busting the Fourth Wall (fr.fanbyte.com): goals name the audience by look only. No FR_Mob page."
+        },
+        {
+          "kind": "client",
+          "evidence": "Step text is the client's ('Talk to the chugawug woman'); 71292 calls them spectators; 410595 'Merry Spectator'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Sibling step (the tool stops at the first). Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". Generic chugawug woman body. No named extras exist for this crowd: the card asks the player to 'talk to the audience'. Tarvie, one of Joona's players, stands at y -30 at (-1126, -355), which marks the stage; this spot is in front of it, near Joona. The 410595 'Merry Spectator' name is the client's own, though nothing ties it to this quest. Probe: no water, walkable."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090042,
+      "legacy_npc_id": null,
+      "model_id": 190,
+      "model_file_name": "robgoblin_f_basic.adr",
+      "name": "Merry Spectator",
+      "name_string_id": 410595,
+      "position": [
+        -1106.0,
+        -38.9,
+        -356.0
+      ],
+      "heading": -1.56,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Quest page Busting the Fourth Wall (fr.fanbyte.com): goals name the audience by look only. No FR_Mob page."
+        },
+        {
+          "kind": "client",
+          "evidence": "Step text is the client's ('Talk to the robgoblin gal'); 71292 calls them spectators; 410595 'Merry Spectator'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Sibling step (the tool stops at the first). Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". Generic robgoblin woman body. No named extras exist for this crowd: the card asks the player to 'talk to the audience'. Tarvie, one of Joona's players, stands at y -30 at (-1126, -355), which marks the stage; this spot is in front of it, near Joona. The 410595 'Merry Spectator' name is the client's own, though nothing ties it to this quest. Probe: no water, walkable."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090043,
+      "legacy_npc_id": null,
+      "model_id": 312,
+      "model_file_name": "human_m_freestyle_03.agr",
+      "name": "Merry Spectator",
+      "name_string_id": 410595,
+      "position": [
+        -1104,
+        -39.7,
+        -350
+      ],
+      "heading": -1.82,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Quest page Busting the Fourth Wall (fr.fanbyte.com): goals name the audience by look only. No FR_Mob page."
+        },
+        {
+          "kind": "client",
+          "evidence": "Step text is the client's ('Talk to the human man wearing purple'); 71292 calls them spectators; 410595 'Merry Spectator'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Sibling step (the tool stops at the first). Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". Generic human man body. The shirt colour the step names is NOT checked: no render was made. No named extras exist for this crowd: the card asks the player to 'talk to the audience'. Tarvie, one of Joona's players, stands at y -30 at (-1126, -355), which marks the stage; this spot is in front of it, near Joona. The 410595 'Merry Spectator' name is the client's own, though nothing ties it to this quest. Probe: no water, walkable."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090044,
+      "legacy_npc_id": null,
+      "model_id": 384,
+      "model_file_name": "fairy_sanctuary_f.adr",
+      "name": "Merry Spectator",
+      "name_string_id": 410595,
+      "position": [
+        -1112,
+        -38.8,
+        -345
+      ],
+      "heading": -2.22,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Quest page Busting the Fourth Wall (fr.fanbyte.com): goals name the audience by look only. No FR_Mob page."
+        },
+        {
+          "kind": "client",
+          "evidence": "Step text is the client's ('Talk to the pixie girl'); 71292 calls them spectators; 410595 'Merry Spectator'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Sibling step (the tool stops at the first). Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". Generic pixie woman body. No named extras exist for this crowd: the card asks the player to 'talk to the audience'. Tarvie, one of Joona's players, stands at y -30 at (-1126, -355), which marks the stage; this spot is in front of it, near Joona. The 410595 'Merry Spectator' name is the client's own, though nothing ties it to this quest. Probe: no water, walkable."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090045,
+      "legacy_npc_id": null,
+      "model_id": 184,
+      "model_file_name": "human_m_freestyle_01.agr",
+      "name": "Tangletrack Spectator",
+      "name_string_id": 115738,
+      "position": [
+        -280,
+        -59.0,
+        1947
+      ],
+      "heading": 0.9,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "115738 'Tangletrack Spectator' sits in the same id block as this quest's lines (115713 is the step, 115714-115716 its neighbours); Models.txt 184 human_m_freestyle_01.agr."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". No wiki page and no video sighting. The wiki does not say who the player asks. One body at the Tangletrack Speedway POI (-273.8, 1951.9) answers a count-1 step; the id block is why this name was chosen, and that link is inference. Race and gender are unknown. Probe: all directions open, no water, flat."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090046,
+      "legacy_npc_id": null,
+      "model_id": 16,
+      "model_file_name": "penguin_01.adr",
+      "name": "Pengu",
+      "name_string_id": 3317,
+      "position": [
+        372,
+        55.034,
+        540
+      ],
+      "heading": -2.34,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "3317 'Pengu'; step 'Feed Pengu the penguin' and the closing 410295 'Return to Valinda', both from lab/autopilot/opus/quest-research/client-steps/steps-fisherman.json; 410259 places Valinda at the Penguin Training Institute; Models.txt 16 penguin_01.adr, also the existing Penguin spawn at (386.6, 557.4)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". No wiki page for this client-only quest and no video sighting. Stands in the yard between Valinda and the Penguin spawn. Probe: no water, walkable."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090047,
+      "legacy_npc_id": null,
+      "model_id": 16,
+      "model_file_name": "penguin_01.adr",
+      "name": "Penge",
+      "name_string_id": 3315,
+      "position": [
+        377.0,
+        54.549,
+        546.3
+      ],
+      "heading": -2.39,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "3315 'Penge'; step 'Feed Penge the penguin' and the closing 410295 'Return to Valinda', both from lab/autopilot/opus/quest-research/client-steps/steps-fisherman.json; 410259 places Valinda at the Penguin Training Institute; Models.txt 16 penguin_01.adr, also the existing Penguin spawn at (386.6, 557.4)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Sibling step (the tool stops at the first). Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". No wiki page for this client-only quest and no video sighting. Stands in the yard between Valinda and the Penguin spawn. Probe: no water, walkable."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090048,
+      "legacy_npc_id": null,
+      "model_id": 16,
+      "model_file_name": "penguin_01.adr",
+      "name": "Pengi",
+      "name_string_id": 3314,
+      "position": [
+        383.0,
+        54.57,
+        541.7
+      ],
+      "heading": -2.04,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "3314 'Pengi'; step 'Feed Pengi the penguin' and the closing 410295 'Return to Valinda', both from lab/autopilot/opus/quest-research/client-steps/steps-fisherman.json; 410259 places Valinda at the Penguin Training Institute; Models.txt 16 penguin_01.adr, also the existing Penguin spawn at (386.6, 557.4)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Sibling step (the tool stops at the first). Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". No wiki page for this client-only quest and no video sighting. Stands in the yard between Valinda and the Penguin spawn. Probe: no water, walkable."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090049,
+      "legacy_npc_id": null,
+      "model_id": 16,
+      "model_file_name": "penguin_01.adr",
+      "name": "Pengy",
+      "name_string_id": 3316,
+      "position": [
+        374.2,
+        54.548,
+        547.8
+      ],
+      "heading": -2.55,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "3316 'Pengy'; step 'Feed Pengy the penguin' and the closing 410295 'Return to Valinda', both from lab/autopilot/opus/quest-research/client-steps/steps-fisherman.json; 410259 places Valinda at the Penguin Training Institute; Models.txt 16 penguin_01.adr, also the existing Penguin spawn at (386.6, 557.4)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Sibling step (the tool stops at the first). Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". No wiki page for this client-only quest and no video sighting. Stands in the yard between Valinda and the Penguin spawn. Probe: no water, walkable."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090050,
+      "legacy_npc_id": null,
+      "model_id": 16,
+      "model_file_name": "penguin_01.adr",
+      "name": "Penga",
+      "name_string_id": 3313,
+      "position": [
+        388,
+        54.568,
+        549
+      ],
+      "heading": -2.18,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "3313 'Penga'; step 'Feed Penga the penguin' and the closing 410295 'Return to Valinda', both from lab/autopilot/opus/quest-research/client-steps/steps-fisherman.json; 410259 places Valinda at the Penguin Training Institute; Models.txt 16 penguin_01.adr, also the existing Penguin spawn at (386.6, 557.4)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Sibling step (the tool stops at the first). Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". No wiki page for this client-only quest and no video sighting. Stands in the yard between Valinda and the Penguin spawn. Probe: no water, walkable."
+        }
+      ],
+      "position_w": null
     }
   ]
 }

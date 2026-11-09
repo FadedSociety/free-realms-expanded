@@ -1630,8 +1630,23 @@
       "location_evidence": [
         "Seaside"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3955224,
+          "title": "Pearls for Ashby",
+          "title_string_id": 101713,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pearls for Ashby (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pearls_for_ashby_e4e50d)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3955224
+      ],
       "quests_given_text": [
         "\"Accessorize her outfit for the Beach Ball\" (1990079989, 2140583155); accessories come from Jet and Bandy Randi (1666566655, 506800004); completion line 90353220"
       ],
@@ -23350,11 +23365,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3389; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4822 (ModelId=4561, ModelFileName=fairy_m_merchant_warrior_asian_spark.agr, NameId=5102434)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.889407,
       "model_id": 4561,
-      "model_file_name": "fairy_m_merchant_warrior_asian_spark.agr"
+      "model_file_name": "fairy_m_merchant_warrior_asian_spark.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000591,

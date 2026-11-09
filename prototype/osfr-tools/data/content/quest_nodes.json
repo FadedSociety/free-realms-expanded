@@ -2285,6 +2285,30 @@
         "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
       },
       "name_id": 2046
+    },
+    {
+      "key": "quest-well",
+      "name": "Well",
+      "model_id": 3519,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 8306
     }
   ],
   "pools": [
@@ -3703,6 +3727,21 @@
       "zone_definition_id": 1,
       "node_type": "quest-toad-1",
       "max_active_nodes": 4,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-well",
+      "zone_definition_id": 1,
+      "node_type": "quest-well",
+      "max_active_nodes": 3,
       "respawn_seconds": 30,
       "source_tag": "reconstructed",
       "source_tags": {
@@ -12065,6 +12104,54 @@
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
         "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 601,
+      "pool_key": "quest-well",
+      "zone_definition_id": 1,
+      "position": [
+        -400.15,
+        13.21,
+        600.54
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) At the well beside Old Gregory's camp: the client's line and the wiki put it there, and the 2014 props have sg_well_01.adr at (-400.15, 13.1, 598.14).",
+        "heading": "(R) At the well beside Old Gregory's camp: the client's line and the wiki put it there, and the 2014 props have sg_well_01.adr at (-400.15, 13.1, 598.14)."
+      }
+    },
+    {
+      "id": 602,
+      "pool_key": "quest-well",
+      "zone_definition_id": 1,
+      "position": [
+        -397.95,
+        13.2,
+        596.74
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) At the well beside Old Gregory's camp: the client's line and the wiki put it there, and the 2014 props have sg_well_01.adr at (-400.15, 13.1, 598.14).",
+        "heading": "(R) At the well beside Old Gregory's camp: the client's line and the wiki put it there, and the 2014 props have sg_well_01.adr at (-400.15, 13.1, 598.14)."
+      }
+    },
+    {
+      "id": 603,
+      "pool_key": "quest-well",
+      "zone_definition_id": 1,
+      "position": [
+        -402.35,
+        13.31,
+        596.74
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) At the well beside Old Gregory's camp: the client's line and the wiki put it there, and the 2014 props have sg_well_01.adr at (-400.15, 13.1, 598.14).",
+        "heading": "(R) At the well beside Old Gregory's camp: the client's line and the wiki put it there, and the 2014 props have sg_well_01.adr at (-400.15, 13.1, 598.14)."
       }
     }
   ]

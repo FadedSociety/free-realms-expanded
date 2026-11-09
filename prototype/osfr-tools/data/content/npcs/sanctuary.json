@@ -37751,8 +37751,23 @@
       "location_evidence": [
         "Memorial Caverns: \"Talk to Lorna in the Memorial Caverns.\" (3955831805); \"Have you spoken to Lorna in the Memorial Caverns yet?\" (3356360564); \"an angry lady in the Memorial Caverns\" (1841258661). The well north of Durango Zoo drops the player to her: \"Jump down the well to reach Lorna\" (427120182; 2197858507). Wiki collection \"Break my Fall\": \"in the water at the base of a waterfall near Lorna\" in the Memorial Caverns."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3955070,
+          "title": "A Plea for Peace and Quiet",
+          "title_string_id": 70828,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Plea for Peace and Quiet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_plea_for_peace_and_quiet_f3c6af)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3955070
+      ],
       "quests_given_text": [
         "Old Gregory's well and chess-table chain: \"Speak to Lorna\" (3130468564), \"Is Lorna the source of the well voice?\" (2752803964), invite her to Old Gregory's camp (1052991284, 1106655288). Quest title not found. Giver is Old Gregory (NPCs - Durango Zoo), not Lorna."
       ],
@@ -59678,8 +59693,23 @@
       "location_evidence": [
         "Memorial Caverns, Sanctuary (747530949, 1273915006, 1342827743)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3955201,
+          "title": "Looking for Volunteers",
+          "title_string_id": 21604,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Looking for Volunteers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_volunteers_5f7af1)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3955201
+      ],
       "quests_given_text": [
         "Looking for Volunteers (find Arnie, Fhred and the murals; shirt reward, 2072750928); missing-tourist errand \"find Ceri in Darvon's Descent\" (1259229194); three stolen artifacts (2991605816) (Darvon's Descent)"
       ],
@@ -63807,8 +63837,23 @@
       "location_evidence": [
         "Behind the houses west of Sanctuary."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3955250,
+          "title": "Royal RSVP",
+          "title_string_id": 390676,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Royal RSVP (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_royal_rsvp_7534e3)."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3955250
+      ],
       "quests_given_text": [],
       "quests_accepted": [],
       "quests_accepted_reason": null,
@@ -63817,9 +63862,9 @@
       "services": [],
       "services_reason": null,
       "position": [
-        -1415.923,
-        -35.308,
-        231.144
+        -1358.0,
+        -29.31,
+        159.8
       ],
       "position_w": 1.0,
       "rotation": [
@@ -64021,12 +64066,12 @@
         ],
         "position": [
           {
-            "kind": "legacy-data",
-            "evidence": "centroid of legacy spawns at the same wiki place: Greyli Dustywings, Honey, Seafoam, Sunflower, Yuri Petaldancer"
+            "kind": "video",
+            "evidence": "lab/reports/placement/index.tsv: Auralie at x=-1358.0 z=159.8 (FabledRealms), error 3.5 m, 5 sightings in 3 videos."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) the giver stands among the NPCs the wiki puts at the same place"
+            "evidence": "(R) The video placement, set down on the floor there."
           }
         ],
         "position_w": [
@@ -64094,8 +64139,15 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: most common model of drawn pixie female NPCs"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     }
   ]
 }

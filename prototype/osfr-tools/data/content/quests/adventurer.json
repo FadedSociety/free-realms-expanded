@@ -4352,10 +4352,65 @@
     {
       "id": 3000051,
       "title_string_id": 391183,
-      "giver_npc_id": 9000000445,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "giver_npc_id": 9500003770,
+      "prerequisite_quest_ids": [
+        3000029
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 391224,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Bonny (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_belated_bonny_1afc76)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "fr.fanbyte.com/wiki/FR_Mob:Bonny: Pixie, female, Queensfields, 'West of Sanctuary's archway'; no portrait on file. Quest page: 'to the west of Sanctuary's entrance archway'. Card: fetching Ammi Lilies 'near the water just outside Sanctuary'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "npc_name 391234 'Bonny'; Models.txt 384 fairy_sanctuary_f.adr, the body of Sanctuary's pixie women."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". No video sighting of her (13 OCR hits for 'Bonny' are all player names). The archway is not in our props. This spot is on t"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "spawn_guid 100000090026"
+            }
+          ],
+          "npc_id": 9500003704
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 391226,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Frolic Steadywings in the Royal Palace (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_belated_bonny_1afc76)."
+            }
+          ],
+          "npc_id": 9500003770
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 12,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Belated Bonny (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_belated_bonny_1afc76)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -4397,7 +4452,7 @@
       "description_string_id": 391184,
       "intro_text_string_id": 391182,
       "end_text_string_id": 391185,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000052,

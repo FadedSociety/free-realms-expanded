@@ -2097,9 +2097,49 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part B. The camp just north of the zoo, row 40; source cell: [client]"
             }
           ]
+        },
+        {
+          "quest_id": 3955191,
+          "title": "Jump in the Well",
+          "title_string_id": 70811,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Jump in the Well (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_jump_in_the_well_2bc347)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3955313,
+          "title": "Well Wishes",
+          "title_string_id": 70832,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Well Wishes (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_well_wishes_6918c3)."
+            }
+          ]
+        },
+        {
+          "quest_id": 3955141,
+          "title": "Extending an Invite",
+          "title_string_id": 71213,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Extending an Invite (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_extending_an_invite_cc8793)."
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3955191,
+        3955313,
+        3955141
+      ],
       "quests_given_text": [
         "The well chain: \"Could you check out that well for me?\" (1530040842); \"Check out the well for Old Gregory. He might not be just hearing things...\" (1077296856). The voice is Lorna, a chess player in the Memorial Caverns, who wants quiet: \"Break the news to Old Gregory that his magical, talking well is nothing more than an angry lady in the Memorial Caverns, and ask him to keep it down.\" (1841258661); his reply \"You mean to tell me my well is alive and well? She plays chess too, you say? Maybe if I had a table in my camp she'd be willing to visit...\" (160616205). Next link: Scoring a Chess Table (client title 1086900492; fetch a table from Fedrick in Shrouded Glade; \"Did you get that chess table from Shrouded Glade yet? I'm an impatient old man.\", 2557626828) and \"Go fetch Lorna\" (3333957292). Separate job: Robgoblin Adept Trouble! (client title 1655477556; \"Robgoblin Adepts have been running around Old Gregory's campsite, waving their fiery wands all over the place...\", 2582277123). Hand-ins \"Return to Old Gregory\" (2880660657, 973743465). Chain titles other than the two named are not found."
       ],
@@ -2407,11 +2447,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2843; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4177 (ModelId=25, ModelFileName=humanelder_m_peacoat.adr, NameId=70768)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.018108,
       "model_id": 25,
-      "model_file_name": "humanelder_m_peacoat.adr"
+      "model_file_name": "humanelder_m_peacoat.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000262,

@@ -28753,10 +28753,23 @@
               "evidence": "title_string_id corrected from raw locale hash 4291056686 to Global.Text id 410201 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3955248,
+          "title": "Resort Refreshments",
+          "title_string_id": 46307,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Resort Refreshments (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_resort_refreshments_cbe30e)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3070047
+        3070047,
+        3955248
       ],
       "quests_given_text": [
         "Fisherman: Fisherman: Snowhill Getaway, Fisherman: My Hut is Your Hut (hands off to Lenore). Hot Springs problems (yeti noise, clean towels from Downey, overdue book, smoothie shop; client 472821565, 545298654, 308421505, 4158807195, 3958234421). The title of that chain is not proven (see #Town and event quests). Tilda's overdue-book errand (client 1613887895)."

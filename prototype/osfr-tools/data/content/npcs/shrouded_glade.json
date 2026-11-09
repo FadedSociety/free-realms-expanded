@@ -17688,11 +17688,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:202; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1435 (ModelId=468, ModelFileName=fairy_druid_m.adr, NameId=70771)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.02352,
       "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr"
+      "model_file_name": "fairy_druid_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000683,
@@ -19530,9 +19537,9 @@
       ],
       "services_reason": null,
       "position": [
-        -0.188721,
-        41.038,
-        1122.411242
+        -0.2,
+        40.868,
+        1122.4
       ],
       "position_w": null,
       "rotation": [
@@ -19922,12 +19929,24 @@
         ],
         "position": [
           {
+            "kind": "wiki",
+            "evidence": "Fandom page Gus Geargrinder: male dwarf, Shrouded Glade, leader of the Freewheelers biker gang; picture Gusgeargrinder.jpg (viewed) shows a bald, goggled dwarf in a black biker jacket. No Fanbyte page."
+          },
+          {
+            "kind": "video",
+            "evidence": "45 OCR frames with his name (live-era, e.g. 5ZQHyCvslXA t=34). reports/haiku-locate evidence: marker 22 m away in MUeqkWyQIOk t=42. No solved position in reports/placement/index.tsv."
+          },
+          {
             "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 8 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
+            "evidence": "npc_name 437262 'Gus Geargrinder' (437518 and 438365 are the same text); card 'the person you need to talk to is Gus Geargrinder'; Models.txt 1639 dwarf_m_biker.adr."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "evidence": "(R) dwarf_m_biker chosen against the Fandom picture and matches his brother Dorn's 1640 dwarf_m_bikerthug; no model carries his name. POSITION IS A JUDGMENT: no source gives his spot. Uses record 9500000687's unanchored position, 10 m from Captain Sunspark (9500000657), who sends the player to him in Trapped and Alone. Jail Break's giver Dorn stands about 785 m away in Sunstone Valley, so that quest's walk is long; moving Dorn is a separate decision. Has a record (npc 9500000687, placement unanchored) with no drawn body. quest_wire's spawned_people() ignores a spawn whose name is already a record, so applying this row also needs content_key 9500000687 (npc_spawns_extra.json)."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The record stands where its body row (spawn 100000090019) stands: talk reach is measured from it."
           }
         ],
         "position_reason": [

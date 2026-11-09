@@ -561,9 +561,12 @@ fn is_quest_binding_and_greeting_change_between(old: &Value, new: &Value) -> boo
             .copied()
             .chain(["greeting_string_id", "greeting_reason", "model_id", "model_file_name", "name_string_id", "field_sources", "position"])
             .collect();
-        // A record set down onto its floor changes height only.
+        // A record set down onto its floor changes height only. One moved anywhere else must
+        // cite why it now stands there.
         let same_spot = old["position"][0] == new["position"][0] && old["position"][2] == new["position"][2];
-        same_spot && without_fields(old, &fields) == without_fields(new, &fields)
+        let newly_cited = new["field_sources"]["position"].is_array()
+            && old["field_sources"]["position"] != new["field_sources"]["position"];
+        (same_spot || newly_cited) && without_fields(old, &fields) == without_fields(new, &fields)
     })
 }
 

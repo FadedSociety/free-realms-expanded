@@ -15629,6 +15629,1428 @@
       "intro_text_string_id": 41782,
       "enabled": true,
       "end_text_string_id": 41786
+    },
+    {
+      "id": 3955062,
+      "title_string_id": 46674,
+      "giver_npc_id": 9500000395,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 46680,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver to Joelle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_change_of_script_f6df05)."
+            }
+          ],
+          "npc_id": 9500000394
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 46682,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver to Morrie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_change_of_script_f6df05)."
+            }
+          ],
+          "npc_id": 9500000409
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 46684,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver to Tarvie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_change_of_script_f6df05)."
+            }
+          ],
+          "npc_id": 9500000428
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 46686,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver to Brennion (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_change_of_script_f6df05)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "fr.fanbyte.com/wiki/FR_Mob:Brennion: Fairy, male, Merry Vale; portrait on file (not compared to the body)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "reports/placement/index.tsv: Brennion solved at x=-963.8 z=-375.8, error 3.2 m, 2 sightings in 1 video, confidence medium."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "npc_name 47182 'Brennion'; step 46686 'Deliver to Brennion'."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Body from quest-research/npcs.json, by race and gender: 454 sprite_basic_m.adr, the Fairy race body, seen in model-view; not proven to be his look. Has a record (npc 9500000372, placement video_index) with no drawn body. quest_wire's spawned_people() ignores a spawn whose name is already a recor"
+            }
+          ],
+          "npc_id": 9500000372
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 46688,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver to Krissa (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_change_of_script_f6df05)."
+            }
+          ],
+          "npc_id": 9500000398
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 6,
+          "text_string_id": 46690,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver to Tyra (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_change_of_script_f6df05)."
+            }
+          ],
+          "npc_id": 9500000430
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 7,
+          "text_string_id": 46671,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Joona (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_change_of_script_f6df05)."
+            }
+          ],
+          "npc_id": 9500000395
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 9,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Change of Script (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_change_of_script_f6df05)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "A Change of Script (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_change_of_script_f6df05)."
+        }
+      ],
+      "description_string_id": 46675,
+      "intro_text_string_id": 46673,
+      "enabled": true
+    },
+    {
+      "id": 3955069,
+      "title_string_id": 46709,
+      "giver_npc_id": 9500000395,
+      "prerequisite_quest_ids": [
+        3955062
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 46715,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Ask Joelle to audition (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_new_star_is_born_2f8237)."
+            }
+          ],
+          "npc_id": 9500000394
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 46718,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Ask Tarvie to audition (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_new_star_is_born_2f8237)."
+            }
+          ],
+          "npc_id": 9500000428
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 46720,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Ask Krissa to audition (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_new_star_is_born_2f8237)."
+            }
+          ],
+          "npc_id": 9500000398
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 46671,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Joona (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_new_star_is_born_2f8237)."
+            }
+          ],
+          "npc_id": 9500000395
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A New Star is Born! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_new_star_is_born_2f8237)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "A New Star is Born! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_new_star_is_born_2f8237)."
+        }
+      ],
+      "description_string_id": 46710,
+      "intro_text_string_id": 46708,
+      "enabled": true
+    },
+    {
+      "id": 3955070,
+      "title_string_id": 70828,
+      "giver_npc_id": 9500000505,
+      "prerequisite_quest_ids": [
+        3955191
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 70837,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Old Gregory (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_plea_for_peace_and_quiet_f3c6af)."
+            }
+          ],
+          "npc_id": 9500000261
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Plea for Peace and Quiet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_plea_for_peace_and_quiet_f3c6af)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "A Plea for Peace and Quiet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_plea_for_peace_and_quiet_f3c6af)."
+        }
+      ],
+      "description_string_id": 70829,
+      "intro_text_string_id": 70827,
+      "enabled": true
+    },
+    {
+      "id": 3955105,
+      "title_string_id": 429062,
+      "giver_npc_id": 9500000297,
+      "prerequisite_quest_ids": [
+        3950264
+      ],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "text_string_id": 429067,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Bigfoot's Lair (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_camp_troubles_049260)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: quest page: 'Follow the quest marker to some trees southwest of Edmond'; closing line: 'The foot prints lead to a copse of trees.'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: 429067 is this step; 6756 'Bigfoot's Lair' is a dungeon name."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Centre of the tree props south-west of Counselor Edmond (-1560, -614) in prop_placements_2014.tsv. Exact marker spot unknown. No video frame was located for this step."
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -1603,
+            -35.15,
+            -678
+          ],
+          "radius": 20.0
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 429069,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Counselor Edmond (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_camp_troubles_049260)."
+            }
+          ],
+          "npc_id": 9500000297
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Camp Troubles (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_camp_troubles_049260)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Camp Troubles (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_camp_troubles_049260)."
+        }
+      ],
+      "description_string_id": 429063,
+      "intro_text_string_id": 429061,
+      "enabled": true
+    },
+    {
+      "id": 3955141,
+      "title_string_id": 71213,
+      "giver_npc_id": 9500000261,
+      "prerequisite_quest_ids": [
+        3955313
+      ],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "text_string_id": 71220,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Jump down the well to reach Lorna (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_extending_an_invite_cc8793)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 71220 is this step; the next step speaks to Lorna in the Memorial Caverns"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) anchored on Lorna's row 9500000505; the well travel itself is not modelled, so the player walks there"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -999.9815,
+            -52.48125,
+            295.0101
+          ],
+          "radius": 15
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 386047,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Lorna (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_extending_an_invite_cc8793)."
+            }
+          ],
+          "npc_id": 9500000505
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Extending an Invite (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_extending_an_invite_cc8793)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Extending an Invite (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_extending_an_invite_cc8793)."
+        }
+      ],
+      "description_string_id": 71214,
+      "intro_text_string_id": 71212,
+      "enabled": true
+    },
+    {
+      "id": 3955186,
+      "title_string_id": 21015,
+      "giver_npc_id": 9500003821,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 21019,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find someone in Lakeshore that will exchange some fish for the shiny piece of metal (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hungry_wolves_8480c5)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: quest page: 'The person who will accept the trade ... is Bluerose at the cooking table in Lakeshore'."
+            }
+          ],
+          "npc_id": 9000000027
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 21021,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Laggosh (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hungry_wolves_8480c5)."
+            }
+          ],
+          "npc_id": 9500003821
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 60,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Hungry Wolves (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hungry_wolves_8480c5)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Hungry Wolves (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hungry_wolves_8480c5)."
+        }
+      ],
+      "description_string_id": 21016,
+      "intro_text_string_id": 24958,
+      "enabled": true
+    },
+    {
+      "id": 3955191,
+      "title_string_id": 70811,
+      "giver_npc_id": 9500000261,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 71111,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Check out the well (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_jump_in_the_well_2bc347)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: stone well with a crank and a rope (sheets/c_click3.png r1c1, tile of farming_well_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_jump_in_the_well_2bc347)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "3097 hsg_well_01 has no .dme; the farming well is the one that draws"
+            }
+          ],
+          "node_type": "quest-well",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 70846,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the source of the noise (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_jump_in_the_well_2bc347)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: quest page: checking the well moves the player to the Memorial Caverns; A Plea for Peace and Quiet: the talking well 'is nothing more than an angry lady in the Memorial Caverns', Lorna."
+            }
+          ],
+          "npc_id": 9500000505
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Jump in the Well (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_jump_in_the_well_2bc347)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Jump in the Well (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_jump_in_the_well_2bc347)."
+        }
+      ],
+      "description_string_id": 70812,
+      "intro_text_string_id": 70803,
+      "enabled": true
+    },
+    {
+      "id": 3955200,
+      "title_string_id": 37717,
+      "giver_npc_id": 9000000225,
+      "prerequisite_quest_ids": [
+        3000018
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 37732,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find someone in the area that might know more (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_trouble_4e4e3d)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "fr.fanbyte.com/wiki/FR_Mob:Wompugg: Chugawug, male, Farnum's Farm, 'South of the farm, in the hills'; portrait on file (not compared). Quest page: 'Follow the green quest arrow to speak to Wompugg'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "npc_name 37719 'Wompugg'; 38573 'Speak with Wompugg near Farnum Farmstead'; 37994 'Wompugg is a Greenwood chugawug'; Models.txt 65 chugawug_m_greenwood_soldier.adr."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No video sighting. Greenwood soldier body by race, gender and the client's 'Greenwood chugawug' line; record 9500000282's model 13 is the female body, against the wiki. Position is that record's unanchored spot: in the hills, 25 m above Uncle Irving, but 150 m east of him and only about 50 m sou"
+            }
+          ],
+          "npc_id": 9500000282
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 37735,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find a shady chugawug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_trouble_4e4e3d)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "Quest page Looking for Trouble (fr.fanbyte.com): one shady chugawug is 'by the sheep pen', with his line of dialogue. No FR_Mob page."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "npc_name 37741 'Shady Chugawug'; Models.txt 199 chugawug_m_bandit_01.adr."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Sibling step of Looking for Trouble (the tool stops at the first step). Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". Bandit body chosen for 'shady'; gender not stated. "
+            },
+            {
+              "kind": "wiki",
+              "evidence": "spawn_guid 100000090035"
+            }
+          ],
+          "npc_id": 9500003929
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 5101426,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find a shady chugawug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_trouble_4e4e3d)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "Quest page Looking for Trouble (fr.fanbyte.com): one shady chugawug is 'by the sheep pen', with his line of dialogue. No FR_Mob page."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "npc_name 37741 'Shady Chugawug'; Models.txt 199 chugawug_m_bandit_01.adr."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Sibling step of Looking for Trouble (the tool stops at the first step). Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". Bandit body chosen for 'shady'; gender not stated. "
+            },
+            {
+              "kind": "wiki",
+              "evidence": "spawn_guid 100000090036"
+            }
+          ],
+          "npc_id": 9500003931
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 5101428,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find a shady chugawug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_trouble_4e4e3d)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "Quest page Looking for Trouble (fr.fanbyte.com): one shady chugawug is 'by the sheep pen', with his line of dialogue. No FR_Mob page."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "npc_name 37741 'Shady Chugawug'; Models.txt 199 chugawug_m_bandit_01.adr."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Sibling step of Looking for Trouble (the tool stops at the first step). Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". Bandit body chosen for 'shady'; gender not stated. "
+            },
+            {
+              "kind": "wiki",
+              "evidence": "spawn_guid 100000090037"
+            }
+          ],
+          "npc_id": 9500003930
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 37711,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Uncle Irving in Farnum Farmstead (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_trouble_4e4e3d)."
+            }
+          ],
+          "npc_id": 9000000225
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Looking for Trouble (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_trouble_4e4e3d)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Looking for Trouble (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_trouble_4e4e3d)."
+        }
+      ],
+      "enabled": true,
+      "intro_text_string_id": 37716,
+      "description_string_id": 37718
+    },
+    {
+      "id": 3955201,
+      "title_string_id": 21604,
+      "giver_npc_id": 9500000541,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 21613,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Arnie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_volunteers_5f7af1)."
+            }
+          ],
+          "npc_id": 9500000440
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 21632,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Fhred (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_volunteers_5f7af1)."
+            }
+          ],
+          "npc_id": 9500000477
+        },
+        {
+          "kind": "visit_position",
+          "id": 3,
+          "text_string_id": 21637,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the first mural (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_volunteers_5f7af1)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: prop sg_muralstone_01.adr is placed here in prop_placements_2014.tsv, the first of eight numbered stones."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: quest page: the museum is 'a half-circle leading up to the Heartseed', murals in order one to eight, 'the first being right next to Tori'; the eight stones do run in a half-circle in number order."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Stone number equals mural number. The stone's own position: these caverns have no floor in the editor's collision data here, and the probe reads the lake above, so the standing height is unverified. Stone 1 is 57 m from Tori, not 'right next to' her."
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -968.91,
+            -35.15,
+            368.06
+          ],
+          "radius": 8.0
+        },
+        {
+          "kind": "visit_position",
+          "id": 4,
+          "text_string_id": 21643,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the second mural (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_volunteers_5f7af1)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: prop sg_muralstone_02.adr is placed here in prop_placements_2014.tsv, the second of eight numbered stones."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: quest page: the museum is 'a half-circle leading up to the Heartseed', murals in order one to eight, 'the first being right next to Tori'; the eight stones do run in a half-circle in number order."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Stone number equals mural number. The stone's own position: these caverns have no floor in the editor's collision data here, and the probe reads the lake above, so the standing height is unverified. Stone 1 is 57 m from Tori, not 'right next to' her."
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -1017.0,
+            -33.85,
+            378.17
+          ],
+          "radius": 8.0
+        },
+        {
+          "kind": "visit_position",
+          "id": 5,
+          "text_string_id": 21645,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the third mural (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_volunteers_5f7af1)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: prop sg_muralstone_03.adr is placed here in prop_placements_2014.tsv, the third of eight numbered stones."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: quest page: the museum is 'a half-circle leading up to the Heartseed', murals in order one to eight, 'the first being right next to Tori'; the eight stones do run in a half-circle in number order."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Stone number equals mural number. The stone's own position: these caverns have no floor in the editor's collision data here, and the probe reads the lake above, so the standing height is unverified. Stone 1 is 57 m from Tori, not 'right next to' her."
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -1060.86,
+            -31.95,
+            359.37
+          ],
+          "radius": 8.0
+        },
+        {
+          "kind": "visit_position",
+          "id": 6,
+          "text_string_id": 21650,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the fourth mural (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_volunteers_5f7af1)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: prop sg_muralstone_04.adr is placed here in prop_placements_2014.tsv, the fourth of eight numbered stones."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: quest page: the museum is 'a half-circle leading up to the Heartseed', murals in order one to eight, 'the first being right next to Tori'; the eight stones do run in a half-circle in number order."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Stone number equals mural number. The stone's own position: these caverns have no floor in the editor's collision data here, and the probe reads the lake above, so the standing height is unverified. Stone 1 is 57 m from Tori, not 'right next to' her."
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -1084.62,
+            -31.63,
+            317.14
+          ],
+          "radius": 8.0
+        },
+        {
+          "kind": "visit_position",
+          "id": 7,
+          "text_string_id": 21653,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the fifth mural (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_volunteers_5f7af1)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: prop sg_muralstone_05.adr is placed here in prop_placements_2014.tsv, the fifth of eight numbered stones."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: quest page: the museum is 'a half-circle leading up to the Heartseed', murals in order one to eight, 'the first being right next to Tori'; the eight stones do run in a half-circle in number order."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Stone number equals mural number. The stone's own position: these caverns have no floor in the editor's collision data here, and the probe reads the lake above, so the standing height is unverified. Stone 1 is 57 m from Tori, not 'right next to' her."
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -1078.95,
+            -30.02,
+            267.93
+          ],
+          "radius": 8.0
+        },
+        {
+          "kind": "visit_position",
+          "id": 8,
+          "text_string_id": 21657,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the sixth mural (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_volunteers_5f7af1)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: prop sg_muralstone_06.adr is placed here in prop_placements_2014.tsv, the sixth of eight numbered stones."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: quest page: the museum is 'a half-circle leading up to the Heartseed', murals in order one to eight, 'the first being right next to Tori'; the eight stones do run in a half-circle in number order."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Stone number equals mural number. The stone's own position: these caverns have no floor in the editor's collision data here, and the probe reads the lake above, so the standing height is unverified. Stone 1 is 57 m from Tori, not 'right next to' her."
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -1043.1,
+            -29.06,
+            233.78
+          ],
+          "radius": 8.0
+        },
+        {
+          "kind": "visit_position",
+          "id": 9,
+          "text_string_id": 21661,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the seventh mural (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_volunteers_5f7af1)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: prop sg_muralstone_07.adr is placed here in prop_placements_2014.tsv, the seventh of eight numbered stones."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: quest page: the museum is 'a half-circle leading up to the Heartseed', murals in order one to eight, 'the first being right next to Tori'; the eight stones do run in a half-circle in number order."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Stone number equals mural number. The stone's own position: these caverns have no floor in the editor's collision data here, and the probe reads the lake above, so the standing height is unverified. Stone 1 is 57 m from Tori, not 'right next to' her."
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -994.14,
+            -26.76,
+            228.23
+          ],
+          "radius": 8.0
+        },
+        {
+          "kind": "visit_position",
+          "id": 10,
+          "text_string_id": 21664,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the eighth mural (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_volunteers_5f7af1)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: prop sg_muralstone_08.adr is placed here in prop_placements_2014.tsv, the eighth of eight numbered stones."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: quest page: the museum is 'a half-circle leading up to the Heartseed', murals in order one to eight, 'the first being right next to Tori'; the eight stones do run in a half-circle in number order."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Stone number equals mural number. The stone's own position: these caverns have no floor in the editor's collision data here, and the probe reads the lake above, so the standing height is unverified. Stone 1 is 57 m from Tori, not 'right next to' her."
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -952.52,
+            -25.92,
+            253.8
+          ],
+          "radius": 8.0
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 11,
+          "text_string_id": 21669,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Tori in the Memorial Caverns (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_volunteers_5f7af1)."
+            }
+          ],
+          "npc_id": 9500000541
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 75,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Looking for Volunteers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_volunteers_5f7af1)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Looking for Volunteers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_volunteers_5f7af1)."
+        }
+      ],
+      "description_string_id": 21605,
+      "intro_text_string_id": 24969,
+      "enabled": true
+    },
+    {
+      "id": 3955202,
+      "title_string_id": 72897,
+      "giver_npc_id": 9500000133,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 73563,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Glumleaf (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lost_and_found_7a2a5a)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "fr.fanbyte.com/wiki/FR_Mob:Glumleaf: Changeling, male, Thistlerow, 'Found in Thistlerow during a quest'; portrait on file (not compared). Quest page Lost and Found: SW corner of the hedge maze."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "npc_name 73531 'Glumleaf'."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No video sighting. Generic male changeling body by the wiki's race and gender. Wiki corner from the Lost and Found page. The hedge pieces in prop_placements_2014.tsv all carry one origin (-814.7, -50, 1778.9), so the walls are unknown: this spot is 45 m off that origin toward the wiki's corner, "
+            }
+          ],
+          "npc_id": 9500000141
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 73565,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Glowlum (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lost_and_found_7a2a5a)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "fr.fanbyte.com/wiki/FR_Mob:Glowlum: Changeling, female, Thistlerow, 'Found in Thistlerow during a quest'; portrait on file (not compared). Quest page Lost and Found: near the SE corner of the hedge maze."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "npc_name 73535 'Glowlum'."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No video sighting. Generic female changeling body by the wiki's race and gender. Wiki corner from the Lost and Found page. The hedge pieces in prop_placements_2014.tsv all carry one origin (-814.7, -50, 1778.9), so the walls are unknown: this spot is 45 m off that origin toward the wiki's corner"
+            }
+          ],
+          "npc_id": 9500000140
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 73567,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Noctelun (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lost_and_found_7a2a5a)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "fr.fanbyte.com/wiki/FR_Mob:Noctelun: Changeling, male, Thistlerow, 'Found in Thistlerow during a quest'; portrait on file (not compared). Quest page Lost and Found: near the centre of the hedge maze."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "npc_name 73536 'Noctelun'."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No video sighting. Generic male changeling body by the wiki's race and gender. Wiki corner from the Lost and Found page. The hedge pieces in prop_placements_2014.tsv all carry one origin (-814.7, -50, 1778.9), so the walls are unknown: this spot is 45 m off that origin toward the wiki's corner, "
+            }
+          ],
+          "npc_id": 9500000186
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 73569,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Lumfall (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lost_and_found_7a2a5a)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "fr.fanbyte.com/wiki/FR_Mob:Lumfall: Changeling, female, Thistlerow, 'Found in Thistlerow during a quest'; portrait on file (not compared). Quest page Lost and Found: near the NW corner of the hedge maze."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "npc_name 73550 'Lumfall'."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No video sighting. Generic female changeling body by the wiki's race and gender. Wiki corner from the Lost and Found page. The hedge pieces in prop_placements_2014.tsv all carry one origin (-814.7, -50, 1778.9), so the walls are unknown: this spot is 45 m off that origin toward the wiki's corner"
+            }
+          ],
+          "npc_id": 9500000167
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 73571,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Jellum (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lost_and_found_7a2a5a)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "fr.fanbyte.com/wiki/FR_Mob:Jellum: Changeling, male, Thistlerow, 'Found in Thistlerow during a quest'; portrait on file (not compared). Quest page Lost and Found: NE corner of the hedge maze."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "npc_name 73551 'Jellum'."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No video sighting. Generic male changeling body by the wiki's race and gender. Wiki corner from the Lost and Found page. The hedge pieces in prop_placements_2014.tsv all carry one origin (-814.7, -50, 1778.9), so the walls are unknown: this spot is 45 m off that origin toward the wiki's corner, "
+            }
+          ],
+          "npc_id": 9500000146
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 6,
+          "text_string_id": 73573,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Freidi (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lost_and_found_7a2a5a)."
+            }
+          ],
+          "npc_id": 9500000133
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 75,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Lost and Found (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lost_and_found_7a2a5a)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Lost and Found (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lost_and_found_7a2a5a)."
+        }
+      ],
+      "description_string_id": 72898,
+      "intro_text_string_id": 72896,
+      "enabled": true
+    },
+    {
+      "id": 3955224,
+      "title_string_id": 101713,
+      "giver_npc_id": 9500000550,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 101715,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Bandy Randi in Seaside (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pearls_for_ashby_e4e50d)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: this step's own goal line is 'Talk to Jet in Seaside'; the wiki's Bandy Randi is the earlier name for the merchant at that spot"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "Jet (npc 9500000590) stands within 2 m of Bandy Randi's video-solved position, x=-486.8 z=-1197.9"
+            }
+          ],
+          "npc_id": 9500000590
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 101717,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Ashby (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pearls_for_ashby_e4e50d)."
+            }
+          ],
+          "npc_id": 9500000550
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pearls for Ashby (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pearls_for_ashby_e4e50d)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Pearls for Ashby (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pearls_for_ashby_e4e50d)."
+        }
+      ],
+      "enabled": true,
+      "intro_text_string_id": 101729,
+      "description_string_id": 101714
+    },
+    {
+      "id": 3955248,
+      "title_string_id": 46307,
+      "giver_npc_id": 9000000158,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 46321,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the smoothie stand (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_resort_refreshments_cbe30e)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: card: 'ask whomever is running the smoothie stand' in Seaside."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: 94565, 140017: Banani in Seaside makes the smoothies."
+            }
+          ],
+          "npc_id": 9500000554
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 46323,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Murphy in Snowhill (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_resort_refreshments_cbe30e)."
+            }
+          ],
+          "npc_id": 9000000158
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Resort Refreshments (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_resort_refreshments_cbe30e)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Resort Refreshments (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_resort_refreshments_cbe30e)."
+        }
+      ],
+      "description_string_id": 46308,
+      "intro_text_string_id": 46306,
+      "enabled": true
+    },
+    {
+      "id": 3955250,
+      "title_string_id": 390676,
+      "giver_npc_id": 9600000010,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 390725,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver the invitation to the Guard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_royal_rsvp_7534e3)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "fr.fanbyte.com/wiki/FR_Mob:Royal_Palace_Guard: Pixie, male, Sanctuary, 'In front of the Royal Palace'; portrait on file (not compared)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "14702 'Royal Palace Guard'; 390352 is the palace guard's line ('no one is allowed entry without a pass'); Models.txt 345 fairy_royalguard_m.adr."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No video sighting. Stands between the two Royal Guard spawns 100000033443/444 at the palace approach. Binding one of those spawns is the alternative, but they are named 'Royal Guard', not this client name. Also fits Bravery is in Demand's next step, which the tool stops before reaching; Farnum's"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "spawn_guid 100000090039"
+            }
+          ],
+          "npc_id": 9500003915
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 390731,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Auralie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_royal_rsvp_7534e3)."
+            }
+          ],
+          "npc_id": 9600000010
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 13,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Royal RSVP (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_royal_rsvp_7534e3)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Royal RSVP (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_royal_rsvp_7534e3)."
+        }
+      ],
+      "description_string_id": 390677,
+      "enabled": true,
+      "intro_text_string_id": 390675
+    },
+    {
+      "id": 3955313,
+      "title_string_id": 70832,
+      "giver_npc_id": 9500000261,
+      "prerequisite_quest_ids": [
+        3955070
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 71115,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Fedrick (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_well_wishes_6918c3)."
+            }
+          ],
+          "npc_id": 9500000682
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 71129,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win a game of chess (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_well_wishes_6918c3)."
+            }
+          ],
+          "minigame_id": 20,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 71119,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Fedrick (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_well_wishes_6918c3)."
+            }
+          ],
+          "npc_id": 9500000682
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 385891,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Old Gregory (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_well_wishes_6918c3)."
+            }
+          ],
+          "npc_id": 9500000261
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Well Wishes (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_well_wishes_6918c3)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Well Wishes (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_well_wishes_6918c3)."
+        }
+      ],
+      "description_string_id": 70833,
+      "intro_text_string_id": 70831,
+      "enabled": true
     }
   ]
 }

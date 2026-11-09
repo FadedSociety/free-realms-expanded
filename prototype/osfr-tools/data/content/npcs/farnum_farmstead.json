@@ -9027,10 +9027,23 @@
               "evidence": "title_string_id corrected from raw locale hash 384690558 to Global.Text id 37702 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3955200,
+          "title": "Looking for Trouble",
+          "title_string_id": 37717,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Looking for Trouble (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_trouble_4e4e3d)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3000018
+        3000018,
+        3955200
       ],
       "quests_given_text": [
         "Peep's Missing Bowl: \"Search the Farmstead for Peep's Dog Bowl.\" (193618891), \"Find Peep's dog bowl\" (1903321596), \"Head back over to Uncle Irving at Farnum's Farmstead\" (3502994905), \"Return to Uncle Irving\" (2240126987), \"Have you found Peep's dog bowl yet? Try searching around the farmstead.\" (2955670721). Offer wording: \"In all the commotion Bo's dog, Peep, seems to have lost his food bowl! Can you find it for us?\" (1511702253; speaker not stated). Reward on screen: 1 Shimmering Air Triangle Shard (3JXpHghLOTs/00014)."
@@ -10648,9 +10661,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2158.694,
-        -31.96,
-        377.931
+        -2158.7,
+        -32.0,
+        377.9
       ],
       "position_w": null,
       "rotation": [
@@ -10872,16 +10885,20 @@
         ],
         "position": [
           {
+            "kind": "wiki",
+            "evidence": "fr.fanbyte.com/wiki/FR_Mob:Wompugg: Chugawug, male, Farnum's Farm, 'South of the farm, in the hills'; portrait on file (not compared). Quest page: 'Follow the green quest arrow to speak to Wompugg'."
+          },
+          {
             "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 23 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
+            "evidence": "npc_name 37719 'Wompugg'; 38573 'Speak with Wompugg near Farnum Farmstead'; 37994 'Wompugg is a Greenwood chugawug'; Models.txt 65 chugawug_m_greenwood_soldier.adr."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "evidence": "(R) No video sighting. Greenwood soldier body by race, gender and the client's 'Greenwood chugawug' line; record 9500000282's model 13 is the female body, against the wiki. Position is that record's unanchored spot: in the hills, 25 m above Uncle Irving, but 150 m east of him and only about 50 m south of the sheep pens, so 'south of the farm' is a loose fit. Probe: all directions open, no water, flat. Has a record (npc 9500000282, placement unanchored) with no drawn body. quest_wire's spawned_people() ignores a spawn whose name is already a record, so applying this row also needs content_key 9500000282 (npc_spawns_extra.json)."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) moved off another actor within 1 m, kept clickable"
+            "evidence": "(R) The record stands where its body row (spawn 100000090020) stands: talk reach is measured from it."
           }
         ],
         "position_reason": [
@@ -10947,10 +10964,17 @@
             "kind": "legacy-data",
             "evidence": "lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1625 (same name)"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 13,
-      "model_file_name": "chugawug_f_01.adr"
+      "model_file_name": "chugawug_f_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     }
   ]
 }
