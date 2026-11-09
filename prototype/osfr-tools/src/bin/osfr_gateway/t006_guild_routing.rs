@@ -300,6 +300,62 @@ fn has(deliveries: &[Delivery], index: usize, sub: u16) -> bool {
         .any(|delivery| delivery.recipient == recipient && family_sub(delivery).1 == sub)
 }
 
+/// The 129/31 name tag update sent to session `index`: (player, guild, in guild).
+fn tag(deliveries: &[Delivery], index: usize) -> Option<(u64, u64, bool)> {
+    let recipient = SessionId(17 + index as u64);
+    deliveries
+        .iter()
+        .find(|delivery| delivery.recipient == recipient && family_sub(delivery) == (129, 31))
+        .map(|delivery| {
+            let inner = &delivery.bytes[7..];
+            (
+                u64::from_le_bytes(inner[4..12].try_into().unwrap()),
+                u64::from_le_bytes(inner[12..20].try_into().unwrap()),
+                inner[20] != 0,
+            )
+        })
+}
+
+/// Guilds piece: the name tag over the founder's head reaches the neighbour who already sees
+/// them (129/31) when the guild is created, again on a relog, and clears when they quit; the
+/// registry mirrors the guild so later AddPc frames carry it.
+#[test]
+fn guild_tags_reach_the_neighbour_on_create_relog_and_quit() {
+    if !super::tests::test_support::bin_test_target("t006") {
+        return;
+    }
+    let mut rig = eligible_rig("tag-neighbour");
+    log_in(&mut rig.sessions[0], "t006-tags");
+    rig.sessions[0].character_guid = GUIDS[0];
+    let founder = SessionId(17);
+    assert_eq!(rig.world.players.guild_of(founder), 0);
+
+    let created = route(&mut rig, 0, &create("Lantern Guild"));
+    let guild = rig
+        .world
+        .guilds
+        .store()
+        .guild_guid_for(GUIDS[0])
+        .expect("the founder owns the new guild");
+    assert_eq!(rig.world.players.guild_of(founder), guild, "AddPc frames carry the guild");
+    assert_eq!(tag(&created, 1), Some((GUIDS[0], guild, true)), "neighbour sees the tag");
+    assert_eq!(tag(&created, 0), Some((GUIDS[0], guild, true)), "the founder's own client too");
+
+    // A relog: the registry entry is fresh (no guild) and the login path mirrors and announces.
+    rig.world.players.set_guild(founder, 0);
+    let relogged = rig.world.guild_login(&rig.sessions[0]);
+    assert_eq!(rig.world.players.guild_of(founder), guild);
+    assert_eq!(tag(&relogged, 1), Some((GUIDS[0], guild, true)), "relog re-announces the tag");
+
+    // A request that changes no membership announces nothing.
+    let unchanged = route(&mut rig, 0, &motd(guild, "Lanterns at dusk"));
+    assert_eq!(tag(&unchanged, 1), None);
+
+    let quit = route(&mut rig, 0, &one_guid(7, guild));
+    assert_eq!(tag(&quit, 1), Some((GUIDS[0], guild, false)), "the tag clears for the neighbour");
+    assert_eq!(rig.world.players.guild_of(founder), 0);
+}
+
 #[test]
 fn create_then_invite_accept_reaches_the_online_founder() {
     if !super::tests::test_support::bin_test_target("t006") {

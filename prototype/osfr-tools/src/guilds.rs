@@ -1275,6 +1275,21 @@ pub fn disbanded_message(recipient_guid: u64, guild_guid: u64, name: &str) -> Gu
     }
 }
 
+/// 129/31 `GuildPlayerStatusUpdatePacket` (`GuildPlayerStatusUpdatePacket__ReadBody`: player
+/// pair at +0x10, guild pair at +0x18, one byte at +0x20; handler `00b1ce80`). The viewer looks
+/// the player up (`00984960`) and, when the byte is set, binds the guild to that player's
+/// name tag through `0096ab60`, which fetches the name with 129/14 (`00b1e960`) on a cache
+/// miss; a clear byte removes the tag keyed by that guild pair, so a leave names the guild
+/// left. Addressed by session, so it is bytes, not a `GuildMessage`: the recipients are the
+/// player's viewers, not guild members.
+pub fn player_status_bytes(player_guid: u64, guild_guid: u64, in_guild: bool) -> Vec<u8> {
+    let mut bytes = guild_header(31);
+    bytes.extend_from_slice(&player_guid.to_le_bytes());
+    bytes.extend_from_slice(&guild_guid.to_le_bytes());
+    bytes.push(u8::from(in_guild));
+    bytes
+}
+
 /// The authenticated actor of one family-129 request. The session supplies these; the body
 /// never names the actor.
 pub struct GuildCaller<'a> {
@@ -1379,6 +1394,8 @@ impl GuildService {
             | GuildRequest::PaidRenameCheck { .. } => true,
             // Positions are not bound to the guild service (see `handle_decoded`).
             GuildRequest::MemberLocationRequest { .. } => false,
+            // A name tag lookup is answered for any guild that exists.
+            GuildRequest::NameRequest { guild_guid } => self.store.guild(*guild_guid).is_some(),
             // A target answer needs a live invitation, whether it accepts, declines or
             // times out.
             GuildRequest::InviteAccept { .. }
@@ -1630,11 +1647,11 @@ impl GuildService {
                 );
             }
             GuildRequest::NameRequest { guild_guid } => {
-                // (R) Only the actor's own guild answers a name request; other guild ids stay
-                // silent so a forged id cannot enumerate guild names.
-                if self.store.guild_guid_for(actor) == Some(guild_guid)
-                    && let Some(guild) = self.store.guild(guild_guid)
-                {
+                // Any existing guild answers: the client asks for the name of a guild it saw
+                // on another player's AddPc (`0096ab60` -> `00b1e960`), so the name tag over
+                // that player's head needs it. Guild names are public. An unknown guid stays
+                // silent, as the reference server does (Sanctuary `GuildNameRequestPacketHandler`).
+                if let Some(guild) = self.store.guild(guild_guid) {
                     let name = guild.name.clone();
                     out.messages
                         .push(name_update_message(actor, guild_guid, &name));

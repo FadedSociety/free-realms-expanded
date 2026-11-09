@@ -11,6 +11,7 @@
 use super::*;
 use osfr_tools::guilds::{
     GuildCaller, GuildMessage, GuildOutcome, GuildStore, can_create_message, decode_request,
+    player_status_bytes,
 };
 use osfr_tools::social_chat::NameData;
 
@@ -118,7 +119,87 @@ impl SharedWorld {
         }
         let outcome =
             Arc::make_mut(&mut self.guilds.service).login(character_guid, &name, eligible);
-        self.guild_messages(&outcome)
+        let mut deliveries = self.guild_messages(&outcome);
+        // The registry's AddPc for this entry went out without a guild (the join ran first);
+        // mirror the guild now and tell the players already in view through 129/31.
+        if let Some(guild_guid) = self.guilds.store().guild_guid_for(character_guid) {
+            self.players.set_guild(session.id, guild_guid);
+            deliveries.extend(self.guild_tag_deliveries(
+                session.id,
+                character_guid,
+                guild_guid,
+                true,
+            ));
+        }
+        deliveries
+    }
+
+    /// 129/31 to the player's current viewers and the player: the AddPc guild list only
+    /// reaches viewers who meet the player later. A clear names the guild that was left: the
+    /// client removes the tag by that guild's key (`00b1ce80`).
+    fn guild_tag_deliveries(
+        &self,
+        session_id: SessionId,
+        character_guid: u64,
+        guild_guid: u64,
+        in_guild: bool,
+    ) -> Vec<Delivery> {
+        let Some(player) = self.players.get(session_id) else {
+            return Vec::new();
+        };
+        let bytes = wrap_application(&player_status_bytes(character_guid, guild_guid, in_guild));
+        let mut recipients = self.players.nearby_sessions(player.zone, player.position);
+        recipients.insert(session_id);
+        recipients
+            .into_iter()
+            .filter(|recipient| self.joined.contains(recipient))
+            .map(|recipient| Delivery {
+                recipient,
+                bytes: bytes.clone(),
+            })
+            .collect()
+    }
+
+    /// Mirror the guild store into the player registry for every joined character whose
+    /// guild changed (create, join, leave, kick, disband), telling their viewers. Guild requests
+    /// are rare, so a scan of the joined characters is fine.
+    pub(super) fn sync_guild_tags(&mut self) -> Vec<Delivery> {
+        let changes: Vec<(SessionId, u64, u64, u64)> = self
+            .active_sessions
+            .iter()
+            .filter_map(|(character_guid, session_id)| {
+                let wanted = self
+                    .guilds
+                    .store()
+                    .guild_guid_for(*character_guid)
+                    .unwrap_or(0);
+                let shown = self.players.guild_of(*session_id);
+                (self.players.contains(*session_id) && shown != wanted).then_some((
+                    *session_id,
+                    *character_guid,
+                    shown,
+                    wanted,
+                ))
+            })
+            .collect();
+        let mut deliveries = Vec::new();
+        for (session_id, character_guid, shown, wanted) in changes {
+            self.players.set_guild(session_id, wanted);
+            // A member who left (or was kicked, or whose guild disbanded) is cleared under the
+            // guild they were shown with; a joiner is bound to the new guild.
+            let (guild_guid, in_guild) = if wanted != 0 {
+                (wanted, true)
+            } else {
+                (shown, false)
+            };
+            deliveries.extend(self.guild_tag_deliveries(
+                session_id,
+                character_guid,
+                guild_guid,
+                in_guild,
+            ));
+        }
+        deliveries
     }
 
     /// Presence notices for the members still connected after a disconnect.
@@ -172,6 +253,8 @@ impl Session {
         };
         let outcome = Arc::make_mut(&mut world.guilds.service)
             .handle_decoded(&caller, &resolve, request, now_ms);
-        world.guild_messages(&outcome)
+        let mut deliveries = world.guild_messages(&outcome);
+        deliveries.extend(world.sync_guild_tags());
+        deliveries
     }
 }

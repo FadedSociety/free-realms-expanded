@@ -225,6 +225,10 @@ pub struct PlayerRegistry {
     // Separate from `PlayerSession::presentation.temporary_model` (a consumable transform);
     // `build_add_pc` prefers this layer while it is applied and falls back to the consumable.
     temporary_models: BTreeMap<SessionId, i32>,
+    // Guilds: the guild guid later AddPc frames carry for this session (the counted key/pair
+    // list the client reader `0091aa10` drains into +328; the name tag asks 129/14 for the
+    // name). Session-only: the guild store owns membership, the gateway mirrors it here.
+    guilds: BTreeMap<SessionId, u64>,
 }
 
 impl PlayerRegistry {
@@ -238,6 +242,7 @@ impl PlayerRegistry {
             views: BTreeMap::new(),
             mounts: BTreeMap::new(),
             temporary_models: BTreeMap::new(),
+            guilds: BTreeMap::new(),
         }
     }
 
@@ -401,6 +406,7 @@ impl PlayerRegistry {
         self.views.remove(&session_id);
         self.mounts.remove(&session_id);
         self.temporary_models.remove(&session_id);
+        self.guilds.remove(&session_id);
         for (owners, guid) in [
             (&mut self.account_owners, removed.account_guid),
             (&mut self.character_owners, removed.character_guid),
@@ -444,6 +450,24 @@ impl PlayerRegistry {
         } else {
             self.temporary_models.insert(session_id, model);
         }
+    }
+
+    /// Guilds: set or clear (0) the guild guid later AddPc frames carry for this session. Nobody
+    /// is messaged; current viewers get 129/31 from the caller. An unknown session is ignored.
+    pub fn set_guild(&mut self, session_id: SessionId, guild_guid: u64) {
+        if !self.sessions.contains_key(&session_id) {
+            return;
+        }
+        if guild_guid == 0 {
+            self.guilds.remove(&session_id);
+        } else {
+            self.guilds.insert(session_id, guild_guid);
+        }
+    }
+
+    /// The guild guid this session's AddPc frames carry, 0 when none.
+    pub fn guild_of(&self, session_id: SessionId) -> u64 {
+        self.guilds.get(&session_id).copied().unwrap_or(0)
     }
 
     /// Drop every temporary model (T492). The boombox tick panicked after changing some, and its
@@ -733,10 +757,11 @@ impl PlayerRegistry {
             if let Some(player) = self.sessions.get(subject) {
                 let mount = self.mounts.get(subject).copied().unwrap_or(MountTail::NONE);
                 let temporary = self.temporary_models.get(subject).copied().unwrap_or(0);
+                let guild = self.guilds.get(subject).copied().unwrap_or(0);
                 messages.push(OutboundMessage {
                     recipient: viewer,
                     kind: MessageKind::Spawn,
-                    bytes: build_add_pc(player, mount, temporary),
+                    bytes: build_add_pc(player, mount, temporary, guild),
                 });
                 messages.extend(build_visual_followups(player).into_iter().map(|bytes| {
                     OutboundMessage {
@@ -910,7 +935,12 @@ fn distance_squared(left: [f32; 3], right: [f32; 3]) -> f64 {
 /// `boombox_model` is the live boombox transform layer (`PlayerRegistry::temporary_models`), 0
 /// when none. It wins over the presentation's consumable visual because it is the later
 /// temporary-appearance write while the player stands in the box.
-fn build_add_pc(player: &PlayerSession, mount: MountTail, boombox_model: i32) -> Vec<u8> {
+fn build_add_pc(
+    player: &PlayerSession,
+    mount: MountTail,
+    boombox_model: i32,
+    guild_guid: u64,
+) -> Vec<u8> {
     let mut inner = Vec::with_capacity(195);
     put_u16(&mut inner, 35);
     put_u16(&mut inner, 1);
@@ -963,7 +993,17 @@ fn build_add_pc(player: &PlayerSession, mount: MountTail, boombox_model: i32) ->
         presentation.temporary_model
     };
     put_i32(&mut inner, temporary_model);
-    put_i32(&mut inner, 0); // (R) guild runtime is not routed.
+    // +328: a counted list of (dword key, guid pair) the client reader `0091aa10` drains
+    // through `maybe_ListDrainReadCountedKeyPairs`; the name tag resolves the guid with 129/14.
+    // One entry under key 0 when the player is in a guild (the reference server writes the
+    // same single entry), none otherwise.
+    if guild_guid == 0 {
+        put_i32(&mut inner, 0);
+    } else {
+        put_i32(&mut inner, 1);
+        put_i32(&mut inner, 0);
+        put_u64(&mut inner, guild_guid);
+    }
     put_i32(&mut inner, presentation.active_profile);
     for _ in 0..4 {
         put_i32(&mut inner, 0); // (R) title fields are not routed.
