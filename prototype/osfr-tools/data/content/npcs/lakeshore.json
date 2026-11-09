@@ -3287,9 +3287,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3687 spawnNpcWithGuid(33465); src/Resources/Npcs.json Id=33465"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -1.84007705
+      "heading": -1.84007705,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000319,
@@ -7018,10 +7025,44 @@
               "evidence": "Lakeshore Reports (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lakeshore_reports_910543)."
             }
           ]
+        },
+        {
+          "quest_id": 3955601,
+          "title": "Further Investigation",
+          "title_string_id": 2401,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Further Investigation (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_further_investigation_04ea57)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3955726,
+          "title": "Thieves About!",
+          "title_string_id": 384798,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Thieves About! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_thieves_about_48429e)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3950247
+        3950247,
+        3955601,
+        3955726
       ],
       "quests_given_text": [
         "Receives the theft reports in the Thieves About! chain (\"Report your findings to Lan Spryleaf\", 1788379616; \"Return to Lan Spryleaf with all the precious things!\", 2713453771; \"Deliver the news to Lan Spryleaf back in Lakeshore\", 3017351224). Cut quest \"NOT LIVE - Spryleaf's Morphin Munchies\" (2636870032)."

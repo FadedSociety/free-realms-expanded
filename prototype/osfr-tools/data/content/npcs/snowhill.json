@@ -38076,11 +38076,28 @@
               "evidence": "title_string_id corrected from raw locale hash 1604679068 to Global.Text id 76971 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3955536,
+          "title": "Bravery is in Demand",
+          "title_string_id": 391058,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Bravery is in Demand (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bravery_is_in_demand_862aea)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3100006,
-        3100007
+        3100007,
+        3955536
       ],
       "quests_given_text": [
         "Miner: Reach Level 5, Miner: Dartmoor Mining Camp (wiki). Gem task in Miner: Gem Appraisal (client text puts it with Sorin; wiki says Trixi; the video first goal is \"Speak with Sorin\", NemdyF6pHTs/00000). Client no-job gate: \"Visit Sorin in Snowhill to become a Miner!\" (705975744)."

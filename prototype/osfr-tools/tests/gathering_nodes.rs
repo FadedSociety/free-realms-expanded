@@ -1360,11 +1360,11 @@ fn node_content_is_bounded_and_unique() {
     // 8 Snowhill copper veins T547 places from the 17 recovered rows and the 13 T553 farm
     // plots (every recovered plot is active), and 496 spots for the quest pick-ups (with the Chapter 1 caravan)
     // (`quest_wire.py`: up to count + 2 each, on a ring round the giver).
-    assert_eq!(actors.len(), 752);
+    assert_eq!(actors.len(), 802);
     let mut ids: Vec<_> = actors.iter().map(|a| a.guid).collect();
     ids.sort();
     ids.dedup();
-    assert_eq!(ids.len(), 752);
+    assert_eq!(ids.len(), 802);
     assert!(
         actors
             .iter()

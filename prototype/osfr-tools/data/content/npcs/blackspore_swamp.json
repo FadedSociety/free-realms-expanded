@@ -22194,10 +22194,78 @@
               "evidence": "Make Sure to Wash Up... (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_make_sure_to_wash_up_ae87ea)."
             }
           ]
+        },
+        {
+          "quest_id": 3955673,
+          "title": "Pulling Weeds",
+          "title_string_id": 93865,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pulling Weeds (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pulling_weeds_6f2500)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3955594,
+          "title": "Follow Your Nose",
+          "title_string_id": 93854,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Follow Your Nose (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_follow_your_nose_f3aa3a)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3955608,
+          "title": "Grave Blossoms",
+          "title_string_id": 93875,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Grave Blossoms (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_grave_blossoms_dc624e)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3955714,
+          "title": "The Master's Components",
+          "title_string_id": 93891,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Master's Components (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_master_s_components_2668ef)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3951317
+        3951317,
+        3955673,
+        3955594,
+        3955608,
+        3955714
       ],
       "quests_given_text": [
         "Search for Milford (1641429655) then ingredient series: bogwart samples (2851729882), strangleroot samples (1985959659), Grave Blossoms (3532615967), poisonous purple toads (4198837565); \"Return to Milford in Blackspore\" (3383934881)"

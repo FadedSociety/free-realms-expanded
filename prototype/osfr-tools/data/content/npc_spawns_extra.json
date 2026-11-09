@@ -1407,7 +1407,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:94; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1308 (ModelId=312, ModelFileName=human_m_freestyle_03.agr, NameId=101637)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500004199
     },
     {
       "spawn_guid": 100000001309,
@@ -2872,7 +2873,8 @@
         }
       ],
       "position_w": null,
-      "texture_alias": "base_02"
+      "texture_alias": "base_02",
+      "content_key": 9500004157
     },
     {
       "spawn_guid": 100000001408,
@@ -16404,7 +16406,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1104; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2360 (ModelId=382, ModelFileName=dwarf_miner_m.adr, NameId=79037)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500000451
     },
     {
       "spawn_guid": 100000002368,
@@ -48439,7 +48442,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2968; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4302 (ModelId=14, ModelFileName=chugawug_m_01.adr, NameId=41262)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500004354
     },
     {
       "spawn_guid": 100000004303,
@@ -78841,6 +78845,513 @@
         }
       ],
       "position_w": null
+    },
+    {
+      "legacy_npc_id": null,
+      "model_id": 312,
+      "model_file_name": "human_m_freestyle_03.agr",
+      "name": "Human Man Wearing Green",
+      "name_string_id": 2230,
+      "position": [
+        -1078.39,
+        -38.591,
+        -439.77
+      ],
+      "position_w": null,
+      "heading": 0.9,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "71258 'Talk to the human man wearing green'; 71259 'Speak with the human in green in front of the stage'; 71257 'the people waiting in front of the Merry Vale stage'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No client name for him. name is the step's own words so quest_wire can match it; name_string_id 2230 is the client's word 'Human'. Body: the free-standing crowd at Merry Vale has no green man, so this is the one new body; 312 human_m_freestyle_03 is the only human male seen in model-view with olive-green sleeves. Freestyle bodies render undyed, so the shirt is a best guess. Stands with the existing crowd. Probe: no water, flat, open 8/8."
+        }
+      ],
+      "spawn_guid": 100000090051
+    },
+    {
+      "legacy_npc_id": null,
+      "model_id": 540,
+      "model_file_name": "cat_longhair.adr",
+      "name": "Long-Haired Cat",
+      "name_string_id": 2244,
+      "position": [
+        44.0,
+        -31.2,
+        2811.0
+      ],
+      "position_w": null,
+      "heading": 2.75,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "390226 'Give the long-haired cat its vitamins'; 390225 'the pets of Briarheart Palace'; 390227 'Find the long-haired cat in Briarheart Palace'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No client name; name is the step's words, name_string_id 2244 is the client's word 'Cat'. Body 540 cat_longhair.adr, seen in model-view (tan, long-haired). Palace interior not modelled, stands 9 m from Sorrowspine at her poi_anchor by the warpstone. Probe: no water, slope 3, open 8/8."
+        }
+      ],
+      "spawn_guid": 100000090052
+    },
+    {
+      "legacy_npc_id": null,
+      "model_id": 173,
+      "model_file_name": "dog_small_pointy.adr",
+      "name": "Hyper Dog",
+      "name_string_id": 46376,
+      "position": [
+        56.0,
+        -30.3,
+        2796.0
+      ],
+      "position_w": null,
+      "heading": -0.91,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "390229 'Give the hyper dog its vitamins'; 390230 'Find the hyper looking dog in Briarheart Palace'; npc_name 46376 'Hyper Dog'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Body 173 dog_small_pointy.adr, seen in model-view (small white dog, pointed ears), chosen for 'hyper'. Near Sorrowspine as for the long-haired cat. Probe: no water, slope 6, open 8/8."
+        }
+      ],
+      "spawn_guid": 100000090053
+    },
+    {
+      "legacy_npc_id": null,
+      "model_id": 3930,
+      "model_file_name": "cat_shorthair_plain.adr",
+      "name": "Lazy Cat",
+      "name_string_id": 102127,
+      "position": [
+        38.89,
+        -31.621,
+        2805.49
+      ],
+      "position_w": null,
+      "heading": 1.89,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "390231 'Give the lazy cat its vitamins'; npc_name 102127 'Lazy Cat'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Body 3930 cat_shorthair_plain.adr, seen in model-view (grey spotted); 'lazy' says nothing about the coat. Near Sorrowspine. Probe: no water, slope 11, open 8/8."
+        }
+      ],
+      "spawn_guid": 100000090054
+    },
+    {
+      "legacy_npc_id": null,
+      "model_id": 514,
+      "model_file_name": "dog_large_dalmation.adr",
+      "name": "Dalmation",
+      "name_string_id": 2239,
+      "position": [
+        49.93,
+        -31.237,
+        2792.49
+      ],
+      "position_w": null,
+      "heading": -0.24,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "390233 'Give the dalmation its vitamins' (the client's spelling)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Body 514 dog_large_dalmation.adr, file named for it, seen in model-view (large white spotted dog). name_string_id 2239 is the client's word 'Dog'. Probe: no water, slope 20, open 8/8."
+        }
+      ],
+      "spawn_guid": 100000090055
+    },
+    {
+      "legacy_npc_id": null,
+      "model_id": 50,
+      "model_file_name": "cat_shorthair.adr",
+      "name": "Dark-Haired Cat",
+      "name_string_id": 2244,
+      "position": [
+        40.0,
+        -31.561,
+        2798.0
+      ],
+      "position_w": null,
+      "heading": 1.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "390235 'Give the dark-haired cat its vitamins'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Body 50 cat_shorthair.adr, the darkest cat seen in model-view (grey spotted). Probe: no water, slope 8, open 5/8 (blocked SW, W, NW)."
+        }
+      ],
+      "spawn_guid": 100000090056
+    },
+    {
+      "legacy_npc_id": null,
+      "model_id": 333,
+      "model_file_name": "sg_collection_node_robgoblin_junkpile_01.adr",
+      "name": "Whizzlebang Whirlygig",
+      "name_string_id": null,
+      "position": [
+        -469.09,
+        9.6,
+        775.54
+      ],
+      "position_w": null,
+      "heading": 3.11,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "21788 'Find a whizzlebang whirlygig remote control from a junkpile in the robgoblin camp'."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fr_quest_missing_marty: 'in a big junkpile behind Fizzlesticks' wagon'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No client name for the thing; name is the step's words, null name id. Body 333, the robgoblin junkpile collection node, seen in model-view (red and blue scrap heap); the plain sg_robgoblin_junkpile_01 (276) renders nothing. The wagon itself was not located: 12 m from Fizzlesticks. Probe: no water, flat, open 7/8."
+        }
+      ],
+      "spawn_guid": 100000090057
+    },
+    {
+      "legacy_npc_id": null,
+      "model_id": 1639,
+      "model_file_name": "dwarf_m_biker.adr",
+      "name": "Missing Supply Party",
+      "name_string_id": 437823,
+      "position": [
+        -100.0,
+        20.7,
+        1100.0
+      ],
+      "position_w": null,
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "npc_name 437823 'Missing Supply Party'; 437914 'They should be somewhere in the southern part of Shrouded Glade'; 437800 'find the missing dwarves'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) POSITION IS A JUDGMENT, low confidence: only 'southern Shrouded Glade' is known. Body dwarf_m_biker.adr like the dwarves in Dorn's camp. Probe: no water, slope 16, open 7/8. quest_wire needs an alias: the step says 'the missing supply party'."
+        }
+      ],
+      "spawn_guid": 100000090058
+    },
+    {
+      "legacy_npc_id": null,
+      "model_id": 180,
+      "model_file_name": "snake.adr",
+      "name": "First Viper Agent",
+      "name_string_id": 437245,
+      "position": [
+        433.88,
+        66.095,
+        1761.9
+      ],
+      "position_w": null,
+      "heading": 1.92,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "npc_name 437245 'Viper Agent'; 437249 'Search for the Viper Agents in the corrupted area of Shrouded Glade'; 437250 first agent objective."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fr_quest_slithering_agents: 'within observation range of the Dwarven Camp', 'my wonderful serpents'; dialogue headed 'First Viper Agent'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Generic snake 180 snake.adr, seen in model-view; a viper body was not found ('She'll have my scales'). name uses 'First' so the step text can match; the client plate reads 'Viper Agent'. POSITION IS A JUDGMENT, low confidence: 48 m south of Brienne and the camp at (480, 1745), which our data places in Sunstone Valley region, not the glade; the corrupted area is not known. Probe: no water, slope 3, open 8/8."
+        }
+      ],
+      "spawn_guid": 100000090059
+    },
+    {
+      "legacy_npc_id": null,
+      "model_id": 180,
+      "model_file_name": "snake.adr",
+      "name": "Second Viper Agent",
+      "name_string_id": 437246,
+      "position": [
+        432.36,
+        67.27,
+        1744.67
+      ],
+      "position_w": null,
+      "heading": 1.56,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "npc_name 437246 'Viper Agent'; 437252 second agent objective."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) See the First Viper Agent; low confidence position, 50 m from the camp. Probe: no water, slope 6, open 8/8."
+        }
+      ],
+      "spawn_guid": 100000090060
+    },
+    {
+      "legacy_npc_id": null,
+      "model_id": 180,
+      "model_file_name": "snake.adr",
+      "name": "Third Viper Agent",
+      "name_string_id": 437247,
+      "position": [
+        449.59,
+        69.945,
+        1815.24
+      ],
+      "position_w": null,
+      "heading": 2.73,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "npc_name 437247 'Viper Agent'; 437254 third agent objective."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) See the First Viper Agent; low confidence position, 75 m from the camp. Probe: no water, slope 6, open 8/8."
+        }
+      ],
+      "spawn_guid": 100000090061
+    },
+    {
+      "legacy_npc_id": null,
+      "model_id": 4203,
+      "model_file_name": "sg_eggbasket_01.adr",
+      "name": "Hidden Egg",
+      "name_string_id": 5100148,
+      "position": [
+        483.0,
+        47.1,
+        329.0
+      ],
+      "position_w": null,
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "5100642 'Alyssa's Spotted Egg'; 5100142 'Find Alyssa Eggelyn's stolen egg'; 5100006 'hid it somewhere in Sacred Grove'."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fr_quest_the_eggxtremely_eggcitingly_eggcellent_egg_hunt: Singing Crystal Mines, '17m West of Spruce Waynehammer', behind a pile of crystals."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Body: the baby egg models do not render, so the egg basket 4203 stands in (seen in model-view). Spot is 11 m west of Spruce on the mine floor (probe floors include 47.1, the terrain answer of 166 is the hillside above the cave); 17 m west has no floor at his level in the obstacle data. Birthday Bash event quest."
+        }
+      ],
+      "spawn_guid": 100000090062,
+      "content_key": 9500004100
+    },
+    {
+      "legacy_npc_id": null,
+      "model_id": 930,
+      "model_file_name": "sg_dpo_flower_01_red.agr",
+      "name": "A Cluckleberry Flower",
+      "name_string_id": 385093,
+      "position": [
+        129.51,
+        37.663,
+        1030.84
+      ],
+      "position_w": null,
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "npc_name 385093 'A Cluckleberry Flower'; 385030 'plant it in the dirt near the Gardener's Hutch'; 385070 'If a red flower grew... you'd better go check on Jack'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Red flower body by the quest's text; model-view shows every sg_dpo_flower tint with one texture. Spot 6 m from Edvard Leafsnipper at the Gardener's Hutch. Should move to wherever the earlier quest's dirt mound lands. Probe: no water, flat, open 8/8."
+        }
+      ],
+      "spawn_guid": 100000090063
+    },
+    {
+      "legacy_npc_id": null,
+      "model_id": 50,
+      "model_file_name": "cat_shorthair.adr",
+      "name": "Jack",
+      "name_string_id": 92587,
+      "position": [
+        23.32,
+        38.812,
+        1022.64
+      ],
+      "position_w": null,
+      "heading": -1.75,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "FR_Mob:Jack: Cat, male, Shrouded Glade, 'usually next to Halle Belleflower at the pet Adoption Center'."
+        },
+        {
+          "kind": "client",
+          "evidence": "npc_name 92587 'Jack'; 385071 'Check on Jack'; 385081 'Feed the purilla to Jack'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Generic male cat 50 cat_shorthair.adr, seen in model-view; no portrait compared. 2.4 m from Halle. Probe: no water, slope 6, open 8/8. Added because the quest cannot finish without him."
+        }
+      ],
+      "spawn_guid": 100000090064
+    },
+    {
+      "legacy_npc_id": null,
+      "model_id": 456,
+      "model_file_name": "fairy_druid_f.adr",
+      "name": "Apprentice Bubbles",
+      "name_string_id": 437495,
+      "position": [
+        489.34,
+        65.559,
+        1746.25
+      ],
+      "position_w": null,
+      "heading": -0.61,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "npc_name 437495 'Apprentice Bubbles'; 437504 'With the Head Alchemist out fighting the Gloam, I'll be handling potion duty'."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fr_quest_the_taste_of_truth: 'Visit the alchemist Apprentice Bubbles', gives the same line."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No race or gender anywhere. Generic druid body 456 fairy_druid_f.adr, seen in model-view, because she serves the druids. Stands in the druid and dwarf camp, 5 m from Brienne Ultrafang. Probe: no water, slope 3, open 7/8."
+        }
+      ],
+      "spawn_guid": 100000090065
+    },
+    {
+      "legacy_npc_id": null,
+      "model_id": 1639,
+      "model_file_name": "dwarf_m_biker.adr",
+      "name": "Dwarven Captive",
+      "name_string_id": 437506,
+      "position": [
+        485.69,
+        67.187,
+        1760.58
+      ],
+      "position_w": null,
+      "heading": 3.11,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "npc_name 437506 'Dwarven Captive'; 437507 'Dwarven Cage'; 437535 'Give the potion to the Dwarf Captive'."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fr_quest_the_taste_of_truth: dialogue 'What's this? A drink for a parched captive?'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Generic dwarf, same biker body as the dwarves in Dorn's camp. Cage not placed. 10 m from Brienne Ultrafang. Probe: no water, slope 9, open 8/8. Added because the quest cannot finish without him; the step says 'Dwarf Captive', so it needs an alias."
+        }
+      ],
+      "spawn_guid": 100000090066
+    },
+    {
+      "legacy_npc_id": null,
+      "model_id": 344,
+      "model_file_name": "fairy_royalguard_f.adr",
+      "name": "Fizzi",
+      "name_string_id": null,
+      "position": [
+        -1165.18,
+        3.918,
+        234.17
+      ],
+      "position_w": null,
+      "heading": 3.1,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "387405 names 'Fizzi' among the Tummies in Turmoil patients; 70936 'My friend Fizzi still is one [a royal guard] ... find her'; 71826 'Fizzi is still a royal guard in Sanctuary'. No locale string is exactly 'Fizzi' (79031 is 'Quartermaster Fizzi'), so name_string_id is null."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "FR_Mob:Fizzi: Pixie, male, Sanctuary, no portrait. Conflicts with the client's 'her'."
+        },
+        {
+          "kind": "video",
+          "evidence": "index.tsv 'Glowlighter Fizzi' at (-1164.7, 228.5), error 5.2 m, 1 sighting, unknown_name: probably OCR of two plates; General Glowlight stands there."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Body 344 is the female royal guard, the model Quartermaster Fizzi already uses, by the client's 'royal guard' and 'her'. MAY BE THE SAME PERSON as Quartermaster Fizzi (wiki links Fond Memories to him): if so, drop this row and point 'Find Fizzi' at 9500000518. Spot 6 m from the video solve at the barracks. Probe: no water, slope 6, open 8/8. Binding needs record 9500000480's poi_anchor position (the Royal Palace placeholder) moved here."
+        }
+      ],
+      "spawn_guid": 100000090067,
+      "content_key": 9500000480
+    },
+    {
+      "legacy_npc_id": null,
+      "model_id": 4499,
+      "model_file_name": "human_m_merchant_brawler_caucasian.agr",
+      "name": "Hank Fisticuffs",
+      "name_string_id": 90196,
+      "position": [
+        228.9,
+        23.445,
+        382.5
+      ],
+      "position_w": null,
+      "heading": -1.33,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "npc_name 90196 'Hank Fisticuffs'; the next string, 90197, reads 'Brawler & Ninja Weapons', his merchant title."
+        },
+        {
+          "kind": "video",
+          "evidence": "index.tsv: solved at x=236.6 z=385.3, error 4.0 m, 3 sightings, confidence high, placed_ok against record 9500000751 (8 m). Frame 0-8dyaBN6rs/00080 shows the plate at 10 m but not a readable body."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Body 4499, the male brawler merchant, by his client title, seen in model-view; race not proven. Kept on the record's exact spot because tests/content_npc_placement.rs requires a bound spawn at a video_index record's position. No wiki page. Probe not run (position taken from the record)."
+        }
+      ],
+      "spawn_guid": 100000090068,
+      "content_key": 9500000751
     }
   ]
 }

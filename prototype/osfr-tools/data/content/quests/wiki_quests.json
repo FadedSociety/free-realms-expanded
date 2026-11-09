@@ -18234,6 +18234,1117 @@
       "intro_text_string_id": 91574,
       "enabled": true,
       "end_text_string_id": 91577
+    },
+    {
+      "id": 3955510,
+      "title_string_id": 46549,
+      "giver_npc_id": 9000000172,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 46559,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the missing postchug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_missing_postchug_bcb8b3)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "The world already draws this postchug."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "spawn_guid 100000004302"
+            }
+          ],
+          "npc_id": 9500004354
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 46562,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Postchug Runalug in Wugachug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_missing_postchug_bcb8b3)."
+            }
+          ],
+          "npc_id": 9000000172
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Missing Postchug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_missing_postchug_bcb8b3)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "A Missing Postchug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_missing_postchug_bcb8b3)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Text ids from quests.merged.json and the client's numbering around the title, each read against the quest: the block filled earlier held another quest's line."
+        }
+      ],
+      "description_string_id": 46550,
+      "intro_text_string_id": 46548,
+      "enabled": true,
+      "end_text_string_id": 46552
+    },
+    {
+      "id": 3955515,
+      "title_string_id": 72040,
+      "giver_npc_id": 9500000223,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 72657,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give the ailing wolves a shot of antidote - (0/6) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ailing_animals_4dfce7)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "npc_name 75594 'Ailing Wolf'; 72658: 'use it on the ailing wolves in western Bristlewood'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "fr_quest_ailing_animals: 'The wolves are found not very far from Tara, to the north.' No wiki mob page."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Body 1 of 6. Generic wolf body 176 wolf.adr, seen in model-view (dark grey wolf). Client and wiki agree: north of Tara on the west side. Probe: terrain, no water, slope 14, open 8/8. Count 6: quest_wire makes talk steps only at count 1, so this step needs pick-up style wiring"
+            }
+          ],
+          "node_type": "quest-ailing-wolf",
+          "quantity": 6
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 72659,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give the ailing bear a shot of antidote - (0/3) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ailing_animals_4dfce7)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "npc_name 75595 'Ailing Bear'; 72660: 'use it on the ailing bears in western Bristlewood'."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Body 1 of 3. Generic bear 91 bear_normal.adr, seen in model-view (grey bear); no wiki mob page. POSITION IS A JUDGMENT: the client says western Bristlewood, the wiki (fr_quest_ailing_animals) says 'only in the northeastern corner'. Followed the client: west side, 220 m north "
+            }
+          ],
+          "node_type": "quest-ailing-bear",
+          "quantity": 3
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 72663,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Tara (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ailing_animals_4dfce7)."
+            }
+          ],
+          "npc_id": 9500000223
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 42,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Ailing Animals (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ailing_animals_4dfce7)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Ailing Animals (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ailing_animals_4dfce7)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Text ids from quests.merged.json and the client's numbering around the title, each read against the quest: the block filled earlier held another quest's line."
+        }
+      ],
+      "job": 11,
+      "description_string_id": 72041,
+      "intro_text_string_id": 72039,
+      "enabled": true,
+      "end_text_string_id": 72042
+    },
+    {
+      "id": 3955536,
+      "title_string_id": 391058,
+      "giver_npc_id": 9000000472,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "text_string_id": 390297,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the Royal Palace (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bravery_is_in_demand_862aea)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step target FR_Place Royal Palace; Royal Palace Guard page: 'In front of the Royal Palace'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: 390297 is this step."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) At the approach held by Royal Guard spawns 100000033443/444 and Guard Banee. Palace interior not checked."
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -1223.0,
+            2.767,
+            301.7
+          ],
+          "radius": 30.0
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 390299,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to the palace guard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bravery_is_in_demand_862aea)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "The world's Royal Palace Guard is the palace guard the goal names."
+            }
+          ],
+          "npc_id": 9500003915
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 391023,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Quills (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bravery_is_in_demand_862aea)."
+            }
+          ],
+          "npc_id": 9500000520
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [
+            {
+              "definition_id": 3992,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Queen's Firecrackers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bravery_is_in_demand_862aea)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Bravery is in Demand (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bravery_is_in_demand_862aea)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Bravery is in Demand (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bravery_is_in_demand_862aea)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 391059,
+      "intro_text_string_id": 391057,
+      "enabled": true
+    },
+    {
+      "id": 3955567,
+      "title_string_id": 46566,
+      "giver_npc_id": 9000000172,
+      "prerequisite_quest_ids": [
+        3955510
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 46574,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver the sasparilla to Rimpadun (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_delivery_for_rimpadun_fd04c7)."
+            }
+          ],
+          "npc_id": 9500000419
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 46562,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Postchug Runalug in Wugachug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_delivery_for_rimpadun_fd04c7)."
+            }
+          ],
+          "npc_id": 9000000172
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 90,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Delivery for Rimpadun (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_delivery_for_rimpadun_fd04c7)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Delivery for Rimpadun (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_delivery_for_rimpadun_fd04c7)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Text ids from quests.merged.json and the client's numbering around the title, each read against the quest: the block filled earlier held another quest's line."
+        }
+      ],
+      "description_string_id": 46567,
+      "intro_text_string_id": 46565,
+      "enabled": true,
+      "end_text_string_id": 46569
+    },
+    {
+      "id": 3955594,
+      "title_string_id": 93854,
+      "giver_npc_id": 9500000047,
+      "prerequisite_quest_ids": [
+        3955673
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 93859,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find bogwart samples - (0/5) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_follow_your_nose_f3aa3a)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: purple bell flower on broad leaves (sheets/k_flora.png r0c1, tile of sg_fairy_flora_02_flower01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_follow_your_nose_f3aa3a)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "no source shows the plant; 'sample' must stay out of the table or it would win over 'bogwart' in model_for"
+            }
+          ],
+          "node_type": "quest-bogwart",
+          "quantity": 5
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 90832,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Milford in Blackspore (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_follow_your_nose_f3aa3a)."
+            }
+          ],
+          "npc_id": 9500000047
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Follow Your Nose (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_follow_your_nose_f3aa3a)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Follow Your Nose (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_follow_your_nose_f3aa3a)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Text ids from quests.merged.json and the client's numbering around the title, each read against the quest: the block filled earlier held another quest's line."
+        }
+      ],
+      "description_string_id": 93858,
+      "intro_text_string_id": 93853,
+      "enabled": true,
+      "end_text_string_id": 93856
+    },
+    {
+      "id": 3955601,
+      "title_string_id": 2401,
+      "giver_npc_id": 9500000351,
+      "prerequisite_quest_ids": [
+        3950247
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 76477,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the Robgoblin Infiltrators - (0/3) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_further_investigation_04ea57)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "FR_Mob:Robgoblin_Infiltrator: Robgoblin, male, 'Only appear north of Lakeshore during a quest'. Quest page: 'near the trees north of the wooden bridge that leads to the Troll Village'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "npc_name 76482 'Robgoblin Infiltrator'."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Body 1 of 3, same spot as the unapplied row 100000090032 in proposed-people.json. Count 3 needs pick-up style wiring; 'appear after Tyn Redwing' is not modelled."
+            }
+          ],
+          "node_type": "quest-robgoblin-infiltrator",
+          "quantity": 3
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 76082,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Lan Spryleaf (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_further_investigation_04ea57)."
+            }
+          ],
+          "npc_id": 9500000351
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 38,
+          "items": [
+            {
+              "definition_id": 3021,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Medium Health Potion (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_further_investigation_04ea57)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Further Investigation (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_further_investigation_04ea57)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Further Investigation (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_further_investigation_04ea57)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Text ids from quests.merged.json and the client's numbering around the title, each read against the quest: the block filled earlier held another quest's line."
+        }
+      ],
+      "description_string_id": 2402,
+      "intro_text_string_id": 2400,
+      "enabled": true,
+      "end_text_string_id": 2403
+    },
+    {
+      "id": 3955608,
+      "title_string_id": 93875,
+      "giver_npc_id": 9500000047,
+      "prerequisite_quest_ids": [
+        3955594
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 93880,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Grave Blossom samples - (0/10) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_grave_blossoms_dc624e)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: single wilted white rose (sheets/g_items3.png r3c3, tile of event_valentines_rose_wilted_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_grave_blossoms_dc624e)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "no source shows the plant; a wilted white rose fits 'grows where someone died'"
+            }
+          ],
+          "node_type": "quest-blossom",
+          "quantity": 10
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 90832,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Milford in Blackspore (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_grave_blossoms_dc624e)."
+            }
+          ],
+          "npc_id": 9500000047
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Grave Blossoms (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_grave_blossoms_dc624e)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Grave Blossoms (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_grave_blossoms_dc624e)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Text ids from quests.merged.json and the client's numbering around the title, each read against the quest: the block filled earlier held another quest's line."
+        }
+      ],
+      "description_string_id": 93879,
+      "intro_text_string_id": 93874,
+      "enabled": true,
+      "end_text_string_id": 93877
+    },
+    {
+      "id": 3955656,
+      "title_string_id": 92559,
+      "giver_npc_id": 9500004157,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 37197,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver the letter (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pen_pals_5c750c)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: the letter is for Valinda."
+            }
+          ],
+          "npc_id": 9500000779
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pen Pals (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pen_pals_5c750c)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Pen Pals (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pen_pals_5c750c)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Text ids from quests.merged.json and the client's numbering around the title, each read against the quest: the block filled earlier held another quest's line."
+        }
+      ],
+      "description_string_id": 92560,
+      "intro_text_string_id": 92558,
+      "enabled": true,
+      "end_text_string_id": 92561
+    },
+    {
+      "id": 3955673,
+      "title_string_id": 93865,
+      "giver_npc_id": 9500000047,
+      "prerequisite_quest_ids": [
+        3951317
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 93870,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find strangleroot samples - (0/5) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pulling_weeds_6f2500)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "npc_name 94138 'Strangleroot'; 93864 'It grows at the base of trees'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "fr_quest_pulling_weeds: 'tall weeds with purple flowers on the tops ... most of the updating flowers to the north of Milford'."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Plant 1 of 5. No model carries the name; 670 is the closest seen in model-view (tall stalks, purple flowers). Base-of-trees not checked. Probe: no water, slope 9, open 8/8. Count 5 needs pick-up style wiring; the wiki's 'sparkling' effect is not modelled."
+            }
+          ],
+          "node_type": "quest-strangleroot",
+          "quantity": 5
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 90832,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Milford in Blackspore (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pulling_weeds_6f2500)."
+            }
+          ],
+          "npc_id": 9500000047
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pulling Weeds (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pulling_weeds_6f2500)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Pulling Weeds (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pulling_weeds_6f2500)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Text ids from quests.merged.json and the client's numbering around the title, each read against the quest: the block filled earlier held another quest's line."
+        }
+      ],
+      "description_string_id": 93869,
+      "intro_text_string_id": 93864,
+      "enabled": true,
+      "end_text_string_id": 93867
+    },
+    {
+      "id": 3955694,
+      "title_string_id": 103484,
+      "giver_npc_id": 9500004199,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 103490,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the snakes - (0/6) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snake_shakedown_6f5fc1)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "103485 'Gather up the wandering snakes causing trouble'; npc_name 4259 'Snake'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "fr_quest_snake_shakedown: Durango Zoo, snakes scaring animals and guests."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Body 1 of 6. Generic snake.adr, seen in model-view. Scattered around the zoo paths near the two Gus Galewind spawns; no source gives spots. Probe: no water, slope 12, open 8/8. Count 6 needs pick-up style wiring."
+            }
+          ],
+          "node_type": "quest-snake",
+          "quantity": 6
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 103493,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Gus Galewind (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snake_shakedown_6f5fc1)."
+            }
+          ],
+          "npc_id": 9500004199
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Snake Shakedown (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snake_shakedown_6f5fc1)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Snake Shakedown (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snake_shakedown_6f5fc1)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Text ids from quests.merged.json and the client's numbering around the title, each read against the quest: the block filled earlier held another quest's line."
+        }
+      ],
+      "description_string_id": 103485,
+      "intro_text_string_id": 103483,
+      "enabled": true,
+      "end_text_string_id": 103486
+    },
+    {
+      "id": 3955710,
+      "title_string_id": 5100013,
+      "giver_npc_id": 9500000436,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 5100142,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Alyssa Eggelyn's stolen egg. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_eggxtremely_eggcitingly_eggcellent_egg_hunt_3f84a5)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "5100642 'Alyssa's Spotted Egg'; 5100142 'Find Alyssa Eggelyn's stolen egg'; 5100006 'hid it somewhere in Sacred Grove'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "fr_quest_the_eggxtremely_eggcitingly_eggcellent_egg_hunt: Singing Crystal Mines, '17m West of Spruce Waynehammer', behind a pile of crystals."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Body: the baby egg models do not render, so the egg basket 4203 stands in (seen in model-view). Spot is 11 m west of Spruce on the mine floor (probe floors include 47.1, the terrain answer of 166 is the hillside above the cave); 17 m west has no floor at his level in the obst"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "spawn_guid 100000090062"
+            }
+          ],
+          "npc_id": 9500004100
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 5100146,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Alyssa Eggelyn. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_eggxtremely_eggcitingly_eggcellent_egg_hunt_3f84a5)."
+            }
+          ],
+          "npc_id": 9500000436
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Eggxtremely Eggcitingly Eggcellent Egg Hunt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_eggxtremely_eggcitingly_eggcellent_egg_hunt_3f84a5)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "The Eggxtremely Eggcitingly Eggcellent Egg Hunt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_eggxtremely_eggcitingly_eggcellent_egg_hunt_3f84a5)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Text ids from quests.merged.json and the client's numbering around the title, each read against the quest: the block filled earlier held another quest's line."
+        }
+      ],
+      "description_string_id": 5100006,
+      "enabled": true,
+      "intro_text_string_id": 5100094,
+      "end_text_string_id": 5100008
+    },
+    {
+      "id": 3955714,
+      "title_string_id": 93891,
+      "giver_npc_id": 9500000047,
+      "prerequisite_quest_ids": [
+        3955608
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 93900,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Eggert (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_master_s_components_2668ef)."
+            }
+          ],
+          "npc_id": 9000000315
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [
+            {
+              "definition_id": 3023,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Medium Energy Potion (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_master_s_components_2668ef)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Master's Components (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_master_s_components_2668ef)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "The Master's Components (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_master_s_components_2668ef)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Text ids from quests.merged.json and the client's numbering around the title, each read against the quest: the block filled earlier held another quest's line."
+        }
+      ],
+      "enabled": true,
+      "intro_text_string_id": 93890,
+      "description_string_id": 93899,
+      "end_text_string_id": 93893
+    },
+    {
+      "id": 3955726,
+      "title_string_id": 384798,
+      "giver_npc_id": 9500000351,
+      "prerequisite_quest_ids": [
+        3955601
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 384804,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Selvi Slowreel (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_thieves_about_48429e)."
+            }
+          ],
+          "npc_id": 9000000194
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 384806,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Dori Tendersole (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_thieves_about_48429e)."
+            }
+          ],
+          "npc_id": 9500000343
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 384808,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Mister Nooklings (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_thieves_about_48429e)."
+            }
+          ],
+          "npc_id": 9500000358
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 384810,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Bry (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_thieves_about_48429e)."
+            }
+          ],
+          "npc_id": 9000000035
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 78491,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Lan Spryleaf (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_thieves_about_48429e)."
+            }
+          ],
+          "npc_id": 9500000351
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 6,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Thieves About! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_thieves_about_48429e)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Thieves About! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_thieves_about_48429e)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Text ids from quests.merged.json and the client's numbering around the title, each read against the quest: the block filled earlier held another quest's line."
+        }
+      ],
+      "description_string_id": 384799,
+      "intro_text_string_id": 384797,
+      "enabled": true,
+      "end_text_string_id": 384800
+    },
+    {
+      "id": 3955736,
+      "title_string_id": 10186,
+      "giver_npc_id": 9500000529,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 14905,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tag all the turtles - (0/8) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_turtle_tag_476069)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "10187 'Tag all the turtles living in the Sanctuary waters'; npc_name 189 'Turtle'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "fr_quest_turtle_tag: 'pretty good sized and have the sprinkling shinies'."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Body 1 of 8. turtle_01.adr, seen in model-view, the model the zoo's turtles already use. WHICH WATER IS A JUDGMENT: the lake of the inner ring, 40 m from Saffron; bank spots 6 to 14 m from the water's edge (the edge itself is steep or blocked). Probe: no water, slope 10, open"
+            }
+          ],
+          "node_type": "quest-turtle",
+          "quantity": 8
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 74931,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Saffron in Pixiewood (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_turtle_tag_476069)."
+            }
+          ],
+          "npc_id": 9500000529
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Turtle Tag (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_turtle_tag_476069)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Turtle Tag (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_turtle_tag_476069)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Text ids from quests.merged.json and the client's numbering around the title, each read against the quest: the block filled earlier held another quest's line."
+        }
+      ],
+      "description_string_id": 10187,
+      "enabled": true,
+      "intro_text_string_id": 74933,
+      "end_text_string_id": 9529
     }
   ]
 }

@@ -318,7 +318,7 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // `legacy_data` clickable quest props (1,209, all Legacy spawns); L096 the two Wildwood
     // turnstile actors (1,211, live_capture); L925 twelve fanbyte-wiki quest givers (1,223, poi_anchor);
     // L932 the two Snowhill soccer gates (1,225, client_object).
-    assert_eq!(regional_legacy + regional_reconstructed, 1287);
+    assert_eq!(regional_legacy + regional_reconstructed, 1291);
     assert!(
         regional_legacy >= 582,
         "regional NPCs dropped to {regional_legacy}"
@@ -344,7 +344,7 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // each a hostile body with the same GUID, which hides the passive copy. That leaves 3,199.
     // L096 appended the bodies of the two Wildwood turnstile actors (3,201); L932 the two Snowhill
     // soccer gates (3,203).
-    assert_eq!(extra_rows.len(), 3249);
+    assert_eq!(extra_rows.len(), 3267);
     assert_eq!(captured_actors.len(), 9);
     println!(
         "NPC placements: {regional_legacy} Legacy, {regional_reconstructed} reconstructed; {} extra spawns, {} capture-confirmed",

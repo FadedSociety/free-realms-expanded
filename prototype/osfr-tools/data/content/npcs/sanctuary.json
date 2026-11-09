@@ -454,8 +454,27 @@
       "location_evidence": [
         "Sanctuary"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3955710,
+          "title": "The Eggxtremely Eggcitingly Eggcellent Egg Hunt",
+          "title_string_id": 5100013,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Eggxtremely Eggcitingly Eggcellent Egg Hunt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_eggxtremely_eggcitingly_eggcellent_egg_hunt_3f84a5)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3955710
+      ],
       "quests_given_text": [
         "The Spring Eggstravaganza; The Eggcellent Egg Hunt; The Eggcitingly Eggcellent Egg Hunt; The Eggxtremely Eggcitingly Eggcellent Egg Hunt"
       ],
@@ -468,9 +487,9 @@
       ],
       "services_reason": null,
       "position": [
-        -1411.578845,
-        -27.631,
-        356.902143
+        -1283.9,
+        -15.0,
+        239.5
       ],
       "position_w": null,
       "rotation": [
@@ -852,12 +871,12 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=5 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=5 NameId=3499 matches native name_string_id."
+            "kind": "video",
+            "evidence": "lab/reports/placement/index.tsv: Alyssa Eggelyn at x=-1283.9 z=239.5, error 4.0 m, 9 sightings in 4 videos, high confidence."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "evidence": "(R) The video placement, set down on the floor there."
           }
         ],
         "position_reason": [
@@ -923,10 +942,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob:Alyssa_Eggelyn"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 456,
-      "model_file_name": "fairy_druid_f.adr"
+      "model_file_name": "fairy_druid_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000437,
@@ -6830,9 +6856,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1407.579225,
-        -27.631,
-        350.982361
+        -942.664,
+        5.328773,
+        233.6187
       ],
       "position_w": null,
       "rotation": [
@@ -7055,11 +7081,23 @@
         "position": [
           {
             "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=5 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=5 NameId=3499 matches native name_string_id."
+            "evidence": "npc_name 79037 'Bilbio Strongarm'; 387405 'Fizzi, Bilbio, and Sir Whittington'."
+          },
+          {
+            "kind": "wiki",
+            "evidence": "FR_Mob:Bilbio_Strongarm: Dwarf, male, Sanctuary. FR_Quest:Medic: Tummies in Turmoil: 'way up in the NW corner by the forge'."
+          },
+          {
+            "kind": "video",
+            "evidence": "fcrEm6xnz9k frame 00274: nameplate 'Bilbio Strongarm' over an orange-bearded dwarf in a hard hat beside the Anvil and Steelbloom; frame 00280 shows Barin Battlerock beside him. Matches this spot (Barin 7 m, Steelbloom 8 m)."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "evidence": "(R) NOT A NEW BODY: spawn 100000002360 already draws him here with dwarf_miner_m.adr, which matches the video by eye. Bind that spawn with content_key 9500000451; do not add a second one. The record's poi_anchor position (Royal Palace placeholder) should move to this spot."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The record stands where its body row (spawn 100000002360) stands: talk reach is measured from it."
           }
         ],
         "position_reason": [
@@ -22513,9 +22551,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1405.981108,
-        -27.631,
-        352.00953
+        -1165.18,
+        3.918,
+        234.17
       ],
       "position_w": null,
       "rotation": [
@@ -22738,11 +22776,23 @@
         "position": [
           {
             "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=5 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=5 NameId=3499 matches native name_string_id."
+            "evidence": "387405 names 'Fizzi' among the Tummies in Turmoil patients; 70936 'My friend Fizzi still is one [a royal guard] ... find her'; 71826 'Fizzi is still a royal guard in Sanctuary'. No locale string is exactly 'Fizzi' (79031 is 'Quartermaster Fizzi'), so name_string_id is null."
+          },
+          {
+            "kind": "wiki",
+            "evidence": "FR_Mob:Fizzi: Pixie, male, Sanctuary, no portrait. Conflicts with the client's 'her'."
+          },
+          {
+            "kind": "video",
+            "evidence": "index.tsv 'Glowlighter Fizzi' at (-1164.7, 228.5), error 5.2 m, 1 sighting, unknown_name: probably OCR of two plates; General Glowlight stands there."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "evidence": "(R) Body 344 is the female royal guard, the model Quartermaster Fizzi already uses, by the client's 'royal guard' and 'her'. MAY BE THE SAME PERSON as Quartermaster Fizzi (wiki links Fond Memories to him): if so, drop this row and point 'Find Fizzi' at 9500000518. Spot 6 m from the video solve at the barracks. Probe: no water, slope 6, open 8/8. Binding needs record 9500000480's poi_anchor position (the Royal Palace placeholder) moved here."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The record stands where its body row (spawn 100000090067) stands: talk reach is measured from it."
           }
         ],
         "position_reason": [
@@ -51285,8 +51335,27 @@
       "location_evidence": [
         "Pixiewood (2321200006)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3955736,
+          "title": "Turtle Tag",
+          "title_string_id": 10186,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Turtle Tag (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_turtle_tag_476069)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3955736
+      ],
       "quests_given_text": [
         "Saffron's Safari (title 584555234; find the animals, 975415894)"
       ],

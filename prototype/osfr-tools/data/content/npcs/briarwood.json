@@ -67944,8 +67944,27 @@
       "location_evidence": [
         "\"Fellow Medic ... sick animals in Bristlewood\" (client 1265014476); wiki: beside Babbina."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3955515,
+          "title": "Ailing Animals",
+          "title_string_id": 72040,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Ailing Animals (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ailing_animals_4dfce7)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3955515
+      ],
       "quests_given_text": [
         "Antidote shots for the ailing wolves and bears \"in western Bristlewood\" (client 2359454570, 4030477642); thorn removal from a wounded Akkodi (41467974). Titles not found."
       ],

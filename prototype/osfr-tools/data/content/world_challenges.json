@@ -2759,6 +2759,124 @@
         "giver: Verve McNichols, the quest's giver (R)",
         "time limit 90 s, coins, xp: wiki or (R) by difficulty"
       ]
+    },
+    {
+      "id": 267,
+      "title": "Medic: Tummies in Turmoil",
+      "giver": 9000000052,
+      "name_id": 73752,
+      "description_id": 115721,
+      "icon_id": 271,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 150,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "deliver",
+          "count": 1,
+          "name_id": 115726,
+          "recipients": [
+            9500000509
+          ]
+        },
+        {
+          "kind": "deliver",
+          "count": 1,
+          "name_id": 115728,
+          "recipients": [
+            9000000091
+          ]
+        },
+        {
+          "kind": "deliver",
+          "count": 1,
+          "name_id": 70928,
+          "recipients": [
+            9500000480
+          ]
+        },
+        {
+          "kind": "deliver",
+          "count": 1,
+          "name_id": 115734,
+          "recipients": [
+            9000000205
+          ]
+        },
+        {
+          "kind": "deliver",
+          "count": 1,
+          "name_id": 115732,
+          "recipients": [
+            9500000451
+          ]
+        }
+      ],
+      "bonuses": [],
+      "coins": 40,
+      "xp": 30,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals and 2:30: wiki fr_minigame_tummies_in_turmoil (Nomi, Flitter, Fizzi, Bilbio, Sir Whittington; Bilbio last, by the forge)",
+        "giver: Clover, whose choice begins the game in the wiki's quest page",
+        "time limit 150 s, coins, xp: wiki or (R) by difficulty"
+      ]
+    },
+    {
+      "id": 268,
+      "title": "Medic: Flu Season",
+      "giver": 9000000143,
+      "name_id": 73828,
+      "description_id": 115882,
+      "icon_id": 271,
+      "difficulty": 1,
+      "profile": 0,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "deliver",
+          "count": 1,
+          "name_id": 115865,
+          "recipients": [
+            9500000749
+          ]
+        },
+        {
+          "kind": "deliver",
+          "count": 1,
+          "name_id": 115869,
+          "recipients": [
+            9500000751
+          ]
+        },
+        {
+          "kind": "deliver",
+          "count": 1,
+          "name_id": 115871,
+          "recipients": [
+            9500000758
+          ]
+        },
+        {
+          "kind": "deliver",
+          "count": 1,
+          "name_id": 35578,
+          "recipients": [
+            9000000132
+          ]
+        }
+      ],
+      "bonuses": [],
+      "coins": 40,
+      "xp": 30,
+      "source": [
+        "names, icon, difficulty: client MiniGameData",
+        "goals and two minutes: wiki fr_minigame_medic_flu_season",
+        "giver: Mayor Crystalline, the wiki's start",
+        "time limit 120 s, coins, xp: wiki or (R) by difficulty"
+      ]
     }
   ]
 }

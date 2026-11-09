@@ -12277,13 +12277,47 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part B. The Thoroughfare, the farm and the cooking tents, row 57; source cell: [client][video]"
             }
           ]
+        },
+        {
+          "quest_id": 3955510,
+          "title": "A Missing Postchug",
+          "title_string_id": 46549,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Missing Postchug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_missing_postchug_bcb8b3)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3955567,
+          "title": "Delivery for Rimpadun",
+          "title_string_id": 46566,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Delivery for Rimpadun (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_delivery_for_rimpadun_fd04c7)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3130020,
         3130021,
         3130022,
-        3130023
+        3130023,
+        3955510,
+        3955567
       ],
       "quests_given_text": [
         "Postman: Where's the Sasparilla? (the PCA hit, 1317516993), Postman: Jug Clean Up, Postman: Sorting It Out, Postman: Achieve Level 15, Postman: Fair Warning; Card Duelist: Parcel Recovery (the video shows Runalug first); the lost postchug (A Missing Postchug, client title 2294107554, by wording: \"Return to Postchug Runalug in Wugachug and tell him what happened to his missing postchug.\", 2688819018; the same errand is Delivery for Rimpadun on NPCs - Merry Vale); the PCA attack text (856673054, 994036297, 2556664170). Receives the Brewery bills (2048485603) and the jugs minigame (\"Collect the Sasparilla Jugs and return them to Postchug Runalug\", 3208546568). The mail-sorting minigame \"Wugachug Mail Sorting\" (title ucdt 3571087974; ugdt 1641783199) sits at the Postbox."
