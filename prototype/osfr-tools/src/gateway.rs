@@ -888,7 +888,7 @@ impl Gateway {
                 state.validate()?;
             }
             if !game.supports_location(&state) {
-                return Err(invalid("saved zone differs from gameplay encounter"));
+                state = game.rescue_unclaimed_zone(&state, &base.initial_state);
             }
             if let Some(return_location) = game.abandon_kart_for_reconnect() {
                 // Check the saved ownership/location before replacing it.

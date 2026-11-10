@@ -1073,6 +1073,14 @@ impl SocialService {
         lists(owner, visitor) && lists(visitor, owner) && !self.ignores_either(owner, visitor)
     }
 
+    /// 74/8 for a refused friend teleport (codes 4, 10 and 11; the client words the line itself,
+    /// `ShowFriendStatusMessage` `00cb3fd0`). The subject is the player who cannot be joined, so
+    /// "[player] is busy playing a minigame" names the target. `None` when it has no profile.
+    pub fn teleport_refusal(&self, code: FriendResultCode, target: u64) -> Option<Vec<u8>> {
+        let name = &self.profiles.get(&target)?.name;
+        encode_friend_status(code, target, name).ok()
+    }
+
     pub fn ignores_either(&self, a: u64, b: u64) -> bool {
         let ignores = |owner: u64, other: u64| {
             self.profiles

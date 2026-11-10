@@ -1086,16 +1086,17 @@ fn warpstone_attunes_by_walking_travel_relocates_and_locked_ids_do_not() {
         "refused travel moved the player"
     );
 
-    // Walk toward Sanctuary: 20 m away is outside the 12 m radius.
-    let far = [SANCTUARY[0] - 45.0, SANCTUARY[1], SANCTUARY[2]];
+    // Walk toward Sanctuary: 40 m away is outside the 30 m attune radius (`travel.json`
+    // `attune_radius_m`, raised from 12 m because stone bodies stand up to 17 m from their rows).
+    let far = [SANCTUARY[0] - 60.0, SANCTUARY[1], SANCTUARY[2]];
     goto(&mut bot, far);
-    let near20 = [SANCTUARY[0] - 20.0, SANCTUARY[1], SANCTUARY[2]];
-    walk(&mut bot, guid, far, near20);
+    let outside = [SANCTUARY[0] - 40.0, SANCTUARY[1], SANCTUARY[2]];
+    walk(&mut bot, guid, far, outside);
     raw(&mut bot, &travel(5));
     bot.wait_for(T, |m| {
         system_text(m).is_some_and(|t| t.contains(NOT_ATTUNED))
     })
-    .expect("20 m from the stone already attuned it");
+    .expect("40 m from the stone already attuned it");
     // Eight metres away attunes it, with the notice and a refreshed list (57).
     let near8 = [SANCTUARY[0] - 8.0, SANCTUARY[1], SANCTUARY[2]];
     let message = bot::wrap(&bot::move_request(guid, near8, [0.0, 0.0, 1.0]));

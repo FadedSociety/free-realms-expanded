@@ -453,6 +453,29 @@ fn leaving_returns_to_the_world_pose() {
     );
 }
 
+/// Travel: "Teleport to Safety" (op 122) inside a lot is a way out that needs no door: it leaves
+/// exactly as 127/10 does, back to the pose the visit started from.
+#[test]
+fn teleport_to_safety_inside_a_house_leaves_for_the_world_pose() {
+    let content = Content::with_houses();
+    let mut game = content.game();
+    let lot = granted(&mut game);
+    game.handle_in_world(&enter(lot.instance_guid), &character(), 2_000)
+        .unwrap();
+    game.initialize_world(&character(), 3_000).unwrap();
+    let mut inside = character();
+    inside.zone_id = 1;
+    inside.position = [440.0, 5.0, 430.0];
+    let out = game.handle_in_world(&[122, 0], &inside, 4_000).unwrap();
+    let scene = out.scene_zoning.expect("the rescue leaves the lot");
+    assert_eq!((scene.id, &scene.position[..3]), (0, &character().position[..]));
+    assert!(out.relocation.is_none(), "op 31 carries the pose, no 38/12");
+    assert_eq!(game.house_return(), None, "the visit is over");
+    // Outside again, with no stone found yet, the same request goes to the nearest stone.
+    let out = game.handle_in_world(&[122, 0], &character(), 5_000).unwrap();
+    assert!(out.relocation.is_some() && out.scene_zoning.is_none());
+}
+
 #[test]
 fn refused_requests_change_nothing() {
     let content = Content::with_houses();

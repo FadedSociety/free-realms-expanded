@@ -368,7 +368,7 @@ fn point_of_interest_reply_round_trips_and_rejects_a_truncated_record() {
 fn registry_rejects_a_destination_that_is_not_a_warpstone() {
     let mut registry = WarpRegistry::new(vec![WarpDestination {
         id: 131,
-        name: "not a warpstone",
+        name: "not a warpstone".into(),
         is_warpstone: false,
         position: [128.81799, 22.525, 390.70901, 1.0],
         rotation: [-0.19572824, 0.0, 0.9806582, 0.0],

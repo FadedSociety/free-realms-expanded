@@ -34,7 +34,8 @@
 //! stay in agreement. Nothing grants items, currency or experience.
 
 use serde::{Deserialize, Serialize};
-use std::collections::BTreeSet;
+use std::borrow::Cow;
+use std::collections::{BTreeMap, BTreeSet};
 
 /// `PacketPointOfInterestDefinitionRequest` (client asks for the destination list).
 pub const POINT_OF_INTEREST_DEFINITION_REQUEST_OPCODE: u16 = 56;
@@ -463,11 +464,11 @@ fn decode_point_of_interest_record(
 }
 
 /// One warpstone destination the server can teleport a character to.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct WarpDestination {
     pub id: i32,
     /// Shown in the attunement notice (client locale text of the row's name id).
-    pub name: &'static str,
+    pub name: Cow<'static, str>,
     /// Recovered rows for non-warpstone points of interest are legitimately in
     /// the client's destination list; only warpstones travel.
     pub is_warpstone: bool,
@@ -628,7 +629,7 @@ pub fn captured_destinations() -> Vec<WarpDestination> {
     .into_iter()
     .map(|(id, position, rotation)| WarpDestination {
         id,
-        name: "captured",
+        name: "captured".into(),
         is_warpstone: true,
         position,
         rotation,
@@ -826,13 +827,13 @@ fn curated_destination(row: &CuratedRow) -> WarpDestination {
         .find(|captured| captured.id == row.id)
     {
         return WarpDestination {
-            name: row.name,
+            name: row.name.into(),
             ..captured
         };
     }
     WarpDestination {
         id: row.id,
-        name: row.name,
+        name: row.name.into(),
         is_warpstone: true,
         position: [row.position[0], row.position[1], row.position[2], 1.0],
         rotation: [0.0; 4],
@@ -1035,7 +1036,37 @@ pub struct WarpRegistry {
     rules: WarpRules,
     last_travel_ms: Option<u64>,
     last_stuck_ms: Option<u64>,
+    /// `Some` for a registry built from the whole point-of-interest table
+    /// ([`WarpRegistry::atlas`]); `None` keeps the hubs-only W142 behaviour.
+    atlas: Option<Undiscovered>,
+    /// Marker id -> the warpstone that must be found before it travels (the comic alias 153).
+    /// Boxed: the registry is cloned with every staged packet, so it stays small.
+    requires: Box<BTreeMap<i32, i32>>,
 }
+
+/// (R) How the whole-table `57` shows a warpstone the character has not found.
+/// The client's Atlas draws notification type 8 with its `warpstoneDisabledIcon`
+/// and offers no teleport for it (atlas movie `placeMapIndicator`,
+/// `rollOutTeleportConfirm`); no source says the original server used it so.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Undiscovered {
+    #[default]
+    Disabled,
+    Hidden,
+}
+
+/// Notification type of a warpstone row, and of one the Atlas draws disabled.
+pub const WARPSTONE_NOTIFICATION: i32 = 7;
+pub const DISABLED_WARPSTONE_NOTIFICATION: i32 = 8;
+/// Notification types the client's Atlas offers no teleport for (atlas movie
+/// `rollOutTeleportConfirm` returns for 8, 10 and 11), so the server honours none.
+const NO_TELEPORT_NOTIFICATIONS: [i32; 3] = [8, 10, 11];
+
+/// (R) A marker's stored arrival this far under the terrain grid is an
+/// interior (the grid keeps the highest surface; eight dungeon mouths lie 6 m
+/// to 133 m under it) and keeps its own height instead of being lifted.
+const INTERIOR_DEPTH_M: f32 = 3.0;
 
 impl WarpRegistry {
     pub fn new(destinations: Vec<WarpDestination>) -> Self {
@@ -1050,6 +1081,24 @@ impl WarpRegistry {
         Self {
             destinations: CURATED.iter().map(curated_destination).collect(),
             definitions: curated_definitions(),
+            ..Self::default()
+        }
+    }
+
+    /// The whole point-of-interest table: every row is listed in `57`, any
+    /// marker can be travelled to (the captures hold the original server's
+    /// replies for markers 31, 131 and 155) and only warpstones need finding.
+    pub fn atlas(
+        destinations: Vec<WarpDestination>,
+        definitions: Vec<PointOfInterestDefinition>,
+        undiscovered: Undiscovered,
+        requires: BTreeMap<i32, i32>,
+    ) -> Self {
+        Self {
+            destinations,
+            definitions,
+            requires: Box::new(requires),
+            atlas: Some(undiscovered),
             ..Self::default()
         }
     }
@@ -1096,12 +1145,28 @@ impl WarpRegistry {
     /// its whole table with it (`00b98b70` clears, then reads), so this is also
     /// the update after a new attunement.
     pub fn definitions_message(&self) -> Vec<u8> {
-        let rows: Vec<_> = self
-            .definitions
-            .iter()
-            .filter(|row| self.attuned.contains(&row.id))
-            .cloned()
-            .collect();
+        let found = |row: &PointOfInterestDefinition| {
+            row.notification_type != WARPSTONE_NOTIFICATION || self.attuned.contains(&row.id)
+        };
+        let rows: Vec<_> = match self.atlas {
+            None => (self.definitions.iter())
+                .filter(|row| self.attuned.contains(&row.id))
+                .cloned()
+                .collect(),
+            Some(Undiscovered::Hidden) => {
+                (self.definitions.iter().filter(|row| found(row)).cloned()).collect()
+            }
+            Some(Undiscovered::Disabled) => (self.definitions.iter())
+                .map(|row| PointOfInterestDefinition {
+                    notification_type: if found(row) {
+                        row.notification_type
+                    } else {
+                        DISABLED_WARPSTONE_NOTIFICATION
+                    },
+                    ..row.clone()
+                })
+                .collect(),
+        };
         point_of_interest_reply_message(&rows)
     }
 
@@ -1113,7 +1178,7 @@ impl WarpRegistry {
             return WarpReply::default();
         }
         let radius_squared = self.rules.attune_radius_m * self.rules.attune_radius_m;
-        let fresh: Vec<(i32, &'static str)> = self
+        let fresh: Vec<(i32, Cow<'static, str>)> = self
             .destinations
             .iter()
             .filter(|d| d.is_warpstone && !self.attuned.contains(&d.id))
@@ -1122,7 +1187,7 @@ impl WarpRegistry {
                 let dz = d.position[2] - ctx.position[2];
                 dx * dx + dz * dz <= radius_squared
             })
-            .map(|d| (d.id, d.name))
+            .map(|d| (d.id, d.name.clone()))
             .collect();
         if fresh.is_empty() {
             return WarpReply::default();
@@ -1178,19 +1243,37 @@ impl WarpRegistry {
     ) -> Result<WarpReply, WarpRejection> {
         let request = ZoneTeleportRequest::decode(body).map_err(WarpRejection::MalformedRequest)?;
         let id = request.destination_id;
-        let destination = *self
+        let destination = self
             .destination(id)
-            .ok_or(WarpRejection::UnknownDestination(id))?;
-        if !destination.is_warpstone {
+            .ok_or(WarpRejection::UnknownDestination(id))?
+            .clone();
+        let marker = !destination.is_warpstone;
+        if marker && self.atlas.is_none() {
             return Err(WarpRejection::NotAWarpstone(id));
         }
-        if !self.is_attuned(id) {
+        let kind = (self.definitions.iter().find(|row| row.id == id))
+            .map_or(0, |row| row.notification_type);
+        if NO_TELEPORT_NOTIFICATIONS.contains(&kind) {
+            return Err(WarpRejection::NotAWarpstone(id));
+        }
+        let stone = if marker {
+            self.requires.get(&id).copied()
+        } else {
+            Some(id)
+        };
+        if stone.is_some_and(|stone| !self.is_attuned(stone)) {
             return Err(WarpRejection::LockedDestination(id));
         }
         self.check_context(ctx)?;
         self.check_cooldown(self.last_travel_ms, self.rules.cooldown_ms, now_ms)?;
         self.last_travel_ms = Some(now_ms);
-        Ok(relocate(arrive_at_destination(&destination, ctx, world)))
+        let mut to = arrive_at_destination(&destination, ctx, world);
+        // A marker inside a cave keeps its own height; a warpstone stands on the ground.
+        let stored = destination.position[1];
+        if marker && to.position[1] - stored > INTERIOR_DEPTH_M + ARRIVAL_LIFT_M {
+            to.position[1] = stored;
+        }
+        Ok(relocate(to))
     }
 
     /// `122`: the client sends it when it falls below the world floor, and a
@@ -1224,15 +1307,21 @@ impl WarpRegistry {
     }
 
     /// The warpstone nearest to `position` in the plane (R): the `122` target.
+    /// With the whole table it is the nearest one already found ("the nearest
+    /// warpstone that you have already activated", the 2009 help article on
+    /// Teleport to Safety), and any stone only while none is found (R), so the
+    /// rescue always has somewhere to go.
     fn nearest_warpstone(&self, position: [f32; 3]) -> Option<WarpDestination> {
         let distance = |d: &WarpDestination| {
             (d.position[0] - position[0]).powi(2) + (d.position[2] - position[2]).powi(2)
         };
-        self.destinations
-            .iter()
-            .filter(|d| d.is_warpstone)
-            .min_by(|a, b| distance(a).total_cmp(&distance(b)))
-            .copied()
+        let nearest = |found_only: bool| {
+            (self.destinations.iter())
+                .filter(|d| d.is_warpstone && (!found_only || self.attuned.contains(&d.id)))
+                .min_by(|a, b| distance(a).total_cmp(&distance(b)))
+                .cloned()
+        };
+        (self.atlas.and_then(|_| nearest(true))).or_else(|| nearest(false))
     }
 
     /// L039 (R): at world entry, an open-world pose more than
@@ -1289,7 +1378,23 @@ impl WarpRegistry {
         }
         self.check_cooldown(self.last_travel_ms, self.rules.cooldown_ms, now_ms)?;
         self.last_travel_ms = Some(now_ms);
-        Ok(relocate(arrival(friend.position, None, ctx, world)))
+        let mut to = arrival(friend.position, None, ctx, world);
+        // A friend inside a cave is joined there, not on the terrain above (the target's
+        // server-side height).
+        if self.atlas.is_some()
+            && to.position[1] - friend.position[1] > INTERIOR_DEPTH_M + ARRIVAL_LIFT_M
+        {
+            to.position[1] = friend.position[1];
+        }
+        Ok(relocate(to))
+    }
+
+    /// The ordinary travel cooldown for a move the caller makes itself (the 122 return to
+    /// a battle instance's start): refused inside the window, else the window restarts.
+    pub fn charge(&mut self, now_ms: u64) -> Result<(), WarpRejection> {
+        self.check_cooldown(self.last_travel_ms, self.rules.cooldown_ms, now_ms)?;
+        self.last_travel_ms = Some(now_ms);
+        Ok(())
     }
 
     fn check_context(&self, ctx: &TravelContext) -> Result<(), WarpRejection> {

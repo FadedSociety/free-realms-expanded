@@ -81,6 +81,8 @@ mod player_menu_routing;
 mod startup_source;
 #[path = "osfr_gateway/t006_guilds.rs"]
 mod t006_guilds;
+#[path = "osfr_gateway/travel_routing.rs"]
+mod travel_routing;
 #[path = "osfr_gateway/tick_stats.rs"]
 mod tick_stats;
 #[path = "osfr_gateway/room_routing.rs"]
@@ -1698,6 +1700,7 @@ impl Session {
             group_arena::Held::enter(&mut staged_gateway, membership, self.character_guid);
         room_routing::lend(&mut staged_gateway, world);
         house_visits::admit(&mut staged_gateway, sessions, world, message);
+        travel_routing::lend(&mut staged_gateway, sessions, world, message);
         let mut outcome = match staged_gateway.handle_at(message, now_ms) {
             Ok(outcome) => outcome,
             Err(error) => {

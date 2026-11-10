@@ -111,6 +111,8 @@ mod seeds;
 mod startup_health;
 mod style_card_use;
 mod tower_defense_table;
+mod travel;
+pub use travel::{FriendLend, Presence};
 mod world_challenge;
 use self::coin_authoring::unloaded;
 use self::npc::{dialogue_packet, quest_offer_packet_with};
@@ -370,7 +372,9 @@ pub struct Gameplay {
     recipe_catalog: crate::recipes::RecipeCatalog,
     learned_recipes: BTreeSet<u32>,
     /// Warpstone attunement and travel cooldowns (W142).
-    warp: piece_077::WarpRegistry,
+    warp: Box<piece_077::WarpRegistry>,
+    lent_friend: Option<Box<FriendLend>>,
+    zone_rescued: bool,
     item_bar: crate::item_bar::ItemBar,
     /// W162: the summoned ride and mount state. Session-only (the ride actor does not survive a
     /// disconnect); absent when the content set has no `mounts.json`.
@@ -668,7 +672,7 @@ impl Gameplay {
             .map(|s| s.upgraded_rides.clone())
             .unwrap_or_default();
         let earned_cards = state.as_ref().map(|s| s.earned_cards.clone()).unwrap_or_default();
-        let mut warp = piece_077::WarpRegistry::curated();
+        let mut warp = Box::new(travel::registry(directory)?);
         let saved_derby = state.as_ref().and_then(|s| s.derby.clone());
         let saved_hunt = state.as_ref().and_then(|s| s.artifact_hunt.clone());
         let saved_chess = state.as_ref().and_then(|s| s.chess);
@@ -1279,6 +1283,8 @@ impl Gameplay {
             recipe_catalog,
             learned_recipes,
             warp,
+            lent_friend: None,
+            zone_rescued: false,
             item_bar,
             mounts,
             field_engaged: false,
@@ -3007,6 +3013,9 @@ impl Gameplay {
     /// L039: `c` at the nearest warpstone when its saved pose is off the map or deep under the
     /// terrain (`WarpRegistry::recover_login_pose`); `None` when no terrain is loaded for the zone.
     pub fn recover_login_pose(&self, c: &CharacterState) -> Option<(CharacterState, &'static str)> {
+        if self.zone_rescued {
+            return Some((c.clone(), "unclaimed_zone"));
+        }
         let grid = self.terrain.as_ref()?.grid(c.zone_id)?;
         let (ctx, ground) = (self.warp_context(c), |x, z| grid.height_at(x, z));
         let (to, reason) = self.warp.recover_login_pose(&ctx, &ground)?;
@@ -3241,53 +3250,6 @@ impl Gameplay {
         if character.zone_id == piece_077::OPEN_WORLD_ZONE {
             out.replies.push(self.warp.definitions_message());
         }
-    }
-
-    /// 56 destination list, 90 warpstone, 122 safe teleport, 58 friend teleport.
-    /// Every request is validated against server state; no position or path
-    /// comes from the client. `friend` stays empty until the player registry
-    /// supplies an online-friend view, so 58 is refused (R).
-    fn handle_warp(
-        &mut self,
-        inner: &[u8],
-        character: &CharacterState,
-        now_ms: u64,
-    ) -> io::Result<Option<Outcome>> {
-        let context = self.warp_context(character);
-        let terrain = self.terrain.clone();
-        let zone = character.zone_id;
-        let ground = move |x: f32, z: f32| terrain.as_ref()?.height_at(zone, x, z);
-        let world = piece_077::WarpWorld {
-            ground: &ground,
-            friend: &|_| None,
-        };
-        let Some(reply) = self.warp.handle(inner, &context, now_ms, &world) else {
-            return Ok(None);
-        };
-        if matches!(
-            reply.rejection,
-            Some(piece_077::WarpRejection::MalformedRequest(_))
-        ) {
-            return Err(invalid("invalid warpstone request"));
-        }
-        let mut out = Outcome {
-            changed: reply.changed,
-            replies: reply.replies,
-            ..Outcome::default()
-        };
-        if let Some(target) = reply.relocation {
-            self.apply_relocation(
-                dev_teleport::Relocation {
-                    position: target.position,
-                    rotation: target.rotation,
-                },
-                character,
-                &mut out,
-            )?;
-        }
-        out.replies
-            .extend(reply.notices.iter().map(|text| chat::system(text)));
-        Ok(Some(out))
     }
 
     /// `goto x z` (onto the ground), `goto x y z` or `goto mark <name>`;
