@@ -232,10 +232,7 @@ impl Rig {
             self.bot(from)
                 .send_message(&bot::wrap(&group_request(from, to, false, 0)), "40/1")
                 .unwrap();
-            match self
-                .bot(to)
-                .wait_for(Duration::from_secs(12), |m| is_sub(m, 40, 1))
-            {
+            match self.wait_reading_all(to, Duration::from_secs(12), |m| is_sub(m, 40, 1)) {
                 Ok(found) => {
                     invite = Some(found);
                     break;
@@ -248,10 +245,37 @@ impl Rig {
         self.bot(to)
             .send_message(&bot::wrap(&group_request(from, to, true, id)), "40/4")
             .unwrap();
-        self.bot(from)
-            .wait_for(PATIENCE, |m| is_sub(m, 40, 2))
+        self.wait_reading_all(from, PATIENCE, |m| is_sub(m, 40, 2))
             .unwrap();
         assert!(self.group(from).is_some() && self.group(from) == self.group(to));
+    }
+
+    /// Wait for a message on `guid`'s bot while reading every other bot too, so no session in
+    /// the rig runs out of reliable retries while one seat is waited on (a real client always
+    /// reads its socket; lead 2026-11-10).
+    fn wait_reading_all(
+        &mut self,
+        guid: u64,
+        timeout: Duration,
+        wanted: impl Fn(&[u8]) -> bool,
+    ) -> Result<Vec<u8>, String> {
+        let seat = Self::seat(guid);
+        let deadline = Instant::now() + timeout;
+        loop {
+            if let Ok(found) = self.bots[seat].wait_for(Duration::from_millis(2), &wanted) {
+                return Ok(found);
+            }
+            // The others are only serviced: their messages stay in their own bot inboxes for
+            // the waits that come later, exactly as before.
+            for (index, bot) in self.bots.iter_mut().enumerate() {
+                if index != seat {
+                    bot.pump(Duration::from_millis(2))?;
+                }
+            }
+            if Instant::now() >= deadline {
+                return Err(format!("timed out after {} ms", timeout.as_millis()));
+            }
+        }
     }
 
     pub fn host<T: Send + 'static>(&self, f: impl FnOnce(&mut Server) -> T + Send + 'static) -> T {
