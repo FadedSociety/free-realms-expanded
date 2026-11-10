@@ -209,7 +209,7 @@ impl Gameplay {
         if let Some(out) = self.npc_store_165(inner, character)? {
             return Ok(Some(out));
         }
-        if let Some(out) = self.npc_merchant_66(inner, character)? {
+        if let Some(out) = self.npc_merchant_66(inner, character, now_ms)? {
             return Ok(Some(out));
         }
         if let Some(out) = self.npc_merchant_buy_66_43(inner, character)? {
@@ -1206,6 +1206,7 @@ impl Gameplay {
         &mut self,
         inner: &[u8],
         character: &CharacterState,
+        now_ms: u64,
     ) -> io::Result<Option<Outcome>> {
         if matches!(
             inner,
@@ -1218,7 +1219,9 @@ impl Gameplay {
             ]
         ) {
             // T230: the shared busy table gates a Station Cash order exactly like an activity.
-            let busy = self.activity_busy();
+            // P-games-window: an open offer's own advertised bundles may be bought before Go.
+            let at_offer = self.buys_at_offer(inner);
+            let busy = self.activity_busy() && !at_offer;
             let Some(shop) = &mut self.npc_coin_shop else {
                 return Ok(None);
             };
@@ -1239,12 +1242,16 @@ impl Gameplay {
                 self.inventory = shop.inventory().clone();
             }
             // T486: a bought pet bundle becomes a pet in `handle_npc_packet`, as a coin buy does.
-            return Ok(Some(Outcome {
+            let mut out = Outcome {
                 replies: outcome.replies,
                 changed: outcome.changed,
                 granted_items: outcome.granted,
                 ..Outcome::default()
-            }));
+            };
+            if at_offer && out.changed {
+                self.use_bought_boosts(inner, character, now_ms, &mut out)?;
+            }
+            return Ok(Some(out));
         }
         Ok(None)
     }

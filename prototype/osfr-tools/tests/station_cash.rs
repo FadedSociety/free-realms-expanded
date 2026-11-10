@@ -1175,10 +1175,11 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
     // Training Saddle of Gliding T528 lists, plus the 1,115 housing fixtures T871 moved from
     // their Legacy coin price (the 16 wiki-priced fixtures are already in the 55), plus the Mystery
     // Key L094 lists at the wiki's 180 SC, minus the 7 Balloon Animal pet rows P-shops-marketplace
-    // made earn-only (an event reward, ROADMAP item 10).
+    // made earn-only (an event reward, ROADMAP item 10), plus the two booster scrolls
+    // P-games-window lists for the minigame offer.
     assert_eq!(
         decoded.len(),
-        1_922,
+        1_924,
         "the shipped ride, deed, wiki item, boombox, saddle and housing fixture count"
     );
     assert!(
@@ -1305,11 +1306,14 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
     const HOUSING: u32 = 116;
     // L094: the client's Mystery Chests category (ItemCategories 408, name 436411).
     const MYSTERY_CHESTS: u32 = 408;
+    // P-games-window: Goods and Services (Legacy category 243, name 436468), the booster scrolls.
+    const GOODS: u32 = 243;
     for (id, name_id) in [
         (CLOTHES, 23_327),
         (PETS, 954),
         (HOUSING, 21_088),
         (MYSTERY_CHESTS, 436_411),
+        (GOODS, 436_468),
     ] {
         assert_eq!(names.get(&id), Some(&name_id), "category {id} name");
         assert_eq!(parents.get(&id), Some(&0), "category {id} is top level");
@@ -1387,6 +1391,7 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
         PETS,
         HOUSING,
         MYSTERY_CHESTS,
+        GOODS,
     ]) {
         for item in listed_under(leaf).keys() {
             assert!(
@@ -1880,6 +1885,8 @@ fn catalogue_navigation_packets_match_the_client_readers() {
         (116, 21_088, 116, 0, 5),
         // L094: the client's Mystery Chests category, the Mystery Key's shelf.
         (408, 436_411, 408, 0, 6),
+        // P-games-window: Goods and Services, the booster scrolls' shelf.
+        (243, 436_468, 243, 0, 7),
         (2, 5_101_131, 2, config.category_id, 10),
         (3, 5_101_134, 3, config.category_id, 20),
         (4, 5_101_132, 4, config.category_id, 30),
@@ -1924,7 +1931,7 @@ fn catalogue_navigation_packets_match_the_client_readers() {
     assert_eq!(
         reader.u32() as usize,
         shelves.len(),
-        "ten categories (T657 adds three item shelves, L094 the Mystery Chests shelf)"
+        "eleven categories (T657 adds three item shelves, L094 the Mystery Chests shelf, P-games-window Goods and Services)"
     );
     for (category, name, _, parent, order) in shelves {
         assert_eq!(reader.u32(), category, "category map key");

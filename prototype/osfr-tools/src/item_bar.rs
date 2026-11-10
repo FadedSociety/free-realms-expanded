@@ -692,6 +692,16 @@ impl ItemBar {
         self.bar.bindings()
     }
 
+    /// The effect row of `definition`, for a use the server starts itself (an offer's booster).
+    pub fn effect(&self, definition: i32) -> Option<&Effect> {
+        self.effects.get(definition)
+    }
+
+    /// Start `definition`'s recast for such a use, as an accepted bar use does.
+    pub fn stamp_use(&mut self, definition: i32, now_ms: u64) {
+        self.last_used.insert(definition, now_ms);
+    }
+
     /// The catalogue row of the boombox `definition`, for the host that places the box. The
     /// catalogue's shared pointer, not a copy: a press must not copy the clip tables.
     pub fn boombox(&self, definition: i32) -> Option<Arc<boombox::Boombox>> {

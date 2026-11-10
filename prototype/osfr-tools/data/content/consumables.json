@@ -64,6 +64,22 @@
       "source": "Wiki: the Super Star Booster page and item tooltip read 'Activatable Effects: + 50% Stars' (SC Shop, 200 SC; Cannot Sell, Cannot Trade). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 78 NameId 2440 DescriptionId 2446 Icon 1157 ActivatableAbilityId 203 SingleUse true). Duration 1800000 (R): the client and the wiki say only 'for a while'; the BubbaJoeX fork's ItemAbilities.json picks 30 minutes. Cooldown 5000 (R, the fork's buff cooldown). The buff row shows the item's own icon (R). L087."
     },
     {
+      "definition": 81,
+      "name_id": 2443,
+      "description_id": 2449,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "boost": {
+          "raises": "coins",
+          "percent": 50,
+          "duration_ms": 1800000,
+          "icon_id": 1156
+        }
+      },
+      "source": "Super Coin Booster: +50% coins (R), the Super Star Booster's wiki percent ('Activatable Effects: + 50% Stars'); the client text 2449 reads 'use this scroll for great luck earning extra money for a while'. Client item table: Id 81 NameId 2443 DescriptionId 2449 Icon 1156 ActivatableAbilityId 206 SingleUse true (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree). Duration 1800000 and cooldown 5000 (R), as the star scroll. P-games-window."
+    },
+    {
       "definition": 306,
       "name_id": 291,
       "description_id": 292,

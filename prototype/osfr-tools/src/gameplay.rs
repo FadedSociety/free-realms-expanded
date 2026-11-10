@@ -81,6 +81,7 @@ mod npc;
 mod npc_quests;
 mod npc_turnin;
 mod occupation;
+mod offer_extras;
 /// T788: an accepted 53/7 pet trick credits the owner's `perform_pet_trick` objective.
 mod pet_quest;
 /// Warpstone definitions, attunement and validated travel (W142).
@@ -398,6 +399,7 @@ pub struct Gameplay {
     /// T474 live treat, cake and transformation effects (`gameplay/item_use.rs`); session-only, never saved.
     consumable_effects: crate::consumable_effects::EffectStack,
     world_challenge: Box<world_challenge::State>,
+    offer_extras: Box<offer_extras::Extras>,
 }
 
 #[derive(Default)]
@@ -1241,6 +1243,7 @@ impl Gameplay {
             content_presence::core(directory, &mut presence, quests, combat)?;
         Ok(Self {
             world_challenge: world_challenge::State::load(npc_content, npc_interaction.as_mut())?,
+            offer_extras: Box::new(offer_extras::Extras::load(npc_content)?),
             mystery_chests,
             pending_chest: None,
             dance_off: dance_off::TickState::default(),
@@ -1662,6 +1665,7 @@ impl Gameplay {
         // only the cast in flight is dropped.
         self.fishing.reset_all();
         self.world_challenge.reset();
+        self.offer_extras.boosts.reset();
     }
 
     /// L012: saves carry the pre-match pose while a soccer match is active.
@@ -2127,6 +2131,7 @@ impl Gameplay {
         now_ms: u64,
     ) -> io::Result<Outcome> {
         let counters_before = self.achievement_counters();
+        self.offer_extras.boosts.inbound(inner);
         let mut out = self.handle_in_world_inner(inner, character, now_ms)?;
         self.sync_activity_list(&mut out);
         self.sync_tracked_target(character, &mut out);

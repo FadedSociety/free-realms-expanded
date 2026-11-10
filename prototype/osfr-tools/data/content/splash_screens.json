@@ -1,0 +1,692 @@
+{
+ "schema_version": 1,
+ "source": "Screens: every loading movie the community install holds (Assets_manifest.txt rows with .gfx, .swf and .lst; packs Assets_000-008), with the stock LoadingScreen.xml ids. The stock file's live rows on a 2026 clock are only Ids 1, 37 and 75 (4 is US only); 72, 80, 82 and 86 ended in 2013-14. The client draws from LoadingScreen.xml by weight and takes no loading screen from the server (src/splash_screens.rs), so 'default' is what a launcher-written LoadingScreen.xml lists, the dock rows are the client's Tutorial-state movies for ZoneConfig (switched off, see dock_movies), and every other row is (R): a themed choice per Games window category (ActivityCategories.txt ids) and zone (zones.json ids) for a client that can be told a screen. Weights are (R). Tips: the stock file's StringIds and weights.",
+ "rotation": "weighted",
+ "dock_movies": false,
+ "dock_movies_note": "(R) Whether ship combat's ZoneConfig names each dock's movie (the dock: rows). The client draws that movie only in its Tutorial game state 7 (00a6a4b0, 00a6b0c0), which the server does not hold: off until a native run decides between a held Tutorial state and leaving it out.",
+ "screens": [
+  {
+   "id": 1,
+   "file": "loadingscreen.swf",
+   "about": "The stock card with a tip line. Stock row Id 1, weight 15."
+  },
+  {
+   "id": 4,
+   "file": "loadingscreen4.swf",
+   "about": "Stock row Id 4, weight 15 (US and en_US only there)."
+  },
+  {
+   "id": 37,
+   "file": "loadscreen_membershipupsell.swf",
+   "about": "Stock row Id 37, weight 40: a membership advert. Held but listed nowhere: everything is free."
+  },
+  {
+   "id": 72,
+   "file": "loadscreen_storage.swf",
+   "about": "Stock row Id 72 (storage), ended 2013-11-14 in the stock file."
+  },
+  {
+   "id": 75,
+   "file": "loadscreen_vendor.swf",
+   "about": "Stock row Id 75 (vendors), weight 80."
+  },
+  {
+   "id": 80,
+   "file": "loadscreen_jobcenter.swf",
+   "about": "Stock row Id 80, 'Job Centers!' (video bCHQ7gzDH2E 106 s), ended 2014-12-20 in the stock file."
+  },
+  {
+   "id": 82,
+   "file": "loadscreen_tcg5.swf",
+   "about": "Stock row Id 82 (card game set 5), ended 2014-12-20."
+  },
+  {
+   "id": 86,
+   "file": "loadscreen_wuga.swf",
+   "about": "Stock row Id 86 (Wugachug), ended 2014-12-20."
+  },
+  {
+   "id": 87,
+   "file": "loadscreen_seaside.swf",
+   "about": "Held by the install but in no stock row; the id is ours (R)."
+  },
+  {
+   "id": 201,
+   "file": "loadingscreen_pirTI_red_bbe.swf",
+   "about": "Pirate's Plunder, Treasure Isle, the red dock. Ids from 201 are ours (R)."
+  },
+  {
+   "id": 202,
+   "file": "loadingscreen_pirTI_green_bbe.swf",
+   "about": "Pirate's Plunder, Treasure Isle, the green dock. Ids from 201 are ours (R)."
+  },
+  {
+   "id": 203,
+   "file": "loadingscreen_pirTI_blue_bbe.swf",
+   "about": "Pirate's Plunder, Treasure Isle, the blue dock. Ids from 201 are ours (R)."
+  },
+  {
+   "id": 204,
+   "file": "loadingscreen_pirTI_orange_bbe.swf",
+   "about": "Pirate's Plunder, Treasure Isle, the orange dock. Ids from 201 are ours (R)."
+  },
+  {
+   "id": 205,
+   "file": "loadingscreen_pirTI_purple_bbe.swf",
+   "about": "Pirate's Plunder, Treasure Isle, the purple dock. Ids from 201 are ours (R)."
+  },
+  {
+   "id": 206,
+   "file": "loadingscreen_pirTI_black_bbe.swf",
+   "about": "Pirate's Plunder, Treasure Isle, the black dock. Ids from 201 are ours (R)."
+  },
+  {
+   "id": 207,
+   "file": "loadingscreen_pirSC_red_bbe.swf",
+   "about": "Pirate's Plunder, Shipwreck Cove, the red dock. Ids from 201 are ours (R)."
+  },
+  {
+   "id": 208,
+   "file": "loadingscreen_pirSC_green_bbe.swf",
+   "about": "Pirate's Plunder, Shipwreck Cove, the green dock. Ids from 201 are ours (R)."
+  },
+  {
+   "id": 209,
+   "file": "loadingscreen_pirSC_blue_bbe.swf",
+   "about": "Pirate's Plunder, Shipwreck Cove, the blue dock. Ids from 201 are ours (R)."
+  },
+  {
+   "id": 210,
+   "file": "loadingscreen_pirSC_orange_bbe.swf",
+   "about": "Pirate's Plunder, Shipwreck Cove, the orange dock. Ids from 201 are ours (R)."
+  },
+  {
+   "id": 211,
+   "file": "loadingscreen_pirSC_purple_bbe.swf",
+   "about": "Pirate's Plunder, Shipwreck Cove, the purple dock. Ids from 201 are ours (R)."
+  },
+  {
+   "id": 212,
+   "file": "loadingscreen_pirSC_black_bbe.swf",
+   "about": "Pirate's Plunder, Shipwreck Cove, the black dock. Ids from 201 are ours (R)."
+  },
+  {
+   "id": 213,
+   "file": "loadingscreen_pirAB_red_bbe.swf",
+   "about": "Pirate's Plunder, Arctic Bay, the red dock. Ids from 201 are ours (R)."
+  },
+  {
+   "id": 214,
+   "file": "loadingscreen_pirAB_green_bbe.swf",
+   "about": "Pirate's Plunder, Arctic Bay, the green dock. Ids from 201 are ours (R)."
+  },
+  {
+   "id": 215,
+   "file": "loadingscreen_pirAB_blue_bbe.swf",
+   "about": "Pirate's Plunder, Arctic Bay, the blue dock. Ids from 201 are ours (R)."
+  },
+  {
+   "id": 216,
+   "file": "loadingscreen_pirAB_orange_bbe.swf",
+   "about": "Pirate's Plunder, Arctic Bay, the orange dock. Ids from 201 are ours (R)."
+  },
+  {
+   "id": 217,
+   "file": "loadingscreen_pirAB_purple_bbe.swf",
+   "about": "Pirate's Plunder, Arctic Bay, the purple dock. Ids from 201 are ours (R)."
+  },
+  {
+   "id": 218,
+   "file": "loadingscreen_pirAB_black_bbe.swf",
+   "about": "Pirate's Plunder, Arctic Bay, the black dock. Ids from 201 are ours (R)."
+  }
+ ],
+ "default": [
+  {
+   "screen": 1,
+   "weight": 15
+  },
+  {
+   "screen": 4,
+   "weight": 15
+  },
+  {
+   "screen": 72,
+   "weight": 20
+  },
+  {
+   "screen": 75,
+   "weight": 20
+  },
+  {
+   "screen": 80,
+   "weight": 20
+  },
+  {
+   "screen": 82,
+   "weight": 20
+  },
+  {
+   "screen": 86,
+   "weight": 20
+  },
+  {
+   "screen": 87,
+   "weight": 20
+  }
+ ],
+ "destinations": {
+  "category:10": [
+   {
+    "screen": 80,
+    "weight": 30
+   },
+   {
+    "screen": 1,
+    "weight": 10
+   }
+  ],
+  "category:11": [
+   {
+    "screen": 82,
+    "weight": 30
+   },
+   {
+    "screen": 1,
+    "weight": 10
+   }
+  ],
+  "category:12": [
+   {
+    "screen": 80,
+    "weight": 30
+   },
+   {
+    "screen": 1,
+    "weight": 10
+   }
+  ],
+  "category:13": [
+   {
+    "screen": 87,
+    "weight": 20
+   },
+   {
+    "screen": 80,
+    "weight": 20
+   }
+  ],
+  "category:14": [
+   {
+    "screen": 80,
+    "weight": 30
+   },
+   {
+    "screen": 1,
+    "weight": 10
+   }
+  ],
+  "category:15": [
+   {
+    "screen": 80,
+    "weight": 30
+   },
+   {
+    "screen": 1,
+    "weight": 10
+   }
+  ],
+  "category:16": [
+   {
+    "screen": 1,
+    "weight": 15
+   },
+   {
+    "screen": 4,
+    "weight": 15
+   }
+  ],
+  "category:17": [
+   {
+    "screen": 75,
+    "weight": 30
+   },
+   {
+    "screen": 1,
+    "weight": 10
+   }
+  ],
+  "category:18": [
+   {
+    "screen": 1,
+    "weight": 15
+   },
+   {
+    "screen": 4,
+    "weight": 15
+   }
+  ],
+  "category:19": [
+   {
+    "screen": 80,
+    "weight": 30
+   },
+   {
+    "screen": 1,
+    "weight": 10
+   }
+  ],
+  "category:20": [
+   {
+    "screen": 87,
+    "weight": 30
+   },
+   {
+    "screen": 1,
+    "weight": 10
+   }
+  ],
+  "category:21": [
+   {
+    "screen": 80,
+    "weight": 30
+   },
+   {
+    "screen": 1,
+    "weight": 10
+   }
+  ],
+  "category:22": [
+   {
+    "screen": 1,
+    "weight": 15
+   },
+   {
+    "screen": 4,
+    "weight": 15
+   }
+  ],
+  "category:23": [
+   {
+    "screen": 1,
+    "weight": 15
+   },
+   {
+    "screen": 4,
+    "weight": 15
+   }
+  ],
+  "category:24": [
+   {
+    "screen": 1,
+    "weight": 15
+   },
+   {
+    "screen": 4,
+    "weight": 15
+   }
+  ],
+  "category:26": [
+   {
+    "screen": 82,
+    "weight": 30
+   },
+   {
+    "screen": 1,
+    "weight": 10
+   }
+  ],
+  "dock:ss_pir_arena3:pir_black": [
+   {
+    "screen": 212,
+    "weight": 1
+   }
+  ],
+  "dock:ss_pir_arena3:pir_blue": [
+   {
+    "screen": 209,
+    "weight": 1
+   }
+  ],
+  "dock:ss_pir_arena3:pir_green": [
+   {
+    "screen": 208,
+    "weight": 1
+   }
+  ],
+  "dock:ss_pir_arena3:pir_orange": [
+   {
+    "screen": 210,
+    "weight": 1
+   }
+  ],
+  "dock:ss_pir_arena3:pir_red": [
+   {
+    "screen": 207,
+    "weight": 1
+   }
+  ],
+  "dock:ss_pir_arena3:pir_violet": [
+   {
+    "screen": 211,
+    "weight": 1
+   }
+  ],
+  "dock:ss_pir_arena4:pir_black": [
+   {
+    "screen": 218,
+    "weight": 1
+   }
+  ],
+  "dock:ss_pir_arena4:pir_blue": [
+   {
+    "screen": 215,
+    "weight": 1
+   }
+  ],
+  "dock:ss_pir_arena4:pir_green": [
+   {
+    "screen": 214,
+    "weight": 1
+   }
+  ],
+  "dock:ss_pir_arena4:pir_orange": [
+   {
+    "screen": 216,
+    "weight": 1
+   }
+  ],
+  "dock:ss_pir_arena4:pir_red": [
+   {
+    "screen": 213,
+    "weight": 1
+   }
+  ],
+  "dock:ss_pir_arena4:pir_violet": [
+   {
+    "screen": 217,
+    "weight": 1
+   }
+  ],
+  "dock:ss_pirate_arena:pir_black": [
+   {
+    "screen": 206,
+    "weight": 1
+   }
+  ],
+  "dock:ss_pirate_arena:pir_blue": [
+   {
+    "screen": 203,
+    "weight": 1
+   }
+  ],
+  "dock:ss_pirate_arena:pir_green": [
+   {
+    "screen": 202,
+    "weight": 1
+   }
+  ],
+  "dock:ss_pirate_arena:pir_orange": [
+   {
+    "screen": 204,
+    "weight": 1
+   }
+  ],
+  "dock:ss_pirate_arena:pir_red": [
+   {
+    "screen": 201,
+    "weight": 1
+   }
+  ],
+  "dock:ss_pirate_arena:pir_violet": [
+   {
+    "screen": 205,
+    "weight": 1
+   }
+  ],
+  "zone:10": [
+   {
+    "screen": 80,
+    "weight": 20
+   },
+   {
+    "screen": 75,
+    "weight": 20
+   },
+   {
+    "screen": 72,
+    "weight": 10
+   }
+  ],
+  "zone:11": [
+   {
+    "screen": 87,
+    "weight": 30
+   },
+   {
+    "screen": 1,
+    "weight": 10
+   }
+  ],
+  "zone:17": [
+   {
+    "screen": 86,
+    "weight": 30
+   },
+   {
+    "screen": 1,
+    "weight": 10
+   }
+  ]
+ },
+ "tips": [
+  {
+   "string_id": 394259,
+   "weight": 1
+  },
+  {
+   "string_id": 394260,
+   "weight": 1
+  },
+  {
+   "string_id": 394262,
+   "weight": 1
+  },
+  {
+   "string_id": 394269,
+   "weight": 1
+  },
+  {
+   "string_id": 394270,
+   "weight": 1
+  },
+  {
+   "string_id": 394271,
+   "weight": 1
+  },
+  {
+   "string_id": 394272,
+   "weight": 1
+  },
+  {
+   "string_id": 394273,
+   "weight": 1
+  },
+  {
+   "string_id": 394275,
+   "weight": 1
+  },
+  {
+   "string_id": 394276,
+   "weight": 1
+  },
+  {
+   "string_id": 394277,
+   "weight": 1
+  },
+  {
+   "string_id": 394278,
+   "weight": 1
+  },
+  {
+   "string_id": 394279,
+   "weight": 1
+  },
+  {
+   "string_id": 394280,
+   "weight": 1
+  },
+  {
+   "string_id": 409121,
+   "weight": 1
+  },
+  {
+   "string_id": 409122,
+   "weight": 1
+  },
+  {
+   "string_id": 409123,
+   "weight": 1
+  },
+  {
+   "string_id": 409124,
+   "weight": 1
+  },
+  {
+   "string_id": 409125,
+   "weight": 1
+  },
+  {
+   "string_id": 409126,
+   "weight": 1
+  },
+  {
+   "string_id": 409127,
+   "weight": 1
+  },
+  {
+   "string_id": 409128,
+   "weight": 1
+  },
+  {
+   "string_id": 409130,
+   "weight": 1
+  },
+  {
+   "string_id": 409131,
+   "weight": 1
+  },
+  {
+   "string_id": 409132,
+   "weight": 1
+  },
+  {
+   "string_id": 409133,
+   "weight": 1
+  },
+  {
+   "string_id": 409134,
+   "weight": 1
+  },
+  {
+   "string_id": 409136,
+   "weight": 1
+  },
+  {
+   "string_id": 409137,
+   "weight": 1
+  },
+  {
+   "string_id": 409138,
+   "weight": 1
+  },
+  {
+   "string_id": 409140,
+   "weight": 1
+  },
+  {
+   "string_id": 409141,
+   "weight": 1
+  },
+  {
+   "string_id": 409142,
+   "weight": 1
+  },
+  {
+   "string_id": 409143,
+   "weight": 1
+  },
+  {
+   "string_id": 409144,
+   "weight": 1
+  },
+  {
+   "string_id": 409146,
+   "weight": 1
+  },
+  {
+   "string_id": 409147,
+   "weight": 1
+  },
+  {
+   "string_id": 409150,
+   "weight": 1
+  },
+  {
+   "string_id": 409152,
+   "weight": 1
+  },
+  {
+   "string_id": 426353,
+   "weight": 20
+  },
+  {
+   "string_id": 426354,
+   "weight": 20
+  },
+  {
+   "string_id": 426355,
+   "weight": 20
+  },
+  {
+   "string_id": 426356,
+   "weight": 20
+  },
+  {
+   "string_id": 426357,
+   "weight": 20
+  },
+  {
+   "string_id": 426358,
+   "weight": 20
+  },
+  {
+   "string_id": 426359,
+   "weight": 20
+  },
+  {
+   "string_id": 426360,
+   "weight": 20
+  },
+  {
+   "string_id": 426361,
+   "weight": 20
+  },
+  {
+   "string_id": 426349,
+   "weight": 20
+  },
+  {
+   "string_id": 426350,
+   "weight": 20
+  },
+  {
+   "string_id": 426351,
+   "weight": 20
+  },
+  {
+   "string_id": 426370,
+   "weight": 20
+  }
+ ]
+}

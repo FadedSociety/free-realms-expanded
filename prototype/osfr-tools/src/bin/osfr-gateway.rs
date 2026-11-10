@@ -71,6 +71,8 @@ mod gm_panel_routing;
 mod client_area_routing;
 #[path = "osfr_gateway/moderation.rs"]
 mod moderation;
+#[path = "osfr_gateway/offer_routing.rs"]
+mod offer_routing;
 #[path = "osfr_gateway/paths.rs"]
 mod paths;
 #[path = "osfr_gateway/player_menu_routing.rs"]
@@ -1823,6 +1825,7 @@ impl Session {
         outcome.replies.extend(ended.replies);
         outcome.nearby.extend(ended.nearby);
         client_area_routing::world_ready(&mut outcome, &staged_gateway, world);
+        offer_routing::dress(&mut outcome, &mut staged_gateway);
         self.bundle_budget.stage(&outcome.replies)?;
         let current = staged_gateway.state().clone();
         let transfer = outcome.began_zoning || previous.zone_id != current.zone_id;

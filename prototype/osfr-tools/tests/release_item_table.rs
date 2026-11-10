@@ -73,7 +73,8 @@ const CONSUMERS: [(&str, &[&str], usize, usize, usize); 4] = [
     // P-kart-garage: 274 kart rows (53 vehicles, 221 parts); 13 of them (two decal and two
     // chassis families, Cardie Racer 48318, Barbed Crusher 56995, Arrow Runner 61000, Splash
     // Zipper 61006) are in the captured inventory, the rest resolve through the table.
-    ("stores.json", &["item_id"], 17_898, 825, 17_222),
+    // P-games-window: the Super Star and Super Coin Booster rows (78, 81).
+    ("stores.json", &["item_id"], 17_900, 825, 17_224),
     // P-kart-garage: the two mechanics' 280 kart ids (the same 13 captured), none shared with
     // the other vendors' stock.
     ("vendors.json", &["item_id", "item_ids"], 1_446, 341, 1_446),

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "source": "The minigame offer's Marketplace panel. Client: 39/44 MiniGameStoreAdvertisement (dispatcher 009bfea0 case 0x2C, reader 009b5f10: the minigame header, an i32, then a counted list of store bundle ids) fills the data source BaseClient.MiniGame.MarketplaceAd (009b6fe0) and calls Lua OnMarketplaceAd(7, the i32); MinigameStartScreen's flyout shows one bundle at a time (name, Station Cash price, description, icon), steps every 10 s, and its BUY! button opens the Marketplace on those bundles (ScriptsBase.lua MinigameStartScreen GotoMarket / HideToMarket, movie MinigameWindowFlyout). Video hZHgADa99FM 36-40 s: a battle offer whose panel shows Daily Grab Bag 450 SC, then Large Energy Potion 50 SC, with arrows and BUY!. Which bundles the live server advertised is not captured, so the list is (R): the two SC Shop booster scrolls, stars first. Every id must be a Marketplace listing (stores.json sc_price) or it is left out.",
+  "enabled": true,
+  "store_push": "first_offer",
+  "store_push_note": "(R) When the Marketplace rows reach the client: world_ready (with the commit in which the client finishes loading into the world, once per session; about 0.3 MB with the shipped Marketplace), first_offer (ahead of the first offer) or never (only when the player opens the Marketplace). The panel reads its rows once, when 39/44 arrives. Shipped as first_offer: nothing is added to a login until the panel is proven in the client.",
+  "use_when_bought_at_offer": true,
+  "use_note": "(R) A booster bought from an offer's panel is used at once when no boost of its kind that is at least as strong is running: the start screen is modal, so the bag cannot be opened before Go. Otherwise it stays in the bag.",
+  "max_ads": 8,
+  "ads": [
+    {
+      "item_id": 78,
+      "source": "Super Star Booster: +50% stars for 30 minutes (consumables.json). SC Shop, 200 SC (fandom wiki, rev 2013-02-15); Item of the Day at 200 -> 100 SC in video qR1uQTMWwoQ 70 s."
+    },
+    {
+      "item_id": 81,
+      "source": "Super Coin Booster: +50% coins for 30 minutes (R, consumables.json). Client item 81, name 2443."
+    }
+  ],
+  "event_ads": {},
+  "event_note": "Hook for the events framework: a key here is an event's key; while Gameplay::set_live_events names it, its ads go ahead of the standing list. Each entry is an ad like the ones above and may carry game_types or game_ids."
+}

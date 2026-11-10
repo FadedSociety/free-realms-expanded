@@ -1174,6 +1174,11 @@ impl CoinShop {
         }
     }
 
+    /// Whether the Marketplace lists `bundle` (an offer may advertise only what can be bought).
+    pub fn lists_bundle(&self, bundle: u32) -> bool {
+        self.marketplace_enabled() && self.sc_catalogue.listing(bundle).is_some()
+    }
+
     fn marketplace_enabled(&self) -> bool {
         self.sc_catalogue.config().enabled && self.catalogue.marketplace.enabled_on_handshake
     }

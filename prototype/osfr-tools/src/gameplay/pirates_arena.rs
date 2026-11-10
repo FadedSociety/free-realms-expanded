@@ -115,6 +115,7 @@ impl Gameplay {
                 &content.zone_config,
                 &content.colours,
                 &content.treasure,
+                &self.offer_extras.dock_movies(&arena.scene, &content.colours),
             ),
             // One human ship, and the captains in the other seats.
             ship_combat::player_count(1, u32::try_from(crew.len()).unwrap_or(0)),

@@ -862,11 +862,16 @@ fn string(body: &mut Vec<u8>, text: &str) {
 /// treasure area, the dock tint flag, the docks (+384, tinted `colours` by slot), then three empty
 /// lists (+416, +432 and +448). The treasure area, where the HUD's "Treasure N m" marker points, is
 /// the centre of the arena's chests (its X spots; `load` keeps at least one).
+/// `movies` names each dock's tutorial movie by slot (`splash_screens::Table::dock_movies`; none
+/// is an empty name). The client keeps the local player's dock's movie (`00a6cdf0`, `00a5c8b0`)
+/// and draws it only in its Tutorial state 7 (`00a6a4b0`, `00a6b0c0`), which this server does not
+/// hold yet, so the shipped table sends none.
 pub fn zone_config(
     arena: &Arena,
     values: &BTreeMap<String, f64>,
     colours: &[String],
     treasure: &Treasure,
+    movies: &[String],
 ) -> Vec<u8> {
     let value = |key: &str| values.get(key).copied().unwrap_or(0.0);
     let mut body = Vec::new();
@@ -884,7 +889,8 @@ pub fn zone_config(
     for (slot, at) in docks.iter().enumerate() {
         let tint = colours.get(slot).map_or("", String::as_str);
         let effects = treasure.dock_effects.get(slot).copied().unwrap_or_default();
-        dock(&mut body, at, tint, effects, treasure);
+        let movie = movies.get(slot).map_or("", String::as_str);
+        dock(&mut body, at, tint, effects, treasure, movie);
     }
     body.extend(u32::try_from(arena.whirlpools.len()).unwrap_or(0).to_le_bytes());
     for pool in &arena.whirlpools {
@@ -908,7 +914,14 @@ pub fn zone_config(
 /// server-side. Bank at the pad, Enter at the cave; the chest and flag sit at the pad (R);
 /// TreasureChestId is the dock chest, TintName the slot's colour, the effects `dock_effects`; angles
 /// (radians on the wire), the flag texture and image set and the tutorial movie are 0 or empty (R).
-fn dock(body: &mut Vec<u8>, at: &Dock, tint: &str, effects: [u32; 2], treasure: &Treasure) {
+fn dock(
+    body: &mut Vec<u8>,
+    at: &Dock,
+    tint: &str,
+    effects: [u32; 2],
+    treasure: &Treasure,
+    movie: &str,
+) {
     let point = |body: &mut Vec<u8>, [x, y, z]: [f32; 3]| {
         for value in [x, y, z, 1.0] {
             body.extend(value.to_le_bytes());
@@ -934,7 +947,8 @@ fn dock(body: &mut Vec<u8>, at: &Dock, tint: &str, effects: [u32; 2], treasure: 
     word(body, 0); // TintColor
     string(body, ""); // FlagTextureAlias
     word(body, 0); // FlagImageSetId
-    string(body, ""); // TutorialMovieFilename
+    // TutorialMovieFilename: the movie the client draws in its Tutorial state.
+    string(body, movie);
 }
 
 /// CreateProxiedPickup (0x1c), reader `sub_A5A5F0`, handler 00a5f860: pickup `id` at `at`, showing
@@ -2015,7 +2029,7 @@ mod tests {
             pickups: vec![[800.0, 50.0, 1200.0], [900.0, 50.0, 1240.0]],
             ..content().arenas[0].clone()
         };
-        let out = zone_config(&empty, &values, &[], &treasure);
+        let out = zone_config(&empty, &values, &[], &treasure, &[]);
         assert_eq!(&out[..4], &[94, 0, 12, 0]);
         let name = 15;
         assert_eq!(&out[4..8], &(name as u32).to_le_bytes());
@@ -2047,7 +2061,7 @@ mod tests {
             docks: vec![dock],
             ..empty.clone()
         };
-        let docked = zone_config(&one, &values, &red, &treasure);
+        let docked = zone_config(&one, &values, &red, &treasure, &[]);
         assert_eq!(docked.len(), out.len() + 4 * 16 + 4 * 13 + 3 * 4 + 7);
         // From the end: three empty lists, then the record after Enter (EnterRadius, three values,
         // the tint, TintColor, an empty string, FlagImageSetId, an empty string).
