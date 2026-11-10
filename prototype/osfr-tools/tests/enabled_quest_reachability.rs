@@ -717,7 +717,8 @@ fn shipped_minigame_producers_are_pinned() {
         // window rows 67/68), the tutorials 289/290 and the quest rows 607, 615, 616, 624 and 627.
         // L930: a kart finish credits the MiniGameData row it ran as, no longer the speedway id 31:
         // 28 (Wildwood Kart Racing) and the Wildwood challenge rows 628-634. L952: the Soccer Tutorial
-        // row 1030 is a soccer row. L961: the Feeling the Beat! songs 201-204. L962: the Tower Defense
+        // row 1030 is a soccer row. L961: the Feeling the Beat! songs 201-204, and 205 (Very Hard,
+        // offered at a music stand). L962: the Tower Defense
         // games 150-161, 250-261, 350-361 and the basic 450-457. Pirate's Plunder's arenas are
         // 1032-1034.
         // L934: checkers 21, Copper Mining 91, Tin/Iron/Silver/Gold Mining 93/95/97/99, the
@@ -738,7 +739,7 @@ fn shipped_minigame_producers_are_pinned() {
             146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159,
             160, 161, 162, 163, 164, 165, 166, 167, 169, 170, 171, 172, 173, 174,
             175, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190,
-            191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204,
+            191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205,
             209, 212, 214, 215, 216, 218, 219, 224, 226, 227, 228, 229, 232, 234, 235, 236,
             238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251,
             252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268,

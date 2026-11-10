@@ -15632,10 +15632,10 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) Any finish of this game counts: the goal's difficulty is not modelled."
+              "evidence": "(R) The step names its difficulty: Musician is MiniGameData 202 (music_game.json; the fan wiki lists the five levels in this order)."
             }
           ],
-          "minigame_id": 201,
+          "minigame_id": 202,
           "count": 1
         },
         {
@@ -15789,10 +15789,10 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) Any finish of this game counts: the goal's difficulty is not modelled."
+              "evidence": "(R) The step names its difficulty: Musician is MiniGameData 202 (music_game.json; the fan wiki lists the five levels in this order)."
             }
           ],
-          "minigame_id": 201,
+          "minigame_id": 202,
           "count": 1
         },
         {
@@ -15927,7 +15927,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) Any finish of this game counts: the goal's difficulty is not modelled."
+              "evidence": "(R) The step names its difficulty: Novice is MiniGameData 201 (music_game.json; the fan wiki lists the five levels in this order)."
             }
           ],
           "minigame_id": 201,
@@ -16028,10 +16028,10 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) Any finish of this game counts: the goal's difficulty is not modelled."
+              "evidence": "(R) The step names its difficulty: Bandmaster is MiniGameData 203 (music_game.json; the fan wiki lists the five levels in this order)."
             }
           ],
-          "minigame_id": 201,
+          "minigame_id": 203,
           "count": 1
         },
         {
@@ -16343,9 +16343,13 @@
             {
               "kind": "wiki",
               "evidence": "Play a conductor level symphony (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_next_big_star_b23c2a)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The step names its difficulty: Conductor is MiniGameData 204 (music_game.json; the fan wiki lists the five levels in this order)."
             }
           ],
-          "minigame_id": 201,
+          "minigame_id": 204,
           "count": 1
         },
         {

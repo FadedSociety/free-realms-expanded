@@ -1,8 +1,11 @@
-//! L961 (L123's engine): Feeling the Beat!'s glue for `Gameplay`: Play on a Games window row
-//! offers that game, and its lifecycle and movie packets route to it. The rules live in
-//! `crate::music_game`.
+//! L961 (L123's engine): Feeling the Beat!'s glue for `Gameplay`: Play on a Games window row or a
+//! song picked at a music stand offers that game, and its lifecycle and movie packets route to
+//! it. The rules live in `crate::music_game`.
 use super::*;
-use crate::music_game::{CONTENT_FILE, MusicContent, MusicGame};
+use crate::{
+    music_game::{CONTENT_FILE, MusicContent, MusicGame, STAND_NAME},
+    npc_interaction::{TableMenu, TableMenus},
+};
 
 /// The music game when `music_game.json` is present; without it no row is published.
 pub(super) fn load_music(content: &Path) -> io::Result<Option<MusicGame>> {
@@ -12,7 +15,40 @@ pub(super) fn load_music(content: &Path) -> io::Result<Option<MusicGame>> {
     MusicGame::new(MusicContent::load(content)?).map(Some)
 }
 
+/// Each music stand's menu: a game table listing every song (fan wiki: the game "can be started
+/// at any Music Stand").
+pub(super) fn stand_menus(music: &Option<MusicGame>) -> TableMenus {
+    let Some(music) = music else {
+        return TableMenus::new();
+    };
+    let (stands, games) = music.stands();
+    let menu = |position| TableMenu {
+        name: STAND_NAME.to_owned(),
+        position,
+        games: games.clone(),
+        lobbies: Vec::new(),
+    };
+    (stands.iter())
+        .map(|stand| (stand.npc, menu(stand.position)))
+        .collect()
+}
+
 impl Gameplay {
+    /// (R) A song picked at a music stand is the quests' "Click on the music stand": a stand's
+    /// menu has no Talk row, so the pick is the click. Any other table's key changes nothing.
+    pub(super) fn music_stand_picked(&mut self, key: u64, out: &mut Outcome) -> io::Result<()> {
+        let stand = |music: &MusicGame| music.stands().0.iter().any(|stand| stand.npc == key);
+        if !self.music.as_ref().is_some_and(stand) {
+            return Ok(());
+        }
+        if let Some(engine) = &mut self.npc_quests {
+            let quest =
+                engine.on_event(crate::quest_engine::QuestEvent::TalkToNpc { npc_id: key })?;
+            self.append_npc_quest_outcome_synced(quest, out)?;
+        }
+        Ok(())
+    }
+
     /// Play on a Feeling the Beat! row: the 39/16 offer, or one refusal line.
     pub(super) fn begin_music(&mut self, id: u32) -> io::Result<Outcome> {
         let refused = |text: &str| Outcome {

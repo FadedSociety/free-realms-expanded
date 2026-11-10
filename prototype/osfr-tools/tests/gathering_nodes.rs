@@ -1785,7 +1785,8 @@ fn games_window_play_opens_a_checkers_table_against_the_server() {
     );
 }
 
-/// L961: Play on a live Feeling the Beat! row (511, MiniGameData 201) offers that song; the
+/// L961: Play on a live Feeling the Beat! row (511, MiniGameData 201) offers that song with its two
+/// goals (8655 "Complete the game!", 102506 "Score 135,000 points!"); the
 /// movie launches on 39/5, its data request gets the song's row, and a second Play while it is
 /// open is refused by the occupation gate.
 #[test]
@@ -1800,6 +1801,9 @@ fn games_window_play_opens_a_feeling_the_beat_song() {
         .expect("the 39/16 offer")
         .to_vec();
     assert_eq!(i32::from_le_bytes(offer[11..15].try_into().unwrap()), 201);
+    for goal in [8_655_u32, 102_506] {
+        assert!(offer.windows(4).any(|w| w == goal.to_le_bytes()), "goal {goal}");
+    }
     assert!(
         (offer.windows(25)).any(|w| w == b"MusicConductingAssets.txt"),
         "the movie's preload list, or the start screen stays on Loading..."
@@ -1836,7 +1840,8 @@ fn games_window_play_opens_a_feeling_the_beat_song() {
             .map(<[u8]>::to_vec)
     };
     assert_eq!(result(&won).expect("the result screen")[15], 1, "won");
-    let paid = i64::from(osfr_tools::music_game::WIN_COINS);
+    // `music_game.json` win_coins: 5, as the video's Very Hard win shows.
+    let paid = 5;
     assert_eq!(coins(&gateway), before + paid);
     let again = send(
         &mut gateway,

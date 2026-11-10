@@ -1187,7 +1187,7 @@ impl Gameplay {
         let tower_defense = tower_defense_table::load_tower_defense(npc_content)?;
         let ship_combat = crate::ship_combat::Content::load(npc_content)?.map(Arc::new);
         let (menus, drawn) = (&mut npc_interaction, &mut npc_visibility);
-        let bound = (&tower_defense, &ship_combat, &sword, &spot);
+        let bound = (&tower_defense, &ship_combat, &sword, &spot, &music);
         tower_defense_table::bind_tables(npc_content, bound, menus, drawn)?;
         let games = portal_games::games(
             kart,
@@ -4995,6 +4995,9 @@ mod w95_vendor_coin_store_regressions;
 
 #[cfg(test)]
 mod w104_quest_tests;
+
+#[cfg(test)]
+mod music_stand_tests;
 
 #[cfg(test)]
 mod t013_objective_events;

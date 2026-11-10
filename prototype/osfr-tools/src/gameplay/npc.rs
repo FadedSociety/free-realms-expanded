@@ -1022,6 +1022,7 @@ impl Gameplay {
                     consume_menu = true;
                     npc_event(select_event(runtime_guid, Some(key), option_id, "board_game"));
                     out = self.begin_board_game(game, character.guid)?;
+                    self.music_stand_picked(key, &mut out)?;
                     out.replies.insert(0, END_DIALOG_26_4.to_vec());
                 }
                 Ok(NpcSelection::Lobby(lobby_type)) => {

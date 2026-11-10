@@ -1,5 +1,6 @@
-//! L123: "Feeling the Beat!", client minigame type 9 (MiniGameData 201-204, the Games window rows
-//! 511-513 and 568): the music conducting movie `game_music.gfx`, refereed by the server.
+//! L123: "Feeling the Beat!", client minigame type 9 (MiniGameData 201-205; the Games window rows
+//! 511-513 and 568 are 201-204, and every song is offered at a music stand): the music conducting
+//! movie `game_music.gfx`, refereed by the server.
 //!
 //! Recovered from the movie's own scripts (`MusicConducting.*` on the shared "Mimic" framework;
 //! JPEXS export in the lab, protocol note L123):
@@ -14,18 +15,25 @@
 //! - Server to client: `OnGameDataMsg <game>`, the level row `OnPhaseDataMsg <row>`,
 //!   `OnDataComplete`, then the verdict `OnGameWonMsg` / `OnGameLostMsg`. A row's STAGE_TYPE - 300
 //!   picks Song1-5 (`MusicGameServer.OnLevelData`); the client plays the first level only.
-//! - Scoring (`MusicRoundPattern.setItemsWithTime`): a frame adds at most the top combo 4 times
-//!   the full closeness 150, plus two combo bonuses of at most 32; the total never goes down.
+//! - Scoring (`MusicRoundPattern.setItemsWithTime`): a frame adds the combo (0 to 4) times the
+//!   closeness (at most 150) plus the combo's points; the points fill a bar that raises the combo
+//!   at the song's `ComboTargets`, with one more grant on that frame. The total never goes down.
+//! - The movie reads only the mouse's movement: a beat point is won when the baton crosses it
+//!   (`MusicRoundPattern.mouseMoving`); it reads no click and no key.
+//! - Goals (start screen and the in-game panel, video 2009): Primary "Complete the game!" and
+//!   Bonus "Score N points!", N per difficulty (fan wiki; the client's locale carries each line).
 //!
 //! Reconstructed (R): difficulty N plays SongN (the row and song names match), the phase ids, the
 //! row's DURATION (the song's seconds; the movie ignores it) and the goal 0 (the movie sets none);
-//! the score bound counts twice the movie's 30 frames a second over the song; a win needs the
-//! song's length to have passed since the row went out, a total within the bound and not below
-//! the last report, and the level's goal, else the server settles a loss; a refused report
-//! changes nothing; a win pays [`WIN_COINS`] (L961) with the result (stars 0).
+//! the score bound is a perfect run at `bound_fps` (36, a fifth over the movie's 30 frames a
+//! second; the combo ramp climbs with the rate, so 60 would allow about 3x a real run) over the
+//! time since the row went out, so a total is never ahead of the clock; a win needs the song's
+//! length to have passed since the row went out, a total within the bound and not below the last
+//! report, and the level's goal, else the server settles a loss; a refused report changes
+//! nothing; a win pays the row's `win_coins` (5 in a 2012 video) with the result (stars 0).
 use crate::{
     minigame::{
-        self, Activity, ActivityFinish, MinigameRuns, RunMode, RunOutcome, RunSpec, RunState,
+        self, Activity, ActivityFinish, Goal, MinigameRuns, RunMode, RunOutcome, RunSpec, RunState,
     },
     rewards::{RewardDisplay, RewardGrant, RewardState},
 };
@@ -47,9 +55,11 @@ pub const CONTENT_FILE: &str = "music_game.json";
 pub const PRELOAD_FILE: &str = "MusicConductingAssets.txt";
 /// (R) Run ids of its own, apart from every other minigame's.
 pub const FIRST_INSTANCE_ID: i32 = 201_000_001;
-/// L961 (R): a won song pays checkers' award (L920), so no Games window game pays nothing.
-// ponytail: one constant for every song; move it to `music_game.json` rows with other tuning.
-pub const WIN_COINS: u32 = 10;
+/// The stand's name on its menu (`npc_spawns_extra.json`, string 38766).
+pub const STAND_NAME: &str = "Feeling the Beat!";
+const PRIMARY_GOAL: u32 = 1;
+const BONUS_GOAL: u32 = 2;
+const MAX_STANDS: usize = 16;
 const MAX_CONTENT: u64 = 16 * 1024;
 const MAX_GAMES: usize = 16;
 const MAX_TEXT: usize = 256;
@@ -57,14 +67,42 @@ const MAX_TEXT: usize = 256;
 const SONG_MS: [u32; 5] = [37_000, 40_000, 49_500, 55_000, 58_000];
 /// `MusicGameServer.mStageTypeOffset`: stage type 301 plays Song1.
 const STAGE_TYPE_OFFSET: i32 = 300;
-/// The most one scoring frame adds: top combo 4 x closeness 150, plus two combo bonuses of 32.
-const MAX_FRAME_POINTS: u64 = 4 * 150 + 2 * 32;
-/// (R) Twice the movie's 30 frames a second, for frame timing slack.
-// ponytail: loose bound (about 2x perfect play); simulate each song's ComboTargets to tighten it.
-const BOUND_FPS: u64 = 60;
+/// `MusicData.nDIST_MAX_NOTE`: the closeness a frame scores, times the combo.
+const CLOSENESS: u64 = 150;
+/// `CombosPts`, the same in all five songs: the points a frame adds at each combo.
+const COMBO_POINTS: [u64; 5] = [4, 8, 12, 16, 32];
+/// `ComboTargets` of Song1 to Song5: the bar that raises combo 0, 1, 2 and 3 (the fifth entry of
+/// each is never reached: the combo stops at 4).
+const COMBO_TARGETS: [[u64; 4]; 5] = [
+    [864, 1728, 2592, 3456],
+    [944, 1888, 2832, 3776],
+    [1168, 2336, 3504, 4672],
+    [1296, 2592, 3876, 5184],
+    [1400, 2800, 4200, 5600],
+];
+
+/// The most `frames` scoring frames of song `song` (0-4) can total: the baton on the guide note
+/// every frame (`MusicRoundPattern.setItemsWithTime`).
+fn max_total(song: usize, frames: u64) -> u64 {
+    let (mut left, mut total) = (frames, 0_u64);
+    for (combo, points) in COMBO_POINTS.iter().enumerate() {
+        let frame = combo as u64 * CLOSENESS + points;
+        let target = COMBO_TARGETS.get(song).and_then(|bars| bars.get(combo));
+        let Some(need) = target.map(|bar| bar.div_ceil(*points)) else {
+            return total.saturating_add(left.saturating_mul(frame));
+        };
+        if left < need {
+            return total + left * frame;
+        }
+        // The frame that fills the bar also pays the next combo's points once.
+        total += need * frame + COMBO_POINTS[combo + 1];
+        left -= need;
+    }
+    total
+}
 
 /// `music_game.json`: one Feeling the Beat game per MiniGameData row.
-#[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct MusicContent {
     pub schema_version: u32,
@@ -73,7 +111,22 @@ pub struct MusicContent {
     pub source: Option<String>,
     pub description_id: i32,
     pub icon_id: i32,
+    /// "Complete the game!" (client locale 8655).
+    pub primary_goal_name_id: u32,
+    /// (R) The frame rate the score bound assumes; the movie runs at 30.
+    pub bound_fps: u32,
     pub games: Vec<MusicGameRow>,
+    /// The world's music stands: each lists every song.
+    #[serde(default)]
+    pub stands: Vec<MusicStand>,
+}
+
+/// One music stand: the NPC content key a click on it resolves to, and where it stands.
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct MusicStand {
+    pub npc: u64,
+    pub position: [f32; 3],
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
@@ -88,6 +141,12 @@ pub struct MusicGameRow {
     pub stage_type: i32,
     /// (R) The least final total that wins; the movie itself sets none (0).
     pub goal: u32,
+    /// Coins a won song pays.
+    pub win_coins: u32,
+    /// The bonus goal: "Score N points!", its locale ids and N.
+    pub bonus_goal_name_id: u32,
+    pub bonus_goal_description_id: u32,
+    pub bonus_score: u32,
 }
 
 impl MusicContent {
@@ -108,22 +167,28 @@ impl MusicContent {
         if self.schema_version != 1
             || self.description_id <= 0
             || self.icon_id <= 0
+            || self.primary_goal_name_id == 0
+            || !(30..=240).contains(&self.bound_fps)
             || self.games.is_empty()
             || self.games.len() > MAX_GAMES
+            || self.stands.len() > MAX_STANDS
+            || (self.stands.iter())
+                .any(|stand| stand.npc == 0 || stand.position.iter().any(|v| !v.is_finite()))
         {
             return Err(invalid("invalid music game content"));
         }
         let mut seen = BTreeSet::new();
         for row in &self.games {
             let level = row
-                .level()
+                .level(self.bound_fps)
                 .ok_or_else(|| invalid("music game stage type must be 301 to 305"))?;
             if row.game_id <= 0
                 || row.name_id <= 0
                 || row.phase_id <= 0
                 || !(1..=5).contains(&row.difficulty)
                 || !seen.insert(row.game_id)
-                || f64::from(row.goal) > level.max_score
+                || row.bonus_goal_name_id == 0
+                || f64::from(row.goal.max(row.bonus_score)) > level.max_score
             {
                 return Err(invalid("invalid music game row"));
             }
@@ -136,28 +201,66 @@ impl MusicContent {
     }
 }
 
-/// One game's level: its row, its song's length and the highest total that song allows.
+/// One game's level: its row, its song (0-4) and length, and the highest total that song allows.
 #[derive(Clone, Copy, Debug, PartialEq)]
 struct Level {
     row: MusicGameRow,
+    song: usize,
     song_ms: u32,
+    fps: u32,
     max_score: f64,
 }
 
 impl MusicGameRow {
-    fn level(&self) -> Option<Level> {
+    fn level(&self, fps: u32) -> Option<Level> {
         let song = usize::try_from(self.stage_type.checked_sub(STAGE_TYPE_OFFSET + 1)?).ok()?;
         let song_ms = *SONG_MS.get(song)?;
-        let frames = (u64::from(song_ms) * BOUND_FPS).div_ceil(1000);
-        Some(Level {
+        let mut level = Level {
             row: *self,
+            song,
             song_ms,
-            max_score: (frames * MAX_FRAME_POINTS) as f64,
-        })
+            fps,
+            max_score: 0.0,
+        };
+        level.max_score = level.bound_at(u64::from(song_ms));
+        Some(level)
+    }
+
+    /// The Goals box of the start screen and the in-game panel (video `P-TFIjTOvN8`, 0 s and 2 s).
+    fn goals(&self, primary_name_id: u32) -> Vec<Goal> {
+        let goal = |id, name_id, description_id, category| Goal {
+            id,
+            name_id,
+            description_id,
+            category,
+            bonus: category == 4,
+            stars: 0,
+            coins: 0,
+            total: 0,
+            failure_condition: false,
+            members_only: false,
+        };
+        vec![
+            goal(PRIMARY_GOAL, primary_name_id, 0, 1),
+            goal(
+                BONUS_GOAL,
+                self.bonus_goal_name_id,
+                self.bonus_goal_description_id,
+                4,
+            ),
+        ]
     }
 }
 
 impl Level {
+    /// The most the song can have totalled `elapsed_ms` after its row went out: a perfect run at
+    /// the bound's frame rate, never past the song's own length (scoring stops with the last
+    /// note). The tutorial and the tempo phase come first and score nothing, so this is generous.
+    fn bound_at(&self, elapsed_ms: u64) -> f64 {
+        let ms = elapsed_ms.min(u64::from(self.song_ms));
+        max_total(self.song, (ms * u64::from(self.fps)).div_ceil(1000)) as f64
+    }
+
     /// The `OnPhaseDataMsg` row: ID^GAME^SEQUENCE^DURATION^OBJECTIVE_ID^STARTID^ENDID^STAGE_TYPE
     /// ^DATA1..4 (`MusicGameServer.LD_*`), with cooking's trailing `^`.
     fn phase_row(&self) -> String {
@@ -268,6 +371,17 @@ impl MusicGame {
         self.content.games.iter().map(|row| row.game_id)
     }
 
+    /// The music stands, and the menu each shows: every song's game id and name id.
+    pub fn stands(&self) -> (&[MusicStand], Vec<(u32, u32)>) {
+        let rows = (self.content.games.iter()).filter_map(|row| {
+            Some((
+                u32::try_from(row.game_id).ok()?,
+                u32::try_from(row.name_id).ok()?,
+            ))
+        });
+        (&self.content.stands, rows.collect())
+    }
+
     pub fn is_active(&self) -> bool {
         self.runs.current_instance_id().is_some()
     }
@@ -280,7 +394,7 @@ impl MusicGame {
             .game(game_id)
             .ok_or_else(|| invalid("not a Feeling the Beat game"))?;
         let level = row
-            .level()
+            .level(self.content.bound_fps)
             .ok_or_else(|| invalid("invalid music game row"))?;
         if self.is_active() {
             return Ok(None);
@@ -296,6 +410,7 @@ impl MusicGame {
         spec.description_id = self.content.description_id;
         spec.icon_id = self.content.icon_id;
         spec.difficulty = row.difficulty;
+        spec.objectives = row.goals(self.content.primary_goal_name_id);
         spec.preload_file = PRELOAD_FILE.into();
         // `offer` changes nothing on an error or a refusal.
         let offered = self.runs.offer(spec)?;
@@ -317,7 +432,8 @@ impl MusicGame {
         self.route_with(packet, now_ms, None)
     }
 
-    /// `route`, where a won song pays [`WIN_COINS`] to `payer` (player guid and reward state).
+    /// `route`, where a won song pays its row's `win_coins` to `payer` (player guid and reward
+    /// state).
     pub fn route_with(
         &mut self,
         packet: &[u8],
@@ -405,16 +521,19 @@ impl MusicGame {
             (["FRServer_ReadyForGameData"], Some(_)) => {
                 MusicOutcome::refused("the song's data was already sent")
             }
-            (["FRServer_ScoreSet", total], Some(_)) => match checked_total(total, &play) {
-                Ok(total) => {
-                    play.score = total;
-                    MusicOutcome::ack()
+            (["FRServer_ScoreSet", total], Some(sent_ms)) => {
+                match checked_total(total, &play, now_ms.saturating_sub(sent_ms)) {
+                    Ok(total) => {
+                        play.score = total;
+                        MusicOutcome::ack()
+                    }
+                    Err(reason) => MusicOutcome::refused(reason),
                 }
-                Err(reason) => MusicOutcome::refused(reason),
-            },
+            }
             (["FRServer_GameWon", total, "0"], Some(sent_ms)) => {
-                let verdict = checked_total(total, &play).and_then(|total| {
-                    if now_ms.saturating_sub(sent_ms) < u64::from(play.level.song_ms) {
+                let elapsed = now_ms.saturating_sub(sent_ms);
+                let verdict = checked_total(total, &play, elapsed).and_then(|total| {
+                    if elapsed < u64::from(play.level.song_ms) {
                         Err("the song cannot have ended yet")
                     } else {
                         Ok(total)
@@ -447,7 +566,7 @@ impl MusicGame {
         Ok(out)
     }
 
-    /// The server's verdict: `OnGameWonMsg` / `OnGameLostMsg`, then the result screen.
+    /// The server's verdict: the goals, then `OnGameWonMsg` / `OnGameLostMsg` and the result.
     fn settle(
         &mut self,
         instance: i32,
@@ -467,20 +586,33 @@ impl MusicGame {
         // `finish` changes nothing on an error.
         let run = match (won, payer) {
             (true, Some((player, rewards))) => {
-                let grant = win_grant(player, self.content.icon_id, play.level.row.name_id);
+                let row = play.level.row;
+                let grant = win_grant(player, row.win_coins, self.content.icon_id, row.name_id);
                 self.runs
                     .finish(instance, &finish, Some((rewards, &grant)))?
             }
             (true, None) => self.runs.finish_win_without_reward(instance, &finish)?,
             (false, _) => self.runs.finish(instance, &finish, None)?,
         };
-        Ok(MusicOutcome::from_run(run))
+        let mut out = MusicOutcome::from_run(run);
+        // As Hack 'n' Slash: the goals' ticks go out ahead of the verdict and the result.
+        let mut goals = if won {
+            minigame::goal_done_packets(PRIMARY_GOAL).to_vec()
+        } else {
+            minigame::goal_failed_packets(PRIMARY_GOAL).to_vec()
+        };
+        if won && finish.score >= play.level.row.bonus_score {
+            goals.extend(minigame::goal_done_packets(BONUS_GOAL));
+        }
+        goals.append(&mut out.replies);
+        out.replies = goals;
+        Ok(out)
     }
 }
 
-fn win_grant(player_id: u64, icon_id: i32, name_id: i32) -> RewardGrant {
+fn win_grant(player_id: u64, coins: u32, icon_id: i32, name_id: i32) -> RewardGrant {
     RewardGrant {
-        coins: WIN_COINS,
+        coins,
         items: Vec::new(),
         job_xp: BTreeMap::new(),
         sc: 0,
@@ -495,10 +627,11 @@ fn win_grant(player_id: u64, icon_id: i32, name_id: i32) -> RewardGrant {
     }
 }
 
-/// A reported total: a finite, non-negative number within the song's bound, not below the last.
-fn checked_total(text: &str, play: &Play) -> Result<f64, &'static str> {
+/// A reported total `elapsed_ms` after the song's row went out: a finite, non-negative number
+/// within what the song allows by then, not below the last.
+fn checked_total(text: &str, play: &Play, elapsed_ms: u64) -> Result<f64, &'static str> {
     let total = parse_score(text).ok_or("the total is not a number")?;
-    if total > play.level.max_score {
+    if total > play.level.bound_at(elapsed_ms) {
         return Err("the total is beyond what the song allows");
     }
     if total < play.score {
@@ -599,13 +732,92 @@ mod tests {
     #[test]
     fn shipped_content_maps_the_four_rows_to_their_songs() {
         let music = MusicGame::new(content()).unwrap();
-        assert_eq!(music.game_ids().collect::<Vec<_>>(), [201, 202, 203, 204]);
-        let level = |game| music.content.game(game).unwrap().level().unwrap();
+        assert_eq!(
+            music.game_ids().collect::<Vec<_>>(),
+            [201, 202, 203, 204, 205]
+        );
+        let level = |game| music.content.game(game).unwrap().level(60).unwrap();
         assert_eq!(level(201).phase_row(), "20101^201^1^37^0^0^0^301^0^0^0^0^");
         assert_eq!(level(203).phase_row(), "20301^203^1^50^0^0^0^303^0^0^0^0^");
+        assert_eq!(level(205).phase_row(), "20501^205^1^58^0^0^0^305^0^0^0^0^");
         assert_eq!(level(204).song_ms, 55_000);
-        // 37 s at 60 frames a second, 664 points a frame.
-        assert_eq!(level(201).max_score, 1_474_080.0);
+        // 37 s at 60 frames a second: four bars of 216 frames, then 1356 at the top combo.
+        assert_eq!(level(201).max_score, 1_060_100.0);
+    }
+
+    /// The bound follows the movie's own arithmetic, and every bonus goal can be reached by a
+    /// run at the movie's real 30 frames a second.
+    #[test]
+    fn the_score_bound_is_a_perfect_run_by_the_clock() {
+        // Song1's first bar: 216 frames at 4 points, and the frame that fills it pays 8 more.
+        assert_eq!(max_total(0, 0), 0);
+        assert_eq!(max_total(0, 215), 860);
+        assert_eq!(max_total(0, 216), 872);
+        // Combo 1: 150 closeness and 8 points a frame.
+        assert_eq!(max_total(0, 217), 872 + 158);
+        // Past the fourth bar every frame is 4 x 150 + 32, for any length.
+        assert_eq!(max_total(0, 865) - max_total(0, 864), 632);
+        assert_eq!(max_total(9, 10), 40, "an unknown song never leaves combo 0");
+        let content = content();
+        for row in &content.games {
+            let real = row.level(30).unwrap();
+            // A perfect run at the movie's own rate always fits under the shipped bound.
+            let shipped = row.level(content.bound_fps).unwrap();
+            assert!(shipped.max_score < 1.5 * real.max_score, "{}", row.game_id);
+            for ms in (0..70_000).step_by(100) {
+                assert!(real.bound_at(ms) <= shipped.bound_at(ms), "{ms}");
+            }
+            assert!(
+                f64::from(row.bonus_score) < real.max_score,
+                "{}",
+                row.game_id
+            );
+            // Nothing is allowed before any time has passed, and the bound never falls.
+            assert_eq!(real.bound_at(0), 0.0);
+            let mut last = 0.0;
+            for ms in (0..70_000).step_by(500) {
+                let now = real.bound_at(ms);
+                assert!(now >= last && now <= real.max_score);
+                last = now;
+            }
+            assert_eq!(last, real.max_score, "the song's length caps it");
+        }
+    }
+
+    /// The offer lists both goals; a win ticks the primary one, the bonus only from its score, and
+    /// a loss fails the primary one.
+    #[test]
+    fn goals_follow_the_verdict() {
+        let content = content();
+        for (total, bonus) in [("104999", false), ("105000", true)] {
+            let mut music = MusicGame::new(content.clone()).unwrap();
+            let offer = music.begin(205).unwrap().unwrap();
+            for id in [8655_u32, 102_505, 102_497] {
+                assert!(
+                    (offer.replies[0].windows(4)).any(|w| w == id.to_le_bytes()),
+                    "the offer names string {id}"
+                );
+            }
+            let instance = i32::from_le_bytes(offer.replies[0][3..7].try_into().unwrap());
+            music.route(&lifecycle(5, instance), 1_000).unwrap();
+            say(&mut music, instance, "FRServer_ReadyForGameData", 2_000);
+            let text = format!("FRServer_GameWon\t{total}\t0");
+            let won = say(&mut music, instance, &text, 61_000);
+            assert_eq!(result(&won)[15], 1);
+            let [primary, _] = minigame::goal_done_packets(PRIMARY_GOAL);
+            let [extra, _] = minigame::goal_done_packets(BONUS_GOAL);
+            assert!(won.replies.contains(&primary));
+            assert_eq!(won.replies.contains(&extra), bonus, "{total}");
+            let verdict = (won.replies.iter()).position(|p| p.starts_with(&[39, 0, 14]));
+            let tick = won.replies.iter().position(|p| *p == primary);
+            assert!(tick < verdict, "the goals go out ahead of the verdict");
+        }
+        let mut music = MusicGame::new(content).unwrap();
+        let instance = start(&mut music, 201);
+        say(&mut music, instance, "FRServer_ReadyForGameData", 2_000);
+        let lost = say(&mut music, instance, "FRServer_GameLost\tundefined", 9_000);
+        let [failed, _] = minigame::goal_failed_packets(PRIMARY_GOAL);
+        assert!(lost.replies.contains(&failed));
     }
 
     #[test]
@@ -631,7 +843,13 @@ mod tests {
             "unknown fields are refused"
         );
         let mut music = MusicGame::new(content()).unwrap();
-        assert!(music.begin(205).is_err(), "not in this content");
+        assert!(music.begin(206).is_err(), "not in this content");
+        let mut bad = content();
+        bad.games[0].bonus_score = 2_000_000;
+        assert!(bad.validate().is_err(), "a bonus no song can reach");
+        let mut bad = content();
+        bad.bound_fps = 10;
+        assert!(bad.validate().is_err(), "slower than the movie");
         assert!(music.begin(-1).is_err());
     }
 
@@ -739,7 +957,8 @@ mod tests {
         let instance = start(&mut music, 201);
         say(&mut music, instance, "FRServer_ReadyForGameData", 2_000);
         assert!(say(&mut music, instance, "FRServer_ScoreSet\t100", 5_000).accepted);
-        for total in ["1474080.5", "-1", "NaN", "inf", "1e400", "99", "abc", ""] {
+        // 4 s after the row is 144 frames at the shipped 36 a second, all at 4 points.
+        for total in ["576.5", "-1", "NaN", "inf", "1e400", "99", "abc", ""] {
             let out = say(
                 &mut music,
                 instance,
@@ -749,10 +968,17 @@ mod tests {
             assert!(!out.accepted && out.refused.is_some(), "{total}");
             assert_eq!(music.play.unwrap().score, 100.0, "{total} changed nothing");
         }
-        assert!(say(&mut music, instance, "FRServer_ScoreSet\t1474080", 7_000).accepted);
+        assert!(say(&mut music, instance, "FRServer_ScoreSet\t576", 6_000).accepted);
+        // The whole song's bound is not open early: a total cannot be ahead of the clock.
+        let ahead = say(&mut music, instance, "FRServer_ScoreSet\t1060100", 20_000);
+        assert_eq!(
+            ahead.refused,
+            Some("the total is beyond what the song allows")
+        );
+        assert!(say(&mut music, instance, "FRServer_ScoreSet\t100000", 20_000).accepted);
 
         // A win reported too early is overruled into a loss.
-        let early = say(&mut music, instance, "FRServer_GameWon\t1474080\t0", 30_000);
+        let early = say(&mut music, instance, "FRServer_GameWon\t100000\t0", 30_000);
         assert_eq!(early.refused, Some("the song cannot have ended yet"));
         assert_eq!(result(&early)[15], 0);
 

@@ -1,8 +1,10 @@
 {
   "schema_version": 1,
-  "source": "client MiniGameData.txt type-9 rows 201-204 (NAME_ID 388938-388941, DESCRIPTION_ID 45646, ICON_ID 915, difficulty 1-4; the Games window rows 511-513 and 568) and game_music.gfx (MusicGameServer.OnLevelData plays Song STAGE_TYPE - 300; song lengths are the movie's Song1-5 LastTime); reconstructed (R): difficulty N plays SongN (row and song names match), the phase ids, and goal 0 (the movie sets no goal; a higher goal turns a finished song below it into a loss)",
+  "source": "client MiniGameData.txt type-9 rows 201-205 (NAME_ID 388938-388942, DESCRIPTION_ID 45646, ICON_ID 915, difficulty 1-5; the Games window rows 511-513 and 568 are 201-204) and game_music.gfx (MusicGameServer.OnLevelData plays Song STAGE_TYPE - 300; song lengths are the movie's Song1-5 LastTime). Goals: the start screen's Goals box (video P-TFIjTOvN8 at 0 s: Primary 'Complete the game!', Bonus 'Score 110,000 points!' on Hard); the bonus scores per difficulty are the fan wiki's (135,000 / 130,000 / 145,000 / 110,000 / 105,000) and each line is in the client's locale (8655; 102506, 102507, 102508, 102504, 102505; descriptions 102499, 102501, 102503, 102495, 102497). win_coins: 5 on a Very Hard win in video UmSNOvWRo94 at 282 s; (R) the same for the other four. stands: the three sh_musicstand_01 spawns of npc_spawns_extra.json (legacy ids 1667 Wugachug, 1812 Seaside, 3570 Snowhill), the first two under the content keys their quests use; the wiki starts the game 'at any Music Stand', and (R) each lists all five songs. Reconstructed (R): difficulty N plays SongN (row and song names match), the phase ids, goal 0 (the movie sets no goal; a higher goal turns a finished song below it into a loss), and bound_fps 36 (the movie runs at 30 frames a second with one scoring tick a frame; the score bound is a perfect run at this rate, and because the combo ramp climbs with the rate too, 36 is a ceiling about 1.4 times a real perfect run where 60 was about three times it)",
   "description_id": 45646,
   "icon_id": 915,
+  "primary_goal_name_id": 8655,
+  "bound_fps": 36,
   "games": [
     {
       "game_id": 201,
@@ -10,7 +12,11 @@
       "difficulty": 1,
       "phase_id": 20101,
       "stage_type": 301,
-      "goal": 0
+      "goal": 0,
+      "win_coins": 5,
+      "bonus_goal_name_id": 102506,
+      "bonus_goal_description_id": 102499,
+      "bonus_score": 135000
     },
     {
       "game_id": 202,
@@ -18,7 +24,11 @@
       "difficulty": 2,
       "phase_id": 20201,
       "stage_type": 302,
-      "goal": 0
+      "goal": 0,
+      "win_coins": 5,
+      "bonus_goal_name_id": 102507,
+      "bonus_goal_description_id": 102501,
+      "bonus_score": 130000
     },
     {
       "game_id": 203,
@@ -26,7 +36,11 @@
       "difficulty": 3,
       "phase_id": 20301,
       "stage_type": 303,
-      "goal": 0
+      "goal": 0,
+      "win_coins": 5,
+      "bonus_goal_name_id": 102508,
+      "bonus_goal_description_id": 102503,
+      "bonus_score": 145000
     },
     {
       "game_id": 204,
@@ -34,7 +48,28 @@
       "difficulty": 4,
       "phase_id": 20401,
       "stage_type": 304,
-      "goal": 0
+      "goal": 0,
+      "win_coins": 5,
+      "bonus_goal_name_id": 102504,
+      "bonus_goal_description_id": 102495,
+      "bonus_score": 110000
+    },
+    {
+      "game_id": 205,
+      "name_id": 388942,
+      "difficulty": 5,
+      "phase_id": 20501,
+      "stage_type": 305,
+      "goal": 0,
+      "win_coins": 5,
+      "bonus_goal_name_id": 102505,
+      "bonus_goal_description_id": 102497,
+      "bonus_score": 105000
     }
+  ],
+  "stands": [
+    { "npc": 9500003432, "position": [75.55552, 24.75366, -404.7428] },
+    { "npc": 9500003665, "position": [-495.1716, -31.1286, -1261.179] },
+    { "npc": 100000003570, "position": [332.6411, 27.24397, 483.7185] }
   ]
 }
