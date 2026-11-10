@@ -409,6 +409,11 @@ impl AccountStore {
         self.data.characters.get(&guid)
     }
 
+    /// Every character record, for indexes built once per store change (friends lookups).
+    pub fn characters(&self) -> impl Iterator<Item = &CharacterRecord> {
+        self.data.characters.values()
+    }
+
     /// L043 (`realm move`, admin only): the one character whose displayed name equals `name`,
     /// ignoring case. `None` when no character or several match, so a name never picks one of two.
     pub fn character_by_display_name(&self, name: &str) -> Option<u64> {

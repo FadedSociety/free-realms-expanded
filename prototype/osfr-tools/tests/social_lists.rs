@@ -101,21 +101,30 @@ fn friend_request_accept_remove_and_all_client_result_codes() {
         .iter()
         .find(|packet| packet.recipient_guid == 202 && family(packet) == 26 && sub(packet) == 16)
         .unwrap();
+    // Client reader 00aa0210: header, guid at +0x10, NameData, one byte. No padding.
     assert_eq!(&invite.bytes[..4], &[26, 0, 16, 0]);
-    assert_eq!(&invite.bytes[4..8], &[0; 4]);
-    assert_eq!(&invite.bytes[8..16], &101u64.to_le_bytes());
+    assert_eq!(&invite.bytes[4..12], &101u64.to_le_bytes());
+    assert_eq!(&invite.bytes[12..24], &[0; 12]);
     assert_eq!(
-        i32::from_le_bytes(invite.bytes[28..32].try_into().unwrap()),
+        i32::from_le_bytes(invite.bytes[24..28].try_into().unwrap()),
         8
     );
-    assert_eq!(&invite.bytes[32..40], b"FixtureA");
+    assert_eq!(&invite.bytes[28..36], b"FixtureA");
     assert_eq!(
-        i32::from_le_bytes(invite.bytes[40..44].try_into().unwrap()),
+        i32::from_le_bytes(invite.bytes[36..40].try_into().unwrap()),
         7
     );
-    assert_eq!(&invite.bytes[44..51], b"Fixture");
-    assert_eq!(invite.bytes[51], 0);
-    assert_eq!(invite.bytes.len(), 52);
+    assert_eq!(&invite.bytes[40..47], b"Fixture");
+    assert_eq!(invite.bytes[47], 0);
+    assert_eq!(invite.bytes.len(), 48);
+    // The "waiting for X" message names the target (00cb3fd0 reads the first NameData when
+    // the guid has no friend row yet), not the requester.
+    let waiting = requested
+        .iter()
+        .find(|packet| packet.recipient_guid == 101 && sub(packet) == 8)
+        .unwrap();
+    assert_eq!(&waiting.bytes[4..12], &202u64.to_le_bytes());
+    assert_eq!(&waiting.bytes[28..36], b"FixtureB");
 
     let accepted = social.respond_friend(202, 101, true).unwrap();
     assert!(social.profile(101).unwrap().friends.contains_key(&202));
@@ -133,22 +142,79 @@ fn friend_request_accept_remove_and_all_client_result_codes() {
     }));
 
     let removed = social.remove_friend(101, &target_name, &directory).unwrap();
-    assert_eq!(removed.len(), 1);
-    assert_eq!(family(&removed[0]), 74);
-    assert_eq!(sub(&removed[0]), 7);
+    // (R) A friendship is mutual, so removal drops both sides and tells both with 74/7.
+    assert_eq!(removed.len(), 2);
+    assert!(removed.iter().all(|m| family(m) == 74 && sub(m) == 7));
+    assert_eq!(&removed[0].bytes[3..11], &202u64.to_le_bytes());
+    assert_eq!(removed[1].recipient_guid, 202);
+    assert_eq!(&removed[1].bytes[3..11], &101u64.to_le_bytes());
     assert!(!social.profile(101).unwrap().friends.contains_key(&202));
-    // (R) Removal is local-only; the original server's reciprocal behavior is unknown.
-    assert!(social.profile(202).unwrap().friends.contains_key(&101));
+    assert!(!social.profile(202).unwrap().friends.contains_key(&101));
+    // Removing again still answers the remover (a stale client row must go), and only them.
+    let again = social.remove_friend(101, &target_name, &directory).unwrap();
+    assert_eq!(again.len(), 1);
+    assert_eq!(again[0].recipient_guid, 101);
 
-    let a = SocialName::new("FixtureA", "Fixture").unwrap();
     let b = SocialName::new("FixtureB", "Fixture").unwrap();
     let mut codes = Vec::new();
     for code in FriendResultCode::ALL {
-        let bytes = encode_friend_status(code, 202, &a, &b).unwrap();
+        let bytes = encode_friend_status(code, 202, &b).unwrap();
         assert_eq!(&bytes[..3], &[74, 0, 8]);
         codes.push(bytes[3]);
     }
     assert_eq!(codes, (1u8..=11).collect::<Vec<_>>());
+}
+
+/// A request to a character who is away is kept in their list, survives a save and load, and
+/// opens the pop-up at their next login; answering it then works as if they had been online.
+#[test]
+fn a_request_to_an_offline_target_waits_in_their_list_and_opens_at_login() {
+    let (mut social, directory) = service(5);
+    social.login(101).unwrap();
+    let name_b = identity(20, 202, "FixtureB").name;
+    let requested = social
+        .request_friend(101, &name_b, &directory)
+        .unwrap();
+    assert_eq!(requested.len(), 1, "no 26/16 while the target is offline");
+    assert_eq!((requested[0].recipient_guid, sub(&requested[0])), (101, 8));
+    assert_eq!(
+        social.profile(202).unwrap().pending_from.get(&101),
+        Some(&identity(10, 101, "FixtureA").name)
+    );
+
+    // The pending request is part of the saved document.
+    let folder = std::env::temp_dir().join(format!("fr-social-pending-{}", std::process::id()));
+    let path = folder.join("social.json");
+    social.profile(202).unwrap().save(&path).unwrap();
+    let loaded = SocialLists::load(&path, 20, 202).unwrap();
+    assert_eq!(loaded, *social.profile(202).unwrap());
+    assert!(std::fs::read_to_string(&path).unwrap().contains("pending_from"));
+    std::fs::remove_dir_all(folder).unwrap();
+
+    let logged_in = social.login(202).unwrap();
+    let invite = logged_in
+        .iter()
+        .find(|m| m.recipient_guid == 202 && family(m) == 26 && sub(m) == 16)
+        .expect("the pop-up opens at login");
+    assert_eq!(&invite.bytes[4..12], &101u64.to_le_bytes());
+    let accepted = social.respond_friend(202, 101, true).unwrap();
+    assert!(accepted.iter().any(|m| m.recipient_guid == 202 && sub(m) == 6));
+    assert!(social.profile(202).unwrap().pending_from.is_empty());
+    assert!(social.profile(101).unwrap().friends.contains_key(&202));
+    // Nothing pending any more: a second answer is refused, and so is an ignored requester.
+    assert_eq!(
+        social.respond_friend(202, 101, true),
+        Err(SocialError::NoPendingFriendRequest)
+    );
+    social
+        .add_ignore(303, &identity(10, 101, "FixtureA").name, &directory)
+        .unwrap();
+    let ignored = social
+        .request_friend(101, &identity(30, 303, "FixtureC").name, &directory)
+        .unwrap();
+    assert_eq!(ignored.len(), 1);
+    assert_eq!(ignored[0].bytes[3], FriendResultCode::TimedOut.wire() as u8);
+    assert!(social.profile(303).unwrap().pending_from.is_empty());
 }
 
 #[test]

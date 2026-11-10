@@ -350,11 +350,28 @@ fn client_requests_decode_from_the_recovered_opcodes_only() {
         Err(FriendError::UnknownSubOpcode(8))
     ));
 
-    // The recovered IgnoreRequest opcode 30 exists but its body was never recovered: refuse it
-    // instead of guessing a shape.
+    // IgnoreRequest 30 (client writer 00c22400): NameData, then the flag byte; only 0 and 1 read.
+    for (flag, ignore) in [(1u8, true), (0, false)] {
+        let mut body = name("Nova", "Reed").encode();
+        body.push(flag);
+        assert_eq!(
+            decode_command(FriendCommand::IgnoreRequest.code(), &body).expect("ignore"),
+            piece_087::FriendRequest::Ignore {
+                name: name("Nova", "Reed"),
+                ignore,
+            }
+        );
+    }
+    let mut bad_flag = name("Nova", "Reed").encode();
+    bad_flag.push(2);
     assert!(matches!(
-        decode_command(FriendCommand::IgnoreRequest.code(), &[]),
-        Err(FriendError::UnrecoveredBody("CommandPacketIgnoreRequest"))
+        decode_command(FriendCommand::IgnoreRequest.code(), &bad_flag),
+        Err(FriendError::InvalidBool(2))
+    ));
+    // The server-sent ConfirmFriendRequest 16 is never read from a client.
+    assert!(matches!(
+        decode_command(FriendCommand::ConfirmFriendRequest.code(), &[]),
+        Err(FriendError::UnrecoveredBody("CommandPacketConfirmFriendRequest"))
     ));
 
     let mut trailing = add.clone();

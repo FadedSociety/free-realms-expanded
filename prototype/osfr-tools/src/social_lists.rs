@@ -104,7 +104,8 @@ pub trait CharacterLookup {
     fn find_by_name(&self, name: &SocialName) -> Option<CharacterIdentity>;
 }
 
-/// Persisted document for exactly one character. Pending requests and groups are volatile.
+/// Persisted document for exactly one character. Groups are volatile; a friend request waiting
+/// for this character's answer is kept here so it reaches them at their next login (R).
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SocialLists {
@@ -113,6 +114,9 @@ pub struct SocialLists {
     pub name: SocialName,
     pub friends: BTreeMap<u64, SocialName>,
     pub ignored: BTreeMap<u64, SocialName>,
+    /// Requesters (guid, name) whose 26/16 pop-up this character has not answered yet.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub pending_from: BTreeMap<u64, SocialName>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -131,6 +135,7 @@ impl SocialLists {
             name: identity.name,
             friends: BTreeMap::new(),
             ignored: BTreeMap::new(),
+            pending_from: BTreeMap::new(),
         })
     }
 
@@ -187,7 +192,12 @@ impl SocialLists {
             name: self.name.clone(),
         }
         .validate()?;
-        for (guid, name) in self.friends.iter().chain(&self.ignored) {
+        for (guid, name) in self
+            .friends
+            .iter()
+            .chain(&self.ignored)
+            .chain(&self.pending_from)
+        {
             if *guid == 0 || *guid == self.character_guid {
                 return Err(SocialError::InvalidIdentity);
             }
@@ -249,8 +259,6 @@ pub enum SocialError {
     UnknownName,
     SelfFriend,
     AlreadyFriend,
-    NotFriend,
-    IgnoredByTarget,
     AlreadyIgnored,
     NotIgnored,
     NoPendingFriendRequest,
@@ -269,8 +277,6 @@ impl std::fmt::Display for SocialError {
             Self::UnknownName => "character name was not found",
             Self::SelfFriend => "cannot add yourself as a friend",
             Self::AlreadyFriend => "character is already a friend",
-            Self::NotFriend => "character is not a friend",
-            Self::IgnoredByTarget => "target ignores the requester",
             Self::AlreadyIgnored => "character is already ignored",
             Self::NotIgnored => "character is not ignored",
             Self::NoPendingFriendRequest => "friend request is not pending",
@@ -283,12 +289,6 @@ impl std::fmt::Display for SocialError {
 }
 
 impl std::error::Error for SocialError {}
-
-#[derive(Clone, Debug)]
-struct PendingFriendRequest {
-    requester_guid: u64,
-    target_guid: u64,
-}
 
 #[derive(Clone, Debug)]
 struct Group {
@@ -327,7 +327,6 @@ struct PendingGroupInvite {
 pub struct SocialService {
     profiles: BTreeMap<u64, SocialLists>,
     online: BTreeSet<u64>,
-    friend_requests: BTreeMap<(u64, u64), PendingFriendRequest>,
     max_group_members: usize,
     /// Host policy copied with the service; never persisted and not part of the saved profile.
     group_invite_ttl_ms: u64,
@@ -353,7 +352,6 @@ impl SocialService {
         Ok(Self {
             profiles: BTreeMap::new(),
             online: BTreeSet::new(),
-            friend_requests: BTreeMap::new(),
             max_group_members,
             group_invite_ttl_ms: DEFAULT_GROUP_INVITE_TTL_MS,
             next_group_id: 1,
@@ -440,6 +438,14 @@ impl SocialService {
                 encode_friend_online(guid, &self.profiles[&guid].name)?,
             ));
         }
+        // Requests made while this character was away: the 26/16 pop-up opens now (R).
+        for (requester_guid, stored_name) in &self.profiles[&guid].pending_from {
+            let name = self
+                .profiles
+                .get(requester_guid)
+                .map_or(stored_name, |requester| &requester.name);
+            out.push(message(guid, encode_friend_invite(*requester_guid, name)?));
+        }
         Ok(out)
     }
 
@@ -494,42 +500,45 @@ impl SocialService {
             return Err(SocialError::AlreadyFriend);
         }
         if target_profile.ignored.contains_key(&requester_guid) {
-            // (R) Suppress requests from an ignored character.
-            return Err(SocialError::IgnoredByTarget);
+            // (R) An ignored requester is told "did not respond" at once; the ignore stays
+            // private and nothing is stored.
+            return Ok(vec![message(
+                requester_guid,
+                encode_friend_status(
+                    FriendResultCode::TimedOut,
+                    target.character_guid,
+                    &target.name,
+                )?,
+            )]);
         }
-        let key = (requester_guid, target.character_guid);
-        if self.friend_requests.contains_key(&key) {
+        if target_profile.pending_from.contains_key(&requester_guid) {
             // (R) Map a repeated outstanding request to the client's no-friend-spam result.
             return Ok(vec![message(
                 requester_guid,
                 encode_friend_status(
                     FriendResultCode::NoFriendSpam,
                     target.character_guid,
-                    &requester.name,
                     &target.name,
                 )?,
             )]);
         }
-        self.friend_requests.insert(
-            key,
-            PendingFriendRequest {
-                requester_guid,
-                target_guid: target.character_guid,
-            },
-        );
+        self.profiles
+            .get_mut(&target.character_guid)
+            .ok_or(SocialError::MissingProfile)?
+            .pending_from
+            .insert(requester_guid, requester.name.clone());
         let mut out = vec![message(
             requester_guid,
             encode_friend_status(
                 FriendResultCode::RequestSent,
                 target.character_guid,
-                &requester.name,
                 &target.name,
             )?,
         )];
         if self.online.contains(&target.character_guid) {
             out.push(message(
                 target.character_guid,
-                encode_friend_invite(&requester)?,
+                encode_friend_invite(requester_guid, &requester.name)?,
             ));
         }
         Ok(out)
@@ -542,30 +551,11 @@ impl SocialService {
         requester_guid: u64,
         accepted: bool,
     ) -> Result<Vec<SocialMessage>, SocialError> {
-        let key = (requester_guid, target_guid);
-        let request = self
-            .friend_requests
-            .remove(&key)
-            .ok_or(SocialError::NoPendingFriendRequest)?;
-        let requester = self
-            .profiles
-            .get(&request.requester_guid)
-            .ok_or(SocialError::MissingProfile)?
-            .clone();
-        let target = self
-            .profiles
-            .get(&request.target_guid)
-            .ok_or(SocialError::MissingProfile)?
-            .clone();
+        let (requester, target) = self.take_pending(requester_guid, target_guid)?;
         if !accepted {
             return Ok(vec![message(
                 requester_guid,
-                encode_friend_status(
-                    FriendResultCode::Declined,
-                    target_guid,
-                    &requester.name,
-                    &target.name,
-                )?,
+                encode_friend_status(FriendResultCode::Declined, target_guid, &target.name)?,
             )]);
         }
         self.profiles
@@ -589,12 +579,7 @@ impl SocialService {
             ),
             message(
                 requester_guid,
-                encode_friend_status(
-                    FriendResultCode::Accepted,
-                    target_guid,
-                    &requester.name,
-                    &target.name,
-                )?,
+                encode_friend_status(FriendResultCode::Accepted, target_guid, &target.name)?,
             ),
         ];
         if self.online.contains(&requester_guid) && self.online.contains(&target_guid) {
@@ -610,36 +595,44 @@ impl SocialService {
         Ok(out)
     }
 
-    /// Reconstructed timeout policy (R); the host timer calls this after its chosen deadline.
+    /// The client's pop-up answered 26/17 status 2 (its own timer ran out).
     pub fn timeout_friend_request(
         &mut self,
         requester_guid: u64,
         target_guid: u64,
     ) -> Result<Vec<SocialMessage>, SocialError> {
-        let request = self
-            .friend_requests
-            .remove(&(requester_guid, target_guid))
-            .ok_or(SocialError::NoPendingFriendRequest)?;
-        let requester = self
-            .profiles
-            .get(&request.requester_guid)
-            .ok_or(SocialError::MissingProfile)?;
-        let target = self
-            .profiles
-            .get(&request.target_guid)
-            .ok_or(SocialError::MissingProfile)?;
+        let (_, target) = self.take_pending(requester_guid, target_guid)?;
         Ok(vec![message(
             requester_guid,
-            encode_friend_status(
-                FriendResultCode::TimedOut,
-                target_guid,
-                &requester.name,
-                &target.name,
-            )?,
+            encode_friend_status(FriendResultCode::TimedOut, target_guid, &target.name)?,
         )])
     }
 
-    /// 26/15 names the target; 74/7 removes a guid. Mutual removal is reconstructed as local-only (R).
+    /// Close the pending request `requester -> target`; both profiles are returned by value.
+    fn take_pending(
+        &mut self,
+        requester_guid: u64,
+        target_guid: u64,
+    ) -> Result<(SocialLists, SocialLists), SocialError> {
+        let requester = self
+            .profiles
+            .get(&requester_guid)
+            .ok_or(SocialError::MissingProfile)?
+            .clone();
+        let target = self
+            .profiles
+            .get_mut(&target_guid)
+            .ok_or(SocialError::MissingProfile)?;
+        target
+            .pending_from
+            .remove(&requester_guid)
+            .ok_or(SocialError::NoPendingFriendRequest)?;
+        Ok((requester, target.clone()))
+    }
+
+    /// 26/15 names the target; 74/7 removes a guid. A friendship is mutual (accept adds both
+    /// sides), so removal drops both sides and tells both (R). The remover's row goes even when
+    /// the server no longer had the friend, so a stale client row never survives.
     pub fn remove_friend<L: CharacterLookup>(
         &mut self,
         owner_guid: u64,
@@ -651,13 +644,20 @@ impl SocialService {
             .profiles
             .get_mut(&owner_guid)
             .ok_or(SocialError::MissingProfile)?;
-        if owner.friends.remove(&target.character_guid).is_none() {
-            return Err(SocialError::NotFriend);
-        }
-        Ok(vec![message(
+        owner.friends.remove(&target.character_guid);
+        let mut out = vec![message(
             owner_guid,
             encode_friend_remove(target.character_guid),
-        )])
+        )];
+        if let Some(other) = self.profiles.get_mut(&target.character_guid)
+            && other.friends.remove(&owner_guid).is_some()
+        {
+            out.push(message(
+                target.character_guid,
+                encode_friend_remove(owner_guid),
+            ));
+        }
+        Ok(out)
     }
 
     pub fn add_ignore<L: CharacterLookup>(
@@ -935,9 +935,7 @@ impl SocialService {
             out.extend(self.remove_group_member(guid, false)?);
         }
         self.changing_job.remove(&guid);
-        // (R) Friend requests are volatile and cleared when either participant disconnects.
-        self.friend_requests
-            .retain(|(requester, target), _| *requester != guid && *target != guid);
+        // Friend requests stay in the target's list and are shown again at their next login (R).
         Ok(out)
     }
 
@@ -1260,18 +1258,20 @@ fn group_header(sub: u16) -> Vec<u8> {
     out
 }
 
-/// 74/8 dispatcher `00c814d0` case 8 -> `00c80ab0` -> `00c80500`: byte, guid pair, two NameData blocks.
+/// 74/8 dispatcher `00c814d0` case 8 -> `00c80ab0` -> `00c80500`: byte, guid pair, two NameData
+/// blocks. `ShowFriendStatusMessage 00cb3fd0` names the player from the friend row the guid picks
+/// or, when there is no row yet, from the first NameData, so both carry the message's subject (the
+/// other player); the second is the new name only for code 9 (rename), which nothing sends.
 pub fn encode_friend_status(
     code: FriendResultCode,
-    target_guid: u64,
-    requester: &SocialName,
-    target: &SocialName,
+    subject_guid: u64,
+    subject: &SocialName,
 ) -> Result<Vec<u8>, SocialError> {
     let mut out = friend_header(8);
     out.push(code.wire() as u8);
-    out.extend_from_slice(&target_guid.to_le_bytes());
-    write_social_name(&mut out, requester)?;
-    write_social_name(&mut out, target)?;
+    out.extend_from_slice(&subject_guid.to_le_bytes());
+    write_social_name(&mut out, subject)?;
+    write_social_name(&mut out, subject)?;
     Ok(out)
 }
 
@@ -1351,14 +1351,13 @@ fn encode_friend_remove(guid: u64) -> Vec<u8> {
     out
 }
 
-/// 26/16 body reader `00aa0210` reads two short fields, a guid pair and NameData via `008e7290`, then a byte.
-/// The short fields and byte default to zero (R).
-fn encode_friend_invite(requester: &SocialLists) -> Result<Vec<u8>, SocialError> {
+/// 26/16 body reader `00aa0210`: the two u16 of the command header (`00a9cb50`), then the
+/// requester's guid at +0x10, NameData via `008e7290`, and a byte at +0xa0 (zero, R). The
+/// client answers with 26/17 carrying this guid.
+fn encode_friend_invite(requester_guid: u64, name: &SocialName) -> Result<Vec<u8>, SocialError> {
     let mut out = command_header(16);
-    out.extend_from_slice(&0u16.to_le_bytes());
-    out.extend_from_slice(&0u16.to_le_bytes());
-    out.extend_from_slice(&requester.character_guid.to_le_bytes());
-    write_social_name(&mut out, &requester.name)?;
+    out.extend_from_slice(&requester_guid.to_le_bytes());
+    write_social_name(&mut out, name)?;
     out.push(0);
     Ok(out)
 }

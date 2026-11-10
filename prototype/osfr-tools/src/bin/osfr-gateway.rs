@@ -45,6 +45,8 @@ mod delivery;
 mod direct_packets;
 #[path = "osfr_gateway/encounter_invites.rs"]
 mod encounter_invites;
+#[path = "osfr_gateway/friends_routing.rs"]
+mod friends_routing;
 #[path = "osfr_gateway/gm_menu_routing.rs"]
 mod gm_menu_routing;
 #[path = "osfr_gateway/group_arena.rs"]
@@ -550,6 +552,8 @@ struct SharedWorld {
     social: SocialService,
     identities: BTreeMap<u64, SocialIdentity>,
     social_paths: BTreeMap<u64, PathBuf>,
+    /// Friends: where a character who is not logged in is found (account-store mode only).
+    friend_store: Option<friends_routing::OfflineStore>,
     session_keys: BTreeMap<SessionId, SessionKey>,
     active_sessions: BTreeMap<u64, SessionId>,
     /// Lockstep: `joined` ⇔ player registry row ⇔ chat member; `join_player`/`leave_player` keep all three.
@@ -646,6 +650,7 @@ impl SharedWorld {
             social: SocialService::new(17).unwrap(),
             identities: BTreeMap::new(),
             social_paths: BTreeMap::new(),
+            friend_store: None,
             session_keys: BTreeMap::new(),
             active_sessions: BTreeMap::new(),
             joined: BTreeSet::new(),
@@ -2190,54 +2195,14 @@ impl Session {
         if let Some(request) = parse_location_request(inner) {
             return self.route_location(request, world);
         }
+        if let Some(deliveries) = friends_routing::route(self, inner, world) {
+            return deliveries;
+        }
         let Ok(Some(request)) = parse_social_request(inner) else {
             return Vec::new();
         };
         let lookup = IdentityLookup(&world.identities);
         let messages = match request {
-            SocialRequest::AddFriend(name) => {
-                world
-                    .social
-                    .request_friend(self.character_guid, &name, &lookup)
-            }
-            SocialRequest::RemoveFriend(name) => {
-                world
-                    .social
-                    .remove_friend(self.character_guid, &name, &lookup)
-            }
-            SocialRequest::FriendResponse {
-                first_guid,
-                second_guid,
-                accepted,
-            } => {
-                let mut accepted_service = None;
-                for requester in [first_guid, second_guid] {
-                    if requester == self.character_guid {
-                        continue;
-                    }
-                    let mut candidate = world.social.clone();
-                    if let Ok(result) =
-                        candidate.respond_friend(self.character_guid, requester, accepted)
-                    {
-                        accepted_service = Some((candidate, result));
-                        break;
-                    }
-                }
-                if let Some((candidate, result)) = accepted_service {
-                    world.social = candidate;
-                    Ok(result)
-                } else {
-                    return Vec::new();
-                }
-            }
-            SocialRequest::AddIgnore(name) => {
-                world.social.add_ignore(self.character_guid, &name, &lookup)
-            }
-            SocialRequest::RemoveIgnore(name) => {
-                world
-                    .social
-                    .remove_ignore(self.character_guid, &name, &lookup)
-            }
             SocialRequest::GroupInvite(name) => {
                 world
                     .social
@@ -2820,16 +2785,9 @@ impl<'a> WireReader<'a> {
     }
 }
 
+/// Group requests (40/x). The friend and ignore commands (26/14, 15, 17, 30) are
+/// `friends_routing`'s.
 enum SocialRequest {
-    AddFriend(SocialName),
-    RemoveFriend(SocialName),
-    FriendResponse {
-        first_guid: u64,
-        second_guid: u64,
-        accepted: bool,
-    },
-    AddIgnore(SocialName),
-    RemoveIgnore(SocialName),
     GroupInvite(SocialName),
     GroupLeave,
     GroupResponse {
@@ -2852,37 +2810,6 @@ fn parse_social_request(bytes: &[u8]) -> io::Result<Option<SocialRequest>> {
     r.u16()?;
     r.u16()?;
     let request = match (family, sub) {
-        (26, 14) => SocialRequest::AddFriend(
-            SocialName::new(r.string(128)?, r.string(128)?).map_err(invalid_io)?,
-        ),
-        (26, 15) => SocialRequest::RemoveFriend(
-            SocialName::new(r.string(128)?, r.string(128)?).map_err(invalid_io)?,
-        ),
-        (26, 17) => {
-            let first_guid = r.u64()?;
-            let second_guid = r.u64()?;
-            let accepted = r.u8()? != 0; // (R) Nonzero client result is interpreted as acceptance.
-            r.social_name()?;
-            SocialRequest::FriendResponse {
-                first_guid,
-                second_guid,
-                accepted,
-            }
-        }
-        (26, 30) => {
-            // Recovered client flag: 1 adds and 0 removes.
-            let adding = match r.u8()? {
-                0 => false,
-                1 => true,
-                _ => return Err(invalid_io("invalid ignore request flag")),
-            };
-            let name = SocialName::new(r.string(128)?, r.string(128)?).map_err(invalid_io)?;
-            if adding {
-                SocialRequest::AddIgnore(name)
-            } else {
-                SocialRequest::RemoveIgnore(name)
-            }
-        }
         // 40/1 client reader `00912090`: the family/sub header, then `008fca60`.
         (40, 1) => {
             r.u64()?;
@@ -3363,6 +3290,9 @@ impl Server {
         world
             .social
             .set_group_invite_ttl(options.group_invite_ttl_ms)?;
+        world.friend_store = options.account_store.as_ref().map(|accounts| {
+            friends_routing::OfflineStore::new(accounts.clone(), options.state.clone())
+        });
         world.guilds = t006_guilds::GuildWorld::load(&options.state, options.guild_invite_ttl_ms)?;
         world.client_areas = client_area_routing::load(&options)?;
         world_event_routing::schedule(&mut world, &options);

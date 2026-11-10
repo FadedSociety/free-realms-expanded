@@ -52,8 +52,11 @@
 //! MISSING / explicit gaps:
 //! * the original status code meanings (the community comment claims 110 online / 111 offline) are
 //!   carried through verbatim without being interpreted.
-//! * the `CommandPacketIgnoreRequest` (30) body, the original request expiry, the teleport-to-friend
-//!   rules, the friend cap, per-zone fan-out limits and any persistence format are unrecovered.
+//! * the original request expiry, the teleport-to-friend rules, the friend cap, per-zone fan-out
+//!   limits and any persistence format are unrecovered. (The `CommandPacketIgnoreRequest` (30)
+//!   body was recovered 2026-11-09 from the client writer `00c22400`: NameData then one flag byte.
+//!   [`decode_command`] is the one parser of the client's friend commands; the gateway's
+//!   `friends_routing` includes this file and routes through it.)
 //! * `popularity` has no recovered producer; roster rows default it to 0.
 //!
 //! ponytail: one directory map, one roster map per character, one pending map, one ignore map, and
@@ -479,6 +482,11 @@ pub enum FriendRequest {
         name: NameData,
     },
     FriendsPositionRequest,
+    /// 26/30: `ignore` true adds the named character to the ignore list, false removes them.
+    Ignore {
+        name: NameData,
+        ignore: bool,
+    },
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -685,7 +693,13 @@ pub fn decode_command(sub: u16, body: &[u8]) -> Result<FriendRequest, FriendErro
             FriendRequest::ConfirmFriend { guid, status, name }
         }
         FriendCommand::FriendsPositionRequest => FriendRequest::FriendsPositionRequest,
-        FriendCommand::ConfirmFriendRequest | FriendCommand::IgnoreRequest => {
+        // Client writer `00c22400`: the NameData record, then the flag byte the Lua entry points
+        // pass (`00c24b00` IgnorePlayer 1, `00c24c00` StopIgnoringPlayer 0).
+        FriendCommand::IgnoreRequest => FriendRequest::Ignore {
+            name: reader.name()?,
+            ignore: reader.boolean()?,
+        },
+        FriendCommand::ConfirmFriendRequest => {
             return Err(FriendError::UnrecoveredBody(command.class_name()));
         }
     };

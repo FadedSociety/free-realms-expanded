@@ -328,8 +328,9 @@ fn offline_one_sided_ignored_unknown_and_unplaced_identities_are_absent() {
     ]);
     assert_eq!(positions(&social, A, &spots).len(), 3);
 
-    // B removes A: A still lists B, but B no longer lists A, so B's location is not shared.
-    social.remove_friend(B, &name(A), &directory).unwrap();
+    // B's list lost A (a one-sided state an older save can hold; removal itself is mutual now):
+    // A still lists B, but B no longer lists A, so B's location is not shared.
+    social.profile_mut(B).unwrap().friends.remove(&A);
     // C logs out.
     social.logout(C).unwrap();
     // D ignores A.

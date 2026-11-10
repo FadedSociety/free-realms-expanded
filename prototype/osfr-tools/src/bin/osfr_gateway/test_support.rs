@@ -6,8 +6,46 @@ use super::*;
 use osfr_tools::item_bar::use_wire::{
     ActionBarSlotUpdate, Target, decode_slot_update, encode_client_request_start_ability,
 };
+use osfr_tools::identity::Resources;
 use osfr_tools::players::PlayerPresentation;
 use osfr_tools::{game_store::Snapshot, gameplay::GameplayState};
+
+/// The character creator's resource tables, cut to one model and one item per slot (L043), for
+/// any rig that makes synthetic account-store characters with `account::create_character`.
+pub fn creator_resources(root: &Path) -> Resources {
+    let dir = root.join("creator");
+    let create = dir.join("CharacterCreate");
+    fs::create_dir_all(&create).unwrap();
+    let mut model = vec!["0"; 17];
+    model[0] = "1";
+    model[5] = "1";
+    model[13] = "1";
+    fs::write(dir.join("Models.txt"), model.join("^")).unwrap();
+    for (file, row) in [
+        ("HeadMappings.txt", "1^head.adr^"),
+        ("HairMappings.txt", "2^hair.adr^"),
+        ("ModelCustomizationMappings.txt", "1^beard.adr^"),
+        ("FacePaintMappings.txt", "0^none^"),
+        ("SkinToneMappings.txt", "1^skin.adr^"),
+    ] {
+        fs::write(create.join(file), row).unwrap();
+    }
+    let mut definitions = String::new();
+    for (id, slot) in [(201, 5), (189, 4), (199, 3)] {
+        let mut row = vec!["0".to_owned(); 42];
+        row[0] = id.to_string();
+        row[12] = slot.to_string();
+        row[16] = "item.adr".into();
+        row[17] = "1".into();
+        row[18] = "cloth".into();
+        row[19] = "0".into();
+        row[41] = "tint".into();
+        definitions.push_str(&row.join("^"));
+        definitions.push('\n');
+    }
+    fs::write(create.join("ItemDefinitions.txt"), definitions).unwrap();
+    Resources::load(&dir).unwrap()
+}
 
 #[path = "../../../tests/common/item_catalogue.rs"]
 #[allow(dead_code)]

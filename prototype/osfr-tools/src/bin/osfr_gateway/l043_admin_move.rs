@@ -12,6 +12,11 @@ const HANDOFF: &[u8] = b"l043-synthetic-handoff";
 /// Cobblestone Village's hub row (`piece_077` CURATED id 7): no captured facing, no terrain here.
 const COBBLESTONE: [f32; 3] = [-1904.46, -39.79, 413.316];
 
+/// The character creator's resource tables, shared with the friends rig in `test_support`.
+fn resources(root: &Path) -> Resources {
+    test_support::creator_resources(root)
+}
+
 struct Rig {
     scratch: Scratch,
     server: Server,
@@ -20,42 +25,6 @@ struct Rig {
     guids: BTreeMap<&'static str, u64>,
     keys: BTreeMap<u64, SessionKey>,
     next_id: u64,
-}
-
-/// The character creator's resource tables, cut to one model and one item per slot.
-fn resources(root: &Path) -> Resources {
-    let dir = root.join("creator");
-    let create = dir.join("CharacterCreate");
-    fs::create_dir_all(&create).unwrap();
-    let mut model = vec!["0"; 17];
-    model[0] = "1";
-    model[5] = "1";
-    model[13] = "1";
-    fs::write(dir.join("Models.txt"), model.join("^")).unwrap();
-    for (file, row) in [
-        ("HeadMappings.txt", "1^head.adr^"),
-        ("HairMappings.txt", "2^hair.adr^"),
-        ("ModelCustomizationMappings.txt", "1^beard.adr^"),
-        ("FacePaintMappings.txt", "0^none^"),
-        ("SkinToneMappings.txt", "1^skin.adr^"),
-    ] {
-        fs::write(create.join(file), row).unwrap();
-    }
-    let mut definitions = String::new();
-    for (id, slot) in [(201, 5), (189, 4), (199, 3)] {
-        let mut row = vec!["0".to_owned(); 42];
-        row[0] = id.to_string();
-        row[12] = slot.to_string();
-        row[16] = "item.adr".into();
-        row[17] = "1".into();
-        row[18] = "cloth".into();
-        row[19] = "0".into();
-        row[41] = "tint".into();
-        definitions.push_str(&row.join("^"));
-        definitions.push('\n');
-    }
-    fs::write(create.join("ItemDefinitions.txt"), definitions).unwrap();
-    Resources::load(&dir).unwrap()
 }
 
 impl Rig {

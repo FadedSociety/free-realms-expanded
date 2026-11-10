@@ -423,26 +423,28 @@ fn chat_request(channel: u16, message: &str, target: Option<(&str, &str)>) -> Ve
     out
 }
 
+/// 26/14 as the client writes it (`0092a930`): the header and one display-name string.
 fn friend_request(first: &str, last: &str) -> Vec<u8> {
     let mut out = vec![26, 0, 14, 0];
-    put_string(&mut out, first);
-    put_string(&mut out, last);
+    put_string(&mut out, &format!("{first} {last}"));
     out
 }
 
-fn friend_response(requester_guid: u64, target_guid: u64) -> Vec<u8> {
+/// 26/17 as the GAQ pop-up sends it (`00a0f330`): the requester's guid from the 26/16 invite,
+/// a u32 status (0 accept) and the NameData record.
+fn friend_response(requester_guid: u64) -> Vec<u8> {
     let mut out = vec![26, 0, 17, 0];
     out.extend_from_slice(&requester_guid.to_le_bytes());
-    out.extend_from_slice(&target_guid.to_le_bytes());
-    out.push(1); // (R) The W23 response parser interprets nonzero as acceptance.
+    out.extend_from_slice(&0u32.to_le_bytes());
     name_record(&mut out, "Aster", "One");
     out
 }
 
+/// 26/30 as the client writes it (`00c22400`): the NameData record, then the flag byte.
 fn ignore_request(add: bool, first: &str, last: &str) -> Vec<u8> {
-    let mut out = vec![26, 0, 30, 0, u8::from(add)];
-    put_string(&mut out, first);
-    put_string(&mut out, last);
+    let mut out = vec![26, 0, 30, 0];
+    name_record(&mut out, first, last);
+    out.push(u8::from(add));
     out
 }
 
@@ -1129,7 +1131,7 @@ fn two_clients_share_world_routing_but_keep_their_sessions_and_saves() {
             .iter()
             .any(|message| is_family(message, 26, 16))
     );
-    let mut friend_added = first.send(&mut server, &application(6, &friend_response(3, 2)));
+    let mut friend_added = first.send(&mut server, &application(6, &friend_response(3)));
     friend_added.extend(second.drain(&mut server));
     assert!(
         friend_added
