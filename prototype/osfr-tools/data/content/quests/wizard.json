@@ -1841,11 +1841,119 @@
       "prerequisite_quest_ids": [
         3160024
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 24460,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Karin Spellweaver in Sanctuary (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_missing_student_sven_14e6de)."
+            }
+          ],
+          "npc_id": 9000000126
+        },
+        {
+          "kind": "visit_position",
+          "id": 2,
+          "text_string_id": 24561,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Search for Sven at the Tangletrack Speedway (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_missing_student_sven_14e6de)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) proximity counts: radius 15 m visit_position on the client POI 34 'Tangletrack Speedway' (snapshot.json points_of_interest), the same pattern as shipped record 3010012; the step's real trigger is unknown."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client text 24561: 'Search for Sven at the Tangletrack Speedway'."
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -273.8,
+            -58.8,
+            1951.9
+          ],
+          "radius": 15.0
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 115713,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Ask people around Tangletrack Speedway if they have seen Sven (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_missing_student_sven_14e6de)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 115714: 'Ask people in the area if they've seen Sven.'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no record names who answers; Shamus Sootbender 9500000210 (drawn) stands at the speedway, 3 m from client POI 34 Tangletrack Speedway"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Shamus Sootbender is the one drawn NPC at the speedway POI, so 'ask people' is a talk with him; completable"
+            }
+          ],
+          "npc_id": 9500000210
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 115715,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Check the Briar Patch in Briarwood for Sven. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_missing_student_sven_14e6de)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client text 115715 'Check the Briar Patch in Briarwood for Sven'; npcs/briarwood.json Sven 9000000209 is placed at the Briar Patch POI (poi_anchor, in world-sets drawable)."
+            }
+          ],
+          "npc_id": 9000000209
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76435,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Disciple Wizard Shoes (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_missing_student_sven_14e6de)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            },
+            {
+              "definition_id": 76436,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Disciple Wizard Shoes (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_missing_student_sven_14e6de)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "12": 167
           },
@@ -1893,10 +2001,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 22310,
-      "enabled": false
+      "enabled": true,
+      "job": 12
     },
     {
       "id": 3160027,

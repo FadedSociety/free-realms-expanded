@@ -5438,9 +5438,61 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part F. Festival of Hearts NPCs, row 114; source cell: [client][video][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3955888,
+          "title": "Petal Picker",
+          "title_string_id": 426990,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Petal Picker (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_petal_picker_86c2f1)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3955737,
+          "title": "A Bundle of Love",
+          "title_string_id": 427041,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Bundle of Love (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_bundle_of_love_c7cd11)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3955895,
+          "title": "Potion Testing: Version 6.0",
+          "title_string_id": 427046,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Potion Testing: Version 6.0 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_potion_testing_version_6_0_50cfd1)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3955888,
+        3955737,
+        3955895
+      ],
       "quests_given_text": [
         "Wiki list: Petal Picker (repeatable), A Bundle of Love, Potion Testing: Version 6.0, Ooey, Gooey Love, Potion Testing: Version 7.0, Where is the Love?, Softening the Stone, Sleeping Pixie, Stone Heart's Hideaway (repeatable). See the quest table for title ids and the strings that fit each."
       ],
@@ -5888,10 +5940,17 @@
             "kind": "client",
             "evidence": "Client Resources/Models.txt row 2044 (fairy_m_cudip.adr), the only model named for Cudip; the file ships in Assets_manifest.txt."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 2044,
-      "model_file_name": "fairy_m_cudip.adr"
+      "model_file_name": "fairy_m_cudip.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000378,
@@ -7186,11 +7245,28 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part D. Townsfolk and visitors, row 76; source cell: [client][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3955802,
+          "title": "Dubawug's Sweetheart",
+          "title_string_id": 427205,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Dubawug's Sweetheart (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_dubawug_s_sweetheart_5babe8)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3000376,
-        3000377
+        3000377,
+        3955802
       ],
       "quests_given_text": [
         "Dubawug's Sweetheart (wiki: only available in the 2010 Festival; \"Help Dubawug win back his sweetheart.\", 3966958711; \"Pay Cudip for Dubawug\", 4031112949); birthday gifts: ask the ladies around town what they would like (2441056566, 2695342494, 1333285077), then pick up pie from Jarvie and pots and pans from Plexi (475223862). Titles for the birthday chain not found."

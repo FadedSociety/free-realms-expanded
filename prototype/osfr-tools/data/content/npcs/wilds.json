@@ -10073,10 +10073,276 @@
               "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
             }
           ]
+        },
+        {
+          "quest_id": 3140006,
+          "title": "Soccer Star: The Perfect Mascot",
+          "title_string_id": 414931,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Soccer Star.md: Quest line > Arc 1 - Joining the Sidekicks (Snowhill and the Northern Wilds), row 3; name 'Soccer Star: The Perfect Mascot'; title id cell 3874475707 ucdt; 245246518 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3140006 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3140007,
+          "title": "Soccer Star: Achieve Level 2",
+          "title_string_id": 409604,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Soccer Star.md: Quest line > Arc 1 - Joining the Sidekicks (Snowhill and the Northern Wilds), row 4; name 'Soccer Star: Achieve Level 2'; title id cell 1969924000 ucdt; 175578003 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3140007 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3140008,
+          "title": "Soccer Star: Slowing the Snowspurs",
+          "title_string_id": 407414,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Soccer Star.md: Quest line > Arc 1 - Joining the Sidekicks (Snowhill and the Northern Wilds), row 5; name 'Soccer Star: Slowing The Snowspurs'; title id cell 83482064 ucdt; 3306887379 ugdt (bare \"Slowing The Snowspurs\" 2623699549 ucdt, 2749696631 ugdt)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3140008 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3140009,
+          "title": "Soccer Star: Goal Stopper",
+          "title_string_id": 407409,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Soccer Star.md: Quest line > Arc 1 - Joining the Sidekicks (Snowhill and the Northern Wilds), row 6; name 'Soccer Star: Goal Stopper'; title id cell 4208100866 ucdt; 2861131145 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3140009 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3140011,
+          "title": "Soccer Star: Achieve Level 5",
+          "title_string_id": 409661,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Soccer Star.md: Quest line > Arc 2 - The season: Briarwood, mascot, Cheetahs, Mud Hoppers, row 8; name 'Soccer Star: Achieve Level 5'; title id cell 3865674054 ucdt; 187072902 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3140011 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3140010,
+          "title": "Soccer Star: Power Game",
+          "title_string_id": 414935,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Soccer Star.md: Quest line > Arc 1 - Joining the Sidekicks (Snowhill and the Northern Wilds), row 7; name 'Soccer Star: Power Game'; title id cell 2780613731 ucdt; 2076303469 ugdt"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Soccer Star.md: Quest line > Arc 1 - Joining the Sidekicks (Snowhill and the Northern Wilds), row 7; name 'Soccer Star: Power Game'; title id cell 2780613731 ucdt; 2076303469 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3140010 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3140021
+        3140021,
+        3140006,
+        3140007,
+        3140008,
+        3140009,
+        3140011,
+        3140010
       ],
       "quests_given_text": [
         "The Soccer Star line from Meeting The Team on: Soccer Star: The Perfect Mascot, Soccer Star: Achieve Level 2, Soccer Star: Slowing The Snowspurs, Soccer Star: Goal Stopper, Soccer Star: Power Game, Soccer Star: Achieve Level 5, Soccer Star: Briarwood's Fancy Feet, Soccer Star: Mascot Madness, Soccer Star: Achieve Level 8, Soccer Star: Cheetahs Double Challenge, Soccer Star: Missing Soccer Balls, Soccer Star: Mud Hopping, Soccer Star: Achieve Level 10, Soccer Star: Black Widows' Rematch, Soccer Star: Trophy Detective, Soccer Star: Returning The Trophy, Soccer Star: Achieve Level 13, Soccer Star: Making The Finals, Soccer Star: Twinkle Toes, Soccer Star: Achieve Level 15, Soccer Star: Ants In The Pants, Soccer Star: Robgoblin Troublemakers, Soccer Star: Achieve Level 19, Soccer Star: Tournament Champion."
@@ -24243,51 +24509,10 @@
               "evidence": "title_string_id corrected from raw locale hash 3675828643 to Global.Text id 403471 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
-        },
-        {
-          "quest_id": 3060031,
-          "title": "Demo Derby: An Incomplete Set",
-          "title_string_id": 403472,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 4: The film set at Wildwood (Sir Horace, Sydney Spellmerg, Jace Wildwheel), row 28; name 'Demo Derby: An Incomplete Set'; title id cell 1000985040 ucdt; 1223934510 ugdt"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3060031 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 1000985040 to Global.Text id 403472 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
         }
       ],
       "quest_ids_given": [
-        3060030,
-        3060031
+        3060030
       ],
       "quests_given_text": [
         "Demo Derby: Stunt Double, Demo Derby: An Incomplete Set (inferred); likely also Demo Derby: Not One, But a Few."
@@ -39031,9 +39256,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -994.679016,
-        -6.470751,
-        438.268687
+        -2272.89,
+        -16.4,
+        582.56
       ],
       "position_w": null,
       "rotation": [
@@ -39271,11 +39496,11 @@
         "position": [
           {
             "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 31,32,60,69 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
+            "evidence": "client POI 31 Wildwood Speedway: startup snapshot world.points_of_interest row 31 at [-2267.635, -16.33359, 585.4462]; the terrain grid gives the height"
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "evidence": "(R) The guide puts Sir Horace 'outside of Wildwood' (the Series 4 film set), so the body stands 6.0 m west of client POI 31 Wildwood Speedway on open terrain (editor probe, 2026-11-09). The earlier spot [-994.7, -6.5, 438.3] wa zone-centre offset 11.5 m under the Sanctuary terrain. The placement fields and position_reason still describe that zone-centre offset: the Merry Vale greetings guard lets a foreign row move only its position and these tags, so this tag is the current account of where the body stands."
           }
         ],
         "position_reason": [
@@ -39341,10 +39566,17 @@
             "kind": "client",
             "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 1306,
-      "model_file_name": "fairy_m_sir_horace.agr"
+      "model_file_name": "fairy_m_sir_horace.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000945,
@@ -41851,11 +42083,175 @@
               "evidence": "title_string_id corrected from raw locale hash 2178802008 to Global.Text id 403477 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3060033,
+          "title": "Demo Derby: Hurtin' Crewe Act II",
+          "title_string_id": 403474,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 4: The film set at Wildwood (Sir Horace, Sydney Spellmerg, Jace Wildwheel), row 30; name \"Demo Derby: Hurtin' Crewe Act II\"; title id cell 2603366820 ucdt; 2422005024 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3060033 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3060035,
+          "title": "Demo Derby: Sir Horace the Horrible",
+          "title_string_id": 403475,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 4: The film set at Wildwood (Sir Horace, Sydney Spellmerg, Jace Wildwheel), row 32; name 'Demo Derby: Sir Horace the Horrible'; title id cell 3537090994 ucdt; 1372874891 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3060035 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3060034,
+          "title": "Demo Derby: Pixiewood Premiere",
+          "title_string_id": 403476,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 4: The film set at Wildwood (Sir Horace, Sydney Spellmerg, Jace Wildwheel), row 31; name 'Demo Derby: Pixiewood Premiere'; title id cell 1480802479 ucdt; 2347033017 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3060034 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3060038,
+          "title": "Demo Derby: Copy Cat",
+          "title_string_id": 403478,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 5: Tangletrack arena (Jackson Spinner, pirates, movie copycats), row 35; name 'Demo Derby: Copy Cat'; title id cell 2873981572 ucdt; 865462143 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3060038 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3060032,
-        3060036
+        3060036,
+        3060033,
+        3060035,
+        3060034,
+        3060038
       ],
       "quests_given_text": [
         "Demo Derby: Action!, Demo Derby: Hurtin' Crewe Act II, Demo Derby: Sir Horace the Horrible, Demo Derby: Encore! (inferred), Demo Derby: Copy Cat (Tangletrack), Demo Derby: Pixiewood Premiere (shared with Jace)."
@@ -41867,9 +42263,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -984.60859,
-        -6.470751,
-        444.6287
+        -2273.45,
+        -16.4,
+        586.94
       ],
       "position_w": null,
       "rotation": [
@@ -42175,11 +42571,11 @@
         "position": [
           {
             "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 31,32,60,69 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
+            "evidence": "client POI 31 Wildwood Speedway: startup snapshot world.points_of_interest row 31 at [-2267.635, -16.33359, 585.4462]; the terrain grid gives the height"
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "evidence": "(R) The guide puts Sydney Spellmerg 'outside of Wildwood' (the Series 4 film set), so the body stands 6.0 m west of client POI 31 Wildwood Speedway on open terrain (editor probe, 2026-11-09). The earlier spot [-984.6, -6.5, 444.6] wa zone-centre offset 11.5 m under the Sanctuary terrain. The placement fields and position_reason still describe that zone-centre offset: the Merry Vale greetings guard lets a foreign row move only its position and these tags, so this tag is the current account of where the body stands."
           }
         ],
         "position_reason": [
@@ -42245,10 +42641,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Sydney_Spellmerg"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 312,
-      "model_file_name": "human_m_freestyle_03.agr"
+      "model_file_name": "human_m_freestyle_03.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000950,

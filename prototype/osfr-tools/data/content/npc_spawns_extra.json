@@ -14093,8 +14093,8 @@
       "legacy_npc_id": 2184,
       "model_id": 250,
       "model_file_name": "chugawug_farmer_f.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Chugawug",
+      "name_string_id": 2236,
       "position": [
         -1082.327,
         -38.73688,
@@ -18009,7 +18009,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1210; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2467 (ModelId=688, ModelFileName=humanchild_m_afro.adr, NameId=21430)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500004525
     },
     {
       "spawn_guid": 100000002469,
@@ -21355,7 +21356,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1391; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2648 (ModelId=65, ModelFileName=chugawug_m_greenwood_soldier.adr, NameId=72393)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500004581
     },
     {
       "spawn_guid": 100000002649,
@@ -22976,7 +22978,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1489; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2746 (ModelId=65, ModelFileName=chugawug_m_greenwood_soldier.adr, NameId=72211)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500004546
     },
     {
       "spawn_guid": 100000002747,
@@ -23636,7 +23639,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1525; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2782 (ModelId=64, ModelFileName=chugawug_f_greenwood_soldier.adr, NameId=72203)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500004582
     },
     {
       "spawn_guid": 100000002783,
@@ -23909,7 +23913,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1545; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2802 (ModelId=65, ModelFileName=chugawug_m_greenwood_soldier.adr, NameId=72379)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500004583
     },
     {
       "spawn_guid": 100000002807,
@@ -77687,7 +77692,8 @@
           "evidence": "(R) Body fairychild_f_sleevesandshorts.adr, a generic pixie child for 'a girl' (nearest other use 217 m), not checked by eye against the portrait. Stands among the spawned dogs and dog owners in the Queensfields, 4.2 m from Buddy, y copied from Buddy (terrain grid -30.36)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500004506
     },
     {
       "spawn_guid": 100000090008,
@@ -78324,7 +78330,8 @@
           "evidence": "(R) Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". No video sighting. No source gives her spot: midway between the other two drawn sentries, Private Chimachug (-633.7, 2011.0) and Private Gorgil (-464.8, 2323.2). Probe: all directions open, no water, flat."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500004586
     },
     {
       "spawn_guid": 100000090030,
@@ -79001,36 +79008,6 @@
         }
       ],
       "spawn_guid": 100000090056
-    },
-    {
-      "legacy_npc_id": null,
-      "model_id": 333,
-      "model_file_name": "sg_collection_node_robgoblin_junkpile_01.adr",
-      "name": "Whizzlebang Whirlygig",
-      "name_string_id": null,
-      "position": [
-        -469.09,
-        9.6,
-        775.54
-      ],
-      "position_w": null,
-      "heading": 3.11,
-      "capture_match": null,
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "21788 'Find a whizzlebang whirlygig remote control from a junkpile in the robgoblin camp'."
-        },
-        {
-          "kind": "wiki",
-          "evidence": "fr_quest_missing_marty: 'in a big junkpile behind Fizzlesticks' wagon'."
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) No client name for the thing; name is the step's words, null name id. Body 333, the robgoblin junkpile collection node, seen in model-view (red and blue scrap heap); the plain sg_robgoblin_junkpile_01 (276) renders nothing. The wagon itself was not located: 12 m from Fizzlesticks. Probe: no water, flat, open 7/8."
-        }
-      ],
-      "spawn_guid": 100000090057
     },
     {
       "legacy_npc_id": null,

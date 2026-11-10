@@ -5024,8 +5024,27 @@
       "location_evidence": [
         "Shrouded Glade"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3955824,
+          "title": "Foreign Lumber",
+          "title_string_id": 91044,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Foreign Lumber (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_foreign_lumber_06c060)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3955824
+      ],
       "quests_given_text": [
         "Lumber-scouting quest"
       ],
@@ -5331,10 +5350,17 @@
             "kind": "legacy-data",
             "evidence": "data/content/npcs/shrouded_glade.json npc_id=9500000658 (same name)"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr"
+      "model_file_name": "fairy_druid_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000047,
@@ -17327,15 +17353,34 @@
         "Werewolf"
       ],
       "roles": [
-        "quest_giver",
-        "enemy"
+        "enemy",
+        "quest_giver"
       ],
       "enemy_kind": "Werewolf",
       "location_evidence": [
         "Blackspore"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3955846,
+          "title": "Howl of Hunger",
+          "title_string_id": 432272,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Howl of Hunger (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_howl_of_hunger_c7899a)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3955846
+      ],
       "quests_given_text": [
         "Howl of Hunger; Howl of Warning (titles 3896567252, 3532653789); chicken errand (2075168490)"
       ],
@@ -17725,10 +17770,17 @@
             "kind": "client",
             "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 3295,
-      "model_file_name": "human_m_werewolf_latte.agr"
+      "model_file_name": "human_m_werewolf_latte.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000039,
@@ -20198,6 +20250,22 @@
               "evidence": "A Dark Future (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_dark_future_4c3d3e)."
             }
           ]
+        },
+        {
+          "quest_id": 3955756,
+          "title": "Being Prepared (Team Werewolf)",
+          "title_string_id": 432210,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Being Prepared (Team Vampire) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_being_prepared_team_vampire_ed9f91)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
@@ -20207,7 +20275,8 @@
         3040056,
         3040057,
         3040058,
-        3952082
+        3952082,
+        3955756
       ],
       "quests_given_text": [
         "Card Duelist: Zelda's Warning; Card Duelist: Heart of Darkness; Card Duelist: Slow and Steady; Card Duelist: Stinky Feet; Card Duelist: Meet the Boss; Card Duelist: The Realmkeepers Are Missing!; Card Duelist: Return from the Rumbledome (Card Duelist); A Dark Future; Being Prepared (Team Vampire); Being Prepared (Team Werewolf) (see Part F)",

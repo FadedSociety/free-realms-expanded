@@ -23991,11 +23991,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:188; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1421 (ModelId=468, ModelFileName=fairy_druid_m.adr, NameId=91750)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.387847,
       "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr"
+      "model_file_name": "fairy_druid_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000696,
@@ -32180,10 +32187,27 @@
               "evidence": "Cool Kids (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cool_kids_a7981f)."
             }
           ]
+        },
+        {
+          "quest_id": 3955806,
+          "title": "Encased in Ice",
+          "title_string_id": 91754,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Encased in Ice (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_encased_in_ice_b817bb)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3954534
+        3954534,
+        3955806
       ],
       "quests_given_text": [
         "Looking for Lavender stop (title ucdt 2150004359; Feldman in Sanctuary: \"Talk to Suni Sorrowsmile in the Shrouded Glade. Return to Feldman in Sanctuary when done.\" 690633245; \"Feldman got a tip that Lavender's old classmate, Suni Sorrowsmile at Shrouded Glade, might have some useful information.\" 2592016959; Sanctuary page row Feldman); Ice magic notes (\"Suni Sorrowsmile wants to see if you can convince Arestol to borrow some notes on druid ice magic.\" 3997502434; deliver to Suni, 1684153362); asks the player to recruit Nayli (2131007632) and to unfreeze Keldon (507761266)."

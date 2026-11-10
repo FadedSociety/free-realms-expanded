@@ -233,7 +233,12 @@ pub fn assert_enabled_archer_chapter_records() {
         .iter()
         .map(|record| record["id"].as_u64().unwrap())
         .collect();
-    assert_eq!(enabled_ids, vec![u64::from(PATH), u64::from(OATH)]);
+    // Lugabow's chapter: Path (3010003), Test of Agility (3010004, live since d7b0b831 "55 more
+    // quests", 2026-11-09) and Oath (3010006); Marksmanship (3010005) stays off.
+    assert_eq!(
+        enabled_ids,
+        vec![u64::from(PATH), 3_010_004, u64::from(OATH)]
+    );
 
     for record in &enabled {
         assert_eq!(record["giver_npc_id"].as_u64(), Some(LUGABOW));
@@ -309,8 +314,10 @@ pub fn assert_enabled_archer_chapter_records() {
     );
     assert_eq!(oath["rewards"][0]["items"], serde_json::json!([]));
 
-    // The chapter deliberately leaves the minigame/field-enemy records disabled.
-    for quest_id in [3_010_004_u64, 3_010_005, 3_010_007] {
+    // The chapter deliberately leaves the minigame/field-enemy records disabled. Test of
+    // Agility (3010004) left this list when d7b0b831 wired it as six pick-ups and a Return to
+    // Lugabow talk, with no minigame step.
+    for quest_id in [3_010_005_u64, 3_010_007] {
         let record = records
             .iter()
             .find(|record| record["id"].as_u64() == Some(quest_id))

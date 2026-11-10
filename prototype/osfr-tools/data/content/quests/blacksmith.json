@@ -49,8 +49,105 @@
       "title_string_id": 78479,
       "giver_npc_id": 9000000206,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "text_string_id": 388237,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Obtain 10 Copper Bars (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_basics_of_blacksmithing_51c13c)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'You can play the Copper Bar minigame as a miner to get the 10 copper bars.'; recipes.json recipe 4 'Copper Bar' (minigame 77, pattern item 381) outputs 5 bars"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) crafting.rs:721 raises CraftRecipe with quantity 1 per run, so two runs make the ten bars; bars bought from players are not counted"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "recipes.json recipe 4 Copper Bar yields 5 per run, so quantity 2 is ten bars; a miner's two smelts complete it"
+            }
+          ],
+          "recipe_id": 4,
+          "quantity": 2
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 78750,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Show Smitty the copper bars (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_basics_of_blacksmithing_51c13c)."
+            }
+          ],
+          "npc_id": 9000000206
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 41667,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Smitty (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_basics_of_blacksmithing_51c13c)."
+            }
+          ],
+          "npc_id": 9000000206
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [
+            {
+              "definition_id": 1356,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Blacksmith Boots (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_basics_of_blacksmithing_51c13c)."
+                }
+              ]
+            },
+            {
+              "definition_id": 2509,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Power Charmed Wand Recipe (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_basics_of_blacksmithing_51c13c)."
+                }
+              ]
+            },
+            {
+              "definition_id": 2505,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Quick Shot Bow Recipe (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_basics_of_blacksmithing_51c13c)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Blacksmith: Basics of Blacksmithing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_basics_of_blacksmithing_51c13c)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The wiki lists no coins for this quest; it pays the usual few coins (5) so the end screen has a reward. Its 'Unlocks Blacksmith Job' cell is not an item row; the unlock is not granted here."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -87,12 +184,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 78480,
       "intro_text_string_id": 78478,
       "end_text_string_id": 78481,
-      "enabled": false
+      "enabled": true,
+      "job": 16
     },
     {
       "id": 3020003,
@@ -2814,7 +2916,62 @@
       "title_string_id": 439706,
       "giver_npc_id": 9000000179,
       "prerequisite_quest_ids": [],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 439747,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect Copper Ore - 0/10 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_grunt_work_b4ec39)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: model sg_mining_node_ore_briarwood_copper_01.agr is in Models.txt, seen by eye below"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: orange crystal ore cluster (sheets/h_harvest.png r2c0, tile of sg_mining_node_ore_briarwood_copper_01.agr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_blacksmith_grunt_work_b4ec39)."
+            }
+          ],
+          "node_type": "quest-ore",
+          "quantity": 10
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 439749,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect Sunstones - 0/10 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_grunt_work_b4ec39)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 439746: 'Collect Copper Ore and Sunstones from around Rumble Ridge.'; 439749 'Collect Sunstones'; 439750 'Collect Sunstones from Sunstone Copper Veins.'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client POI 151 Rumble Ridge at (501, 70, 1775); mining.json has no sunstone output, so gather_resource cannot count them"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "objects.json: 4022 sg_mining_node_sunstonecopper_01 seen as an orange crystal ore cluster (sheets/h_harvest.png r2c1)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) twelve spots 6-15 m around the POI, 7 m apart"
+            }
+          ],
+          "node_type": "quest-sunstone",
+          "quantity": 10
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -2826,6 +2983,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 75 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020033)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The wiki also lists Metal Cactoid Illusion Recipe, which matches no row of the item table; not granted."
             }
           ]
         }
@@ -2866,12 +3027,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 439707,
       "intro_text_string_id": 439705,
       "end_text_string_id": 439708,
-      "enabled": false
+      "enabled": true,
+      "job": 16
     },
     {
       "id": 3020034,

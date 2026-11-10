@@ -263,7 +263,8 @@ fn smitty_offers_the_merchandise_lesson_only_to_blacksmiths() {
     );
 
     // A real Blacksmith (profile 16 unlocked and active) gets exactly one 49/1 for 3020003,
-    // without the disabled 3020002 unlock quest being completed.
+    // without the 3020002 unlock quest (Basics of Blacksmithing, live since d7b0b831) being
+    // accepted or completed: 3020003 lists no prerequisite.
     let mut blacksmith = blacksmith_game(&fixture, CHARACTER, 0);
     let offered = offer(&mut blacksmith, &smitty, SMITTY, MERCHANDISE, now + 10);
     assert_eq!(
@@ -288,7 +289,7 @@ fn smitty_offers_the_merchandise_lesson_only_to_blacksmiths() {
             .unwrap()
             .quests
             .contains_key(&3_020_002),
-        "3020002 stays disabled and is not required as a prerequisite"
+        "3020002 is not a prerequisite of 3020003 and the lesson offer does not add it to the log"
     );
 }
 

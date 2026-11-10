@@ -344,16 +344,17 @@ fn the_loader_binds_each_giver_and_turn_in() {
     }
 }
 
-/// The ten quests of the two wiring lists that stay off, and the one blocker the server can
+/// The nine quests of the two wiring lists that stay off, and the one blocker the server can
 /// check: `Some(item)` is a gather target no server mining or harvesting game yields. The rest
 /// are in `notes/Autopilot/T669.md`: a giver nobody draws, a client-reported step, an item the
-/// catalogue lacks, a recipe without an id.
+/// catalogue lacks, a recipe without an id. The tenth, Chef 3050025, went live in d7b0b831
+/// ("55 more quests", 2026-11-09).
 #[test]
+// Named when ten rows were off; one has since gone live.
 fn the_other_ten_stay_off_until_their_blocker_lifts() {
-    const OFF: [(u32, Option<u32>); 10] = [
+    const OFF: [(u32, Option<u32>); 9] = [
         (3_000_043, None),
         (3_000_044, None),
-        (3_050_025, None),
         (3_070_019, None),
         (3_090_019, None),
         (3_090_020, Some(77_549)),

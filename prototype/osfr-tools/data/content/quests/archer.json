@@ -236,11 +236,185 @@
       "prerequisite_quest_ids": [
         3010003
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 387176,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Touch the first target dummy! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_test_of_agility_aef5e8)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: straw practice target with arrows stuck in it, arms out (sheets/d_creatures.png r3c0, tile of sg_chugawug_targets_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_archer_test_of_agility_aef5e8)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the world's Practice Dummy 387 stands at Lugabow's camp but renders as fragments, so 226 is the one actually seen"
+            }
+          ],
+          "node_type": "quest-dummy",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 22107,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Touch the second target dummy! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_test_of_agility_aef5e8)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: straw practice target with arrows stuck in it, arms out (sheets/d_creatures.png r3c0, tile of sg_chugawug_targets_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_archer_test_of_agility_aef5e8)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the world's Practice Dummy 387 stands at Lugabow's camp but renders as fragments, so 226 is the one actually seen"
+            }
+          ],
+          "node_type": "quest-dummy-2",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 3,
+          "text_string_id": 22109,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Touch the third target dummy! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_test_of_agility_aef5e8)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: straw practice target with arrows stuck in it, arms out (sheets/d_creatures.png r3c0, tile of sg_chugawug_targets_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_archer_test_of_agility_aef5e8)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the world's Practice Dummy 387 stands at Lugabow's camp but renders as fragments, so 226 is the one actually seen"
+            }
+          ],
+          "node_type": "quest-dummy-3",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 4,
+          "text_string_id": 22113,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Touch the fourth target dummy! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_test_of_agility_aef5e8)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: straw practice target with arrows stuck in it, arms out (sheets/d_creatures.png r3c0, tile of sg_chugawug_targets_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_archer_test_of_agility_aef5e8)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the world's Practice Dummy 387 stands at Lugabow's camp but renders as fragments, so 226 is the one actually seen"
+            }
+          ],
+          "node_type": "quest-dummy-4",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 5,
+          "text_string_id": 22115,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Touch the fifth target dummy! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_test_of_agility_aef5e8)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: straw practice target with arrows stuck in it, arms out (sheets/d_creatures.png r3c0, tile of sg_chugawug_targets_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_archer_test_of_agility_aef5e8)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the world's Practice Dummy 387 stands at Lugabow's camp but renders as fragments, so 226 is the one actually seen"
+            }
+          ],
+          "node_type": "quest-dummy-5",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 6,
+          "text_string_id": 22117,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Touch the sixth target dummy! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_test_of_agility_aef5e8)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'touch all six of the target dummies before the timer runs out'; Lugabow 9000000387 at (-1915.3, -37, -636.3)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "objects.json: 226 sg_chugawug_targets_01 seen as a straw practice target (sheets/d_creatures.png r3c0); quest_wire's ring ran out of room for the sixth"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) placed 17 m from Lugabow, beyond the 6-15 m ring the first five use"
+            }
+          ],
+          "node_type": "quest-dummy",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 7,
+          "text_string_id": 22083,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Lugabow (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_test_of_agility_aef5e8)."
+            }
+          ],
+          "npc_id": 9000000387
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75733,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Hen Feather Archer Boots (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_test_of_agility_aef5e8)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "35": 84
           },
@@ -288,11 +462,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 22103,
       "intro_text_string_id": 22101,
-      "enabled": false
+      "enabled": true,
+      "job": 35
     },
     {
       "id": 3010005,

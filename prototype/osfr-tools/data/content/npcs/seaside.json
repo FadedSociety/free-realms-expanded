@@ -35182,8 +35182,44 @@
       "location_evidence": [
         "On the boardwalk (2669395519)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3955834,
+          "title": "Going Coco-Nuts!",
+          "title_string_id": 75538,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Going Coco-Nuts! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_going_coco_nuts_997b2d)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3955832,
+          "title": "Gathering Coconuts",
+          "title_string_id": 389261,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Gathering Coconuts (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_gathering_coconuts_407aa2)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3955834,
+        3955832
+      ],
       "quests_given_text": [
         "Members-only per wiki: collect coconuts and deliver Chilly Coconut drinks before they melt (927130766, 1175929175, 2542758746, 2749075229); title not found"
       ],
@@ -35651,11 +35687,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:602; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1843 (ModelId=365, ModelFileName=human_m_burton_01.agr, NameId=45580)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.119171,
       "model_id": 365,
-      "model_file_name": "human_m_burton_01.agr"
+      "model_file_name": "human_m_burton_01.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000617,

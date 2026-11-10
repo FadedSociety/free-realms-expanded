@@ -14567,10 +14567,27 @@
               "evidence": "The Golden Bear of Greenwood (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_golden_bear_of_greenwood_4a95d2)."
             }
           ]
+        },
+        {
+          "quest_id": 3955836,
+          "title": "Greenwood Toads",
+          "title_string_id": 71564,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Greenwood Toads (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_greenwood_toads_d1b385)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3952407
+        3952407,
+        3955836
       ],
       "quests_given_text": [
         "Greenwood Toads (client title 187833044, ugdt 3370751021): \"Find the places in Greenwood where toads live, and we'll reward you!\" (1638384594, 635119819, 1559291360). The Golden Bear of Greenwood (client title 620234978, ugdt 598876220; the wiki says Isabella hosts it): \"Find the Golden Bear of Greenwood Forest.\" (4079581822), the bear \"only wanders the forest at nighttime\" (695989523, 2212038982), \"We could really use information about the whereabouts of any golden bears\" (449245327). She also moves the player on: \"she might be able to put you to work\" (1653812357)."
@@ -16898,12 +16915,61 @@
         },
         {
           "quest_id": 3010006
+        },
+        {
+          "quest_id": 3010004,
+          "title": "Archer: Test of Agility",
+          "title_string_id": 22102,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0: unlocking the job (Lugabow, Greenwood Camp), row 2; name 'Archer: Test of Agility'; title id cell ucdt 2872736102 / ugdt 698740440"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0: unlocking the job (Lugabow, Greenwood Camp), row 2; name 'Archer: Test of Agility'; title id cell ucdt 2872736102 / ugdt 698740440"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3010004 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row 1; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3010003,
         3010006,
-        3010035
+        3010035,
+        3010004
       ],
       "quests_given_text": [
         "Full line on Archer: Path of the Archer (unlocks the job), Archer: Test of Agility, Archer: Taking Aim, Archer: Oath of Honor; entry quests \"Being a Better Archer\" and \"Aiming For Archery\" point to her. The wiki also lists the quest Thugawugs under her and names her in Lofty Letter (an Adventurer side quest); a letter to her from a guard named Trusty is in the client (3739059730, 2181619100) and is not tied to a title. Weapon-testing text: \"Help Lugabow with her weapons testing in the Greenwood Camp.\" (3032659489, title not found). Related: Miner: Arrowheads for Lugabow; blacksmith bow orders (2576706017)."

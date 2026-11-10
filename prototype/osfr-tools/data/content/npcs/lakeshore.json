@@ -3000,8 +3000,27 @@
       "location_evidence": [
         "Not stated. She waits while the player searches for Mino at \"the waterfall east of Lakeshore\" (3168149344, 3216991838)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3955821,
+          "title": "Finding Mino",
+          "title_string_id": 36472,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Finding Mino (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_finding_mino_831f54)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3955821
+      ],
       "quests_given_text": [
         "\"Finding Mino\" (client titles 2761785727, 3046856435; 1856303934). Jewellery-chest search \"Find Dori Tendersole's jewelry chest\" (4243880494, 4208959633); title not found. \"Deliver to Dori\" (3125144943)."
       ],
@@ -4626,8 +4645,27 @@
       "location_evidence": [
         "\"Ivan at the camp just south of Lakeshore\" (2194763594)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3955910,
+          "title": "Scary Stories",
+          "title_string_id": 40520,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Scary Stories (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_scary_stories_acb281)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3955910
+      ],
       "quests_given_text": [
         "\"Ivan's Missing Satchel\" (client title 3319927220; ugdt 4016228332): explore the monster-head cave east of Cobblestone Village and recover his satchel (1100005951, 2050890848)."
       ],
@@ -5009,10 +5047,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Ivan_Smolderwing"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr"
+      "model_file_name": "fairy_druid_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000129,
@@ -13399,14 +13444,34 @@
         "The zoo's owner and zookeeper. \"He feels that the animals should be able to roam freely, without fences.\" Not Sam Potts, the Card Duelist trainer in Sanctuary."
       ],
       "roles": [
+        "quest_giver",
         "trainer"
       ],
       "enemy_kind": null,
       "location_evidence": [
         "Wiki: Lakeshore. The client gives no place. A bear-keeper's line blames him: \"How am I supposed to make sure no animals leave the park if Sam insists on letting them 'roam freely'!?\" (2726196253)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3955939,
+          "title": "The Park Tour",
+          "title_string_id": 102201,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Park Tour (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_park_tour_ac42fa)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3955939
+      ],
       "quests_given_text": [
         "None found. The only quest string that names him is the hand-in \"Return to Sam Durango\" (408958409); the quest it ends is not identified."
       ],
@@ -13808,11 +13873,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:56; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1257 (ModelId=438, ModelFileName=human_m_andrew.agr, NameId=101628)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.748308,
       "model_id": 438,
-      "model_file_name": "human_m_andrew.agr"
+      "model_file_name": "human_m_andrew.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000194,

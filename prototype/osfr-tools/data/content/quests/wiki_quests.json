@@ -1377,13 +1377,17 @@
       ],
       "rewards": [
         {
-          "coins": 61,
+          "coins": 30,
           "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "wiki",
               "evidence": "I'm New at This (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_i_m_new_at_this_a2f9f5)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The wiki row has two unlabelled coin cells, 30 and 31 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_i_m_new_at_this_a2f9f5); the earlier 61 summed them. The lower is paid until the page says which applies."
             }
           ]
         }
@@ -19356,6 +19360,3508 @@
       "enabled": true,
       "intro_text_string_id": 74933,
       "end_text_string_id": 9529
+    },
+    {
+      "id": 3955737,
+      "title_string_id": 427041,
+      "giver_npc_id": 9500000377,
+      "prerequisite_quest_ids": [
+        3955888
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 427058,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pluck a flower in Merry Vale (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_bundle_of_love_c7cd11)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: model ss_deco_flower_04.adr is in Models.txt, seen by eye below"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: blue-green flowers in a pot (sheets/l_existing.png r0c3, tile of ss_deco_flower_04.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_a_bundle_of_love_c7cd11)."
+            }
+          ],
+          "node_type": "quest-flower",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 427060,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pluck a flower from Snowhill (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_bundle_of_love_c7cd11)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: model ss_deco_flower_04.adr is in Models.txt, seen by eye below"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: blue-green flowers in a pot (sheets/l_existing.png r0c3, tile of ss_deco_flower_04.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_a_bundle_of_love_c7cd11)."
+            }
+          ],
+          "node_type": "quest-flower-2-2",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 3,
+          "text_string_id": 427062,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pluck a flower from Seaside (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_bundle_of_love_c7cd11)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: model ss_deco_flower_04.adr is in Models.txt, seen by eye below"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: blue-green flowers in a pot (sheets/l_existing.png r0c3, tile of ss_deco_flower_04.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_a_bundle_of_love_c7cd11)."
+            }
+          ],
+          "node_type": "quest-flower-3",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 427065,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Cudip (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_bundle_of_love_c7cd11)."
+            }
+          ],
+          "npc_id": 9500000377
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [
+            {
+              "definition_id": 7892,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Festival of Hearts Mystery Gift (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_bundle_of_love_c7cd11)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 14 rows (colours); the lowest id is used."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Bundle of Love (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_bundle_of_love_c7cd11)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The wiki lists no coins for this quest; it pays the usual few coins (5) so the end screen has a reward."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "A Bundle of Love (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_bundle_of_love_c7cd11)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 427042,
+      "intro_text_string_id": 427040,
+      "enabled": true
+    },
+    {
+      "id": 3955745,
+      "title_string_id": 36483,
+      "giver_npc_id": 9500000180,
+      "prerequisite_quest_ids": [
+        3955821
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 36498,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Cuttensnip in Thistlerow (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_thorny_situation_0c916d)."
+            }
+          ],
+          "npc_id": 9500000116
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 389066,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Mino (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_thorny_situation_0c916d)."
+            }
+          ],
+          "npc_id": 9500000180
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 61,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Thorny Situation (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_thorny_situation_0c916d)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "A Thorny Situation (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_thorny_situation_0c916d)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 36484,
+      "enabled": true
+    },
+    {
+      "id": 3955752,
+      "title_string_id": 47248,
+      "giver_npc_id": 9500000190,
+      "prerequisite_quest_ids": [
+        3955967
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 47253,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Jonathan (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_asking_the_expert_4b9172)."
+            }
+          ],
+          "npc_id": 9500000152
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 41514,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Parr (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_asking_the_expert_4b9172)."
+            }
+          ],
+          "npc_id": 9500000190
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Asking the Expert (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_asking_the_expert_4b9172)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Asking the Expert (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_asking_the_expert_4b9172)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 47247,
+      "intro_text_string_id": 47247,
+      "enabled": true,
+      "end_text_string_id": 47250
+    },
+    {
+      "id": 3955756,
+      "title_string_id": 432210,
+      "giver_npc_id": 9000000136,
+      "prerequisite_quest_ids": [
+        3952082
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 432266,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Catch a chicken for Lon (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_being_prepared_team_werewolf_c51885)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki card: 'If you catch the chicken south of here, and give it to him'; Madam Zelda 9000000136 at (-2401.7, -30, 1068.2)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "model 535 chicken is quest_wire's checked word model (sheets/m_more.png)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) south is -x on this map; spots 35-50 m south of Zelda"
+            }
+          ],
+          "node_type": "quest-chicken",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 432268,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Lon Blackforest (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_being_prepared_team_werewolf_c51885)."
+            }
+          ],
+          "npc_id": 9500000038
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [
+            {
+              "definition_id": 16537,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Werewolf Cake Slice (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_being_prepared_team_werewolf_c51885)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Being Prepared (Team Werewolf) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_being_prepared_team_werewolf_c51885): the steps are Lon Blackforest's, so this is the werewolf row, not Team Vampire's."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The wiki lists no coins for this quest; it pays the usual few coins (5) so the end screen has a reward."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Being Prepared (Team Vampire) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_being_prepared_team_vampire_ed9f91)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 432211,
+      "enabled": true,
+      "intro_text_string_id": 432260
+    },
+    {
+      "id": 3955781,
+      "title_string_id": 72028,
+      "giver_npc_id": 9500004546,
+      "prerequisite_quest_ids": [
+        3955819
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 72232,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Splash water on Private Gorgil (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cold_water_surprise_a968d4)."
+            }
+          ],
+          "npc_id": 9500004583
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 72234,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Splash water on Private Nabogga (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cold_water_surprise_a968d4)."
+            }
+          ],
+          "npc_id": 9500004586
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 72236,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Splash water on Private Chimachug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cold_water_surprise_a968d4)."
+            }
+          ],
+          "npc_id": 9500004581
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 72192,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Murdunk (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cold_water_surprise_a968d4)."
+            }
+          ],
+          "npc_id": 9500004546
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cold Water Surprise (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cold_water_surprise_a968d4)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Cold Water Surprise (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cold_water_surprise_a968d4)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3955802,
+      "title_string_id": 427205,
+      "giver_npc_id": 9500000381,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 427220,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Get a special potion (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_dubawug_s_sweetheart_5babe8)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'Speak to Cudip for the special potion.'; client 427221: 'See the master of mixing up potions and other magical concoctions at Merry Vale.'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "row 9500000377 is drawn"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the server has no hand-over event for this item; the talk completes the step and the player keeps nothing"
+            }
+          ],
+          "npc_id": 9500000377
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 427222,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give the present to Dubawug's sweetheart (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_dubawug_s_sweetheart_5babe8)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 427222 is this step; client 427242 is Verna's reply about the present from Dubawug; her row says Dubawug's wife"
+            }
+          ],
+          "npc_id": 9500000431
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 387055,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Dubawug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_dubawug_s_sweetheart_5babe8)."
+            }
+          ],
+          "npc_id": 9500000381
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 427234,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pay Cudip for Dubawug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_dubawug_s_sweetheart_5babe8)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 427234 is this step; client 427207 is Cudip's reply when paid"
+            }
+          ],
+          "npc_id": 9500000377
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [
+            {
+              "definition_id": 76821,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Be-Mine Balloon (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_dubawug_s_sweetheart_5babe8)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Dubawug's Sweetheart (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_dubawug_s_sweetheart_5babe8)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The wiki lists no coins for this quest; it pays the usual few coins (5) so the end screen has a reward."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Dubawug's Sweetheart (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_dubawug_s_sweetheart_5babe8)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 427206,
+      "intro_text_string_id": 427204,
+      "enabled": true,
+      "end_text_string_id": 427207
+    },
+    {
+      "id": 3955806,
+      "title_string_id": 91754,
+      "giver_npc_id": 9500000715,
+      "prerequisite_quest_ids": [
+        3954534
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 91761,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Grab a bucket of water (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_encased_in_ice_b817bb)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: model sh_bucket_01.adr is in Models.txt, seen by eye below"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: plain wooden bucket (sheets/a_world_click1.png r2c3, tile of sh_bucket_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_encased_in_ice_b817bb)."
+            }
+          ],
+          "node_type": "quest-water",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 91763,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Toss the hot water on the ice block in Shrouded Glade (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_encased_in_ice_b817bb)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 91764: 'Toss the bucket of hot water on Keldon to melt the ice block that surrounds him.'; Keldon 9500000695 at (177.6, 61, 1171.1)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 4217 'Ice Block'; model 68 sh_icecube_01 loads in the editor (69 KB) but is not in objects.json's checked list"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the block stands 2.5 m from Keldon; carrying the water is not checked"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "/api/assets/model/68: sh_icecube_01.adr, kind prop, status ok (Assets_001.pack)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the block stands 2.5 m from Keldon because the client says the ice surrounds him; a pick-up 2.5 m off is the closest standable point beside him"
+            }
+          ],
+          "node_type": "quest-ice-block",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 91765,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Keldon (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_encased_in_ice_b817bb)."
+            }
+          ],
+          "npc_id": 9500000695
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Encased in Ice (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_encased_in_ice_b817bb)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Encased in Ice (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_encased_in_ice_b817bb)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 115028,
+      "enabled": true
+    },
+    {
+      "id": 3955818,
+      "title_string_id": 70140,
+      "giver_npc_id": 9500000981,
+      "prerequisite_quest_ids": [
+        3955860
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 70142,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Cook Yumtumlot (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_feeding_the_kittens_3e875a)."
+            }
+          ],
+          "npc_id": 9000000061
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 70539,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect the bag of Cat Food (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_feeding_the_kittens_3e875a)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: brown paper bag with boxes sticking out (sheets/e_items.png r2c3, tile of sg_brownbag_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_feeding_the_kittens_3e875a)."
+            }
+          ],
+          "node_type": "quest-food-2",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 70541,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return the cat food to Gooplemoop (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_feeding_the_kittens_3e875a)."
+            }
+          ],
+          "npc_id": 9500000981
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Feeding the Kittens (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_feeding_the_kittens_3e875a)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Feeding the Kittens (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_feeding_the_kittens_3e875a)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 70534,
+      "enabled": true
+    },
+    {
+      "id": 3955819,
+      "title_string_id": 72024,
+      "giver_npc_id": 9500004546,
+      "prerequisite_quest_ids": [
+        3955947
+      ],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "text_string_id": 72228,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Fill the bucket with Snowhill spring water (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fill_er_up_1f7de6)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: Murdunk 'Head to Snowhill springs, lift out a bucketful, then bring it back here'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client area 929 SnowHill_HotSprings_CloseEffects_2 at (294, 24, 275); area 49 Snowhill_HotSprings at (286, 36, 234)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "probe: floor 21.1, dry, 8/8 open"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            294.0,
+            21.1,
+            275.0
+          ],
+          "radius": 15
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 72192,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Murdunk (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fill_er_up_1f7de6)."
+            }
+          ],
+          "npc_id": 9500004546
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Fill'er Up! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fill_er_up_1f7de6)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Fill'er Up! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fill_er_up_1f7de6)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 72025,
+      "enabled": true
+    },
+    {
+      "id": 3955821,
+      "title_string_id": 36472,
+      "giver_npc_id": 9500000343,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 36475,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Search near the waterfall (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_finding_mino_831f54)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'Mino Breadcrumbs will take you to Silas Emptyhook, near the waterfall, who will advance the quest.'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "row 9500001385 is bound to spawn 100000003069 at (-857.4, -22.8, 1031.8), 50 m from client areas 592/593 TheWild_River_WaterFall (east of Lakeshore, east being +z)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "steps.json already answers the next table row ('Mino should be playing...') with the same NPC"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "compass: the client's POI table (pois.json) puts Snowhill at x +51 and Blackspore at x -2141, Seaside at z -1042 and Briarwood at z +1632, Merry Vale at z -434 and Lakeshore at z +946, so north is +x and east is +z; the probe calls x 'latitude' and z 'longitude'"
+            }
+          ],
+          "npc_id": 9500001385
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 36476,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Mino should be playing near the waterfall east of Lakeshore (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_finding_mino_831f54)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 36476 has this wording; wiki: Silas Emptyhook near the waterfall advances the quest"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "row 9500001385 is bound to spawn 100000003069 (model 32)"
+            }
+          ],
+          "npc_id": 9500001385
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 36477,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Mino Tendersole (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_finding_mino_831f54)."
+            }
+          ],
+          "npc_id": 9500000180
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 36478,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Check if Mino Tendersole is in Briarwood (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_finding_mino_831f54)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki target(s): ['Mino Tendersole', 'Briarwood']"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_finding_mino_831f54)."
+            }
+          ],
+          "npc_id": 9500000180
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 61,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Finding Mino (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_finding_mino_831f54)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Finding Mino (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_finding_mino_831f54)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 36473,
+      "intro_text_string_id": 36479,
+      "enabled": true
+    },
+    {
+      "id": 3955824,
+      "title_string_id": 91044,
+      "giver_npc_id": 9500000012,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "text_string_id": 91124,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Scout the area west of the warpstone in Blackspore (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_foreign_lumber_06c060)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 91124 is this step; wiki card: 'One is in Blackspore west of the warpstone'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no Blackspore warpstone spawn in our data; client POI 16 Blackspore (-2141, -33, 1042) stands where region POIs mark their warpstones (Snowhill POI 3 is 7 m from spawn 100000033602, Seaside POI 13 is 7 m from 100000002164)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) west is -z on this map (Seaside lies west of Sanctuary at lower z); 70 m west of the POI with radius 35 because nothing says how far"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "probe: floor -31.9, dry, 8/8 open"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -2141.0,
+            -31.9,
+            972.0
+          ],
+          "radius": 35
+        },
+        {
+          "kind": "reach_poi",
+          "id": 2,
+          "text_string_id": 91126,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Scout near Farmer Brambleback's Farm in Briarwood (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_foreign_lumber_06c060)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client POI 25 is Brambleback Farm"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) radius widened for 'near'"
+            }
+          ],
+          "poi_id": 25,
+          "zone_id": 0,
+          "position": [
+            -708.9,
+            -44.9,
+            2069.2
+          ],
+          "radius": 25
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 90579,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Ceard in Shrouded Glade (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_foreign_lumber_06c060)."
+            }
+          ],
+          "npc_id": 9500000658
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 61,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Foreign Lumber (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_foreign_lumber_06c060)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Foreign Lumber (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_foreign_lumber_06c060)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 91045,
+      "enabled": true
+    },
+    {
+      "id": 3955832,
+      "title_string_id": 389261,
+      "giver_npc_id": 9500000616,
+      "prerequisite_quest_ids": [
+        3955834
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 391155,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on Quinton's Cart (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_gathering_coconuts_407aa2)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: red-roofed vendor cart with goods (sheets/i_click4.png r0c0, tile of sh_cart_fair_vendor_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_gathering_coconuts_407aa2)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "vendor cart stands in; 207 sh_cart_vendor_01 renders as outlines"
+            }
+          ],
+          "node_type": "quest-cart",
+          "quantity": 1
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 390967,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat the Gathering Coconuts minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_gathering_coconuts_407aa2)."
+            }
+          ],
+          "minigame_id": 577,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 390969,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Quinton Coco (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_gathering_coconuts_407aa2)."
+            }
+          ],
+          "npc_id": 9500000616
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 6,
+          "items": [
+            {
+              "definition_id": 223,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Baseball Cap (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_gathering_coconuts_407aa2)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows (colours); the lowest id is used."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Gathering Coconuts (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_gathering_coconuts_407aa2)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Gathering Coconuts (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_gathering_coconuts_407aa2)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 389260,
+      "intro_text_string_id": 389260,
+      "enabled": true
+    },
+    {
+      "id": 3955834,
+      "title_string_id": 75538,
+      "giver_npc_id": 9500000616,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 387016,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click the cart (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_going_coco_nuts_997b2d)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "objects.json: 1086 sh_cart_fair_vendor_01 seen as a red-roofed vendor cart (sheets/i_click4.png r0c0); Quinton Coco 9500000616 at (-447.6, -21.9, -1242.2)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) placed 14 m from Quinton; the ring placement failed"
+            }
+          ],
+          "node_type": "quest-cart-2",
+          "quantity": 1
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 76635,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Play the Going Coco-Nuts! minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_going_coco_nuts_997b2d)."
+            }
+          ],
+          "minigame_id": 226,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 76637,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Quinton (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_going_coco_nuts_997b2d)."
+            }
+          ],
+          "npc_id": 9500000616
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [
+            {
+              "definition_id": 3023,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Medium Energy Potion (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_going_coco_nuts_997b2d)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Going Coco-Nuts! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_going_coco_nuts_997b2d)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Going Coco-Nuts! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_going_coco_nuts_997b2d)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3955836,
+      "title_string_id": 71564,
+      "giver_npc_id": 9500000310,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 71569,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "First Toad Location (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_greenwood_toads_d1b385)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'follow the path on your map ... to each of the four locations. There, or very close, you will find a large green toad. Step up to him'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "objects.json: 141 toad 'green toad'; Isabella 9500000310 at (-1644.7, -37.8, -457.9)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the four places are not recorded; spots 45-60 m around Isabella, 25 m or more apart"
+            }
+          ],
+          "node_type": "quest-toad",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 71571,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Second Toad Location (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_greenwood_toads_d1b385)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'follow the path on your map ... to each of the four locations. There, or very close, you will find a large green toad. Step up to him'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "objects.json: 141 toad 'green toad'; Isabella 9500000310 at (-1644.7, -37.8, -457.9)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the four places are not recorded; spots 45-60 m around Isabella, 25 m or more apart"
+            }
+          ],
+          "node_type": "quest-toad",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 3,
+          "text_string_id": 71573,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Third Toad Location (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_greenwood_toads_d1b385)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'follow the path on your map ... to each of the four locations. There, or very close, you will find a large green toad. Step up to him'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "objects.json: 141 toad 'green toad'; Isabella 9500000310 at (-1644.7, -37.8, -457.9)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the four places are not recorded; spots 45-60 m around Isabella, 25 m or more apart"
+            }
+          ],
+          "node_type": "quest-toad",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 4,
+          "text_string_id": 71575,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Fourth Toad Location (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_greenwood_toads_d1b385)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'follow the path on your map ... to each of the four locations. There, or very close, you will find a large green toad. Step up to him'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "objects.json: 141 toad 'green toad'; Isabella 9500000310 at (-1644.7, -37.8, -457.9)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the four places are not recorded; spots 45-60 m around Isabella, 25 m or more apart"
+            }
+          ],
+          "node_type": "quest-toad",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 71577,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give the locations to Isabella (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_greenwood_toads_d1b385)."
+            }
+          ],
+          "npc_id": 9500000310
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 38,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Greenwood Toads (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_greenwood_toads_d1b385)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Greenwood Toads (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_greenwood_toads_d1b385)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 71565,
+      "intro_text_string_id": 71563,
+      "enabled": true
+    },
+    {
+      "id": 3955846,
+      "title_string_id": 432272,
+      "giver_npc_id": 9500000038,
+      "prerequisite_quest_ids": [
+        3955756
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 432277,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Dig up bowls from the Artifacts mini-game - 0/10 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_howl_of_hunger_c7899a)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 432277 has this wording; MiniGameData 57 is Artifact Hunt (pinned)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) one finished game stands in for ten bowls, as live derby records do when a goal's own condition is not modelled"
+            }
+          ],
+          "minigame_id": 57,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 432281,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Lon (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_howl_of_hunger_c7899a)."
+            }
+          ],
+          "npc_id": 9500000038
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [
+            {
+              "definition_id": 16537,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Werewolf Cake Slice (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_howl_of_hunger_c7899a)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Howl of Hunger (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_howl_of_hunger_c7899a)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Howl of Hunger (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_howl_of_hunger_c7899a)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 432273,
+      "intro_text_string_id": 432271,
+      "enabled": true
+    },
+    {
+      "id": 3955860,
+      "title_string_id": 47082,
+      "giver_npc_id": 9500000981,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 47086,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Search for Gertrude (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_little_lost_kitten_684024)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 47087: 'Gooplemoop suggested searching near Cook Yumtumlot's cook tent'; Cook Yumtumlot 9000000061 at (92.7, 33.5, -358.7); wiki: 'There is a kitten at the cook's tent, but it is not Gertrude!'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "objects.json: 50 cat_shorthair 'spotted grey shorthair cat'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) placed 3-4 m from the named person or prop"
+            }
+          ],
+          "node_type": "quest-kitten",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 47092,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return the kitten to Gooplemoop (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_little_lost_kitten_684024)."
+            }
+          ],
+          "npc_id": 9500000981
+        },
+        {
+          "kind": "collect_node",
+          "id": 3,
+          "text_string_id": 47099,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Search near the campfires (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_little_lost_kitten_684024)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'I found a kitten at the campfires'; tile prop bw_campfire_01 at (51.0, 24.7, -394.9)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "objects.json: 50 cat_shorthair 'spotted grey shorthair cat'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) placed 3-4 m from the named person or prop"
+            }
+          ],
+          "node_type": "quest-kitten",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 47092,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return the kitten to Gooplemoop (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_little_lost_kitten_684024)."
+            }
+          ],
+          "npc_id": 9500000981
+        },
+        {
+          "kind": "collect_node",
+          "id": 5,
+          "text_string_id": 47122,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Search near Postchug Runalug's shipments (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_little_lost_kitten_684024)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'Go try near Postchug Runalug's shipping boxes'; Postchug Runalug 9000000172 at (20.4, 24.7, -387.9)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "objects.json: 50 cat_shorthair 'spotted grey shorthair cat'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) placed 3-4 m from the named person or prop"
+            }
+          ],
+          "node_type": "quest-kitten",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 6,
+          "text_string_id": 47092,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return the kitten to Gooplemoop (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_little_lost_kitten_684024)."
+            }
+          ],
+          "npc_id": 9500000981
+        },
+        {
+          "kind": "collect_node",
+          "id": 7,
+          "text_string_id": 47130,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Search near Farmer Murglot's chugaroot patch (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_little_lost_kitten_684024)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'look near Farmer Murglot's chicks. Find the kitten in a wheelbarrow'; Farmer Murglot 9500000975 at (67.2, 31.3, -346.4)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "objects.json: 50 cat_shorthair 'spotted grey shorthair cat'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) placed 3-4 m from the named person or prop"
+            }
+          ],
+          "node_type": "quest-kitten",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 8,
+          "text_string_id": 47092,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return the kitten to Gooplemoop (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_little_lost_kitten_684024)."
+            }
+          ],
+          "npc_id": 9500000981
+        },
+        {
+          "kind": "collect_node",
+          "id": 9,
+          "text_string_id": 47149,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Search near Oggy in Wugachug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_little_lost_kitten_684024)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'Maybe Gertrude is in Oggy's tent! Success at last!'; Oggy 9500000993 at (102.9, 34.0, -380.6); Gertrude's row 9500000978 is not drawn"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "objects.json: 50 cat_shorthair 'spotted grey shorthair cat'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) placed 3-4 m from the named person or prop"
+            }
+          ],
+          "node_type": "quest-gertrude",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 10,
+          "text_string_id": 47092,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return the kitten to Gooplemoop (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_little_lost_kitten_684024)."
+            }
+          ],
+          "npc_id": 9500000981
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Little Lost Kitten (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_little_lost_kitten_684024)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The wiki lists no coins for this quest; it pays the usual few coins (5) so the end screen has a reward."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Little Lost Kitten (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_little_lost_kitten_684024)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 47083,
+      "enabled": true
+    },
+    {
+      "id": 3955866,
+      "title_string_id": 21779,
+      "giver_npc_id": 9500000474,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 21783,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Marty (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_missing_marty_da7fdc)."
+            }
+          ],
+          "npc_id": 9500004525
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 21789,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Zobs in Memorial Caverns (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_missing_marty_da7fdc)."
+            }
+          ],
+          "npc_id": 9500000545
+        },
+        {
+          "kind": "collect_node",
+          "id": 3,
+          "text_string_id": 21791,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find a whizzlebang whirlygig at the Robgoblin Camp (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_missing_marty_da7fdc)."
+            },
+            {
+              "kind": "client",
+              "evidence": "21788 'Find a whizzlebang whirlygig remote control from a junkpile in the robgoblin camp'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "fr_quest_missing_marty: 'in a big junkpile behind Fizzlesticks' wagon'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no client string names the thing, so it is a pick-up with the junkpile body (node quest-whirlygig, spawn 784) rather than a nameless talk target with a junk-pile model; the earlier extras body 100000090057 and NPC row 9500004687 are removed"
+            }
+          ],
+          "node_type": "quest-whirlygig",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 21794,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Zobs (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_missing_marty_da7fdc)."
+            }
+          ],
+          "npc_id": 9500000545
+        },
+        {
+          "kind": "visit_position",
+          "id": 5,
+          "text_string_id": 21797,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the bauble in the Memorial Caverns (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_missing_marty_da7fdc)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'The bauble was right next to Marty the whole time, on the bridge!'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "Marty is spawn 100000002467 at (-1049.7, -51.2, 298.9); client areas MemorialCaves_WaterLap_* lie at y -52 around it"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "probe: the terrain is 56 m above, but the probe lists an obstacle-mesh floor at -51.78 under Marty, and the client's MemorialCaves_WaterLap areas and the Marty and Frolic Steadywings spawns sit at this depth, so the cave interior is real walkable floor"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest_engine.rs within(): the visit distance is measured in 3-D, so the player must be inside the cave at this height; the terrain above is outside the radius (r10); the visit keeps Marty's own height"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -1049.7,
+            -51.2,
+            298.9
+          ],
+          "radius": 10
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 6,
+          "text_string_id": 21799,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Marty in the Memorial Caverns (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_missing_marty_da7fdc)."
+            }
+          ],
+          "npc_id": 9500004525
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 113,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Missing Marty (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_missing_marty_da7fdc)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Missing Marty (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_missing_marty_da7fdc)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 21780,
+      "intro_text_string_id": 24971,
+      "enabled": true
+    },
+    {
+      "id": 3955888,
+      "title_string_id": 426990,
+      "giver_npc_id": 9500000377,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 426995,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pick a petal (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_petal_picker_86c2f1)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'The Heart Flower is right behind Cudip!'; client 427002 'Heart Flower'; Cudip 9500000377 at (-1105.8, -40, -412.8)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "objects.json: 453 sh_bush_rose_01 'red rose bush' is the checked model for 'petal'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) placed 4 m from Cudip; which side is 'behind' is not known"
+            }
+          ],
+          "node_type": "quest-heart-flower",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 426997,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Cudip (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_petal_picker_86c2f1)."
+            }
+          ],
+          "npc_id": 9500000377
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Petal Picker (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_petal_picker_86c2f1)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The wiki lists no coins for this quest; it pays the usual few coins (5) so the end screen has a reward."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The wiki's reward cell reads 'See below': the page offers a choice of items the table did not capture, so no item is granted."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Petal Picker (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_petal_picker_86c2f1)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 426991,
+      "intro_text_string_id": 426989,
+      "enabled": true
+    },
+    {
+      "id": 3955891,
+      "title_string_id": 74544,
+      "giver_npc_id": 9600000009,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 74567,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Kapri (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_playful_puppies_b47642)."
+            }
+          ],
+          "npc_id": 9500004506
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 74604,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Help catch Cinnamon (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_playful_puppies_b47642)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'The dogs are the fastest ones in the pet park. You need to click on each for the update, and that dog will disappear after.'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "Kapri is new-people spawn 100000090007 at (-1392, -30, 251) in the Queensfields pet park; client names 74594 'Cinnamon', 74597 'Pupsicles', 23310 'Spice', 23316 'Sugar'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "objects.json: 172 dog_small_floppy and 169 dog_large_floppy are checked 'pet' models"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the park's own Dog spawns (100000033114/33119/33120) are T549 critters quest_wire keeps unbound, so each puppy is a pick-up that vanishes when clicked"
+            }
+          ],
+          "node_type": "quest-cinnamon",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 3,
+          "text_string_id": 74606,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Help catch Spice (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_playful_puppies_b47642)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'The dogs are the fastest ones in the pet park. You need to click on each for the update, and that dog will disappear after.'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "Kapri is new-people spawn 100000090007 at (-1392, -30, 251) in the Queensfields pet park; client names 74594 'Cinnamon', 74597 'Pupsicles', 23310 'Spice', 23316 'Sugar'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "objects.json: 172 dog_small_floppy and 169 dog_large_floppy are checked 'pet' models"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the park's own Dog spawns (100000033114/33119/33120) are T549 critters quest_wire keeps unbound, so each puppy is a pick-up that vanishes when clicked"
+            }
+          ],
+          "node_type": "quest-spice",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 4,
+          "text_string_id": 74608,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Help catch Sugar (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_playful_puppies_b47642)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'The dogs are the fastest ones in the pet park. You need to click on each for the update, and that dog will disappear after.'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "Kapri is new-people spawn 100000090007 at (-1392, -30, 251) in the Queensfields pet park; client names 74594 'Cinnamon', 74597 'Pupsicles', 23310 'Spice', 23316 'Sugar'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "objects.json: 172 dog_small_floppy and 169 dog_large_floppy are checked 'pet' models"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the park's own Dog spawns (100000033114/33119/33120) are T549 critters quest_wire keeps unbound, so each puppy is a pick-up that vanishes when clicked"
+            }
+          ],
+          "node_type": "quest-sugar-2",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 5,
+          "text_string_id": 74610,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Help catch Pupsicles (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_playful_puppies_b47642)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'The dogs are the fastest ones in the pet park. You need to click on each for the update, and that dog will disappear after.'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "Kapri is new-people spawn 100000090007 at (-1392, -30, 251) in the Queensfields pet park; client names 74594 'Cinnamon', 74597 'Pupsicles', 23310 'Spice', 23316 'Sugar'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "objects.json: 172 dog_small_floppy and 169 dog_large_floppy are checked 'pet' models"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the park's own Dog spawns (100000033114/33119/33120) are T549 critters quest_wire keeps unbound, so each puppy is a pick-up that vanishes when clicked"
+            }
+          ],
+          "node_type": "quest-pupsicles",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 6,
+          "text_string_id": 74612,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Kapri (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_playful_puppies_b47642)."
+            }
+          ],
+          "npc_id": 9500004506
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 38,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Playful Puppies (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_playful_puppies_b47642)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Playful Puppies (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_playful_puppies_b47642)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 74545,
+      "intro_text_string_id": 74543,
+      "enabled": true
+    },
+    {
+      "id": 3955895,
+      "title_string_id": 427046,
+      "giver_npc_id": 9500000377,
+      "prerequisite_quest_ids": [
+        3955737
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 427110,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Perform the first test (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_potion_testing_version_6_0_50cfd1)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: red rose bush (sheets/g_items3.png r3c0, tile of sh_bush_rose_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_potion_testing_version_6_0_50cfd1)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "card: 'bunches of red flowers near the water's edge'"
+            }
+          ],
+          "node_type": "quest-test",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 427254,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Perform the second test (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_potion_testing_version_6_0_50cfd1)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: red rose bush (sheets/g_items3.png r3c0, tile of sh_bush_rose_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_potion_testing_version_6_0_50cfd1)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "card: 'bunches of red flowers near the water's edge'"
+            }
+          ],
+          "node_type": "quest-test-2",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 3,
+          "text_string_id": 427255,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Perform the third test (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_potion_testing_version_6_0_50cfd1)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: red rose bush (sheets/g_items3.png r3c0, tile of sh_bush_rose_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_potion_testing_version_6_0_50cfd1)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "card: 'bunches of red flowers near the water's edge'"
+            }
+          ],
+          "node_type": "quest-test-3",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 427257,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Report to Cudip (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_potion_testing_version_6_0_50cfd1)."
+            }
+          ],
+          "npc_id": 9500000377
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [
+            {
+              "definition_id": 7892,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Festival of Hearts Mystery Gift (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_potion_testing_version_6_0_50cfd1)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 14 rows (colours); the lowest id is used."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Potion Testing: Version 6.0 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_potion_testing_version_6_0_50cfd1)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The wiki lists no coins for this quest; it pays the usual few coins (5) so the end screen has a reward."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Potion Testing: Version 6.0 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_potion_testing_version_6_0_50cfd1)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 427047,
+      "enabled": true
+    },
+    {
+      "id": 3955903,
+      "title_string_id": 36722,
+      "giver_npc_id": 9500000747,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 36729,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect a baby penguin (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rider_request_f863aa)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: model penguin_01.adr is in Models.txt, seen by eye below"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: blue and white penguin (sheets/l_existing.png r3c1, tile of penguin_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_rider_request_f863aa)."
+            }
+          ],
+          "node_type": "quest-penguin",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 36731,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect a cup of hot chocolate (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rider_request_f863aa)."
+            }
+          ],
+          "node_type": "quest-cup-of-hot-chocolate",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 36733,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect a Snowberry Souffle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rider_request_f863aa)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 36734: 'Lucca De'Flor in Snowhill probably has some Snowberry Souffle.'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) handing over the souffle is reduced to a talk; row 9000000133 is drawn"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the server has no hand-over event for this item; the talk completes the step and the player keeps nothing"
+            }
+          ],
+          "npc_id": 9000000133
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 36735,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Flynn at the Snowhill stage (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rider_request_f863aa)."
+            }
+          ],
+          "npc_id": 9500000747
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 38,
+          "items": [
+            {
+              "definition_id": 3402,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Rockstar Doll Glasses (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rider_request_f863aa)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows (colours); the lowest id is used."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Rider Request (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rider_request_f863aa)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Rider Request (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rider_request_f863aa)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 36723,
+      "intro_text_string_id": 36721,
+      "enabled": true
+    },
+    {
+      "id": 3955910,
+      "title_string_id": 40520,
+      "giver_npc_id": 9500000346,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "text_string_id": 40529,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Locate the cave's entrance (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_scary_stories_acb281)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 40530: 'the cave is shaped like a monster's head and is located to the east of Cobblestone Village'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client area 112 TheWild_skullcave_part1 at (-1874, -26, 681); parts 2 and 3 run on east to z 739 and 804; Cobblestone Village POI 7 is at (-1904, -40, 413), east being +z"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'The cave Ivan is speaking of is the one that connects Crossroads with Blackspore.'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "probe: obstacle-mesh floor at -26.33 at the area's point (the cave mouth), terrain -6.15 above it is 19.9 m up, at the edge of r20"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest_engine.rs within(): the visit distance is measured in 3-D, so the player must be inside the cave at this height; the terrain above is outside the radius"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "compass: the client's POI table (pois.json) puts Snowhill at x +51 and Blackspore at x -2141, Seaside at z -1042 and Briarwood at z +1632, Merry Vale at z -434 and Lakeshore at z +946, so north is +x and east is +z; the probe calls x 'latitude' and z 'longitude'"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -1874.0,
+            -26.0,
+            681.0
+          ],
+          "radius": 20
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 40531,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Ivan's satchel (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_scary_stories_acb281)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'His satchel will be just before the mouth of the cave, off to the right.'; skull cave area 112 at (-1874, -26, 681)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "objects.json: 807 loot_bag_big_01 'brown leather satchel'"
+            }
+          ],
+          "node_type": "quest-satchel",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 40533,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Ivan (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_scary_stories_acb281)."
+            }
+          ],
+          "npc_id": 9500000346
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Scary Stories (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_scary_stories_acb281)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Scary Stories (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_scary_stories_acb281)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3955914,
+      "title_string_id": 72058,
+      "giver_npc_id": 9500000213,
+      "prerequisite_quest_ids": [
+        3955917
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 72694,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Test out Smoggo's sword (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_slash_and_smash_0a1829)."
+            }
+          ],
+          "minigame_id": 79,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 72692,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Smoggo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_slash_and_smash_0a1829)."
+            }
+          ],
+          "npc_id": 9500000213
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Slash and Smash (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_slash_and_smash_0a1829)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Slash and Smash (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_slash_and_smash_0a1829)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 116145,
+      "intro_text_string_id": 72057,
+      "enabled": true
+    },
+    {
+      "id": 3955917,
+      "title_string_id": 72054,
+      "giver_npc_id": 9500000213,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 72690,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pick up Smoggo's sword from the quartermaster (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_smoggo_s_sword_408fa3)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki target: Quartermaster Bargargle; our row 9500000201 'Quartermaster Bargangle' (same quartermaster, spelt differently) stands at Gorg's camp (-656.0, -70.4, 2287.8) and is drawn"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the two questions the wiki lists before the sword are not modelled"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client locale 73506 'Quartermaster Bargangle' (11 client lines spell it so, none spell Bargargle): the wiki's 'Bargargle' is the wiki's slip, our row 9500000201 carries the client's name"
+            }
+          ],
+          "npc_id": 9500000201
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 72692,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Smoggo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_smoggo_s_sword_408fa3)."
+            }
+          ],
+          "npc_id": 9500000213
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Smoggo's Sword (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_smoggo_s_sword_408fa3)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Smoggo's Sword (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_smoggo_s_sword_408fa3)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 72055,
+      "intro_text_string_id": 72053,
+      "enabled": true
+    },
+    {
+      "id": 3955919,
+      "title_string_id": 36927,
+      "giver_npc_id": 9600000001,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 36929,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Member #1 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snowhill_secret_society_b13d16)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: quest page: Member 1 Lucca De'Flor, Member 2 Frostpetal, Member 3 Smitty, Member 4 Mr. Twinkle."
+            }
+          ],
+          "npc_id": 9000000133
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 36931,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Member #2 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snowhill_secret_society_b13d16)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'Member 1 Lucca De'Flor ... Member 2 Frostpetal ... Member 3 Smitty' and Member 4 Mr. Twinkle (proposed-places.json note)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "row 9000000093 is drawn"
+            }
+          ],
+          "npc_id": 9000000093
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 36933,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Member #3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snowhill_secret_society_b13d16)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'Member 1 Lucca De'Flor ... Member 2 Frostpetal ... Member 3 Smitty' and Member 4 Mr. Twinkle (proposed-places.json note)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "row 9000000206 is drawn"
+            }
+          ],
+          "npc_id": 9000000206
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 36936,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Member #4 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snowhill_secret_society_b13d16)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'Member 1 Lucca De'Flor ... Member 2 Frostpetal ... Member 3 Smitty' and Member 4 Mr. Twinkle (proposed-places.json note)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "row 9500000758 is drawn"
+            }
+          ],
+          "npc_id": 9500000758
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 36939,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Scarlet Shadeveil (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snowhill_secret_society_b13d16)."
+            }
+          ],
+          "npc_id": 9600000001
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 26,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Snowhill Secret Society (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snowhill_secret_society_b13d16)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Snowhill Secret Society (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snowhill_secret_society_b13d16)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3955927,
+      "title_string_id": 72078,
+      "giver_npc_id": 9500000089,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 74569,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Stoke the first brazier (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_stoke_the_flames_4b2016)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: gold bowl brazier with an orange flame (sheets/d_creatures.png r3c2, tile of bw_brazier_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_stoke_the_flames_4b2016)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "braziers along the path to Gorg's camp; 560 hsg_brazier_01 has no .dme in the packs, so the Bristlewood-style bw_ brazier stands in"
+            }
+          ],
+          "node_type": "quest-brazier",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 74571,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Stoke the second brazier (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_stoke_the_flames_4b2016)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: gold bowl brazier with an orange flame (sheets/d_creatures.png r3c2, tile of bw_brazier_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_stoke_the_flames_4b2016)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "braziers along the path to Gorg's camp; 560 hsg_brazier_01 has no .dme in the packs, so the Bristlewood-style bw_ brazier stands in"
+            }
+          ],
+          "node_type": "quest-brazier-2",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 3,
+          "text_string_id": 74573,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Stoke the third brazier (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_stoke_the_flames_4b2016)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: gold bowl brazier with an orange flame (sheets/d_creatures.png r3c2, tile of bw_brazier_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_stoke_the_flames_4b2016)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "braziers along the path to Gorg's camp; 560 hsg_brazier_01 has no .dme in the packs, so the Bristlewood-style bw_ brazier stands in"
+            }
+          ],
+          "node_type": "quest-brazier-3",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 4,
+          "text_string_id": 74575,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Stoke the fourth brazier (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_stoke_the_flames_4b2016)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: gold bowl brazier with an orange flame (sheets/d_creatures.png r3c2, tile of bw_brazier_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_stoke_the_flames_4b2016)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "braziers along the path to Gorg's camp; 560 hsg_brazier_01 has no .dme in the packs, so the Bristlewood-style bw_ brazier stands in"
+            }
+          ],
+          "node_type": "quest-brazier-4",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 5,
+          "text_string_id": 74577,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Stoke the fifth brazier (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_stoke_the_flames_4b2016)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: gold bowl brazier with an orange flame (sheets/d_creatures.png r3c2, tile of bw_brazier_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_stoke_the_flames_4b2016)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "braziers along the path to Gorg's camp; 560 hsg_brazier_01 has no .dme in the packs, so the Bristlewood-style bw_ brazier stands in"
+            }
+          ],
+          "node_type": "quest-brazier-5",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 6,
+          "text_string_id": 74579,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Stoke the sixth brazier (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_stoke_the_flames_4b2016)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: gold bowl brazier with an orange flame (sheets/d_creatures.png r3c2, tile of bw_brazier_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_stoke_the_flames_4b2016)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "braziers along the path to Gorg's camp; 560 hsg_brazier_01 has no .dme in the packs, so the Bristlewood-style bw_ brazier stands in"
+            }
+          ],
+          "node_type": "quest-brazier-6",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 7,
+          "text_string_id": 74581,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Stoke the seventh brazier (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_stoke_the_flames_4b2016)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'Take the path east and follow it to Gorg's camp, tending to the flames along the way.'; road node (-661.2, -71.9, 2227.8) lies 83% of the way from Babbina 9500000089 to Gorg 9500000142"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "objects.json: 231 bw_brazier_01 'gold bowl brazier with an orange flame'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) placed 2.5 m beside that road node; no brazier props exist on this path"
+            }
+          ],
+          "node_type": "quest-brazier",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 8,
+          "text_string_id": 74583,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Stoke the pair of braziers leading to Gorg's camp (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_stoke_the_flames_4b2016)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "Gorg 9500000142 at (-644, -71, 2284); spots 18 m from him on the side the path comes from, 8 m apart"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) text has no 0/N so quest_wire counts one; two spots for the pair"
+            }
+          ],
+          "node_type": "quest-brazier",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 9,
+          "text_string_id": 74588,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Gorg (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_stoke_the_flames_4b2016)."
+            }
+          ],
+          "npc_id": 9500000142
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Stoke the Flames (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_stoke_the_flames_4b2016)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Stoke the Flames (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_stoke_the_flames_4b2016)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 72077,
+      "intro_text_string_id": 72077,
+      "enabled": true
+    },
+    {
+      "id": 3955939,
+      "title_string_id": 102201,
+      "giver_npc_id": 9500000364,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "text_string_id": 102206,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Visit the Bear and Goat Exhibits (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_park_tour_ac42fa)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'To get the updates, you must stand near the listed exhibits for about five seconds.' (no dwell is modelled)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) between the bear_normal spawns (-599.5, 483.9 and neighbours) and the billy and nanny goat spawns (-617..-634, 491..516) (proposed-places.json)"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -613.0,
+            -1.2,
+            490.0
+          ],
+          "radius": 25
+        },
+        {
+          "kind": "visit_position",
+          "id": 2,
+          "text_string_id": 102210,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Visit the Antelope Pen (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_park_tour_ac42fa)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'To get the updates, you must stand near the listed exhibits for about five seconds.' (no dwell is modelled)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) centre of the three antelope spawns nearest Sam Durango (proposed-places.json)"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -537.0,
+            2.7,
+            541.0
+          ],
+          "radius": 18
+        },
+        {
+          "kind": "visit_position",
+          "id": 3,
+          "text_string_id": 102212,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Visit the Overlook Bridge (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_park_tour_ac42fa)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'To get the updates, you must stand near the listed exhibits for about five seconds.' (no dwell is modelled)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) deck of the highest sh_bridge_04 near the zoo; chosen by name only (proposed-places.json)"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -685.9,
+            3.3,
+            539.6
+          ],
+          "radius": 12
+        },
+        {
+          "kind": "visit_position",
+          "id": 4,
+          "text_string_id": 102220,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Visit the Squirrel Tree (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_park_tour_ac42fa)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'To get the updates, you must stand near the listed exhibits for about five seconds.' (no dwell is modelled)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) four squirrel spawns stand within 9 m of (-513, 631) (proposed-places.json)"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -513.0,
+            4.14,
+            631.0
+          ],
+          "radius": 12
+        },
+        {
+          "kind": "visit_position",
+          "id": 5,
+          "text_string_id": 102222,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Visit the Lakeshore Pier and Frog Lillies (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_park_tour_ac42fa)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'To get the updates, you must stand near the listed exhibits for about five seconds.' (no dwell is modelled)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) shore beside the sg_lilypad_cluster_01 props; no pier prop found (proposed-places.json); client 102222 'Visit the Lakeshore Pier and Frog Lilies' is this step"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "tile props: no pier, dock, wharf, jetty or boardwalk prop within 250 m of the zoo lake, so the lily-pad shore stands for both halves of the name"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the centre itself is a 35-degree bank; flat shore lies inside r20 (checker ring), and the Animal Investigation visit now sits 24 m north-east, so the two steps no longer share a point"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -562.4,
+            -3.152,
+            606.2
+          ],
+          "radius": 20
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 6,
+          "text_string_id": 102224,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Sam Durango (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_park_tour_ac42fa)."
+            }
+          ],
+          "npc_id": 9500000364
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Park Tour (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_park_tour_ac42fa)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "The Park Tour (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_park_tour_ac42fa)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 102202,
+      "intro_text_string_id": 102200,
+      "enabled": true
+    },
+    {
+      "id": 3955941,
+      "title_string_id": 72098,
+      "giver_npc_id": 9500000205,
+      "prerequisite_quest_ids": [
+        3954036
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 389152,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Quartermaster Bargargle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_quartermaster_s_query_714191)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client text 389152 'Speak to Quartermaster Bargangle' (the wiki spells it Bargargle); npcs/briarwood.json 9500000201, drawable."
+            }
+          ],
+          "npc_id": 9500000201
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 23052,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Answer question one correctly (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_quartermaster_s_query_714191)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: the quartermaster asks three questions (Smoggo's Sword lists them)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the server has no dialog-answer event; each answer is a talk with row 9500000201 (drawn)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client locale 73506 'Quartermaster Bargangle' (11 client lines spell it so, none spell Bargargle): the wiki's 'Bargargle' is the wiki's slip, our row 9500000201 carries the client's name"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) three talk steps in a row with the same quartermaster: the player clicks him once per question; the engine's DialogueFinished variant needs complete_after_dialogue content this row does not carry"
+            }
+          ],
+          "npc_id": 9500000201
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 23080,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Answer question two correctly (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_quartermaster_s_query_714191)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: the quartermaster asks three questions (Smoggo's Sword lists them)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the server has no dialog-answer event; each answer is a talk with row 9500000201 (drawn)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client locale 73506 'Quartermaster Bargangle' (11 client lines spell it so, none spell Bargargle): the wiki's 'Bargargle' is the wiki's slip, our row 9500000201 carries the client's name"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) three talk steps in a row with the same quartermaster: the player clicks him once per question; the engine's DialogueFinished variant needs complete_after_dialogue content this row does not carry"
+            }
+          ],
+          "npc_id": 9500000201
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 23086,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Answer question three correctly (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_quartermaster_s_query_714191)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: the quartermaster asks three questions (Smoggo's Sword lists them)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the server has no dialog-answer event; each answer is a talk with row 9500000201 (drawn)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client locale 73506 'Quartermaster Bargangle' (11 client lines spell it so, none spell Bargargle): the wiki's 'Bargargle' is the wiki's slip, our row 9500000201 carries the client's name"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) three talk steps in a row with the same quartermaster: the player clicks him once per question; the engine's DialogueFinished variant needs complete_after_dialogue content this row does not carry"
+            }
+          ],
+          "npc_id": 9500000201
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 389141,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Recruit Agga (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_quartermaster_s_query_714191)."
+            }
+          ],
+          "npc_id": 9500000205
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 18,
+          "items": [
+            {
+              "definition_id": 3084,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Medium Replenishment Potion (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_quartermaster_s_query_714191)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows (colours); the lowest id is used."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Quartermaster's Query (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_quartermaster_s_query_714191)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "The Quartermaster's Query (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_quartermaster_s_query_714191)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 72099,
+      "enabled": true
+    },
+    {
+      "id": 3955947,
+      "title_string_id": 72019,
+      "giver_npc_id": 9500004546,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 72183,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Borrow Recruit Agga's bucket (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_there_s_a_hole_in_my_bucket_42d749)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 72183 is this step; the wiki places her north of Murdunk; row 9500000205"
+            }
+          ],
+          "npc_id": 9500000205
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 72185,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Borrow Burgo's bucket (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_there_s_a_hole_in_my_bucket_42d749)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 72185 is this step; wiki target Burgo; row 9500000097 is listed as bucket lender"
+            }
+          ],
+          "npc_id": 9500000097
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 72187,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Borrow Gub Cargil's bucket (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_there_s_a_hole_in_my_bucket_42d749)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 72187 is this step; wiki places him in the Mother Lode Quarry; row 9500000144"
+            }
+          ],
+          "npc_id": 9500000144
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 72190,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Borrow Private Dogamug's bucket (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_there_s_a_hole_in_my_bucket_42d749)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "spawn_guid 100000002782"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: 'Private Dogamug is north of Recruit Agga, inside Gorg's camp at the campfire'; spawn 100000002782 'Private Dogamug' (name 72203, model 64) stands at (-659, -71, 2270) in Gorg's camp"
+            }
+          ],
+          "npc_id": 9500004582
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 72192,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Murdunk (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_there_s_a_hole_in_my_bucket_42d749)."
+            }
+          ],
+          "npc_id": 9500004546
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "There's a Hole in My Bucket (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_there_s_a_hole_in_my_bucket_42d749)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "There's a Hole in My Bucket (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_there_s_a_hole_in_my_bucket_42d749)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 72112,
+      "intro_text_string_id": 72018,
+      "enabled": true
+    },
+    {
+      "id": 3955967,
+      "title_string_id": 39924,
+      "giver_npc_id": 9500000190,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "text_string_id": 41476,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Visit the lower waterfall (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_you_can_lead_a_tortoise_to_water_c9d2e3)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 41477: 'Sample the water at the base of the lower waterfall in eastern Nettleseed.'; wiki: Parr 'Head east, upstream to where the waterfalls splash into the ponds.'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client area 981 Briarwood_Nettle_Waterfall_med_1 (-591, -64, 2520), upstream end of the Briarwood_Nettle_River areas; east is +z and Parr 9500000190 is at z 2321"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the other candidate, area 2474 Briarwood_Waterfall_4 (-144, -66, 2273), lies west of Parr, so it is not 'east, upstream'; same spot as proposed-places.json"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "probe: floor -62.8, dry, 8/8 open"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "compass: the client's POI table (pois.json) puts Snowhill at x +51 and Blackspore at x -2141, Seaside at z -1042 and Briarwood at z +1632, Merry Vale at z -434 and Lakeshore at z +946, so north is +x and east is +z; the probe calls x 'latitude' and z 'longitude'"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -579.0,
+            -62.8,
+            2521.7
+          ],
+          "radius": 16
+        },
+        {
+          "kind": "visit_position",
+          "id": 2,
+          "text_string_id": 41478,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Visit the upper waterfall (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_you_can_lead_a_tortoise_to_water_c9d2e3)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 41479: 'Sample the water at the base of the upper waterfall in eastern Nettleseed.'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client areas 976 Briarwood_Nettle_Waterfall_2 (-619, -39, 2569) and 1744 Briarwood_waterfall_spray_08 (-619, -34, 2572), the next falls up the same river"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "probe: floor -36.3, dry, 8/8 open"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -602.0,
+            -36.3,
+            2560.0
+          ],
+          "radius": 18
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 41514,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Parr (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_you_can_lead_a_tortoise_to_water_c9d2e3)."
+            }
+          ],
+          "npc_id": 9500000190
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "You Can Lead a Tortoise to Water (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_you_can_lead_a_tortoise_to_water_c9d2e3)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "You Can Lead a Tortoise to Water (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_you_can_lead_a_tortoise_to_water_c9d2e3)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 39923,
+      "intro_text_string_id": 39923,
+      "enabled": true
     }
   ]
 }

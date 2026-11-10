@@ -929,12 +929,51 @@
       "id": 3060012,
       "title_string_id": 403484,
       "giver_npc_id": 9000000289,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3060042
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 394130,
+          "minigame_id": 625,
+          "count": 1,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 2026-11-08: finishing this quest's own derby row 625 counts for this goal (Knock out as many opponents as you can!); the goal's own condition is not modelled."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 93090,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Crash Davis (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_thunder_falls_crash_for_coin_881a87)."
+            }
+          ],
+          "npc_id": 9000000289
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76064,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Super Charged Derby Jacket (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_thunder_falls_crash_for_coin_881a87)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 200
           },
@@ -974,9 +1013,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49
     },
     {
       "id": 3060013,
@@ -2185,13 +2229,52 @@
     {
       "id": 3060029,
       "title_string_id": 403481,
-      "giver_npc_id": 9000000270,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9000000111,
+      "prerequisite_quest_ids": [
+        3060041
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 394124,
+          "minigame_id": 623,
+          "count": 1,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 2026-11-08: finishing this quest's own derby row 623 counts for this goal (Investigate the arena); the goal's own condition is not modelled."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394121,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Jackson Spinner (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_not_one_but_a_few_36b6dd)."
+            }
+          ],
+          "npc_id": 9000000111
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76065,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Super-Charged Derby Boots (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_not_one_but_a_few_36b6dd)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 192
           },
@@ -2231,9 +2314,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49,
+      "description_string_id": 393366,
+      "intro_text_string_id": 393406
     },
     {
       "id": 3060030,
@@ -2342,12 +2432,68 @@
     {
       "id": 3060031,
       "title_string_id": 403472,
-      "giver_npc_id": 9000000357,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9500000467,
+      "prerequisite_quest_ids": [
+        3060030
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 394106,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Recover the missing props (6) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_an_incomplete_set_ca2bf5)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 394106 'Recover the missing props'; 394040 'Help the crew recover some of the missing props in Sanctuary.'; Dani 9500000467 at (-1284.1, -14.2, 263.8)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) nothing says what the props look like; 691 sg_collection_node_crate_01, objects.json 'stacked wooden supply crates', stands in"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) spot 0 lifted from y -15.0 to the pavement at -14.755"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the wiki step reads 'Recover the missing props (6)', so six are collected; the six quest-prop spots are 742-747's ring round Dani"
+            }
+          ],
+          "node_type": "quest-prop",
+          "quantity": 6
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394107,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Dani (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_an_incomplete_set_ca2bf5)."
+            }
+          ],
+          "npc_id": 9500000467
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 397958,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Sydney Spellmerg (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_an_incomplete_set_ca2bf5)."
+            }
+          ],
+          "npc_id": 9000000482
+        }
+      ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 2,
           "items": [],
           "job_xp": {
             "49": 167
@@ -2356,6 +2502,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 167 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060031)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "2 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_an_incomplete_set_ca2bf5)."
             }
           ]
         }
@@ -2388,20 +2538,65 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49,
+      "description_string_id": 393357
     },
     {
       "id": 3060032,
       "title_string_id": 403473,
       "giver_npc_id": 9000000482,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3060031
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 394108,
+          "minigame_id": 619,
+          "count": 1,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 2026-11-08: finishing this quest's own derby row 619 counts for this goal (Score points in a Wildwood derby); the goal's own condition is not modelled."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394109,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Sydney Spellmerg (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_action_fd8b53)."
+            }
+          ],
+          "npc_id": 9000000482
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76058,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Leaf-Springed Derby Helmet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_action_fd8b53)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 167
           },
@@ -2441,16 +2636,51 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49,
+      "description_string_id": 393358,
+      "intro_text_string_id": 393398
     },
     {
       "id": 3060033,
       "title_string_id": 403474,
       "giver_npc_id": 9000000482,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3060032
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 395564,
+          "minigame_id": 620,
+          "count": 1,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 2026-11-08: finishing this quest's own derby row 620 counts for this goal (Collect power-ups); the goal's own condition is not modelled."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394109,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Sydney Spellmerg (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_hurtin_crewe_act_ii_5feed1)."
+            }
+          ],
+          "npc_id": 9000000482
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -2462,6 +2692,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 167 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060033)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The wiki also lists Leaf-Springed Derby Trousers, which matches no row of the item table; not granted."
             }
           ]
         }
@@ -2494,19 +2728,89 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49
     },
     {
       "id": 3060034,
       "title_string_id": 403476,
-      "giver_npc_id": 9000000486,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9000000482,
+      "prerequisite_quest_ids": [
+        3060035
+      ],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "text_string_id": 394114,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Attend the big premiere in Pixiewood (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_pixiewood_premiere_f3cbc3)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 394114 is this step; wiki: walking up to Sir Horace, a few metres from Dani, updates it"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) anchored on Dani's row 9500000467; Sir Horace's row 9500000944 sits about 340 m away, which contradicts the wiki"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -1284.1,
+            -14.2,
+            263.8
+          ],
+          "radius": 15
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394113,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Sir Horace (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_pixiewood_premiere_f3cbc3)."
+            }
+          ],
+          "npc_id": 9500000944
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 398206,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Dani (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_pixiewood_premiere_f3cbc3)."
+            }
+          ],
+          "npc_id": 9500000467
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 398208,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Sydney Spellmerg outside of Wildwood (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_pixiewood_premiere_f3cbc3)."
+            }
+          ],
+          "npc_id": 9000000482
+        }
+      ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 2,
           "items": [],
           "job_xp": {
             "49": 175
@@ -2515,6 +2819,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 175 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060034)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "2 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_pixiewood_premiere_f3cbc3)."
             }
           ]
         }
@@ -2547,19 +2855,65 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49,
+      "description_string_id": 393401,
+      "intro_text_string_id": 393401
     },
     {
       "id": 3060035,
       "title_string_id": 403475,
       "giver_npc_id": 9000000482,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3060033
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 394112,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Dance a jig for Sir Horace (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_sir_horace_the_horrible_cf8100)."
+            }
+          ],
+          "npc_id": 9500000944
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394113,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Sir Horace (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_sir_horace_the_horrible_cf8100)."
+            }
+          ],
+          "npc_id": 9500000944
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 394111,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Sydney Spellmerg (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_sir_horace_the_horrible_cf8100)."
+            }
+          ],
+          "npc_id": 9000000482
+        }
+      ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 2,
           "items": [],
           "job_xp": {
             "49": 175
@@ -2568,6 +2922,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 175 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060035)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "2 coins, the wiki's PC reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_sir_horace_the_horrible_cf8100): the row has a PS3 cell (4) and a PC cell (2), and ours is the PC client; the earlier 6 summed both."
             }
           ]
         }
@@ -2600,20 +2958,64 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49
     },
     {
       "id": 3060036,
       "title_string_id": 403477,
       "giver_npc_id": 9000000482,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3060034
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 394116,
+          "minigame_id": 621,
+          "count": 1,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 2026-11-08: finishing this quest's own derby row 621 counts for this goal (Knock out Sir Horace); the goal's own condition is not modelled."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394111,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Sydney Spellmerg (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_encore_af81b6)."
+            }
+          ],
+          "npc_id": 9000000482
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76062,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Rollover Derby Helmet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_encore_af81b6)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 175
           },
@@ -2653,9 +3055,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49,
+      "description_string_id": 393402,
+      "intro_text_string_id": 393402
     },
     {
       "id": 3060037,
@@ -2718,11 +3127,53 @@
       "id": 3060038,
       "title_string_id": 403478,
       "giver_npc_id": 9000000482,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3060036
+      ],
+      "objectives": [
+        {
+          "kind": "reach_poi",
+          "id": 1,
+          "text_string_id": 394118,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Travel to Tangletrack (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_copy_cat_6993cd)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client POI 34 is Tangletrack Speedway, the wiki target"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the next step's NPC Jackson Spinner stands about 8 m from it"
+            }
+          ],
+          "poi_id": 34,
+          "zone_id": 0,
+          "position": [
+            -273.8,
+            -58.8,
+            1951.9
+          ],
+          "radius": 20
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394119,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Jackson Spinner (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_copy_cat_6993cd)."
+            }
+          ],
+          "npc_id": 9000000111
+        }
+      ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 2,
           "items": [],
           "job_xp": {
             "49": 183
@@ -2731,6 +3182,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 183 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060038)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "2 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_copy_cat_6993cd)."
             }
           ]
         }
@@ -2763,9 +3218,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49,
+      "description_string_id": 393363
     },
     {
       "id": 3060039,
@@ -2810,12 +3271,51 @@
       "id": 3060040,
       "title_string_id": 403482,
       "giver_npc_id": 9000000111,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3060029
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 394126,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Take first place against the pirates! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_tangletrack_trio_40a446)."
+            }
+          ],
+          "minigame_id": 624,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394121,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Jackson Spinner (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_tangletrack_trio_40a446)."
+            }
+          ],
+          "npc_id": 9000000111
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76067,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Super-Charged Derby Pants (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_tangletrack_trio_40a446)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 192
           },
@@ -2855,20 +3355,86 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49,
+      "description_string_id": 393367
     },
     {
       "id": 3060041,
       "title_string_id": 403480,
       "giver_npc_id": 9000000111,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3060045
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 394122,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click the barrel to start inspecting the cars (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_booby_trapped_0aeaee)."
+            }
+          ],
+          "minigame_id": 658,
+          "count": 1
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 394123,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defuse the cars (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_booby_trapped_0aeaee)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 394123 is this step; MiniGameData 658 is Booby Trapped!"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "not servable yet: 658 is not in the server's pinned minigames"
+            }
+          ],
+          "minigame_id": 658,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 394121,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Jackson Spinner (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_booby_trapped_0aeaee)."
+            }
+          ],
+          "npc_id": 9000000111
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76061,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Rollover Derby Boots (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_booby_trapped_0aeaee)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 183
           },
@@ -2908,19 +3474,113 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49,
+      "description_string_id": 393365
     },
     {
       "id": 3060042,
       "title_string_id": 403483,
       "giver_npc_id": 9000000111,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3060040
+      ],
+      "objectives": [
+        {
+          "kind": "reach_poi",
+          "id": 1,
+          "text_string_id": 394128,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Thunder Falls (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_a_hero_s_homecoming_e42a6e)."
+            },
+            {
+              "kind": "client",
+              "evidence": "client POI 32 is Thunder Falls Speedway (name 3606), the step's target: startup snapshot world.points_of_interest row 32 at [-915.60803, -39.1328, 1203.7272]; the next step's Crash Davis 9000000289 stands 8 m from it"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) earlier wired as a talk to the giver Jackson Spinner at Tangletrack, which is not Thunder Falls; the 20 m radius follows the other speedway reach steps"
+            }
+          ],
+          "poi_id": 32,
+          "zone_id": 0,
+          "position": [
+            -915.60803,
+            -39.1328,
+            1203.7272
+          ],
+          "radius": 20
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394063,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Crash Davis (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_a_hero_s_homecoming_e42a6e)."
+            }
+          ],
+          "npc_id": 9000000289
+        },
+        {
+          "kind": "visit_position",
+          "id": 3,
+          "text_string_id": 402832,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Choose your sponsor (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_a_hero_s_homecoming_e42a6e)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: after speaking to Crash Davis the game 'should ... highlight the message board to his right'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "tile prop sh_corkboard_01 at (-911.2, -37.9, 1193.5), 3 m from Crash Davis 9000000289 (-913.8, -38.2, 1195.9)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the sponsor choice itself is not modelled; standing at the board completes the step"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "probe: the board prop blocks N, NE, E and NW at its own point; open terrain 1 m away at (-910.5, -37.7, 1192.8) and Crash Davis' ground 3 m away lie inside r4"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -911.2,
+            -37.775,
+            1193.5
+          ],
+          "radius": 4
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 93090,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Crash Davis (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_a_hero_s_homecoming_e42a6e)."
+            }
+          ],
+          "npc_id": 9000000289
+        }
+      ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 2,
           "items": [],
           "job_xp": {
             "49": 192
@@ -2929,6 +3589,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 192 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060042)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "2 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_a_hero_s_homecoming_e42a6e)."
             }
           ]
         }
@@ -2961,9 +3625,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49,
+      "description_string_id": 393368,
+      "intro_text_string_id": 393408
     },
     {
       "id": 3060043,
@@ -3068,13 +3739,52 @@
     {
       "id": 3060045,
       "title_string_id": 403479,
-      "giver_npc_id": 9000000534,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9000000111,
+      "prerequisite_quest_ids": [
+        3060038
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 394120,
+          "minigame_id": 622,
+          "count": 1,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 2026-11-08: finishing this quest's own derby row 622 counts for this goal (Clean up Tangletrack); the goal's own condition is not modelled."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394121,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Jackson Spinner (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_down_and_dirty_derby_70bd09)."
+            }
+          ],
+          "npc_id": 9000000111
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76060,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Rollover Derby Jacket (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_down_and_dirty_derby_70bd09)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 183
           },
@@ -3118,9 +3828,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49,
+      "description_string_id": 393364,
+      "intro_text_string_id": 393404
     },
     {
       "id": 3060046,

@@ -2210,11 +2210,79 @@
       "prerequisite_quest_ids": [
         3050024
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 72246,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Get a high score (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_surprise_me_c07a9a)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 72245: 'As a chef, cook Rainleaf Wrapped Dumplings and score 20,000 or higher'; MiniGameData 188 'Cooking: Rainleaf Wrapped Dumpling'; the id is in the pinned producer set (tests/enabled_quest_reachability.rs shipped_minigame_producers_are_pinned)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the 20,000 score is not required: cooking credits the id only (crafting.rs npc_minigame_win_id_only)"
+            }
+          ],
+          "minigame_id": 188,
+          "count": 1
+        },
+        {
+          "kind": "craft_recipe",
+          "id": 2,
+          "text_string_id": 78164,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cook Rainleaf Wrapped Dumplings - (0/3) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_surprise_me_c07a9a)."
+            }
+          ],
+          "recipe_id": 48,
+          "quantity": 3
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 78166,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Cook Yumtumlot (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_surprise_me_c07a9a)."
+            }
+          ],
+          "npc_id": 9000000061
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 14522,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Chef Hat (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_surprise_me_c07a9a)."
+                }
+              ]
+            },
+            {
+              "definition_id": 10854,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Chef Triangle Shard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_surprise_me_c07a9a)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "45": 1250
           },
@@ -2258,12 +2326,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 72242,
       "intro_text_string_id": 72240,
       "end_text_string_id": 72243,
-      "enabled": false
+      "enabled": true,
+      "job": 45
     },
     {
       "id": 3050026,

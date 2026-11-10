@@ -299,8 +299,10 @@ fn natali_before_the_offer_the_wrong_job_and_a_missing_prerequisite_change_nothi
 #[test]
 fn the_other_wilds_rows_stay_off_with_a_blocker() {
     /// Quests that named an unresolved Coach Eddie slot until T898 pointed them at his drawn row
-    /// (9000000053); they stay off because no objectives are wired.
-    const NO_OBJECTIVES: [u32; 5] = [3_140_006, 3_140_010, 3_140_011, 3_140_023, 3_140_026];
+    /// (9000000053); they stay off because no objectives are wired. Their siblings 3140006,
+    /// 3140010 and 3140011 got objectives and went live in d7b0b831 ("55 more quests",
+    /// 2026-11-09).
+    const NO_OBJECTIVES: [u32; 2] = [3_140_023, 3_140_026];
     /// Quests behind a prerequisite that is itself disabled.
     const NO_PREREQUISITE: [u32; 2] = [3_160_008, 3_160_009];
     let root = content_dir();

@@ -3653,11 +3653,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:421; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1655 (ModelId=13, ModelFileName=chugawug_f_01.adr, NameId=41248)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.670032,
       "model_id": 13,
-      "model_file_name": "chugawug_f_01.adr"
+      "model_file_name": "chugawug_f_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000973,
@@ -6981,9 +6988,44 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part A. The entrance, the Sasparilla Brewery and the Party Tent, row 42; source cell: [client][video][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3955860,
+          "title": "Little Lost Kitten",
+          "title_string_id": 47082,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Little Lost Kitten (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_little_lost_kitten_684024)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3955818,
+          "title": "Feeding the Kittens",
+          "title_string_id": 70140,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Feeding the Kittens (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_feeding_the_kittens_3e875a)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3955860,
+        3955818
+      ],
       "quests_given_text": [
         "\"Look for Gooplemoop's lost kitten in Wugachug.\" (1541615867; wiki: his one quest, \"you have to complete his quest to get his cat back\"). The chain, by text: find Gertrude near Cook Yumtumlot's tent (1179432882, 3095443454), near Postchug Runalug's shipping boxes (794119209, 4010241019), near Murglot's chicks (1300115169), near Oggy (1273632756), near the two campfires in the Thoroughfare (1679526592, 3527526412); each wrong kitten returns to him (853406729, 2022555695); then \"Speak with Cook Yumtumlot and find out what kind of food Gooplemoop should feed his kittens\" (3501965421, 2200788218, 2916362417), bring the cat food back (2208677348, 2780159403), thanks \"You found my Gertrude! And all of these other kitties\" (2223585202). Possible titles (wording only): Feeding the Kittens (4005571067), Found Kitten (4259044467)."
       ],
@@ -7433,11 +7475,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:426; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1660 (ModelId=221, ModelFileName=chugawug_m_02.adr, NameId=41247)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.162503,
       "model_id": 221,
-      "model_file_name": "chugawug_m_02.adr"
+      "model_file_name": "chugawug_m_02.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000982,

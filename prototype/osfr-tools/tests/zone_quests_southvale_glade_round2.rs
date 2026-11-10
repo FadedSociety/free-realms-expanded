@@ -172,16 +172,20 @@ fn the_pet_trainer_rows_wait_for_a_pet_trainer_profile() {
     assert!(trick(12)["waypoint_count"].as_u64().unwrap() > 0);
 }
 
-/// The rows of the five matched files that stay disabled (reasons in `notes/Autopilot/T676.md`).
-/// A row that gains objectives has to be re-checked.
+/// The row of the five matched files that stays disabled (reasons in `notes/Autopilot/T676.md`).
+/// A row that gains objectives has to be re-checked. Grunt Work (3020033) and An Incomplete Set
+/// (3060031) went live in d7b0b831 ("55 more quests", 2026-11-09).
 #[test]
 fn the_other_round_two_rows_stay_off() {
     for id in [
-        // Sunstone Valley: Grunt Work (Sunstone ore).
-        3_020_033,
-        // Wildwood: An Incomplete Set, Wildwood Derby 1000 (no objectives in any source).
-        3_060_031, 3_060_044,
+        // Wildwood: Wildwood Derby 1000 (no objectives in any source).
+        3_060_044,
     ] {
-        assert!(!shipped_quest(id).enabled, "quest {id} is enabled");
+        let quest = shipped_quest(id);
+        assert!(!quest.enabled, "quest {id} is enabled");
+        assert!(
+            quest.objectives.is_empty(),
+            "{id} grew objectives; re-check it"
+        );
     }
 }

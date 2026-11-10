@@ -15355,11 +15355,52 @@
               "evidence": "Bound for Blackspore (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bound_for_blackspore_45c668)."
             }
           ]
+        },
+        {
+          "quest_id": 3060031,
+          "title": "Demo Derby: An Incomplete Set",
+          "title_string_id": 403472,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 4: The film set at Wildwood (Sir Horace, Sydney Spellmerg, Jace Wildwheel), row 28; name 'Demo Derby: An Incomplete Set'; title id cell 1000985040 ucdt; 1223934510 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3060031 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3953011,
-        3954510
+        3954510,
+        3060031
       ],
       "quests_given_text": [
         "Creepy Crawly Cards (Super Spooktacular, wiki); pet-trick audience (4174833278)"
@@ -19140,8 +19181,27 @@
       "location_evidence": [
         "Memorial Caverns (wiki Memorial Caverns dialogue)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3955866,
+          "title": "Missing Marty",
+          "title_string_id": 21779,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Missing Marty (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_missing_marty_da7fdc)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3955866
+      ],
       "quests_given_text": [
         "Marty gift errand (3322566651; possibly another Evan)"
       ],
@@ -42528,9 +42588,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3670 spawnNpcWithGuid(33446); src/Resources/Npcs.json Id=33446"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -1.83369003
+      "heading": -1.83369003,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000512,
@@ -62538,6 +62605,12 @@
             "kind": "reconstructed",
             "evidence": "(R) T739: lab/references/quest-lines/wiring/spawn-objects.json matched q3040010-o0 and q3040010-o1 to this reference spawn (spawnobj-infer); Scripts/Zone/FabledRealms.lua:3584 and Resources/Npcs.json Id=33354 carry no objective id, so the binding is inferred and revisionable, not recovered."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.57079633,
@@ -62546,7 +62619,8 @@
       "objective_ids": [
         "q3040010-o0",
         "q3040010-o1"
-      ]
+      ],
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500001012,
@@ -63552,8 +63626,27 @@
       "location_evidence": [
         "On the northern side of the hill above Sunrise St., facing the medical clinic."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3955891,
+          "title": "Playful Puppies",
+          "title_string_id": 74544,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Playful Puppies (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_playful_puppies_b47642)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3955891
+      ],
       "quests_given_text": [],
       "quests_accepted": [],
       "quests_accepted_reason": null,
@@ -63563,7 +63656,7 @@
       "services_reason": null,
       "position": [
         -1121.146,
-        -9.551,
+        4.408,
         312.432
       ],
       "position_w": 1.0,
@@ -63767,6 +63860,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) the giver stands among the NPCs the wiki puts at the same place"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) y lifted from -9.551 to the terrain height 4.408 at this x/z (editor probe, 2026-11-09): the legacy centroid's y put Vereni 14 m underground."
           }
         ],
         "position_w": [
@@ -63834,8 +63931,15 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: most common model of drawn pixie male NPCs"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9600000010,

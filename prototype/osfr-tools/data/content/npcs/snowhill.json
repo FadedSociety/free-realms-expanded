@@ -15397,10 +15397,27 @@
               "evidence": "Noise Permit (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_noise_permit_4b200b)."
             }
           ]
+        },
+        {
+          "quest_id": 3955903,
+          "title": "Rider Request",
+          "title_string_id": 36722,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Rider Request (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rider_request_f863aa)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3950285
+        3950285,
+        3955903
       ],
       "quests_given_text": [
         "Wiki lists a \"Noise Permit\" questline on the Snowhill page; the client has the exact title Noise Permit (511573328)."
@@ -24682,8 +24699,15 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000143,
@@ -28721,9 +28745,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3871 spawnNpcWithGuid(33652); src/Resources/Npcs.json Id=33652"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": 3.10415006
+      "heading": 3.10415006,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000158,
@@ -48789,11 +48820,28 @@
               "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
             }
           ]
+        },
+        {
+          "quest_id": 3955919,
+          "title": "Snowhill Secret Society",
+          "title_string_id": 36927,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Snowhill Secret Society (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snowhill_secret_society_b13d16)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3040048,
-        3040049
+        3040049,
+        3955919
       ],
       "quests_given_text": [],
       "quests_accepted": [],

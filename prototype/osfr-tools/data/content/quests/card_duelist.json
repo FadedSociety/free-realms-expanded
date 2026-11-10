@@ -940,9 +940,229 @@
       "id": 3040010,
       "title_string_id": 103705,
       "giver_npc_id": 9000000170,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3040009
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 103668,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Poe's hidden cards (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_poe_s_planted_cards_105feb)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: model sh_playingcards_02.adr is in Models.txt, seen by eye below"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: scattered playing cards with gold faces (sheets/l_existing.png r2c0, tile of sh_playingcards_02.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_card_duelist_poe_s_planted_cards_105feb)."
+            }
+          ],
+          "node_type": "quest-card",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 103672,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Planter 1: You feel something soggy and wet, but it's certainly not cards... (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_poe_s_planted_cards_105feb)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 103672 is this step's line"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "beside gl_planter_flowers prop (-1267.2, -14.4, 318.2)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: Poe's cards are 'stashed away in one of the yellow potted plants' around Sanctuary"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the three 'Planter' spawns (100000033415/33420/33421, model sg_rock_01) are T549/T550 imported families that quest_wire keeps unbound, so each planter is a pick-up beside a real gl_planter_flowers prop"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "objects.json: 541 ss_deco_flower_04 seen as flowers in a pot (sheets/l_existing.png r0c3)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) its own node quest-planter, one spawn (745) on the pavement at y -14.401 beside the cited prop; the earlier note about a lift to -14.402 described a y the file never held"
+            }
+          ],
+          "node_type": "quest-planter",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 3,
+          "text_string_id": 103674,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Planter 2: The soil is smooth and free from debris. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_poe_s_planted_cards_105feb)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 103674 is this step's line"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "beside gl_planter_flowers prop (-1254.8, -14.5, 442.2)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: Poe's cards are 'stashed away in one of the yellow potted plants' around Sanctuary"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the three 'Planter' spawns (100000033415/33420/33421, model sg_rock_01) are T549/T550 imported families that quest_wire keeps unbound, so each planter is a pick-up beside a real gl_planter_flowers prop"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "objects.json: 541 ss_deco_flower_04 seen as flowers in a pot (sheets/l_existing.png r0c3)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) its own node quest-planter-3, one spawn (781) on the grass beside the pavement at y -15.0 beside the cited prop; the earlier note about a lift to -14.402 described a y the file never held"
+            }
+          ],
+          "node_type": "quest-planter-3",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 4,
+          "text_string_id": 103676,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Planter 3: You find nothing unusual in the soil (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_poe_s_planted_cards_105feb)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 103676 is this step's line"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "beside gl_planter_flowers prop (-1257.5, -14.4, 387.8)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: Poe's cards are 'stashed away in one of the yellow potted plants' around Sanctuary"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the three 'Planter' spawns (100000033415/33420/33421, model sg_rock_01) are T549/T550 imported families that quest_wire keeps unbound, so each planter is a pick-up beside a real gl_planter_flowers prop"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "objects.json: 541 ss_deco_flower_04 seen as flowers in a pot (sheets/l_existing.png r0c3)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) its own node quest-planter-4, one spawn (782) on the pavement at y -14.462 beside the cited prop; the earlier note about a lift to -14.402 described a y the file never held"
+            }
+          ],
+          "node_type": "quest-planter-4",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 103684,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Planter 4: You feel something crawling on your hand as you reach into the soil... (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_poe_s_planted_cards_105feb)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 103684 is this step's line; wiki: Poe's cards are 'stashed away in one of the yellow potted plants'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "npc row 9500001011 'Planter' stands by Poe Tatters at (-1289.8, -14.4, 351.6) and is drawn"
+            }
+          ],
+          "npc_id": 9500001011
+        },
+        {
+          "kind": "collect_node",
+          "id": 6,
+          "text_string_id": 103682,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Planter 5: EWWW! A Stinky Sock! Nope not cards... (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_poe_s_planted_cards_105feb)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 103682 is this step's line"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "beside gl_planter_flowers prop (-1263.1, -14.4, 419.3)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: Poe's cards are 'stashed away in one of the yellow potted plants' around Sanctuary"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the three 'Planter' spawns (100000033415/33420/33421, model sg_rock_01) are T549/T550 imported families that quest_wire keeps unbound, so each planter is a pick-up beside a real gl_planter_flowers prop"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "objects.json: 541 ss_deco_flower_04 seen as flowers in a pot (sheets/l_existing.png r0c3)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) its own node quest-planter-6, one spawn (783) on the grass beside the pavement at y -15.0 beside the cited prop; the earlier note about a lift to -14.402 described a y the file never held"
+            }
+          ],
+          "node_type": "quest-planter-6",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 7,
+          "text_string_id": 103670,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return the cards to Poe Tatters (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_poe_s_planted_cards_105feb)."
+            }
+          ],
+          "npc_id": 9000000170
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 4,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Card Duelist: Poe's Planted Cards (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_poe_s_planted_cards_105feb)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -979,12 +1199,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 103706,
       "intro_text_string_id": 103704,
       "end_text_string_id": 103707,
-      "enabled": false
+      "enabled": true,
+      "job": 120
     },
     {
       "id": 3040011,

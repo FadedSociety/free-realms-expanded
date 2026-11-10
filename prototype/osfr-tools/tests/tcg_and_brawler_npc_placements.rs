@@ -263,13 +263,14 @@ fn eligibility() -> CharacterEligibility {
     }
 }
 
-const CARD_DUELIST_STILL_OFF: [u32; 5] = [3_040_010, 3_040_039, 3_040_044, 3_040_045, 3_040_053];
+const CARD_DUELIST_STILL_OFF: [u32; 4] = [3_040_039, 3_040_044, 3_040_045, 3_040_053];
 
 #[test]
 fn card_duelist_and_brawler_quests_stay_disabled() {
     let quests = quest_records::read_quests(&content_dir());
     // The Card Duelist quests still waiting on a mechanic (the rest went live behind the job-120
-    // gate, 2026-11-08) and the Brawler line's disabled records (3030014 is Tevin's).
+    // gate, 2026-11-08; Poe's Planted Cards 3040010 followed in d7b0b831, 2026-11-09) and the
+    // Brawler line's disabled records (3030014 is Tevin's).
     let disabled: Vec<u32> = CARD_DUELIST_STILL_OFF
         .into_iter()
         .chain(3_030_010..=3_030_014)
