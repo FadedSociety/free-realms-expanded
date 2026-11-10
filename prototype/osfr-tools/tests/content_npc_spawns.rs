@@ -256,7 +256,12 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
             );
         }
 
-        if let Some(capture_match) = row["capture_match"].as_object() {
+        // The nine stones whose twin sits in the login stream. The mark was `capture_match`, which
+        // kept the row out of the world table; the login stream is not sent with the opening
+        // campaign loaded, so those stones were never drawn (tests/warpstone_rock.rs). The
+        // provenance stays under a key the loader does not read.
+        assert!(row["capture_match"].is_null(), "{owner}: left to the login stream");
+        if let Some(capture_match) = row["login_stream_match"].as_object() {
             let actor_id = capture_match["actor_id"].as_u64().unwrap();
             assert!(
                 captured_actors.insert(actor_id),

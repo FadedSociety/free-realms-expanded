@@ -27,6 +27,7 @@ impl Gateway {
             .filter(|index| {
                 !(gameplay.is_some_and(Gameplay::is_opening) && (10..=32).contains(index))
                     && !(welcomed && *index == 41)
+                    && !self.world_draws(*index, gameplay)
             })
             .map(|index| {
                 let message = match index {
@@ -51,6 +52,15 @@ impl Gateway {
                 Ok(message)
             })
             .collect()
+    }
+
+    /// Whether startup message `index` is an NPC row (10 to 32) the world table draws itself.
+    /// Such a row is sent once, by the table (`Gameplay::draws_startup_npc`).
+    fn world_draws(&self, index: usize, gameplay: Option<&Gameplay>) -> bool {
+        let row = index
+            .checked_sub(10)
+            .and_then(|row| self.startup_snapshot.world.npc_spawns.get(row));
+        matches!((row, gameplay), (Some(npc), Some(game)) if game.draws_startup_npc(npc))
     }
 
     pub(super) fn build_self_message(

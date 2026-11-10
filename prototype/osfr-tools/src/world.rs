@@ -973,6 +973,18 @@ impl NpcVisibility {
             .map(|npc| npc.spawn.actor_id)
     }
 
+    /// Whether the table draws an actor of this model within `reach` metres (level distance) of
+    /// `position`: the same thing as a login-stream row there, which must then stay unsent or
+    /// the viewer gets it twice. Excluded rows and seasons are ignored: a row the table owns is
+    /// the table's to show or hide.
+    pub fn draws_model_near(&self, model_id: i32, position: [f32; 3], reach: f32) -> bool {
+        self.by_zone.values().flatten().any(|npc| {
+            npc.spawn.model_id == model_id
+                && (npc.position[0] - position[0]).hypot(npc.position[2] - position[2]) <= reach
+                && (npc.position[1] - position[1]).abs() <= reach
+        })
+    }
+
     pub fn exclude_actor_guids(&mut self, actor_guids: impl IntoIterator<Item = u64>) {
         self.hide_actor_guids(actor_guids);
         self.visible.retain(|guid| !self.excluded.contains(guid));

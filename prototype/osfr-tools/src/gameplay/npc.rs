@@ -9,6 +9,19 @@ impl Gameplay {
         }
     }
 
+    /// Whether the world table already draws this login-stream actor (same model, same spot).
+    /// The table sends it after the world has loaded, with its cursor and minimap rows, and
+    /// removes it with distance; the login-stream copy would be a second actor on top of it.
+    pub fn draws_startup_npc(&self, npc: &crate::startup_world::NpcSpawn) -> bool {
+        /// (R) Two recovered placements of one stone differ by up to 0.75 m (Wugachug,
+        /// Bristlewood); no two different world actors of one model stand this close.
+        const SAME_SPOT_M: f32 = 2.0;
+        let [x, y, z, _] = npc.position;
+        self.npc_visibility
+            .as_ref()
+            .is_some_and(|table| table.draws_model_near(npc.model_id, [x, y, z], SAME_SPOT_M))
+    }
+
     pub fn update_npc_visibility(
         &mut self,
         character: &CharacterState,

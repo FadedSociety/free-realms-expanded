@@ -33,6 +33,14 @@ HOOK_SETS = {
         {"addr": 0x0092FF22, "kind": "insn", "label": "addpc.lookup_result", "read": ["reg:eax"]},
         {"addr": 0x00930058, "kind": "insn", "label": "addpc.actor_created", "read": []},
     ],
+    # NPC spawn (35/2 AddNpc), same dispatcher: case 2 at 0092f547, reader 00921a10 through
+    # 00929670, actor creation 00985340. At 0092f76e eax is the new actor (0 = refused, e.g. the
+    # guid already exists) and the packet sits at esp+0x4f4: guid +0x10, model id +0x1c.
+    "add_npc": [
+        {"addr": 0x0092F56C, "kind": "insn", "label": "addnpc.parse_result", "read": ["u8:eax"]},
+        {"addr": 0x0092F76E, "kind": "insn", "label": "addnpc.actor",
+         "read": ["reg:eax", "mem32:esp+0x510", "mem32:esp+0x504", "mem32:esp+0x508"]},
+    ],
     "quest_offer": [
         {"addr": 0x00A107F0, "kind": "enter", "label": "quest.dispatch.thunk",
          "read": ["arg:0", "arg:1", "bytes:arg0:arg1:16"]},
