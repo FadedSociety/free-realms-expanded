@@ -172,6 +172,7 @@ impl Gameplay {
     /// Idempotent: a satisfied goal is no longer open, so a repeat emits nothing
     /// and changes nothing.
     pub(super) fn sync_job_level_objectives(&mut self, out: &mut Outcome) -> io::Result<()> {
+        self.pet_earn_job_ranks();
         let Some(engine) = &self.npc_quests else {
             return Ok(());
         };
@@ -284,6 +285,7 @@ impl Gameplay {
         event: crate::quest_engine::QuestEvent,
         out: &mut Outcome,
     ) -> io::Result<()> {
+        self.pet_earn_quest_event(&event);
         if let Some(engine) = &mut self.npc_quests {
             let result = engine.on_event(event)?;
             self.append_npc_quest_outcome_synced(result, out)?;
@@ -405,6 +407,7 @@ impl Gameplay {
             if report_facts && packet.starts_with(&[39, 0, 18]) {
                 self.credit_minigame(id, game_over_result(packet), out)?;
             } else {
+                self.pet_earn_minigame(id);
                 self.npc_quest_event(
                     crate::quest_engine::QuestEvent::FinishMinigame { minigame_id: id },
                     out,

@@ -337,6 +337,7 @@ impl PetService {
         let Some(active) = self.active.filter(|active| active.grooming.is_some()) else {
             return wire;
         };
+        self.earn_bump("pet_groom", 1);
         let needs = self
             .pet(active.pet_id)
             .and_then(|pet| decayed(&self.content.need_policy, pet, true, now_ms / 1_000));

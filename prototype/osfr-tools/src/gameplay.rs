@@ -1272,7 +1272,8 @@ impl Gameplay {
             item_bar,
             mounts,
             field_engaged: false,
-            pets: crate::pets::PetService::new(crate::pets::PetService::bundled_content()?)?,
+            pets: crate::pets::PetService::new(crate::pets::PetService::bundled_content()?)?
+                .with_earn_rules_in(directory),
             progression_extras,
             achievement_bindings,
             collections,

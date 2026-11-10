@@ -462,6 +462,11 @@ impl Gameplay {
             out.replies.extend(transition.reward_packets);
             self.adopt_reward_state(transition.reward_state, out)?;
         }
+        if let Some(done) = &transition.outcome.completion {
+            self.pets.earn_bump("collection", 1);
+            self.pets
+                .earn_bump(&format!("collection:{}", done.collection_id), 1);
+        }
         Ok(transition
             .outcome
             .completion

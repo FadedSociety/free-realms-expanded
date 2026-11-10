@@ -1,0 +1,3180 @@
+{
+ "schema_version": 1,
+ "enabled": true,
+ "provenance": {
+  "generator": "scripts/build_pet_rewards.py (python -I)",
+  "decision": "Owner 2026-11-09: pets are earned, not bought; exotic pets left the coin vendor.",
+  "original": "fanbyte wiki harvest 2026-11-02: Category:Adoption Centers (FR) and Category:Pets (FR) (every pet cost Station Cash; 20-minute trials), Special Pets (FR) (Daily Wheel, Trading Card Game, events, VIP, Shrouded Gloam boss chests), Pet Types (FR).",
+  "counters": "quest and quest:<id> (turn-in), dungeon and dungeon:<id> (clear), minigame and minigame:<id> (settled game), kart_race, derby_match, soccer_match, chess_game, kill, gather, craft, collection and collection:<id>, pet_trick, pet_feed, pet_groom (a session that ends by itself), pet_treasure, job_level and job:<profile> (highest rank; no shipped row uses it yet), active_day (a day with a quest turn-in, kart race, derby or soccer match, chess game or dungeon clear). minigame counts one per game with a result, never a fish catch or a harvest run.",
+  "rule": "(R) every row. At most one row per client pet item that the Marketplace does not list; the row key is the item, never the goal."
+ },
+ "daily_caps": {
+  "pet_trick": 10,
+  "pet_feed": 3,
+  "pet_groom": 3
+ },
+ "rows": [
+  {
+   "key": "pet#23963",
+   "counter": "active_day",
+   "at": 7,
+   "item_id": 23963,
+   "name": "Bandit",
+   "goal": "Finish a quest, race, match, chess game or dungeon on 7 different days",
+   "kind": "reconstructed",
+   "basis": "(R) Bandit was an ultra-rare Daily Wheel prize (fanbyte wiki harvest 2026-11-02, Special Pets (FR)); the wheel pays no prizes yet, so daily play earns it."
+  },
+  {
+   "key": "pet#24058",
+   "counter": "active_day",
+   "at": 14,
+   "item_id": 24058,
+   "name": "Lexy",
+   "goal": "Finish a quest, race, match, chess game or dungeon on 14 different days",
+   "kind": "reconstructed",
+   "basis": "(R) Lexy was an ultra-rare Daily Wheel prize (fanbyte wiki harvest 2026-11-02, Special Pets (FR)); the wheel pays no prizes yet, so daily play earns it."
+  },
+  {
+   "key": "pet#77466",
+   "counter": "collection",
+   "at": 1,
+   "item_id": 77466,
+   "name": "Balloon Animal (green)",
+   "goal": "Complete 1 collections",
+   "kind": "reconstructed",
+   "basis": "(R) the Balloon Animal's other colours: party prizes for finished collections."
+  },
+  {
+   "key": "pet#77467",
+   "counter": "collection",
+   "at": 2,
+   "item_id": 77467,
+   "name": "Balloon Animal (pink)",
+   "goal": "Complete 2 collections",
+   "kind": "reconstructed",
+   "basis": "(R) the Balloon Animal's other colours: party prizes for finished collections."
+  },
+  {
+   "key": "pet#77468",
+   "counter": "collection",
+   "at": 3,
+   "item_id": 77468,
+   "name": "Balloon Animal (purple)",
+   "goal": "Complete 3 collections",
+   "kind": "reconstructed",
+   "basis": "(R) the Balloon Animal's other colours: party prizes for finished collections."
+  },
+  {
+   "key": "pet#77470",
+   "counter": "collection",
+   "at": 4,
+   "item_id": 77470,
+   "name": "Balloon Animal (yellow)",
+   "goal": "Complete 4 collections",
+   "kind": "reconstructed",
+   "basis": "(R) the Balloon Animal's other colours: party prizes for finished collections."
+  },
+  {
+   "key": "pet#76528",
+   "counter": "derby_match",
+   "at": 2,
+   "item_id": 76528,
+   "name": "Yule (tan)",
+   "goal": "Finish 2 derby matches",
+   "kind": "reconstructed",
+   "basis": "(R) the Yule reindeer in every coat (fanbyte wiki harvest 2026-11-02, Special Pets (FR): a Snow Days pet)."
+  },
+  {
+   "key": "pet#76529",
+   "counter": "derby_match",
+   "at": 5,
+   "item_id": 76529,
+   "name": "Yule (brown)",
+   "goal": "Finish 5 derby matches",
+   "kind": "reconstructed",
+   "basis": "(R) the Yule reindeer in every coat (fanbyte wiki harvest 2026-11-02, Special Pets (FR): a Snow Days pet)."
+  },
+  {
+   "key": "pet#76530",
+   "counter": "derby_match",
+   "at": 8,
+   "item_id": 76530,
+   "name": "Yule (gold)",
+   "goal": "Finish 8 derby matches",
+   "kind": "reconstructed",
+   "basis": "(R) the Yule reindeer in every coat (fanbyte wiki harvest 2026-11-02, Special Pets (FR): a Snow Days pet)."
+  },
+  {
+   "key": "pet#76531",
+   "counter": "derby_match",
+   "at": 11,
+   "item_id": 76531,
+   "name": "Yule (grey)",
+   "goal": "Finish 11 derby matches",
+   "kind": "reconstructed",
+   "basis": "(R) the Yule reindeer in every coat (fanbyte wiki harvest 2026-11-02, Special Pets (FR): a Snow Days pet)."
+  },
+  {
+   "key": "pet#76532",
+   "counter": "derby_match",
+   "at": 14,
+   "item_id": 76532,
+   "name": "Yule (red)",
+   "goal": "Finish 14 derby matches",
+   "kind": "reconstructed",
+   "basis": "(R) the Yule reindeer in every coat (fanbyte wiki harvest 2026-11-02, Special Pets (FR): a Snow Days pet)."
+  },
+  {
+   "key": "pet#76533",
+   "counter": "derby_match",
+   "at": 17,
+   "item_id": 76533,
+   "name": "Yule (greed)",
+   "goal": "Finish 17 derby matches",
+   "kind": "reconstructed",
+   "basis": "(R) the Yule reindeer in every coat (fanbyte wiki harvest 2026-11-02, Special Pets (FR): a Snow Days pet)."
+  },
+  {
+   "key": "pet#76534",
+   "counter": "derby_match",
+   "at": 20,
+   "item_id": 76534,
+   "name": "Yule (white)",
+   "goal": "Finish 20 derby matches",
+   "kind": "reconstructed",
+   "basis": "(R) the Yule reindeer in every coat (fanbyte wiki harvest 2026-11-02, Special Pets (FR): a Snow Days pet)."
+  },
+  {
+   "key": "pet#2152",
+   "counter": "dungeon",
+   "at": 1,
+   "item_id": 2152,
+   "name": "Spaz",
+   "goal": "Clear 1 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#2274",
+   "counter": "dungeon",
+   "at": 3,
+   "item_id": 2274,
+   "name": "Zando",
+   "goal": "Clear 3 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#15490",
+   "counter": "dungeon",
+   "at": 5,
+   "item_id": 15490,
+   "name": "Wolf (base blue)",
+   "goal": "Clear 5 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#17514",
+   "counter": "dungeon",
+   "at": 7,
+   "item_id": 17514,
+   "name": "Ghostly Raven",
+   "goal": "Clear 7 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#17515",
+   "counter": "dungeon",
+   "at": 9,
+   "item_id": 17515,
+   "name": "Ghostly Grave Elemental",
+   "goal": "Clear 9 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#17516",
+   "counter": "dungeon",
+   "at": 11,
+   "item_id": 17516,
+   "name": "Grave Elemental",
+   "goal": "Clear 11 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#17517",
+   "counter": "dungeon",
+   "at": 13,
+   "item_id": 17517,
+   "name": "Mini Necrowart Zombie",
+   "goal": "Clear 13 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#17518",
+   "counter": "dungeon",
+   "at": 15,
+   "item_id": 17518,
+   "name": "Necrowart Zombie2",
+   "goal": "Clear 15 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#17519",
+   "counter": "dungeon",
+   "at": 17,
+   "item_id": 17519,
+   "name": "Necrowart Zombie3",
+   "goal": "Clear 17 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#17520",
+   "counter": "dungeon",
+   "at": 19,
+   "item_id": 17520,
+   "name": "Skeleton",
+   "goal": "Clear 19 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#17522",
+   "counter": "dungeon",
+   "at": 21,
+   "item_id": 17522,
+   "name": "Ghostly Toad",
+   "goal": "Clear 21 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#17523",
+   "counter": "dungeon",
+   "at": 23,
+   "item_id": 17523,
+   "name": "Skeletal Vulture",
+   "goal": "Clear 23 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#17524",
+   "counter": "dungeon",
+   "at": 25,
+   "item_id": 17524,
+   "name": "Ghostly Warthog",
+   "goal": "Clear 25 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#17548",
+   "counter": "dungeon",
+   "at": 27,
+   "item_id": 17548,
+   "name": "Ghostly Ninja",
+   "goal": "Clear 27 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#17551",
+   "counter": "dungeon",
+   "at": 29,
+   "item_id": 17551,
+   "name": "Mauthedog",
+   "goal": "Clear 29 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#17556",
+   "counter": "dungeon",
+   "at": 31,
+   "item_id": 17556,
+   "name": "Ghostly Snake",
+   "goal": "Clear 31 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#17564",
+   "counter": "dungeon",
+   "at": 33,
+   "item_id": 17564,
+   "name": "Vulture",
+   "goal": "Clear 33 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#17566",
+   "counter": "dungeon",
+   "at": 35,
+   "item_id": 17566,
+   "name": "Wraith",
+   "goal": "Clear 35 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#17846",
+   "counter": "dungeon",
+   "at": 37,
+   "item_id": 17846,
+   "name": "Char (black)",
+   "goal": "Clear 37 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#17866",
+   "counter": "dungeon",
+   "at": 39,
+   "item_id": 17866,
+   "name": "Zax (army)",
+   "goal": "Clear 39 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#55840",
+   "counter": "dungeon",
+   "at": 41,
+   "item_id": 55840,
+   "name": "Shadow",
+   "goal": "Clear 41 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#15491",
+   "counter": "dungeon",
+   "at": 43,
+   "item_id": 15491,
+   "name": "Wolf (base brown)",
+   "goal": "Clear 43 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#15492",
+   "counter": "dungeon",
+   "at": 45,
+   "item_id": 15492,
+   "name": "Wolf (base green)",
+   "goal": "Clear 45 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#15493",
+   "counter": "dungeon",
+   "at": 47,
+   "item_id": 15493,
+   "name": "Wolf (base grey)",
+   "goal": "Clear 47 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#15494",
+   "counter": "dungeon",
+   "at": 49,
+   "item_id": 15494,
+   "name": "Wolf (base metal)",
+   "goal": "Clear 49 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#15495",
+   "counter": "dungeon",
+   "at": 51,
+   "item_id": 15495,
+   "name": "Wolf (snow purple)",
+   "goal": "Clear 51 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#70351",
+   "counter": "dungeon",
+   "at": 53,
+   "item_id": 70351,
+   "name": "Char",
+   "goal": "Clear 53 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#70352",
+   "counter": "dungeon",
+   "at": 55,
+   "item_id": 70352,
+   "name": "Char (red)",
+   "goal": "Clear 55 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#70353",
+   "counter": "dungeon",
+   "at": 57,
+   "item_id": 70353,
+   "name": "Char (purple)",
+   "goal": "Clear 57 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#70354",
+   "counter": "dungeon",
+   "at": 59,
+   "item_id": 70354,
+   "name": "Char (cream)",
+   "goal": "Clear 59 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#70355",
+   "counter": "dungeon",
+   "at": 61,
+   "item_id": 70355,
+   "name": "Char (green)",
+   "goal": "Clear 61 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#70356",
+   "counter": "dungeon",
+   "at": 63,
+   "item_id": 70356,
+   "name": "Char (gold)",
+   "goal": "Clear 63 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#70447",
+   "counter": "dungeon",
+   "at": 65,
+   "item_id": 70447,
+   "name": "Zax (barndoor)",
+   "goal": "Clear 65 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#70448",
+   "counter": "dungeon",
+   "at": 67,
+   "item_id": 70448,
+   "name": "Zax (amethyst)",
+   "goal": "Clear 67 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#70449",
+   "counter": "dungeon",
+   "at": 69,
+   "item_id": 70449,
+   "name": "Zax (saphire)",
+   "goal": "Clear 69 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#70451",
+   "counter": "dungeon",
+   "at": 71,
+   "item_id": 70451,
+   "name": "Zax (latte)",
+   "goal": "Clear 71 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#70452",
+   "counter": "dungeon",
+   "at": 73,
+   "item_id": 70452,
+   "name": "Zax (blizzard)",
+   "goal": "Clear 73 dungeons",
+   "kind": "reconstructed",
+   "basis": "(R) dragons, dinosaurs, wolves and the undead: dungeon trophies, after the Shrouded Gloam boss-chest pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#2272",
+   "counter": "gather",
+   "at": 20,
+   "item_id": 2272,
+   "name": "Chicken",
+   "goal": "Gather 20 resources",
+   "kind": "reconstructed",
+   "basis": "(R) farm and forest animals: earned by harvesting and mining."
+  },
+  {
+   "key": "pet#2807",
+   "counter": "gather",
+   "at": 40,
+   "item_id": 2807,
+   "name": "Parrot",
+   "goal": "Gather 40 resources",
+   "kind": "reconstructed",
+   "basis": "(R) farm and forest animals: earned by harvesting and mining."
+  },
+  {
+   "key": "pet#3058",
+   "counter": "gather",
+   "at": 60,
+   "item_id": 3058,
+   "name": "Fish",
+   "goal": "Gather 60 resources",
+   "kind": "reconstructed",
+   "basis": "(R) farm and forest animals: earned by harvesting and mining."
+  },
+  {
+   "key": "pet#7884",
+   "counter": "gather",
+   "at": 80,
+   "item_id": 7884,
+   "name": "Chick",
+   "goal": "Gather 80 resources",
+   "kind": "reconstructed",
+   "basis": "(R) farm and forest animals: earned by harvesting and mining."
+  },
+  {
+   "key": "pet#7886",
+   "counter": "gather",
+   "at": 100,
+   "item_id": 7886,
+   "name": "Duck",
+   "goal": "Gather 100 resources",
+   "kind": "reconstructed",
+   "basis": "(R) farm and forest animals: earned by harvesting and mining."
+  },
+  {
+   "key": "pet#7888",
+   "counter": "gather",
+   "at": 120,
+   "item_id": 7888,
+   "name": "Rabbit",
+   "goal": "Gather 120 resources",
+   "kind": "reconstructed",
+   "basis": "(R) farm and forest animals: earned by harvesting and mining."
+  },
+  {
+   "key": "pet#7889",
+   "counter": "gather",
+   "at": 140,
+   "item_id": 7889,
+   "name": "Squirrel",
+   "goal": "Gather 140 resources",
+   "kind": "reconstructed",
+   "basis": "(R) farm and forest animals: earned by harvesting and mining."
+  },
+  {
+   "key": "pet#17529",
+   "counter": "gather",
+   "at": 160,
+   "item_id": 17529,
+   "name": "Dove",
+   "goal": "Gather 160 resources",
+   "kind": "reconstructed",
+   "basis": "(R) farm and forest animals: earned by harvesting and mining."
+  },
+  {
+   "key": "pet#17532",
+   "counter": "gather",
+   "at": 180,
+   "item_id": 17532,
+   "name": "Owl",
+   "goal": "Gather 180 resources",
+   "kind": "reconstructed",
+   "basis": "(R) farm and forest animals: earned by harvesting and mining."
+  },
+  {
+   "key": "pet#17534",
+   "counter": "gather",
+   "at": 200,
+   "item_id": 17534,
+   "name": "Seagull",
+   "goal": "Gather 200 resources",
+   "kind": "reconstructed",
+   "basis": "(R) farm and forest animals: earned by harvesting and mining."
+  },
+  {
+   "key": "pet#17537",
+   "counter": "gather",
+   "at": 220,
+   "item_id": 17537,
+   "name": "Butterfly",
+   "goal": "Gather 220 resources",
+   "kind": "reconstructed",
+   "basis": "(R) farm and forest animals: earned by harvesting and mining."
+  },
+  {
+   "key": "pet#17538",
+   "counter": "gather",
+   "at": 240,
+   "item_id": 17538,
+   "name": "Brown Cow",
+   "goal": "Gather 240 resources",
+   "kind": "reconstructed",
+   "basis": "(R) farm and forest animals: earned by harvesting and mining."
+  },
+  {
+   "key": "pet#17540",
+   "counter": "gather",
+   "at": 260,
+   "item_id": 17540,
+   "name": "Ewe",
+   "goal": "Gather 260 resources",
+   "kind": "reconstructed",
+   "basis": "(R) farm and forest animals: earned by harvesting and mining."
+  },
+  {
+   "key": "pet#17541",
+   "counter": "gather",
+   "at": 280,
+   "item_id": 17541,
+   "name": "Shaved Ewe",
+   "goal": "Gather 280 resources",
+   "kind": "reconstructed",
+   "basis": "(R) farm and forest animals: earned by harvesting and mining."
+  },
+  {
+   "key": "pet#17543",
+   "counter": "gather",
+   "at": 300,
+   "item_id": 17543,
+   "name": "Firefly",
+   "goal": "Gather 300 resources",
+   "kind": "reconstructed",
+   "basis": "(R) farm and forest animals: earned by harvesting and mining."
+  },
+  {
+   "key": "pet#17545",
+   "counter": "gather",
+   "at": 320,
+   "item_id": 17545,
+   "name": "Buck",
+   "goal": "Gather 320 resources",
+   "kind": "reconstructed",
+   "basis": "(R) farm and forest animals: earned by harvesting and mining."
+  },
+  {
+   "key": "pet#17546",
+   "counter": "gather",
+   "at": 340,
+   "item_id": 17546,
+   "name": "Doe",
+   "goal": "Gather 340 resources",
+   "kind": "reconstructed",
+   "basis": "(R) farm and forest animals: earned by harvesting and mining."
+  },
+  {
+   "key": "pet#7887",
+   "counter": "gather",
+   "at": 360,
+   "item_id": 7887,
+   "name": "Fish",
+   "goal": "Gather 360 resources",
+   "kind": "reconstructed",
+   "basis": "(R) farm and forest animals: earned by harvesting and mining."
+  },
+  {
+   "key": "pet#17868",
+   "counter": "kart_race",
+   "at": 2,
+   "item_id": 17868,
+   "name": "Chibi (white)",
+   "goal": "Finish 2 kart races",
+   "kind": "reconstructed",
+   "basis": "(R) unicorns and the Fire Pegasus: racing prizes."
+  },
+  {
+   "key": "pet#70377",
+   "counter": "kart_race",
+   "at": 5,
+   "item_id": 70377,
+   "name": "Chibi (blue)",
+   "goal": "Finish 5 kart races",
+   "kind": "reconstructed",
+   "basis": "(R) unicorns and the Fire Pegasus: racing prizes."
+  },
+  {
+   "key": "pet#70378",
+   "counter": "kart_race",
+   "at": 8,
+   "item_id": 70378,
+   "name": "Chibi (gold)",
+   "goal": "Finish 8 kart races",
+   "kind": "reconstructed",
+   "basis": "(R) unicorns and the Fire Pegasus: racing prizes."
+  },
+  {
+   "key": "pet#70379",
+   "counter": "kart_race",
+   "at": 11,
+   "item_id": 70379,
+   "name": "Chibi (green)",
+   "goal": "Finish 11 kart races",
+   "kind": "reconstructed",
+   "basis": "(R) unicorns and the Fire Pegasus: racing prizes."
+  },
+  {
+   "key": "pet#70380",
+   "counter": "kart_race",
+   "at": 14,
+   "item_id": 70380,
+   "name": "Chibi (pink)",
+   "goal": "Finish 14 kart races",
+   "kind": "reconstructed",
+   "basis": "(R) unicorns and the Fire Pegasus: racing prizes."
+  },
+  {
+   "key": "pet#70381",
+   "counter": "kart_race",
+   "at": 17,
+   "item_id": 70381,
+   "name": "Chibi (purple)",
+   "goal": "Finish 17 kart races",
+   "kind": "reconstructed",
+   "basis": "(R) unicorns and the Fire Pegasus: racing prizes."
+  },
+  {
+   "key": "pet#70383",
+   "counter": "kart_race",
+   "at": 20,
+   "item_id": 70383,
+   "name": "Chibi (aqua)",
+   "goal": "Finish 20 kart races",
+   "kind": "reconstructed",
+   "basis": "(R) unicorns and the Fire Pegasus: racing prizes."
+  },
+  {
+   "key": "pet#70384",
+   "counter": "kart_race",
+   "at": 23,
+   "item_id": 70384,
+   "name": "Chibi (black)",
+   "goal": "Finish 23 kart races",
+   "kind": "reconstructed",
+   "basis": "(R) unicorns and the Fire Pegasus: racing prizes."
+  },
+  {
+   "key": "pet#7882",
+   "counter": "kill",
+   "at": 25,
+   "item_id": 7882,
+   "name": "Bat (base1 default)",
+   "goal": "Defeat 25 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#7883",
+   "counter": "kill",
+   "at": 50,
+   "item_id": 7883,
+   "name": "Screecher",
+   "goal": "Defeat 50 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#7885",
+   "counter": "kill",
+   "at": 75,
+   "item_id": 7885,
+   "name": "Crab",
+   "goal": "Defeat 75 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#7890",
+   "counter": "kill",
+   "at": 100,
+   "item_id": 7890,
+   "name": "Snake",
+   "goal": "Defeat 100 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#7891",
+   "counter": "kill",
+   "at": 125,
+   "item_id": 7891,
+   "name": "Toad",
+   "goal": "Defeat 125 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#10387",
+   "counter": "kill",
+   "at": 150,
+   "item_id": 10387,
+   "name": "Mini Cray",
+   "goal": "Defeat 150 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17525",
+   "counter": "kill",
+   "at": 175,
+   "item_id": 17525,
+   "name": "Antelope",
+   "goal": "Defeat 175 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17526",
+   "counter": "kill",
+   "at": 200,
+   "item_id": 17526,
+   "name": "Female Antelope",
+   "goal": "Defeat 200 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17527",
+   "counter": "kill",
+   "at": 225,
+   "item_id": 17527,
+   "name": "Bear Cub",
+   "goal": "Defeat 225 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17528",
+   "counter": "kill",
+   "at": 250,
+   "item_id": 17528,
+   "name": "Billy Goat",
+   "goal": "Defeat 250 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17530",
+   "counter": "kill",
+   "at": 275,
+   "item_id": 17530,
+   "name": "Eagle",
+   "goal": "Defeat 275 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17531",
+   "counter": "kill",
+   "at": 300,
+   "item_id": 17531,
+   "name": "Raven",
+   "goal": "Defeat 300 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17535",
+   "counter": "kill",
+   "at": 325,
+   "item_id": 17535,
+   "name": "Black Widow",
+   "goal": "Defeat 325 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17536",
+   "counter": "kill",
+   "at": 350,
+   "item_id": 17536,
+   "name": "Baby Black Widow",
+   "goal": "Defeat 350 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17539",
+   "counter": "kill",
+   "at": 375,
+   "item_id": 17539,
+   "name": "Swamp Cray",
+   "goal": "Defeat 375 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17542",
+   "counter": "kill",
+   "at": 400,
+   "item_id": 17542,
+   "name": "Faerie Drake",
+   "goal": "Defeat 400 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17544",
+   "counter": "kill",
+   "at": 425,
+   "item_id": 17544,
+   "name": "Floren",
+   "goal": "Defeat 425 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17547",
+   "counter": "kill",
+   "at": 450,
+   "item_id": 17547,
+   "name": "Mini Forest Giant",
+   "goal": "Defeat 450 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17549",
+   "counter": "kill",
+   "at": 475,
+   "item_id": 17549,
+   "name": "Maneating Fungus",
+   "goal": "Defeat 475 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17550",
+   "counter": "kill",
+   "at": 500,
+   "item_id": 17550,
+   "name": "Maneating Plant",
+   "goal": "Defeat 500 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17552",
+   "counter": "kill",
+   "at": 525,
+   "item_id": 17552,
+   "name": "Cow",
+   "goal": "Defeat 525 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17553",
+   "counter": "kill",
+   "at": 550,
+   "item_id": 17553,
+   "name": "Nanny Goat",
+   "goal": "Defeat 550 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17554",
+   "counter": "kill",
+   "at": 575,
+   "item_id": 17554,
+   "name": "Shaggy Cow",
+   "goal": "Defeat 575 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17555",
+   "counter": "kill",
+   "at": 600,
+   "item_id": 17555,
+   "name": "Shaggy Spider",
+   "goal": "Defeat 600 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17557",
+   "counter": "kill",
+   "at": 625,
+   "item_id": 17557,
+   "name": "Snow Hog",
+   "goal": "Defeat 625 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17559",
+   "counter": "kill",
+   "at": 650,
+   "item_id": 17559,
+   "name": "Black Toad",
+   "goal": "Defeat 650 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17560",
+   "counter": "kill",
+   "at": 675,
+   "item_id": 17560,
+   "name": "Purple Toad",
+   "goal": "Defeat 675 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17561",
+   "counter": "kill",
+   "at": 700,
+   "item_id": 17561,
+   "name": "Mini Tree Soldier",
+   "goal": "Defeat 700 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17562",
+   "counter": "kill",
+   "at": 725,
+   "item_id": 17562,
+   "name": "Mini Ice Tree Soldier",
+   "goal": "Defeat 725 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17563",
+   "counter": "kill",
+   "at": 750,
+   "item_id": 17563,
+   "name": "Mushroom Tree Soldier",
+   "goal": "Defeat 750 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17565",
+   "counter": "kill",
+   "at": 775,
+   "item_id": 17565,
+   "name": "Warthog",
+   "goal": "Defeat 775 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17533",
+   "counter": "kill",
+   "at": 800,
+   "item_id": 17533,
+   "name": "Raven",
+   "goal": "Defeat 800 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#17558",
+   "counter": "kill",
+   "at": 825,
+   "item_id": 17558,
+   "name": "Toad",
+   "goal": "Defeat 825 enemies",
+   "kind": "reconstructed",
+   "basis": "(R) miniatures of the world's own creatures: earned by fighting them."
+  },
+  {
+   "key": "pet#10407",
+   "counter": "minigame",
+   "at": 3,
+   "item_id": 10407,
+   "name": "Fairy Boy",
+   "goal": "Finish 3 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#10408",
+   "counter": "minigame",
+   "at": 7,
+   "item_id": 10408,
+   "name": "Fairy Girl",
+   "goal": "Finish 7 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#10417",
+   "counter": "minigame",
+   "at": 11,
+   "item_id": 10417,
+   "name": "ROFLE",
+   "goal": "Finish 11 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#10489",
+   "counter": "minigame",
+   "at": 15,
+   "item_id": 10489,
+   "name": "Marshmallow (bubblegum)",
+   "goal": "Finish 15 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#10995",
+   "counter": "minigame",
+   "at": 19,
+   "item_id": 10995,
+   "name": "Emo-Tor",
+   "goal": "Finish 19 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#13676",
+   "counter": "minigame",
+   "at": 23,
+   "item_id": 13676,
+   "name": "Clockwork Monkey (bubblegum)",
+   "goal": "Finish 23 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#17521",
+   "counter": "minigame",
+   "at": 27,
+   "item_id": 17521,
+   "name": "Snowman",
+   "goal": "Finish 27 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#17842",
+   "counter": "minigame",
+   "at": 31,
+   "item_id": 17842,
+   "name": "Bat (dyetint darkmatter)",
+   "goal": "Finish 31 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#77460",
+   "counter": "minigame",
+   "at": 35,
+   "item_id": 77460,
+   "name": "Cakeling",
+   "goal": "Finish 35 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#77461",
+   "counter": "minigame",
+   "at": 39,
+   "item_id": 77461,
+   "name": "Cupcake",
+   "goal": "Finish 39 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#10490",
+   "counter": "minigame",
+   "at": 43,
+   "item_id": 10490,
+   "name": "Marshmallow (amethyst)",
+   "goal": "Finish 43 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#10491",
+   "counter": "minigame",
+   "at": 47,
+   "item_id": 10491,
+   "name": "Marshmallow (grape)",
+   "goal": "Finish 47 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#10492",
+   "counter": "minigame",
+   "at": 51,
+   "item_id": 10492,
+   "name": "Marshmallow (pumpkin)",
+   "goal": "Finish 51 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#10493",
+   "counter": "minigame",
+   "at": 55,
+   "item_id": 10493,
+   "name": "Marshmallow (chocolate)",
+   "goal": "Finish 55 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#10494",
+   "counter": "minigame",
+   "at": 59,
+   "item_id": 10494,
+   "name": "Marshmallow (raincloud)",
+   "goal": "Finish 59 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#10495",
+   "counter": "minigame",
+   "at": 63,
+   "item_id": 10495,
+   "name": "Marshmallow (honey)",
+   "goal": "Finish 63 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#10496",
+   "counter": "minigame",
+   "at": 67,
+   "item_id": 10496,
+   "name": "Marshmallow (tumbleweed)",
+   "goal": "Finish 67 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#10497",
+   "counter": "minigame",
+   "at": 71,
+   "item_id": 10497,
+   "name": "Marshmallow (snow)",
+   "goal": "Finish 71 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#10498",
+   "counter": "minigame",
+   "at": 75,
+   "item_id": 10498,
+   "name": "Marshmallow (charcoal)",
+   "goal": "Finish 75 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#13677",
+   "counter": "minigame",
+   "at": 79,
+   "item_id": 13677,
+   "name": "Clockwork Monkey (concrete)",
+   "goal": "Finish 79 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#13678",
+   "counter": "minigame",
+   "at": 83,
+   "item_id": 13678,
+   "name": "Clockwork Monkey (mahogany)",
+   "goal": "Finish 83 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#13679",
+   "counter": "minigame",
+   "at": 87,
+   "item_id": 13679,
+   "name": "Clockwork Monkey (raincloud)",
+   "goal": "Finish 87 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#13680",
+   "counter": "minigame",
+   "at": 91,
+   "item_id": 13680,
+   "name": "Clockwork Monkey (sweetpea)",
+   "goal": "Finish 91 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#13681",
+   "counter": "minigame",
+   "at": 95,
+   "item_id": 13681,
+   "name": "Clockwork Monkey (timberwolf)",
+   "goal": "Finish 95 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#77462",
+   "counter": "minigame",
+   "at": 99,
+   "item_id": 77462,
+   "name": "Cupcake",
+   "goal": "Finish 99 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#77463",
+   "counter": "minigame",
+   "at": 103,
+   "item_id": 77463,
+   "name": "Cupcake",
+   "goal": "Finish 103 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#77464",
+   "counter": "minigame",
+   "at": 107,
+   "item_id": 77464,
+   "name": "Cupcake",
+   "goal": "Finish 107 minigames (kart races, derby matches, card duels, Pirate's Plunder and the arcade games; fishing, harvesting and mining do not count)",
+   "kind": "reconstructed",
+   "basis": "(R) toys, treats and clockwork pets: minigame prizes, after the Trading Card Game reward pets (fanbyte wiki harvest 2026-11-02, Special Pets (FR))."
+  },
+  {
+   "key": "pet#24045",
+   "counter": "pet_feed",
+   "at": 3,
+   "item_id": 24045,
+   "name": "Longhair Cat (plain black)",
+   "goal": "Feed your pet 3 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24046",
+   "counter": "pet_feed",
+   "at": 8,
+   "item_id": 24046,
+   "name": "Longhair Cat (plain grey)",
+   "goal": "Feed your pet 8 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24047",
+   "counter": "pet_feed",
+   "at": 13,
+   "item_id": 24047,
+   "name": "Longhair Cat (plain tan)",
+   "goal": "Feed your pet 13 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24048",
+   "counter": "pet_feed",
+   "at": 18,
+   "item_id": 24048,
+   "name": "Longhair Cat (plain ltbrown)",
+   "goal": "Feed your pet 18 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24049",
+   "counter": "pet_feed",
+   "at": 23,
+   "item_id": 24049,
+   "name": "Longhair Cat (plain dkbrown)",
+   "goal": "Feed your pet 23 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24050",
+   "counter": "pet_feed",
+   "at": 28,
+   "item_id": 24050,
+   "name": "Longhair Cat (striped white)",
+   "goal": "Feed your pet 28 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24051",
+   "counter": "pet_feed",
+   "at": 33,
+   "item_id": 24051,
+   "name": "Longhair Cat (striped black)",
+   "goal": "Feed your pet 33 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24053",
+   "counter": "pet_feed",
+   "at": 38,
+   "item_id": 24053,
+   "name": "Longhair Cat (striped tan)",
+   "goal": "Feed your pet 38 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24054",
+   "counter": "pet_feed",
+   "at": 43,
+   "item_id": 24054,
+   "name": "Longhair Cat (striped orange)",
+   "goal": "Feed your pet 43 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24055",
+   "counter": "pet_feed",
+   "at": 48,
+   "item_id": 24055,
+   "name": "Longhair Cat (striped chocolate)",
+   "goal": "Feed your pet 48 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24057",
+   "counter": "pet_feed",
+   "at": 53,
+   "item_id": 24057,
+   "name": "Longhair Cat (tuxedo grey)",
+   "goal": "Feed your pet 53 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24059",
+   "counter": "pet_feed",
+   "at": 58,
+   "item_id": 24059,
+   "name": "Longhair Cat (tuxedo brown)",
+   "goal": "Feed your pet 58 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24061",
+   "counter": "pet_feed",
+   "at": 63,
+   "item_id": 24061,
+   "name": "Longhair Cat (tuxedo tan)",
+   "goal": "Feed your pet 63 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24063",
+   "counter": "pet_feed",
+   "at": 68,
+   "item_id": 24063,
+   "name": "Longhair Cat (calico black)",
+   "goal": "Feed your pet 68 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24064",
+   "counter": "pet_feed",
+   "at": 73,
+   "item_id": 24064,
+   "name": "Longhair Cat (calico grey)",
+   "goal": "Feed your pet 73 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24065",
+   "counter": "pet_feed",
+   "at": 78,
+   "item_id": 24065,
+   "name": "Longhair Cat (calico tan)",
+   "goal": "Feed your pet 78 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24066",
+   "counter": "pet_feed",
+   "at": 83,
+   "item_id": 24066,
+   "name": "Longhair Cat (calico chocolate)",
+   "goal": "Feed your pet 83 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24067",
+   "counter": "pet_feed",
+   "at": 88,
+   "item_id": 24067,
+   "name": "Longhair Cat (calico latte)",
+   "goal": "Feed your pet 88 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24068",
+   "counter": "pet_feed",
+   "at": 93,
+   "item_id": 24068,
+   "name": "Longhair Cat (tabby white)",
+   "goal": "Feed your pet 93 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24070",
+   "counter": "pet_feed",
+   "at": 98,
+   "item_id": 24070,
+   "name": "Longhair Cat (tabby grey)",
+   "goal": "Feed your pet 98 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24071",
+   "counter": "pet_feed",
+   "at": 103,
+   "item_id": 24071,
+   "name": "Longhair Cat (tabby chocolate)",
+   "goal": "Feed your pet 103 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24074",
+   "counter": "pet_feed",
+   "at": 108,
+   "item_id": 24074,
+   "name": "Longhair Cat (siamese white)",
+   "goal": "Feed your pet 108 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24075",
+   "counter": "pet_feed",
+   "at": 113,
+   "item_id": 24075,
+   "name": "Longhair Cat (siamese black)",
+   "goal": "Feed your pet 113 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24076",
+   "counter": "pet_feed",
+   "at": 118,
+   "item_id": 24076,
+   "name": "Longhair Cat (siamese mediumgrey)",
+   "goal": "Feed your pet 118 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24077",
+   "counter": "pet_feed",
+   "at": 123,
+   "item_id": 24077,
+   "name": "Longhair Cat (siamese lightgrey)",
+   "goal": "Feed your pet 123 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24078",
+   "counter": "pet_feed",
+   "at": 128,
+   "item_id": 24078,
+   "name": "Longhair Cat (siamese darkgrey)",
+   "goal": "Feed your pet 128 times (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the long-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR))."
+  },
+  {
+   "key": "pet#24008",
+   "counter": "pet_groom",
+   "at": 3,
+   "item_id": 24008,
+   "name": "Shorthair Cat (plain white)",
+   "goal": "Finish 3 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24010",
+   "counter": "pet_groom",
+   "at": 8,
+   "item_id": 24010,
+   "name": "Shorthair Cat (plain grey)",
+   "goal": "Finish 8 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24011",
+   "counter": "pet_groom",
+   "at": 13,
+   "item_id": 24011,
+   "name": "Shorthair Cat (plain tan)",
+   "goal": "Finish 13 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24012",
+   "counter": "pet_groom",
+   "at": 18,
+   "item_id": 24012,
+   "name": "Shorthair Cat (plain ltbrown)",
+   "goal": "Finish 18 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24014",
+   "counter": "pet_groom",
+   "at": 23,
+   "item_id": 24014,
+   "name": "Shorthair Cat (striped white)",
+   "goal": "Finish 23 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24015",
+   "counter": "pet_groom",
+   "at": 28,
+   "item_id": 24015,
+   "name": "Shorthair Cat (striped black)",
+   "goal": "Finish 28 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24016",
+   "counter": "pet_groom",
+   "at": 33,
+   "item_id": 24016,
+   "name": "Shorthair Cat (striped grey)",
+   "goal": "Finish 33 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24017",
+   "counter": "pet_groom",
+   "at": 38,
+   "item_id": 24017,
+   "name": "Shorthair Cat (striped tan)",
+   "goal": "Finish 38 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24019",
+   "counter": "pet_groom",
+   "at": 43,
+   "item_id": 24019,
+   "name": "Shorthair Cat (striped chocolate)",
+   "goal": "Finish 43 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24020",
+   "counter": "pet_groom",
+   "at": 48,
+   "item_id": 24020,
+   "name": "Shorthair Cat (tuxedo black)",
+   "goal": "Finish 48 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24023",
+   "counter": "pet_groom",
+   "at": 53,
+   "item_id": 24023,
+   "name": "Shorthair Cat (tuxedo brown)",
+   "goal": "Finish 53 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24024",
+   "counter": "pet_groom",
+   "at": 58,
+   "item_id": 24024,
+   "name": "Shorthair Cat (tuxedo chocolate)",
+   "goal": "Finish 58 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24025",
+   "counter": "pet_groom",
+   "at": 63,
+   "item_id": 24025,
+   "name": "Shorthair Cat (tuxedo tan)",
+   "goal": "Finish 63 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24026",
+   "counter": "pet_groom",
+   "at": 68,
+   "item_id": 24026,
+   "name": "Shorthair Cat (calico white)",
+   "goal": "Finish 68 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24028",
+   "counter": "pet_groom",
+   "at": 73,
+   "item_id": 24028,
+   "name": "Shorthair Cat (calico grey)",
+   "goal": "Finish 73 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24029",
+   "counter": "pet_groom",
+   "at": 78,
+   "item_id": 24029,
+   "name": "Shorthair Cat (calico tan)",
+   "goal": "Finish 78 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24030",
+   "counter": "pet_groom",
+   "at": 83,
+   "item_id": 24030,
+   "name": "Shorthair Cat (calico chocolate)",
+   "goal": "Finish 83 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24031",
+   "counter": "pet_groom",
+   "at": 88,
+   "item_id": 24031,
+   "name": "Shorthair Cat (calico latte)",
+   "goal": "Finish 88 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24033",
+   "counter": "pet_groom",
+   "at": 93,
+   "item_id": 24033,
+   "name": "Shorthair Cat (tabby black)",
+   "goal": "Finish 93 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24034",
+   "counter": "pet_groom",
+   "at": 98,
+   "item_id": 24034,
+   "name": "Shorthair Cat (tabby grey)",
+   "goal": "Finish 98 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24035",
+   "counter": "pet_groom",
+   "at": 103,
+   "item_id": 24035,
+   "name": "Shorthair Cat (tabby chocolate)",
+   "goal": "Finish 103 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24036",
+   "counter": "pet_groom",
+   "at": 108,
+   "item_id": 24036,
+   "name": "Shorthair Cat (tabby latte)",
+   "goal": "Finish 108 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24037",
+   "counter": "pet_groom",
+   "at": 113,
+   "item_id": 24037,
+   "name": "Shorthair Cat (tabby orange)",
+   "goal": "Finish 113 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24039",
+   "counter": "pet_groom",
+   "at": 118,
+   "item_id": 24039,
+   "name": "Shorthair Cat (siamese black)",
+   "goal": "Finish 118 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24040",
+   "counter": "pet_groom",
+   "at": 123,
+   "item_id": 24040,
+   "name": "Shorthair Cat (siamese mediumgrey)",
+   "goal": "Finish 123 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24042",
+   "counter": "pet_groom",
+   "at": 128,
+   "item_id": 24042,
+   "name": "Shorthair Cat (siamese darkgrey)",
+   "goal": "Finish 128 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#24043",
+   "counter": "pet_groom",
+   "at": 133,
+   "item_id": 24043,
+   "name": "Shorthair Cat (siamese brown)",
+   "goal": "Finish 133 grooming sessions (up to 3 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) the short-haired Adoption Center cats in every coat: pet care (fanbyte wiki harvest 2026-11-02, Pet Care (FR)). A session counts when it ends by itself: a full bar or its time limit."
+  },
+  {
+   "key": "pet#9049",
+   "counter": "pet_treasure",
+   "at": 3,
+   "item_id": 9049,
+   "name": "Treeble",
+   "goal": "Open 3 pet treasure chests",
+   "kind": "reconstructed",
+   "basis": "(R) the diggers (groundhogs, landsharks, treebles): found while treasure hunting (fanbyte wiki harvest 2026-11-02, Pet FAQ (FR): pets find treasure chests)."
+  },
+  {
+   "key": "pet#10366",
+   "counter": "pet_treasure",
+   "at": 8,
+   "item_id": 10366,
+   "name": "Landshark (black)",
+   "goal": "Open 8 pet treasure chests",
+   "kind": "reconstructed",
+   "basis": "(R) the diggers (groundhogs, landsharks, treebles): found while treasure hunting (fanbyte wiki harvest 2026-11-02, Pet FAQ (FR): pets find treasure chests)."
+  },
+  {
+   "key": "pet#10987",
+   "counter": "pet_treasure",
+   "at": 13,
+   "item_id": 10987,
+   "name": "Chuck (white)",
+   "goal": "Open 13 pet treasure chests",
+   "kind": "reconstructed",
+   "basis": "(R) the diggers (groundhogs, landsharks, treebles): found while treasure hunting (fanbyte wiki harvest 2026-11-02, Pet FAQ (FR): pets find treasure chests)."
+  },
+  {
+   "key": "pet#10367",
+   "counter": "pet_treasure",
+   "at": 18,
+   "item_id": 10367,
+   "name": "Landshark (blue)",
+   "goal": "Open 18 pet treasure chests",
+   "kind": "reconstructed",
+   "basis": "(R) the diggers (groundhogs, landsharks, treebles): found while treasure hunting (fanbyte wiki harvest 2026-11-02, Pet FAQ (FR): pets find treasure chests)."
+  },
+  {
+   "key": "pet#10368",
+   "counter": "pet_treasure",
+   "at": 23,
+   "item_id": 10368,
+   "name": "Landshark (orange)",
+   "goal": "Open 23 pet treasure chests",
+   "kind": "reconstructed",
+   "basis": "(R) the diggers (groundhogs, landsharks, treebles): found while treasure hunting (fanbyte wiki harvest 2026-11-02, Pet FAQ (FR): pets find treasure chests)."
+  },
+  {
+   "key": "pet#10369",
+   "counter": "pet_treasure",
+   "at": 28,
+   "item_id": 10369,
+   "name": "Landshark (pink)",
+   "goal": "Open 28 pet treasure chests",
+   "kind": "reconstructed",
+   "basis": "(R) the diggers (groundhogs, landsharks, treebles): found while treasure hunting (fanbyte wiki harvest 2026-11-02, Pet FAQ (FR): pets find treasure chests)."
+  },
+  {
+   "key": "pet#10370",
+   "counter": "pet_treasure",
+   "at": 33,
+   "item_id": 10370,
+   "name": "Landshark (red)",
+   "goal": "Open 33 pet treasure chests",
+   "kind": "reconstructed",
+   "basis": "(R) the diggers (groundhogs, landsharks, treebles): found while treasure hunting (fanbyte wiki harvest 2026-11-02, Pet FAQ (FR): pets find treasure chests)."
+  },
+  {
+   "key": "pet#10371",
+   "counter": "pet_treasure",
+   "at": 38,
+   "item_id": 10371,
+   "name": "Landshark (white)",
+   "goal": "Open 38 pet treasure chests",
+   "kind": "reconstructed",
+   "basis": "(R) the diggers (groundhogs, landsharks, treebles): found while treasure hunting (fanbyte wiki harvest 2026-11-02, Pet FAQ (FR): pets find treasure chests)."
+  },
+  {
+   "key": "pet#10988",
+   "counter": "pet_treasure",
+   "at": 43,
+   "item_id": 10988,
+   "name": "Chuck (red)",
+   "goal": "Open 43 pet treasure chests",
+   "kind": "reconstructed",
+   "basis": "(R) the diggers (groundhogs, landsharks, treebles): found while treasure hunting (fanbyte wiki harvest 2026-11-02, Pet FAQ (FR): pets find treasure chests)."
+  },
+  {
+   "key": "pet#10989",
+   "counter": "pet_treasure",
+   "at": 48,
+   "item_id": 10989,
+   "name": "Chuck (black)",
+   "goal": "Open 48 pet treasure chests",
+   "kind": "reconstructed",
+   "basis": "(R) the diggers (groundhogs, landsharks, treebles): found while treasure hunting (fanbyte wiki harvest 2026-11-02, Pet FAQ (FR): pets find treasure chests)."
+  },
+  {
+   "key": "pet#10990",
+   "counter": "pet_treasure",
+   "at": 53,
+   "item_id": 10990,
+   "name": "Chuck (orange)",
+   "goal": "Open 53 pet treasure chests",
+   "kind": "reconstructed",
+   "basis": "(R) the diggers (groundhogs, landsharks, treebles): found while treasure hunting (fanbyte wiki harvest 2026-11-02, Pet FAQ (FR): pets find treasure chests)."
+  },
+  {
+   "key": "pet#10991",
+   "counter": "pet_treasure",
+   "at": 58,
+   "item_id": 10991,
+   "name": "Chuck (pink)",
+   "goal": "Open 58 pet treasure chests",
+   "kind": "reconstructed",
+   "basis": "(R) the diggers (groundhogs, landsharks, treebles): found while treasure hunting (fanbyte wiki harvest 2026-11-02, Pet FAQ (FR): pets find treasure chests)."
+  },
+  {
+   "key": "pet#10992",
+   "counter": "pet_treasure",
+   "at": 63,
+   "item_id": 10992,
+   "name": "Chuck (blue)",
+   "goal": "Open 63 pet treasure chests",
+   "kind": "reconstructed",
+   "basis": "(R) the diggers (groundhogs, landsharks, treebles): found while treasure hunting (fanbyte wiki harvest 2026-11-02, Pet FAQ (FR): pets find treasure chests)."
+  },
+  {
+   "key": "pet#17865",
+   "counter": "pet_treasure",
+   "at": 68,
+   "item_id": 17865,
+   "name": "Treeble (treebleorange)",
+   "goal": "Open 68 pet treasure chests",
+   "kind": "reconstructed",
+   "basis": "(R) the diggers (groundhogs, landsharks, treebles): found while treasure hunting (fanbyte wiki harvest 2026-11-02, Pet FAQ (FR): pets find treasure chests)."
+  },
+  {
+   "key": "pet#23900",
+   "counter": "pet_trick",
+   "at": 5,
+   "item_id": 23900,
+   "name": "Small Floppy Dog (solid charcoal)",
+   "goal": "Have your pet do 5 tricks (up to 10 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) ten Adoption Center dogs, the breeds in turn: dogs are the trick pets (fanbyte wiki harvest 2026-11-02, Pet Tricks: seven dog tricks)."
+  },
+  {
+   "key": "pet#23903",
+   "counter": "pet_trick",
+   "at": 15,
+   "item_id": 23903,
+   "name": "Small Floppy Dog (solid rusty)",
+   "goal": "Have your pet do 15 tricks (up to 10 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) ten Adoption Center dogs, the breeds in turn: dogs are the trick pets (fanbyte wiki harvest 2026-11-02, Pet Tricks: seven dog tricks)."
+  },
+  {
+   "key": "pet#23917",
+   "counter": "pet_trick",
+   "at": 25,
+   "item_id": 23917,
+   "name": "Small Fluffy Dog (solid gold)",
+   "goal": "Have your pet do 25 tricks (up to 10 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) ten Adoption Center dogs, the breeds in turn: dogs are the trick pets (fanbyte wiki harvest 2026-11-02, Pet Tricks: seven dog tricks)."
+  },
+  {
+   "key": "pet#23918",
+   "counter": "pet_trick",
+   "at": 35,
+   "item_id": 23918,
+   "name": "Small Fluffy Dog (solid charcoal)",
+   "goal": "Have your pet do 35 tricks (up to 10 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) ten Adoption Center dogs, the breeds in turn: dogs are the trick pets (fanbyte wiki harvest 2026-11-02, Pet Tricks: seven dog tricks)."
+  },
+  {
+   "key": "pet#23936",
+   "counter": "pet_trick",
+   "at": 45,
+   "item_id": 23936,
+   "name": "Small Pointy Dog (solid charcoal)",
+   "goal": "Have your pet do 45 tricks (up to 10 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) ten Adoption Center dogs, the breeds in turn: dogs are the trick pets (fanbyte wiki harvest 2026-11-02, Pet Tricks: seven dog tricks)."
+  },
+  {
+   "key": "pet#23937",
+   "counter": "pet_trick",
+   "at": 55,
+   "item_id": 23937,
+   "name": "Small Pointy Dog (solid tan)",
+   "goal": "Have your pet do 55 tricks (up to 10 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) ten Adoption Center dogs, the breeds in turn: dogs are the trick pets (fanbyte wiki harvest 2026-11-02, Pet Tricks: seven dog tricks)."
+  },
+  {
+   "key": "pet#23954",
+   "counter": "pet_trick",
+   "at": 65,
+   "item_id": 23954,
+   "name": "Large Floppy Dog (solid gold)",
+   "goal": "Have your pet do 65 tricks (up to 10 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) ten Adoption Center dogs, the breeds in turn: dogs are the trick pets (fanbyte wiki harvest 2026-11-02, Pet Tricks: seven dog tricks)."
+  },
+  {
+   "key": "pet#23955",
+   "counter": "pet_trick",
+   "at": 75,
+   "item_id": 23955,
+   "name": "Large Floppy Dog (solid charcoal)",
+   "goal": "Have your pet do 75 tricks (up to 10 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) ten Adoption Center dogs, the breeds in turn: dogs are the trick pets (fanbyte wiki harvest 2026-11-02, Pet Tricks: seven dog tricks)."
+  },
+  {
+   "key": "pet#23969",
+   "counter": "pet_trick",
+   "at": 85,
+   "item_id": 23969,
+   "name": "Large Pointy Dog (solid gold)",
+   "goal": "Have your pet do 85 tricks (up to 10 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) ten Adoption Center dogs, the breeds in turn: dogs are the trick pets (fanbyte wiki harvest 2026-11-02, Pet Tricks: seven dog tricks)."
+  },
+  {
+   "key": "pet#23984",
+   "counter": "pet_trick",
+   "at": 95,
+   "item_id": 23984,
+   "name": "Large Shortears Dog (solid gold)",
+   "goal": "Have your pet do 95 tricks (up to 10 count each day)",
+   "kind": "reconstructed",
+   "basis": "(R) ten Adoption Center dogs, the breeds in turn: dogs are the trick pets (fanbyte wiki harvest 2026-11-02, Pet Tricks: seven dog tricks)."
+  },
+  {
+   "key": "pet#23901",
+   "counter": "quest",
+   "at": 1,
+   "item_id": 23901,
+   "name": "Small Floppy Dog (solid tan)",
+   "goal": "Complete your first quest",
+   "kind": "reconstructed",
+   "basis": "(R) the first pet: the live game opened with a 20-minute trial pet from the Pet Tutorial (fanbyte wiki harvest 2026-11-02, Category:Pets (FR)); here the first finished quest gives a small dog to keep."
+  },
+  {
+   "key": "pet#2644",
+   "counter": "quest",
+   "at": 10,
+   "item_id": 2644,
+   "name": "Black Lab Whistle",
+   "goal": "Complete 10 quests",
+   "kind": "reconstructed",
+   "basis": "(R) the named Adoption Center and Cragara pets and the whistle pets: steady quest play."
+  },
+  {
+   "key": "pet#2684",
+   "counter": "quest",
+   "at": 20,
+   "item_id": 2684,
+   "name": "Pug Whistle",
+   "goal": "Complete 20 quests",
+   "kind": "reconstructed",
+   "basis": "(R) the named Adoption Center and Cragara pets and the whistle pets: steady quest play."
+  },
+  {
+   "key": "pet#2701",
+   "counter": "quest",
+   "at": 30,
+   "item_id": 2701,
+   "name": "Toyger Whistle",
+   "goal": "Complete 30 quests",
+   "kind": "reconstructed",
+   "basis": "(R) the named Adoption Center and Cragara pets and the whistle pets: steady quest play."
+  },
+  {
+   "key": "pet#10004",
+   "counter": "quest",
+   "at": 40,
+   "item_id": 10004,
+   "name": "Woof!",
+   "goal": "Complete 40 quests",
+   "kind": "reconstructed",
+   "basis": "(R) the named Adoption Center and Cragara pets and the whistle pets: steady quest play."
+  },
+  {
+   "key": "pet#10968",
+   "counter": "quest",
+   "at": 50,
+   "item_id": 10968,
+   "name": "Cloud",
+   "goal": "Complete 50 quests",
+   "kind": "reconstructed",
+   "basis": "(R) the named Adoption Center and Cragara pets and the whistle pets: steady quest play."
+  },
+  {
+   "key": "pet#23935",
+   "counter": "quest",
+   "at": 60,
+   "item_id": 23935,
+   "name": "Jinx",
+   "goal": "Complete 60 quests",
+   "kind": "reconstructed",
+   "basis": "(R) the named Adoption Center and Cragara pets and the whistle pets: steady quest play."
+  },
+  {
+   "key": "pet#23964",
+   "counter": "quest",
+   "at": 70,
+   "item_id": 23964,
+   "name": "Peccadillo",
+   "goal": "Complete 70 quests",
+   "kind": "reconstructed",
+   "basis": "(R) the named Adoption Center and Cragara pets and the whistle pets: steady quest play."
+  },
+  {
+   "key": "pet#23973",
+   "counter": "quest",
+   "at": 80,
+   "item_id": 23973,
+   "name": "Bort",
+   "goal": "Complete 80 quests",
+   "kind": "reconstructed",
+   "basis": "(R) the named Adoption Center and Cragara pets and the whistle pets: steady quest play."
+  },
+  {
+   "key": "pet#23977",
+   "counter": "quest",
+   "at": 90,
+   "item_id": 23977,
+   "name": "Scout",
+   "goal": "Complete 90 quests",
+   "kind": "reconstructed",
+   "basis": "(R) the named Adoption Center and Cragara pets and the whistle pets: steady quest play."
+  },
+  {
+   "key": "pet#23986",
+   "counter": "quest",
+   "at": 100,
+   "item_id": 23986,
+   "name": "Stretch",
+   "goal": "Complete 100 quests",
+   "kind": "reconstructed",
+   "basis": "(R) the named Adoption Center and Cragara pets and the whistle pets: steady quest play."
+  },
+  {
+   "key": "pet#24002",
+   "counter": "quest",
+   "at": 110,
+   "item_id": 24002,
+   "name": "Marlin",
+   "goal": "Complete 110 quests",
+   "kind": "reconstructed",
+   "basis": "(R) the named Adoption Center and Cragara pets and the whistle pets: steady quest play."
+  },
+  {
+   "key": "pet#24013",
+   "counter": "quest",
+   "at": 120,
+   "item_id": 24013,
+   "name": "Koko",
+   "goal": "Complete 120 quests",
+   "kind": "reconstructed",
+   "basis": "(R) the named Adoption Center and Cragara pets and the whistle pets: steady quest play."
+  },
+  {
+   "key": "pet#24018",
+   "counter": "quest",
+   "at": 130,
+   "item_id": 24018,
+   "name": "Milo",
+   "goal": "Complete 130 quests",
+   "kind": "reconstructed",
+   "basis": "(R) the named Adoption Center and Cragara pets and the whistle pets: steady quest play."
+  },
+  {
+   "key": "pet#24038",
+   "counter": "quest",
+   "at": 140,
+   "item_id": 24038,
+   "name": "Kiri",
+   "goal": "Complete 140 quests",
+   "kind": "reconstructed",
+   "basis": "(R) the named Adoption Center and Cragara pets and the whistle pets: steady quest play."
+  },
+  {
+   "key": "pet#24052",
+   "counter": "quest",
+   "at": 150,
+   "item_id": 24052,
+   "name": "Zoey",
+   "goal": "Complete 150 quests",
+   "kind": "reconstructed",
+   "basis": "(R) the named Adoption Center and Cragara pets and the whistle pets: steady quest play."
+  },
+  {
+   "key": "pet#24060",
+   "counter": "quest",
+   "at": 160,
+   "item_id": 24060,
+   "name": "Amira",
+   "goal": "Complete 160 quests",
+   "kind": "reconstructed",
+   "basis": "(R) the named Adoption Center and Cragara pets and the whistle pets: steady quest play."
+  },
+  {
+   "key": "pet#24069",
+   "counter": "quest",
+   "at": 170,
+   "item_id": 24069,
+   "name": "Chumly",
+   "goal": "Complete 170 quests",
+   "kind": "reconstructed",
+   "basis": "(R) the named Adoption Center and Cragara pets and the whistle pets: steady quest play."
+  },
+  {
+   "key": "pet#24072",
+   "counter": "quest",
+   "at": 180,
+   "item_id": 24072,
+   "name": "Riley",
+   "goal": "Complete 180 quests",
+   "kind": "reconstructed",
+   "basis": "(R) the named Adoption Center and Cragara pets and the whistle pets: steady quest play."
+  },
+  {
+   "key": "pet#24073",
+   "counter": "quest",
+   "at": 190,
+   "item_id": 24073,
+   "name": "Dashiell",
+   "goal": "Complete 190 quests",
+   "kind": "reconstructed",
+   "basis": "(R) the named Adoption Center and Cragara pets and the whistle pets: steady quest play."
+  },
+  {
+   "key": "pet#68801",
+   "counter": "quest",
+   "at": 200,
+   "item_id": 68801,
+   "name": "Bengal Whistle",
+   "goal": "Complete 200 quests",
+   "kind": "reconstructed",
+   "basis": "(R) the named Adoption Center and Cragara pets and the whistle pets: steady quest play."
+  },
+  {
+   "key": "pet#68871",
+   "counter": "quest",
+   "at": 210,
+   "item_id": 68871,
+   "name": "Doberman Whistle",
+   "goal": "Complete 210 quests",
+   "kind": "reconstructed",
+   "basis": "(R) the named Adoption Center and Cragara pets and the whistle pets: steady quest play."
+  },
+  {
+   "key": "pet#76615",
+   "counter": "quest",
+   "at": 220,
+   "item_id": 76615,
+   "name": "Sigroy",
+   "goal": "Complete 220 quests",
+   "kind": "reconstructed",
+   "basis": "(R) the named Adoption Center and Cragara pets and the whistle pets: steady quest play."
+  },
+  {
+   "key": "pet#17841",
+   "counter": "quest:3951154",
+   "at": 1,
+   "item_id": 17841,
+   "name": "Balloon Animal (red)",
+   "goal": "Complete the quest Bundles of Balloons",
+   "kind": "reconstructed",
+   "basis": "(R) Balloon Animal (349 Station Cash on the wiki, earn-only here): the balloon quest."
+  },
+  {
+   "key": "pet#77465",
+   "counter": "quest:3954106",
+   "at": 1,
+   "item_id": 77465,
+   "name": "Balloon Animal (blue)",
+   "goal": "Complete the quest Free the Balloons?!",
+   "kind": "reconstructed",
+   "basis": "(R) Balloon Animal, second colour: the balloon minigame quest."
+  },
+  {
+   "key": "pet#10322",
+   "counter": "soccer_match",
+   "at": 1,
+   "item_id": 10322,
+   "name": "Soccer Ball",
+   "goal": "Finish 1 soccer matches",
+   "kind": "reconstructed",
+   "basis": "(R) the Soccer Ball pets."
+  },
+  {
+   "key": "pet#10323",
+   "counter": "soccer_match",
+   "at": 5,
+   "item_id": 10323,
+   "name": "Soccer Ball",
+   "goal": "Finish 5 soccer matches",
+   "kind": "reconstructed",
+   "basis": "(R) the Soccer Ball pets."
+  }
+ ],
+ "unwired": [
+  {
+   "item_id": 10353,
+   "reason": "Creepy Construct is already the reward of collection 298 (collection_catalogue.json); the bag search turns that reward item into the pet."
+  },
+  {
+   "item_id": 10469,
+   "reason": "In no item table the server ships (review 2026-11-09): held back until a native run shows the client draws this pet's card and actor."
+  },
+  {
+   "item_id": 10481,
+   "reason": "In no item table the server ships (review 2026-11-09): held back until a native run shows the client draws this pet's card and actor."
+  },
+  {
+   "item_id": 11614,
+   "reason": "In no item table the server ships (review 2026-11-09): held back until a native run shows the client draws this pet's card and actor."
+  },
+  {
+   "item_id": 11939,
+   "reason": "In no item table the server ships (review 2026-11-09): held back until a native run shows the client draws this pet's card and actor."
+  },
+  {
+   "item_id": 14184,
+   "reason": "In no item table the server ships (review 2026-11-09): held back until a native run shows the client draws this pet's card and actor."
+  },
+  {
+   "item_id": 17844,
+   "reason": "The same pet in the same colour as item 3061 (a second client row)."
+  },
+  {
+   "item_id": 17845,
+   "reason": "The same pet in the same colour as item 4324 (a second client row)."
+  },
+  {
+   "item_id": 17847,
+   "reason": "The same pet in the same colour as item 10990 (a second client row)."
+  },
+  {
+   "item_id": 17848,
+   "reason": "The same pet in the same colour as item 10962 (a second client row)."
+  },
+  {
+   "item_id": 17849,
+   "reason": "The same pet in the same colour as item 10368 (a second client row)."
+  },
+  {
+   "item_id": 17850,
+   "reason": "The same pet in the same colour as item 10414 (a second client row)."
+  },
+  {
+   "item_id": 17851,
+   "reason": "The same pet in the same colour as item 10979 (a second client row)."
+  },
+  {
+   "item_id": 17854,
+   "reason": "The same pet in the same colour as item 15514 (a second client row)."
+  },
+  {
+   "item_id": 17855,
+   "reason": "The same pet in the same colour as item 10955 (a second client row)."
+  },
+  {
+   "item_id": 17857,
+   "reason": "The same pet in the same colour as item 2226 (a second client row)."
+  },
+  {
+   "item_id": 17858,
+   "reason": "The same pet in the same colour as item 4248 (a second client row)."
+  },
+  {
+   "item_id": 17861,
+   "reason": "The same pet in the same colour as item 10981 (a second client row)."
+  },
+  {
+   "item_id": 17864,
+   "reason": "The same pet in the same colour as item 10969 (a second client row)."
+  },
+  {
+   "item_id": 17869,
+   "reason": "The same pet in the same colour as item 15494 (a second client row)."
+  },
+  {
+   "item_id": 23904,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23905,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23907,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23908,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23909,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23910,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23911,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23912,
+   "reason": "The same pet in the same colour as item 15956 (a second client row)."
+  },
+  {
+   "item_id": 23914,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23915,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23916,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23919,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23920,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23921,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23922,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23923,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23925,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23926,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23927,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23928,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23932,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23933,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23934,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23938,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23939,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23940,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23942,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23944,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23945,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23946,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23947,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23948,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23949,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23950,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23951,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23952,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23953,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23956,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23958,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23959,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23960,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23962,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23965,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23967,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23968,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23970,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23971,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23972,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23974,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23975,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23976,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23979,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23980,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23981,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23983,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23985,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23987,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23988,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23989,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23991,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23992,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23993,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23994,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23996,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23997,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23998,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 23999,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 24000,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 24003,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 24004,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 24005,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 24006,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 24007,
+   "reason": "An Adoption Center dog coat beyond the trick ladder's 10: no source until an Adoption Center flow exists."
+  },
+  {
+   "item_id": 30589,
+   "reason": "In no item table the server ships (review 2026-11-09): held back until a native run shows the client draws this pet's card and actor."
+  },
+  {
+   "item_id": 38788,
+   "reason": "In no item table the server ships (review 2026-11-09): held back until a native run shows the client draws this pet's card and actor."
+  },
+  {
+   "item_id": 55839,
+   "reason": "The same pet in the same colour as item 10998 (a second client row)."
+  },
+  {
+   "item_id": 70357,
+   "reason": "The same pet in the same colour as item 17846 (a second client row)."
+  },
+  {
+   "item_id": 70359,
+   "reason": "The same pet in the same colour as item 17859 (a second client row)."
+  },
+  {
+   "item_id": 70365,
+   "reason": "The same pet in the same colour as item 17867 (a second client row)."
+  },
+  {
+   "item_id": 70374,
+   "reason": "The same pet in the same colour as item 17853 (a second client row)."
+  },
+  {
+   "item_id": 70382,
+   "reason": "The same pet in the same colour as item 17868 (a second client row)."
+  },
+  {
+   "item_id": 70387,
+   "reason": "The same pet in the same colour as item 17863 (a second client row)."
+  },
+  {
+   "item_id": 70397,
+   "reason": "The same pet in the same colour as item 17856 (a second client row)."
+  },
+  {
+   "item_id": 70400,
+   "reason": "The same pet in the same colour as item 17852 (a second client row)."
+  },
+  {
+   "item_id": 70407,
+   "reason": "The same pet in the same colour as item 17843 (a second client row)."
+  },
+  {
+   "item_id": 70414,
+   "reason": "The same pet in the same colour as item 17862 (a second client row)."
+  },
+  {
+   "item_id": 70450,
+   "reason": "The same pet in the same colour as item 17866 (a second client row)."
+  },
+  {
+   "item_id": 76906,
+   "reason": "In no item table the server ships (review 2026-11-09): held back until a native run shows the client draws this pet's card and actor."
+  },
+  {
+   "item_id": 77030,
+   "reason": "The same pet in the same colour as item 17860 (a second client row)."
+  },
+  {
+   "item_id": 77469,
+   "reason": "The same pet in the same colour as item 17841 (a second client row)."
+  },
+  {
+   "item_id": 78070,
+   "reason": "In no item table the server ships (review 2026-11-09): held back until a native run shows the client draws this pet's card and actor."
+  },
+  {
+   "item_ids": [
+    2171,
+    2172,
+    2226,
+    2227,
+    2228,
+    2229,
+    2267,
+    3061,
+    3062,
+    3063,
+    3064,
+    3065,
+    3066,
+    4248,
+    4249,
+    4250,
+    4251,
+    4252,
+    4253,
+    4324,
+    4325,
+    4326,
+    4327,
+    4328,
+    4329,
+    4680,
+    4681,
+    4682,
+    4683,
+    4684,
+    4685,
+    10392,
+    10399,
+    10411,
+    10412,
+    10413,
+    10414,
+    10415,
+    10416,
+    10955,
+    10956,
+    10957,
+    10958,
+    10959,
+    10960,
+    10961,
+    10962,
+    10963,
+    10964,
+    10965,
+    10966,
+    10967,
+    10969,
+    10970,
+    10971,
+    10972,
+    10973,
+    10974,
+    10975,
+    10976,
+    10977,
+    10978,
+    10979,
+    10980,
+    10981,
+    10982,
+    10983,
+    10984,
+    10985,
+    10986,
+    10993,
+    10994,
+    10996,
+    10998,
+    15514,
+    15515,
+    15516,
+    15517,
+    15518,
+    15519,
+    15956,
+    17840,
+    17843,
+    17844,
+    17845,
+    17848,
+    17850,
+    17851,
+    17852,
+    17853,
+    17854,
+    17855,
+    17856,
+    17857,
+    17858,
+    17859,
+    17860,
+    17861,
+    17862,
+    17863,
+    17864,
+    17867,
+    23902,
+    23906,
+    23912,
+    23913,
+    23924,
+    23929,
+    23930,
+    23931,
+    23941,
+    23943,
+    23957,
+    23961,
+    23966,
+    23978,
+    23982,
+    23990,
+    23995,
+    24001,
+    24009,
+    24021,
+    24022,
+    24027,
+    24032,
+    24041,
+    24044,
+    24056,
+    24062,
+    24079,
+    55839,
+    55841,
+    55842,
+    55843,
+    69824,
+    70358,
+    70359,
+    70360,
+    70361,
+    70362,
+    70363,
+    70364,
+    70365,
+    70366,
+    70367,
+    70368,
+    70369,
+    70370,
+    70371,
+    70372,
+    70373,
+    70374,
+    70375,
+    70376,
+    70385,
+    70386,
+    70387,
+    70388,
+    70389,
+    70390,
+    70391,
+    70392,
+    70393,
+    70394,
+    70395,
+    70396,
+    70397,
+    70398,
+    70399,
+    70400,
+    70401,
+    70402,
+    70403,
+    70404,
+    70405,
+    70406,
+    70407,
+    70408,
+    70409,
+    70410,
+    70411,
+    70412,
+    70413,
+    70414,
+    70415,
+    70416,
+    76535,
+    76613,
+    76614,
+    76616,
+    77029,
+    77030,
+    77031,
+    77032,
+    77033,
+    77034,
+    77035,
+    77036,
+    77037
+   ],
+   "reason": "Listed in the Station Cash Marketplace Pets category (T486/T657). Station Cash is itself earned from activities (sc_rewards.json), so these are earned, not coin-bought; they get no second source here."
+  },
+  {
+   "wiki_pet": "Arcadius",
+   "original_source": [
+    "cragara"
+   ],
+   "reason": "The wiki lists this pet but no client pet item carries its name (pets.json items), so there is nothing to grant yet."
+  },
+  {
+   "wiki_pet": "Chester",
+   "original_source": [
+    "tcg_reward"
+   ],
+   "reason": "The wiki lists this pet but no client pet item carries its name (pets.json items), so there is nothing to grant yet."
+  },
+  {
+   "wiki_pet": "Coyote",
+   "original_source": [
+    "sc_marketplace"
+   ],
+   "reason": "The wiki lists this pet but no client pet item carries its name (pets.json items), so there is nothing to grant yet."
+  },
+  {
+   "wiki_pet": "Duke",
+   "original_source": [
+    "tcg_reward"
+   ],
+   "reason": "The wiki lists this pet but no client pet item carries its name (pets.json items), so there is nothing to grant yet."
+  },
+  {
+   "wiki_pet": "Gray Toyger",
+   "original_source": [
+    "sc_marketplace"
+   ],
+   "reason": "The wiki lists this pet but no client pet item carries its name (pets.json items), so there is nothing to grant yet."
+  },
+  {
+   "wiki_pet": "Hugo",
+   "original_source": [
+    "tcg_reward"
+   ],
+   "reason": "The wiki lists this pet but no client pet item carries its name (pets.json items), so there is nothing to grant yet."
+  },
+  {
+   "wiki_pet": "Hydra Pet",
+   "original_source": [
+    "sc_marketplace"
+   ],
+   "reason": "The wiki lists this pet but no client pet item carries its name (pets.json items), so there is nothing to grant yet."
+  },
+  {
+   "wiki_pet": "Mini-Mech",
+   "original_source": [
+    "craft_recipe"
+   ],
+   "reason": "The wiki lists this pet but no client pet item carries its name (pets.json items), so there is nothing to grant yet."
+  },
+  {
+   "wiki_pet": "Nightmare Pony",
+   "original_source": [
+    "sc_marketplace"
+   ],
+   "reason": "The wiki lists this pet but no client pet item carries its name (pets.json items), so there is nothing to grant yet."
+  },
+  {
+   "wiki_pet": "Petunia",
+   "original_source": [
+    "tcg_reward"
+   ],
+   "reason": "The wiki lists this pet but no client pet item carries its name (pets.json items), so there is nothing to grant yet."
+  },
+  {
+   "wiki_pet": "Pinkeye",
+   "original_source": [
+    "membership_promo"
+   ],
+   "reason": "The wiki lists this pet but no client pet item carries its name (pets.json items), so there is nothing to grant yet."
+  },
+  {
+   "wiki_pet": "Piñata Pony",
+   "original_source": [
+    "sc_marketplace"
+   ],
+   "reason": "The wiki lists this pet but no client pet item carries its name (pets.json items), so there is nothing to grant yet."
+  },
+  {
+   "wiki_pet": "Snowflake",
+   "original_source": [
+    "sc_marketplace"
+   ],
+   "reason": "The wiki lists this pet but no client pet item carries its name (pets.json items), so there is nothing to grant yet."
+  },
+  {
+   "wiki_pet": "St. Bernard",
+   "original_source": [
+    "quest_event"
+   ],
+   "reason": "The wiki lists this pet but no client pet item carries its name (pets.json items), so there is nothing to grant yet."
+  },
+  {
+   "wiki_pet": "Striped Treeble",
+   "original_source": [
+    "sc_marketplace"
+   ],
+   "reason": "The wiki lists this pet but no client pet item carries its name (pets.json items), so there is nothing to grant yet."
+  },
+  {
+   "wiki_pet": "Tacky Sweater Penguin",
+   "original_source": [
+    "sc_marketplace"
+   ],
+   "reason": "The wiki lists this pet but no client pet item carries its name (pets.json items), so there is nothing to grant yet."
+  }
+ ]
+}

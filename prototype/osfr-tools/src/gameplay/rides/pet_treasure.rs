@@ -83,6 +83,7 @@ impl Gameplay {
         let mut out = Outcome::default();
         out.replies.extend(replies);
         staged.adopt_reward_state(next, &mut out)?;
+        staged.pets.earn_bump("pet_treasure", 1);
         out.replies.extend(staged.pets.clear_treasure());
         *self = staged;
         Ok(Some(out))

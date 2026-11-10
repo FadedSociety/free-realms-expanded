@@ -139,6 +139,7 @@ impl Gameplay {
         source: EarnSource,
         out: &mut Outcome,
     ) -> io::Result<()> {
+        self.pet_earn_source(source);
         let Some(shop) = self.npc_coin_shop.as_ref() else {
             return Ok(());
         };

@@ -28,6 +28,7 @@ impl Gameplay {
         result: crate::quest_engine::MinigameResult,
         out: &mut Outcome,
     ) -> io::Result<()> {
+        self.pet_earn_minigame(minigame_id);
         self.npc_quest_event(
             crate::quest_engine::QuestEvent::FinishMinigame { minigame_id },
             out,

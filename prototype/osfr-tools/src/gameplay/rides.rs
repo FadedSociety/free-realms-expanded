@@ -3,6 +3,7 @@
 use super::*;
 use crate::item_bar::use_wire;
 
+mod pet_earn;
 mod pet_treasure;
 
 /// F820: the shared client `53/*` pet request bodies (`tests/support/pet_wire.rs`), included by
@@ -296,7 +297,9 @@ impl Gameplay {
     /// world entry; `pets_document` hands it back for every save of that document.
     pub fn adopt_pets(&mut self, pets: Option<serde_json::Value>) -> io::Result<()> {
         let content = crate::pets::PetService::bundled_content()?;
-        self.pets = crate::pets::PetService::from_document(content, pets)?;
+        let mut next = crate::pets::PetService::from_document(content, pets)?;
+        next.keep_earn_rules_of(&self.pets);
+        self.pets = next;
         Ok(())
     }
 
@@ -531,6 +534,7 @@ impl Gameplay {
         self.credit_dance_off_join(&mut out);
         self.follow_pet(character, now_ms, &mut out);
         self.sync_happy_buff(character, now_ms, &mut out);
+        self.claim_earned_pets(now_ms, &mut out);
         if self.pets.active_pet_id().is_some() {
             // T828: the feed's completion notice rides the same `PetWire::notice` hand-off as
             // every other pet request.

@@ -22,11 +22,13 @@ use std::{
     sync::Arc,
 };
 
+mod earn;
 mod grooming;
 mod idle;
 mod treasure;
 mod tricks;
 
+pub use earn::{EARN_FILE, EarnClaim, EarnRow, EarnRules, EarnState, EarnedPet};
 pub use idle::{PetAnimation, PetIdleSet, PetRestPosture};
 pub use treasure::TreasureRefusal;
 
@@ -654,6 +656,21 @@ impl PetContent {
         self.tricks.iter().map(|trick| trick.id)
     }
 
+    /// Every item definition id `definition_for_item` turns into a pet.
+    fn adoption_items(&self) -> Arc<BTreeSet<i32>> {
+        let listed = self.items.iter().map(|item| item.item_id);
+        let wiki = self
+            .species
+            .iter()
+            .flat_map(|species| species.adoption_item_ids.iter().copied());
+        Arc::new(
+            listed
+                .chain(wiki)
+                .filter(|&id| self.definition_for_item(id).is_some())
+                .collect(),
+        )
+    }
+
     pub fn item(&self, item_id: i32) -> Option<&PetItem> {
         self.items.iter().find(|item| item.item_id == item_id)
     }
@@ -971,6 +988,15 @@ pub struct PetRoster {
     next_pet_id: u32,
     pets: Vec<Pet>,
     vendor_grants: BTreeMap<u64, u32>,
+    /// Earned-pet counters and the rows already paid (`pets::earn`); left out while empty.
+    /// Boxed: the roster sits inside `Gameplay`, which is moved by value on test threads that
+    /// are near their stack limit, so it must not grow by more than a pointer.
+    #[serde(default, skip_serializing_if = "earn_is_empty")]
+    earn: Box<EarnState>,
+}
+
+fn earn_is_empty(earn: &EarnState) -> bool {
+    earn.is_empty()
 }
 
 impl Default for PetRoster {
@@ -980,6 +1006,7 @@ impl Default for PetRoster {
             next_pet_id: 1,
             pets: Vec::new(),
             vendor_grants: BTreeMap::new(),
+            earn: Box::default(),
         }
     }
 }
@@ -1422,6 +1449,9 @@ pub struct PetService {
     treasure: treasure::State,
     /// T532: the live happy-speed buff; session-only, so `reset_session` drops it.
     happy: Option<HappyBuffLive>,
+    /// The earn table, its session flags and the pet item ids of the bag search (`pets::earn`).
+    /// Boxed for the same reason as `PetRoster::earn`: one pointer in `Gameplay`.
+    earn: Box<earn::EarnSession>,
 }
 
 impl PetService {
@@ -1432,6 +1462,7 @@ impl PetService {
     pub fn new(content: PetContent) -> io::Result<Self> {
         content.validate()?;
         Ok(Self {
+            earn: Box::new(earn::EarnSession::new(content.adoption_items())),
             content: Arc::new(content),
             roster: PetRoster::default(),
             active: None,
@@ -1448,6 +1479,7 @@ impl PetService {
         let roster = roster.unwrap_or_default();
         validate_roster(&content, &roster)?;
         Ok(Self {
+            earn: Box::new(earn::EarnSession::new(content.adoption_items())),
             content: Arc::new(content),
             roster,
             active: None,
@@ -1471,7 +1503,7 @@ impl PetService {
 
     /// The persisted roster without the session-only active actor.
     pub fn roster_snapshot(&self) -> Option<PetRoster> {
-        (!self.roster.pets.is_empty()).then(|| self.roster.clone())
+        (!self.roster.pets.is_empty() || !self.roster.earn.is_empty()).then(|| self.roster.clone())
     }
 
     /// S17: the roster as `game_store::Snapshot::pets` stores it. `None` while the roster is
@@ -1600,6 +1632,7 @@ impl PetService {
         self.ui_mode = 0;
         self.remembered = None;
         self.happy = None;
+        self.earn.reset();
         // T533: a chest belongs to one connection; the pet's cooldown stays in the roster.
         self.clear_treasure();
     }
@@ -2709,6 +2742,7 @@ impl PetService {
                     // eat (R). A food that left the bag reaches no `care`, so it says nothing.
                     wire.notice = Some(FEED_FINISHED);
                     wire.changed = true;
+                    self.earn_bump("pet_feed", 1);
                     // F778/F820: echo every slot that actually lost the food. (R) The care panel
                     // otherwise keeps showing it from the 53/16 echo; the recovered part is the
                     // client's write into its pet record (`00b5ce60` case 16, `00b5ea69`).
