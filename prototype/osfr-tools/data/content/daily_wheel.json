@@ -1,11 +1,219 @@
 {
-  "schema_version": 1,
-  "source": "Client MiniGameData.txt row 8 (TYPE 22, NAME_ID 409962, DESCRIPTION_ID 409969, ICON_ID 20985, empty PRELOAD_FILE); ActivityCategories.txt row 17 (Wheels) and the calendar's dailyWheelId 8 in ScriptsBase.lua; the wheel movie game_wheel.gfx is the client's own (Assets_008). The reset at UTC midnight and one spin a day are (R); see src/daily_wheel.rs.",
+  "schema_version": 2,
+  "source": {
+    "rows": "Client MiniGameData.txt row 8 (TYPE 22, NAME_ID 409962, DESCRIPTION_ID 409969, ICON_ID 20985, empty PRELOAD_FILE); ActivityCategories.txt row 17 (Wheels) and the calendar's dailyWheelId 8 in ScriptsBase.lua; the movie game_wheel.gfx is the client's own (Assets_008).",
+    "wheels": "Two wheels, as a February 2013 gameplay video shows them (YouTube cUPJm5Bcp98, 168-201 s): the Daily Wheel (movie type 1: purple rim, orange tree) and the Coin Wheel (type 5: blue rim, gold tree), each with one spin, paged with the movie's arrow buttons. Strings are the client's: 408046 Daily Wheel, 409970 its line, 3969 its reward line; 427102 Coin Wheel, 427101 its line, 427100 its reward line.",
+    "slots": "The wedge pictures are frames of the movie's wedge sprite. Daily Wheel order (wedge 0 is left of the needle, then counter-clockwise) is read from the video: ring, clothes, bee and potion, the wheel itself, cards, grab bag, sports gear, potion and scrolls, house, sword and wrench. The Coin Wheel's order is the video's (250 500 250 2000 figure 1000 500 250 5000 figure) with the 2014 client's own coin pictures, which are marked 2 5 10 20 30 40 50: (R) 250->2, 500->5, 1000->10, 2000->20, 5000->50. A coin wedge pays exactly the number drawn on it.",
+    "odds": "Every wedge weight is 1: the movie's built-in test server (Wheel.WheelGameServer) picks Random(0, slotCount - 1). The weights of the prizes inside a wedge are (R); 'very rare' in the wiki is weight 1.",
+    "prizes": "Item lists per wedge are the fan wiki's Daily Wheel page (fr.fanbyte.com/wiki/Daily_Wheel_(FR), CC BY-SA): Accessories (shards) on the ring wedge, Clothing and pet clothing on the clothes wedge, Wieldables on the sword wedge, Consumables split between the bee wedge (potions, frag orbs, pet care) and the scroll wedge (boosters, food), Housing on the house wedge, Kart/Fishing/Soccer gear on the sports wedge, the Trading Card Game rows on the card wedge, Extra Spins 1/2/3/5 on the wheel wedge, and the grab bag paying several at once (its first row is the wiki's own example). Definition ids are the client item rows whose name is the wiki's item name; where several colour variants share a name the lowest id is used (R). In the video the Coin Wheel's figure wedge paid 1 Standard Wooden Crate and the ring wedge paid a Champion Tempered Circle Shard. Not included: the pets Bandit and Lexy and the Up and Away 720 Diamond Shard (no grantable row found).",
+    "streak": "Fan wiki: three consecutive days win one extra spin, seven win two. The notices are client strings 415176 and 415177, shown through 143/3. Restarting the count after the last row is (R).",
+    "reward_window": "Coins show with icon 22663, the movie's own coin case (it swaps in picture 4809 and shows the Shop Now button), named by string 6513 Coins. Extra spins show the wheel's icon 20985 (R) with strings 409187 Extra Spin and 412559 Cool! You get to spin again!",
+    "reset": "One free spin per wheel per UTC day (R: the original reset hour is unknown); see src/daily_wheel.rs."
+  },
   "activity_id": 8,
   "minigame_id": 8,
   "type_id": 22,
   "name_id": 409962,
   "description_id": 409969,
   "icon_id": 20985,
-  "movie": "game_wheel.gfx"
+  "movie": "game_wheel.gfx",
+  "coin_icon_id": 22663,
+  "coin_name_id": 6513,
+  "spin_icon_id": 20985,
+  "spin_name_id": 409187,
+  "spin_message_id": 412559,
+  "streak_message_id": 415176,
+  "streak_last_message_id": 415177,
+  "wheels": [
+    {
+      "key": "daily",
+      "wheel_id": 1,
+      "wheel_type": 1,
+      "name_id": 408046,
+      "message_id": 409970,
+      "reward_message_id": 3969,
+      "streak_bonuses": [
+        { "days": 3, "spins": 1 },
+        { "days": 7, "spins": 2 }
+      ],
+      "slots": [
+        {
+          "category": 1,
+          "weight": 1,
+          "prizes": [
+            { "weight": 1, "items": [{ "definition_id": 2212, "count": 1 }] },
+            { "weight": 1, "items": [{ "definition_id": 65817, "count": 1 }] },
+            { "weight": 1, "items": [{ "definition_id": 2211, "count": 1 }] },
+            { "weight": 1, "items": [{ "definition_id": 2207, "count": 1 }] },
+            { "weight": 1, "items": [{ "definition_id": 2208, "count": 1 }] },
+            { "weight": 1, "items": [{ "definition_id": 2209, "count": 1 }] },
+            { "weight": 1, "items": [{ "definition_id": 2210, "count": 1 }] }
+          ]
+        },
+        {
+          "category": 2,
+          "weight": 1,
+          "prizes": [
+            { "weight": 5, "items": [{ "definition_id": 427, "count": 1 }] },
+            { "weight": 5, "items": [{ "definition_id": 395, "count": 1 }] },
+            { "weight": 5, "items": [{ "definition_id": 194, "count": 1 }] },
+            { "weight": 5, "items": [{ "definition_id": 2195, "count": 1 }] },
+            { "weight": 5, "items": [{ "definition_id": 396, "count": 1 }] },
+            { "weight": 5, "items": [{ "definition_id": 2196, "count": 1 }] },
+            { "weight": 5, "items": [{ "definition_id": 193, "count": 1 }] },
+            { "weight": 5, "items": [{ "definition_id": 391, "count": 1 }] },
+            { "weight": 5, "items": [{ "definition_id": 51402, "count": 1 }] },
+            { "weight": 5, "items": [{ "definition_id": 394, "count": 1 }] },
+            { "weight": 5, "items": [{ "definition_id": 2194, "count": 1 }] },
+            { "weight": 5, "items": [{ "definition_id": 392, "count": 1 }] },
+            { "weight": 5, "items": [{ "definition_id": 2192, "count": 1 }] },
+            { "weight": 5, "items": [{ "definition_id": 393, "count": 1 }] },
+            { "weight": 5, "items": [{ "definition_id": 188, "count": 1 }] },
+            { "weight": 5, "items": [{ "definition_id": 2193, "count": 1 }] },
+            { "weight": 5, "items": [{ "definition_id": 197, "count": 1 }] },
+            { "weight": 5, "items": [{ "definition_id": 2205, "count": 1 }] },
+            { "weight": 5, "items": [{ "definition_id": 2204, "count": 1 }] },
+            { "weight": 5, "items": [{ "definition_id": 2206, "count": 1 }] },
+            { "weight": 5, "items": [{ "definition_id": 2203, "count": 1 }] },
+            { "weight": 1, "items": [{ "definition_id": 65815, "count": 1 }] }
+          ]
+        },
+        {
+          "category": 3,
+          "weight": 1,
+          "prizes": [
+            { "weight": 3, "items": [{ "definition_id": 65820, "count": 3 }] },
+            { "weight": 3, "items": [{ "definition_id": 1196, "count": 3 }] },
+            { "weight": 3, "items": [{ "definition_id": 1197, "count": 3 }] },
+            { "weight": 2, "items": [{ "definition_id": 1835, "count": 3 }] },
+            { "weight": 2, "items": [{ "definition_id": 1836, "count": 3 }] }
+          ]
+        },
+        {
+          "category": 4,
+          "weight": 1,
+          "prizes": [
+            { "weight": 70, "spins": 1 },
+            { "weight": 20, "spins": 2 },
+            { "weight": 8, "spins": 3 },
+            { "weight": 2, "spins": 5 }
+          ]
+        },
+        {
+          "category": 5,
+          "weight": 1,
+          "prizes": [
+            { "weight": 9, "items": [{ "definition_id": 65834, "count": 1 }] },
+            { "weight": 1, "items": [{ "definition_id": 65836, "count": 1 }] }
+          ]
+        },
+        {
+          "category": 6,
+          "weight": 1,
+          "prizes": [
+            {
+              "weight": 4,
+              "items": [
+                { "definition_id": 65821, "count": 1 },
+                { "definition_id": 65822, "count": 1 },
+                { "definition_id": 65820, "count": 3 }
+              ]
+            },
+            { "weight": 3, "spins": 1, "items": [{ "definition_id": 1197, "count": 3 }] },
+            {
+              "weight": 3,
+              "coins": 10,
+              "items": [
+                { "definition_id": 1195, "count": 3 },
+                { "definition_id": 218, "count": 3 }
+              ]
+            }
+          ]
+        },
+        {
+          "category": 7,
+          "weight": 1,
+          "prizes": [
+            { "weight": 3, "items": [{ "definition_id": 2197, "count": 1 }] },
+            { "weight": 3, "items": [{ "definition_id": 2199, "count": 1 }] },
+            { "weight": 3, "items": [{ "definition_id": 2198, "count": 1 }] },
+            { "weight": 3, "items": [{ "definition_id": 2200, "count": 1 }] },
+            { "weight": 3, "items": [{ "definition_id": 65819, "count": 1 }] },
+            { "weight": 1, "items": [{ "definition_id": 9241, "count": 1 }] },
+            { "weight": 1, "items": [{ "definition_id": 9262, "count": 1 }] },
+            { "weight": 1, "items": [{ "definition_id": 9263, "count": 1 }] },
+            { "weight": 1, "items": [{ "definition_id": 9256, "count": 1 }] }
+          ]
+        },
+        {
+          "category": 8,
+          "weight": 1,
+          "prizes": [
+            { "weight": 3, "items": [{ "definition_id": 65822, "count": 1 }] },
+            { "weight": 3, "items": [{ "definition_id": 65821, "count": 1 }] },
+            { "weight": 3, "items": [{ "definition_id": 1195, "count": 3 }] },
+            { "weight": 1, "items": [{ "definition_id": 1194, "count": 3 }] }
+          ]
+        },
+        {
+          "category": 13,
+          "weight": 1,
+          "prizes": [
+            { "weight": 5, "items": [{ "definition_id": 218, "count": 1 }] },
+            { "weight": 3, "items": [{ "definition_id": 218, "count": 3 }] },
+            { "weight": 1, "items": [{ "definition_id": 218, "count": 5 }] },
+            { "weight": 3, "items": [{ "definition_id": 2764, "count": 1 }] }
+          ]
+        },
+        {
+          "category": 10,
+          "weight": 1,
+          "prizes": [
+            { "weight": 3, "items": [{ "definition_id": 1430, "count": 1 }] },
+            { "weight": 3, "items": [{ "definition_id": 1432, "count": 1 }] },
+            { "weight": 3, "items": [{ "definition_id": 68111, "count": 1 }] },
+            { "weight": 3, "items": [{ "definition_id": 1434, "count": 1 }] },
+            { "weight": 3, "items": [{ "definition_id": 1431, "count": 1 }] },
+            { "weight": 3, "items": [{ "definition_id": 68112, "count": 1 }] },
+            { "weight": 3, "items": [{ "definition_id": 1433, "count": 1 }] },
+            { "weight": 1, "items": [{ "definition_id": 207, "count": 1 }] }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "coin",
+      "wheel_id": 2,
+      "wheel_type": 5,
+      "name_id": 427102,
+      "message_id": 427101,
+      "reward_message_id": 427100,
+      "slots": [
+        { "category": 15, "weight": 1, "prizes": [{ "weight": 1, "coins": 2 }] },
+        { "category": 16, "weight": 1, "prizes": [{ "weight": 1, "coins": 5 }] },
+        { "category": 15, "weight": 1, "prizes": [{ "weight": 1, "coins": 2 }] },
+        { "category": 18, "weight": 1, "prizes": [{ "weight": 1, "coins": 20 }] },
+        {
+          "category": 22,
+          "weight": 1,
+          "prizes": [
+            { "weight": 3, "items": [{ "definition_id": 2764, "count": 1 }] },
+            { "weight": 2, "items": [{ "definition_id": 218, "count": 3 }] }
+          ]
+        },
+        { "category": 17, "weight": 1, "prizes": [{ "weight": 1, "coins": 10 }] },
+        { "category": 16, "weight": 1, "prizes": [{ "weight": 1, "coins": 5 }] },
+        { "category": 15, "weight": 1, "prizes": [{ "weight": 1, "coins": 2 }] },
+        { "category": 21, "weight": 1, "prizes": [{ "weight": 1, "coins": 50 }] },
+        {
+          "category": 22,
+          "weight": 1,
+          "prizes": [
+            { "weight": 3, "items": [{ "definition_id": 2764, "count": 1 }] },
+            { "weight": 2, "items": [{ "definition_id": 218, "count": 3 }] }
+          ]
+        }
+      ]
+    }
+  ]
 }

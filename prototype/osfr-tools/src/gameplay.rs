@@ -201,9 +201,12 @@ pub struct GameplayState {
     /// Cards earned beyond the starter set; absent when empty so older saves stay byte-identical.
     #[serde(default, skip_serializing_if = "crate::card_game::EarnedCards::is_empty")]
     pub earned_cards: crate::card_game::EarnedCards,
-    /// T560: the UTC day index of the last paid daily-wheel spin; absent until one is paid.
+    /// The Daily Wheel's last free-spin day, mirrored from `wheel_spins` (written, never read).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_spin_day: Option<u64>,
+    /// Every wheel's spins (day, extra spins, streak); absent until a wheel is spun.
+    #[serde(default, skip_serializing_if = "crate::daily_wheel::Ledger::is_empty")]
+    pub wheel_spins: crate::daily_wheel::Ledger,
 }
 
 /// Opt-in Harvesting candidate bound by this gateway integration: Farnum's
@@ -664,7 +667,7 @@ impl Gameplay {
         let saved_derby = state.as_ref().and_then(|s| s.derby.clone());
         let saved_hunt = state.as_ref().and_then(|s| s.artifact_hunt.clone());
         let saved_chess = state.as_ref().and_then(|s| s.chess);
-        let saved_wheel_day = state.as_ref().and_then(|s| s.last_spin_day);
+        let saved_wheel_spins = state.as_ref().map(|s| s.wheel_spins.clone()).unwrap_or_default();
         let saved_sc_wallet = state.as_ref().and_then(|s| s.sc_wallet.clone());
         let saved_housing = state.as_ref().and_then(|s| s.housing.clone());
         let saved_item_bar = state.as_ref().and_then(|s| s.item_bar.clone());
@@ -1010,7 +1013,7 @@ impl Gameplay {
             Some(path) => Some(Arc::new(crate::soccer_entry::Content::load(&path)?)),
             None => None,
         };
-        let daily_wheel = crate::daily_wheel::DailyWheel::load(npc_content, saved_wheel_day)?;
+        let daily_wheel = crate::daily_wheel::DailyWheel::load(npc_content, saved_wheel_spins)?;
         let activities = crate::activity_portal::Catalogue::assemble(
             content_presence::battle_rows(&battle_file, encounter.is_some()),
             chess.as_ref(),
@@ -1531,6 +1534,7 @@ impl Gameplay {
                 mounts.saved_upgrades(self.inventory.state())
             }),
             last_spin_day: self.daily_wheel.last_spin_day(),
+            wheel_spins: self.daily_wheel.ledger().clone(),
             earned_cards: self.earned_cards.clone(),
         };
         content_presence::restore_skipped(&mut state, &self.dormant);

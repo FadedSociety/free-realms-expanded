@@ -5,7 +5,7 @@
 //! shipped `data/content` (a scratch directory without an NPC package binds it).
 use osfr_tools::{
     character_store::CharacterState,
-    daily_wheel::{Content, START_WHEEL},
+    daily_wheel::{Content, Ledger, NO_SPIN, START_WHEEL},
     gameplay::{Gameplay, GameplayState, Outcome},
 };
 use serde_json::json;
@@ -44,9 +44,25 @@ fn character() -> CharacterState {
 
 /// A player who has just entered the world on the pinned clock.
 fn session(last_spin_day: Option<u64>) -> (Gameplay, Outcome, Scratch) {
-    let scratch = Scratch::new("daily-wheel");
+    session_in(Scratch::new("daily-wheel"), last_spin_day)
+}
+
+/// A fresh player whose content has the shipped item tables (`data/release`), so item prizes
+/// pay exactly when a released server would pay them.
+fn paying_session() -> (Gameplay, Outcome, Scratch) {
+    let scratch = Scratch::new("daily-wheel-items");
+    let release = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("data/release");
+    for file in ["inventory.json", "item-table.json", "item-table-supplement.json"] {
+        std::fs::copy(release.join(file), scratch.path().join(file)).expect(file);
+    }
+    session_in(scratch, None)
+}
+
+fn session_in(scratch: Scratch, last_spin_day: Option<u64>) -> (Gameplay, Outcome, Scratch) {
     let mut state = Gameplay::load(scratch.path(), None).unwrap().state();
-    state.last_spin_day = last_spin_day;
+    // `Some`: both wheels' free spins were used on that day.
+    state.wheel_spins =
+        last_spin_day.map_or_else(Ledger::default, |day| Ledger::spun_on(day, &["daily", "coin"]));
     let mut game = Gameplay::load(scratch.path(), Some(state)).unwrap();
     game.seed_wheel_clock(CLOCK);
     let entry = game.initialize_world(&character(), 500).unwrap();
@@ -115,7 +131,7 @@ fn world_entry_offers_one_spin_with_the_seconds_to_the_next_utc_midnight() {
     let (_game, entry, _scratch) = session(None);
     let counts = published(&entry, &[143, 0, 1]);
     assert_eq!(counts.len(), 1, "one 143/1 at world entry");
-    assert_eq!(*counts[0], spins(1, 82_800));
+    assert_eq!(*counts[0], spins(2, 82_800));
 }
 
 #[test]
@@ -215,7 +231,7 @@ fn a_forged_start_with_no_spin_left_is_refused_and_changes_nothing() {
 #[test]
 fn the_next_utc_day_offers_the_spin_again() {
     let (mut game, entry, _scratch) = session(Some(TODAY - 1));
-    assert_eq!(*published(&entry, &[143, 0, 1])[0], spins(1, 82_800));
+    assert_eq!(*published(&entry, &[143, 0, 1])[0], spins(2, 82_800));
     open(&mut game);
 }
 
@@ -243,7 +259,7 @@ fn entering_a_zone_ends_a_stale_wheel_without_using_the_spin() {
     let (mut game, _entry, _scratch) = session(None);
     open(&mut game);
     let entry = game.initialize_world(&character(), 2_000).unwrap();
-    assert_eq!(*published(&entry, &[143, 0, 1])[0], spins(1, 82_800));
+    assert_eq!(*published(&entry, &[143, 0, 1])[0], spins(2, 82_800));
     // The player is free: chess starts, and so does a new wheel once chess is left.
     assert_eq!(offers(&send(&mut game, &play(CHESS_ROW))).len(), 1);
 }
@@ -260,19 +276,19 @@ fn a_relog_keeps_the_day_and_a_disconnect_mid_wheel_keeps_the_spin() {
     let mut relog = Gameplay::load(scratch.path(), Some(saved)).unwrap();
     relog.seed_wheel_clock(CLOCK);
     let entry = relog.initialize_world(&character(), 500).unwrap();
-    assert_eq!(*published(&entry, &[143, 0, 1])[0], spins(1, 82_800));
+    assert_eq!(*published(&entry, &[143, 0, 1])[0], spins(2, 82_800));
     open(&mut relog);
 
     // A stamped day survives the save round trip and the relog.
     let mut stamped = game.state();
-    stamped.last_spin_day = Some(TODAY);
+    stamped.wheel_spins = Ledger::spun_on(TODAY, &["daily"]);
     let saved: GameplayState =
         serde_json::from_slice(&serde_json::to_vec(&stamped).unwrap()).unwrap();
-    assert_eq!(saved.last_spin_day, Some(TODAY));
+    assert_eq!(saved.wheel_spins, Ledger::spun_on(TODAY, &["daily"]));
     let mut relog = Gameplay::load(scratch.path(), Some(saved)).unwrap();
     relog.seed_wheel_clock(CLOCK);
     let entry = relog.initialize_world(&character(), 500).unwrap();
-    assert_eq!(*published(&entry, &[143, 0, 1])[0], spins(0, 82_800));
+    assert_eq!(*published(&entry, &[143, 0, 1])[0], spins(1, 82_800));
     assert_eq!(relog.state().last_spin_day, Some(TODAY));
 }
 
@@ -295,7 +311,7 @@ fn the_shipped_content_loads_and_a_malformed_file_is_refused() {
         ("minigame_id", json!(0)),
         ("activity_id", json!(0)),
         ("activity_id", json!(u32::MAX)),
-        ("schema_version", json!(2)),
+        ("schema_version", json!(3)),
     ] {
         let mut broken = document.clone();
         broken[field] = bad;
@@ -306,4 +322,363 @@ fn the_shipped_content_loads_and_a_malformed_file_is_refused() {
             "{field} is validated at load"
         );
     }
+}
+
+// ---- The movie's messages, the spin and its prize (piece daily-wheel) ----
+
+/// A 39/14 movie message from the client for `instance`.
+fn movie(instance: i32, text: &str) -> Vec<u8> {
+    let mut packet = lifecycle(14, instance);
+    packet.extend(int(text.len() as i32 + 1));
+    packet.extend(text.as_bytes());
+    packet.push(0);
+    packet
+}
+
+/// The texts of the 39/14 messages in `out`, in order.
+fn said(out: &Outcome) -> Vec<String> {
+    published(out, &[39, 0, 14])
+        .into_iter()
+        .map(|packet| String::from_utf8(packet[19..packet.len() - 1].to_vec()).unwrap())
+        .collect()
+}
+
+/// Open the wheel through the real entry path (26/11, the client's 39/5, the movie's connect)
+/// and return the instance id with what the connect answered.
+fn connected(game: &mut Gameplay) -> (i32, Vec<String>) {
+    let instance = open(game);
+    send(game, &lifecycle(5, instance));
+    let hello = send(game, &movie(instance, "OnConnectMsg"));
+    (instance, said(&hello))
+}
+
+/// One whole turn of wheel `id` landing on (`slot`, `prize`): the request, then the stop.
+fn turn(game: &mut Gameplay, instance: i32, id: i32, slot: usize, prize: usize) -> (Outcome, Outcome) {
+    game.seed_wheel_draw(slot, prize);
+    let spin = send(game, &movie(instance, &format!("OnWheelSpinRequestMsg\t{id}")));
+    let stop = send(game, &movie(instance, &format!("OnWheelStopMsg\t{id}")));
+    (spin, stop)
+}
+
+/// 143/1 with a streak in the consecutive field.
+fn count(spins_left: i32, streak: i32, seconds: i32) -> Vec<u8> {
+    let mut bytes = spins(spins_left, seconds);
+    bytes[11..15].copy_from_slice(&int(streak));
+    bytes
+}
+
+#[test]
+fn the_connect_sends_both_wheels_with_their_spins_then_ready() {
+    let (mut game, _entry, _scratch) = session(None);
+    let (instance, hello) = connected(&mut game);
+    assert_eq!(
+        hello,
+        [
+            "OnWheelDataMsg\t1\t1\t1 2 3 4 5 6 7 8 13 10\t408046\t409970",
+            "OnWheelUpdateMsg\t1\t1\t0\t0",
+            "OnWheelDataMsg\t2\t5\t15 16 15 18 22 17 16 15 21 22\t427102\t427101",
+            "OnWheelUpdateMsg\t2\t1\t0\t0",
+            "OnServerReadyMsg",
+        ]
+    );
+    // A second connect adds no second set of wheels; the page buttons are confirmed.
+    assert!(send(&mut game, &movie(instance, "OnConnectMsg")).replies.is_empty());
+    for id in [1, 2] {
+        let paged = send(&mut game, &movie(instance, &format!("OnChangeWheelRequestMsg\t{id}")));
+        assert_eq!(said(&paged), [format!("OnWheelChangedMsg\t{id}")]);
+    }
+    assert!(send(&mut game, &movie(instance, "OnChangeWheelRequestMsg\t9")).replies.is_empty());
+    assert_eq!(game.state().wheel_spins, Ledger::default(), "nothing is used by looking");
+}
+
+#[test]
+fn a_spin_pays_the_wedge_the_needle_stops_on_once_and_only_shows_it_at_the_stop() {
+    let (mut game, _entry, _scratch) = paying_session();
+    let (instance, _) = connected(&mut game);
+    let before = game.state().inventory.coins;
+    // The Coin Wheel's wedge 8 is the coin marked 50.
+    game.seed_wheel_draw(8, 0);
+    let spin = send(&mut game, &movie(instance, "OnWheelSpinRequestMsg\t2"));
+    assert_eq!(said(&spin), ["OnSpinInfoMsg\t8"], "the needle is told where to stop");
+    assert_eq!(spin.replies.len(), 1, "nothing of the prize shows before the stop");
+    assert!(spin.changed, "the paid spin is saved with the prize");
+    assert_eq!(game.state().inventory.coins, before + 50);
+    let ledger = serde_json::to_value(game.state().wheel_spins).unwrap();
+    assert_eq!(ledger, json!({"coin": {"day": TODAY, "streak": 1}}));
+
+    // A second request while the wheel turns, and one after: no spin left on this wheel.
+    let paid = game.state();
+    assert!(send(&mut game, &movie(instance, "OnWheelSpinRequestMsg\t2")).replies.is_empty());
+    let stop = send(&mut game, &movie(instance, "OnWheelStopMsg\t2"));
+    assert_eq!(
+        said(&stop),
+        [
+            "OnRewardInfoMsg\t22663\t0\t50\t6513\t427100\t0",
+            "OnWheelUpdateMsg\t2\t0\t1\t82800",
+        ]
+    );
+    assert!(stop.replies.len() > 3, "the reward packets arrive with the window");
+    assert_eq!(**published(&stop, &[143, 0, 1]).last().unwrap(), spins(1, 82_800));
+    assert!(send(&mut game, &movie(instance, "OnWheelStopMsg\t2")).replies.is_empty());
+    assert!(send(&mut game, &movie(instance, "OnWheelSpinRequestMsg\t2")).replies.is_empty());
+    assert_eq!(game.state(), paid, "one spin, one prize");
+}
+
+#[test]
+fn the_client_cannot_name_a_wedge_spin_early_or_spin_an_unknown_wheel() {
+    let (mut game, _entry, _scratch) = paying_session();
+    let instance = open(&mut game);
+    send(&mut game, &lifecycle(5, instance));
+    let fresh = game.state();
+    // Before the movie connected.
+    assert!(send(&mut game, &movie(instance, "OnWheelSpinRequestMsg\t1")).replies.is_empty());
+    send(&mut game, &movie(instance, "OnConnectMsg"));
+    for forged in [
+        "OnWheelSpinRequestMsg\t9",
+        "OnWheelSpinRequestMsg\tfirst",
+        "OnWheelSpinRequestMsg",
+        "OnSpinInfoMsg\t8",
+        "OnRewardInfoMsg\t22663\t0\t5000\t6513\t0\t0",
+        "OnWheelStopMsg\t1",
+    ] {
+        assert!(send(&mut game, &movie(instance, forged)).replies.is_empty(), "{forged}");
+    }
+    // Another run's instance id.
+    assert!(send(&mut game, &movie(instance + 7, "OnWheelSpinRequestMsg\t1")).replies.is_empty());
+    assert_eq!(game.state(), fresh);
+    // Extra fields after the wheel id are not read: the server still draws the wedge itself.
+    game.seed_wheel_draw(0, 0);
+    let spin = send(&mut game, &movie(instance, "OnWheelSpinRequestMsg\t2\t8\t5000"));
+    assert_eq!(said(&spin), ["OnSpinInfoMsg\t0"]);
+    assert_eq!(game.state().inventory.coins, fresh.inventory.coins + 2);
+}
+
+#[test]
+fn used_spins_survive_a_relog_and_a_start_without_one_gets_the_clients_text() {
+    let (mut game, _entry, scratch) = paying_session();
+    let (instance, _) = connected(&mut game);
+    turn(&mut game, instance, 2, 0, 0);
+    turn(&mut game, instance, 1, 0, 0);
+    // The movie closes itself after the last wheel's reward window.
+    let closed = send(&mut game, &movie(instance, "FRServer_GameClose"));
+    assert_eq!(published(&closed, &[39, 0, 19]).len(), 1, "the run ends");
+    let saved: GameplayState =
+        serde_json::from_slice(&serde_json::to_vec(&game.state()).unwrap()).unwrap();
+    assert_eq!(saved.last_spin_day, Some(TODAY));
+
+    // The same day after a restart: no spin, and the refusal is the client's own sentence.
+    let mut relog = Gameplay::load(scratch.path(), Some(saved.clone())).unwrap();
+    relog.seed_wheel_clock(CLOCK + 3_600);
+    let entry = relog.initialize_world(&character(), 500).unwrap();
+    assert_eq!(*published(&entry, &[143, 0, 1])[0], count(0, 1, 79_200));
+    let refused = send(&mut relog, &START_WHEEL);
+    assert!(offers(&refused).is_empty());
+    let line = published(&refused, &[15, 0, 3, 0]);
+    assert_eq!(line.len(), 1);
+    assert!(
+        line[0].windows(NO_SPIN.len()).any(|part| part == NO_SPIN.as_bytes()),
+        "\"{NO_SPIN}\""
+    );
+    assert_eq!(relog.state(), saved);
+
+    // The next UTC day both wheels are back.
+    let mut tomorrow = Gameplay::load(scratch.path(), Some(saved)).unwrap();
+    tomorrow.seed_wheel_clock(CLOCK + DAY);
+    let entry = tomorrow.initialize_world(&character(), 500).unwrap();
+    assert_eq!(*published(&entry, &[143, 0, 1])[0], count(2, 1, 82_800));
+}
+
+#[test]
+fn leaving_mid_turn_still_delivers_the_paid_prize_and_frees_no_spin() {
+    let (mut game, _entry, _scratch) = paying_session();
+    let (instance, _) = connected(&mut game);
+    game.seed_wheel_draw(8, 0);
+    send(&mut game, &movie(instance, "OnWheelSpinRequestMsg\t2"));
+    let left = send(&mut game, &lifecycle(6, instance));
+    assert!(left.replies.len() > 2, "the held reward packets go out with the leave");
+    assert_eq!(**published(&left, &[143, 0, 1]).last().unwrap(), spins(1, 82_800));
+    // The Daily Wheel is still there. The used Coin Wheel is not sent at all: the movie keeps
+    // its current-wheel index at 0, so a spent wheel in front would swallow the spin button.
+    let (instance, hello) = connected(&mut game);
+    assert_eq!(
+        hello,
+        [
+            "OnWheelDataMsg\t1\t1\t1 2 3 4 5 6 7 8 13 10\t408046\t409970",
+            "OnWheelUpdateMsg\t1\t1\t0\t0",
+            "OnServerReadyMsg",
+        ]
+    );
+    assert!(send(&mut game, &movie(instance, "OnWheelSpinRequestMsg\t2")).replies.is_empty());
+}
+
+#[test]
+fn the_extra_spin_wedge_gives_the_wheel_another_turn() {
+    let (mut game, _entry, _scratch) = paying_session();
+    let (instance, _) = connected(&mut game);
+    // The Daily Wheel's wedge 3 is the wheel picture; its first prize is one extra spin.
+    let (spin, stop) = turn(&mut game, instance, 1, 3, 0);
+    assert_eq!(said(&spin), ["OnSpinInfoMsg\t3"]);
+    assert_eq!(
+        said(&stop),
+        [
+            "OnRewardInfoMsg\t20985\t0\t1\t409187\t412559\t0",
+            "OnWheelUpdateMsg\t1\t1\t1\t0",
+        ]
+    );
+    assert_eq!(**published(&stop, &[143, 0, 1]).last().unwrap(), count(2, 1, 82_800));
+    // The extra spin is used next, and then the wheel is empty until tomorrow.
+    let (again, stop) = turn(&mut game, instance, 1, 0, 0);
+    assert_eq!(said(&again), ["OnSpinInfoMsg\t0"]);
+    assert_eq!(said(&stop)[1], "OnWheelUpdateMsg\t1\t0\t1\t82800");
+    assert!(send(&mut game, &movie(instance, "OnWheelSpinRequestMsg\t1")).replies.is_empty());
+}
+
+#[test]
+fn three_days_in_a_row_bank_a_bonus_spin_with_the_clients_notice_and_a_gap_starts_over() {
+    let (mut game, _entry, _scratch) = paying_session();
+    let mut notices = Vec::new();
+    // Days 0, 1, 2 in a row, then a missed day, then one more.
+    for (day, streak, left_after) in [(0, 1, 0), (1, 2, 0), (2, 3, 1), (4, 1, 1)] {
+        game.seed_wheel_clock(CLOCK + day * DAY);
+        game.initialize_world(&character(), 500).unwrap();
+        let (instance, _) = connected(&mut game);
+        let (_, stop) = turn(&mut game, instance, 1, 0, 0);
+        let next = if left_after == 0 { 82_800 } else { 0 };
+        assert_eq!(
+            said(&stop)[1],
+            format!("OnWheelUpdateMsg\t1\t{left_after}\t{streak}\t{next}"),
+            "day {day}"
+        );
+        notices.extend(published(&stop, &[143, 0, 3]).into_iter().cloned());
+        send(&mut game, &movie(instance, "FRServer_GameClose"));
+    }
+    // One notice, on the third day: 143/3 id, day, spin, string, next day, next spin.
+    let mut notice = vec![143, 0, 3];
+    for value in [8, 3, 1, 415_176, 7, 2] {
+        notice.extend(int(value));
+    }
+    assert_eq!(notices, [notice]);
+}
+
+#[test]
+fn every_shipped_prize_is_paid_through_the_reward_path() {
+    let (mut base, _entry, _scratch) = paying_session();
+    let (instance, _) = connected(&mut base);
+    let content = Content::load_optional(&field_battle_fixture::content_dir())
+        .unwrap()
+        .unwrap();
+    let mut seen = 0;
+    for (wheel, slot, at, prize) in content.prizes() {
+        let mut game = base.clone();
+        let coins = game.state().inventory.coins;
+        let (spin, stop) = turn(&mut game, instance, wheel, slot, at);
+        assert_eq!(
+            said(&spin),
+            [format!("OnSpinInfoMsg\t{slot}")],
+            "wheel {wheel} wedge {slot} prize {at} is refused: {prize:?}"
+        );
+        let window: Vec<i32> = (said(&stop)[0].strip_prefix("OnRewardInfoMsg\t").unwrap())
+            .split('\t')
+            .map(|field| field.parse().unwrap())
+            .collect();
+        assert!(window[0] > 0 && window[2] > 0 && window[3] > 0, "{window:?} for {prize:?}");
+        assert!(game.state().inventory.coins >= coins + prize.coins);
+        seen += 1;
+    }
+    assert!(seen >= 60, "{seen} prizes");
+}
+
+#[test]
+fn unweighted_spins_reach_every_wedge_of_both_wheels() {
+    let (mut base, _entry, _scratch) = paying_session();
+    let (instance, _) = connected(&mut base);
+    for wheel in [1, 2] {
+        let mut wedges = std::collections::BTreeSet::new();
+        for seed in 0..200 {
+            let mut game = base.clone();
+            game.seed_wheel_roll(seed);
+            let spin = send(&mut game, &movie(instance, &format!("OnWheelSpinRequestMsg\t{wheel}")));
+            wedges.insert(said(&spin)[0].clone());
+        }
+        assert_eq!(wedges.len(), 10, "wheel {wheel}: {wedges:?}");
+    }
+}
+
+#[test]
+fn malformed_wheels_are_refused_at_load() {
+    let document = json::read(&field_battle_fixture::content_dir().join("daily_wheel.json"));
+    let mut cases = Vec::new();
+    let mut short = document.clone();
+    short["wheels"][0]["slots"].as_array_mut().unwrap().pop();
+    cases.push(("nine wedges on a ten-wedge wheel", short));
+    for (what, pointer, bad) in [
+        ("a wedge weight of zero", "/wheels/0/slots/0/weight", json!(0)),
+        ("a picture frame the movie lacks", "/wheels/0/slots/0/category", json!(26)),
+        ("a prize that pays nothing", "/wheels/1/slots/0/prizes/0/coins", json!(0)),
+        ("a wheel type without art", "/wheels/1/wheel_type", json!(3)),
+        ("two wheels with one save key", "/wheels/1/key", json!("daily")),
+        ("two wheels with one id", "/wheels/1/wheel_id", json!(1)),
+        ("a missing coin picture", "/coin_icon_id", json!(0)),
+        ("schema 1", "/schema_version", json!(1)),
+    ] {
+        let mut broken = document.clone();
+        *broken.pointer_mut(pointer).unwrap() = bad;
+        cases.push((what, broken));
+    }
+    for (what, broken) in cases {
+        let dir = Scratch::new("daily-wheel-bad-wheel");
+        json::write_pretty(&dir.path().join("daily_wheel.json"), &broken);
+        assert!(Content::load_optional(dir.path()).is_err(), "{what}");
+    }
+}
+
+#[test]
+fn a_full_bag_refuses_the_spin_before_the_draw_whatever_it_would_have_paid() {
+    let (mut game, _entry, scratch) = paying_session();
+    // Win one item, then fill the bag to its 100 rows with copies of it. The next day both
+    // wheels have their spin again.
+    let (instance, _) = connected(&mut game);
+    turn(&mut game, instance, 1, 0, 0);
+    let mut state = game.state();
+    let filler = (state.inventory.items.last().cloned()).expect("the shard just won");
+    let mut id = state.inventory.items.iter().map(|item| item.id).max().unwrap() + 1;
+    while state.inventory.items.len() < 100 {
+        let mut item = filler.clone();
+        item.id = id;
+        id += 1;
+        state.inventory.items.push(item);
+    }
+    state.inventory.next_instance_id = Some(i64::from(id));
+    let mut game = Gameplay::load(scratch.path(), Some(state)).unwrap();
+    game.seed_wheel_clock(CLOCK + DAY);
+    game.initialize_world(&character(), 500).unwrap();
+    let (instance, _) = connected(&mut game);
+    let before = game.state();
+    // An Extra Spin, a coin wedge and an item wedge are refused alike: the refusal comes before
+    // the draw, so a full bag cannot keep the prizes that need no room and reroll the rest.
+    for (wheel, slot) in [(1, 3), (2, 8), (1, 0)] {
+        let mut probe = game.clone();
+        probe.seed_wheel_draw(slot, 0);
+        let refused = send(&mut probe, &movie(instance, &format!("OnWheelSpinRequestMsg\t{wheel}")));
+        assert!(said(&refused).is_empty(), "wheel {wheel} wedge {slot}: no needle");
+        assert_eq!(chat_lines(&refused), 1, "wheel {wheel} wedge {slot}");
+        assert_eq!(published(&refused, &[39, 0, 19]).len(), 1, "the wheel closes");
+        assert!(!refused.changed);
+        assert_eq!(probe.state(), before, "wheel {wheel} wedge {slot}: nothing paid, the spin kept");
+    }
+}
+
+#[test]
+fn a_player_online_across_utc_midnight_is_sent_the_new_days_count_once() {
+    let (mut game, _entry, _scratch) = session(Some(TODAY));
+    let counts = |tick: Option<Outcome>| {
+        tick.map_or(0, |out| published(&out, &[143, 0, 1]).len())
+    };
+    assert_eq!(counts(game.pet_tick(&character(), 2_000)), 0, "the same day");
+    assert!(offers(&send(&mut game, &START_WHEEL)).is_empty(), "no spin today");
+    game.seed_wheel_clock(CLOCK + DAY);
+    let midnight = game.pet_tick(&character(), 3_000).expect("the new day's count");
+    assert_eq!(*published(&midnight, &[143, 0, 1])[0], spins(2, 82_800));
+    assert_eq!(counts(game.pet_tick(&character(), 4_000)), 0, "once");
+    assert_eq!(offers(&send(&mut game, &START_WHEEL)).len(), 1, "and the wheel opens");
 }

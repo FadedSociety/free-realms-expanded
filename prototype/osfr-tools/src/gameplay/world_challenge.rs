@@ -213,7 +213,7 @@ impl Gameplay {
         character: &CharacterState,
         now_ms: u64,
     ) -> io::Result<Option<Outcome>> {
-        if let Some(out) = self.handle_daily_wheel(inner)? {
+        if let Some(out) = self.handle_daily_wheel(inner, character.guid)? {
             return Ok(Some(out));
         }
         self.handle_world_challenge(inner, character, now_ms)
@@ -368,6 +368,7 @@ impl Gameplay {
         now_ms: u64,
         out: &mut Outcome,
     ) {
+        out.replies.extend(self.daily_wheel.day_rollover()); // the wheel's count at UTC midnight
         let Some(session) = self.world_challenge.session.as_mut() else {
             let state = &mut self.world_challenge;
             if state.offered.is_some_and(|o| {

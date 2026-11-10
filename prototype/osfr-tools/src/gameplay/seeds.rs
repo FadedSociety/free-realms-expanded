@@ -21,4 +21,14 @@ impl Gameplay {
     pub fn seed_wheel_clock(&mut self, unix_seconds: u64) {
         self.daily_wheel.set_clock(unix_seconds);
     }
+
+    /// Deterministic wheel draws.
+    pub fn seed_wheel_roll(&mut self, seed: u64) {
+        self.daily_wheel.reseed(seed);
+    }
+
+    /// The next wheel draw lands on this wedge index and this prize of it.
+    pub fn seed_wheel_draw(&mut self, slot: usize, prize: usize) {
+        self.daily_wheel.force(slot, prize);
+    }
 }
