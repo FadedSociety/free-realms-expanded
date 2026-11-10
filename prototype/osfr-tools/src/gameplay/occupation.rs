@@ -224,6 +224,16 @@ impl Gameplay {
     pub(super) fn activity_busy(&self) -> bool {
         self.blocks(|gates| gates.start)
     }
+
+    /// P-housing: `activity_busy` with the Housing variant alone exempted. Being inside a lot
+    /// is an occupation that closes `start`, yet the lot's own NPC and a second lot must stay
+    /// reachable from it; every other start-closing activity (a groom on the farm, a fight)
+    /// still refuses, exactly as in the continent.
+    pub(super) fn busy_outside_housing(&self) -> bool {
+        Occupation::ALL
+            .iter()
+            .any(|o| *o != Occupation::Housing && o.gates().start && self.is_occupied(*o))
+    }
 }
 
 #[cfg(test)]

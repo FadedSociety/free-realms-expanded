@@ -50949,6 +50949,365 @@
           }
         ]
       }
+    },
+    {
+      "npc_id": 9500004355,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Farmer Chug",
+      "name_reason": null,
+      "name_string_id": 434254,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 434254
+        },
+        {
+          "table": "client_locale",
+          "id": 359
+        },
+        {
+          "table": "client_locale",
+          "id": 434611
+        }
+      ],
+      "name_string_id_reason": "Three client locale rows read 'Farmer Chug' (359, 434254, 434611; lab/reports/locale-id-to-text.json); 434254 sits in the 2011 farming block beside the farm quest texts (434546 'Return to Farmer Chug').",
+      "zone": "Wilds",
+      "zone_id": 16,
+      "zone_reason": "The Wilds Farm is a player lot in the Wilds (wiki: Sacred Grove, Wilds Farm Mobs); the row is grouped with the Wilds and drawn in the lot scene by house_zone_id.",
+      "house_zone_id": 34,
+      "region_pages": [
+        "Wilds Farm"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "Farming tutor on the player's Wilds Farm; gives the Intro to Farming and Wilds Farm quest lines."
+      ],
+      "roles": [
+        "quest_giver"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "\"Farmer Chug is waiting for you on your farm! Click the Wilds Farm option in your Houses Browser to check it out.\" (wiki fr_quest:Farming:_Meet_Farmer_Chug!; client text 435268)",
+        "\"Speak to Farmer Chug in Wilds Farm.\" (wiki start line of Be a Star and Make a Mint, Birds of a Feather, Farming: Away with Weeds, Farming: It's What Plants Crave, Farming: My Cousin Wug, Farming: Toil Over Soil and the other Wilds Farm Quests)",
+        "[video: V3xStzxf-IU 'Freerealms with Luke Tomahawk' (2013-06-07), quest card 'Farming: Meet Farmer Chug!' with goal 'Talk to Chug' at 0:00-2:40]"
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [
+        "Farming: Meet Farmer Chug! (wiki; client 435268 'Click the Wilds Farm option in your Houses Browser to meet Farmer Chug.')",
+        "Farming: Away with Weeds (wiki; return 434738)",
+        "Farming: Toil Over Soil (wiki; return 434738)",
+        "Farming: It's What Plants Crave (wiki; return 434738)",
+        "Farming: My Cousin Wug (wiki; return 436187)",
+        "Farming: The First Harvest (wiki; return 434738)",
+        "Farming: Samples to Seeds (wiki; return 436200)",
+        "Farming: The Big Harvest (wiki; return 436200)",
+        "Farming: The Farmer's Market (wiki; return 434546)",
+        "Farming: Snowberry Harvest (wiki; return 434546)",
+        "Be a Star and Make a Mint (wiki; return 434546)",
+        "Birds of a Feather (wiki; return 434546)",
+        "Till Next Time (wiki; return 434546)"
+      ],
+      "quests_accepted": [],
+      "quests_accepted_reason": "Every Wilds Farm quest returns to him (client 'Return to Farmer Chug' 434546, 434738, 436187, 436200); the farming steps themselves are the farming piece's.",
+      "vendor_stock": null,
+      "vendor_stock_reason": "He sells nothing; the farm's soil and seeds came from the coin shop (wiki Farming: Toil Over Soil).",
+      "services": [],
+      "services_reason": "Quest giver only.",
+      "position": [
+        1397.5,
+        0.0,
+        745.0
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        0.7071067811865476,
+        0.0,
+        0.7071067811865476
+      ],
+      "heading": 1.5707963267948966,
+      "placement": "house_lot",
+      "placement_source": "reconstructed_house_lot_spawn",
+      "placement_confidence": "high",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "(R) Inside the Wilds Farm lot's build box (houses.json property 34: x 1356..1406, z 723.4..778.2), 11.5 m west of the lot spawn (1409, 0, 750.8) and facing it, so the player sees him on arrival as the tutorial quest says; y 0 is the lot spawn's height (the farm scene's ground is unread).",
+      "model_id": 488,
+      "model_file_name": "chugawug_farmer_m.adr",
+      "greeting_string_id": 134934,
+      "greeting_reason": "Client text 134934 'Howdy neighbor! The name is Farmer Chug. I live over on the farm next door...' is his introduction (wiki Farming: Meet Farmer Chug! quotes the same line).",
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "fr_mob_farmer_chug (lab/references/fanbyte-wiki-20261102/raw/fr_mob_farmer_chug_89ec7f.html): Quest NPC, race Chugawug, gender Male, place Wilds Farm, Farming"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.434254 = Farmer Chug (lab/reports/locale-id-to-text.json); Models.txt 488 = chugawug_farmer_m.adr, the male chugawug farmer body Farmer Wug (npc_spawns_extra 9500000475) wears"
+        },
+        {
+          "kind": "video",
+          "evidence": "V3xStzxf-IU 'Freerealms with Luke Tomahawk' (2013-06-07): the quest card 'Farming: Meet Farmer Chug!' and its goal 'Talk to Chug' stay on screen 0:00-2:40 (lab/video-archive/out/V3xStzxf-IU/frames.jsonl)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No capture or placement index knows him; he is a lot NPC (house_zone_id 34), drawn only inside the Wilds Farm scene, at a spot chosen from the lot's build box"
+        }
+      ],
+      "field_sources": {
+        "name_string_id": [
+          {
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json 434254 = Farmer Chug"
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Models.txt 488 = chugawug_farmer_m.adr (wiki: Chugawug, Male)"
+          }
+        ],
+        "position": [
+          {
+            "kind": "client",
+            "evidence": "The spot lies inside the Wilds Farm lot scene the client manifest names (Assets_manifest.txt:69126 farming_wilds_farmstead_01.gzne.z, houses.json property 34, zone 34); the client draws him only in that scene (35/2 after the lot's 127/28)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) houses.json property 34 build box and spawn; see position_reason"
+          }
+        ],
+        "heading": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) faces the lot spawn"
+          }
+        ],
+        "house_zone_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) houses.json property 34 zone_id 34, the Wilds Farm scene farming_wilds_farmstead_01"
+          }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json 134934"
+          }
+        ],
+        "npc_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) next free reconstructed content key in the 95xxxxxxxx range"
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) P-housing lot NPC row: the field follows the npcs/*.json row shape; its value is reconstructed from the wiki, the client strings and houses.json property 34"
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) no reference emulator row names him"
+          }
+        ],
+        "name": [
+          {
+            "kind": "wiki",
+            "evidence": "fr_mob_farmer_chug (fanbyte wiki): Quest NPC, Chugawug, male, Wilds Farm, Farming; the 13 Farmer Chug quest pages"
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) P-housing lot NPC row: the field follows the npcs/*.json row shape; its value is reconstructed from the wiki, the client strings and houses.json property 34"
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json (client locale); Models.txt 488: 359, 434254 and 434611 all read 'Farmer Chug'"
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json (client locale); Models.txt 488"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "wiki",
+            "evidence": "fr_mob_farmer_chug (fanbyte wiki): Quest NPC, Chugawug, male, Wilds Farm, Farming; the 13 Farmer Chug quest pages; Sacred Grove (FR Mobs by Region)"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zones.json package id 16 Wilds, the region grouping the lot sits in"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) P-housing lot NPC row: the field follows the npcs/*.json row shape; its value is reconstructed from the wiki, the client strings and houses.json property 34"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "wiki",
+            "evidence": "fr_mob_farmer_chug (fanbyte wiki): Quest NPC, Chugawug, male, Wilds Farm, Farming; the 13 Farmer Chug quest pages"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "wiki",
+            "evidence": "fr_mob_farmer_chug (fanbyte wiki): Quest NPC, Chugawug, male, Wilds Farm, Farming; the 13 Farmer Chug quest pages"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "wiki",
+            "evidence": "fr_mob_farmer_chug (fanbyte wiki): Quest NPC, Chugawug, male, Wilds Farm, Farming; the 13 Farmer Chug quest pages"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "wiki",
+            "evidence": "fr_mob_farmer_chug (fanbyte wiki): Quest NPC, Chugawug, male, Wilds Farm, Farming; the 13 Farmer Chug quest pages"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "wiki",
+            "evidence": "fr_mob_farmer_chug (fanbyte wiki): Quest NPC, Chugawug, male, Wilds Farm, Farming; the 13 Farmer Chug quest pages (a quest NPC, not an enemy)"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "wiki",
+            "evidence": "fr_mob_farmer_chug (fanbyte wiki): Quest NPC, Chugawug, male, Wilds Farm, Farming; the 13 Farmer Chug quest pages; client text 435268; video V3xStzxf-IU"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) empty until the quests-dialog piece wires his 13 quests"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) empty until the quests-dialog piece wires his 13 quests"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "wiki",
+            "evidence": "fr_mob_farmer_chug (fanbyte wiki): Quest NPC, Chugawug, male, Wilds Farm, Farming; the 13 Farmer Chug quest pages; client return texts 434546, 434738, 436187, 436200"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) empty until the quests-dialog piece wires his 13 quests"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "wiki",
+            "evidence": "fr_mob_farmer_chug (fanbyte wiki): Quest NPC, Chugawug, male, Wilds Farm, Farming; the 13 Farmer Chug quest pages"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "wiki",
+            "evidence": "fr_mob_farmer_chug (fanbyte wiki): Quest NPC, Chugawug, male, Wilds Farm, Farming; the 13 Farmer Chug quest pages (he sells nothing)"
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "wiki",
+            "evidence": "fr_mob_farmer_chug (fanbyte wiki): Quest NPC, Chugawug, male, Wilds Farm, Farming; the 13 Farmer Chug quest pages"
+          }
+        ],
+        "services": [
+          {
+            "kind": "wiki",
+            "evidence": "fr_mob_farmer_chug (fanbyte wiki): Quest NPC, Chugawug, male, Wilds Farm, Farming; the 13 Farmer Chug quest pages"
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "wiki",
+            "evidence": "fr_mob_farmer_chug (fanbyte wiki): Quest NPC, Chugawug, male, Wilds Farm, Farming; the 13 Farmer Chug quest pages"
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) P-housing lot NPC row: the field follows the npcs/*.json row shape; its value is reconstructed from the wiki, the client strings and houses.json property 34"
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) the heading as a Y quaternion"
+          }
+        ],
+        "placement": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) house_lot: a row inside a player's lot"
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) reconstructed_house_lot_spawn"
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) high: the lot's build box is the whole walkable area"
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) no POI candidates: a lot has no POI"
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) no capture shows the farm"
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) P-housing lot NPC row: the field follows the npcs/*.json row shape; its value is reconstructed from the wiki, the client strings and houses.json property 34"
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json (client locale); Models.txt 488: chugawug_farmer_m.adr"
+          }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json (client locale); Models.txt 488: 134934"
+          }
+        ]
+      }
     }
   ]
 }

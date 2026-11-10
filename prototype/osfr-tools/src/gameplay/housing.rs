@@ -188,12 +188,11 @@ impl Gameplay {
         let Some(session) = self.housing.as_ref() else {
             return Ok(None);
         };
-        // The occupation table: another activity (a fishing hole, a match, a race) owns the
-        // player's scene, and a lot entered from it would keep that scene as its way back. Going
-        // from one lot to another stays open.
-        if matches!(decode_request(inner), Ok(Request::Enter { .. }))
-            && self.activity_busy()
-            && !self.is_occupied(occupation::Occupation::Housing)
+        // The occupation table: another activity (a fishing hole, a match, a race, a groom) owns
+        // the player's scene or time, and a lot entered from it would keep that scene as its way
+        // back. Going from one lot to another stays open; any other activity inside a lot still
+        // refuses (`busy_outside_housing`).
+        if matches!(decode_request(inner), Ok(Request::Enter { .. })) && self.busy_outside_housing()
         {
             return Ok(Some(Outcome {
                 replies: vec![chat::system(
@@ -284,7 +283,12 @@ impl Gameplay {
             out.replies
                 .extend(self.inventory.adopt_state(inventory.state().clone())?);
         }
+        // P-housing: inside a lot only the lot's own NPCs are in reach (`check_range`).
+        let in_house = session.in_house();
         self.housing = Some(session);
+        if let Some(interaction) = self.npc_interaction.as_mut() {
+            interaction.set_in_house(in_house);
+        }
         Ok(Some(out))
     }
 
@@ -309,6 +313,9 @@ impl Gameplay {
         session.house = None;
         let back = session.return_to.take()?;
         session.service.end_visit(back.guid);
+        if let Some(interaction) = self.npc_interaction.as_mut() {
+            interaction.set_in_house(false);
+        }
         Some(back)
     }
 

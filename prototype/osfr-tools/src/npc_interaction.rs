@@ -295,6 +295,10 @@ struct NpcRecord {
     name: String,
     #[serde(default)]
     zone_id: Option<u32>,
+    /// P-housing: the lot scene this NPC stands in (`houses.json` `zone_id`); reachable only
+    /// from inside that lot, and no world pin is known for it.
+    #[serde(default)]
+    house_zone_id: Option<u32>,
     #[serde(default)]
     position: Option<[f32; 3]>,
     #[serde(default)]
@@ -440,6 +444,10 @@ pub struct NpcInteraction {
     /// T538: the last 26/8 named an actor this router does not own (a player menu or a
     /// world-event actor), so a following 26/6 is that route's, not a dialogue's here.
     foreign_click: bool,
+    /// P-housing: the player is inside a lot (the housing session sets it on entry and clears it
+    /// on leaving or a reconnect). Then only a row standing in that lot (`house_zone_id`) is in
+    /// reach; continent rows are not, whatever their regional label.
+    in_house: bool,
 }
 
 impl NpcInteraction {
@@ -563,6 +571,7 @@ impl NpcInteraction {
             }),
             active: None,
             foreign_click: false,
+            in_house: false,
         })
     }
 
@@ -751,8 +760,19 @@ impl NpcInteraction {
         Ok(())
     }
 
+    /// P-housing: the housing session reports whether the player is inside a lot; while true
+    /// only the lot's own rows are in reach (`check_range`).
+    pub fn set_in_house(&mut self, in_house: bool) {
+        self.in_house = in_house;
+    }
+
+    /// Where the NPC stands in the continent. A lot NPC (`house_zone_id`) has no continent
+    /// place: a quest pin or route to it must say "your house", not a world spot (P-housing).
     pub fn location(&self, npc_id: u64) -> Option<(u32, [f32; 3])> {
         let npc = self.content.npcs.get(&npc_id)?;
+        if npc.house_zone_id.is_some() {
+            return None;
+        }
         Some((npc.zone_id.unwrap_or(OPEN_WORLD_ZONE), npc.position?))
     }
 
@@ -770,7 +790,7 @@ impl NpcInteraction {
             .npcs
             .get(&npc_id)
             .ok_or(NpcInteractionError::UnknownNpc)?;
-        check_range(npc, zone_id, position)?;
+        check_range(npc, self.in_house, zone_id, position)?;
         let options = self.build_options(npc, quests)?;
         let packet = interaction_list_packet(npc, &options)?;
         // (R) Keep one active NPC/menu per session until another interaction or close.
@@ -806,7 +826,7 @@ impl NpcInteraction {
             .npcs
             .get(&npc_id)
             .ok_or(NpcInteractionError::UnknownNpc)?;
-        check_range(npc, zone_id, position)?;
+        check_range(npc, self.in_house, zone_id, position)?;
         let active = self
             .active
             .as_mut()
@@ -920,7 +940,7 @@ impl NpcInteraction {
             .npcs
             .get(&active.npc_id)
             .ok_or(NpcInteractionError::UnknownNpc)?;
-        check_range(npc, zone_id, position)?;
+        check_range(npc, self.in_house, zone_id, position)?;
         let subtype = match (le::u16(packet, 0), le::u16(packet, 2)) {
             (Some(COIN_STORE_FAMILY), Some(subtype)) => subtype,
             _ => return Err(NpcInteractionError::InvalidPacket),
@@ -1007,7 +1027,7 @@ impl NpcInteraction {
             .npcs
             .get(&active.npc_id)
             .ok_or(NpcInteractionError::UnknownNpc)?;
-        check_range(npc, zone_id, position)
+        check_range(npc, self.in_house, zone_id, position)
     }
 
     /// Return the native 66/46 hide message and clear this session's active merchant.
@@ -1047,7 +1067,7 @@ impl NpcInteraction {
                 .content
                 .npcs
                 .get(&npc_id)
-                .is_some_and(|npc| check_range(npc, zone_id, position).is_ok())
+                .is_some_and(|npc| check_range(npc, self.in_house, zone_id, position).is_ok())
     }
 
     /// (R) T773: remember the 26/3 a Talk actually sent: its exact rows and the page body
@@ -1398,6 +1418,7 @@ fn sell_refusal_code(error: &NpcInteractionError) -> u32 {
 
 fn check_range(
     npc: &NpcRecord,
+    in_house: bool,
     zone_id: u32,
     position: [f32; 3],
 ) -> Result<(), NpcInteractionError> {
@@ -1410,9 +1431,19 @@ fn check_range(
     {
         return Err(NpcInteractionError::OutOfRange);
     }
-    // (R) Regional `zone_id`s are content package labels inside the one
-    // continent (local world zone 0); there the distance check decides reach.
-    if zone_id != npc_zone && zone_id != OPEN_WORLD_ZONE {
+    // A lot NPC answers only inside its lot's scene (P-housing); the continent never reaches it.
+    if let Some(house) = npc.house_zone_id {
+        if zone_id != house {
+            return Err(NpcInteractionError::WrongZone);
+        }
+    } else if in_house {
+        // Inside a lot only the lot's own NPCs answer: a continent row whose regional label
+        // happens to equal the lot's zone id must not (house zone ids 1-34 and the labels 1-17
+        // share one number space).
+        return Err(NpcInteractionError::WrongZone);
+    } else if zone_id != npc_zone && zone_id != OPEN_WORLD_ZONE {
+        // (R) Regional `zone_id`s are content package labels inside the one
+        // continent (local world zone 0); there the distance check decides reach.
         return Err(NpcInteractionError::WrongZone);
     }
     let distance_squared: f64 = position

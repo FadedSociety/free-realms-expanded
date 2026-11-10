@@ -80,9 +80,41 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
                         | "video_index"
                         | "poi_anchor"
                         | "unanchored"
+                        | "house_lot"
                 ),
                 "{owner}: unknown placement class {placement:?}"
             );
+            if placement == "house_lot" {
+                // P-housing: an NPC inside a player's lot (Farmer Chug on the Wilds Farm). It is
+                // drawn only in that lot's scene, so it must name an enterable lot and stand in
+                // the lot's build box, where the client lets a player walk.
+                assert_eq!(
+                    source, "reconstructed_house_lot_spawn",
+                    "{owner}: unexpected source"
+                );
+                let zone = npc["house_zone_id"]
+                    .as_u64()
+                    .unwrap_or_else(|| panic!("{owner}: house_lot row needs house_zone_id"));
+                let houses = read_json(&data_root.parent().unwrap().join("houses.json"));
+                let lot = (houses["lots"].as_array().unwrap().iter())
+                    .find(|lot| lot["zone_id"].as_u64() == Some(zone))
+                    .unwrap_or_else(|| panic!("{owner}: no lot has zone {zone}"));
+                assert_eq!(
+                    lot["enabled"].as_bool(),
+                    Some(true),
+                    "{owner}: lot {zone} is not enterable"
+                );
+                let xyz: Vec<f64> = (npc["position"].as_array().unwrap().iter())
+                    .map(|value| value.as_f64().unwrap())
+                    .collect();
+                let inside = (lot["build_areas"].as_array().unwrap().iter()).any(|area| {
+                    let b: Vec<f64> = (area.as_array().unwrap().iter())
+                        .map(|value| value.as_f64().unwrap())
+                        .collect();
+                    (0..3).all(|axis| b[axis] <= xyz[axis] && xyz[axis] <= b[axis + 3])
+                });
+                assert!(inside, "{owner}: stands outside lot {zone}'s build box");
+            }
             if placement == "video_index" {
                 // T878: a position solved from the video archive; the tag carries the counts.
                 assert_eq!(source, "video_archive_index", "{owner}: unexpected source");
@@ -333,6 +365,7 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
     // L096 appended the two Wildwood turnstile actors (live_capture).
     // L925 appended twelve fanbyte-wiki quest givers (poi_anchor, 1,223).
     // L932 appended the two Snowhill soccer gates (client_object, 1,225).
-    assert_eq!(npc_count, 1298);
+    // P-housing appended Farmer Chug on the Wilds Farm lot (house_lot, 1,299).
+    assert_eq!(npc_count, 1299);
     println!("NPC placement sources: {counts:?}");
 }

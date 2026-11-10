@@ -317,8 +317,9 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // T501 appended the unanchored Shannon and Sugaboo rows (1,205); T739 appended four
     // `legacy_data` clickable quest props (1,209, all Legacy spawns); L096 the two Wildwood
     // turnstile actors (1,211, live_capture); L925 twelve fanbyte-wiki quest givers (1,223, poi_anchor);
-    // L932 the two Snowhill soccer gates (1,225, client_object).
-    assert_eq!(regional_legacy + regional_reconstructed, 1298);
+    // L932 the two Snowhill soccer gates (1,225, client_object); P-housing Farmer Chug on the
+    // Wilds Farm lot (house_lot, 1,299).
+    assert_eq!(regional_legacy + regional_reconstructed, 1299);
     assert!(
         regional_legacy >= 582,
         "regional NPCs dropped to {regional_legacy}"

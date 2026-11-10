@@ -97,7 +97,11 @@ impl Gameplay {
     /// reaches this router before the opening handlers' activity refusals, so the shared busy
     /// table has to hold here too. A refusal changes no menu, quest or save state.
     fn busy_interaction_refusal(&self) -> Option<Outcome> {
-        self.activity_busy().then(|| Outcome {
+        // P-housing: a player inside a lot is "busy" with housing, yet the lot's own NPC (Farmer
+        // Chug on the Wilds Farm) must answer; the reach check keeps every continent NPC out of
+        // a house zone, so only lot NPCs get through. Any other activity (a groom on the farm)
+        // still refuses, as it does in the continent.
+        self.busy_outside_housing().then(|| Outcome {
             replies: vec![chat::system(
                 "Finish the active activity before interacting.",
             )],

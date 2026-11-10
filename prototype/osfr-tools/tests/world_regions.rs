@@ -283,8 +283,8 @@ fn shipped_npc_rows_cover_1192_of_1209() {
         }
     }
 
-    // L932: the two Snowhill soccer gates (1,225).
-    assert_eq!(total, 1298, "shipped NPC rows");
+    // L932: the two Snowhill soccer gates (1,225). P-housing: Farmer Chug on the Wilds Farm lot (1,299).
+    assert_eq!(total, 1299, "shipped NPC rows");
     // T876 (was 981 / 844 / 905 / 1091 with the T753 grouping and the community region shapes): the places'
     // music/ambience area families and the client-row regions cover 1,193 rows, of which every one is in a place.
     // T665 moved Sorin and Coach Eddie onto drawn Legacy spawns; one of the two landed outside every

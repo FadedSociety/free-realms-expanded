@@ -180,6 +180,12 @@ struct RegionalNpc {
     placement: Option<String>,
     #[serde(default)]
     placement_confidence: Option<String>,
+    /// P-housing: an NPC standing inside a player's lot. The value is the lot's scene zone id
+    /// (`houses.json` `zone_id`, the id the house scene transition carries), so the row is drawn
+    /// only to a player inside that lot and never in the continent. `zone_id` stays the regional
+    /// label the content tables group the row by.
+    #[serde(default)]
+    house_zone_id: Option<u32>,
 }
 
 /// `placement_confidence` classes the loader spawns for a `video_index` row (T896, (R)): the
@@ -475,7 +481,12 @@ impl NpcVisibility {
                 // (R) Positioned legacy_data rows without a regional label are
                 // part of the shared open-world coordinate space.
                 .unwrap_or(OPEN_WORLD_ZONE);
-            anchors.push((zone_id, position));
+            // A lot NPC lives in the lot's own scene: it anchors no continent spawn and is
+            // drawn only to a player whose zone is that lot (P-housing).
+            let draw_zone = npc.house_zone_id.unwrap_or(OPEN_WORLD_ZONE);
+            if npc.house_zone_id.is_none() {
+                anchors.push((zone_id, position));
+            }
             let bound_elsewhere =
                 npc.placement.as_deref() != Some("legacy_data") && bound.contains(&npc.npc_id);
             if !npc.drawn() || bound_elsewhere {
@@ -506,7 +517,7 @@ impl NpcVisibility {
             let mut notifications = Vec::new();
             let cursor = presentation.apply(&mut spawn, &mut notifications);
             Arc::make_mut(&mut result.by_zone)
-                .entry(OPEN_WORLD_ZONE)
+                .entry(draw_zone)
                 .or_default()
                 .push(VisibleNpc {
                     spawn,

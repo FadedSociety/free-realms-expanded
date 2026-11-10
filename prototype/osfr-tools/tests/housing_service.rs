@@ -223,6 +223,7 @@ fn lot_definition(property: PropertyDefinition) -> HousingLotDefinition {
         deed: None,
         source_tag: "test fixture only".to_string(),
         enabled: true,
+        granted_with_starter: false,
     }
 }
 
@@ -1745,7 +1746,8 @@ const BOUNDS_SOURCES: [&str; 3] = ["legacy (R)", "lxzxrus-whereami (R)", "lxzxru
 fn enabled_bundled_lots_have_scene_bounds_and_source_tags() {
     let content = HousingContent::bundled().unwrap();
     assert_eq!(content.lots.len(), 31);
-    assert_eq!(content.lots.iter().filter(|lot| lot.enabled).count(), 23);
+    // P-housing: the Wilds Farm (34) joined the 23 houses.
+    assert_eq!(content.lots.iter().filter(|lot| lot.enabled).count(), 24);
     for lot in &content.lots {
         assert!(!lot.source_tag.is_empty());
         assert!(!lot.build_areas.is_empty());
@@ -1843,7 +1845,8 @@ fn enabled_lots_have_distinct_scenes_and_shipped_skies() {
             );
         }
     }
-    assert_eq!(scenes.len(), 23);
+    // P-housing: the Wilds Farm (34, farming_wilds_farmstead_01) joined the 23 houses.
+    assert_eq!(scenes.len(), 24);
 }
 
 #[test]
@@ -1992,7 +1995,11 @@ fn the_starter_lot_and_its_kit_commit_together() {
     stock.refuse_return = false;
     assert!(service.handle(OWNER, &grant, &mut stock).unwrap().changed);
     assert_eq!(stock.instances, [owned(1, KIT_CHICKEN, 1)]);
-    let standing = service.state().lots[0].fixtures.clone();
+    // P-housing: the free Wilds Farm (34) is granted beside the starter and stays empty.
+    let standing = (service.state().lots.into_iter())
+        .find(|lot| lot.property_id != 34)
+        .expect("the starter lot")
+        .fixtures;
     let ids: Vec<_> = standing.iter().map(|f| f.item_instance_id).collect();
     assert_eq!(ids.len(), 4);
     assert!(
@@ -2010,7 +2017,10 @@ fn the_starter_lot_and_its_kit_commit_together() {
         1,
         "a repeat ask grants no second unit"
     );
-    assert_eq!(service.state().lots[0].fixtures, standing);
+    let starter = (service.state().lots.into_iter())
+        .find(|lot| lot.property_id != 34)
+        .expect("the starter lot");
+    assert_eq!(starter.fixtures, standing);
 }
 
 #[test]

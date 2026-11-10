@@ -1557,17 +1557,29 @@
         0,
         0
       ],
-      "scene": null,
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=34;R:cap=9999;R:landmark-cap=0;R:inverted-legacy-box-components-normalized;lxzxrus-scout:Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:145 Farm plot, no house scene (R)",
-      "enabled": false,
+      "scene": {
+        "name": "farming_wilds_farmstead_01",
+        "zone_type": 2,
+        "sky": "sky_housing_wilds.xml",
+        "tutorial": false,
+        "unknown": 1,
+        "zone_id": 34,
+        "update_radius": 0.0,
+        "geometry_id": 214,
+        "override_update_radius": true,
+        "wait_for_zone_ready": false
+      },
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=34;R:cap=9999;R:landmark-cap=0;R:inverted-legacy-box-components-normalized;lxzxrus-scout:Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:145 Farm plot (R);P-housing:client-manifest:Assets_manifest.txt:69126 farming_wilds_farmstead_01.gzne.z crc 2947444826 plus 32 farming_wilds_farmstead_01_* chunk rows (R: the scene is picked by its name, farming_wilds_farmstead_02 is the alternate);R:sky sky_housing_wilds.xml as the other Wilds lots 3 and 22;R:transition-defaults zone_type 2, geometry 214;R:free grant with the starter (wiki Farms: 'Wilds Farm free'; tutorial quest text 435268 'Click the Wilds Farm option in your Houses Browser to meet Farmer Chug.')",
+      "enabled": true,
       "bounds_source": "legacy (R)",
-      "scene_source": null,
-      "disabled_reason": "farm plot, not a house zone (Lxzxrus housing-scout.md:144-145) (R)",
+      "scene_source": "client-manifest (R)",
+      "disabled_reason": null,
       "deed": {
         "item_id": 11435,
         "store_bundle_ids": [],
         "source": "Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:145; item-catalogue Type 16, NameId 5409 = name_id; no original bundle"
-      }
+      },
+      "granted_with_starter": true
     }
   ]
 }

@@ -249,11 +249,13 @@ const EXISTING_GREETINGS: [(&str, u64, u32); 19] = [
 
 /// Bindings added after this suite was written (T378, T369, T894 Tooga). They are expected
 /// in the two owned files, not a T298 regression.
-const LATER_GREETINGS: [(&str, u64, u32); 4] = [
+const LATER_GREETINGS: [(&str, u64, u32); 5] = [
     ("wilds.json", 9500000953, 70733),
     ("wilds.json", 9500000941, 94519),
     ("wilds.json", 9000000289, 393376),
     ("wilds.json", 9000000295, 395495),
+    // P-housing: Farmer Chug on the Wilds Farm lot, client 134934 "Howdy neighbor! ..."
+    ("wilds.json", 9500004355, 134934),
 ];
 
 /// Sam Durango: a drawable Lakeshore trainer with no recovered speaker line.
@@ -263,8 +265,8 @@ const BLANK: u64 = 9500000364;
 // L925: twelve wiki quest givers appended (Ginger stands in lakeshore.json: 39 -> 40)
 const LAKESHORE_RECORDS: usize = 40;
 /// T498 appended the Burglz row (a quest hand-in with no greeting), so 119; L096 the two Wildwood
-/// turnstile actors (no greeting), so 121.
-const WILDS_RECORDS: usize = 121;
+/// turnstile actors (no greeting), so 121; P-housing Farmer Chug on the Wilds Farm lot, so 122.
+const WILDS_RECORDS: usize = 122;
 
 fn assert_drawable(record: &Value, npc_id: u64) {
     assert!(

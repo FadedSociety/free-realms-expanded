@@ -205,6 +205,12 @@ pub struct HousingLotDefinition {
     /// recorded. A deed names at most one lot (`HousingContent::validate`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub deed: Option<LotDeed>,
+    /// P-housing (R): granted beside the starter on the first 127/23, once per character. The
+    /// wiki lists the Wilds Farm as free and its tutorial quest ("Click the Wilds Farm option in
+    /// your Houses Browser", client text 435268) expects it in the list already. Its deed is
+    /// never sold. Only an enabled lot may carry it.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub granted_with_starter: bool,
 }
 
 /// L046: the property deed (a Type 16 `ClientItemDefinition`) that sells one lot, with its source.
@@ -268,6 +274,7 @@ impl HousingLotDefinition {
                     || deed.source.trim().is_empty()
                     || deed.store_bundle_ids.contains(&0)
             })
+            || (self.granted_with_starter && !self.enabled)
         {
             return Err(ServiceError::HousingContentInvalid(
                 "invalid or untagged lot row",
@@ -1435,6 +1442,31 @@ impl HousingService {
         Ok(lot_guid)
     }
 
+    /// P-housing (R): the lots every character holds beside the starter
+    /// (`granted_with_starter`, the Wilds Farm), granted once each and never again. A lot the
+    /// character already holds is left as it is, fixtures included.
+    fn grant_free_lots(&mut self, owner_guid: u64) -> Result<(), ServiceError> {
+        let free: Vec<_> = (self.house_definitions.values())
+            .filter(|lot| lot.granted_with_starter && Some(lot.property_id) != self.starter_property_id)
+            .cloned()
+            .collect();
+        let owned: BTreeSet<i32> = (self.lots_of(owner_guid).iter())
+            .map(|lot| lot.property_id)
+            .collect();
+        for definition in free {
+            if owned.contains(&definition.property_id) {
+                continue;
+            }
+            let lot_guid = self.housing.lot_guid(owner_guid, definition.property_id)?;
+            self.housing.grant_property(PropertyGrant {
+                owner_guid,
+                property: definition.property(),
+                lot_guid,
+            })?;
+        }
+        Ok(())
+    }
+
     /// L046 (R): a paid Marketplace deed grants the one enabled lot that names it. An owner who
     /// already has that lot is refused, so a repeated purchase is never charged. Replies: 127/49
     /// ("You have received a new %s.") with the lot's name, then the owner's 127/39 list. A deed
@@ -1456,6 +1488,7 @@ impl HousingService {
             .find(|lot| {
                 lot.enabled
                     && Some(lot.property_id) != self.starter_property_id
+                    && !lot.granted_with_starter
                     && lot
                         .deed
                         .as_ref()
@@ -1895,15 +1928,19 @@ impl HousingService {
         stock: &mut dyn FurnitureStock,
     ) -> Result<ServiceOutcome, ServiceError> {
         let mut staged = self.clone();
+        let before = self.lots_of(actor_guid);
         let lot_guid = staged.grant_starter_lot(actor_guid)?;
-        let granted = staged.lots_of(actor_guid).len() > self.lots_of(actor_guid).len();
+        staged.grant_free_lots(actor_guid)?;
+        // The kit stands only in a starter lot granted now: an older owner who gains a free lot
+        // on this ask must not have the kit stood in the Condo a second time.
+        let granted = !before.iter().any(|lot| lot.lot_guid == lot_guid);
         let kit = self.starter_kit.as_ref().filter(|_| granted);
         let ids = match kit {
             Some(kit) => staged.stand_kit(actor_guid, lot_guid, kit, stock)?,
             None => Vec::new(),
         };
         let mut outcome = staged.house_list(actor_guid, actor_guid)?;
-        outcome.changed = granted;
+        outcome.changed = staged.lots_of(actor_guid).len() > before.len();
         if let Some(kit) = kit {
             // Last, like placement: the bag refuses atomically and the staged lot is dropped.
             stock.grant_kit(kit.item_id, &ids)?;

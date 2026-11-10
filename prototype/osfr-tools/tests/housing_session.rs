@@ -38,6 +38,8 @@ const GRANT: [u8; 4] = [127, 0, 23, 0];
 const LEAVE: [u8; 4] = [127, 0, 10, 0];
 /// Locale name id of the Wilds Condo, the starter since 2012-01-26 (houses.json property 25).
 const WILDS_CONDO: i32 = 296;
+/// Locale name id of the Wilds Farm (houses.json property 34), granted free beside the starter.
+const WILDS_FARM: i32 = 5409;
 
 /// The opening reference content every gameplay route test loads (`OSFR_ACTIVITY_CONTENT`
 /// overrides it), optionally with the repository's `houses.json` copied in.
@@ -161,12 +163,21 @@ fn only_list(replies: &[Vec<u8>]) -> InstanceList {
     InstanceList::decode(reply(replies, 39)).expect("a well-formed 127/39")
 }
 
+/// The starter's record among a first 127/23's list. The free Wilds Farm (P-housing,
+/// `granted_with_starter`) is listed beside it, so the starter is the record that is not the farm.
+fn starter_record(records: &[PlayerHousingInstanceInfo]) -> PlayerHousingInstanceInfo {
+    (records.iter())
+        .find(|record| record.name_id != WILDS_FARM)
+        .cloned()
+        .expect("a starter record beside the farm")
+}
+
 fn granted(game: &mut Gameplay) -> PlayerHousingInstanceInfo {
     let out = game.handle_in_world(&GRANT, &character(), 1_000).unwrap();
     let list = only_list(&out.replies);
     assert_eq!(list.owner_guid, OWNER);
-    assert_eq!(list.records.len(), 1);
-    list.records[0].clone()
+    assert_eq!(list.records.len(), 2, "the starter and the free Wilds Farm");
+    starter_record(&list.records)
 }
 
 #[test]
@@ -179,7 +190,8 @@ fn the_first_grant_gives_the_starter_lot_once_and_lists_it() {
     );
     let first = game.handle_in_world(&GRANT, &character(), 1_000).unwrap();
     assert!(first.changed, "the grant is saved");
-    let lot = only_list(&first.replies).records[0].clone();
+    let records = only_list(&first.replies).records;
+    let lot = starter_record(&records);
     assert_eq!(lot.owner_guid, OWNER);
     let starter = HousingContent::bundled().unwrap();
     let row = starter
@@ -188,15 +200,17 @@ fn the_first_grant_gives_the_starter_lot_once_and_lists_it() {
         .find(|row| row.property_id == starter.starter_property_id)
         .unwrap();
     assert_eq!(lot.icon_id, row.icon_id);
-    assert_eq!(game.state().housing.unwrap().lots.len(), 1);
+    // P-housing: the free Wilds Farm comes with the starter, once.
+    assert_eq!(game.state().housing.unwrap().lots.len(), 2);
+    assert!(records.iter().any(|record| record.name_id == WILDS_FARM));
 
     let again = game.handle_in_world(&GRANT, &character(), 2_000).unwrap();
     assert!(!again.changed, "a repeated ask grants nothing");
-    assert_eq!(only_list(&again.replies).records, vec![lot.clone()]);
+    assert_eq!(only_list(&again.replies).records, records);
     let listed = game
         .handle_in_world(&list_request(OWNER), &character(), 3_000)
         .unwrap();
-    assert_eq!(only_list(&listed.replies).records, vec![lot]);
+    assert_eq!(only_list(&listed.replies).records, records);
 }
 
 #[test]
@@ -216,7 +230,7 @@ fn an_owner_of_lot_one_gains_the_condo_once_and_keeps_lot_one() {
     let first = game.handle_in_world(&GRANT, &character(), 2_000).unwrap();
     assert!(first.changed, "the condo is saved");
     let lots = only_list(&first.replies).records;
-    assert_eq!(lots.len(), 2);
+    assert_eq!(lots.len(), 3, "lot 1, the condo and the free farm");
     assert!(lots.contains(&lot_one), "lot 1 is kept unchanged");
     assert!(lots.iter().any(|lot| lot.name_id == WILDS_CONDO));
     assert!(
@@ -341,7 +355,9 @@ fn saves_and_reconnects_inside_a_house_keep_the_world_pose() {
     let listed = reloaded
         .handle_in_world(&list_request(OWNER), &character(), 3_000)
         .unwrap();
-    assert_eq!(only_list(&listed.replies).records, vec![lot]);
+    let records = only_list(&listed.replies).records;
+    assert_eq!(records.len(), 2, "the condo and the free farm");
+    assert!(records.contains(&lot));
 }
 
 /// L045: a character save from before `placed_by` (housing schema 1, fixture with no placer)
@@ -555,11 +571,15 @@ fn owned(game: &Gameplay, definition: i32) -> Vec<(i32, u32)> {
     items.map(|item| (item.id, item.count)).collect()
 }
 
-/// The saved fixtures of the one lot this character holds.
+/// The saved fixtures of the one house this character holds (the free Wilds Farm beside it
+/// stays empty, P-housing).
 fn standing(game: &Gameplay) -> Vec<SavedFixture> {
     let lots = game.state().housing.unwrap().lots;
-    assert_eq!(lots.len(), 1, "one lot");
-    lots[0].fixtures.clone()
+    assert_eq!(lots.len(), 2, "one house and the farm");
+    (lots.into_iter())
+        .find(|lot| lot.name_id != WILDS_FARM)
+        .expect("the house beside the farm")
+        .fixtures
 }
 
 /// The 127/40 records among `replies`.
@@ -1267,7 +1287,7 @@ fn the_wilds_condo_is_entered_by_op31_and_leave_returns_to_the_world_pose() {
     let content = Content::with_houses();
     let mut gateway = world_gateway(&content);
     let world = gateway.state().clone();
-    let condo = gateway_grant(&mut gateway, 11_000).records[0].clone();
+    let condo = starter_record(&gateway_grant(&mut gateway, 11_000).records);
     assert_eq!(condo.name_id, WILDS_CONDO);
     let entered = gateway
         .handle_at(&wrap(&enter(condo.instance_guid)), 12_000)
@@ -1291,7 +1311,10 @@ fn the_gateway_sends_the_scene_change_then_the_house_after_the_load() {
     let mut gateway = world_gateway(&content);
     let list = gateway_grant(&mut gateway, 11_000);
     let entered = gateway
-        .handle_at(&wrap(&enter(list.records[0].instance_guid)), 12_000)
+        .handle_at(
+            &wrap(&enter(starter_record(&list.records).instance_guid)),
+            12_000,
+        )
         .unwrap();
     assert!(entered.began_zoning, "{:?}", entered.trace);
     assert!(
