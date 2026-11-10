@@ -13,7 +13,16 @@
 //! gates are `QuestEngine::offer_denial` and `accept`). No packet is added: the
 //! offer is the existing 49/1 (client reader 0x00c7bb60) and each command answers
 //! with one `chat::system` line.
+//!
+//! The event calendar (`crate::event_calendar`) shares the gate: a quest an event lists is
+//! open while that event's season is active (by date or by hand), beside whatever the admin
+//! has opened. Once a second the session re-reads the hand toggles, and when the running
+//! events moved it holds the seasons in its NPC view and closes the ended events' quests:
+//! a started one is abandoned (26/23's own `QuestAbandoned` answer) and a finished one is
+//! forgotten, as the calendar's `on_end` says. `realm event season` shows and sets the toggles.
 use super::*;
+use crate::client_areas::{ClientAreas, unix_now_ms};
+use crate::event_calendar::{self, Mode};
 use crate::world_events::WorldEventCommand;
 use std::fs;
 
@@ -56,7 +65,93 @@ fn read_events(path: &Path) -> io::Result<BTreeSet<u32>> {
     Ok(events.open)
 }
 
+/// What this session has applied of `events.json` and the event calendar. Never saved.
+#[derive(Clone, Default)]
+pub(super) struct EventWatch {
+    file: placement_watch::PlacementWatch,
+    /// The admin's open list, kept so a calendar change does not need the file again.
+    admin_open: BTreeSet<u32>,
+    /// This session's season table with the calendar's hand toggles; `None` without content.
+    seasons: Option<ClientAreas>,
+    /// Tests pin the clock the calendar is judged at; `None` is the wall clock.
+    clock: Option<u64>,
+    /// The journal has not been cleaned since the last load: the first tick does it, once the
+    /// live world (and so the hand toggles) is known and the client can be told.
+    unsettled: bool,
+}
+
 impl Gameplay {
+    /// Pin the clock seasonal content and event quests are judged at (`None`: the wall clock).
+    pub fn set_event_clock(&mut self, unix_ms: Option<u64>) {
+        self.event_watch.clock = unix_ms;
+        if let Some(visibility) = self.npc_visibility.as_mut() {
+            visibility.set_season_clock(unix_ms);
+        }
+    }
+
+    /// Open the admin's events and the running calendar events, hold the seasons in the NPC
+    /// view, and (on a tick, when `out` can carry the answer) clear what ended events left in
+    /// the journal. Idempotent: it reads state, not transitions, so a character that was
+    /// offline when an event ended is cleaned on its first tick.
+    fn apply_events(&mut self, unix_ms: u64, out: Option<&mut Outcome>) {
+        let watch = &self.event_watch;
+        let mut open = watch.admin_open.clone();
+        let mut ended = BTreeSet::new();
+        let mut on_end = event_calendar::OnEnd::default();
+        if let Some(areas) = &watch.seasons {
+            let running = areas.calendar().open_quests(areas, unix_ms);
+            ended = &areas.calendar().gated_quests() - &running;
+            ended.retain(|id| !open.contains(id));
+            on_end = areas.calendar().on_end();
+            open.extend(running);
+            if let Some(visibility) = self.npc_visibility.as_mut() {
+                visibility.set_event_modes(areas.hand_modes().clone());
+            }
+        }
+        let Some(engine) = self.npc_quests.as_mut() else {
+            return;
+        };
+        let ignored: Vec<u32> = (engine.set_open_events(&open).into_iter())
+            .filter(|id| watch.admin_open.contains(id))
+            .collect();
+        if !ignored.is_empty() {
+            npc_event(serde_json::json!({"event": "live_events_ignored", "ids": ignored}));
+        }
+        let Some(out) = out else {
+            return;
+        };
+        let (mut dropped, mut forgot, mut waiting) = (Vec::new(), false, false);
+        for id in ended {
+            match engine.state().quests.get(&id).map(|progress| progress.status.clone()) {
+                // A player on this quest's reward screen keeps the reward: try again later.
+                Some(crate::quest_engine::QuestStatus::Active)
+                    if engine.state().pending_turnin == Some(id) =>
+                {
+                    waiting = true;
+                }
+                Some(crate::quest_engine::QuestStatus::Active) if on_end.abandon_active => {
+                    dropped.push((id, engine.abandon(id)));
+                }
+                Some(crate::quest_engine::QuestStatus::Completed) if on_end.forget_completed => {
+                    forgot |= engine.forget_completed(id);
+                }
+                _ => {}
+            }
+        }
+        self.event_watch.unsettled = waiting;
+        out.changed |= forgot;
+        for (id, result) in dropped {
+            if (self.quest_conversation.as_ref()).is_some_and(|open| open.quest_id == id) {
+                self.quest_conversation = None;
+            }
+            if let Err(error) = self.append_npc_quest_outcome(result, out) {
+                npc_event(serde_json::json!({
+                    "event": "event_quest_close_failed", "quest": id, "error": error.to_string(),
+                }));
+            }
+        }
+    }
+
     fn events_path(&self) -> PathBuf {
         self.live_dir().join(EVENTS_FILE)
     }
@@ -64,35 +159,61 @@ impl Gameplay {
     /// Read the open list now (catalogue bind, live folder change, own write),
     /// so an NPC Talk never waits for the first tick to see the file.
     pub(super) fn load_live_events(&mut self) {
-        self.event_watch = placement_watch::PlacementWatch::default();
-        self.tick_live_events(0);
+        let clock = self.event_watch.clock;
+        // The season table the NPC view reads (`Gameplay::load`), so both follow one calendar.
+        let content = crate::content::npc_content(&self.content_dir);
+        let seasons = match ClientAreas::load(&content) {
+            Ok(areas) => Some(areas.watching(&self.live_dir())),
+            Err(error) => {
+                npc_event(serde_json::json!({
+                    "event": "event_calendar_refused", "error": error.to_string(),
+                }));
+                None
+            }
+        };
+        if let (Some(engine), Some(areas)) = (self.npc_quests.as_mut(), &seasons) {
+            engine.gate_events(areas.calendar().gated_quests());
+        }
+        self.event_watch = EventWatch {
+            seasons,
+            clock,
+            unsettled: true,
+            ..EventWatch::default()
+        };
+        self.tick_live_events(0, None);
     }
 
     /// Apply a changed `events.json` to the quest engine, at most one stat per
     /// second. A refused file closes every event; it and any id that is not a
     /// live event are logged once per file version. World state only: no
-    /// packet, no save, no `Outcome::changed`; an idle tick is one comparison.
-    pub(super) fn tick_live_events(&mut self, now_ms: u64) {
-        if !self.event_watch.due(now_ms) {
+    /// packet and no save for the admin's list; an idle tick is one comparison. The same
+    /// second's poll follows the event calendar (see the module note).
+    pub(super) fn tick_live_events(&mut self, now_ms: u64, out: Option<&mut Outcome>) {
+        if !self.event_watch.file.due(now_ms) {
             return;
         }
         let path = self.events_path();
-        let open = match self.event_watch.poll_with(&path, now_ms, read_events) {
-            Ok(Some(open)) => open,
-            Ok(None) => return,
+        let mut moved = match self.event_watch.file.poll_with(&path, now_ms, read_events) {
+            Ok(Some(open)) => {
+                self.event_watch.admin_open = open;
+                true
+            }
+            Ok(None) => false,
             Err(error) => {
                 npc_event(serde_json::json!({
                     "event": "live_events_refused",
                     "error": error.to_string(),
                 }));
-                BTreeSet::new()
+                self.event_watch.admin_open.clear();
+                true
             }
         };
-        if let Some(engine) = self.npc_quests.as_mut() {
-            let ignored = engine.set_open_events(&open);
-            if !ignored.is_empty() {
-                npc_event(serde_json::json!({"event": "live_events_ignored", "ids": ignored}));
-            }
+        let unix_ms = self.event_watch.clock.unwrap_or_else(unix_now_ms);
+        if let Some(areas) = self.event_watch.seasons.as_mut() {
+            moved |= areas.poll(unix_ms);
+        }
+        if moved || out.is_some() && self.event_watch.unsettled {
+            self.apply_events(unix_ms, out);
         }
     }
 
@@ -113,9 +234,17 @@ impl Gameplay {
     /// `realm event open <id>`, `realm event close <id>` and `realm event list`.
     /// One chat line each; a refusal writes nothing and changes nothing.
     fn live_event_command(&mut self, args: &[&str]) -> io::Result<String> {
-        let Some(live) = self.npc_quests.as_ref().map(|q| q.live_events().clone()) else {
+        if let ["season", rest @ ..] = args {
+            return Ok(self.event_season_command(rest));
+        }
+        let Some(mut live) = self.npc_quests.as_ref().map(|q| q.live_events().clone()) else {
             return Ok("Live events need the quest catalogue.".into());
         };
+        // A calendar event's quests follow their season; `realm event season` switches those.
+        if let Some(areas) = &self.event_watch.seasons {
+            let seasonal = areas.calendar().gated_quests();
+            live.retain(|id, _| !seasonal.contains(id));
+        }
         let (opening, id) = match args {
             ["list"] => {
                 let ids = |open: bool| {
@@ -185,6 +314,109 @@ impl Gameplay {
         }
         self.load_live_events(); // the acting session applies its own write at once
         Ok(format!("Event {id} is {state}."))
+    }
+
+    /// The short forms an admin types in chat: `/event` (list), `/event <key> on|off|calendar`
+    /// and `/<key> on|off|calendar` for every key of `event_calendar.json` (`/halloween on`).
+    /// Anything else is left to the realm router, starting with its role refusal.
+    pub(super) fn event_command(&mut self, inner: &[u8], guid: u64) -> io::Result<Option<Outcome>> {
+        let short = chat::request(inner, guid)?.and_then(|text| {
+            let lower = text.trim().to_ascii_lowercase();
+            let mut words = lower.strip_prefix('/')?.split_whitespace().map(str::to_owned);
+            let first = words.next()?;
+            let calendar = self.event_watch.seasons.as_ref()?.calendar();
+            if first == "event" {
+                return Some(words.collect::<Vec<String>>());
+            }
+            (calendar.has_event(&first)).then(|| std::iter::once(first).chain(words).collect())
+        });
+        let Some(args) = short else {
+            return self.command_refusal(inner, guid);
+        };
+        let args: Vec<&str> = args.iter().map(String::as_str).collect();
+        let reply = chat::system(&self.event_season_command(&args));
+        Ok(Some(Outcome {
+            replies: vec![reply],
+            ..Outcome::default()
+        }))
+    }
+
+    /// One event as an admin reads it: its mode, whether it runs, and until or from when.
+    fn event_line(areas: &ClientAreas, key: &str, unix_ms: u64) -> String {
+        let calendar = areas.calendar();
+        let Some((name, mode)) = calendar.describe(key, areas.hand_modes()) else {
+            return format!("{key} is not a calendar event");
+        };
+        let date = |ms: u64| event_calendar::local_date(areas.local_minute(ms));
+        let running = calendar.active_at(areas, unix_ms).contains(&key);
+        let state = match (mode, running) {
+            (Mode::On, _) => "on, running until an admin turns it off".to_owned(),
+            (Mode::Off, _) => "off, not running until an admin turns it on".to_owned(),
+            (Mode::Calendar, true) => match calendar.running_until(key, areas, unix_ms) {
+                Some(end) => format!("calendar, running until {}", date(end)),
+                None => "calendar, running".to_owned(),
+            },
+            (Mode::Calendar, false) => match calendar.next_occurrence(key, areas, unix_ms) {
+                Some(start) => format!("calendar, not running, next starts {}", date(start)),
+                None => "calendar, not running".to_owned(),
+            },
+        };
+        format!("{key} ({name}): {state}")
+    }
+
+    /// The event toggles, for admins only (owner 2026-11-09): list the calendar's events, show
+    /// one, or set its hand toggle. `on` starts the event and its quests now, `off` ends it now
+    /// by the calendar's end rules, `calendar` (or `default`) returns it to its real dates. The
+    /// write goes to the live world's `event_overrides.json`; every session and the gateway's
+    /// shared world pick it up at their next one-second poll, this one included. Anyone who is
+    /// not an admin is refused before the file is looked at: a tester's wide realm rights do not
+    /// reach a switch that changes the world for every player.
+    fn event_season_command(&mut self, args: &[&str]) -> String {
+        if self.role != crate::account_store::AccountRole::Admin {
+            return "Cannot do that: only an admin can start or stop an event.".into();
+        }
+        let Some(areas) = self.event_watch.seasons.as_ref() else {
+            return "The event calendar is not loaded.".into();
+        };
+        let (live, unix_ms) = (self.live_dir(), self.event_watch.clock.unwrap_or_else(unix_now_ms));
+        // The answer describes the toggles as the file now holds them, not the last poll.
+        let view = |areas: &ClientAreas| {
+            let mut view = areas.clone();
+            if let Ok(hand) = event_calendar::read_overrides(&live) {
+                view.set_hand_modes(hand);
+            }
+            view
+        };
+        let (key, mode) = match args {
+            [] => {
+                let view = view(areas);
+                let lines: Vec<String> = (view.calendar().keys())
+                    .map(|key| Self::event_line(&view, key, unix_ms))
+                    .collect();
+                if lines.is_empty() {
+                    return "The event calendar is empty.".into();
+                }
+                return lines.join("; ") + ".";
+            }
+            [key] if areas.calendar().has_event(key) => {
+                return Self::event_line(&view(areas), key, unix_ms) + ".";
+            }
+            [key, "on"] => (*key, Some(Mode::On)),
+            [key, "off"] => (*key, Some(Mode::Off)),
+            [key, "calendar"] => (*key, Some(Mode::Calendar)),
+            [key, "default"] => (*key, None),
+            _ => return "Usage: /event [<key> on|off|calendar], or /<key> on|off|calendar.".into(),
+        };
+        if !areas.calendar().has_event(key) {
+            return format!("{key} is not a calendar event; /event lists them.");
+        }
+        if let Err(error) = event_calendar::write_override(&live, key, mode) {
+            return format!("Could not save the event toggle: {error}. Nothing changed.");
+        }
+        let view = view(areas);
+        let active = view.calendar().active_at(&view, unix_ms).join(", ");
+        let active = if active.is_empty() { "nothing".to_owned() } else { active };
+        format!("{}. Active now: {active}.", Self::event_line(&view, key, unix_ms))
     }
 }
 

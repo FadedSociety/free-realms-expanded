@@ -32,6 +32,7 @@ pub mod dev_teleport;
 pub mod encounter;
 pub mod encounter_invite;
 pub mod enemies;
+pub mod event_calendar;
 pub mod fishing;
 pub mod fishing_service;
 pub mod forging;

@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "run_on_real_dates": true,
+  "on_end": {
+    "abandon_active": true,
+    "forget_completed": false
+  },
+  "source": "The events are the original game's, from the fan wikis and the dated news rows behind each client_areas.json season. (R) The switch itself is ours: run_on_real_dates true follows the season dates as the live game's events did; false starts nothing by date. An event starts by its season's yearly dates (by_date, the default) and by any row of rotations that lists it: {key, period: day|week|month, events: [keys in turn order], offset_minutes, length_minutes, source} gives each period to the next event in the list, so one listed event is a plain daily, weekly or monthly event and rows overlap freely. No rotation ships: the wikis date every original event by the year, and the repeating shows (Bruce's concerts, the dance-off) are slots in world_events.json. Each event's mode is calendar, on or off; `realm event season <key> on|off|calendar|default` sets a hand toggle in the live world's event_overrides.json. Owner 2026-11-09: events stay once a year on real dates, no rotation ships, and an admin (the admin role only) can start or stop one at any time with /event <key> on|off|calendar or /<key> on|off|calendar. (R) on_end: when an event is over a started quest is abandoned, unless its reward screen is open. forget_completed is off: a finished event quest stays finished, because forgetting it would lower the character's completed-quest count (the quest achievements) and the save has no field to remember it by; so an event quest is once per character until that field exists.",
+  "rotations": [],
+  "events": [
+    {
+      "key": "halloween",
+      "name": "Super Spooktacular",
+      "season": "Halloween",
+      "mode": "calendar",
+      "quest_ids": [
+        3950200,
+        3950273,
+        3950498,
+        3952082,
+        3952500,
+        3952926,
+        3953011,
+        3953110,
+        3953116,
+        3955038,
+        3955756,
+        3955846
+      ],
+      "source": "Category 'Super Spooktacular': the event's wiki category and quest pages (fanbyte harvest 2026-11-02, category 'Free Realms Events'), matched to quest records by title. Brings the 13 Halloween_* client areas, the season-tagged people and props and the Blackspore dance-off."
+    },
+    {
+      "key": "snow_days",
+      "name": "Snow Days",
+      "season": "Snow Days",
+      "mode": "calendar",
+      "quest_ids": [
+        3951040,
+        3951809,
+        3951995,
+        3952343,
+        3954720,
+        3954907
+      ],
+      "source": "Category 'Snow Days': the event's wiki category and quest pages (fanbyte harvest 2026-11-02, category 'Free Realms Events'), matched to quest records by title (Candi Ivy's Gifting Tree line, Holiday Recital, Snowman Showdown, Curious Gift Baskets, Pretty Presents)."
+    },
+    {
+      "key": "twelve_days",
+      "name": "12 Days of Presents",
+      "season": "12 Days of Presents",
+      "mode": "calendar",
+      "quest_ids": [
+        3950114,
+        3953095
+      ],
+      "source": "Trina Turtledove's daily challenges, wiki pages 'Day 9: Snowhill Soccer' and 'Day 11: Snowhill Derby' (the other ten days have no record yet)."
+    },
+    {
+      "key": "festival_of_hearts",
+      "name": "Festival of Hearts",
+      "season": "Festival of Hearts",
+      "mode": "calendar",
+      "quest_ids": [
+        3955737,
+        3955802,
+        3955888,
+        3955895
+      ],
+      "source": "Category 'Festival of Hearts': the event's wiki category and quest pages (fanbyte harvest 2026-11-02, category 'Free Realms Events'), matched to quest records by title (Cudip's and Dubawug's lines in Merry Vale)."
+    },
+    {
+      "key": "saint_patricks",
+      "name": "Saint Patrick's",
+      "season": "Saint Patrick's",
+      "mode": "calendar",
+      "quest_ids": [
+        3000055,
+        3000056,
+        3000057,
+        3000058
+      ],
+      "source": "Lucky Chance McXander's coin hunt in Merry Vale (Fandom wiki Saint Patrick's; notes/Build Guides/Content/Jobs/Adventurer.md part G)."
+    },
+    {
+      "key": "spring_eggstravaganza",
+      "name": "The Spring Eggstravaganza",
+      "season": "Spring Eggstravaganza",
+      "mode": "calendar",
+      "quest_ids": [
+        3955710
+      ],
+      "source": "Alyssa Eggelyn's egg hunts in Sanctuary, wiki page 'The Eggxtremely Eggcitingly Eggcellent Egg Hunt' (the other three hunts have no record yet)."
+    },
+    {
+      "key": "birthday_bash",
+      "name": "Birthday Bash",
+      "season": "Birthday Bash",
+      "mode": "calendar",
+      "quest_ids": [
+        3951154,
+        3954573
+      ],
+      "source": "Category 'Birthday Bash': the event's wiki category and quest pages (fanbyte harvest 2026-11-02, category 'Free Realms Events'), matched to quest records by title (Bundles of Balloons, Feeding the Crowd)."
+    },
+    {
+      "key": "summer_camp",
+      "name": "Summer Camp",
+      "season": "Summer Camp",
+      "mode": "calendar",
+      "quest_ids": [
+        3950264,
+        3950333,
+        3950399,
+        3953107,
+        3953370,
+        3954033,
+        3954262,
+        3954588,
+        3954740,
+        3955105
+      ],
+      "source": "Category 'Summer Camp': the event's wiki category and quest pages (fanbyte harvest 2026-11-02, category 'Free Realms Events'), matched to quest records by title (the counselors' and Robbie's lines)."
+    },
+    {
+      "key": "childs_play",
+      "name": "Child's Play Charity Drive",
+      "season": "Child's Play Charity Drive",
+      "mode": "calendar",
+      "quest_ids": [],
+      "source": "A marketplace promotion with no quests; the row lets the season be switched by hand."
+    },
+    {
+      "key": "turkey_dance",
+      "name": "Turkey Dance",
+      "season": "Turkey Dance",
+      "mode": "calendar",
+      "quest_ids": [],
+      "source": "Two community dance parties at Thanksgiving 2010 with no quests; the row lets the season be switched by hand."
+    }
+  ]
+}

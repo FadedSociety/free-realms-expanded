@@ -161,6 +161,11 @@ pub struct ClientAreas {
     /// T775: whether the last `season_changes` call moved the active season set, even when those
     /// seasons hold no client area (so no packet was sent). Read with [`Self::season_changed`].
     season_changed: bool,
+    /// Event calendar: the hand toggles (event key to mode) laid over the content's modes.
+    modes: BTreeMap<String, crate::event_calendar::Mode>,
+    /// The calendar read beside this file, and the live hand toggles it follows (if watched).
+    calendar: crate::event_calendar::EventCalendar,
+    hand: Option<crate::event_calendar::HandWatch>,
     /// T900: each session's area-banner state (104 and 15/2); see [`crate::area_banner`].
     pub banners: crate::area_banner::AreaBanners,
 }
@@ -183,10 +188,69 @@ impl ClientAreas {
         };
         let content: Content = serde_json::from_slice(&bytes).map_err(|error| named(&error))?;
         content.validate().map_err(|error| named(&error))?;
+        let calendar = crate::event_calendar::EventCalendar::load(directory)?;
+        let known = |season: &str| content.seasons.iter().any(|row| row.name == season);
+        if let Some(season) = calendar.seasons().find(|season| !known(season)) {
+            return Err(named(&format!(
+                "event_calendar.json names season {season:?}, which is not defined here"
+            )));
+        }
         Ok(Self {
             content: Arc::new(content),
+            calendar,
             ..Self::default()
         })
+    }
+
+    /// The event calendar read beside `client_areas.json` (empty when the file is absent).
+    pub fn calendar(&self) -> &crate::event_calendar::EventCalendar {
+        &self.calendar
+    }
+
+    /// Follow the hand toggles in `live_dir` (`event_overrides.json`): [`Self::poll`] and
+    /// [`Self::season_changes`] re-read the file when it changes, at most once a second.
+    pub fn watching(mut self, live_dir: &Path) -> Self {
+        self.hand = Some(crate::event_calendar::HandWatch::new(live_dir));
+        self
+    }
+
+    /// The hand toggles in force: event key to mode.
+    pub fn hand_modes(&self) -> &BTreeMap<String, crate::event_calendar::Mode> {
+        &self.modes
+    }
+
+    /// Replace the hand toggles. True when they moved; the next [`Self::season_changes`] then
+    /// re-evaluates at once instead of waiting for the minute to turn.
+    pub fn set_hand_modes(&mut self, modes: BTreeMap<String, crate::event_calendar::Mode>) -> bool {
+        if modes == self.modes {
+            return false;
+        }
+        self.modes = modes;
+        if self.checked_minute.is_some() {
+            self.checked_minute = Some(u64::MAX);
+        }
+        true
+    }
+
+    /// Re-read the hand toggles when due, then report whether the active seasons moved (always
+    /// true on the first call, so a caller applies its gates once at start).
+    pub fn poll(&mut self, unix_ms: u64) -> bool {
+        let first = self.checked_minute.is_none();
+        self.season_changes(unix_ms);
+        first || self.season_changed
+    }
+
+    /// Local minutes since the unix epoch: the clock the calendar's rotations count in.
+    pub fn local_minute(&self, unix_ms: u64) -> i64 {
+        // u64::MAX / 60_000 fits an i64, so neither the cast nor the offset can overflow.
+        (unix_ms / 60_000) as i64 + i64::from(self.content.utc_offset_minutes)
+    }
+
+    /// The calendar's word first (a mode, a hand toggle or a rotation), else the season's dates.
+    fn in_season(&self, season: &Season, unix_ms: u64) -> bool {
+        (self.calendar)
+            .held(&season.name, &self.modes, self.local_minute(unix_ms))
+            .unwrap_or_else(|| season.contains(self.month_day(unix_ms)))
     }
 
     /// (month, day) of `unix_ms` after the UTC offset, by Howard Hinnant's public-domain
@@ -209,12 +273,11 @@ impl ClientAreas {
     }
 
     fn active_mask(&self, unix_ms: u64) -> u64 {
-        let date = self.month_day(unix_ms);
         self.content
             .seasons
             .iter()
             .enumerate()
-            .filter(|(_, season)| season.contains(date))
+            .filter(|(_, season)| self.in_season(season, unix_ms))
             .fold(0, |mask, (index, _)| mask | 1 << index)
     }
 
@@ -225,12 +288,11 @@ impl ClientAreas {
 
     /// `None` for a season the content does not define.
     pub fn season_state(&self, name: &str, unix_ms: u64) -> Option<bool> {
-        let date = self.month_day(unix_ms);
         self.content
             .seasons
             .iter()
             .find(|season| season.name == name)
-            .map(|season| season.contains(date))
+            .map(|season| self.in_season(season, unix_ms))
     }
 
     /// Unknown season names are never active.
@@ -297,6 +359,9 @@ impl ClientAreas {
     /// the same clock.
     pub fn season_changes(&mut self, unix_ms: u64) -> Vec<Vec<u8>> {
         self.season_changed = false;
+        if let Some(hand) = self.hand.as_mut().and_then(|hand| hand.poll(unix_ms)) {
+            self.set_hand_modes(hand);
+        }
         let minute = unix_ms / 60_000;
         if self.content.seasons.is_empty() || self.checked_minute == Some(minute) {
             return Vec::new();

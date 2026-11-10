@@ -632,6 +632,17 @@ impl NpcVisibility {
         self.revision = self.revision.wrapping_add(1);
     }
 
+    /// Event calendar: lay the hand toggles (event key to mode, `crate::event_calendar`) over
+    /// this view's seasons, and make the next view re-diff when that moved anything.
+    pub fn set_event_modes(&mut self, modes: BTreeMap<String, crate::event_calendar::Mode>) {
+        let moved = |areas: &mut Arc<crate::client_areas::ClientAreas>| {
+            Arc::make_mut(areas).set_hand_modes(modes)
+        };
+        if self.seasons.as_mut().is_some_and(moved) {
+            self.revision = self.revision.wrapping_add(1);
+        }
+    }
+
     /// The clock a tagged row is judged at. Zero (no clock read) when the table has no season
     /// table: [`Self::load`] keeps every row, as T491's archive rule requires.
     fn season_now_ms(&self) -> u64 {

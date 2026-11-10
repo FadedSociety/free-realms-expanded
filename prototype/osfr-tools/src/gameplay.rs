@@ -328,7 +328,7 @@ pub struct Gameplay {
     npc_ambient: Option<std::sync::Arc<crate::npc_ambient::NpcAmbient>>,
     placement_watch: placement_watch::PlacementWatch, // live stat; never saved
     coin_edits_watch: placement_watch::PlacementWatch, // T525 coin overlay; never saved
-    event_watch: placement_watch::PlacementWatch,     // T418 events.json; never saved
+    event_watch: live_events::EventWatch, // T418 events.json and the event calendar; never saved
     npc_interaction: Option<NpcInteraction>,
     /// Last NPC Talk packet, retained only for the opt-in offer experiment.
     last_npc_dialogue: Option<(u32, u64, u64, Vec<u8>)>,
@@ -1246,7 +1246,7 @@ impl Gameplay {
             npc_ambient,
             placement_watch: placement_watch::PlacementWatch::default(),
             coin_edits_watch: placement_watch::PlacementWatch::default(),
-            event_watch: placement_watch::PlacementWatch::default(),
+            event_watch: Default::default(),
             npc_interaction,
             last_npc_dialogue: None,
             pending_quest_choice: None,
@@ -1978,7 +1978,7 @@ impl Gameplay {
         self.tick_gathering_nodes(now_ms, &mut out)?;
         self.tick_live_placements(now_ms, &mut out); // world visibility only, never saved
         self.tick_live_coin_edits(now_ms, &mut out); // T525 coin overlay; never saved
-        self.tick_live_events(now_ms); // quest offer gate only, never saved
+        self.tick_live_events(now_ms, Some(&mut out)); // quest gates; an ended event's quests leave
         self.tick_consumable_effects(character.guid, now_ms, &mut out);
         out.replies.splice(0..0, fishing.replies);
         out.scene_zoning = fishing.scene_zoning.or(out.scene_zoning.take());
@@ -2180,7 +2180,7 @@ impl Gameplay {
         if let Some(out) = self.handle_effect_strip(inner, character.guid)? {
             return Ok(out);
         }
-        if let Some(out) = self.command_refusal(inner, character.guid)? {
+        if let Some(out) = self.event_command(inner, character.guid)? {
             return Ok(out);
         }
         if let Some(out) = self.admin_move_request(inner, character.guid)? {

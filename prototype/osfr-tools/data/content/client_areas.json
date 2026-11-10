@@ -83,6 +83,24 @@
       "end_day": 29,
       "area_ids": [],
       "source": "quest-lines/schedules.json svturkey-dance and svbaile-de-pavos-turkey-dance (Thanksgiving Turkey Dance is the same event). Nov 25 and 26 2010 (articles 645, 1918). (R) Thanksgiving Thursday and the Friday after can fall anywhere in Nov 22 to Nov 29, so the window covers every year. No switchable client area carries this season's name in FabledRealmsAreas.xml (all 138 AreaEnabled=0 rows read), so area_ids is empty and the row only gates events."
+    },
+    {
+      "name": "Saint Patrick's",
+      "start_month": 3,
+      "start_day": 14,
+      "end_month": 3,
+      "end_day": 20,
+      "area_ids": [],
+      "source": "Fandom wiki page Saint Patrick's: 'held everyday from March 14th, 2013'; client locale strings 5100514-5100541 (Lucky's items) and Models.txt 4212 event_stpatricks_potofgold_01.adr. (R) No end date is in either wiki: one week, so it covers March 17 and ends before the Spring Eggstravaganza; the yearly repeat is a judgement. No switchable client area carries this season's name in FabledRealmsAreas.xml (all 138 AreaEnabled=0 rows read), so area_ids is empty and the row only gates events."
+    },
+    {
+      "name": "Spring Eggstravaganza",
+      "start_month": 3,
+      "start_day": 28,
+      "end_month": 4,
+      "end_day": 7,
+      "area_ids": [],
+      "source": "quest-lines/schedules.json svspring-eggstravaganza: daily egg days March 28 to March 31 2013 (locale 5100000, 5100569; fanbyte Alyssa Eggelyn: 'expected with the March 28 game update'). (R) The tracker says 'Open on March 31st'; a week after it is kept for opening and turning in, and the yearly repeat is a judgement. No switchable client area carries this season's name in FabledRealmsAreas.xml (all 138 AreaEnabled=0 rows read), so area_ids is empty and the row only gates events."
     }
   ]
 }

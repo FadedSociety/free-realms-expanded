@@ -9,10 +9,11 @@ const OPEN_WORLD_ZONE: u32 = 0;
 
 /// `client_areas.json` from the content directory; no content means no areas.
 pub(super) fn load(options: &Options) -> io::Result<ClientAreas> {
-    options
-        .content
-        .as_deref()
-        .map_or_else(|| Ok(ClientAreas::default()), ClientAreas::load)
+    let Some(content) = options.content.as_deref() else {
+        return Ok(ClientAreas::default());
+    };
+    // The event calendar's hand toggles live in the live world, as `Gameplay::live_dir`.
+    Ok(ClientAreas::load(content)?.watching(options.world.as_deref().unwrap_or(content)))
 }
 
 fn in_open_world(gateway: &Gateway) -> bool {

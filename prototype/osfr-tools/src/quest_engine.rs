@@ -2096,6 +2096,27 @@ impl QuestEngine {
             .collect()
     }
 
+    /// Event calendar: these quests are offered only while their event runs, as T418's live
+    /// events are. Ids the catalogue does not hold are ignored.
+    pub fn gate_events(&mut self, quest_ids: impl IntoIterator<Item = u32>) {
+        for id in quest_ids {
+            if self.definitions.contains_key(&id) {
+                self.live_events.entry(id).or_insert(false);
+            }
+        }
+    }
+
+    /// Event calendar: forget a finished quest so its event's next run offers it again.
+    pub fn forget_completed(&mut self, quest_id: u32) -> bool {
+        let done = |progress: &QuestProgress| progress.status == QuestStatus::Completed;
+        if !self.state.quests.get(&quest_id).is_some_and(done) {
+            return false;
+        }
+        self.state.quests.remove(&quest_id);
+        self.bump();
+        true
+    }
+
     fn event_closed(&self, quest_id: u32) -> bool {
         self.live_events.get(&quest_id) == Some(&false)
     }

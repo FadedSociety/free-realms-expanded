@@ -263,6 +263,13 @@ impl Shipped {
     fn walk_layers(&self, fixture: &Fixture, quests: &[u32]) -> Pass {
         let base = fixture.game(None).state();
         let live = fixture.open_live_events(self.engine.live_events().keys().copied());
+        // A calendar event's quests are offered only while it runs: run every event by hand,
+        // so the walk does not depend on the day it is run.
+        let calendar = osfr_tools::event_calendar::EventCalendar::load(&content_dir()).unwrap();
+        for key in calendar.keys() {
+            let on = Some(osfr_tools::event_calendar::Mode::On);
+            osfr_tools::event_calendar::write_override(&live, key, on).unwrap();
+        }
         let mut layers = BTreeMap::<(Option<i32>, usize, Option<u32>), Vec<u32>>::new();
         for &quest in quests {
             let record = &self.records[&quest];
