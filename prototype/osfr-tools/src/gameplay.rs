@@ -2490,6 +2490,16 @@ impl Gameplay {
             }
         };
         let game = nodes.game_id(target);
+        // P-quest-games: a vein's row asks its ore's rank, as the Games window row does
+        // (`portal_games`). The rich veins (92-100) start only from their nodes, so this is their
+        // one rank gate; the file's own game (no row named) asks none.
+        if game.is_some_and(|game| self.job_level(gather.job()) < gather.rank_floor(game)) {
+            out.replies.push(chat::system(&format!(
+                "Your {} rank is too low for that game.",
+                gather.word()
+            )));
+            return Ok(Some(out));
+        }
         let Some(spec) = self.type8(gather).and_then(|e| e.spec_for(game)) else {
             out.replies
                 .push(chat::system("Gathering is not available in this campaign."));

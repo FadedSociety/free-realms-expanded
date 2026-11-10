@@ -3,7 +3,7 @@
   "source": [
     "L937: client minigame TYPE 1 (SAMPLE) in-world timed challenges, one row per MiniGameData id. Names, descriptions, icons and difficulties are the client's own; every count, timer, radius, reward and distance is a reconstruction (R).",
     "Adapted from the Sanctuary community server fork (BubbaJoeX) Resources/Challenges.json and ChallengeManager.cs, AGPL-3.0; see NOTICE.",
-    "Not built: 301 (Mail Morph transform) needs an ability system; 302 visits two of its three recipients (Toilin has no NPC row).",
+    "301 Biting Back runs without the Mail Morph transform (P-quest-games): the Tricksters are caught by clicking them. 302 visits two of its three recipients (Toilin has no NPC row).",
     "Only a win pays and credits quests. A job-less row (profile 0) pays the active job. xp is the fallback; the job's activity_xp (data/release/job_xp_curve.json) pays instead where one challenge is one unit of the job's activity (not for the combat jobs, whose rate is per kill).",
     "P-autograph: 592 Can I Have Your Autograph is the one row with no MiniGameData id of its own; the client has the game's text but no table row, so the id is a reconstruction (R) in the kart range."
   ],
@@ -2952,6 +2952,39 @@
         "giver: Roxy 9500000620 (Seaside, name 395119; her lines 395127 and 431357 say to click the barrel next to her). The barrel, npc_spawns_extra 100000001742 'Roxy's Barrel' (model 83, 2.2 m from her), has no NPC content key, so her own menu offers the game, as Amber Violet's does for 660 (R).",
         "time limit 150 s, coins 45, one stop per stage: (R) by difficulty as 588; the live game's 'as many as you can' count is unknown. xp 35 is only the fallback: with data/release/job_xp_curve.json in the bundle a win pays the Kart Driver's activity_xp (97 per race, L927), as every profile-48 row does.",
         "P-autograph hand row"
+      ]
+    },
+    {
+      "id": 301,
+      "title": "Biting Back",
+      "giver": 9000000132,
+      "name_id": 130298,
+      "description_id": 130743,
+      "icon_id": 312,
+      "difficulty": 2,
+      "profile": 4,
+      "time_limit_seconds": 120,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "catch",
+          "count": 8,
+          "radius": 40.0,
+          "name_id": 130746,
+          "model_id": 489,
+          "label_id": 130764
+        }
+      ],
+      "bonuses": [],
+      "coins": 50,
+      "xp": 35,
+      "source": [
+        "names, icon, difficulty: client MiniGameData 301 (TYPE 1; 269 is the NOT LIVE copy)",
+        "goal: client 130746 'Terrorize the Tricksters', the things 130764 'PCA Trickster'; wiki fr_minigame_biting_back (Mail Delivery style, Snowhill)",
+        "model 489: Sanctuary-BubbaJoeX-20261031 Npcs.json 'PCA Trickster' rows (33657) use human_m_hooligan_brawler_02.agr, the same model the shipped PCA Takedown row uses for its Campers",
+        "giver: Loryn (R), the quest's giver and the Snowhill post office; the live game started from the Snowhill Postboxes (client 130743 tips), 25 m away, which have no NPC content key yet",
+        "(R) not modelled: the Wolf and Chihuahua Mail Morph forms (client 130747 'Use your Mail-Morph ability to turn into a wolf and then click on the PCA Tricksters'); a plain click within click_range counts, and the fireball mailbox attacks are left out",
+        "count 8, radius 40, time limit 120 s, coins 50, xp 35: (R) by difficulty 2, as lab/tools/world_challenge_rows.py sizes a row with no fork entry"
       ]
     }
   ]

@@ -268,7 +268,9 @@ fn legacy_mushroom_and_mining_files_still_load_with_the_new_fields_defaulted() {
             mining.pools.len(),
             mining.spawns.len()
         ),
-        (2, 2, 22)
+        // P-quest-games: five rich vein types and pools (Dartmoor rich copper and tin, Snorg's camp
+        // rich iron, silver and gold) with 14 spots.
+        (7, 7, 36)
     );
     let copper = mining
         .node_types
@@ -367,6 +369,17 @@ fn the_gathering_loader_reads_collection_nodes() {
                 (presentation.scale, presentation.texture_alias.as_deref()),
                 (Some(0.5), Some("Copper")),
                 "the vein type's own scale and texture"
+            );
+        } else if [4020, 4018, 4021, 4015, 4016].contains(&actor.model_id) {
+            // P-quest-games: the rich veins draw the client's regional vein models at the copper
+            // veins' scale; only the Snowhill mine copper (4020) carries the copper texture alias.
+            assert_eq!(
+                (presentation.scale, presentation.texture_alias.as_deref()),
+                (
+                    Some(0.5),
+                    (actor.model_id == 4020).then_some("Copper")
+                ),
+                "a rich vein type's own scale and texture"
             );
         } else {
             assert_eq!(

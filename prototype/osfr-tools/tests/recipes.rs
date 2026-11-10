@@ -270,8 +270,13 @@ fn unresolved_candidate_ids_do_not_silently_shadow_loaded_rows() {
         .collect();
     assert_eq!(
         collisions,
-        vec![("chef.pepper_punkin".to_owned(), 46)],
-        "only the documented stale Pepper Punkin candidate may collide; see its missing_fields"
+        vec![
+            ("chef.pepper_punkin".to_owned(), 46),
+            // P-quest-games: Mystery Pot Roast took recipe id 40 (MiniGameData 180 = 140 + 40); the
+            // Legacy pattern item 850's "Punkin Pot Roast" is that slot's earlier name.
+            ("chef.punkin_pot_roast".to_owned(), 40),
+        ],
+        "only the documented stale Punkin candidates may collide; see their missing_fields"
     );
 }
 

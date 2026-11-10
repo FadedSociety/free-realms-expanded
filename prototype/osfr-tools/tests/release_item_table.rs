@@ -80,10 +80,11 @@ const CONSUMERS: [(&str, &[&str], usize, usize, usize); 4] = [
     (
         "recipes.json",
         &["definition_id", "recipe_item_definition_id"],
-        // 39 reconstructed recipes (2026-11-07) add their outputs and scrolls.
-        190,
+        // 39 reconstructed recipes (2026-11-07) add their outputs and scrolls; P-quest-games
+        // binds Mystery Pot Roast (850) and Briarmelon Surprise (868).
+        192,
         39,
-        190,
+        192,
     ),
     (
         "collection_catalogue.json",

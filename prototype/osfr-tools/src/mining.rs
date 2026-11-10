@@ -53,15 +53,27 @@ pub const COPPER_MINING_GAME_ID: i32 = 91;
 /// 15-18 (Tin 93, Iron 95, Silver 97, Gold 99), client Requirements 17-20 =
 /// `CheckRankLastProfileByType` profile type 9 at rank 5/9/13/17. (R) Type 9 is the Miner's own
 /// profile type (the fourth dword of its profile record). Copper 91, Mining Practice 375 and the
-/// node game 18 carried none.
+/// node game 18 carried none. (R) P-quest-games: a rich vein's row (94, 96, 98, 100) asks its
+/// ore's rank; the rich copper vein 92, like Copper 91, asks none.
 pub fn rank_floor(game: i32) -> u32 {
     match game {
-        93 => 5,
-        95 => 9,
-        97 => 13,
-        99 => 17,
+        93 | 94 => 5,
+        95 | 96 => 9,
+        97 | 98 => 13,
+        99 | 100 => 17,
         _ => 0,
     }
+}
+
+/// The last of the client's TYPE 8 ore rows (MiniGameData 100, Rich Gold Mining).
+pub const RICH_GOLD_MINING_GAME_ID: i32 = 100;
+
+/// The client's ore rows, Copper Mining 91 to Rich Gold Mining 100: the games a Miner node pool
+/// may name (`harvest_nodes`). The plain rows are the Games window's; the rich rows (92, 94, 96,
+/// 98, 100) are started by their veins, as the wiki files them under "Mining Node (FR Minigame
+/// Starter)". `mining.json` must offer the row or the click is refused as unavailable.
+pub fn is_ore_row(game: i32) -> bool {
+    (COPPER_MINING_GAME_ID..=RICH_GOLD_MINING_GAME_ID).contains(&game)
 }
 
 /// Gateway content file name for the reconstructed Mining18 board.

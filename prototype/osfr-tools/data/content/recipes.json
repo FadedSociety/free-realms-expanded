@@ -4,12 +4,12 @@
     {
       "key": "chef.briarmelon_surprise",
       "name": "Briarmelon Surprise",
-      "recipe_id": null,
+      "recipe_id": 58,
       "candidate_recipe_id": null,
-      "recipe_item_definition_id": null,
+      "recipe_item_definition_id": 868,
       "job": "chef",
       "job_profile_id": 45,
-      "required_job_rank": null,
+      "required_job_rank": 1,
       "minigame_type_id": 9,
       "minigame_id": 198,
       "ingredients": [
@@ -103,6 +103,18 @@
         "minigame_id": {
           "kind": "client",
           "evidence": "MiniGameData row 198 is the 'Cooking: Briarmelon Surprise' game (NAME_ID 386064); the live server's Games window row 476 carried it as ContentId (data/content/activity_catalogue.json, L095)."
+        },
+        "recipe_id": {
+          "kind": "reconstructed",
+          "evidence": "(R) P-quest-games: 'Cooking: Briarmelon Surprise' is MiniGameData 198 = 140 + 58, the slot rule 25 of the 29 Chef recipes follow (the four rows on the shared cooking game 46 excepted) (57 Candied Briarmelon 197, 59 Moonbean Mousse 199). The Legacy pattern item with Param1 58 is 868 (Comment 'Sweetwater Float Recipe', a stale name like 850's and 856's, MinProfileRank 1)."
+        },
+        "recipe_item_definition_id": {
+          "kind": "reconstructed",
+          "evidence": "(R) P-quest-games: 'Cooking: Briarmelon Surprise' is MiniGameData 198 = 140 + 58, the slot rule 25 of the 29 Chef recipes follow (the four rows on the shared cooking game 46 excepted) (57 Candied Briarmelon 197, 59 Moonbean Mousse 199). The Legacy pattern item with Param1 58 is 868 (Comment 'Sweetwater Float Recipe', a stale name like 850's and 856's, MinProfileRank 1)."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "Pattern item 868 MinProfileRank 1 (lab/references/FreeRealms-Legacy ClientItemDefinitions.json); the Chef guide states no rank for Briarmelon Surprise."
         }
       },
       "source": [
@@ -1751,12 +1763,12 @@
     {
       "key": "chef.mystery_pot_roast",
       "name": "Mystery Pot Roast",
-      "recipe_id": null,
+      "recipe_id": 40,
       "candidate_recipe_id": null,
-      "recipe_item_definition_id": null,
+      "recipe_item_definition_id": 850,
       "job": "chef",
       "job_profile_id": 45,
-      "required_job_rank": null,
+      "required_job_rank": 1,
       "minigame_type_id": 9,
       "minigame_id": 180,
       "ingredients": [
@@ -1850,6 +1862,18 @@
         "minigame_id": {
           "kind": "client",
           "evidence": "MiniGameData row 180 is the 'Cooking: Mystery Pot Roast' game (NAME_ID 386042); the live server's Games window row 457 carried it as ContentId (data/content/activity_catalogue.json, L095)."
+        },
+        "recipe_id": {
+          "kind": "reconstructed",
+          "evidence": "(R) P-quest-games: 25 of the 29 Chef recipes run the cooking row 140 + their Param1 recipe index (the four reconstructed rows on the shared cooking game 46 are the exceptions) (38 Burnetta's 178, 39 Crispy Choychoy 179, 41 Slugmud 181 ...); 'Cooking: Mystery Pot Roast' is MiniGameData 180, so the recipe index is 40. The Legacy pattern item with Param1 40 is 850 (Comment 'Punkin Pot Roast Recipe', an earlier name of the slot, MinProfileRank 1; lab/references/FreeRealms-Legacy ClientItemDefinitions.json)."
+        },
+        "recipe_item_definition_id": {
+          "kind": "reconstructed",
+          "evidence": "(R) P-quest-games: 25 of the 29 Chef recipes run the cooking row 140 + their Param1 recipe index (the four reconstructed rows on the shared cooking game 46 are the exceptions) (38 Burnetta's 178, 39 Crispy Choychoy 179, 41 Slugmud 181 ...); 'Cooking: Mystery Pot Roast' is MiniGameData 180, so the recipe index is 40. The Legacy pattern item with Param1 40 is 850 (Comment 'Punkin Pot Roast Recipe', an earlier name of the slot, MinProfileRank 1; lab/references/FreeRealms-Legacy ClientItemDefinitions.json)."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "Pattern item 850 MinProfileRank 1 (lab/references/FreeRealms-Legacy ClientItemDefinitions.json); the Chef guide states no rank for Mystery Pot Roast."
         }
       },
       "source": [
@@ -11341,7 +11365,7 @@
       "name": "Tempest Woven Wand",
       "candidate_recipe_id": null,
       "minigame_type_id": 8,
-      "minigame_id": 365,
+      "minigame_id": 367,
       "source": [
         {
           "kind": "client",
@@ -11370,8 +11394,8 @@
           "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 30480 (MinProfileRank 12); ingredients, minigame and XP follow Eclipse Infused Wand (rank 10, same family, at or below this rank)."
         },
         "minigame_id": {
-          "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 30480 (MinProfileRank 12); ingredients, minigame and XP follow Eclipse Infused Wand (rank 10, same family, at or below this rank)."
+          "kind": "client",
+          "evidence": "MiniGameData row 367 is TYPE 8 'Forging: Tempest Woven Wand' (name 386115), the recipe's own forging row, as 365 is Eclipse Infused Wand's and 366 Savage Sting Bow's (P-quest-games; the 2026-11-07 reconstruction had borrowed 365)."
         },
         "recipe_id": {
           "kind": "reconstructed",
@@ -11607,7 +11631,7 @@
       "name": "Void Woven Wand",
       "candidate_recipe_id": null,
       "minigame_type_id": 8,
-      "minigame_id": 365,
+      "minigame_id": 369,
       "source": [
         {
           "kind": "client",
@@ -11648,8 +11672,8 @@
           "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 20."
         },
         "minigame_id": {
-          "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 30541 (MinProfileRank 16); ingredients, minigame and XP follow Eclipse Infused Wand (rank 10, same family, at or below this rank)."
+          "kind": "client",
+          "evidence": "MiniGameData row 369 is TYPE 8 'Forging: Void Woven Wand' (name 386119), the recipe's own forging row (P-quest-games; the 2026-11-07 reconstruction had borrowed 365)."
         },
         "recipe_id": {
           "kind": "reconstructed",

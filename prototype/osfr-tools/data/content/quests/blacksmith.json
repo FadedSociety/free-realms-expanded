@@ -2158,7 +2158,7 @@
       "source": [
         {
           "kind": "reconstructed",
-          "evidence": "(R) T895: stays disabled: the hand-over step gives the Tempest Woven Wand (30480) but no record step or recipe forges it, the prerequisite 3020020 is a hollow record (no objectives) and no reward is recovered."
+          "evidence": "(R) P-quest-games lifts the T895 hold: recipes.json 'Tempest Woven Wand' (recipe 200, rank 12) now forges item 30480 on its own MiniGameData row 367, so 'Forge A Tempest Woven Wand' (100015) is craft_recipe 200 x1, then this deliver_item step (100017), then 'Speak with Silverray'. The deliver step is kept in place because tests/quest_item_handin.rs binds the shipped record's objectives[0]; the lead adds the other two steps and the prerequisite (3020020 Silver Appearance is still a hollow record) when wiring. The record stays disabled until then."
         },
         {
           "kind": "client",

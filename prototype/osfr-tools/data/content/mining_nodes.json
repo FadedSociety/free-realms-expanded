@@ -50,6 +50,162 @@
         "placement_y_offset": "0.0: the recovered spawn heights already sit on the terrain",
         "drop_table": "empty like copper-vein: the Mining18 board (mining.json) pays Copper Ore 2739"
       }
+    },
+    {
+      "key": "rich-copper-vein",
+      "name": "Copper Vein",
+      "model_id": 4020,
+      "scale": 0.5,
+      "composite_effect_id": 0,
+      "interact_range": 12,
+      "cursor_id": 20,
+      "placement_y_offset": 0.0,
+      "texture_alias": "Copper",
+      "notifications": [
+        {
+          "kind": 6,
+          "image_id": 340,
+          "state": 340,
+          "name_id": 7228,
+          "subtext_id": -1
+        }
+      ],
+      "drop_table": [],
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "name": "client locale 7228 'Copper Vein' (lab/reports/locale-id-to-text.json)",
+        "model_id": "client Resources/Models.txt 4020 = sg_mining_node_snowhillminecopper_01.adr, the client's Snowhill mine copper vein (its .adr/.cdt/.dma are in Assets_002/005/006, lab/manifests/rust-asset-catalog.tsv); 4019 stays the plain Snowhill veins' model so the recovered 17 keep their own count. (R) The fork spawns no 4020 row; the 'Copper' texture alias follows the 4019 rows and is to be checked natively.",
+        "scale": "(R) 0.5 like the snowhill-copper-vein type (Sanctuary-main-20261019 Npcs.json Scale 0.5 on the copper templates)",
+        "notifications": "(R) as snowhill-copper-vein, with the vein's own name id",
+        "cursor_id": "client Resources/Cursors.txt 20 = cursor_interaction_mining.cur (loaded only, not sent)",
+        "interact_range": "(R) 12, same as the copper vein types",
+        "placement_y_offset": "0.0: spawn heights are sampled from the zone-0 terrain grid",
+        "drop_table": "empty: the rich board (mining.json games) pays the ore and the gem"
+      }
+    },
+    {
+      "key": "rich-tin-vein",
+      "name": "Tin Vein",
+      "model_id": 4018,
+      "scale": 0.5,
+      "composite_effect_id": 0,
+      "interact_range": 12,
+      "cursor_id": 20,
+      "placement_y_offset": 0.0,
+      "notifications": [
+        {
+          "kind": 6,
+          "image_id": 340,
+          "state": 340,
+          "name_id": 7229,
+          "subtext_id": -1
+        }
+      ],
+      "drop_table": [],
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "name": "client locale 7229 'Tin Vein' (lab/reports/locale-id-to-text.json)",
+        "model_id": "client Resources/Models.txt 4018 = sg_mining_node_northernwildstin_01.adr, the client's own regional vein model; in Assets packs (lab/manifests/rust-asset-catalog.tsv); (R) no texture alias: the fork's rows for this model carry none",
+        "scale": "(R) 0.5 like the snowhill-copper-vein type (Sanctuary-main-20261019 Npcs.json Scale 0.5 on the copper templates)",
+        "notifications": "(R) as snowhill-copper-vein, with the vein's own name id",
+        "cursor_id": "client Resources/Cursors.txt 20 = cursor_interaction_mining.cur (loaded only, not sent)",
+        "interact_range": "(R) 12, same as the copper vein types",
+        "placement_y_offset": "0.0: spawn heights are sampled from the zone-0 terrain grid",
+        "drop_table": "empty: the rich board (mining.json games) pays the ore and the gem"
+      }
+    },
+    {
+      "key": "rich-iron-vein",
+      "name": "Iron Vein",
+      "model_id": 4021,
+      "scale": 0.5,
+      "composite_effect_id": 0,
+      "interact_range": 12,
+      "cursor_id": 20,
+      "placement_y_offset": 0.0,
+      "notifications": [
+        {
+          "kind": 6,
+          "image_id": 340,
+          "state": 340,
+          "name_id": 7230,
+          "subtext_id": -1
+        }
+      ],
+      "drop_table": [],
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "name": "client locale 7230 'Iron Vein' (lab/reports/locale-id-to-text.json)",
+        "model_id": "client Resources/Models.txt 4021 = sg_mining_node_southernwildsiron_01.adr, the client's own regional vein model; in Assets packs (lab/manifests/rust-asset-catalog.tsv); (R) no texture alias: the fork's rows for this model carry none",
+        "scale": "(R) 0.5 like the snowhill-copper-vein type (Sanctuary-main-20261019 Npcs.json Scale 0.5 on the copper templates)",
+        "notifications": "(R) as snowhill-copper-vein, with the vein's own name id",
+        "cursor_id": "client Resources/Cursors.txt 20 = cursor_interaction_mining.cur (loaded only, not sent)",
+        "interact_range": "(R) 12, same as the copper vein types",
+        "placement_y_offset": "0.0: spawn heights are sampled from the zone-0 terrain grid",
+        "drop_table": "empty: the rich board (mining.json games) pays the ore and the gem"
+      }
+    },
+    {
+      "key": "rich-silver-vein",
+      "name": "Silver Vein",
+      "model_id": 4015,
+      "scale": 0.5,
+      "composite_effect_id": 0,
+      "interact_range": 12,
+      "cursor_id": 20,
+      "placement_y_offset": 0.0,
+      "notifications": [
+        {
+          "kind": 6,
+          "image_id": 340,
+          "state": 340,
+          "name_id": 7231,
+          "subtext_id": -1
+        }
+      ],
+      "drop_table": [],
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "name": "client locale 7231 'Silver Vein' (lab/reports/locale-id-to-text.json)",
+        "model_id": "client Resources/Models.txt 4015 = sg_mining_node_blacksporesilver_01.adr, the client's own regional vein model; in Assets packs (lab/manifests/rust-asset-catalog.tsv); (R) no texture alias: the fork's rows for this model carry none",
+        "scale": "(R) 0.5 like the snowhill-copper-vein type (Sanctuary-main-20261019 Npcs.json Scale 0.5 on the copper templates)",
+        "notifications": "(R) as snowhill-copper-vein, with the vein's own name id",
+        "cursor_id": "client Resources/Cursors.txt 20 = cursor_interaction_mining.cur (loaded only, not sent)",
+        "interact_range": "(R) 12, same as the copper vein types",
+        "placement_y_offset": "0.0: spawn heights are sampled from the zone-0 terrain grid",
+        "drop_table": "empty: the rich board (mining.json games) pays the ore and the gem"
+      }
+    },
+    {
+      "key": "rich-gold-vein",
+      "name": "Gold Vein",
+      "model_id": 4016,
+      "scale": 0.5,
+      "composite_effect_id": 0,
+      "interact_range": 12,
+      "cursor_id": 20,
+      "placement_y_offset": 0.0,
+      "notifications": [
+        {
+          "kind": 6,
+          "image_id": 340,
+          "state": 340,
+          "name_id": 7232,
+          "subtext_id": -1
+        }
+      ],
+      "drop_table": [],
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "name": "client locale 7232 'Gold Vein' (lab/reports/locale-id-to-text.json)",
+        "model_id": "client Resources/Models.txt 4016 = sg_mining_node_briarwoodgold_01.adr, the client's own regional vein model; in Assets packs (lab/manifests/rust-asset-catalog.tsv); (R) no texture alias: the fork's rows for this model carry none",
+        "scale": "(R) 0.5 like the snowhill-copper-vein type (Sanctuary-main-20261019 Npcs.json Scale 0.5 on the copper templates)",
+        "notifications": "(R) as snowhill-copper-vein, with the vein's own name id",
+        "cursor_id": "client Resources/Cursors.txt 20 = cursor_interaction_mining.cur (loaded only, not sent)",
+        "interact_range": "(R) 12, same as the copper vein types",
+        "placement_y_offset": "0.0: spawn heights are sampled from the zone-0 terrain grid",
+        "drop_table": "empty: the rich board (mining.json games) pays the ore and the gem"
+      }
     }
   ],
   "pools": [
@@ -72,6 +228,81 @@
         "placement": "17 spawnNpcWithGuid rows of copper model 4019 in Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua (Snowhill, zone 13)",
         "max_active_nodes": "(R) 8 of the 17 recovered veins active at a time; no recovered cap",
         "respawn_seconds": "(R) 60, same as the existing snowhill-copper pool; no recovered timer"
+      }
+    },
+    {
+      "key": "dartmoor-rich-copper",
+      "zone_definition_id": 13,
+      "node_type": "rich-copper-vein",
+      "game_id": 92,
+      "max_active_nodes": 3,
+      "respawn_seconds": 60,
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "placement": "Dartmoor Mining Camp: wiki fr_quest_miner_dartmoor_mining_camp 'Mine one malachite from rich copper veins just outside Snowhill'; client 76972 sends the player to Shimmer Shinyaxe at the Dartmoor Mining Camp for copper ore. Spots 12-24 m from Shimmer (9000000201, -506.4 10.0 -35.0).",
+        "game_id": "MiniGameData 92 (mining.json games): the wiki files the rich games under 'Mining Node (FR Minigame Starter)', so a vein starts it, not the Games window",
+        "max_active_nodes": "(R) 3 of 4 spots up at a time",
+        "respawn_seconds": "(R) 60, as the Snowhill copper pools"
+      }
+    },
+    {
+      "key": "dartmoor-rich-tin",
+      "zone_definition_id": 13,
+      "node_type": "rich-tin-vein",
+      "game_id": 94,
+      "max_active_nodes": 3,
+      "respawn_seconds": 60,
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "placement": "Suspicious Eyes: wiki fr_quest_miner_suspicious_eyes 'Mine 3 garnet by playing the Rich Tin Mining minigame', given at Dartmoor; Derp Axemaker's placement note has his nameplate near tin nodes (video -zAdRWR9MtE/00092). Spots 12-24 m from Derp (9000000069, -519.5 10.2 -34.7).",
+        "game_id": "MiniGameData 94 (mining.json games): the wiki files the rich games under 'Mining Node (FR Minigame Starter)', so a vein starts it, not the Games window",
+        "max_active_nodes": "(R) 3 of 4 spots up at a time",
+        "respawn_seconds": "(R) 60, as the Snowhill copper pools"
+      }
+    },
+    {
+      "key": "snorg-rich-iron",
+      "zone_definition_id": 2,
+      "node_type": "rich-iron-vein",
+      "game_id": 96,
+      "max_active_nodes": 2,
+      "respawn_seconds": 60,
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "placement": "Rare Rock Collection (Snorg, Briarwood): wiki fr_quest_miner_rare_rock_collection asks amethyst, fire agate, garnet, malachite and ruby; the Mother Lode is the Miner's Briarwood quarry (client 23659). The quarry floor is below the rasterised ground (Pinkelug -82 m vs grid 87 m), so the veins stand at Snorg's camp.",
+        "game_id": "MiniGameData 96 (mining.json games): the wiki files the rich games under 'Mining Node (FR Minigame Starter)', so a vein starts it, not the Games window",
+        "max_active_nodes": "(R) 2 of 2 spots up at a time",
+        "respawn_seconds": "(R) 60, as the Snowhill copper pools"
+      }
+    },
+    {
+      "key": "snorg-rich-silver",
+      "zone_definition_id": 2,
+      "node_type": "rich-silver-vein",
+      "game_id": 98,
+      "max_active_nodes": 2,
+      "respawn_seconds": 60,
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "placement": "As snorg-rich-iron: the Rare Rock Collection gems near their giver.",
+        "game_id": "MiniGameData 98 (mining.json games): the wiki files the rich games under 'Mining Node (FR Minigame Starter)', so a vein starts it, not the Games window",
+        "max_active_nodes": "(R) 2 of 2 spots up at a time",
+        "respawn_seconds": "(R) 60, as the Snowhill copper pools"
+      }
+    },
+    {
+      "key": "snorg-rich-gold",
+      "zone_definition_id": 2,
+      "node_type": "rich-gold-vein",
+      "game_id": 100,
+      "max_active_nodes": 2,
+      "respawn_seconds": 60,
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "placement": "As snorg-rich-iron: the Rare Rock Collection gems near their giver.",
+        "game_id": "MiniGameData 100 (mining.json games): the wiki files the rich games under 'Mining Node (FR Minigame Starter)', so a vein starts it, not the Games window",
+        "max_active_nodes": "(R) 2 of 2 spots up at a time",
+        "respawn_seconds": "(R) 60, as the Snowhill copper pools"
       }
     }
   ],
@@ -389,6 +620,216 @@
       "source_tag": "Sanctuary-main-20261019",
       "source_tags": {
         "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:4266 spawnNpcWithGuid(36303, 100000036303, -5.44792, 11.29212, 241.60905, -0.630230023); Sanctuary-main-20261019 src/Resources/Npcs.json Id=36303 (ModelId 4019, NameId 7228, Scale 0.5, TextureAlias Copper, CursorId 20)"
+      }
+    },
+    {
+      "id": 101,
+      "pool_key": "dartmoor-rich-copper",
+      "zone_definition_id": 13,
+      "position": [
+        -506.4,
+        10.0,
+        -23.0
+      ],
+      "heading": 0.0,
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "position": "(R) chosen spot; height 10.00 sampled from lab/terrain/zone_0.hgt (2 m grid); 7.1 m clear of every placed NPC, prop, pick-up and node (review pass)"
+      }
+    },
+    {
+      "id": 102,
+      "pool_key": "dartmoor-rich-copper",
+      "zone_definition_id": 13,
+      "position": [
+        -494.4,
+        11.2,
+        -37.0
+      ],
+      "heading": 0.0,
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "position": "(R) chosen spot; height 11.20 sampled from lab/terrain/zone_0.hgt (2 m grid); 12.2 m clear of every placed NPC, prop, pick-up and node (review pass)"
+      }
+    },
+    {
+      "id": 103,
+      "pool_key": "dartmoor-rich-copper",
+      "zone_definition_id": 13,
+      "position": [
+        -516.0,
+        10.18,
+        -19.0
+      ],
+      "heading": 0.0,
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "position": "(R) chosen spot; height 10.18 sampled from lab/terrain/zone_0.hgt (2 m grid); 4.7 m clear of every placed NPC, prop, pick-up and node (review pass)"
+      }
+    },
+    {
+      "id": 104,
+      "pool_key": "dartmoor-rich-copper",
+      "zone_definition_id": 13,
+      "position": [
+        -498.0,
+        10.4,
+        -25.0
+      ],
+      "heading": 0.0,
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "position": "(R) chosen spot; height 10.40 sampled from lab/terrain/zone_0.hgt (2 m grid)"
+      }
+    },
+    {
+      "id": 111,
+      "pool_key": "dartmoor-rich-tin",
+      "zone_definition_id": 13,
+      "position": [
+        -531.0,
+        9.97,
+        -47.0
+      ],
+      "heading": 0.0,
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "position": "(R) chosen spot; height 9.97 sampled from lab/terrain/zone_0.hgt (2 m grid)"
+      }
+    },
+    {
+      "id": 112,
+      "pool_key": "dartmoor-rich-tin",
+      "zone_definition_id": 13,
+      "position": [
+        -531.0,
+        10.2,
+        -23.0
+      ],
+      "heading": 0.0,
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "position": "(R) chosen spot; height 10.20 sampled from lab/terrain/zone_0.hgt (2 m grid)"
+      }
+    },
+    {
+      "id": 113,
+      "pool_key": "dartmoor-rich-tin",
+      "zone_definition_id": 13,
+      "position": [
+        -540.0,
+        10.18,
+        -41.0
+      ],
+      "heading": 0.0,
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "position": "(R) chosen spot; height 10.18 sampled from lab/terrain/zone_0.hgt (2 m grid); 7.3 m clear of every placed NPC, prop, pick-up and node (review pass)"
+      }
+    },
+    {
+      "id": 114,
+      "pool_key": "dartmoor-rich-tin",
+      "zone_definition_id": 13,
+      "position": [
+        -525.0,
+        8.1,
+        -58.0
+      ],
+      "heading": 0.0,
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "position": "(R) chosen spot; height 8.10 sampled from lab/terrain/zone_0.hgt (2 m grid)"
+      }
+    },
+    {
+      "id": 121,
+      "pool_key": "snorg-rich-iron",
+      "zone_definition_id": 2,
+      "position": [
+        -785.0,
+        -68.2,
+        2349.0
+      ],
+      "heading": 0.0,
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "position": "(R) chosen spot; height -68.20 sampled from lab/terrain/zone_0.hgt (2 m grid)"
+      }
+    },
+    {
+      "id": 122,
+      "pool_key": "snorg-rich-iron",
+      "zone_definition_id": 2,
+      "position": [
+        -761.0,
+        -68.38,
+        2349.0
+      ],
+      "heading": 0.0,
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "position": "(R) chosen spot; height -68.38 sampled from lab/terrain/zone_0.hgt (2 m grid)"
+      }
+    },
+    {
+      "id": 131,
+      "pool_key": "snorg-rich-silver",
+      "zone_definition_id": 2,
+      "position": [
+        -781.0,
+        -69.8,
+        2377.0
+      ],
+      "heading": 0.0,
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "position": "(R) chosen spot; height -69.80 sampled from lab/terrain/zone_0.hgt (2 m grid); 7.0 m clear of every placed NPC, prop, pick-up and node (review pass)"
+      }
+    },
+    {
+      "id": 132,
+      "pool_key": "snorg-rich-silver",
+      "zone_definition_id": 2,
+      "position": [
+        -761.0,
+        -68.92,
+        2373.0
+      ],
+      "heading": 0.0,
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "position": "(R) chosen spot; height -68.92 sampled from lab/terrain/zone_0.hgt (2 m grid)"
+      }
+    },
+    {
+      "id": 141,
+      "pool_key": "snorg-rich-gold",
+      "zone_definition_id": 2,
+      "position": [
+        -773.0,
+        -68.65,
+        2385.0
+      ],
+      "heading": 0.0,
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "position": "(R) chosen spot; height -68.65 sampled from lab/terrain/zone_0.hgt (2 m grid)"
+      }
+    },
+    {
+      "id": 142,
+      "pool_key": "snorg-rich-gold",
+      "zone_definition_id": 2,
+      "position": [
+        -773.0,
+        -68.5,
+        2337.0
+      ],
+      "heading": 0.0,
+      "source_tag": "P-quest-games (R)",
+      "source_tags": {
+        "position": "(R) chosen spot; height -68.50 sampled from lab/terrain/zone_0.hgt (2 m grid)"
       }
     }
   ]

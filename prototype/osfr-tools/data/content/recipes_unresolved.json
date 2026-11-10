@@ -427,7 +427,8 @@
         "ingredient definitions and counts",
         "recipe-to-minigame binding",
         "required job rank",
-        "output item definition selection"
+        "output item definition selection",
+        "candidate recipe id 40 is the loaded Mystery Pot Roast (recipes.json chef.mystery_pot_roast, P-quest-games): 'Cooking: Mystery Pot Roast' is MiniGameData 180 = 140 + 40, so pattern item 850's 'Punkin Pot Roast' is that slot's earlier name and this row is not safe to load under id 40"
       ],
       "source": [
         {

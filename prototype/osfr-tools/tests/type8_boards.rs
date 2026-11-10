@@ -111,7 +111,8 @@ fn every_offered_game_has_a_games_window_row_and_ore_rows_carry_their_rank_sets(
     ];
     for engine in &engines {
         for (game, _) in engine.games() {
-            if game == mining::MINING_GAME_ID {
+            // The rich ore rows start only from their veins (P-quest-games), never from Play.
+            if game == mining::MINING_GAME_ID || [92, 94, 96, 98, 100].contains(&game) {
                 continue;
             }
             assert!(

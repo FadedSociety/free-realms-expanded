@@ -159,10 +159,12 @@ fn every_plot_is_placed_and_names_its_regions_game() {
         // The mushrooms stay on the engine's own game.
         assert!(nodes.is_node(actor.guid) && nodes.game_id(actor.guid).is_some());
     }
+    // P-quest-games: the Miner file's rich veins (tag byte 2) name their ore rows; here only
+    // the harvest file's other actors (the mushrooms) must name none.
     assert!(
         nodes
             .actors()
-            .filter(|actor| actor.model_id != PLOT_MODEL)
+            .filter(|actor| actor.model_id != PLOT_MODEL && (actor.guid >> 32) & 0xff == 1)
             .all(|actor| nodes.game_id(actor.guid).is_none()),
         "only plots name a game"
     );
@@ -309,9 +311,13 @@ fn the_shipped_harvesting_file_offers_each_plot_game_with_the_recovered_produce(
         }
     }
     // Every game a plot pool names is offered, so no shipped plot is unavailable.
+    // (The Miner file's rich veins, tag byte 2, name mining rows; `tests/quest_games_content.rs`
+    // checks those against `mining.json`.)
     let nodes = shipped_nodes();
     for actor in nodes.actors() {
-        if let Some(game) = nodes.game_id(actor.guid) {
+        if let Some(game) = nodes.game_id(actor.guid)
+            && (actor.guid >> 32) & 0xff == 1
+        {
             assert!(offered.contains(&game), "plot game {game} is not offered");
         }
     }

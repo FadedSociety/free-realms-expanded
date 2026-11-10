@@ -84,7 +84,9 @@ const FROZEN_SHA256: &[(&str, &str)] = &[
         "mining.json",
         // L100: Copper Mining (game 91) added on the copper board.
         // L934: Tin, Iron, Silver and Gold Mining (93-99) and Mining Practice (375).
-        "ef16f36f7f282c420985c60483e377158ace8dcafbe88d91642221cf151376d8",
+        // P-quest-games: the rich veins' rows 92-100, each its ore board paying the client's
+        // bonus gem (malachite, garnet, amethyst, ruby, fire agate).
+        "217aab16d5e4d343f4584293d5647fbcd668085e081b027151913340055db1b0",
     ),
     (
         "harvesting.json",

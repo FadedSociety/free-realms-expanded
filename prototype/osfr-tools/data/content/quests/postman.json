@@ -993,19 +993,7 @@
       "title_string_id": 115427,
       "giver_npc_id": 9000000086,
       "prerequisite_quest_ids": [],
-      "objectives": [
-        {
-          "kind": "talk_to_npc",
-          "id": 1,
-          "npc_id": 9000000107,
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "description 115428 'Meet up with Honey in the Queensfield south of Sanctuary.'; target resolved by scripts/quest_talk_objectives.py"
-            }
-          ]
-        }
-      ],
+      "objectives": [],
       "rewards": [
         {
           "coins": 0,
@@ -1024,7 +1012,7 @@
       "source": [
         {
           "kind": "reconstructed",
-          "evidence": "(R) T895: stays disabled: the record backs only the Talk to Honey (9000000107); the guide's collect-and-deliver Bixie Buds steps have no object ids, the quest-lines answer is unresolved and no reward is recovered; Felipe's row (9000000086) and Honey are drawn, so the W110 'unspawned' note above is stale."
+          "evidence": "(R) P-quest-games lifts the T895 hold: Bixie Bud Blitz (MiniGameData 243) is served by world_challenges.json (Honey's menu) and pinned as a finish_minigame producer, so the guide's 'Complete the Bixie Bud Blitz minigame' step resolves. The partial Talk-to-Honey step was removed so lab/tools/quest_wire.py --apply fills every step (Talk to Honey 22763, finish_minigame 243 'Complete the Bixie Bud Blitz minigame' 115438, Return to Honey 71372); the record stays off until the lead wires it. Felipe (9000000086) and Honey (9000000107) are drawn."
         },
         {
           "kind": "client",

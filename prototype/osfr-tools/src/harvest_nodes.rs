@@ -183,9 +183,10 @@ pub struct HarvestNodePool {
     pub max_active_nodes: u32,
     pub respawn_seconds: u32,
     /// T553: the MiniGameData Harvesting game a click on this pool's nodes starts (a
-    /// `harvesting::REGIONS` id; the file's own game when absent). Only the Chef harvest file
-    /// may name one. The engine must offer the game (`harvesting.json` `games`) or a click is
-    /// refused as unavailable.
+    /// `harvesting::REGIONS` id; the file's own game when absent). The Chef harvest file may
+    /// name a region; the Miner file (P-quest-games) one of the client's ore rows
+    /// (`mining::is_ore_row`, the rich veins 92-100). The engine must offer the game
+    /// (`harvesting.json` / `mining.json` `games`) or a click is refused as unavailable.
     #[serde(default)]
     pub game_id: Option<i32>,
     /// Sanctuary keeps the loot table on the pool, Legacy on the type. T524's collection
@@ -758,9 +759,14 @@ fn add_sites(
             return Err(bad("node range or respawn out of bounds"));
         }
         // T553: only the Chef harvest file starts regional games, and only ones the client names.
-        if pool.game_id.is_some_and(|game| {
-            region(game).is_none() || !matches!(source, NodeSource::Gather(Gather::Harvesting))
-        }) {
+        // P-quest-games: a Miner pool may start one of the client's ore rows (the rich veins 92-100
+        // beside the Games window's 91-99); `mining.json` must offer it or the click is refused.
+        let starts = |game: i32| match source {
+            NodeSource::Gather(Gather::Harvesting) => region(game).is_some(),
+            NodeSource::Gather(Gather::Mining) => crate::mining::is_ore_row(game),
+            _ => false,
+        };
+        if pool.game_id.is_some_and(|game| !starts(game)) {
             return Err(bad("a node pool names a game it cannot start"));
         }
         // T547: a model scale or alias the client cannot draw is refused at load, not sent.

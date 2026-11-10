@@ -741,6 +741,125 @@ fn shipped_mining_board_pays_ore_and_xp_once_through_the_node() {
     assert_eq!(gateway.snapshot(), paid, "a replayed win paid again");
 }
 
+/// P-quest-games: a Dartmoor rich copper vein (`mining_nodes.json` pool `dartmoor-rich-copper`)
+/// starts Rich Copper Mining, MiniGameData 92, whose board pays copper ore and malachite.
+const RICH_COPPER: Game = Game {
+    node: "Copper Vein",
+    json_key: "mining",
+    profile: MINER_PROFILE_ID,
+    goals: 2,
+    outputs: [2739, 2746, 0, 0],
+    region: Some(92),
+};
+
+#[test]
+fn a_rich_copper_vein_starts_rich_copper_mining_and_pays_copper_and_malachite() {
+    let fixture = Fixture::new(RICH_COPPER)
+        .with_shipped_mining()
+        .with_release_items();
+    let mut gateway = fixture.ready();
+    tick(&mut gateway, 1_500);
+    let started = click(&mut gateway, fixture.node.guid, 2_000);
+    assert_eq!(
+        started_game(&started),
+        (92, 16226, 7911),
+        "the vein's own row: Rich Copper Mining, the mining description"
+    );
+    let id = active(&gateway, RICH_COPPER).expect("Rich Copper Mining offered") as i32;
+    for (step, packet) in [
+        frame(5, id, -1),
+        payload(id, "OnConnectMsg"),
+        payload(id, "OnStartGameMsg"),
+        payload(id, "OnStartLevelMsg"),
+    ]
+    .iter()
+    .enumerate()
+    {
+        send(&mut gateway, packet, 2_100 + 20 * step as u64);
+    }
+    finish_shipped_mining(&mut gateway, id, 2_200);
+    assert_eq!(mining_run(&gateway).phase, Type8Phase::LevelComplete);
+    assert_eq!(count(&gateway, 2739), 0, "nothing before the win request");
+
+    send(&mut gateway, &payload(id, "OnNextLevelMsg"), 20_000);
+    assert_eq!(mining_run(&gateway).phase, Type8Phase::Won);
+    assert!(
+        count(&gateway, 2739) >= 16,
+        "the rich copper quota, 16 ore (client 92849), is paid as copper ore"
+    );
+    assert!(
+        count(&gateway, 2746) >= 1,
+        "the malachite that fell with the ore (bonus tile 709) is paid as Malachite"
+    );
+    assert_eq!(
+        xp(&gateway, RICH_COPPER),
+        u64::from(RECONSTRUCTED_MINER_XP_PER_WIN),
+        "(R) Miner XP per win"
+    );
+}
+
+/// The Dartmoor rich tin vein (Rich Tin Mining 94, Miner rank 5) and a Snorg's camp rich gold
+/// vein (Rich Gold Mining 100, rank 17).
+const RICH_TIN: Game = Game {
+    node: "Tin Vein",
+    outputs: [2740, 2745, 0, 0],
+    region: Some(94),
+    ..RICH_COPPER
+};
+const RICH_GOLD: Game = Game {
+    node: "Gold Vein",
+    outputs: [2743, 2744, 0, 0],
+    region: Some(100),
+    ..RICH_COPPER
+};
+
+/// P-quest-games: the rich veins have no Games window row, so the node click is their one rank
+/// gate. A Miner at the starting rank is refused at the rich tin (rank 5) and rich gold (rank 17)
+/// veins with the Games window's own line, and nothing starts or changes.
+#[test]
+fn a_low_rank_miner_is_refused_at_the_rich_tin_and_gold_veins() {
+    for game in [RICH_TIN, RICH_GOLD] {
+        let fixture = Fixture::new(game).with_shipped_mining().with_release_items();
+        let mut gateway = fixture.ready();
+        tick(&mut gateway, 1_500);
+        assert!(
+            mining::rank_floor(game.region.unwrap()) > 1,
+            "{} asks a rank the fresh Miner lacks",
+            game.node
+        );
+        let before = gateway.snapshot();
+        let refused = click(&mut gateway, fixture.node.guid, 2_000);
+        assert_eq!(
+            chat_text(&refused).trim_end(),
+            "Your Miner rank is too low for that game.",
+            "{} refusal",
+            game.node
+        );
+        assert!(!refused.gameplay_changed, "{} refusal saved", game.node);
+        assert_eq!(gateway.snapshot(), before, "{} refusal changed state", game.node);
+        assert!(active(&gateway, game).is_none(), "{} started a run", game.node);
+        assert_eq!(ore(&gateway, game), vec![0, 0], "{} paid", game.node);
+    }
+}
+
+/// P-quest-games: a vein may name any ore row, but a campaign whose `mining.json` does not offer
+/// the row refuses the click (the synthetic board offers only game 18), and nothing changes.
+#[test]
+fn a_rich_vein_whose_row_the_campaign_does_not_offer_is_refused_at_the_click() {
+    let fixture = Fixture::new(RICH_COPPER);
+    let mut gateway = fixture.ready();
+    tick(&mut gateway, 1_500);
+    let before = gateway.snapshot();
+    let refused = click(&mut gateway, fixture.node.guid, 2_000);
+    assert_eq!(
+        chat_text(&refused).trim_end(),
+        "Gathering is not available in this campaign."
+    );
+    assert!(!refused.gameplay_changed, "the refusal saved");
+    assert_eq!(gateway.snapshot(), before);
+    assert!(active(&gateway, RICH_COPPER).is_none());
+}
+
 /// The packets in `outcome` as inner family/sub pairs plus the raw bytes.
 fn inners(outcome: &GatewayOutcome) -> Vec<&[u8]> {
     outcome.replies.iter().map(|r| inner(r)).collect()
@@ -1359,12 +1478,14 @@ fn node_content_is_bounded_and_unique() {
     // 8 homework pages), 166 placed collection nodes (T524, the 34 pool maxima) and the
     // 8 Snowhill copper veins T547 places from the 17 recovered rows and the 13 T553 farm
     // plots (every recovered plot is active), and 496 spots for the quest pick-ups (with the Chapter 1 caravan)
-    // (`quest_wire.py`: up to count + 2 each, on a ring round the giver).
-    assert_eq!(actors.len(), 911);
+    // (`quest_wire.py`: up to count + 2 each, on a ring round the giver), and the 12 rich veins
+    // P-quest-games places (3 rich copper and 3 rich tin at Dartmoor, 2 each of rich iron, silver
+    // and gold at Snorg's camp: the pool maxima of 4, 4, 2, 2, 2 spots).
+    assert_eq!(actors.len(), 923);
     let mut ids: Vec<_> = actors.iter().map(|a| a.guid).collect();
     ids.sort();
     ids.dedup();
-    assert_eq!(ids.len(), 911);
+    assert_eq!(ids.len(), 923);
     assert!(
         actors
             .iter()
