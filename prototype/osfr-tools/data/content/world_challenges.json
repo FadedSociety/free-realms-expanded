@@ -4,7 +4,8 @@
     "L937: client minigame TYPE 1 (SAMPLE) in-world timed challenges, one row per MiniGameData id. Names, descriptions, icons and difficulties are the client's own; every count, timer, radius, reward and distance is a reconstruction (R).",
     "Adapted from the Sanctuary community server fork (BubbaJoeX) Resources/Challenges.json and ChallengeManager.cs, AGPL-3.0; see NOTICE.",
     "Not built: 301 (Mail Morph transform) needs an ability system; 302 visits two of its three recipients (Toilin has no NPC row).",
-    "Only a win pays and credits quests. A job-less row (profile 0) pays the active job. xp is the fallback; the job's activity_xp (data/release/job_xp_curve.json) pays instead where one challenge is one unit of the job's activity (not for the combat jobs, whose rate is per kill)."
+    "Only a win pays and credits quests. A job-less row (profile 0) pays the active job. xp is the fallback; the job's activity_xp (data/release/job_xp_curve.json) pays instead where one challenge is one unit of the job's activity (not for the combat jobs, whose rate is per kill).",
+    "P-autograph: 592 Can I Have Your Autograph is the one row with no MiniGameData id of its own; the client has the game's text but no table row, so the id is a reconstruction (R) in the kart range."
   ],
   "tuning": {
     "start_range": 30.0,
@@ -2876,6 +2877,81 @@
         "goals and two minutes: wiki fr_minigame_medic_flu_season",
         "giver: Mayor Crystalline, the wiki's start",
         "time limit 120 s, coins, xp: wiki or (R) by difficulty"
+      ]
+    },
+    {
+      "id": 592,
+      "title": "Can I Have Your Autograph",
+      "giver": 9500000620,
+      "name_id": 395139,
+      "description_id": 394798,
+      "icon_id": 9550,
+      "difficulty": 1,
+      "profile": 48,
+      "time_limit_seconds": 150,
+      "win_goal_id": 388162,
+      "stages": [
+        {
+          "kind": "deliver",
+          "count": 1,
+          "name_id": 394796,
+          "recipients": [
+            9500000567
+          ]
+        },
+        {
+          "kind": "deliver",
+          "count": 1,
+          "name_id": 394843,
+          "recipients": [
+            9500000562
+          ]
+        },
+        {
+          "kind": "deliver",
+          "count": 1,
+          "name_id": 394847,
+          "recipients": [
+            9500000585
+          ]
+        },
+        {
+          "kind": "deliver",
+          "count": 1,
+          "name_id": 394857,
+          "recipients": [
+            9500000622
+          ]
+        },
+        {
+          "kind": "deliver",
+          "count": 1,
+          "name_id": 394861,
+          "recipients": [
+            9500000582
+          ]
+        },
+        {
+          "kind": "deliver",
+          "count": 1,
+          "name_id": 394863,
+          "recipients": [
+            9500000554
+          ]
+        }
+      ],
+      "bonuses": [],
+      "coins": 45,
+      "xp": 35,
+      "source": [
+        "(R) id 592: the client's MiniGameData.txt has no row for this game (its kart rows run 585, 587, 588, 590, 591, 593; 589 and 592 are unused), so the server names it by a free id in that range, absent from the client table, the client Lua and the Legacy reference data.",
+        "wiki fr_minigame_can_i_have_your_autograph: Timed, Easy, 'Sign enough autographs before time runs out!', started by clicking the barrel next to Roxy; quest page fr_quest_kart_driver_the_price_of_fame: Talk to Roxy in Seaside, click the barrel, beat the game, talk to Roxy, talk to Ace O'Mally.",
+        "name 395139 'Beat the \"Can I Have Your Autograph?\" minigame' is the only client string that names the game (the title itself never shipped in the locale); description 394798 is the wiki's one-line description; icon 9550 and difficulty 1 (Easy) as the other Kart Driver rows.",
+        "goals: the client's 'Sign an autograph for <fan>' lines 394796-394881 (objective group 394794 'Autograph IWMG OBJ GRP', timer group 394899) name 18 fans. The six with Seaside NPC rows nearest Roxy are the stops, in route order from her barrel: Cole 9500000567 (394796), Brenna 9500000562 (394843), Gaius 9500000585 (394847), Sanford 9500000622 (394857), Esther Summerspark 9500000582 (394861), Banani 9500000554 (394863): 288 m of straight legs.",
+        "(R) left out: Aimee, Winnie and Kenny (npc_spawns_extra bodies with no content key), Tigee, Taffy, Swatch and Saul (no body anywhere), Flurrie Flo, the Great Koodini, Duane, Diggy and Kendall (rows 270-335 m out, beyond an Easy run's timer). The fans' thank-you lines 394818, 394821, 394824, 394826 and 394828 are not spoken.",
+        "giver: Roxy 9500000620 (Seaside, name 395119; her lines 395127 and 431357 say to click the barrel next to her). The barrel, npc_spawns_extra 100000001742 'Roxy's Barrel' (model 83, 2.2 m from her), has no NPC content key, so her own menu offers the game, as Amber Violet's does for 660 (R).",
+        "time limit 150 s, coins 45, one stop per stage: (R) by difficulty as 588; the live game's 'as many as you can' count is unknown. xp 35 is only the fallback: with data/release/job_xp_curve.json in the bundle a win pays the Kart Driver's activity_xp (97 per race, L927), as every profile-48 row does.",
+        "P-autograph hand row"
       ]
     }
   ]

@@ -726,6 +726,8 @@ fn shipped_minigame_producers_are_pinned() {
         // The card decks NPCs offer (card_game.json npc_decks) credit theirs too.
         // L935: the 16 Games-window card rows (category 11) credit their own MiniGameData id
         // (499 lobby, 500-531 the named decks, 537 tutorial) on a Skirmish or Scenario win.
+        // P-autograph: 592 is Can I Have Your Autograph, Roxy's Seaside signing, a hand id (R)
+        // for a game the client's MiniGameData has no row for (`world_challenges.json`).
         vec![
             14, 18, 20, 21, 28, 29, 36, 39, 40, 41, 42, 43, 44, 46,
             57, 66, 67, 74, 77, 79, 91, 93, 95, 97, 99, 109, 111, 113,
@@ -747,7 +749,7 @@ fn shipped_minigame_producers_are_pinned() {
             502, 503, 504, 505, 506, 507, 508, 509, 510, 511, 512, 513, 514, 515,
             516, 517, 518, 519, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529,
             530, 531, 532, 533, 534, 535, 536, 537, 538, 539, 540, 551, 553, 555, 571, 572, 573,
-            574, 575, 577, 585, 586, 587, 588, 590, 591, 593, 594, 596, 597, 598, 599, 600,
+            574, 575, 577, 585, 586, 587, 588, 590, 591, 592, 593, 594, 596, 597, 598, 599, 600,
             601, 603, 604, 605, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615,
             616, 617, 618, 619, 620, 621, 622, 623, 624, 625, 626, 627, 628, 629,
             630, 631, 632, 633, 634, 658, 659, 660, 661, 666, 667, 668, 669, 681, 682,
