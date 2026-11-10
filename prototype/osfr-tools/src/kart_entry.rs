@@ -564,6 +564,11 @@ impl KartEntryHandler {
         })
     }
 
+    /// The content this entry serves, after the gateway's per-visit rewrites.
+    pub fn content(&self) -> &RaceEntryContent {
+        &self.content
+    }
+
     pub fn set_gate(&mut self, gate: EntryGate) {
         self.gate = gate;
     }

@@ -159,6 +159,8 @@ impl Gameplay {
             .as_mut()
             .ok_or_else(|| invalid("derby entry requires the derby service"))?;
         // L936: the player stays a Demo Derby Driver after the match (client 101319).
+        // The garage's chosen derby car rides in (`vehicle_looks.json`); none keeps the package's.
+        derby.set_player_vehicle(self.kart_entry.as_ref().and_then(|kart| kart.chosen_look(2)));
         let offer = derby.begin_row(character, now_ms, row)?;
         let mut start = vec![offer];
         start.extend(derby.ready_packet());

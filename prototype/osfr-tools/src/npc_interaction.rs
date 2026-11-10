@@ -89,6 +89,8 @@ pub enum NpcAction {
     Race,
     /// (R) Start the solo demolition derby. Offered only by NPCs named in `derby_gates.json`.
     Derby,
+    /// (R) Open the Kart & Demo Derby Garage. Offered only by the mechanics in `kart_garage.json`.
+    Garage,
     /// (R) L932: start this soccer row. Offered only by NPCs named in `soccer.json` `gates`.
     Soccer {
         game: u32,
@@ -241,6 +243,8 @@ pub enum NpcSelection {
     Race,
     /// The caller decides whether the derby may start (`DerbyGateway::admit`).
     Derby,
+    /// The caller opens the garage or refuses (`Gameplay::begin_garage`).
+    Garage,
     /// The caller decides whether this row may start (`Gameplay::begin_soccer_gate`).
     Soccer(u32),
     CardDuel(u32),
@@ -402,6 +406,9 @@ struct NpcContent {
     /// (R) NPCs whose menu lists the demolition derby, and the label's locale id.
     derby_gates: BTreeSet<u64>,
     derby_string_id: u32,
+    /// (R) The mechanics whose menu opens the garage, and the label's locale id.
+    garage_gates: BTreeSet<u64>,
+    garage_string_id: u32,
     /// (R) L932: NPCs whose menu offers a soccer match, and the label's locale id.
     soccer_gates: BTreeSet<u64>,
     /// The rows a gate lists: game id, name id.
@@ -539,6 +546,8 @@ impl NpcInteraction {
                 race_string_id: 0,
                 derby_gates: BTreeSet::new(),
                 derby_string_id: 0,
+                garage_gates: BTreeSet::new(),
+                garage_string_id: 0,
                 soccer_gates: BTreeSet::new(),
                 soccer_rows: Vec::new(),
                 card_duels: std::collections::HashMap::new(),
@@ -578,6 +587,18 @@ impl NpcInteraction {
         let content = Arc::make_mut(&mut self.content);
         content.derby_gates = known.into_iter().collect();
         content.derby_string_id = string_id;
+        unknown
+    }
+
+    /// (R) List the garage in these mechanics' menus. Returns unknown content keys like
+    /// [`Self::set_race_gates`].
+    pub fn set_garage_gates(&mut self, npcs: &[u64], string_id: u32) -> Vec<u64> {
+        let (known, unknown): (Vec<u64>, Vec<u64>) = npcs
+            .iter()
+            .partition(|npc| self.content.npcs.contains_key(*npc));
+        let content = Arc::make_mut(&mut self.content);
+        content.garage_gates = known.into_iter().collect();
+        content.garage_string_id = string_id;
         unknown
     }
 
@@ -811,6 +832,7 @@ impl NpcInteraction {
             }
             NpcAction::Race => Ok(NpcSelection::Race),
             NpcAction::Derby => Ok(NpcSelection::Derby),
+            NpcAction::Garage => Ok(NpcSelection::Garage),
             NpcAction::Soccer { game } => Ok(NpcSelection::Soccer(game)),
             NpcAction::CardDuel { activity } => Ok(NpcSelection::CardDuel(activity)),
             NpcAction::BuyCardPack { item_id, coins } => {
@@ -1210,6 +1232,9 @@ impl NpcInteraction {
         }
         if self.content.derby_gates.contains(&npc.npc_id) {
             options.push((NpcAction::Derby, self.content.derby_string_id));
+        }
+        if self.content.garage_gates.contains(&npc.npc_id) {
+            options.push((NpcAction::Garage, self.content.garage_string_id));
         }
         if self.content.soccer_gates.contains(&npc.npc_id) {
             // (R) A gate's radial is its rows alone (`jCjxTaJfPt0_34.00`, 2010).

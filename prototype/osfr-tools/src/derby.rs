@@ -1032,6 +1032,26 @@ fn fresh_state(key: ParticipantKey, human: bool, health: u32) -> DerbyDriverStat
 }
 
 impl DerbyService {
+    /// A driver's car definition, as its 33/11 carries it.
+    pub fn vehicle_definition(&self, key: ParticipantKey) -> Option<&[u8]> {
+        self.drivers.get(&key).map(|driver| driver.vehicle.definition.as_slice())
+    }
+
+    /// The garage's pick from the offer (139/5): a driver's car changes until the match has
+    /// started, when the cars are on the floor. Returns whether it took.
+    pub fn set_vehicle_definition(&mut self, key: ParticipantKey, definition: Vec<u8>) -> bool {
+        if self.started_at_ms.is_some() || definition.is_empty() || definition.len() > MAX_OPAQUE_BYTES {
+            return false;
+        }
+        match self.drivers.get_mut(&key) {
+            Some(driver) => {
+                driver.vehicle.definition = definition;
+                true
+            }
+            None => false,
+        }
+    }
+
     pub fn new(
         instance_id: i32,
         game_id: i32,

@@ -1126,6 +1126,14 @@ impl Gameplay {
                     serde_json::json!({"event": "kart_gate_unknown_npc", "content_key": npc}),
                 );
             }
+            if let Some(garage) = kart.garage_content() {
+                let unknown = interaction.set_garage_gates(&garage.gate_ids(), garage.menu_string_id);
+                for npc in unknown {
+                    npc_event(
+                        serde_json::json!({"event": "garage_gate_unknown_npc", "content_key": npc}),
+                    );
+                }
+            }
         }
         let derby = crate::derby_gateway::DerbyGateway::load(directory, saved_derby.as_ref())?;
         if let (Some(derby), Some(interaction)) = (&derby, &mut npc_interaction) {

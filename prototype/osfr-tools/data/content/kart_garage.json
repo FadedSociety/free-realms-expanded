@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "note": "The Kart & Demo Derby Garage's own values (sheet kart-garage). Row 1079 and its text ids stay in code; these are the tunable ones.",
+  "menu_string_id": 407334,
+  "menu_string_id_evidence": "(R) locale 407334 'Garage'; the wikis call the entry 'visiting a Mechanic' and no capture holds the menu.",
+  "spawn": [
+    250.0,
+    8.67,
+    250.0
+  ],
+  "spawn_evidence": "(R) the lift prop and the room both sit at (250, 8.67, 250) in prop_placements_2014.tsv; the client builds the kart where the server put the player (00b877d0).",
+  "first_cars": [
+    {
+      "job": 48,
+      "item": 48316,
+      "evidence": "(R) Roadster Racer: the captured character's first kart loadout (guids 66-72); refusal 407744 sends a carless player to the trainers."
+    },
+    {
+      "job": 49,
+      "item": 48317,
+      "evidence": "(R) Ripper Wrecker: the captured character's first derby loadout (guids 77-80); a rank-1 player holds one (T-gxBo8ImE4_2654.00)."
+    }
+  ],
+  "gate_npcs": [
+    {
+      "npc_id": 9000000008,
+      "name": "Andrea Motorspark",
+      "where": "Tangletrack Speedway, Briarwood",
+      "evidence": "fr_mob_andrea_motorspark_37a396.html; npcs/briarwood.json; video n151vLzDLdY 174-178 (offer from this mechanic)"
+    },
+    {
+      "npc_id": 9500000638,
+      "name": "Trevor Wilkes",
+      "where": "Sandstorm Speedway, Seaside",
+      "evidence": "fr_mob_trevor_wilkes_e206e1.html 'Outside of the speedway'; npcs/seaside.json"
+    },
+    {
+      "npc_id": 100000003006,
+      "name": "Bunsen Nolts",
+      "where": "Frost Ridge Speedway",
+      "evidence": "fr_mob_bunsen_nolts_4b24f7.html; npc_spawns_extra.json row (not NPC content yet: the loader logs garage_gate_unknown_npc until a record exists)"
+    },
+    {
+      "npc_id": 100000003022,
+      "name": "Big Paulie",
+      "where": "Wildwood Speedway",
+      "evidence": "fr_mob_big_paulie_52546a.html; video FkCPRbskFVU 8 (back beside him on leaving); npc_spawns_extra.json row"
+    },
+    {
+      "npc_id": 100000003061,
+      "name": "Duncan Slickshoes",
+      "where": "Thunder Falls Speedway",
+      "evidence": "fr_mob_duncan_slickshoes_3fe445.html; npc_spawns_extra.json row"
+    }
+  ]
+}

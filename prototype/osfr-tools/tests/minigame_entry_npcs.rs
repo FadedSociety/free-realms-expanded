@@ -286,10 +286,30 @@ impl Content {
             NEXT.fetch_add(1, Ordering::Relaxed)
         ));
         copy_dir(&reference_content(), &dir);
-        for file in ["kart_entry.json", "kart_gates.json", "derby_gates.json"] {
+        for file in [
+            "kart_entry.json",
+            "kart_gates.json",
+            "derby_gates.json",
+            "vehicles.json",
+            "vehicle_looks.json",
+            "kart_garage.json",
+        ] {
             fs::copy(data().join(file), dir.join(file)).unwrap();
         }
         Self(dir)
+    }
+
+    /// The release item table over the reference snapshot's: the merchant list drops any row the
+    /// inventory's table does not define, and the snapshot predates the kart rows.
+    fn with_release_items(self) -> Self {
+        for file in ["item-table.json", "item-table-supplement.json"] {
+            fs::copy(
+                Path::new(CRATE).join("data/release").join(file),
+                self.0.join(file),
+            )
+            .unwrap();
+        }
+        self
     }
 
     fn write_derby_package(&self) {
@@ -607,6 +627,113 @@ fn the_wildwood_turnstile_offers_and_starts_the_kart_race_for_two_players() {
     assert_ne!(prior_job, 48);
     assert_eq!(after.profiles.unwrap().active, 48);
     assert_eq!(after.inventory.coins, coins);
+}
+
+/// The mechanic's menu is the garage's world door (sheet kart-garage B5): a player with no car is
+/// told so (locale 407742) and nothing changes; a driver with a car gets the Kind 12 offer.
+#[test]
+fn the_mechanic_opens_the_garage_for_a_driver_and_turns_the_carless_away() {
+    const ANDREA: u64 = 9_000_000_008;
+    const GARAGE_LABEL: u32 = 407_334;
+    let content = Content::new();
+    let position = npc_position(ANDREA);
+
+    let mut stranger = gateway_at(&content, content.state(), position);
+    let menu = bodies(&click(&mut stranger, ANDREA, NOW));
+    let option = menu_option(&menu, GARAGE_LABEL).expect("the mechanic lists the garage");
+    let before = save_bytes(&stranger);
+    let refused = choose(&mut stranger, ANDREA, option, NOW + 100);
+    assert!(!refused.gameplay_changed, "a refusal changes nothing");
+    let text = b"without a car";
+    assert!(
+        bodies(&refused)
+            .iter()
+            .any(|packet| packet.windows(text.len()).any(|w| w == text)),
+        "the carless hear locale 407742"
+    );
+    assert_eq!(save_bytes(&stranger), before);
+
+    // A Kart Driver with a kart: the same row opens the Games row's offer.
+    let mut state = content.state();
+    state.profiles.as_mut().unwrap().unlocked.insert(KART_JOB);
+    let table = osfr_tools::vehicle_parts::Vehicles::load(&data())
+        .unwrap()
+        .expect("vehicles.json");
+    let kart_state = state.kart_entry.as_mut().expect("the kart package's state");
+    kart_state
+        .loadouts
+        .add(table.by_item(48_316).unwrap(), [0; osfr_tools::vehicle_parts::SLOTS]);
+    let mut driver = gateway_at(&content, state, position);
+    let menu = bodies(&click(&mut driver, ANDREA, NOW));
+    let option = menu_option(&menu, GARAGE_LABEL).expect("the mechanic lists the garage");
+    let opened = choose(&mut driver, ANDREA, option, NOW + 100);
+    assert!(opened.gameplay_changed, "the visit outlives the staging");
+    let packets = bodies(&opened);
+    let details = packets
+        .iter()
+        .find(|packet| packet.starts_with(&[41, 0, 114, 0]))
+        .expect("the offer's encounter details");
+    assert!(
+        details
+            .windows(9)
+            .any(|w| w == [12, 0, 0, 0, 0, 0, 0, 0, 1]),
+        "Kind 12 starts the client's garage"
+    );
+    assert!(
+        packets.iter().any(|packet| packet.starts_with(&[41, 0, 107, 0])),
+        "Go turns on with the zone-ready"
+    );
+    assert!(
+        packets.iter().any(|packet| packet.starts_with(&[26, 0, 4, 0])),
+        "the dialog closes first"
+    );
+}
+
+/// Buying a kart from the mechanic (26/8, 26/10 Shop, 66/43) makes a loadout with its kit in
+/// the same reply, and a second copy is refused: one kart, one loadout.
+#[test]
+fn a_kart_bought_from_the_mechanic_is_a_loadout_at_once() {
+    use osfr_tools::npc_interaction::{MerchantBuyRequestV2, encode_merchant_buy_66_43};
+    const ANDREA: u64 = 9_000_000_008;
+    const SHOP_LABEL: u32 = 432_156;
+    const BLAST_SPEEDSTER: i32 = 56_984;
+    let content = Content::new().with_release_items();
+    let mut state = content.state();
+    state.profiles.as_mut().unwrap().unlocked.insert(KART_JOB);
+    state.inventory.coins = 1_000;
+    let mut driver = gateway_at(&content, state, npc_position(ANDREA));
+    let menu = bodies(&click(&mut driver, ANDREA, NOW));
+    let shop = menu_option(&menu, SHOP_LABEL).expect("the mechanic sells");
+    choose(&mut driver, ANDREA, shop, NOW + 100);
+    let buy = |transaction: u32| {
+        encode_merchant_buy_66_43(&MerchantBuyRequestV2 {
+            initial_dwords: [BLAST_SPEEDSTER as u32, 0],
+            context_dwords: [0; 3],
+            context_bytes: Vec::new(),
+            trailing_dwords: [1, 0, transaction],
+        })
+        .expect("66/43 encodes")
+    };
+    let bought = driver.handle_at(&wrap(&buy(7)), NOW + 200).unwrap();
+    assert!(bought.gameplay_changed);
+    assert!(
+        bodies(&bought).iter().any(|packet| packet.starts_with(&[137, 0, 3])),
+        "the loadout list refresh rides with the sale"
+    );
+    let after = driver.snapshot().gameplay.unwrap();
+    let cars = &after.kart_entry.as_ref().unwrap().loadouts.cars;
+    let blast = cars.iter().find(|car| car.item == BLAST_SPEEDSTER).expect("a loadout");
+    assert_eq!(blast.slots.iter().filter(|slot| **slot != 0).count(), 6, "its kit");
+    assert_eq!(after.inventory.coins, 1_000 - 60);
+
+    let again = driver.handle_at(&wrap(&buy(8)), NOW + 300).unwrap();
+    let after = driver.snapshot().gameplay.unwrap();
+    assert_eq!(after.inventory.coins, 1_000 - 60, "a second copy is refused");
+    assert_eq!(
+        after.kart_entry.unwrap().loadouts.cars.iter().filter(|car| car.item == BLAST_SPEEDSTER).count(),
+        1
+    );
+    assert!(!bodies(&again).iter().any(|packet| packet.starts_with(&[137, 0, 3])));
 }
 
 #[test]

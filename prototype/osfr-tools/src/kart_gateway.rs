@@ -12,7 +12,7 @@ use crate::{
     kart_entry::{EntryGate, EntryOutcome, KartEntryHandler, RaceEntryContent, RaceEntryContext},
     kart_rows::KartRows,
     kart_service::KartServiceContent,
-    vehicle_parts::{Loadouts, Vehicles},
+    vehicle_parts::{self, GarageContent, Loadouts, Looks, Vehicles},
     le, zone_transition,
 };
 use serde::{Deserialize, Serialize};
@@ -185,6 +185,10 @@ pub struct KartGateway {
     next_row: Option<u32>,
     /// `None` when the content has no vehicle table: logins keep the template's list.
     vehicles: Option<Arc<Vehicles>>,
+    /// `None` without `vehicle_looks.json`: every car keeps the race's or derby's default look.
+    looks: Option<Arc<Looks>>,
+    /// The garage's own values; `None` without `kart_garage.json` (no doors, no first cars).
+    garage_content: Option<Arc<GarageContent>>,
 }
 
 fn invalid(message: impl ToString) -> io::Error {
@@ -279,6 +283,38 @@ impl KartGateway {
     /// The vehicle table and this character's loadouts.
     pub fn garage(&mut self) -> Option<(Arc<Vehicles>, &mut Loadouts)> {
         Some((self.vehicles.clone()?, &mut self.state.loadouts))
+    }
+
+    pub fn garage_content(&self) -> Option<&GarageContent> {
+        self.garage_content.as_deref()
+    }
+
+    /// The vehicle table, when the content has one.
+    pub fn vehicles(&self) -> Option<&Vehicles> {
+        self.vehicles.as_deref()
+    }
+
+    /// 139/5 from a race's offer: the open entry takes the newly chosen kart while nobody has
+    /// registered, as 33/11 goes out at registration. A pick after that waits for the next race.
+    pub fn refresh_look(&mut self) -> io::Result<()> {
+        let waiting = (self.entry.as_ref())
+            .is_some_and(|entry| matches!(entry.phase(), crate::kart_entry::EntryPhase::Waiting));
+        if waiting && self.state.active.is_some() {
+            self.rebuild_entry()?;
+        }
+        Ok(())
+    }
+
+    /// The open entry's content, after this visit's rewrites (`None` between races).
+    pub fn entry_content(&self) -> Option<&RaceEntryContent> {
+        Some(self.entry.as_ref()?.content())
+    }
+
+    /// The definition of the chosen car of a type (1 kart, 2 derby), when `vehicle_looks.json`
+    /// knows its look; `None` keeps the race's or derby's default car.
+    pub fn chosen_look(&self, kind: u32) -> Option<Vec<u8>> {
+        let item = self.state.loadouts.chosen(kind)?.item;
+        self.looks.as_ref()?.definition(item).map(<[u8]>::to_vec)
     }
 
     /// The list and chosen ids the self packet carries.
@@ -477,6 +513,8 @@ impl KartGateway {
             rows,
             next_row: None,
             vehicles: Vehicles::load(directory)?,
+            looks: Looks::load(directory)?,
+            garage_content: GarageContent::load(directory)?,
         };
         if result.state.active.is_some() {
             result.rebuild_entry()?;
@@ -652,7 +690,16 @@ impl KartGateway {
         // 33/5 has a slot, not a GUID; register words are rebound by on_register.
         let old = self.content.context.session;
         let owned = active.context.session;
-        let start = self.content.vehicle_guid_offset;
+        let mut start = self.content.vehicle_guid_offset;
+        // The chosen kart's look (`vehicle_looks.json`) replaces the captured definition; the
+        // 33/11 tail after it stays, so the owner guid moves with the definition's length. A
+        // look that does not apply leaves the default kart: a saved race must always load.
+        if let Some(look) = self.chosen_look(1) {
+            match vehicle_parts::apply_look(&mut content.entry_vehicles[0], &look, start) {
+                Some(moved) => start = moved,
+                None => eprintln!("kart look is not a definition; the default kart rides"),
+            }
+        }
         content.entry_vehicles[0].attribute_block[start..start + 8]
             .copy_from_slice(&owned.to_le_bytes());
         for progress in &mut content.progress {

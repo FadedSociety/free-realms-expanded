@@ -45953,7 +45953,8 @@
         "Human NPC"
       ],
       "roles": [
-        "ambient"
+        "ambient",
+        "vendor"
       ],
       "enemy_kind": null,
       "location_evidence": [
@@ -45966,7 +45967,7 @@
       ],
       "quests_accepted": [],
       "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
-      "vendor_stock": null,
+      "vendor_stock": "Kart and derby parts and karts (kart-garage piece, vendors.json P1079). (R) The wiki Mechanic page says parts come from the Merchants; the mechanic at the Sandstorm Speedway sells them.",
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [],
       "services_reason": "The regional row lists no distinct service.",

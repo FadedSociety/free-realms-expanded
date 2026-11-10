@@ -47,8 +47,9 @@ use std::{
 const MR_TWINKLE: u64 = 9_500_000_758;
 /// The NPC file that carries Mr. Twinkle's row.
 const MR_TWINKLE_FILE: &str = "snowhill.json";
-/// Vendor-role NPCs with at least one priced `vendors.json` row.
-const SHOP_VENDORS: usize = 96;
+/// Vendor-role NPCs with at least one priced `vendors.json` row (P-kart-garage: the two speedway
+/// mechanics, Andrea Motorspark and Trevor Wilkes, sell the kart tree).
+const SHOP_VENDORS: usize = 98;
 /// Vendor-role NPCs with no priced stock: no Shop choice, so no empty window.
 const NO_SHOP_VENDORS: usize = 98;
 /// The vendor-role NPCs that offer no Shop, pinned so a stock change or a new

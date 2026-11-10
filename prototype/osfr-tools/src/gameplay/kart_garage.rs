@@ -2,27 +2,26 @@
 //! with the encounter's Kind at 12, and Go zones the player into `sg_racing_garage`. Kind 12 makes
 //! the client start its garage as the room is ready (`00936d00` -> `GarageManager__Start`), so the
 //! offer has to be gone by then. That asks for the vehicle (139/1), and the answer builds the kart
-//! on the spot. Every car on show looks like the race's one kart or the derby's one car: those are
-//! the only definitions we hold. Parts are bookkeeping for now, as a race still sends its own kart.
+//! on the spot. A car on show, in a race or in a derby looks like the captured car
+//! `vehicle_looks.json` names for it, or the race's one kart and the derby's one car without a
+//! row. Parts are bookkeeping: live's formula for turning them into a car never reached the client.
+//! The mechanics' menus open the same offer (`kart_garage.json` gates), the mechanics sell karts
+//! and parts (vendors.json), and a kart in the bag becomes a loadout with its kit (`adopt_vehicles`).
 use super::*;
 use crate::inventory::Inventory;
 use crate::kart_gateway::GarageParts;
 use crate::startup_selfdata::SelfData;
-use crate::vehicle_parts::{self, Request, Vehicle, DECAL, LOGIN_TAIL, SLOTS};
+use crate::vehicle_parts::{self, DECAL, LOGIN_TAIL, Request, SLOTS, Vehicle};
 use std::sync::atomic::{AtomicI32, Ordering};
 
 /// The Games window row: it joins by its own id, as ContentId 121 is a dead row.
 pub(super) const GARAGE_ROW: u32 = 1079;
 /// (R) The ids the row itself shows, and the race's icon.
 const TEXT: [u32; 6] = [393_460, 9_870, 403_317, 1, 0, 0];
-/// (R) Where the room's floor is, from the scene's bounds.
-const SPAWN: [f32; 4] = [250.0, 8.67, 250.0, 1.0];
 /// Locale 407742, for a player with no car.
 const NO_CAR: &str = "Entering the garage isn't going to do you much good without a car now, is \
                       it! Come back once you've become a Kart Driver or a Demolition Derby Driver \
                       and the garage will be all yours.";
-/// (R) The first car of each driving job: the capture's first two, guids 66-72 and 77-80.
-const FIRST_CARS: [(i32, i32); 2] = [(48, 48316), (49, 48317)];
 /// The instance ids a visit takes, out of the other games' ranges.
 static NEXT_INSTANCE: AtomicI32 = AtomicI32::new(64_000_001);
 
@@ -63,12 +62,18 @@ fn garage_frame(captured: &[u8], instance: i32, guid: u64) -> io::Result<Vec<u8>
     Ok(frame)
 }
 
-/// Grants a vehicle and its kit; returns the packets and its slots.
+/// Grants a vehicle's kit, and the vehicle itself unless the bag already holds it; returns the
+/// packets and the kit's slots.
 fn grant_kit(
     inventory: &mut Inventory,
     vehicle: &Vehicle,
+    held: bool,
 ) -> io::Result<(Vec<Vec<u8>>, [u32; SLOTS])> {
-    let mut replies = inventory.grant(0, vehicle.item, 1)?.replies;
+    let mut replies = if held {
+        Vec::new()
+    } else {
+        inventory.grant(0, vehicle.item, 1)?.replies
+    };
     let mut slots = [0; SLOTS];
     for &part in &vehicle.kit {
         let grant = inventory.grant(0, part, 1)?;
@@ -89,10 +94,16 @@ impl Gameplay {
     /// A driving job's first car, unless the player has a car of that type. A full bag leaves it
     /// for the next login's repair: a job must not fail on it.
     pub(super) fn grant_first_car(&mut self, job: i32, out: &mut Outcome) {
-        let Some(&(_, item)) = FIRST_CARS.iter().find(|(driver, _)| *driver == job) else {
+        let Some(kart) = self.kart_entry.as_mut() else {
             return;
         };
-        let Some((table, list)) = self.kart_entry.as_mut().and_then(|kart| kart.garage()) else {
+        let Some(item) = kart
+            .garage_content()
+            .and_then(|garage| garage.first_car(job))
+        else {
+            return;
+        };
+        let Some((table, list)) = kart.garage() else {
             return;
         };
         let Some(vehicle) = table.by_item(item) else {
@@ -106,8 +117,14 @@ impl Gameplay {
         if list.cars.iter().any(owned) {
             return;
         }
+        let held = self
+            .inventory
+            .state()
+            .items
+            .iter()
+            .any(|i| i.definition_id == item);
         let mut staged = self.inventory.clone();
-        let (replies, slots) = match grant_kit(&mut staged, vehicle) {
+        let (replies, slots) = match grant_kit(&mut staged, vehicle, held) {
             Ok(granted) => granted,
             Err(error) => {
                 eprintln!("first car {item} not granted: {error}");
@@ -122,13 +139,78 @@ impl Gameplay {
         out.changed = true;
     }
 
+    /// A vehicle item in the bag with no loadout (bought from a mechanic, a quest's reward)
+    /// becomes one, with its kit granted: one loadout per vehicle, however many copies the bag
+    /// holds. Each car is staged on its own, so a kit that fails half-way grants nothing, and a
+    /// full bag leaves that car for the next try.
+    pub(super) fn adopt_vehicles(&mut self, out: &mut Outcome) {
+        let Some((table, list)) = self.kart_entry.as_mut().and_then(|kart| kart.garage()) else {
+            return;
+        };
+        let held: std::collections::BTreeSet<i32> = (self.inventory.state().items.iter())
+            .map(|item| item.definition_id)
+            .filter(|item| table.by_item(*item).is_some())
+            .filter(|item| !list.cars.iter().any(|car| car.item == *item))
+            .collect();
+        let mut adopted = false;
+        for item in held {
+            let Some(vehicle) = table.by_item(item) else {
+                continue;
+            };
+            let mut staged = self.inventory.clone();
+            match grant_kit(&mut staged, vehicle, true) {
+                Ok((replies, slots)) => {
+                    self.inventory = staged;
+                    list.add(vehicle, slots);
+                    out.replies.extend(replies);
+                    adopted = true;
+                }
+                Err(error) => eprintln!("vehicle {item} not adopted: {error}"),
+            }
+        }
+        if adopted {
+            out.changed = true;
+            out.replies
+                .push(vehicle_parts::refresh(&list.encode(&table)));
+        }
+    }
+
+    /// Whether the player already has this vehicle (in the bag or as a loadout): a mechanic
+    /// refuses to sell a second copy, which could never be a second loadout.
+    pub(super) fn owns_vehicle(&self, item: i32) -> bool {
+        let Some(kart) = self.kart_entry.as_ref() else {
+            return false;
+        };
+        let is_vehicle = kart
+            .vehicles()
+            .is_some_and(|table| table.by_item(item).is_some());
+        is_vehicle
+            && (kart
+                .state()
+                .loadouts
+                .cars
+                .iter()
+                .any(|car| car.item == item)
+                || self
+                    .inventory
+                    .state()
+                    .items
+                    .iter()
+                    .any(|held| held.definition_id == item))
+    }
+
     /// On entering the world, for a driver from before cars or with a bag that was full.
     pub(super) fn repair_first_cars(&mut self, out: &mut Outcome) {
-        for (job, _) in FIRST_CARS {
+        let jobs: Vec<i32> = (self.kart_entry.as_ref())
+            .and_then(|kart| kart.garage_content())
+            .map(|garage| garage.first_cars.iter().map(|car| car.job).collect())
+            .unwrap_or_default();
+        for job in jobs {
             if (self.profiles.as_ref()).is_some_and(|p| p.state().unlocked.contains(&job)) {
                 self.grant_first_car(job, out);
             }
         }
+        self.adopt_vehicles(out);
     }
 
     /// The character's vehicles in the self packet, in place of the capture's. Without a vehicle
@@ -151,12 +233,14 @@ impl Gameplay {
         let Some(garage) = self.garage.as_ref() else {
             return Vec::new();
         };
-        let list = self.kart_entry.as_ref().map(|kart| &kart.state().loadouts);
-        let chosen = list.and_then(|list| list.chosen(garage.showing));
-        let definition = match garage.showing {
+        let kart = self.kart_entry.as_ref();
+        let chosen = kart.and_then(|kart| kart.state().loadouts.chosen(garage.showing));
+        // The chosen car's own look, or the race's kart and the derby's car.
+        let look = kart.and_then(|kart| kart.chosen_look(garage.showing));
+        let definition = look.as_deref().unwrap_or(match garage.showing {
             2 => &garage.derby,
             _ => &garage.parts.vehicle,
-        };
+        });
         let id = chosen.map_or(0, |car| car.id);
         let mut out = vec![vehicle_parts::config(definition, id, garage.showing + 8)];
         let decal = chosen.map_or(0, |car| car.slots[DECAL]);
@@ -185,6 +269,26 @@ impl Gameplay {
             out.changed = true;
             if let Some(garage) = self.garage.as_mut() {
                 garage.showing = kind;
+            }
+            // A pick from a race or derby offer's browser rides in that race or derby: the open
+            // race entry takes the car until registration, the derby lobby until the start.
+            match kind {
+                1 => {
+                    if let Some(kart) = self.kart_entry.as_mut()
+                        && let Err(error) = kart.refresh_look()
+                    {
+                        eprintln!("kart entry not rebuilt for the chosen car: {error}");
+                    }
+                }
+                _ => {
+                    let look = self
+                        .kart_entry
+                        .as_ref()
+                        .and_then(|kart| kart.chosen_look(2));
+                    if let Some(derby) = self.derby.as_mut() {
+                        derby.apply_player_vehicle(look);
+                    }
+                }
             }
         }
         out
@@ -246,6 +350,12 @@ impl Gameplay {
             .as_ref()
             .and_then(|kart| kart.garage_parts()))
         .ok_or_else(|| invalid("the garage needs the kart content"))?;
+        let [x, y, z] = (self.kart_entry.as_ref())
+            .and_then(|kart| kart.garage_content())
+            .map(|garage| garage.spawn)
+            .ok_or_else(|| invalid("the garage needs kart_garage.json"))?;
+        // A kart bought since the last login is a loadout before the browser lists them.
+        self.adopt_vehicles(out);
         let list = self.kart_entry.as_mut().and_then(|kart| kart.garage());
         if list.as_ref().is_some_and(|(_, list)| list.is_empty()) {
             out.replies.push(chat::system(NO_CAR));
@@ -259,7 +369,7 @@ impl Gameplay {
         let instance = NEXT_INSTANCE.fetch_add(1, Ordering::Relaxed);
         let mut scene = parts.scene.clone();
         scene.scene = "sg_racing_garage".to_owned();
-        scene.position = SPAWN;
+        scene.position = [x, y, z, 1.0];
         scene.id = instance;
         let guid = character.guid;
         out.replies
@@ -423,7 +533,12 @@ mod tests {
             ] {
                 std::fs::copy(root.join("data/release").join(name), path.join(name)).unwrap();
             }
-            for name in ["kart_entry.json", "vehicles.json"] {
+            for name in [
+                "kart_entry.json",
+                "vehicles.json",
+                "vehicle_looks.json",
+                "kart_garage.json",
+            ] {
                 std::fs::copy(root.join("data/content").join(name), path.join(name)).unwrap();
             }
             Self(path)
@@ -525,25 +640,28 @@ mod tests {
         assert_eq!(tail[4..], 9_u32.to_le_bytes());
 
         let chassis = list(&game).cars[0].slots[0];
-        assert!(game
-            .handle_garage(&equip(chassis))
-            .unwrap()
-            .unwrap()
-            .replies
-            .is_empty());
+        assert!(
+            game.handle_garage(&equip(chassis))
+                .unwrap()
+                .unwrap()
+                .replies
+                .is_empty()
+        );
         let derby_part = list(&game).cars[1].slots[1];
-        assert!(game
-            .handle_garage(&equip(derby_part))
-            .unwrap()
-            .unwrap()
-            .replies
-            .is_empty());
-        assert!(game
-            .handle_garage(&equip(999_999))
-            .unwrap()
-            .unwrap()
-            .replies
-            .is_empty());
+        assert!(
+            game.handle_garage(&equip(derby_part))
+                .unwrap()
+                .unwrap()
+                .replies
+                .is_empty()
+        );
+        assert!(
+            game.handle_garage(&equip(999_999))
+                .unwrap()
+                .unwrap()
+                .replies
+                .is_empty()
+        );
 
         let decal = game.inventory.grant(0, 9240, 1).unwrap().granted[0].0 as u32;
         let out = game.handle_garage(&equip(decal)).unwrap().unwrap();
@@ -599,6 +717,248 @@ mod tests {
             game.handle_garage(&[139, 0, 1, 0]).unwrap().is_none(),
             "no garage, no config"
         );
+    }
+
+    /// A kart that reaches the bag by any road (a mechanic's sale, a quest) is a loadout with its
+    /// kit the next time the garage looks, once; the garage then shows it with its own look.
+    #[test]
+    fn a_bought_kart_becomes_a_loadout_and_shows_its_own_look() {
+        let fixture = Fixture::new("adopt");
+        let mut game = fixture.game(&[48]);
+        let items = game.inventory.state().items.len();
+        game.inventory.grant(0, 56_984, 1).unwrap();
+        let mut out = Outcome::default();
+        game.adopt_vehicles(&mut out);
+        assert!(out.changed);
+        assert_eq!(
+            out.replies.last().unwrap()[..3],
+            [137, 0, 3],
+            "the list refresh"
+        );
+        let blast = list(&game)
+            .cars
+            .iter()
+            .find(|car| car.item == 56_984)
+            .unwrap()
+            .clone();
+        let filled = blast.slots.iter().filter(|slot| **slot != 0).count();
+        assert_eq!(filled, 6, "the Blast Speedster's kit");
+        // The bag gained the kart and its six parts, no duplicate kart.
+        assert_eq!(game.inventory.state().items.len(), items + 7);
+        let mut again = Outcome::default();
+        game.adopt_vehicles(&mut again);
+        assert!(!again.changed && list(&game).cars.len() == 2);
+
+        // Chosen, it rides into the garage's 139/2 with the captured speedster definition.
+        enter(&mut game);
+        let select = [
+            &[139, 0, 5, 0],
+            &blast.id.to_le_bytes()[..],
+            &1_u32.to_le_bytes()[..],
+        ]
+        .concat();
+        assert!(game.handle_garage(&select).unwrap().unwrap().changed);
+        let config = game
+            .handle_garage(&[139, 0, 1, 0])
+            .unwrap()
+            .unwrap()
+            .replies;
+        let body = b"sg_kt_speedster_body_bbec_002.cdt";
+        assert!(
+            config[0].windows(body.len()).any(|w| w == body),
+            "the speedster body"
+        );
+        assert_eq!(
+            game.kart_entry
+                .as_ref()
+                .unwrap()
+                .chosen_look(1)
+                .unwrap()
+                .len()
+                + 16,
+            config[0].len()
+        );
+    }
+
+    /// The chosen cars ride into a race and a derby: the kart's definition replaces the captured
+    /// one in front of the 33/11 tail, and the derby service gets the chosen car.
+    #[test]
+    fn the_chosen_cars_ride_into_the_race_and_the_derby() {
+        let fixture = Fixture::new("ride");
+        let mut game = fixture.game(&[48, 49]);
+        game.inventory.grant(0, 56_984, 1).unwrap();
+        game.inventory.grant(0, 56_998, 1).unwrap();
+        game.adopt_vehicles(&mut Outcome::default());
+        let kart = game.kart_entry.as_mut().unwrap();
+        let (table, loadouts) = kart.garage().unwrap();
+        let blast = loadouts
+            .cars
+            .iter()
+            .find(|car| car.item == 56_984)
+            .unwrap()
+            .id;
+        let dragon = loadouts
+            .cars
+            .iter()
+            .find(|car| car.item == 56_998)
+            .unwrap()
+            .id;
+        assert!(loadouts.select(&table, blast, 1) && loadouts.select(&table, dragon, 2));
+        let look = kart.chosen_look(1).unwrap();
+        let (name, _, block) = vehicle_parts::split_definition(&look).unwrap();
+        let before = kart.garage_parts().unwrap().vehicle;
+        assert_ne!(before, look, "the default kart is another car");
+
+        kart.begin(&who()).unwrap();
+        let entry = kart.state().active.as_ref().unwrap().context.session;
+        let vehicle = &kart_entry_content(kart).entry_vehicles[0];
+        assert_eq!(vehicle.body_asset, name);
+        assert_eq!(vehicle.attribute_block[..block.len()], *block);
+        assert_eq!(
+            vehicle.attribute_block[block.len()..block.len() + 8],
+            entry.to_le_bytes(),
+            "the owner guid follows the new definition"
+        );
+
+        let content = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+        let mut derby = crate::derby_gateway::DerbyGateway::load(&content, None)
+            .unwrap()
+            .unwrap();
+        let default = derby.garage_vehicle();
+        let chosen = game.kart_entry.as_ref().unwrap().chosen_look(2).unwrap();
+        assert_ne!(default, chosen);
+        derby.set_player_vehicle(Some(chosen.clone()));
+        derby.begin_row(&who(), 0, None).unwrap();
+        assert_eq!(derby.player_vehicle(), Some(chosen.as_slice()));
+    }
+
+    fn kart_entry_content(
+        kart: &crate::kart_gateway::KartGateway,
+    ) -> &crate::kart_entry::RaceEntryContent {
+        kart.entry_content().expect("an open entry")
+    }
+
+    /// A pick in a race offer's browser (139/5 between the offer and the registration) rides in
+    /// that race: the 33/11 at registration carries the newly chosen kart. In the derby the lobby's
+    /// car follows the pick until the match starts, and no pick means the package's car.
+    #[test]
+    fn a_pick_in_the_offer_rides_in_that_race_and_derby() {
+        let fixture = Fixture::new("pick");
+        let mut game = fixture.game(&[48, 49]);
+        game.inventory.grant(0, 56_984, 1).unwrap();
+        game.adopt_vehicles(&mut Outcome::default());
+        let blast = list(&game)
+            .cars
+            .iter()
+            .find(|car| car.item == 56_984)
+            .unwrap()
+            .id;
+        assert_eq!(
+            list(&game).active[0],
+            list(&game).cars[0].id,
+            "the Roadster is chosen"
+        );
+
+        // The offer is up (begin), then the browser's pick, then the client registers.
+        game.kart_entry.as_mut().unwrap().begin(&who()).unwrap();
+        let select = [
+            &[139, 0, 5, 0],
+            &blast.to_le_bytes()[..],
+            &1_u32.to_le_bytes()[..],
+        ]
+        .concat();
+        assert!(game.handle_garage(&select).unwrap().unwrap().changed);
+        let kart = game.kart_entry.as_mut().unwrap();
+        let session = kart.state().active.as_ref().unwrap().context.session;
+        let mut register = vec![33, 0, 9, 0];
+        register.extend(session.to_le_bytes());
+        register.extend([0; 8]);
+        let replies = kart.handle_entry(&register).unwrap();
+        let body = b"sg_kt_speedster_body_bbec_002.cdt";
+        let created: Vec<&Vec<u8>> = replies
+            .iter()
+            .filter(|p| p.starts_with(&[33, 0, 11, 0]))
+            .collect();
+        assert_eq!(created.len(), 1, "one 33/11 for the one entry vehicle");
+        assert!(
+            created[0].windows(body.len()).any(|w| w == body),
+            "the pick rides"
+        );
+        let look = kart.chosen_look(1).unwrap();
+        let (_, _, block) = vehicle_parts::split_definition(&look).unwrap();
+        let vehicle = &kart.entry_content().unwrap().entry_vehicles[0];
+        assert_eq!(
+            vehicle.attribute_block[block.len()..block.len() + 8],
+            session.to_le_bytes()
+        );
+
+        // After registration a pick waits for the next race: the entry keeps the speedster.
+        let roadster = list(&game).cars[0].id;
+        let back = [
+            &[139, 0, 5, 0],
+            &roadster.to_le_bytes()[..],
+            &1_u32.to_le_bytes()[..],
+        ]
+        .concat();
+        assert!(game.handle_garage(&back).unwrap().unwrap().changed);
+        let vehicle = &game
+            .kart_entry
+            .as_ref()
+            .unwrap()
+            .entry_content()
+            .unwrap()
+            .entry_vehicles[0];
+        assert_eq!(vehicle.body_asset, "sg_kt_speedster_body_bbec_002.cdt");
+
+        let content = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+        let mut derby = crate::derby_gateway::DerbyGateway::load(&content, None)
+            .unwrap()
+            .unwrap();
+        let default = derby.garage_vehicle();
+        assert!(
+            !derby.apply_player_vehicle(Some(vec![1, 2, 3])),
+            "no lobby yet"
+        );
+        derby.begin_row(&who(), 0, None).unwrap();
+        assert_eq!(derby.player_vehicle(), Some(default.as_slice()));
+        let dragon = vehicle_parts::Looks::load(&content)
+            .unwrap()
+            .unwrap()
+            .definition(56_998)
+            .unwrap()
+            .to_vec();
+        assert!(derby.apply_player_vehicle(Some(dragon.clone())));
+        assert_eq!(derby.player_vehicle(), Some(dragon.as_slice()));
+        assert!(
+            derby.apply_player_vehicle(None),
+            "a car with no look row is the package's"
+        );
+        assert_eq!(derby.player_vehicle(), Some(default.as_slice()));
+    }
+
+    /// Two copies of one kart in the bag make one loadout and one kit; a second copy is then
+    /// something the mechanic refuses to sell.
+    #[test]
+    fn copies_of_a_kart_adopt_once_and_a_mechanic_sells_no_second() {
+        let fixture = Fixture::new("copies");
+        let mut game = fixture.game(&[48]);
+        assert!(!game.owns_vehicle(56_984));
+        // A kart stacks to one: two copies are two grants (a quest and a sale, say).
+        game.inventory.grant(0, 56_984, 1).unwrap();
+        game.inventory.grant(0, 56_984, 1).unwrap();
+        let items = game.inventory.state().items.len();
+        let mut out = Outcome::default();
+        game.adopt_vehicles(&mut out);
+        assert!(out.changed);
+        let blasts = list(&game)
+            .cars
+            .iter()
+            .filter(|car| car.item == 56_984)
+            .count();
+        assert_eq!(blasts, 1, "one loadout for two copies");
+        assert_eq!(game.inventory.state().items.len(), items + 6, "one kit");
+        assert!(game.owns_vehicle(56_984) && game.owns_vehicle(48_316));
+        assert!(!game.owns_vehicle(59_654), "a part is not a vehicle");
     }
 
     /// The login list has the character's car, in the place the template's six were.

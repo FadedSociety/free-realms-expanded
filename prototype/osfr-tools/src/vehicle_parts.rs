@@ -2,10 +2,14 @@
 //! (sheet `kart-garage` section 5). Field order is the client's: the record `008e8d30`, the whole
 //! list `0092afb0`, family 137 `00944840`, family 139 `009d89c0`. A slot holds an item's instance
 //! id, not its definition, and a row shows only while its chassis is in the bag.
+use crate::kart_entry::ProxiedVehicle;
 use serde::{Deserialize, Serialize};
-use std::{fs, io, path::Path, sync::Arc};
+use std::{collections::BTreeMap, fs, io, path::Path, sync::Arc};
 
 pub const SLOTS: usize = 16;
+/// A look's attribute block plus the race's 33/11 tail (58 bytes) must fit the entry handler's
+/// `MAX_ATTRIBUTE_BLOCK_BYTES`, or a saved race could not load; the biggest capture is 6,078.
+const MAX_LOOK_BLOCK_BYTES: usize = crate::kart_entry::MAX_ATTRIBUTE_BLOCK_BYTES - 64;
 /// Where the login self packet's tail holds the list (`post_effect_tail`).
 pub const LOGIN_TAIL: std::ops::Range<usize> = 1116..1730;
 /// How the template's list starts: next id 7, six loadouts.
@@ -62,6 +66,143 @@ impl Vehicles {
 
     pub fn by_item(&self, item: i32) -> Option<&Vehicle> {
         self.vehicles.iter().find(|vehicle| vehicle.item == item)
+    }
+
+    /// Every vehicle item of the table.
+    pub fn items(&self) -> impl Iterator<Item = i32> + '_ {
+        self.vehicles.iter().map(|vehicle| vehicle.item)
+    }
+}
+
+fn read_optional(path: &Path) -> io::Result<Option<Vec<u8>>> {
+    match fs::read(path) {
+        Ok(bytes) => Ok(Some(bytes)),
+        Err(error) if error.kind() == io::ErrorKind::NotFound => Ok(None),
+        Err(error) => Err(error),
+    }
+}
+
+/// `data/content/vehicle_looks.json`: which captured car each vehicle item shows in the garage, a
+/// race and a derby. A definition is a `ReadVehicleDefinition` blob (`009d7b50`): u32 name
+/// length, the name, an f32, then the attribute block. The item rows are (R), the blobs captured.
+#[derive(Debug, Deserialize)]
+pub struct Looks {
+    schema_version: u32,
+    definitions: BTreeMap<String, Vec<u8>>,
+    vehicles: Vec<LookRow>,
+}
+
+#[derive(Debug, Deserialize)]
+struct LookRow {
+    item: i32,
+    look: String,
+}
+
+impl Looks {
+    /// `None` without the file: every car keeps the race's or derby's default look.
+    pub fn load(directory: &Path) -> io::Result<Option<Arc<Self>>> {
+        let Some(bytes) = read_optional(&directory.join("vehicle_looks.json"))? else {
+            return Ok(None);
+        };
+        let table: Self = serde_json::from_slice(&bytes).map_err(io::Error::other)?;
+        let sound = |definition: &Vec<u8>| {
+            split_definition(definition).is_some_and(|(_, value, block)| {
+                value.is_finite() && !block.is_empty() && block.len() <= MAX_LOOK_BLOCK_BYTES
+            })
+        };
+        if table.schema_version != 1
+            || !table.definitions.values().all(sound)
+            || (table.vehicles.iter()).any(|row| !table.definitions.contains_key(&row.look))
+        {
+            return Err(io::Error::other(
+                "vehicle_looks.json names a look it does not hold",
+            ));
+        }
+        Ok(Some(Arc::new(table)))
+    }
+
+    /// The definition a vehicle item shows; `None` keeps the default car.
+    pub fn definition(&self, item: i32) -> Option<&[u8]> {
+        let row = self.vehicles.iter().find(|row| row.item == item)?;
+        self.definitions.get(&row.look).map(Vec::as_slice)
+    }
+}
+
+/// A definition's three parts: the asset name, the f32 after it (400.0 in every capture) and the
+/// attribute block, as `ProxiedVehicle` holds them.
+pub fn split_definition(definition: &[u8]) -> Option<(&str, f32, &[u8])> {
+    let length = u32::from_le_bytes(definition.get(..4)?.try_into().ok()?) as usize;
+    let name = std::str::from_utf8(definition.get(4..4 + length)?).ok()?;
+    let value = f32::from_le_bytes(definition.get(4 + length..8 + length)?.try_into().ok()?);
+    Some((name, value, definition.get(8 + length..)?))
+}
+
+/// Gives a race's entry vehicle another look: the definition replaces everything before the
+/// 33/11 tail (owner guid on), which starts at `guid_offset`. Returns the tail's new offset.
+pub fn apply_look(
+    vehicle: &mut ProxiedVehicle,
+    definition: &[u8],
+    guid_offset: usize,
+) -> Option<usize> {
+    let (name, value, block) = split_definition(definition)?;
+    if !value.is_finite() || block.is_empty() {
+        return None;
+    }
+    let tail = vehicle.attribute_block.get(guid_offset..)?;
+    vehicle.attribute_block = [block, tail].concat();
+    vehicle.body_asset = name.to_owned();
+    vehicle.first_attribute = value;
+    Some(block.len())
+}
+
+/// `data/content/kart_garage.json`: the garage's tunable values. Without the file there are no
+/// mechanic doors, no first cars and no room to zone into: the Games row refuses.
+#[derive(Clone, Debug, Deserialize)]
+pub struct GarageContent {
+    schema_version: u32,
+    pub menu_string_id: u32,
+    /// (R) Where the kart stands: the room's lift (`prop_placements_2014.tsv`).
+    pub spawn: [f32; 3],
+    pub first_cars: Vec<FirstCar>,
+    pub gate_npcs: Vec<GateNpc>,
+}
+
+/// (R) A driving job's first car: the capture's first two loadouts.
+#[derive(Clone, Debug, Deserialize)]
+pub struct FirstCar {
+    pub job: i32,
+    pub item: i32,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+pub struct GateNpc {
+    pub npc_id: u64,
+}
+
+impl GarageContent {
+    /// `None` without the file.
+    pub fn load(directory: &Path) -> io::Result<Option<Arc<Self>>> {
+        let Some(bytes) = read_optional(&directory.join("kart_garage.json"))? else {
+            return Ok(None);
+        };
+        let content: Self = serde_json::from_slice(&bytes).map_err(io::Error::other)?;
+        if content.schema_version != 1
+            || content.spawn.iter().any(|value| !value.is_finite())
+            || content.first_cars.len() > 8
+            || content.gate_npcs.len() > 64
+        {
+            return Err(io::Error::other("kart_garage.json is out of bounds"));
+        }
+        Ok(Some(Arc::new(content)))
+    }
+
+    /// The first car of a driving job, when it has one.
+    pub fn first_car(&self, job: i32) -> Option<i32> {
+        (self.first_cars.iter()).find_map(|car| (car.job == job).then_some(car.item))
+    }
+
+    pub fn gate_ids(&self) -> Vec<u64> {
+        self.gate_npcs.iter().map(|gate| gate.npc_id).collect()
     }
 }
 

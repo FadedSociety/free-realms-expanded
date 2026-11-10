@@ -257,12 +257,36 @@ pub struct DerbyGateway {
     arena: Option<ArenaVisit>,
     /// MiniGameData name ids by row, so each offer shows its own game.
     row_names: BTreeMap<i32, i32>,
+    /// The player's chosen car for the next match (`vehicle_looks.json`); never saved.
+    player_vehicle: Option<Vec<u8>>,
 }
 
 impl DerbyGateway {
     /// The derby car's definition, for the garage's derby tab.
     pub fn garage_vehicle(&self) -> Vec<u8> {
         self.content.vehicle.definition.clone()
+    }
+
+    /// The definition the next [`Self::begin_row`] gives the player's car; `None` keeps the
+    /// package's.
+    pub fn set_player_vehicle(&mut self, definition: Option<Vec<u8>>) {
+        self.player_vehicle = definition;
+    }
+
+    /// The live match's player car definition, for the garage and tests.
+    pub fn player_vehicle(&self) -> Option<&[u8]> {
+        let owner = self.owner?;
+        self.service.as_ref()?.vehicle_definition(owner)
+    }
+
+    /// A pick from the offer's own browser (139/5 after `begin_row`): the lobby's car changes
+    /// until the match starts; `None` is the package's car. Returns whether it took.
+    pub fn apply_player_vehicle(&mut self, definition: Option<Vec<u8>>) -> bool {
+        let definition = definition.unwrap_or_else(|| self.content.vehicle.definition.clone());
+        let Some(owner) = self.owner else {
+            return false;
+        };
+        (self.service.as_mut()).is_some_and(|service| service.set_vehicle_definition(owner, definition))
     }
 }
 
@@ -603,6 +627,7 @@ impl DerbyGateway {
             paid_matches: Vec::new(),
             arena: None,
             row_names,
+            player_vehicle: None,
         })
     }
 
@@ -724,11 +749,15 @@ impl DerbyGateway {
             return Err(invalid("derby instance overflow"));
         }
         let owner = ParticipantKey(character.guid);
+        let mut vehicle = package.vehicle.clone();
+        if let Some(definition) = self.player_vehicle.take() {
+            vehicle.definition = definition;
+        }
         let mut service = DerbyService::new(
             instance as i32,
             package.game_id,
             owner,
-            package.vehicle.clone(),
+            vehicle,
             package.rules.clone(),
             package.pickups.clone(),
         )

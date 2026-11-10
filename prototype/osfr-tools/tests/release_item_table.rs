@@ -70,8 +70,13 @@ fn ids(value: &Value, keys: &[&str], out: &mut BTreeSet<i32>) {
 const CONSUMERS: [(&str, &[&str], usize, usize, usize); 4] = [
     // L093: the supplement's donor prize rows resolve 37 more store items (16,910 with the table alone).
     // L094: the Mystery Key row (78137, in the captured inventory) adds one to each count.
-    ("stores.json", &["item_id"], 17_624, 812, 16_948),
-    ("vendors.json", &["item_id", "item_ids"], 1_166, 328, 1_166),
+    // P-kart-garage: 274 kart rows (53 vehicles, 221 parts); 13 of them (two decal and two
+    // chassis families, Cardie Racer 48318, Barbed Crusher 56995, Arrow Runner 61000, Splash
+    // Zipper 61006) are in the captured inventory, the rest resolve through the table.
+    ("stores.json", &["item_id"], 17_898, 825, 17_222),
+    // P-kart-garage: the two mechanics' 280 kart ids (the same 13 captured), none shared with
+    // the other vendors' stock.
+    ("vendors.json", &["item_id", "item_ids"], 1_446, 341, 1_446),
     (
         "recipes.json",
         &["definition_id", "recipe_item_definition_id"],

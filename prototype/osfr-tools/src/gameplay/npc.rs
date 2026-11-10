@@ -784,6 +784,7 @@ impl Gameplay {
                         npc_interaction::NpcAction::Shop => "shop",
                         npc_interaction::NpcAction::Race => "race",
                         npc_interaction::NpcAction::Derby => "derby",
+                        npc_interaction::NpcAction::Garage => "garage",
                         npc_interaction::NpcAction::Soccer { .. } => "soccer",
                         npc_interaction::NpcAction::CardDuel { .. } => "card_duel",
                         npc_interaction::NpcAction::BuyCardPack { .. } => "card_pack",
@@ -959,6 +960,18 @@ impl Gameplay {
                             crate::derby_gateway::DerbyEntryDenied::Unavailable.message(),
                         )),
                     }
+                }
+                Ok(NpcSelection::Garage) => {
+                    consume_menu = true;
+                    npc_event(select_event(runtime_guid, Some(key), option_id, "garage"));
+                    // The mechanic's door is the Games row's offer, staged the same way; a
+                    // player with no car gets its refusal and nothing changes.
+                    out = self.commit_if_changed(|staged| {
+                        let mut out = Outcome::default();
+                        staged.begin_garage(character, &mut out)?;
+                        Ok(out)
+                    })?;
+                    out.replies.insert(0, END_DIALOG_26_4.to_vec());
                 }
                 Ok(NpcSelection::Soccer(game)) => {
                     consume_menu = true;
@@ -1264,7 +1277,9 @@ impl Gameplay {
                     } else {
                         crate::coin_shop::RESULT_INVALID_MERCHANT
                     }
-                });
+                })
+                // A kart is one loadout: a second copy would be a dead item (kart_garage.rs).
+                .or_else(|| self.owns_vehicle(item_id).then_some(crate::coin_shop::RESULT_FAILURE));
             let Some(shop) = &mut self.npc_coin_shop else {
                 return Ok(Some(Outcome {
                     replies: vec![crate::coin_shop::merchant_buy_result_packet(false)],
@@ -1285,6 +1300,11 @@ impl Gameplay {
                 }
             };
             self.inventory = shop.inventory().clone();
+            // A kart bought from a mechanic is a loadout at once (kart_garage.rs).
+            let mut adopted = Outcome::default();
+            if outcome.changed {
+                self.adopt_vehicles(&mut adopted);
+            }
             npc_event(serde_json::json!({
                 "event": "shop_txn",
                 "subtype": 43,
@@ -1297,9 +1317,11 @@ impl Gameplay {
                 },
                 "result": outcome.result_code
             }));
+            let mut replies = outcome.replies;
+            replies.extend(adopted.replies);
             return Ok(Some(Outcome {
-                replies: outcome.replies,
-                changed: outcome.changed,
+                replies,
+                changed: outcome.changed || adopted.changed,
                 granted_items: outcome.granted,
                 ..Outcome::default()
             }));
