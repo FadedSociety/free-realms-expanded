@@ -7,13 +7,13 @@ use std::io;
 impl Gateway {
     /// W162: the summoned ride as other players must see it; `None` without one.
     pub fn ride_view(&self) -> Option<crate::mounts::RideView> {
-        self.gameplay.as_ref()?.ride_view(self.state.guid)
+        self.gameplay.as_deref()?.ride_view(self.state.guid)
     }
 
     /// S17: adopt the roster read from the character document (`Snapshot::pets`) before world
     /// entry. Without gameplay it stays on disk untouched (`snapshot` then sends `None`).
     pub fn adopt_pets(&mut self, pets: Option<serde_json::Value>) -> io::Result<()> {
-        if let Some(game) = self.gameplay.as_mut() {
+        if let Some(game) = self.gameplay.as_deref_mut() {
             game.adopt_pets(pets)?;
         }
         Ok(())
@@ -21,7 +21,7 @@ impl Gateway {
 
     /// W177: the active pet for AddNpc fanout and late viewers.
     pub fn pet_view(&self) -> Option<crate::pets::PetPresence> {
-        self.gameplay.as_ref()?.pet_view(self.state.guid)
+        self.gameplay.as_deref()?.pet_view(self.state.guid)
     }
 
     /// T455: the summoned pet's follow step on the world tick, on the live gameplay (no clone).
@@ -30,7 +30,7 @@ impl Gateway {
         let state = &self.state;
         if let Some(result) = self
             .gameplay
-            .as_mut()
+            .as_deref_mut()
             .and_then(|g| g.pet_tick(state, now_ms))
         {
             // T485: a feed's apply step spends a food, so it is saved like any other change.
@@ -46,7 +46,7 @@ impl Gateway {
     pub fn settle_pets(&mut self, zoned: bool, now_ms: u64) -> io::Result<GatewayOutcome> {
         let mut outcome = GatewayOutcome::default();
         let state = &self.state;
-        if let Some(game) = self.gameplay.as_mut() {
+        if let Some(game) = self.gameplay.as_deref_mut() {
             let ended = game.settle_pets(state, zoned, now_ms)?;
             outcome.state_changed = ended.changed;
             outcome.gameplay_changed = ended.changed;
@@ -60,7 +60,7 @@ impl Gateway {
     /// minigame, or was knocked out. Replies are wrapped like every gateway reply.
     pub fn settle_rides(&mut self, zoned: bool) -> GatewayOutcome {
         let mut outcome = GatewayOutcome::default();
-        if let Some(game) = self.gameplay.as_mut() {
+        if let Some(game) = self.gameplay.as_deref_mut() {
             let ended = game.settle_mounts(&self.state, zoned);
             outcome.replies = ended.replies.iter().map(|r| wrapped(r)).collect();
             outcome.nearby = ended.nearby;

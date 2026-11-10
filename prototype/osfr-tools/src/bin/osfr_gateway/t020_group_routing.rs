@@ -1204,7 +1204,7 @@ fn damaged_gateway(server: &Server, key: SessionKey, health: u32) -> Gateway {
 }
 
 fn hurt_member(server: &mut Server, key: SessionKey, gateway: &Gateway) {
-    server.sessions.get_mut(&key).unwrap().gateway = gateway.clone();
+    server.sessions.get_mut(&key).unwrap().gateway = Box::new(gateway.clone());
 }
 
 fn member_health(server: &Server, key: SessionKey) -> u32 {

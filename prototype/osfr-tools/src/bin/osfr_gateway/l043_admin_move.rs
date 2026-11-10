@@ -122,7 +122,7 @@ impl Rig {
             &self.server.options,
             CRC_SEED,
             None,
-            self.server.template.as_ref(),
+            self.server.template.as_deref(),
         )
         .unwrap();
         let key = SessionKey {

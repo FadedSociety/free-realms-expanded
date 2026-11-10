@@ -249,7 +249,7 @@ fn f213_sync_field_views_replays_pending_end_screen_after_the_speaker_spawn() {
         .handle_at(&wrap_application(&[10, 0]), now + 2)
         .expect("the reconnect reaches the loaded event");
     let session = server.sessions.get_mut(&keys[0]).unwrap();
-    session.gateway = gateway;
+    session.gateway = Box::new(gateway);
     session.sender = f213_sender();
     let pose = WorldPose {
         position: [jones[0], jones[1], jones[2], 1.0],
@@ -414,7 +414,7 @@ fn t499_shared_view_sends_markers_after_spawn_and_refreshes_on_quest_change() {
         .handle_at(&wrap_application(&[10, 0]), now + 2)
         .unwrap();
     let session = server.sessions.get_mut(&keys[0]).unwrap();
-    session.gateway = gateway;
+    session.gateway = Box::new(gateway);
     session.sender = f213_sender();
     let pose = WorldPose {
         position: [jones[0], jones[1], jones[2], 1.0],

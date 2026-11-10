@@ -105,7 +105,7 @@ pub struct Gateway {
     loaded: bool,
     /// The welcome splash went out this login; reloads skip it (see `startup_for`).
     welcomed: bool,
-    gameplay: Option<Gameplay>,
+    gameplay: Option<Box<Gameplay>>, // boxed: staged clones stay off the stack (stack_room.rs)
     identity: Option<CharacterIdentity>,
     /// Developer-only chat commands; off unless the launcher opts in.
     dev_tools: bool,
@@ -759,15 +759,15 @@ impl Gateway {
             .collect()
     }
     pub fn take_shared_fields(&mut self) -> Option<crate::encounter::SharedFieldState> {
-        self.gameplay.as_mut()?.take_shared_fields()
+        self.gameplay.as_deref_mut()?.take_shared_fields()
     }
     pub fn bind_run_instance(&mut self, instance: i32, scene_reload: bool) -> io::Result<bool> {
         self.gameplay
-            .as_mut()
+            .as_deref_mut()
             .map_or(Ok(false), |g| g.bind_run_instance(instance, scene_reload))
     }
     pub fn field_participant(&self) -> Option<crate::encounter::FieldParticipant> {
-        self.gameplay.as_ref()?.field_participant(&self.state)
+        self.gameplay.as_deref()?.field_participant(&self.state)
     }
     pub fn handle_shared_field(
         &mut self,
@@ -777,7 +777,7 @@ impl Gateway {
         now_ms: u64,
     ) -> io::Result<crate::gameplay::Outcome> {
         self.gameplay
-            .as_mut()
+            .as_deref_mut()
             .ok_or_else(|| invalid("shared combat requires gameplay"))?
             .handle_shared_field(action, field, known, &self.state, now_ms)
     }
@@ -787,7 +787,7 @@ impl Gateway {
         now_ms: u64,
     ) -> io::Result<crate::gameplay::Outcome> {
         self.gameplay
-            .as_mut()
+            .as_deref_mut()
             .ok_or_else(|| invalid("shared effects require gameplay"))?
             .tick_shared_effects(field, &self.state, now_ms)
     }
@@ -799,7 +799,7 @@ impl Gateway {
         elapsed: u64,
     ) -> io::Result<(crate::encounter::EncounterOutcome, Vec<(u64, u32)>)> {
         self.gameplay
-            .as_mut()
+            .as_deref_mut()
             .ok_or_else(|| invalid("shared motion requires gameplay"))?
             .tick_shared_motion(field, players, now_ms, elapsed)
     }
@@ -810,14 +810,14 @@ impl Gateway {
         engaged: bool,
     ) -> io::Result<crate::gameplay::Outcome> {
         self.gameplay
-            .as_mut()
+            .as_deref_mut()
             .ok_or_else(|| invalid("shared damage requires gameplay"))?
             .receive_field_damage(damage, now_ms, engaged)
     }
     /// W158: heal this player for another member's big heart.
     pub fn receive_group_heal(&mut self, percent: u32) -> io::Result<crate::gameplay::Outcome> {
         self.gameplay
-            .as_mut()
+            .as_deref_mut()
             .ok_or_else(|| invalid("group heal requires gameplay"))?
             .receive_group_heal(percent)
     }
@@ -919,7 +919,7 @@ impl Gateway {
             ready: false,
             loaded: false,
             welcomed: false,
-            gameplay,
+            gameplay: gameplay.map(Box::new),
             identity: None,
             dev_tools: false,
             role_commands: false,
@@ -942,19 +942,19 @@ impl Gateway {
 
     /// The live gameplay engine, for developer tooling (Studio).
     pub fn gameplay(&self) -> Option<&Gameplay> {
-        self.gameplay.as_ref()
+        self.gameplay.as_deref()
     }
 
     /// The live gameplay engine, for host services beside the UDP session (T770 card service).
     pub fn gameplay_mut(&mut self) -> Option<&mut Gameplay> {
-        self.gameplay.as_mut()
+        self.gameplay.as_deref_mut()
     }
 
     /// Restore the host-owned rolling-hour fishing ledger for this character. A fresh
     /// `Gameplay` starts empty, so the gateway calls this from its character-scoped state after
     /// loading a save; the timestamps never enter the save envelope.
     pub fn restore_fishing_hours(&mut self, hours: Vec<u64>) -> io::Result<()> {
-        let Some(gameplay) = self.gameplay.as_mut() else {
+        let Some(gameplay) = self.gameplay.as_deref_mut() else {
             return if hours.is_empty() {
                 Ok(())
             } else {
@@ -966,7 +966,7 @@ impl Gateway {
 
     pub fn fishing_hour_history(&self) -> Option<Vec<u64>> {
         self.gameplay
-            .as_ref()
+            .as_deref()
             .map(|gameplay| gameplay.fishing_hour_history(self.state.guid))
     }
 
@@ -983,7 +983,7 @@ impl Gateway {
 
     /// T872: the house lot this character is inside; the membership registry keys its instance.
     pub fn visiting_house(&self) -> Option<u64> {
-        self.gameplay.as_ref()?.visiting_house()
+        self.gameplay.as_deref()?.visiting_house()
     }
 
     pub fn take_pending_transfer(&mut self) -> Option<crate::players::ZoneInstance> {
@@ -1036,7 +1036,7 @@ impl Gateway {
     /// (R) Runtime membership adapter: regional content labels are not scene ids.
     /// Scene geometry/tutorial values reuse the existing startup/transition route.
     pub fn runtime_zone(&self) -> io::Result<crate::content::Zone> {
-        if let Some(scene) = self.gameplay.as_ref().and_then(Gameplay::current_zone) {
+        if let Some(scene) = self.gameplay.as_deref().and_then(Gameplay::current_zone) {
             return Ok(crate::content::Zone {
                 id: scene.zone_id,
                 name: scene.name,
@@ -1067,7 +1067,7 @@ impl Gateway {
     /// (R) Name ids stay zero (literal-name mode); speed keeps the players.rs default.
     /// See `Gameplay::public_look` (W143 Inspect).
     pub fn public_look(&self) -> Option<crate::player_radial::PublicLook> {
-        self.gameplay.as_ref()?.public_look()
+        self.gameplay.as_deref()?.public_look()
     }
 
     pub fn player_presentation(&self, member: bool) -> io::Result<PlayerPresentation> {
@@ -1081,7 +1081,7 @@ impl Gateway {
             look.first_name.clone_from(&identity.first_name);
             look.last_name.clone_from(&identity.last_name);
         }
-        if let Some(appearance) = self.current_look(self.gameplay.as_ref()) {
+        if let Some(appearance) = self.current_look(self.gameplay.as_deref()) {
             look.customization_ids = appearance.portrait_ids();
             (look.model, look.hair_color, look.eye_color) = (
                 appearance.model,
@@ -1096,7 +1096,7 @@ impl Gateway {
         // Without loaded profiles, self-data keeps the template's job; match it.
         let profile = self
             .gameplay
-            .as_ref()
+            .as_deref()
             .and_then(Gameplay::active_profile)
             .unwrap_or(self.self_data_template.jobs.active_profile_id as i32);
         look.active_profile = profile;
@@ -1143,13 +1143,13 @@ impl Gateway {
         if let Some(identity) = &self.identity {
             gameplay.set_character_name(identity.display_name());
         }
-        self.gameplay = Some(gameplay);
+        self.gameplay = Some(Box::new(gameplay));
         Ok(())
     }
 
     /// The session's authority for developer commands (Build Plan 1.5).
     pub fn set_role(&mut self, role: crate::account_store::AccountRole) {
-        if let Some(gameplay) = self.gameplay.as_mut() {
+        if let Some(gameplay) = self.gameplay.as_deref_mut() {
             gameplay.set_role(role);
         }
         self.role = role;
@@ -1164,7 +1164,7 @@ impl Gateway {
         use crate::account_store::AccountRole::{Admin, Moderator};
         self.referee = matches!(self.role, Moderator | Admin);
         // L052 (R): the staff jobs (Referee, Enforcer) follow the same login decision.
-        if let Some(game) = self.gameplay.as_mut() {
+        if let Some(game) = self.gameplay.as_deref_mut() {
             game.set_staff_jobs(self.referee);
         }
     }
@@ -1197,7 +1197,7 @@ impl Gateway {
     /// not erase a developer refusal from the shared SecurityLog (R).
     pub fn denied_dev_commands(&mut self, message: &[u8]) -> io::Result<usize> {
         self.refresh_role();
-        let Some(game) = self.gameplay.as_ref().filter(|_| self.loaded) else {
+        let Some(game) = self.gameplay.as_deref().filter(|_| self.loaded) else {
             return Ok(0);
         };
         let mut count = 0;
@@ -1217,7 +1217,7 @@ impl Gateway {
         &mut self,
         hashes: Option<std::sync::Arc<std::collections::HashSet<u32>>>,
     ) {
-        if let Some(gameplay) = self.gameplay.as_mut() {
+        if let Some(gameplay) = self.gameplay.as_deref_mut() {
             gameplay.set_stock_text(hashes.clone());
         }
         self.stock_text = hashes;
@@ -1225,7 +1225,7 @@ impl Gateway {
 
     /// The World Builder live layer folder (`--world`).
     pub fn set_world_dir(&mut self, dir: Option<std::path::PathBuf>) -> io::Result<()> {
-        if let Some(gameplay) = self.gameplay.as_mut() {
+        if let Some(gameplay) = self.gameplay.as_deref_mut() {
             gameplay.set_world_dir(dir.clone())?;
         }
         self.world_dir = dir;
@@ -1237,7 +1237,7 @@ impl Gateway {
         &mut self,
         tables: Option<std::sync::Arc<crate::style_cards::ClientTables>>,
     ) {
-        if let Some(gameplay) = self.gameplay.as_mut() {
+        if let Some(gameplay) = self.gameplay.as_deref_mut() {
             gameplay.set_style_tables(tables.clone());
         }
         self.style_tables = tables;
@@ -1255,7 +1255,7 @@ impl Gateway {
 
     /// Ground heights for enemy movement and developer teleports.
     pub fn set_terrain(&mut self, terrain: Option<std::sync::Arc<crate::terrain::Terrain>>) {
-        if let Some(gameplay) = self.gameplay.as_mut() {
+        if let Some(gameplay) = self.gameplay.as_deref_mut() {
             gameplay.set_terrain(terrain.clone());
         }
         self.terrain = terrain;
@@ -1267,7 +1267,7 @@ impl Gateway {
         if self.logged_in {
             return None;
         }
-        let (to, reason) = self.gameplay.as_ref()?.recover_login_pose(&self.state)?;
+        let (to, reason) = self.gameplay.as_deref()?.recover_login_pose(&self.state)?;
         self.movement_state = MovementState::new(to.zone_id, to.position, to.rotation);
         Some((std::mem::replace(&mut self.state, to).position, reason))
     }
@@ -1276,7 +1276,7 @@ impl Gateway {
     /// default so an ordinary local session cannot relocate by accident.
     pub fn set_dev_tools(&mut self, enabled: bool) {
         self.dev_tools = enabled;
-        if let Some(gameplay) = self.gameplay.as_mut() {
+        if let Some(gameplay) = self.gameplay.as_deref_mut() {
             gameplay.set_dev_tools(enabled);
         }
     }
@@ -1284,7 +1284,7 @@ impl Gateway {
     /// See `Gameplay::set_role_commands` (Security Model decision 1).
     pub fn set_role_commands(&mut self, enabled: bool) {
         self.role_commands = enabled;
-        if let Some(gameplay) = self.gameplay.as_mut() {
+        if let Some(gameplay) = self.gameplay.as_deref_mut() {
             gameplay.set_role_commands(enabled);
         }
     }
@@ -1295,7 +1295,7 @@ impl Gateway {
     }
 
     pub fn set_game_rules(&mut self, rules: crate::game_rules::GameRuleSet) {
-        if let Some(gameplay) = self.gameplay.as_mut() {
+        if let Some(gameplay) = self.gameplay.as_deref_mut() {
             gameplay.set_game_rules(rules);
         }
     }
@@ -1305,15 +1305,15 @@ impl Gateway {
             // L012, T514: a save taken in a match, a house or a fishing hole stores the world pose.
             character: self
                 .gameplay
-                .as_ref()
+                .as_deref()
                 .and_then(|game| {
                     game.soccer_return(&self.state)
                         .or_else(|| game.scene_return())
                 })
                 .unwrap_or_else(|| self.state.clone()),
-            gameplay: self.gameplay.as_ref().map(Gameplay::state),
+            gameplay: self.gameplay.as_deref().map(Gameplay::state),
             // S17: the roster rides in the same document write as the character and inventory.
-            pets: self.gameplay.as_ref().and_then(Gameplay::pets_document),
+            pets: self.gameplay.as_deref().and_then(Gameplay::pets_document),
         }
     }
 
@@ -1326,7 +1326,7 @@ impl Gateway {
         let mut canonical_identity = identity.clone();
         canonical_identity.guid = 1;
         canonical_identity.validate()?;
-        let changed = match self.gameplay.as_mut() {
+        let changed = match self.gameplay.as_deref_mut() {
             Some(game) => game.apply_identity(&canonical_identity)?,
             None => false,
         };
@@ -1335,7 +1335,7 @@ impl Gateway {
     }
 
     pub fn gameplay_summary(&self) -> Option<serde_json::Value> {
-        self.gameplay.as_ref().map(Gameplay::summary)
+        self.gameplay.as_deref().map(Gameplay::summary)
     }
 
     /// W178: trusted server/store hook for one queued claim; not a network route.
@@ -1345,7 +1345,7 @@ impl Gateway {
         grant: crate::rewards::RewardGrant,
     ) -> io::Result<()> {
         self.gameplay
-            .as_mut()
+            .as_deref_mut()
             .ok_or_else(|| invalid("claims require gameplay"))?
             .issue_claim(claim_id, grant)
     }
@@ -1357,7 +1357,7 @@ impl Gateway {
         bindings: &[crate::progression_extras::AchievementTitleBinding],
     ) -> io::Result<Vec<Vec<u8>>> {
         self.gameplay
-            .as_mut()
+            .as_deref_mut()
             .ok_or_else(|| invalid("titles require gameplay"))?
             .award_achievement_titles(newly_completed, bindings)
     }
@@ -1376,7 +1376,7 @@ impl Gateway {
     /// (R) Actor state for emote validation. `mounted` comes from the mount service in
     /// gameplay (W162); `moving` from the last accepted position update.
     pub fn emote_context(&self, now_ms: u64) -> crate::social_chat::piece_093::EmoteContext {
-        let mounted = self.gameplay.as_ref().is_some_and(Gameplay::is_mounted);
+        let mounted = self.gameplay.as_deref().is_some_and(Gameplay::is_mounted);
         crate::social_chat::emote_context(mounted, self.last_movement_ms, now_ms)
     }
 
@@ -1386,7 +1386,7 @@ impl Gateway {
         self.ready = false;
         self.loaded = false;
         self.welcomed = false;
-        if let Some(game) = self.gameplay.as_mut() {
+        if let Some(game) = self.gameplay.as_deref_mut() {
             if let Some(return_location) = game.abandon_kart_for_reconnect() {
                 self.state = return_location;
             }
@@ -1451,11 +1451,11 @@ impl Gateway {
                         outcome.replies.extend(self.startup_for(
                             Kind::Login,
                             &state,
-                            gameplay.as_ref(),
+                            gameplay.as_deref(),
                             welcomed,
                         )?);
                         // T798: the card window's session ticket, with a card launch block only.
-                        let card = gameplay.as_ref().map(Gameplay::card_session_data);
+                        let card = gameplay.as_deref().map(Gameplay::card_session_data);
                         outcome.replies.extend(card.transpose()?.flatten());
                         logged_in = true;
                     }
@@ -1466,7 +1466,7 @@ impl Gateway {
                     }
                     if !ready {
                         if let Some(replies) = gameplay
-                            .as_ref()
+                            .as_deref()
                             .map(Gameplay::kart_ready_stream)
                             .transpose()?
                             .flatten()
@@ -1476,7 +1476,7 @@ impl Gateway {
                             outcome.replies.extend(self.startup_for(
                                 Kind::Ready,
                                 &state,
-                                gameplay.as_ref(),
+                                gameplay.as_deref(),
                                 welcomed,
                             )?);
                             welcomed = true;
@@ -1490,7 +1490,7 @@ impl Gateway {
                     }
                     outcome.entered_world |= !loaded;
                     if !loaded {
-                        if let Some(game) = gameplay.as_mut() {
+                        if let Some(game) = gameplay.as_deref_mut() {
                             let result = game.initialize_world(&state, now_ms)?;
                             outcome.state_changed |= result.changed;
                             outcome.gameplay_changed |= result.changed;
@@ -1510,7 +1510,7 @@ impl Gateway {
                     if !ready {
                         // Movement from the prior scene can already be queued
                         // when a begin-zoning reply is emitted.
-                        if gameplay.as_ref().is_some_and(Gameplay::is_opening) {
+                        if gameplay.as_deref().is_some_and(Gameplay::is_opening) {
                             set_trace(
                                 &mut trace,
                                 event_index,
@@ -1523,7 +1523,7 @@ impl Gateway {
                         }
                         return Err(invalid("position before world initialization"));
                     }
-                    if gameplay.as_ref().is_some_and(Gameplay::pirates_active) {
+                    if gameplay.as_deref().is_some_and(Gameplay::pirates_active) {
                         // L963: the ship owns movement; the client parks its hidden character at
                         // the origin, which is no move to validate (or to snap back).
                         let why = Some("ship_combat_owns_movement".into());
@@ -1538,7 +1538,7 @@ impl Gateway {
                         update,
                         state.zone_id,
                         elapsed,
-                        Gameplay::speed_modifiers(gameplay.as_ref()),
+                        Gameplay::speed_modifiers(gameplay.as_deref()),
                         expected_discontinuity,
                     );
                     expected_discontinuity = validated.expected_discontinuity;
@@ -1598,7 +1598,7 @@ impl Gateway {
                             }
                         }
                     }
-                    if let Some(game) = gameplay.as_mut() {
+                    if let Some(game) = gameplay.as_deref_mut() {
                         let result = game.on_location(&state, now_ms)?;
                         outcome.state_changed |= result.changed;
                         outcome.gameplay_changed |= result.changed;
@@ -1615,7 +1615,7 @@ impl Gateway {
                 }
                 Event::Camera => {
                     if !ready {
-                        if gameplay.as_ref().is_some_and(Gameplay::is_opening) {
+                        if gameplay.as_deref().is_some_and(Gameplay::is_opening) {
                             set_trace(
                                 &mut trace,
                                 event_index,
@@ -1639,7 +1639,7 @@ impl Gateway {
                         .as_secs();
                     let seconds =
                         i64::try_from(seconds).map_err(|_| invalid("system time overflow"))?;
-                    let clock = gameplay.as_ref().map(Gameplay::game_clock);
+                    let clock = gameplay.as_deref().map(Gameplay::game_clock);
                     let inner = clock.unwrap_or_default().sync_reply(seconds);
                     outcome.replies.push(wrapped(&inner));
                 }
@@ -1668,7 +1668,7 @@ impl Gateway {
                             outcome.applications.push(inner.clone());
                             continue;
                         }
-                        let mut staged_game = game.clone();
+                        let mut staged_game = game.clone(); // clones the box: heap, not this frame
                         // `realm role` and the L042 moderation words (gateway/staff.rs).
                         if crate::chat::request(&inner, state.guid)
                             .ok()
@@ -1837,7 +1837,7 @@ impl Gateway {
             && !(self.ready
                 && self
                     .gameplay
-                    .as_ref()
+                    .as_deref()
                     .is_some_and(|g| g.accepts_kart_loading_application(&[33, 0])))
         {
             return Ok(GatewayOutcome::default());

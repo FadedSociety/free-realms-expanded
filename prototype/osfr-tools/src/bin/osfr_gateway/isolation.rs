@@ -157,7 +157,7 @@ fn a_movie_error_ends_only_that_session_and_not_the_server() {
     // arrives over the production reliable transport and `Server::step` path.
     let client = UdpSocket::bind("127.0.0.1:0").expect("client socket binds");
     let victim = server.sessions.get_mut(&keys[0]).unwrap();
-    victim.gateway = gateway;
+    victim.gateway = Box::new(gateway);
     victim.selected_character = true;
     victim.state_path = scratch.join("victim.json");
     let victim_guid = victim.character_guid;

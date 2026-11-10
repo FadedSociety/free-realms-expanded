@@ -328,7 +328,7 @@ fn a_failed_vendor_save_ends_only_that_session() {
         .remove(&keys[0])
         .expect("the seeded victim session exists");
     victim.peer = client.local_addr().expect("client address");
-    victim.gateway = gateway;
+    victim.gateway = Box::new(gateway);
     victim.state_path = save_path.clone();
     let key = SessionKey {
         peer: victim.peer,

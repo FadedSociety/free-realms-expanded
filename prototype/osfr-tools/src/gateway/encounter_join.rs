@@ -8,7 +8,7 @@ use std::io;
 impl Gateway {
     /// This player's live field-battle run as (battle id, run instance, title string id).
     pub fn joinable_run(&self) -> Option<(u32, i32, i32)> {
-        self.gameplay.as_ref()?.joinable_run()
+        self.gameplay.as_deref()?.joinable_run()
     }
 
     /// Whether this loaded session could start `battle` now (the Go gates).
@@ -16,7 +16,7 @@ impl Gateway {
         self.loaded
             && self
                 .gameplay
-                .as_ref()
+                .as_deref()
                 .is_some_and(|game| game.can_join_group_battle(battle))
     }
 

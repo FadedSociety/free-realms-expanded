@@ -481,7 +481,7 @@ struct Session {
     codec: Codec,
     receiver: ReliableReceiver,
     sender: ReliableSender,
-    gateway: Gateway,
+    gateway: Box<Gateway>, // boxed: sessions move by value (stack_room.rs)
     // (R) Directed shared-field view cache (W106): unchanged inputs retain the
     // known set; one update site writes all five after a successful delivery.
     known_npcs: BTreeSet<u64>,
@@ -1124,7 +1124,7 @@ impl Session {
             codec,
             receiver: ReliableReceiver::new(0, 1024, MAX_MESSAGE, 2 * 1024 * 1024)?,
             sender,
-            gateway,
+            gateway: Box::new(gateway),
             state_path: options.state.clone(),
             recent: std::collections::VecDeque::new(),
             recent_on: options.dev_tools,
@@ -1222,7 +1222,7 @@ impl Session {
                 initial = legacy.character;
             }
         }
-        self.gateway = load_gateway_from(options, &path, initial)?;
+        self.gateway = Box::new(load_gateway_from(options, &path, initial)?);
         self.gateway.bind_account_role(
             options.account_store.as_ref().unwrap(),
             record.owner_account_id,
@@ -1776,7 +1776,7 @@ impl Session {
 
     fn commit_outcome(
         &mut self,
-        mut staged_gateway: Gateway,
+        mut staged_gateway: Box<Gateway>,
         previous: CharacterState,
         mut outcome: GatewayOutcome,
         world: &mut SharedWorld,
@@ -2871,7 +2871,7 @@ const BYTE_BUDGET: (f64, f64) = (256.0 * 1024.0, 1024.0 * 1024.0);
 pub struct Server {
     options: Options,
     /// Account-store mode: the pre-login gateway each handshake clones (S05).
-    template: Option<Gateway>,
+    template: Option<Box<Gateway>>,
     handshakes: IpLimiter,
     refused: u64,
     refusal_logged: Option<Instant>,
@@ -3312,7 +3312,7 @@ impl Server {
         if let Some(fields) = seed.take_shared_fields() {
             membership.install_field_seed(0, fields);
         }
-        let template = options.account_store.is_some().then_some(seed);
+        let template = options.account_store.is_some().then(|| Box::new(seed));
         let portraits = portrait_http::open(&options, socket.local_addr()?);
         world.portraits = portraits.as_ref().map(portrait_http::PortraitHttp::root);
         Ok(Self {
@@ -4318,7 +4318,7 @@ impl Server {
             &self.options,
             seed,
             self.trace.clone(),
-            self.template.as_ref(),
+            self.template.as_deref(),
         ) {
             Ok(mut session) => {
                 self.world.session_keys.insert(id, key);

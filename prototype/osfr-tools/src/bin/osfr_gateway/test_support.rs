@@ -821,7 +821,7 @@ impl Table {
                 Gateway::load_gameplay(reference, character.clone(), content, Some(saved.clone()))
                     .unwrap();
             gateway.take_shared_fields();
-            session.gateway = gateway;
+            session.gateway = Box::new(gateway);
             session.character_guid = character.guid;
             session.account_guid = 10_000 + character.guid;
             session.state_path = options.state.clone();

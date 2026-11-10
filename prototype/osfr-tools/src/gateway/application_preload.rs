@@ -44,7 +44,7 @@ impl Gateway {
     /// route answers, where it can also see other players' presentations.
     pub(super) fn fotomat_loading_reply(&self, inner: &[u8], own_guid: u64) -> Option<Vec<u8>> {
         loading_reply(inner, own_guid, || {
-            self.current_look(self.gameplay.as_ref())?;
+            self.current_look(self.gameplay.as_deref())?;
             self.player_presentation(false).ok()
         })
     }

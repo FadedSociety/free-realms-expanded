@@ -1816,6 +1816,11 @@ mod t458_world_events;
 #[path = "t852_content_presence.rs"]
 mod t852_content_presence;
 
+/// The session's moved size is pinned so growth fails with a number, not a stack crash.
+#[cfg(test)]
+#[path = "stack_room.rs"]
+mod stack_room;
+
 /// T478: a style card through the real dispatch and commit path: viewers in range, a late
 /// joiner's AddPc, a failed save and a relog.
 #[cfg(test)]

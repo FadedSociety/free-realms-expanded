@@ -35,7 +35,7 @@ impl Gateway {
         };
         let result = self
             .gameplay
-            .as_mut()
+            .as_deref_mut()
             .ok_or_else(|| invalid("it has no gameplay session"))?
             .admin_relocation(relocation, &self.state)?;
         // Staged exactly like a relocation in `handle_at`: pose, movement baseline and the
@@ -71,7 +71,7 @@ impl Gateway {
         }
         let result = self
             .gameplay
-            .as_mut()
+            .as_deref_mut()
             .ok_or_else(|| invalid("it has no gameplay session"))?
             .admin_grant(coins, sc)?;
         Ok(GatewayOutcome {

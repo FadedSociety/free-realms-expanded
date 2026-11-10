@@ -357,7 +357,7 @@ impl Server {
     /// The live gateway of the character's session (tests only).
     pub fn test_gateway(&self, guid: u64) -> Option<&Gateway> {
         let key = key_of(self, guid)?;
-        self.sessions.get(&key).map(|session| &session.gateway)
+        self.sessions.get(&key).map(|session| &*session.gateway)
     }
 
     /// Where the character's saves go (tests only: a path under a file makes every save fail).

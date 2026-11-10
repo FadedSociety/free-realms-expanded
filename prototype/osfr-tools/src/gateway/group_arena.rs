@@ -17,7 +17,7 @@ impl Gateway {
         now_ms: u64,
     ) -> io::Result<(Vec<Vec<u8>>, Option<i32>)> {
         let guid = self.state.guid;
-        let Some(game) = self.gameplay.as_mut() else {
+        let Some(game) = self.gameplay.as_deref_mut() else {
             return Ok((Vec::new(), None));
         };
         let (out, instance) = game.begin_hosted(lobby_type, guid, table_id, now_ms)?;
@@ -25,13 +25,13 @@ impl Gateway {
     }
 
     pub fn can_host(&self) -> bool {
-        self.gameplay.as_ref().is_some_and(|game| game.can_host())
+        self.gameplay.as_deref().is_some_and(|game| game.can_host())
     }
 
     /// The other seat of a drawn lobby game, with the table lent: the replies.
     pub fn settle_hosted_chess(&mut self, now_ms: u64) -> io::Result<Vec<Vec<u8>>> {
         let guid = self.state.guid;
-        let Some(game) = self.gameplay.as_mut() else {
+        let Some(game) = self.gameplay.as_deref_mut() else {
             return Ok(Vec::new());
         };
         Ok(game.settle_hosted_chess(guid, now_ms)?.replies)
@@ -44,34 +44,34 @@ impl Gateway {
         white: ChessParticipant,
         black: ChessParticipant,
     ) -> io::Result<ChessTable> {
-        let game = self.gameplay.as_mut().ok_or_else(|| io::Error::other("no gameplay"))?;
+        let game = self.gameplay.as_deref_mut().ok_or_else(|| io::Error::other("no gameplay"))?;
         game.open_hosted_chess(table_id, white, black)
     }
 
     pub fn hosted_table(&self) -> Option<u64> {
-        self.gameplay.as_ref()?.hosted_table()
+        self.gameplay.as_deref()?.hosted_table()
     }
 
     pub fn lend_table(&mut self, table: HostedTable) {
-        if let Some(game) = self.gameplay.as_mut() {
+        if let Some(game) = self.gameplay.as_deref_mut() {
             game.lend_table(table);
         }
     }
 
     pub fn reclaim_table(&mut self) -> Option<(HostedTable, Vec<ChessMessage>)> {
-        self.gameplay.as_mut()?.reclaim_table()
+        self.gameplay.as_deref_mut()?.reclaim_table()
     }
 
     /// Copy this player's live battle run into a new shared arena.
     pub fn open_arena(&self) -> Option<SharedArena> {
-        self.gameplay.as_ref()?.open_arena(self.state.guid)
+        self.gameplay.as_deref()?.open_arena(self.state.guid)
     }
 
     /// Lend `arena` to this player's engine for the staged action. `false`: not in that run.
     pub fn enter_arena(&mut self, arena: &SharedArena) -> bool {
         let guid = self.state.guid;
         self.gameplay
-            .as_mut()
+            .as_deref_mut()
             .is_some_and(|game| game.enter_arena(arena, guid))
     }
 
@@ -86,11 +86,11 @@ impl Gateway {
         if !self.loaded {
             return None;
         }
-        self.gameplay.as_ref()?.arena_participant(&self.state)
+        self.gameplay.as_deref()?.arena_participant(&self.state)
     }
 
     pub fn run_phase(&self) -> Option<EncounterPhase> {
-        self.gameplay.as_ref()?.run_phase()
+        self.gameplay.as_deref()?.run_phase()
     }
 
     pub fn tick_arena_enemies(
@@ -99,21 +99,21 @@ impl Gateway {
         now_ms: u64,
         elapsed: u64,
     ) -> Vec<(u64, u32, Vec<Vec<u8>>)> {
-        self.gameplay.as_mut().map_or_else(Vec::new, |game| {
+        self.gameplay.as_deref_mut().map_or_else(Vec::new, |game| {
             game.tick_arena_enemies(players, now_ms, elapsed)
         })
     }
 
     pub fn receive_arena_damage(&mut self, damage: u32, now_ms: u64) -> io::Result<Outcome> {
         self.gameplay
-            .as_mut()
+            .as_deref_mut()
             .ok_or_else(|| super::invalid("arena damage requires gameplay"))?
             .receive_arena_damage(damage, now_ms)
     }
 
     pub fn finish_arena_win(&mut self, now_ms: u64) -> io::Result<Outcome> {
         self.gameplay
-            .as_mut()
+            .as_deref_mut()
             .ok_or_else(|| super::invalid("arena win requires gameplay"))?
             .finish_arena_win(now_ms)
     }

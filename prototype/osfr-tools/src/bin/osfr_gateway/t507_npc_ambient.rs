@@ -91,7 +91,7 @@ fn load_world_view(server: &mut Server, key: SessionKey, position: [f32; 3], ver
         .expect("the world entry reaches the loaded event");
     let guid = server.sessions[&key].character_guid;
     let session = server.sessions.get_mut(&key).unwrap();
-    session.gateway = gateway;
+    session.gateway = Box::new(gateway);
     session.sender = sender(32 * 1024 * 1024);
     let pose = WorldPose {
         position: [position[0], position[1], position[2], 1.0],

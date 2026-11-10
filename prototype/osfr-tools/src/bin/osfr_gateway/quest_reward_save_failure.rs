@@ -697,7 +697,7 @@ fn a_failed_save_ends_only_that_session() {
         .remove(&keys[1])
         .expect("the bystander session exists");
     bystander.peer = b_socket.local_addr().expect("B address");
-    bystander.gateway = fixture_gateway(&fixture, b_guid);
+    bystander.gateway = Box::new(fixture_gateway(&fixture, b_guid));
     bystander.state_path = b_save.clone();
     bystander.character_guid = b_guid;
     let b_key = SessionKey {
@@ -732,7 +732,7 @@ fn a_failed_save_ends_only_that_session() {
         .remove(&keys[0])
         .expect("the seeded victim session exists");
     victim.peer = client.local_addr().expect("client address");
-    victim.gateway = fixture_gateway(&fixture, a_guid);
+    victim.gateway = Box::new(fixture_gateway(&fixture, a_guid));
     victim.state_path = a_save.clone();
     victim.character_guid = a_guid;
     let a_key = SessionKey {
